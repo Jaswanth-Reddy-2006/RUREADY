@@ -1,0 +1,271 @@
+// ═══════════════════════════════════════════════════════════════
+// R U Ready? — Prisma Schema
+// Complete database schema with all models and enums
+// ═══════════════════════════════════════════════════════════════
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+  output          = "../generated/client"
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [pgvector(map: "vector")]
+}
+
+// ─── Models ──────────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  sessions      InterviewSession[]
+  resumes       Resume[]
+  refreshTokens RefreshToken[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenId   String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@unique([userId, tokenId])
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+model Resume {
+  id         String                    @id @default(cuid())
+  userId     String
+  user       User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fileName   String
+  filePath   String
+  parsedText String?
+  embedding  Unsupported("vector(1536)")?
+  skills     String[]
+  experience Json?
+  uploadedAt DateTime                  @default(now())
+
+  sessions InterviewSession[]
+
+  @@index([userId])
+  @@map("resumes")
+}
+
+model InterviewSession {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  resumeId String?
+  resume   Resume? @relation(fields: [resumeId], references: [id], onDelete: SetNull)
+
+  // Setup form fields
+  interviewType   InterviewType
+  targetRole      String
+  targetCompany   String?
+  industry        String
+  experienceLevel ExperienceLevel
+  focusAreas      String[]
+  interviewGoal   String?
+  durationMins    Int             @default(20)
+
+  // State management
+  status      SessionStatus @default(SETUP)
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime      @default(now())
+
+  questions           Question[]
+  analysis            Analysis?
+  chatHistory         ChatHistory[]
+  telemetryLogs       TelemetryLog[]
+  codeExecutionDeltas CodeExecutionDelta[]
+
+  mode             InterviewMode @default(ORAL)
+  hintCount        Int           @default(0)
+  testCasesPassed  Int?
+  selectedLanguage String?
+  isDeleted        Boolean       @default(false)
+
+  @@index([userId])
+  @@index([status])
+  @@index([isDeleted])
+  @@map("interview_sessions")
+}
+
+model Question {
+  id        String           @id @default(cuid())
+  sessionId String
+  session   InterviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  orderIndex   Int
+  questionText String
+  questionType QuestionType
+  difficulty   Difficulty
+
+  // User's answer
+  answerText    String?
+  answeredAt    DateTime?
+  timeTakenSecs Int?
+
+  // AI evaluation of this answer (set after interview)
+  evalScore      Int?
+  evalFeedback   String?
+  evalStrengths  String[]
+  evalWeaknesses String[]
+  betterAnswer   String?
+
+  @@index([sessionId])
+  @@map("questions")
+}
+
+model Analysis {
+  id        String           @id @default(cuid())
+  sessionId String           @unique
+  session   InterviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  // Overall scores (0-100, no inflation)
+  overallScore       Int
+  communicationScore Int
+  technicalScore     Int
+  confidenceScore    Int
+  structureScore     Int
+  confidenceMeterScore Int?
+  confidenceSignals    Json?
+  eyeContactScore      Int?
+  presenceScore        Int?
+
+  // Qualitative
+  summary          String
+  strengths        String[]
+  improvements     String[]
+  actionableTips   Json
+  readinessVerdict ReadinessVerdict
+
+  createdAt DateTime @default(now())
+
+  @@map("analyses")
+}
+
+// ─── Enums ───────────────────────────────────────────────────
+
+enum InterviewType {
+  INTERNSHIP
+  JOB
+  PROMOTION
+  PRACTICE
+  HR_ROUND
+  COMMUNICATION
+  SYSTEM_DESIGN
+  DATA_SCIENCE
+  PRODUCT_MANAGER
+  STARTUP
+  CAREER_SWITCH
+  LEADERSHIP
+  CODING
+}
+
+enum ExperienceLevel {
+  FRESHER
+  MID
+  SENIOR
+}
+
+enum SessionStatus {
+  SETUP
+  IN_PROGRESS
+  COMPLETED
+  ANALYSED
+}
+
+enum QuestionType {
+  TECHNICAL
+  BEHAVIOURAL
+  SITUATIONAL
+  RESUME_BASED
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum ReadinessVerdict {
+  NOT_READY
+  ALMOST_READY
+  READY
+  STRONG
+}
+
+model ChatHistory {
+  id                String           @id @default(uuid())
+  sessionId         String
+  interviewSession  InterviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  role              String           // 'system' | 'user'
+  content           String           @db.Text
+  score             Int?             // Uninflated individual answer rating
+  critique          String?          @db.Text
+  timestamp         DateTime         @default(now())
+
+  // CRITICAL: Composite index optimization for ultra-fast historical session logs retrieval
+  @@index([sessionId, timestamp])
+}
+
+model TelemetryLog {
+  id                String           @id @default(uuid())
+  sessionId         String
+  interviewSession  InterviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  type              String           // 'TAB_BLUR' | 'EYE_CONTACT_DROP' | 'SPEECH_METRIC' | 'STRESS_COEFFICIENT'
+  wordsPerMinute    Int?
+  fillerWordsCount  Int?
+  stressCoefficient Float?
+  timestamp         DateTime         @default(now())
+
+  // CRITICAL: Composite index to prevent write bottlenecks during real-time background streaming aggregation lookups
+  @@index([sessionId, type, timestamp])
+}
+
+enum InterviewMode {
+  ORAL
+  CODING
+}
+
+model PreDefinedProblem {
+  id              String   @id @default(uuid())
+  title           String
+  difficulty      String   // 'EASY' | 'MEDIUM' | 'HARD'
+  pattern         String   // e.g., 'Two Pointers', 'Sliding Window', 'Graphs'
+  description     String   @db.Text
+  starterCode     Json     // Key-value pairs for languages: { javascript: "string", python: "string" }
+  testCases       Json     // Array of objects: [ { input: "...", expected: "..." } ]
+  optimalSolution String  @db.Text
+  optimalTime     String  // e.g., "O(N)"
+  optimalSpace    String  // e.g., "O(1)"
+}
+
+model CodeExecutionDelta {
+  id                String           @id @default(uuid())
+  sessionId         String
+  interviewSession  InterviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  code              String           @db.Text
+  language          String
+  output            String?          @db.Text
+  success           Boolean?
+  timestamp         DateTime         @default(now())
+
+  // CRITICAL: Composite index optimization for ultra-fast historical session logs retrieval
+  @@index([sessionId, timestamp])
+}

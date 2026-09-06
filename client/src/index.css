@@ -1,0 +1,260 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Base Styles ─────────────────────────────────────────────── */
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    background-color: #FFFFFF;
+    color-scheme: light;
+  }
+
+  body {
+    @apply font-body text-slate-800 bg-white;
+    line-height: 1.6;
+    letter-spacing: -0.01em;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-display text-slate-900 tracking-tight;
+    line-height: 1.15;
+  }
+
+  ::selection {
+    background-color: rgba(255, 122, 0, 0.35);
+    color: #FFFFFF;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-solar-orange-500;
+  }
+
+  /* Smooth image loading */
+  img {
+    transition: opacity 0.3s ease;
+  }
+
+  img[loading="lazy"] {
+    opacity: 0;
+  }
+
+  img.loaded,
+  img:not([loading="lazy"]) {
+    opacity: 1;
+  }
+}
+
+/* ─── Dark Obsidian Scrollbar Styling ────────────────────────── */
+
+@layer base {
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #0A0B0E;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #181B22;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #222734;
+  }
+}
+
+/* ─── Glassmorphic Card Elevations & Utilities ────────────────── */
+
+@layer components {
+  /* Core Glassmorphic Card: semi-transparent obsidian, backdrop blur, frosted border */
+  .glass-card {
+    background-color: rgba(17, 19, 24, 0.70);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+    border-radius: 1rem;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Interactive Glass Card with Solar Orange hover effect */
+  .glass-card-hover {
+    @apply glass-card;
+  }
+  .glass-card-hover:hover {
+    background-color: rgba(24, 27, 34, 0.80);
+    border-color: rgba(255, 255, 255, 0.16);
+    box-shadow: 0 16px 48px 0 rgba(0, 0, 0, 0.60), 0 0 24px 0 rgba(255, 122, 0, 0.15), inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+    transform: translateY(-2px);
+  }
+
+  /* Solar Accent Glass Card */
+  .glass-card-solar {
+    background-color: rgba(17, 19, 24, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 122, 0, 0.30);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45), 0 0 16px 0 rgba(255, 122, 0, 0.15), inset 0 1px 0 0 rgba(255, 122, 0, 0.20);
+    border-radius: 1rem;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .glass-card-solar:hover {
+    border-color: rgba(255, 122, 0, 0.50);
+    box-shadow: 0 16px 48px 0 rgba(0, 0, 0, 0.60), 0 0 28px 0 rgba(255, 122, 0, 0.25), inset 0 1px 0 0 rgba(255, 122, 0, 0.30);
+    transform: translateY(-2px);
+  }
+
+  /* Subtle Low-Profile Glass Panel for sub-containers and secondary groups */
+  .glass-panel-subtle {
+    background-color: rgba(10, 11, 14, 0.60);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 0.75rem;
+  }
+
+  /* High Elevation Glass Modal & Dialog overlay container */
+  .glass-modal {
+    background-color: rgba(17, 19, 24, 0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 24px 64px 0 rgba(0, 0, 0, 0.70), 0 0 32px 0 rgba(255, 122, 0, 0.10);
+    border-radius: 1.5rem;
+  }
+
+  /* Glass Badge / Tag container */
+  .glass-badge {
+    background-color: rgba(24, 27, 34, 0.80);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  /* Frosted Glass Form Input / Select */
+  .glass-input {
+    background-color: rgba(17, 19, 24, 0.80);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    color: #F0F2F5;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .glass-input:focus {
+    border-color: #FF7A00;
+    box-shadow: 0 0 0 2px rgba(255, 122, 0, 0.35);
+    background-color: rgba(24, 27, 34, 0.95);
+  }
+}
+
+/* ─── Gradients & Visual Accents ─────────────────────────────── */
+
+@layer utilities {
+  .text-gradient-orange,
+  .text-gradient-solar {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #FF9433 0%, #FF7A00 50%, #E66E00 100%);
+  }
+
+  .text-gradient-amber {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #FF9433 0%, #FF7A00 100%);
+  }
+
+  .bg-gradient-solar {
+    background-image: linear-gradient(135deg, #FF7A00 0%, #E66E00 100%);
+  }
+
+  .bg-gradient-orange {
+    background-image: linear-gradient(135deg, #FF7A00 0%, #E66E00 100%);
+  }
+
+  .bg-gradient-amber {
+    background-image: linear-gradient(135deg, #FF7A00 0%, #E66E00 100%);
+  }
+
+  .bg-gradient-navy,
+  .bg-gradient-dark,
+  .bg-gradient-obsidian {
+    background-image: linear-gradient(180deg, #111318 0%, #0A0B0E 100%);
+  }
+
+  .bg-radial-soft,
+  .bg-radial-solar {
+    background-image: radial-gradient(circle at 50% 0%, rgba(255, 122, 0, 0.12) 0%, transparent 70%);
+  }
+
+  .border-frosted {
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .glow-solar-sm {
+    box-shadow: 0 0 16px rgba(255, 122, 0, 0.25);
+  }
+
+  .glow-solar-md {
+    box-shadow: 0 0 28px rgba(255, 122, 0, 0.35);
+  }
+}
+
+/* ─── Skeleton Pulse for Obsidian Theme ──────────────────────── */
+
+@layer components {
+  .skeleton {
+    @apply relative overflow-hidden rounded-xl;
+    background: #181B22;
+  }
+
+  .skeleton::after {
+    content: '';
+    @apply absolute inset-0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 122, 0, 0.04) 35%,
+      rgba(255, 122, 0, 0.10) 50%,
+      rgba(255, 122, 0, 0.04) 65%,
+      transparent 100%
+    );
+    animation: shimmer 1.8s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+}
+
+/* ─── Global Transitions ─────────────────────────────────────── */
+
+@layer utilities {
+  a, button, input, select, textarea, [role="button"] {
+    transition-property: color, background-color, border-color, opacity, box-shadow, transform, filter;
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    transition-duration: 200ms;
+  }
+}

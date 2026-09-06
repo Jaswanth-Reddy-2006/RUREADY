@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: ankane/pgvector:v0.5.1
+    container_name: ru_ready_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ru_ready
+      POSTGRES_USER: ruready
+      POSTGRES_PASSWORD: ruready_dev_pass
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ruready -d ru_ready']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+

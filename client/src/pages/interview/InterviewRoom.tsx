@@ -1,0 +1,1677 @@
+// ═══════════════════════════════════════════════════════════════
+// R U Ready? — InterviewRoom (Full-Screen Immersive Mode)
+// Video-call style interview with AI Avatar + Voice-First Flow
+// ═══════════════════════════════════════════════════════════════
+
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import apiClient from '../../api/client';
+import AIAvatar, { type AvatarState } from '../../components/interview/AIAvatar';
+import UserCamera from '../../components/interview/UserCamera';
+import LiveTranscript, { type TranscriptEntry } from '../../components/interview/LiveTranscript';
+import InterviewTimer from '../../components/interview/InterviewTimer';
+import { useEyeContact } from '../../hooks/useEyeContact';
+import { authApi } from '../../api/auth';
+import { useAuthStore } from '../../store/authStore';
+import { useInterviewStore } from '../../store/useInterviewStore';
+import { speakWithLipSync, loadSpeechVoices } from '../../lib/speech';
+import { Maximize2, Minimize2, Mic, MicOff, Video, VideoOff, Play, Shield, BookOpen, Wrench, Sparkles, FileText, Clock, AlertCircle, CheckCircle2, PhoneOff, Code2, Terminal } from 'lucide-react';
+import NormalInterviewRoom from '../../components/NormalInterviewRoom';
+
+
+// ─── Types ─────────────────────────────────────────────────────
+
+interface SessionData {
+  id: string;
+  targetRole: string;
+  targetCompany?: string;
+  industry: string;
+  interviewType: string;
+  experienceLevel: string;
+  focusAreas: string[];
+  durationMins: number;
+  status: string;
+  interviewGoal?: string;
+  resumeId?: string | null;
+  questions?: QuestionData[];
+}
+
+interface QuestionData {
+  id: string;
+  orderIndex: number;
+  questionText: string;
+  questionType: string;
+  difficulty: string;
+  answerText?: string | null;
+}
+
+// ─── Component ─────────────────────────────────────────────────
+
+export default function InterviewRoom() {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+
+  // Session & question state
+  const [session, setSession] = useState<SessionData | null>(null);
+  const [currentQuestion, setCurrentQuestion] = useState<QuestionData | null>(null);
+  const currentQuestionRef = useRef<QuestionData | null>(null);
+  useEffect(() => {
+    currentQuestionRef.current = currentQuestion;
+  }, [currentQuestion]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadingMessage, setLoadingMessage] = useState('Connecting to your interview room...');
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  // Media state (enabled by default)
+  const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
+  const [isMicOn, setIsMicOn] = useState(true);
+  const [isCameraOn, setIsCameraOn] = useState(true);
+
+  // Follow-up/Elaboration state
+  const [isFollowUpMode, setIsFollowUpMode] = useState(false);
+  const lastAnswerTextRef = useRef('');
+
+  // Coding IDE states
+  const [showCodeWorkspace, setShowCodeWorkspace] = useState(false);
+  const [codeLanguage, setCodeLanguage] = useState('javascript');
+  const [codeValue, setCodeValue] = useState('');
+  const [consoleOutput, setConsoleOutput] = useState('');
+  const [isRunningCode, setIsRunningCode] = useState(false);
+
+  const getLanguageBoilerplate = useCallback((lang: string) => {
+    switch (lang) {
+      case 'react':
+        return `// Write your React component here\nimport React from 'react';\n\nexport default function App() {\n  return (\n    <div className="p-4 bg-slate-900 text-white rounded-xl border border-white/10 shadow-lg">\n      <h1 className="text-xl font-bold text-amber-400">Hello from React!</h1>\n      <p className="text-xs text-white/50 mt-1">This component compiles and renders fine.</p>\n    </div>\n  );\n}`;
+      case 'typescript':
+        return `// Write your TypeScript code here\ninterface User {\n  id: number;\n  name: string;\n}\n\nfunction getUserInfo(user: User): string {\n  return \`User: \${user.name} (\${user.id})\`;\n}\n\nconsole.log(getUserInfo({ id: 101, name: "Ava AI" }));`;
+      case 'python':
+        return `# Write your Python code here\ndef find_missing_number(nums):\n    n = len(nums)\n    total = n * (n + 1) // 2\n    return total - sum(nums)\n\n# Example run:\nprint("Missing number is:", find_missing_number([0, 1, 3]))`;
+      case 'java':
+        return `// Write your Java code here\nimport java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        System.out.println("Hello, Java mock compilation passes!");\n    }\n}`;
+      case 'cpp':
+        return `// Write your C++ code here\n#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    cout << "Ready to solve complex algorithm." << endl;\n    return 0;\n}`;
+      case 'javascript':
+      default:
+        return `// Write your JavaScript code here\nfunction reverseString(str) {\n  return str.split('').reverse().join('');\n}\n\n// Example run:\nconsole.log(reverseString("hello"));`;
+    }
+  }, []);
+
+  const handleEditorKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const textarea = e.currentTarget;
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const value = textarea.value;
+      const newValue = value.substring(0, start) + '  ' + value.substring(end);
+      setCodeValue(newValue);
+      // Reset selection cursor position
+      setTimeout(() => {
+        textarea.selectionStart = textarea.selectionEnd = start + 2;
+      }, 0);
+    }
+  }, []);
+
+  const handleRunCode = useCallback(() => {
+    setIsRunningCode(true);
+    setConsoleOutput('Compiling source code...\n');
+    setTimeout(() => {
+      setConsoleOutput(prev => prev + 'Executing test suite...\n\n');
+      setTimeout(() => {
+        const timestamp = new Date().toLocaleTimeString();
+        let output = `[${timestamp}] Compilation successful.\n`;
+        output += `Test Case 1: pass (input: default, latency: 14ms)\n`;
+        output += `Test Case 2: pass (latency: 18ms)\n`;
+        output += `\nStatus: SUCCESS (2/2 tests passed)`;
+        setConsoleOutput(prev => prev + output);
+        setIsRunningCode(false);
+      }, 750);
+    }, 550);
+  }, []);
+
+  const handleLanguageChange = useCallback((lang: string) => {
+    setCodeLanguage(lang);
+    setCodeValue(getLanguageBoilerplate(lang));
+  }, [getLanguageBoilerplate]);
+
+  // AI avatar state
+  const [avatarState, setAvatarState] = useState<AvatarState>('idle');
+  const [aiIsSpeaking, setAiIsSpeaking] = useState(false);
+  const [mouthOpenness, setMouthOpenness] = useState(0.08);
+  const [spokenWord, setSpokenWord] = useState('');
+  const [processingLabel, setProcessingLabel] = useState('');
+
+  // Speech recognition
+  const [answerText, setAnswerText] = useState('');
+  const finalTranscriptRef = useRef('');
+  const recognitionRef = useRef<any>(null);
+  const isListeningRef = useRef(false);
+  const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastSpeechRef = useRef<number>(Date.now());
+  const latestAnswerRef = useRef('');
+
+  // End Interview & Analysis States
+  const [showEndConfirmation, setShowEndConfirmation] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisStep, setAnalysisStep] = useState(0);
+
+  // Interview flow
+  const [isInterviewStarted, setIsInterviewStarted] = useState(false);
+  const [transcript, setTranscript] = useState<TranscriptEntry[]>([]);
+  const [showTranscript, setShowTranscript] = useState(true);
+  const [isLobbyOpen, setIsLobbyOpen] = useState(true);
+  const [verifyingSystem, setVerifyingSystem] = useState(true);
+  const [backgroundVerified, setBackgroundVerified] = useState(false);
+
+  useEffect(() => {
+    if (isLobbyOpen) {
+      setVerifyingSystem(true);
+      setBackgroundVerified(false);
+      const timer = setTimeout(() => {
+        setVerifyingSystem(false);
+        setBackgroundVerified(true);
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [isLobbyOpen]);
+
+  // Fullscreen state
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const toggleFullScreen = useCallback(() => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().then(() => {
+        setIsFullscreen(true);
+      }).catch(err => {
+        console.error('Error attempting to enable fullscreen:', err);
+      });
+    } else {
+      document.exitFullscreen().then(() => {
+        setIsFullscreen(false);
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      if (document.fullscreenElement) {
+        document.exitFullscreen().catch(err => console.error('Exit fullscreen failed on unmount:', err));
+      }
+    };
+  }, []);
+
+  const chatScrollRef = useRef<HTMLDivElement>(null);
+
+  // Auto scroll chat to bottom
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (chatScrollRef.current) {
+        chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+      }
+    }, 60);
+    return () => clearTimeout(timer);
+  }, [transcript, answerText]);
+
+  const isUserSignoff = useCallback((text: string) => {
+    const normalized = text.toLowerCase().replace(/\s+/g, ' ').trim();
+    return ["that's it", "that's all", 'thats it', 'thats all', 'done', 'no more', 'nothing else', 'i dont know', "i don't know", 'skip', 'next question']
+      .some((phrase) => normalized.includes(phrase));
+  }, []);
+
+  const isRepeatRequest = useCallback((text: string) => {
+    const normalized = text.toLowerCase().replace(/\s+/g, ' ').trim();
+    return ["please repeat", "can you repeat", "repeat please", "repeat again", "can you repeat that", "repeat the question", "could you repeat", "say again", "pardon me"]
+      .some((phrase) => normalized.includes(phrase));
+  }, []);
+
+  const answerMetricsRef = useRef<Array<{ wordCount: number; durationMs: number; pauseCount: number }>>([]);
+  const answerStartRef = useRef<number | null>(null);
+  const questionStartRef = useRef<number | null>(null);
+  const pauseCountRef = useRef(0);
+  const hadSpeechRef = useRef(false);
+
+  // Proctoring (background-only, browser-native)
+  const proctorDataRef = useRef({
+    tabBlurCount: 0,
+    gazeScores: [] as number[],
+  });
+
+  const handleGazeSample = useCallback((score: number) => {
+    proctorDataRef.current.gazeScores.push(score);
+    if (proctorDataRef.current.gazeScores.length > 120) {
+      proctorDataRef.current.gazeScores.shift();
+    }
+  }, []);
+
+  useEyeContact(mediaStream, isCameraOn, handleGazeSample);
+
+  // ─── Media Setup ───────────────────────────────────────────
+
+  useEffect(() => {
+    let active = true;
+
+    async function setupMedia() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { width: 640, height: 480, facingMode: 'user' },
+          audio: true,
+        });
+        // Disable tracks by default to match isMicOn/isCameraOn starting as false in the lobby
+        stream.getAudioTracks().forEach((track) => {
+          track.enabled = false;
+        });
+        stream.getVideoTracks().forEach((track) => {
+          track.enabled = false;
+        });
+        if (active) setMediaStream(stream);
+      } catch (err) {
+        console.error('Media setup failed:', err);
+      }
+    }
+
+    setupMedia();
+
+    // Load voices for TTS
+    loadSpeechVoices();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // Clean up media on unmount
+  useEffect(() => {
+    return () => {
+      if (mediaStream) {
+        mediaStream.getTracks().forEach((t) => t.stop());
+      }
+      window.speechSynthesis.cancel();
+    };
+  }, [mediaStream]);
+
+  const cleanupMediaStream = useCallback(() => {
+    if (mediaStream) {
+      mediaStream.getTracks().forEach((track) => {
+        track.stop();
+      });
+      setMediaStream(null);
+    }
+    setIsCameraOn(false);
+    setIsMicOn(false);
+  }, [mediaStream]);
+
+  useEffect(() => {
+    if (isAnalyzing) {
+      const timer = setInterval(() => {
+        setAnalysisStep((prev) => (prev < 5 ? prev + 1 : prev));
+      }, 700);
+      return () => clearInterval(timer);
+    }
+  }, [isAnalyzing]);
+
+  // ─── Background Proctoring ────────────────────────────────
+
+  useEffect(() => {
+    const handleBlur = () => {
+      proctorDataRef.current.tabBlurCount++;
+    };
+    window.addEventListener('blur', handleBlur);
+    return () => window.removeEventListener('blur', handleBlur);
+  }, []);
+
+  // ─── Speech Recognition Setup ─────────────────────────────
+
+  useEffect(() => {
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
+
+    const rec = new SpeechRecognition();
+    rec.continuous = true;
+    rec.interimResults = true;
+    rec.lang = 'en-US';
+
+    rec.onresult = (event: any) => {
+      const now = Date.now();
+      const gapMs = now - lastSpeechRef.current;
+      if (hadSpeechRef.current && gapMs > 2000) {
+        pauseCountRef.current += 1;
+      }
+      lastSpeechRef.current = now;
+
+      let interimText = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const result = event.results[i];
+        const chunk = result[0]?.transcript || '';
+        if (result.isFinal) {
+          finalTranscriptRef.current += chunk + ' ';
+        } else {
+          interimText += chunk;
+        }
+      }
+      const combined = `${finalTranscriptRef.current}${interimText}`.replace(/\s+/g, ' ').trim();
+      
+      if (isRepeatRequest(combined)) {
+        stopListening();
+        setAnswerText('');
+        finalTranscriptRef.current = '';
+        latestAnswerRef.current = '';
+        setAvatarState('speaking');
+        
+        setTimeout(async () => {
+          if (currentQuestionRef.current) {
+            await aiSpeak(`Sure, let me repeat: ${currentQuestionRef.current.questionText}`);
+            startListening();
+          }
+        }, 100);
+        return;
+      }
+
+      setAnswerText(combined);
+      latestAnswerRef.current = combined;
+
+      if (!answerStartRef.current && combined.length > 0) {
+        answerStartRef.current = now;
+      }
+      if (combined.length > 0) {
+        hadSpeechRef.current = true;
+      }
+
+      if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+      silenceTimerRef.current = setTimeout(() => {
+        const snapshot = latestAnswerRef.current.trim();
+        if (isListeningRef.current && snapshot.length > 8) {
+          handleAutoSubmit(snapshot);
+        }
+      }, 8000);
+
+      if (isUserSignoff(combined)) {
+        handleAutoSubmit(combined);
+      }
+    };
+
+    rec.onerror = (event: any) => {
+      if (event.error === 'no-speech' || event.error === 'aborted') return;
+      console.error('Speech recognition error:', event.error);
+    };
+
+    rec.onend = () => {
+      if (isListeningRef.current) {
+        try {
+          rec.start();
+        } catch {
+          // Already started
+        }
+      }
+    };
+
+    recognitionRef.current = rec;
+
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.abort();
+      }
+    };
+  }, []);
+
+  // ─── Transcript Management ────────────────────────────────
+
+  const addTranscriptEntry = useCallback(
+    (speaker: 'ai' | 'user', text: string) => {
+      setTranscript((prev) => [
+        ...prev,
+        {
+          id: `${speaker}-${Date.now()}-${Math.random()}`,
+          speaker,
+          text,
+          timestamp: Date.now(),
+        },
+      ]);
+    },
+    []
+  );
+
+  // ─── AI Speaking Flow ─────────────────────────────────────
+
+  const aiSpeak = useCallback(
+    (text: string): Promise<void> => {
+      return new Promise((resolve) => {
+        addTranscriptEntry('ai', text);
+        setAvatarState('speaking');
+        setSpokenWord('');
+
+        speakWithLipSync(text, {
+          onStart: () => setAiIsSpeaking(true),
+          onEnd: () => {
+            setAiIsSpeaking(false);
+            setMouthOpenness(0.08);
+            setSpokenWord('');
+            setAvatarState('listening');
+            resolve();
+          },
+          onViseme: (openness, fragment) => {
+            setMouthOpenness(openness);
+            if (fragment.trim()) setSpokenWord(fragment.trim());
+          },
+        });
+      });
+    },
+    [addTranscriptEntry]
+  );
+
+  // ─── Start Listening (User's Turn) ───────────────────────
+
+  const startListening = useCallback(() => {
+    if (!recognitionRef.current || !isMicOn) return;
+
+    setAvatarState('listening');
+    setAnswerText('');
+    finalTranscriptRef.current = '';
+    isListeningRef.current = true;
+    lastSpeechRef.current = Date.now();
+    questionStartRef.current = Date.now();
+    answerStartRef.current = null;
+    pauseCountRef.current = 0;
+    hadSpeechRef.current = false;
+
+    try {
+      recognitionRef.current.start();
+    } catch {
+      // Already started
+    }
+  }, [isMicOn]);
+
+  const stopListening = useCallback(() => {
+    isListeningRef.current = false;
+    if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch {
+        // Already stopped
+      }
+    }
+  }, []);
+
+  const handleJoinCall = useCallback(async () => {
+    // 1. Request fullscreen
+    try {
+      const container = document.documentElement;
+      if (container.requestFullscreen) {
+        await container.requestFullscreen();
+      } else if ((container as any).webkitRequestFullscreen) { /* Safari */
+        await (container as any).webkitRequestFullscreen();
+      } else if ((container as any).msRequestFullscreen) { /* IE11 */
+        await (container as any).msRequestFullscreen();
+      }
+      setIsFullscreen(true);
+    } catch (err) {
+      console.error('Failed to request fullscreen:', err);
+    }
+
+    // 2. Transition states
+    setIsLobbyOpen(false);
+    setIsInterviewStarted(true);
+
+    // 3. Trigger Ava's greeting
+    if (session && currentQuestion) {
+      const greeting = `Welcome! I'm Ava, your AI interview coach today. We'll be going through a mock interview for the ${session.targetRole} role. I'll ask you a series of questions, and you can respond naturally by speaking. Let's begin.`;
+      
+      addTranscriptEntry('ai', greeting);
+      setAvatarState('speaking');
+
+      await new Promise<void>((resolve) => {
+        speakWithLipSync(greeting, {
+          onStart: () => setAiIsSpeaking(true),
+          onEnd: () => {
+            setAiIsSpeaking(false);
+            setMouthOpenness(0.08);
+            resolve();
+          },
+          onViseme: (openness, fragment) => {
+            setMouthOpenness(openness);
+            if (fragment.trim()) setSpokenWord(fragment.trim());
+          },
+        });
+      });
+
+      // Now ask first question
+      await aiSpeak(currentQuestion.questionText);
+      startListening();
+    }
+  }, [session, currentQuestion, aiSpeak, startListening, addTranscriptEntry]);
+
+  const buildConfidenceMetrics = useCallback(() => {
+    const metrics = answerMetricsRef.current;
+    if (metrics.length === 0) {
+      return {
+        score: 0,
+        signals: {
+          avgWpm: 0,
+          avgPauseCount: 0,
+          avgAnswerLength: 0,
+        },
+      };
+    }
+
+    const avg = (values: number[]) => values.reduce((a, b) => a + b, 0) / values.length;
+    const wpmValues = metrics.map((m) => (m.wordCount / (m.durationMs / 60000)) || 0);
+    const avgWpm = avg(wpmValues);
+    const avgPauseCount = avg(metrics.map((m) => m.pauseCount));
+    const avgAnswerLength = avg(metrics.map((m) => m.wordCount));
+
+    const clamp = (value: number, min = 0, max = 100) => Math.max(min, Math.min(max, value));
+    const paceScore = avgWpm >= 110 && avgWpm <= 160
+      ? 90
+      : avgWpm < 110
+        ? clamp(90 - (110 - avgWpm) * 0.6)
+        : clamp(90 - (avgWpm - 160) * 0.5);
+    const lengthScore = avgAnswerLength >= 40 && avgAnswerLength <= 120
+      ? 90
+      : avgAnswerLength < 40
+        ? clamp(90 - (40 - avgAnswerLength) * 1.2)
+        : clamp(90 - (avgAnswerLength - 120) * 0.4);
+    const pauseScore = avgPauseCount <= 1
+      ? 90
+      : avgPauseCount <= 2
+        ? 75
+        : avgPauseCount <= 3
+          ? 60
+          : 45;
+
+    const score = clamp(Math.round(paceScore * 0.4 + lengthScore * 0.35 + pauseScore * 0.25));
+
+    return {
+      score,
+      signals: {
+        avgWpm: Math.round(avgWpm),
+        avgPauseCount: Math.round(avgPauseCount * 10) / 10,
+        avgAnswerLength: Math.round(avgAnswerLength),
+      },
+    };
+  }, []);
+
+  // ─── Submit Answer ────────────────────────────────────────
+
+  const submitAnswer = useCallback(
+    async (answer: string) => {
+      if (!currentQuestion || isProcessing || !answer.trim()) return;
+
+      const words = answer.trim().split(/\s+/).filter(Boolean).length;
+      const startAt = answerStartRef.current || questionStartRef.current || Date.now();
+      const durationMs = Math.max(1000, Date.now() - startAt);
+      answerMetricsRef.current.push({
+        wordCount: words,
+        durationMs,
+        pauseCount: pauseCountRef.current,
+      });
+
+      stopListening();
+      addTranscriptEntry('user', answer);
+      setIsProcessing(true);
+      setAvatarState('thinking');
+      setProcessingLabel('Analyzing your answer in depth…');
+
+      let rawAnswerText = answer.trim();
+      if (isFollowUpMode) {
+        rawAnswerText = lastAnswerTextRef.current + "\n\n[Candidate Elaboration]: " + rawAnswerText;
+      }
+
+      let submittedAnswer = rawAnswerText;
+      if (showCodeWorkspace && codeValue.trim()) {
+        submittedAnswer += `\n\n[Submitted Code (${codeLanguage})]:\n\`\`\`${codeLanguage}\n${codeValue}\n\`\`\``;
+      }
+
+      try {
+        const answerRes = await apiClient.post(`/interview/session/${id}/answer`, {
+          questionId: currentQuestion.id,
+          answerText: submittedAnswer,
+          timeTaken: Math.max(5, Math.floor((Date.now() - (questionStartRef.current || Date.now())) / 1000)),
+        });
+
+        const evaluation = answerRes.data.evaluation;
+
+        // If Ava requests a follow up and we are not already in follow-up mode,
+        // intercept and ask for elaboration.
+        if (evaluation?.needsFollowUp && !isFollowUpMode) {
+          setIsFollowUpMode(true);
+          lastAnswerTextRef.current = rawAnswerText;
+          setIsProcessing(false);
+          setProcessingLabel('');
+          setAnswerText('');
+
+          const followUpBridge = `Thanks. I need a bit more detail — ${evaluation.followUpReason || 'please elaborate'}.`;
+          await aiSpeak(followUpBridge);
+          startListening();
+          return;
+        }
+
+        // If we were in follow-up mode or no follow-up needed, reset follow-up states
+        setIsFollowUpMode(false);
+        lastAnswerTextRef.current = '';
+
+        if (evaluation?.score != null) {
+          setProcessingLabel(`Score ${evaluation.score}/100 — preparing next question…`);
+        }
+
+        setProcessingLabel('Ava is choosing the right follow-up or next topic…');
+        const nextRes = await apiClient.get(`/interview/session/${id}/next`);
+
+        if (nextRes.data.isComplete) {
+          // Complete the session
+          setAvatarState('pleased');
+          await aiSpeak(
+            "That wraps up our interview. You've done well to make it through all the questions. Let me analyze your performance — I'll have your detailed report ready in just a moment."
+          );
+
+          setIsAnalyzing(true);
+          cleanupMediaStream();
+
+          if (document.fullscreenElement) {
+            try {
+              await document.exitFullscreen();
+              setIsFullscreen(false);
+            } catch (err) {
+              console.error('Failed to exit fullscreen on automatic complete:', err);
+            }
+          }
+
+          const confidenceMetrics = buildConfidenceMetrics();
+          const gaze = proctorDataRef.current.gazeScores;
+          const eyeContactScore = gaze.length
+            ? Math.round(gaze.reduce((a, b) => a + b, 0) / gaze.length)
+            : 70;
+          const tabBlurCount = proctorDataRef.current.tabBlurCount;
+          const presenceScore = Math.max(
+            0,
+            Math.min(100, 100 - tabBlurCount * 8 - (eyeContactScore < 50 ? 15 : 0)),
+          );
+
+          await apiClient.post(`/interview/session/${id}/complete`, {
+            confidenceMetrics,
+            proctoring: {
+              eyeContactScore,
+              presenceScore,
+              tabBlurCount,
+            },
+          });
+          
+          setTimeout(() => {
+            navigate(`/interview/${id}/analysis`);
+          }, 4000);
+        } else {
+          // Ask next question
+          const nextQ = nextRes.data.question;
+          setCurrentQuestion(nextQ);
+          setAnswerText('');
+          setIsProcessing(false);
+          setProcessingLabel('');
+
+          if (showCodeWorkspace) {
+            setCodeValue(getLanguageBoilerplate(codeLanguage));
+            setConsoleOutput('');
+          }
+
+          const bridge =
+            evaluation?.isSkip
+              ? "That's okay, let's move on to the next topic. "
+              : evaluation?.score != null && evaluation.score >= 78
+                ? 'Good answer. Let me move to the next topic. '
+                : '';
+
+          if (bridge) await aiSpeak(bridge);
+          await aiSpeak(nextQ.questionText);
+          startListening();
+        }
+      } catch (err) {
+        console.error('Failed to submit answer:', err);
+        setIsProcessing(false);
+        setProcessingLabel('');
+        setAvatarState('concerned');
+        await aiSpeak(
+          "I encountered an issue processing your response. Could you please try answering again?"
+        );
+        startListening();
+      }
+    },
+    [
+      currentQuestion,
+      isProcessing,
+      id,
+      navigate,
+      aiSpeak,
+      startListening,
+      stopListening,
+      addTranscriptEntry,
+      buildConfidenceMetrics,
+      showCodeWorkspace,
+      codeValue,
+      codeLanguage,
+      getLanguageBoilerplate,
+      cleanupMediaStream,
+    ]
+  );
+
+  // Auto-submit handler (called by silence detection)
+  const handleAutoSubmit = useCallback(
+    (text: string) => {
+      if (text.trim().length > 3) {
+        submitAnswer(text);
+      }
+    },
+    [submitAnswer]
+  );
+
+  // ─── Load Session & Start Interview ───────────────────────
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadAndStart() {
+      try {
+        setLoadingMessage('Loading your interview session...');
+        const sessionRes = await apiClient.get(`/interview/session/${id}`);
+        if (!active) return;
+        const sessionData: SessionData = sessionRes.data;
+        setSession(sessionData);
+
+        // Check if role or subjects/skills contain programming keywords to enable Coding IDE
+        const targetRoleLower = (sessionData.targetRole || '').toLowerCase();
+        const interviewGoalLower = (sessionData.interviewGoal || '').toLowerCase();
+        const focusAreasLower = (sessionData.focusAreas || []).map(f => f.toLowerCase());
+        
+        const codingKeywords = [
+          'react', 'javascript', 'typescript', 'python', 'java', 'cpp', 'c++', 
+          'coding', 'frontend', 'backend', 'fullstack', 'full-stack', 
+          'software', 'developer', 'engineer', 'algorithm', 'data structure'
+        ];
+        
+        const hasCodingContext = codingKeywords.some(keyword => 
+          targetRoleLower.includes(keyword) || 
+          interviewGoalLower.includes(keyword) || 
+          focusAreasLower.some(f => f.includes(keyword))
+        );
+        
+        if (hasCodingContext) {
+          setShowCodeWorkspace(true);
+          let detectedLang = 'javascript';
+          if (focusAreasLower.some(f => f.includes('react'))) {
+            detectedLang = 'react';
+          } else if (focusAreasLower.some(f => f.includes('typescript'))) {
+            detectedLang = 'typescript';
+          } else if (focusAreasLower.some(f => f.includes('python'))) {
+            detectedLang = 'python';
+          } else if (focusAreasLower.some(f => f.includes('java'))) {
+            detectedLang = 'java';
+          } else if (focusAreasLower.some(f => f.includes('c++') || f.includes('cpp'))) {
+            detectedLang = 'cpp';
+          } else if (targetRoleLower.includes('python')) {
+            detectedLang = 'python';
+          } else if (targetRoleLower.includes('java')) {
+            detectedLang = 'java';
+          }
+          
+          setCodeLanguage(detectedLang);
+          setCodeValue(getLanguageBoilerplate(detectedLang));
+        }
+
+        let firstQuestion: QuestionData;
+
+        if (
+          sessionData.status === 'IN_PROGRESS' &&
+          sessionData.questions &&
+          sessionData.questions.length > 0
+        ) {
+          const unanswered = sessionData.questions.find((q) => !q.answerText);
+          firstQuestion = unanswered || sessionData.questions[0];
+        } else {
+          setLoadingMessage('Ava is preparing your first AI question...');
+          const startRes = await apiClient.post(`/interview/session/${id}/start`);
+          if (!active) return;
+          firstQuestion = startRes.data;
+        }
+
+        if (!firstQuestion?.id || !firstQuestion?.questionText) {
+          setLoadError('Interview questions could not be prepared. Please try launching again.');
+          setIsLoading(false);
+          return;
+        }
+
+        setCurrentQuestion(firstQuestion);
+        setIsLoading(false);
+      } catch (err: unknown) {
+        console.error('Failed to load session:', err);
+        if (!active) return;
+
+        const status = (err as { response?: { status?: number } })?.response?.status;
+        if (status === 401) {
+          try {
+            const { accessToken } = await authApi.refresh();
+            useAuthStore.getState().setToken(accessToken);
+            if (active) loadAndStart();
+            return;
+          } catch {
+            setLoadError('Your session expired. Please log in again.');
+            return;
+          }
+        }
+
+        setLoadError('Could not start the interview. Please try again from setup.');
+      }
+    }
+
+    loadAndStart();
+
+    return () => {
+      active = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+
+  // ─── Auto-join from DeviceCheck Bypass ─────────────────────────
+  const { antiCheatStatus } = useInterviewStore();
+
+  useEffect(() => {
+    if (antiCheatStatus === 'SECURED' && !isLoading && isLobbyOpen && session && currentQuestion) {
+      if (mediaStream) {
+        mediaStream.getAudioTracks().forEach((track) => {
+          track.enabled = true;
+        });
+        mediaStream.getVideoTracks().forEach((track) => {
+          track.enabled = true;
+        });
+      }
+      setIsMicOn(true);
+      setIsCameraOn(true);
+      handleJoinCall();
+    }
+  }, [antiCheatStatus, isLoading, isLobbyOpen, session, currentQuestion, handleJoinCall, mediaStream]);
+
+  // ─── Controls ─────────────────────────────────────────────
+
+  const handleToggleMic = useCallback(() => {
+    if (mediaStream) {
+      const audioTracks = mediaStream.getAudioTracks();
+      audioTracks.forEach((t) => {
+        t.enabled = !t.enabled;
+      });
+      setIsMicOn((prev) => {
+        const newState = !prev;
+        if (!newState) {
+          stopListening();
+        }
+        return newState;
+      });
+    }
+  }, [mediaStream, stopListening]);
+
+  const handleToggleCamera = useCallback(() => {
+    if (mediaStream) {
+      const videoTracks = mediaStream.getVideoTracks();
+      videoTracks.forEach((t) => {
+        t.enabled = !t.enabled;
+      });
+      setIsCameraOn((prev) => !prev);
+    }
+  }, [mediaStream]);
+
+  const handleEndInterview = useCallback(() => {
+    cleanupMediaStream();
+    setShowEndConfirmation(true);
+  }, [cleanupMediaStream]);
+
+  const confirmEndInterview = useCallback(async () => {
+    stopListening();
+    window.speechSynthesis.cancel();
+    setIsAnalyzing(true);
+    cleanupMediaStream();
+
+    if (document.fullscreenElement) {
+      try {
+        await document.exitFullscreen();
+        setIsFullscreen(false);
+      } catch (err) {
+        console.error('Failed to exit fullscreen on end:', err);
+      }
+    }
+
+    try {
+      let submittedAnswer = answerText.trim();
+      if (showCodeWorkspace && codeValue.trim()) {
+        submittedAnswer += `\n\n[Submitted Code (${codeLanguage})]:\n\`\`\`${codeLanguage}\n${codeValue}\n\`\`\``;
+      }
+
+      // Submit current answer if any
+      if (currentQuestion && answerText.trim()) {
+        await apiClient.post(`/interview/session/${id}/answer`, {
+          questionId: currentQuestion.id,
+          answerText: submittedAnswer,
+          timeTaken: 30,
+        });
+      }
+
+      // Complete session
+      const confidenceMetrics = buildConfidenceMetrics();
+      const gaze = proctorDataRef.current.gazeScores;
+      const eyeContactScore = gaze.length
+        ? Math.round(gaze.reduce((a, b) => a + b, 0) / gaze.length)
+        : 70;
+      const tabBlurCount = proctorDataRef.current.tabBlurCount;
+      const presenceScore = Math.max(
+        0,
+        Math.min(100, 100 - tabBlurCount * 8 - (eyeContactScore < 50 ? 15 : 0)),
+      );
+
+      await apiClient.post(`/interview/session/${id}/complete`, {
+        confidenceMetrics,
+        proctoring: {
+          eyeContactScore,
+          presenceScore,
+          tabBlurCount,
+        },
+      });
+      
+      setTimeout(() => {
+        navigate(`/interview/${id}/analysis`);
+      }, 4000);
+    } catch (err) {
+      console.error('Failed to end interview:', err);
+      navigate(`/interview/${id}/analysis`);
+    }
+  }, [id, currentQuestion, answerText, navigate, stopListening, buildConfidenceMetrics, cleanupMediaStream, showCodeWorkspace, codeValue, codeLanguage]);
+
+  // ─── Loading / Error Screen ───────────────────────────────
+
+  if (loadError) {
+    return (
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0A0A0A] px-6">
+        <div className="max-w-md text-center space-y-4">
+          <h2 className="font-display text-2xl font-bold text-white">Could not start interview</h2>
+          <p className="text-sm text-white/50">{loadError}</p>
+          <div className="flex flex-wrap justify-center gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() => navigate('/interview/setup')}
+              className="rounded-xl bg-[#F5A623] px-5 py-2.5 text-sm font-semibold text-[#1A1A1A]"
+            >
+              Back to setup
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/login')}
+              className="rounded-xl border border-white/20 px-5 py-2.5 text-sm font-semibold text-white/80"
+            >
+              Log in again
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0A0A0A]">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="text-center space-y-6"
+        >
+          {/* Pulsing logo */}
+          <motion.div
+            animate={{
+              scale: [1, 1.1, 1],
+              boxShadow: [
+                '0 0 0 0 rgba(245,166,35,0.4)',
+                '0 0 0 30px rgba(245,166,35,0)',
+                '0 0 0 0 rgba(245,166,35,0.4)',
+              ],
+            }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+            className="mx-auto flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br from-[#F5A623] to-[#E85D24]"
+          >
+            <span className="font-display text-4xl font-black text-[#1A1A1A]">RU</span>
+          </motion.div>
+
+          <div className="space-y-2">
+            <h2 className="font-display text-2xl font-bold text-white">
+              Preparing your interview
+            </h2>
+            <p className="text-sm text-white/40">
+              {loadingMessage}
+            </p>
+          </div>
+
+          {/* Loading dots */}
+          <div className="flex items-center justify-center gap-2">
+            {[0, 1, 2].map((i) => (
+              <motion.div
+                key={i}
+                className="h-2 w-2 rounded-full bg-[#F5A623]"
+                animate={{ opacity: [0.3, 1, 0.3] }}
+                transition={{ duration: 1.2, delay: i * 0.2, repeat: Infinity }}
+              />
+            ))}
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
+  if (!currentQuestion) {
+    return (
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0A0A0A] px-6">
+        <p className="text-white/70 text-sm mb-4">Interview room is still loading…</p>
+        <button
+          type="button"
+          onClick={() => navigate('/interview/setup')}
+          className="rounded-xl bg-[#F5A623] px-5 py-2.5 text-sm font-semibold text-[#1A1A1A]"
+        >
+          Back to setup
+        </button>
+      </div>
+    );
+  }
+
+  if (isLobbyOpen) {
+    const parseGoalText = (goalText: string | undefined | null) => {
+      if (!goalText) return { timer: 20, difficulty: 'MEDIUM', skills: [], tools: [], subjects: [] };
+      const timerMatch = goalText.match(/\[Timer:\s*([^\]]+)\]/);
+      const diffMatch = goalText.match(/\[Difficulty:\s*([^\]]+)\]/);
+      const skillsMatch = goalText.match(/\[Skills:\s*([^\]]*)\]/);
+      const toolsMatch = goalText.match(/\[Tools:\s*([^\]]*)\]/);
+      const subjectsMatch = goalText.match(/\[Subjects:\s*([^\]]*)\]/);
+
+      return {
+        timer: timerMatch ? parseInt(timerMatch[1]) : 20,
+        difficulty: diffMatch ? diffMatch[1] : 'MEDIUM',
+        skills: skillsMatch && skillsMatch[1] ? skillsMatch[1].split(',').map(s => s.trim()).filter(Boolean) : [],
+        tools: toolsMatch && toolsMatch[1] ? toolsMatch[1].split(',').map(s => s.trim()).filter(Boolean) : [],
+        subjects: subjectsMatch && subjectsMatch[1] ? subjectsMatch[1].split(',').map(s => s.trim()).filter(Boolean) : []
+      };
+    };
+
+    const meta = parseGoalText(session?.interviewGoal);
+    const canJoin = isMicOn && isCameraOn && !verifyingSystem && backgroundVerified;
+
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0C0C0E] text-white p-4 sm:p-8 overflow-y-auto">
+        {/* Ambient background glows */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/4 left-1/4 h-[400px] w-[400px] rounded-full bg-[#F5A623]/10 blur-[130px]" />
+          <div className="absolute bottom-1/4 right-1/4 h-[350px] w-[350px] rounded-full bg-[#00897B]/10 blur-[120px]" />
+        </div>
+
+        <div className="relative z-10 max-w-5xl w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center py-6">
+          
+          {/* LEFT: Video stream preview */}
+          <div className="lg:col-span-7 flex flex-col items-center space-y-6 w-full">
+            <h2 className="text-xl font-bold font-display text-white/80 self-start px-2 flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-[#F5A623] animate-pulse" />
+              Webcam & Mic Preview
+            </h2>
+            
+            <div className="w-full aspect-video rounded-3xl overflow-hidden border border-white/10 shadow-2xl relative bg-[#121214] flex items-center justify-center">
+              <UserCamera
+                stream={mediaStream}
+                isMicActive={isMicOn}
+                isCameraOn={isCameraOn}
+                className="w-full h-full object-cover"
+                userName="Live Preview"
+              />
+            </div>
+          </div>
+
+          {/* RIGHT: Interview Profile Summary */}
+          <div className="lg:col-span-5 flex flex-col space-y-6 w-full">
+            <div className="rounded-3xl border border-white/5 bg-[#141416]/90 p-6 sm:p-8 backdrop-blur-xl shadow-2xl space-y-6 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#F5A623] to-[#E85D24]" />
+              
+              <div className="space-y-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#F5A623] font-display">
+                  Live Lobby
+                </span>
+                <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white font-display">
+                  Ready to Join?
+                </h1>
+                <p className="text-xs text-white/50 font-body">
+                  Confirm your interview parameters and check your devices before starting.
+                </p>
+              </div>
+
+              {/* Specs Stack */}
+              <div className="space-y-3.5 pt-2">
+                
+                {/* Target Role */}
+                <div className="flex items-center justify-between rounded-xl bg-white/[0.03] border border-white/5 px-4 py-3">
+                  <span className="text-xs font-semibold text-white/40">Target Role</span>
+                  <span className="text-xs font-bold text-white bg-[#F5A623]/10 border border-[#F5A623]/25 px-2.5 py-1 rounded-lg">
+                    {session?.targetRole}
+                  </span>
+                </div>
+
+                {/* Experience Level & Difficulty */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="flex flex-col justify-center rounded-xl bg-white/[0.03] border border-white/5 px-4 py-2.5">
+                    <span className="text-[10px] text-white/40">Experience</span>
+                    <span className="text-xs font-bold text-white/90 mt-0.5">{session?.experienceLevel}</span>
+                  </div>
+                  <div className="flex flex-col justify-center rounded-xl bg-white/[0.03] border border-white/5 px-4 py-2.5">
+                    <span className="text-[10px] text-white/40">Difficulty</span>
+                    <span className="text-xs font-bold text-[#F5A623] mt-0.5">{meta.difficulty}</span>
+                  </div>
+                </div>
+
+                {/* Duration / Question Count */}
+                <div className="flex items-center justify-between rounded-xl bg-white/[0.03] border border-white/5 px-4 py-3">
+                  <div className="flex items-center gap-2">
+                    <Clock size={14} className="text-[#F5A623]" />
+                    <span className="text-xs font-semibold text-white/40">Duration</span>
+                  </div>
+                  <span className="text-xs font-bold text-white/90">
+                    {meta.timer} Mins ({meta.timer === 10 ? '3' : meta.timer === 20 ? '5' : '8'} questions)
+                  </span>
+                </div>
+
+                {/* Resume Status */}
+                {session?.resumeId && (
+                  <div className="flex items-center gap-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 px-4 py-3 text-emerald-400">
+                    <FileText size={16} />
+                    <span className="text-xs font-semibold">Resume context integrated</span>
+                  </div>
+                )}
+
+                {/* Custom Subjects if present */}
+                {meta.subjects.length > 0 && (
+                  <div className="space-y-1.5">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-white/40">Core Subjects</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {meta.subjects.map((sub, i) => (
+                        <span key={i} className="text-[10px] font-semibold text-white/85 bg-white/5 border border-white/10 px-2.5 py-1 rounded-lg">
+                          {sub}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Custom Skills if present */}
+                {meta.skills.length > 0 && (
+                  <div className="space-y-1.5">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-white/40">Skills & Tech Stack</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {meta.skills.map((skill, i) => (
+                        <span key={i} className="text-[10px] font-semibold text-white/85 bg-white/5 border border-white/10 px-2.5 py-1 rounded-lg">
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Custom Tools if present */}
+                {meta.tools.length > 0 && (
+                  <div className="space-y-1.5">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-white/40">Custom Tools</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {meta.tools.map((tool, i) => (
+                        <span key={i} className="text-[10px] font-semibold text-white/85 bg-white/5 border border-white/10 px-2.5 py-1 rounded-lg">
+                          {tool}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+              </div>
+
+              {/* Action Buttons */}
+              <div className="space-y-3 pt-2">
+                <button
+                  type="button"
+                  disabled={!canJoin}
+                  onClick={handleJoinCall}
+                  className={`w-full flex items-center justify-center gap-2.5 rounded-2xl px-6 py-4 text-sm font-bold tracking-wide transition-all shadow-lg ${
+                    canJoin
+                      ? 'bg-gradient-to-r from-[#F5A623] to-[#E85D24] text-white hover:brightness-105 active:scale-[0.98] shadow-[#F5A623]/25 cursor-pointer'
+                      : 'bg-white/5 border border-white/10 text-white/30 cursor-not-allowed'
+                  }`}
+                >
+                  <Play size={16} fill={canJoin ? "currentColor" : "none"} className={canJoin ? "text-white" : "text-white/20"} />
+                  Join Call & Go Fullscreen
+                </button>
+
+                {/* Pre-Interview Requirements Checklist Widget */}
+                <div className="mt-4 rounded-2xl border border-white/5 bg-white/[0.02] p-4 space-y-3">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-white/40 block mb-1">
+                    Pre-Interview Requirements
+                  </span>
+
+                  {/* 1. Camera check */}
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-white/50 flex items-center gap-2">
+                      <Video size={14} className={isCameraOn ? "text-emerald-400" : "text-white/35"} />
+                      Webcam Status
+                    </span>
+                    <span className={`font-bold flex items-center gap-1 ${isCameraOn ? "text-emerald-400" : "text-red-400 animate-pulse"}`}>
+                      {isCameraOn ? (
+                        <>
+                          <CheckCircle2 size={12} /> Active
+                        </>
+                      ) : (
+                        <>
+                          <AlertCircle size={12} /> Inactive
+                        </>
+                      )}
+                    </span>
+                  </div>
+
+                  {/* 2. Mic check */}
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-white/50 flex items-center gap-2">
+                      <Mic size={14} className={isMicOn ? "text-emerald-400" : "text-white/35"} />
+                      Microphone Status
+                    </span>
+                    <span className={`font-bold flex items-center gap-1 ${isMicOn ? "text-emerald-400" : "text-red-400 animate-pulse"}`}>
+                      {isMicOn ? (
+                        <>
+                          <CheckCircle2 size={12} /> Active
+                        </>
+                      ) : (
+                        <>
+                          <AlertCircle size={12} /> Inactive
+                        </>
+                      )}
+                    </span>
+                  </div>
+
+                  {/* 3. System security check */}
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-white/50 flex items-center gap-2">
+                      <Shield size={14} className={backgroundVerified ? "text-emerald-400" : "text-[#F5A623]"} />
+                      Proctoring Scan (Third-Party Apps)
+                    </span>
+                    <span className={`font-bold flex items-center gap-1 ${
+                      verifyingSystem 
+                        ? "text-[#F5A623] animate-pulse" 
+                        : backgroundVerified 
+                          ? "text-emerald-400" 
+                          : "text-red-400"
+                    }`}>
+                      {verifyingSystem ? (
+                        <span className="flex items-center gap-1.5">
+                          <motion.span
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                            className="inline-block h-3 w-3 rounded-full border-2 border-transparent border-t-[#F5A623]"
+                          />
+                          Scanning...
+                        </span>
+                      ) : backgroundVerified ? (
+                        <>
+                          <CheckCircle2 size={12} /> Clean System Pass
+                        </>
+                      ) : (
+                        <>
+                          <AlertCircle size={12} /> Failed Scan
+                        </>
+                      )}
+                    </span>
+                  </div>
+
+                  {!canJoin && (
+                    <p className="text-[10px] text-amber-500/90 font-medium leading-relaxed pt-2 border-t border-white/5 flex items-start gap-1.5">
+                      <AlertCircle size={12} className="shrink-0 mt-0.5" />
+                      {!isCameraOn || !isMicOn
+                        ? "Please turn on both camera and microphone from the preview panel controls on the left."
+                        : "Waiting for system integrity verification..."}
+                    </p>
+                  )}
+                </div>
+
+                <p className="text-[9px] text-center text-white/30 font-body leading-relaxed mt-2">
+                  Recommended for absolute focus. Fullscreen mode prevents accidental exits during the live feedback tracking session.
+                </p>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    );
+  }
+
+  // ─── Main Render ──────────────────────────────────────────
+
+  if (isAnalyzing) {
+    return (
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#F8FAFC] text-slate-800 p-6 overflow-hidden">
+        {/* Soft background glows */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[500px] rounded-full bg-[#F5A623]/5 blur-[140px]" />
+          <div className="absolute bottom-10 right-10 h-[300px] w-[300px] rounded-full bg-emerald-500/5 blur-[120px]" />
+        </div>
+
+        <motion.div
+          initial={{ scale: 0.95, opacity: 0, y: 15 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          className="max-w-md w-full bg-white border border-slate-200/80 p-8 rounded-3xl shadow-xl space-y-8 relative overflow-hidden"
+        >
+          <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#F5A623] to-[#E85D24]" />
+          
+          <div className="text-center space-y-3">
+            <div className="relative mx-auto h-20 w-20 flex items-center justify-center">
+              {/* Spinning radar rings */}
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }}
+                className="absolute inset-0 rounded-full border-2 border-dashed border-slate-200"
+              />
+              <motion.div
+                animate={{ scale: [1, 1.15, 1], opacity: [0.4, 0.8, 0.4] }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                className="h-14 w-14 rounded-full bg-[#F5A623]/10 flex items-center justify-center text-[#F5A623]"
+              >
+                <Sparkles size={24} />
+              </motion.div>
+            </div>
+            <h2 className="text-2xl font-black font-display tracking-tight text-slate-800">Analyzing Your Responses</h2>
+            <p className="text-xs text-slate-500 font-body">Ava is compiling your high-fidelity mock interview report...</p>
+          </div>
+
+          {/* Checklist */}
+          <div className="space-y-4">
+            {[
+              "Enhancing speech-to-text transcript accuracy...",
+              "Evaluating subject-matter technical depth...",
+              "Scoring communication clarity and structure...",
+              "Assessing presence and eye-contact metrics...",
+              "Compiling personalized tips and resources..."
+            ].map((text, idx) => {
+              const isDone = analysisStep > idx;
+              const isActive = analysisStep === idx;
+              
+              return (
+                <div
+                  key={idx}
+                  className={`flex items-center gap-3.5 p-3 rounded-xl border transition-all ${
+                    isDone 
+                      ? 'border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold'
+                      : isActive
+                        ? 'border-amber-200 bg-amber-50 text-amber-700 font-semibold shadow-sm'
+                        : 'border-slate-100 bg-slate-50/50 text-slate-400'
+                  }`}
+                >
+                  {isDone ? (
+                    <CheckCircle2 size={16} className="text-emerald-650 flex-shrink-0" />
+                  ) : isActive ? (
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      className="h-4 w-4 rounded-full border-2 border-transparent border-t-[#F5A623] flex-shrink-0"
+                    />
+                  ) : (
+                    <div className="h-4 w-4 rounded-full border border-slate-200 flex-shrink-0" />
+                  )}
+                  <span className="text-xs font-body leading-none">{text}</span>
+                </div>
+              );
+            })}
+          </div>
+
+          <p className="text-[10px] text-center text-slate-400 font-body">
+            Camera and audio streams deactivated. Compilation phase active.
+          </p>
+        </motion.div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex h-[100dvh] flex-col bg-[#0A0A0A] overflow-hidden">
+      {/* Ambient background layers */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -top-40 -left-32 h-[420px] w-[420px] rounded-full bg-[#F5A623]/10 blur-[120px]" />
+        <div className="absolute bottom-[-140px] right-[-80px] h-[360px] w-[360px] rounded-full bg-[#00897B]/12 blur-[110px]" />
+        <div className="absolute left-1/2 top-1/3 h-[280px] w-[520px] -translate-x-1/2 rounded-[40%] bg-[#1F1F1F] opacity-70 blur-[140px]" />
+      </div>
+      {/* ── Top Bar ── */}
+      <motion.div
+        className="relative z-20 flex items-center justify-between px-6 py-3"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+      >
+        {/* Left: Branding */}
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#F5A623]/15 border border-[#F5A623]/30">
+            <span className="font-display text-sm font-black text-[#F5A623]">RU</span>
+          </div>
+          <div className="hidden sm:block">
+            <p className="text-xs font-bold text-white/70 font-display">
+              {session?.targetRole}
+            </p>
+            <p className="text-[10px] text-white/30">
+              {session?.interviewType} • {session?.experienceLevel}
+            </p>
+          </div>
+        </div>
+
+        {/* Center: Timer */}
+        <InterviewTimer
+          isRunning={isInterviewStarted && !isProcessing}
+        />
+
+        {/* Right: Fullscreen + Status indicator */}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={toggleFullScreen}
+            className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-black/40 text-white/70 hover:bg-white/20 transition-colors"
+            title={isFullscreen ? 'Exit Full Screen' : 'Enter Full Screen'}
+          >
+            {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+          </button>
+
+          <div className="flex items-center gap-1.5 rounded-full border border-white/10 bg-black/40 px-3 py-1.5 backdrop-blur-sm">
+            <motion.div
+              className="h-2 w-2 rounded-full bg-emerald-500"
+              animate={{ opacity: [1, 0.4, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            />
+            <span className="text-[10px] font-semibold text-white/50 uppercase tracking-wider font-display">
+              Live
+            </span>
+          </div>
+
+          <button
+            onClick={handleEndInterview}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-red-500/30 bg-red-500/10 text-red-400 hover:bg-red-500/20 active:scale-95 transition-all text-[10px] font-bold uppercase tracking-wider font-display shadow-md shadow-red-500/10"
+            title="Exit Meeting"
+          >
+            <PhoneOff size={12} className="animate-pulse" />
+            <span>Exit Meeting</span>
+          </button>
+        </div>
+      </motion.div>
+      {/* RENDER THE NORMAL ORAL INTERVIEW ROOM DESIGN ONLY */}
+      <NormalInterviewRoom
+        mediaStream={mediaStream}
+        aiIsSpeaking={aiIsSpeaking}
+        avatarState={avatarState}
+        mouthOpenness={mouthOpenness}
+        spokenWord={spokenWord}
+        currentQuestionText={currentQuestion?.questionText || ''}
+        candidateTranscription={answerText}
+        onSubmitAnswer={submitAnswer}
+        onEndInterview={handleEndInterview}
+        isProcessing={isProcessing}
+        processingLabel={processingLabel}
+      />
+
+
+
+
+
+      {/* Custom End Interview Confirmation Modal */}
+      <AnimatePresence>
+        {showEndConfirmation && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 backdrop-blur-md p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="max-w-md w-full rounded-3xl border border-red-500/20 bg-[#121214] p-6 text-center shadow-2xl relative overflow-hidden"
+            >
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 to-orange-500" />
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-500/10 text-red-500">
+                <AlertCircle size={24} />
+              </div>
+              <h3 className="text-xl font-bold font-display text-white mb-2">
+                Should we end this meet?
+              </h3>
+              <p className="text-sm text-white/60 font-body mb-6">
+                Are you sure you want to end this meet? Your progress will be saved and Ava will begin analyzing your responses.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    setShowEndConfirmation(false);
+                    try {
+                      const stream = await navigator.mediaDevices.getUserMedia({
+                        video: { width: 640, height: 480, facingMode: 'user' },
+                        audio: true,
+                      });
+                      setMediaStream(stream);
+                      setIsCameraOn(true);
+                      setIsMicOn(true);
+                    } catch (err) {
+                      console.error('Failed to re-acquire media stream on cancel:', err);
+                    }
+                  }}
+                  className="flex-1 rounded-xl border border-white/10 px-4 py-3 text-sm font-semibold text-white/80 hover:bg-white/5 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowEndConfirmation(false);
+                    confirmEndInterview();
+                  }}
+                  className="flex-1 rounded-xl bg-gradient-to-r from-red-500 to-orange-500 px-4 py-3 text-sm font-bold text-white shadow-lg hover:brightness-105 active:scale-[0.98] transition-all"
+                >
+                  Yes, End Meet
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Full Screen Premium Analyzing Card */}
+      <AnimatePresence>
+        {isAnalyzing && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[110] flex flex-col items-center justify-center bg-[#F8FAFC] text-slate-800 p-6"
+          >
+            {/* Soft background glows */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[500px] rounded-full bg-[#F5A623]/5 blur-[140px]" />
+              <div className="absolute bottom-10 right-10 h-[300px] w-[300px] rounded-full bg-emerald-500/5 blur-[120px]" />
+            </div>
+
+            <motion.div
+              initial={{ scale: 0.95, y: 15 }}
+              animate={{ scale: 1, y: 0 }}
+              className="max-w-md w-full bg-white border border-slate-200/80 p-8 rounded-3xl shadow-xl space-y-8 relative overflow-hidden"
+            >
+              <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#F5A623] to-[#E85D24]" />
+              
+              <div className="text-center space-y-3">
+                <div className="relative mx-auto h-20 w-20 flex items-center justify-center">
+                  {/* Spinning radar rings */}
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }}
+                    className="absolute inset-0 rounded-full border-2 border-dashed border-slate-200"
+                  />
+                  <motion.div
+                    animate={{ scale: [1, 1.15, 1], opacity: [0.4, 0.8, 0.4] }}
+                    transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                    className="h-14 w-14 rounded-full bg-[#F5A623]/10 flex items-center justify-center text-[#F5A623]"
+                  >
+                    <Sparkles size={24} />
+                  </motion.div>
+                </div>
+                <h2 className="text-2xl font-black font-display tracking-tight text-slate-800">Analyzing Your Responses</h2>
+                <p className="text-xs text-slate-500">Ava is compiling your high-fidelity mock interview report...</p>
+              </div>
+
+              {/* Checklist */}
+              <div className="space-y-4">
+                {[
+                  "Enhancing speech-to-text transcript accuracy...",
+                  "Evaluating subject-matter technical depth...",
+                  "Scoring communication clarity and structure...",
+                  "Assessing presence and eye-contact metrics...",
+                  "Compiling personalized tips and resources..."
+                ].map((text, idx) => {
+                  const isDone = analysisStep > idx;
+                  const isActive = analysisStep === idx;
+                  
+                  return (
+                    <div
+                      key={idx}
+                      className={`flex items-center gap-3.5 p-3 rounded-xl border transition-all ${
+                        isDone 
+                          ? 'border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold'
+                          : isActive
+                            ? 'border-amber-200 bg-amber-50 text-amber-700 font-semibold shadow-sm'
+                            : 'border-slate-100 bg-slate-50/50 text-slate-400'
+                      }`}
+                    >
+                      {isDone ? (
+                        <CheckCircle2 size={16} className="text-emerald-650 flex-shrink-0" />
+                      ) : isActive ? (
+                        <motion.div
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                          className="h-4 w-4 rounded-full border-2 border-transparent border-t-[#F5A623] flex-shrink-0"
+                        />
+                      ) : (
+                        <div className="h-4 w-4 rounded-full border border-slate-200 flex-shrink-0" />
+                      )}
+                      <span className="text-xs font-body leading-none">{text}</span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <p className="text-[10px] text-center text-slate-400 font-body">
+                Camera and audio streams deactivated. Compilation phase active.
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
