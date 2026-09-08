@@ -1,0 +1,116 @@
+// ═══════════════════════════════════════════════════════════════
+// AI & Analysis Microservice — Prisma Schema
+// Data ownership: analyses (plus read mappings for interview_sessions, questions)
+// ═══════════════════════════════════════════════════════════════
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Analysis {
+  id        String           @id @default(cuid())
+  sessionId String           @unique
+  session   InterviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  overallScore         Int
+  communicationScore   Int
+  technicalScore       Int
+  confidenceScore      Int
+  structureScore       Int
+  confidenceMeterScore Int?
+  confidenceSignals    Json?
+  eyeContactScore      Int?
+  presenceScore        Int?
+
+  summary          String
+  strengths        String[]
+  improvements     String[]
+  actionableTips   Json
+  readinessVerdict ReadinessVerdict
+
+  createdAt DateTime @default(now())
+
+  @@map("analyses")
+}
+
+model InterviewSession {
+  id              String          @id @default(cuid())
+  userId          String
+  interviewType   String
+  targetRole      String
+  targetCompany   String?
+  industry        String
+  experienceLevel ExperienceLevel
+  focusAreas      String[]
+  interviewGoal   String?
+  durationMins    Int             @default(20)
+  status          String          @default("SETUP")
+  startedAt       DateTime?
+  completedAt     DateTime?
+  createdAt       DateTime        @default(now())
+  mode            String          @default("ORAL")
+  hintCount       Int             @default(0)
+  testCasesPassed Int?
+  selectedLanguage String?
+  isDeleted       Boolean         @default(false)
+
+  questions Question[]
+  analysis  Analysis?
+
+  @@map("interview_sessions")
+}
+
+model Question {
+  id           String           @id @default(cuid())
+  sessionId    String
+  session      InterviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  orderIndex   Int
+  questionText String
+  questionType String
+  difficulty   String
+  answerText   String?
+  answeredAt   DateTime?
+  timeTakenSecs Int?
+
+  evalScore      Int?
+  evalFeedback   String?
+  evalStrengths  String[]
+  evalWeaknesses String[]
+  betterAnswer   String?
+
+  @@map("questions")
+}
+
+model PreDefinedProblem {
+  id              String   @id @default(uuid())
+  title           String
+  difficulty      String
+  pattern         String
+  description     String   @db.Text
+  starterCode     Json
+  testCases       Json
+  optimalSolution String   @db.Text
+  optimalTime     String
+  optimalSpace    String
+
+  @@map("pre_defined_problems")
+}
+
+enum ReadinessVerdict {
+  NOT_READY
+  ALMOST_READY
+  READY
+  STRONG
+}
+
+enum ExperienceLevel {
+  FRESHER
+  MID
+  SENIOR
+}

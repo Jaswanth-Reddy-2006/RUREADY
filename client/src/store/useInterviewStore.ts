@@ -5,15 +5,22 @@ export type ExperienceLevel = 'FRESHER' | 'MID' | 'SENIOR';
 
 export interface SetupFormData {
   category: InterviewCategory | null;
+  preparationGoal?: string;
   targetRole: string;
   targetCompany: string;
   industry: string;
   experienceLevel: ExperienceLevel | null;
+  selectedTech?: string[];
+  difficulty?: 'EASY' | 'MEDIUM' | 'HARD' | 'ADAPTIVE';
   focusDomains: string[];
   durationMinutes: number;
   resumeFile: File | null;
   resumeId?: string | null; // For backend persistence integration
   resumeFileName?: string | null;
+  avatarPersona?: 'ETHAN' | 'AVA';
+  enableVoice?: boolean;
+  enableCamera?: boolean;
+  enableAvatar?: boolean;
 }
 
 interface InterviewState {
@@ -37,16 +44,23 @@ interface InterviewState {
 }
 
 const initialFormData: SetupFormData = {
-  category: null,
-  targetRole: '',
+  category: 'PRACTICE',
+  preparationGoal: 'Technical Interview',
+  targetRole: 'Fullstack Engineer',
   targetCompany: '',
-  industry: '',
-  experienceLevel: null,
-  focusDomains: [],
-  durationMinutes: 20,
+  industry: 'Software',
+  experienceLevel: 'MID',
+  selectedTech: ['JavaScript', 'TypeScript', 'Node.js', 'React'],
+  difficulty: 'ADAPTIVE',
+  focusDomains: ['DSA', 'System Design', 'Behavioral (STAR)'],
+  durationMinutes: 30,
   resumeFile: null,
   resumeId: null,
   resumeFileName: null,
+  avatarPersona: 'AVA',
+  enableVoice: true,
+  enableCamera: true,
+  enableAvatar: true,
 };
 
 export const useInterviewStore = create<InterviewState>((set) => ({

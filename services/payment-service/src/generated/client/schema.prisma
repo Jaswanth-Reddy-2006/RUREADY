@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model PaymentPlan {
+  id        String   @id @default(cuid())
+  name      String
+  price     Float
+  currency  String   @default("USD")
+  interval  String   @default("MONTHLY")
+  features  String[]
+  createdAt DateTime @default(now())
+
+  @@map("payment_plans")
+}
+
+model Order {
+  id              String   @id @default(cuid())
+  userId          String
+  planId          String
+  amount          Float
+  currency        String   @default("USD")
+  status          String   @default("CREATED")
+  providerOrderId String?
+  createdAt       DateTime @default(now())
+
+  @@index([userId])
+  @@map("orders")
+}
+
+model Subscription {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  plan             String   @default("FREE")
+  status           String   @default("ACTIVE")
+  currentPeriodEnd DateTime
+  createdAt        DateTime @default(now())
+
+  @@map("subscriptions")
+}

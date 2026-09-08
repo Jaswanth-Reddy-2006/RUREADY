@@ -263,12 +263,12 @@ export default function InterviewRoom() {
           video: { width: 640, height: 480, facingMode: 'user' },
           audio: true,
         });
-        // Disable tracks by default to match isMicOn/isCameraOn starting as false in the lobby
+        // Enable tracks for live webcam and microphone capture
         stream.getAudioTracks().forEach((track) => {
-          track.enabled = false;
+          track.enabled = true;
         });
         stream.getVideoTracks().forEach((track) => {
-          track.enabled = false;
+          track.enabled = true;
         });
         if (active) setMediaStream(stream);
       } catch (err) {
@@ -1437,72 +1437,8 @@ export default function InterviewRoom() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex h-[100dvh] flex-col bg-[#0A0A0A] overflow-hidden">
-      {/* Ambient background layers */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-40 -left-32 h-[420px] w-[420px] rounded-full bg-[#F5A623]/10 blur-[120px]" />
-        <div className="absolute bottom-[-140px] right-[-80px] h-[360px] w-[360px] rounded-full bg-[#00897B]/12 blur-[110px]" />
-        <div className="absolute left-1/2 top-1/3 h-[280px] w-[520px] -translate-x-1/2 rounded-[40%] bg-[#1F1F1F] opacity-70 blur-[140px]" />
-      </div>
-      {/* ── Top Bar ── */}
-      <motion.div
-        className="relative z-20 flex items-center justify-between px-6 py-3"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-      >
-        {/* Left: Branding */}
-        <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#F5A623]/15 border border-[#F5A623]/30">
-            <span className="font-display text-sm font-black text-[#F5A623]">RU</span>
-          </div>
-          <div className="hidden sm:block">
-            <p className="text-xs font-bold text-white/70 font-display">
-              {session?.targetRole}
-            </p>
-            <p className="text-[10px] text-white/30">
-              {session?.interviewType} • {session?.experienceLevel}
-            </p>
-          </div>
-        </div>
-
-        {/* Center: Timer */}
-        <InterviewTimer
-          isRunning={isInterviewStarted && !isProcessing}
-        />
-
-        {/* Right: Fullscreen + Status indicator */}
-        <div className="flex items-center gap-3">
-          <button
-            onClick={toggleFullScreen}
-            className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-black/40 text-white/70 hover:bg-white/20 transition-colors"
-            title={isFullscreen ? 'Exit Full Screen' : 'Enter Full Screen'}
-          >
-            {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
-          </button>
-
-          <div className="flex items-center gap-1.5 rounded-full border border-white/10 bg-black/40 px-3 py-1.5 backdrop-blur-sm">
-            <motion.div
-              className="h-2 w-2 rounded-full bg-emerald-500"
-              animate={{ opacity: [1, 0.4, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
-            <span className="text-[10px] font-semibold text-white/50 uppercase tracking-wider font-display">
-              Live
-            </span>
-          </div>
-
-          <button
-            onClick={handleEndInterview}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-red-500/30 bg-red-500/10 text-red-400 hover:bg-red-500/20 active:scale-95 transition-all text-[10px] font-bold uppercase tracking-wider font-display shadow-md shadow-red-500/10"
-            title="Exit Meeting"
-          >
-            <PhoneOff size={12} className="animate-pulse" />
-            <span>Exit Meeting</span>
-          </button>
-        </div>
-      </motion.div>
-      {/* RENDER THE NORMAL ORAL INTERVIEW ROOM DESIGN ONLY */}
+    <div className="fixed inset-0 z-50 flex h-[100dvh] flex-col bg-black overflow-hidden">
+      {/* RENDER THE MINIMAL 2-PANEL ORAL INTERVIEW ROOM MATCHING REFERENCE */}
       <NormalInterviewRoom
         mediaStream={mediaStream}
         aiIsSpeaking={aiIsSpeaking}

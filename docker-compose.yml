@@ -19,6 +19,160 @@ services:
       timeout: 5s
       retries: 5
 
+  gateway:
+    build:
+      context: .
+      dockerfile: docker/gateway/Dockerfile
+    container_name: ru_ready_gateway
+    restart: unless-stopped
+    ports:
+      - '4000:4000'
+    environment:
+      PORT: 4000
+      NODE_ENV: production
+      AUTH_SERVICE_URL: http://auth-service:4001
+      ORAL_INTERVIEW_SERVICE_URL: http://oral-interview-service:4002
+      AI_SERVICE_URL: http://ai-analysis-service:4003
+      ANALYTICS_SERVICE_URL: http://analytics-service:4004
+      USER_SERVICE_URL: http://user-service:4005
+      CODING_INTERVIEW_SERVICE_URL: http://coding-interview-service:4006
+      PAYMENT_SERVICE_URL: http://payment-service:4007
+      ADMIN_SERVICE_URL: http://admin-service:4008
+    depends_on:
+      - auth-service
+      - oral-interview-service
+      - coding-interview-service
+      - payment-service
+      - user-service
+      - ai-analysis-service
+      - analytics-service
+      - admin-service
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: docker/auth-service/Dockerfile
+    container_name: ru_ready_auth
+    restart: unless-stopped
+    ports:
+      - '4001:4001'
+    environment:
+      AUTH_SERVICE_PORT: 4001
+      DATABASE_URL: postgresql://ruready:ruready_dev_pass@postgres:5432/ru_ready
+      JWT_SECRET: dev-jwt-secret-ru-ready-2024
+      JWT_REFRESH_SECRET: dev-refresh-secret-ru-ready-2024
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  oral-interview-service:
+    build:
+      context: .
+      dockerfile: docker/oral-interview-service/Dockerfile
+    container_name: ru_ready_oral_interview
+    restart: unless-stopped
+    ports:
+      - '4002:4002'
+    environment:
+      ORAL_INTERVIEW_SERVICE_PORT: 4002
+      DATABASE_URL: postgresql://ruready:ruready_dev_pass@postgres:5432/ru_ready
+      AI_ANALYSIS_SERVICE_URL: http://ai-analysis-service:4003
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  coding-interview-service:
+    build:
+      context: .
+      dockerfile: docker/coding-interview-service/Dockerfile
+    container_name: ru_ready_coding_interview
+    restart: unless-stopped
+    ports:
+      - '4006:4006'
+    environment:
+      CODING_INTERVIEW_SERVICE_PORT: 4006
+      DATABASE_URL: postgresql://ruready:ruready_dev_pass@postgres:5432/ru_ready
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  payment-service:
+    build:
+      context: .
+      dockerfile: docker/payment-service/Dockerfile
+    container_name: ru_ready_payment
+    restart: unless-stopped
+    ports:
+      - '4007:4007'
+    environment:
+      PAYMENT_SERVICE_PORT: 4007
+      DATABASE_URL: postgresql://ruready:ruready_dev_pass@postgres:5432/ru_ready
+      PAYMENT_PROVIDER_KEY: sk_test_mock_key
+      PAYMENT_WEBHOOK_SECRET: whsec_mock_secret
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  user-service:
+    build:
+      context: .
+      dockerfile: docker/user-service/Dockerfile
+    container_name: ru_ready_user
+    restart: unless-stopped
+    ports:
+      - '4005:4005'
+    environment:
+      USER_SERVICE_PORT: 4005
+      DATABASE_URL: postgresql://ruready:ruready_dev_pass@postgres:5432/ru_ready
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  analytics-service:
+    build:
+      context: .
+      dockerfile: docker/analytics-service/Dockerfile
+    container_name: ru_ready_analytics
+    restart: unless-stopped
+    ports:
+      - '4004:4004'
+    environment:
+      ANALYTICS_SERVICE_PORT: 4004
+      DATABASE_URL: postgresql://ruready:ruready_dev_pass@postgres:5432/ru_ready
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  ai-analysis-service:
+    build:
+      context: .
+      dockerfile: docker/ai-analysis-service/Dockerfile
+    container_name: ru_ready_ai_analysis
+    restart: unless-stopped
+    ports:
+      - '4003:4003'
+    environment:
+      AI_SERVICE_PORT: 4003
+      DATABASE_URL: postgresql://ruready:ruready_dev_pass@postgres:5432/ru_ready
+      AI_MOCK: 'true'
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  admin-service:
+    build:
+      context: .
+      dockerfile: docker/admin-service/Dockerfile
+    container_name: ru_ready_admin
+    restart: unless-stopped
+    ports:
+      - '4008:4008'
+    environment:
+      ADMIN_SERVICE_PORT: 4008
+      DATABASE_URL: postgresql://ruready:ruready_dev_pass@postgres:5432/ru_ready
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 volumes:
   postgres_data:
-

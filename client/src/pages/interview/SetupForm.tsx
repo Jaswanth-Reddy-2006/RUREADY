@@ -136,7 +136,7 @@ export default function SetupForm() {
         targetCompany: company,
         industry: 'Technology',
         experienceLevel: expLevel,
-        focusAreas: domains,
+        focusAreas: domains && domains.length > 0 ? domains : ['General Technical'],
         interviewGoal: goalMeta,
         durationMins: 20,
       });
@@ -350,7 +350,7 @@ export default function SetupForm() {
         targetCompany: formData.targetCompany.trim() || 'General Practice',
         industry: formData.industry.trim() || 'Technology',
         experienceLevel: formData.experienceLevel,
-        focusAreas: formData.focusDomains,
+        focusAreas: formData.focusDomains && formData.focusDomains.length > 0 ? formData.focusDomains : ['General Technical'],
         interviewGoal: goalMeta,
         durationMins: formData.durationMinutes,
         resumeId: formData.resumeId || undefined,

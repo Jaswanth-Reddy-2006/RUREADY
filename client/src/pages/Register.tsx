@@ -271,8 +271,8 @@ export default function Register() {
 
     if (!form.password) {
       newErrors.password = 'Password is required';
-    } else if (form.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+    } else if (form.password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters';
     } else if (form.password.length > 128) {
       newErrors.password = 'Password must not exceed 128 characters';
     }

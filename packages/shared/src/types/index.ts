@@ -264,3 +264,55 @@ export const FOCUS_AREAS = [
 ] as const;
 
 export type FocusArea = (typeof FOCUS_AREAS)[number];
+
+// ─── Payment Types ─────────────────────────────────────────────
+
+export interface PaymentPlan {
+  id: string;
+  name: string;
+  price: number;
+  currency: string;
+  interval: 'MONTHLY' | 'YEARLY' | 'ONE_TIME';
+  features: string[];
+}
+
+export interface PaymentOrder {
+  id: string;
+  userId: string;
+  planId: string;
+  amount: number;
+  currency: string;
+  status: 'CREATED' | 'PAID' | 'FAILED' | 'CANCELLED';
+  providerOrderId?: string;
+  createdAt: string;
+}
+
+export interface PaymentVerificationRequest {
+  orderId: string;
+  paymentId: string;
+  signature?: string;
+}
+
+export interface Subscription {
+  id: string;
+  userId: string;
+  plan: 'FREE' | 'STARTER' | 'PRO' | 'ULTIMATE';
+  status: 'ACTIVE' | 'CANCELLED' | 'EXPIRED';
+  currentPeriodEnd: string;
+}
+
+// ─── User Profile Types ───────────────────────────────────────
+
+export interface UserProfile {
+  id: string;
+  userId: string;
+  name: string;
+  email: string;
+  avatarUrl?: string;
+  bio?: string;
+  title?: string;
+  experienceYears?: number;
+  targetRoles?: string[];
+  updatedAt: string;
+}
+

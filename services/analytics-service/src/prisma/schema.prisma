@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Analysis {
+  id                   String   @id @default(cuid())
+  sessionId            String   @unique
+  overallScore         Int
+  communicationScore   Int
+  technicalScore       Int
+  confidenceScore      Int
+  structureScore       Int
+  confidenceMeterScore Int?
+  confidenceSignals    Json?
+  eyeContactScore      Int?
+  presenceScore        Int?
+  summary              String
+  strengths            String[]
+  improvements         String[]
+  actionableTips       Json
+  readinessVerdict     String   @default("READY")
+  createdAt            DateTime @default(now())
+
+  @@map("analyses")
+}
+
+model TelemetryLog {
+  id                String   @id @default(uuid())
+  sessionId         String
+  type              String
+  wordsPerMinute    Int?
+  fillerWordsCount  Int?
+  stressCoefficient Float?
+  timestamp         DateTime @default(now())
+
+  @@index([sessionId, type, timestamp])
+  @@map("telemetry_logs")
+}

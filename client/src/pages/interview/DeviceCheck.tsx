@@ -413,10 +413,6 @@ export default function DeviceCheck() {
         {/* Top Header Card */}
         <div className="bg-white border border-slate-200 p-6 rounded-3xl shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-orange-50 border border-orange-200/80 px-3 py-0.5 text-xs text-[#FF7A00] font-bold font-display">
-              <Shield size={13} />
-              <span>Pre-Flight Diagnostic Verification</span>
-            </div>
             <h1 className="text-2xl font-extrabold font-display text-slate-900 tracking-tight">
               Device Check & System Integrity Setup
             </h1>
@@ -509,15 +505,12 @@ export default function DeviceCheck() {
                       Ensure your camera is enabled, lens is clean, and your face is positioned in good lighting.
                     </p>
                   </div>
-                  <Badge variant={isCameraReady ? "success" : "amber"} size="sm" dot>
-                    {isCameraReady ? 'Camera Active' : 'Connecting...'}
-                  </Badge>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
                   {/* Video Viewport Frame with Face Framing Guide */}
                   <div className="md:col-span-8">
-                    <div className="w-full aspect-video border border-slate-200 bg-slate-900 rounded-2xl overflow-hidden relative flex items-center justify-center shadow-inner">
+                    <div className="w-full aspect-video border border-slate-200 bg-slate-100 rounded-2xl overflow-hidden relative flex items-center justify-center shadow-inner">
                       {cameraStatus === 'ALLOWED' ? (
                         <>
                           <video 
@@ -529,24 +522,24 @@ export default function DeviceCheck() {
                           />
                           {/* Face Guideline Oval Overlay */}
                           <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-                            <div className="w-48 h-64 border-2 border-dashed border-white/40 rounded-[50%] shadow-[0_0_20px_rgba(255,255,255,0.15)] flex flex-col items-center justify-between py-4">
-                              <span className="text-[10px] font-bold text-white/80 bg-black/50 px-2 py-0.5 rounded-full font-mono">
+                            <div className="w-48 h-64 border-2 border-dashed border-white/60 rounded-[50%] shadow-[0_0_20px_rgba(0,0,0,0.15)] flex flex-col items-center justify-between py-4">
+                              <span className="text-[10px] font-bold text-white bg-slate-900/70 px-2 py-0.5 rounded-full font-mono">
                                 Center Face Here
                               </span>
-                              <span className="text-[9px] text-white/60 font-body">Eye Level</span>
+                              <span className="text-[9px] text-white/80 font-body">Eye Level</span>
                             </div>
                           </div>
                         </>
                       ) : cameraStatus === 'PENDING' ? (
                         <div className="text-center space-y-2 font-body p-6">
                           <div className="h-6 w-6 border-2 border-[#FF7A00] border-t-transparent animate-spin rounded-full mx-auto" />
-                          <p className="text-xs text-slate-300 font-semibold">Connecting to camera device...</p>
+                          <p className="text-xs text-slate-700 font-semibold">Connecting to camera device...</p>
                         </div>
                       ) : (
                         <div className="text-center p-6 space-y-3 max-w-xs font-body">
                           <AlertTriangle size={24} className="mx-auto text-rose-500 animate-pulse" />
-                          <p className="text-xs font-bold text-white">Camera Access Denied</p>
-                          <p className="text-[11px] text-slate-400 leading-relaxed">
+                          <p className="text-xs font-bold text-slate-900">Camera Access Denied</p>
+                          <p className="text-[11px] text-slate-600 leading-relaxed">
                             Please allow camera permissions in your browser address bar and reload.
                           </p>
                           <Button size="sm" variant="secondary" onClick={setupHardware}>
@@ -555,35 +548,15 @@ export default function DeviceCheck() {
                         </div>
                       )}
 
-                      <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-sm border border-white/10 px-3 py-1 text-[10px] font-bold text-white rounded-full uppercase tracking-wider flex items-center gap-1.5">
+                      <div className="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-sm border border-white/10 px-3 py-1 text-[10px] font-bold text-white rounded-full uppercase tracking-wider flex items-center gap-1.5">
                         <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                         <span>Live Stream</span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Checklist & Alignment Prompts */}
+                  {/* Alignment Action */}
                   <div className="md:col-span-4 space-y-4">
-                    <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3">
-                      <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider font-display">
-                        Alignment Checklist
-                      </h4>
-                      <div className="space-y-2 text-xs text-slate-600 font-body">
-                        <div className="flex items-center gap-2">
-                          <CheckCircle2 size={14} className={isCameraReady ? "text-emerald-600" : "text-slate-300"} />
-                          <span>HD 720p Sensor Connected</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <CheckCircle2 size={14} className={isCameraReady ? "text-emerald-600" : "text-slate-300"} />
-                          <span>Face Centered in Frame</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <CheckCircle2 size={14} className={isCameraReady ? "text-emerald-600" : "text-slate-300"} />
-                          <span>No glare or backlit silhouette</span>
-                        </div>
-                      </div>
-                    </div>
-
                     <Button
                       fullWidth
                       size="md"
@@ -859,44 +832,6 @@ export default function DeviceCheck() {
                     >
                       {isFullscreenActive ? 'Fullscreen Active ✓' : 'Enable Fullscreen Mode'}
                     </Button>
-                  </div>
-
-                  {/* Proctoring Policy Box */}
-                  <div className="p-6 rounded-3xl bg-slate-50 border border-slate-200 space-y-3">
-                    <div className="flex items-center gap-2">
-                      <Lock size={16} className="text-emerald-600" />
-                      <h4 className="text-sm font-bold font-display text-slate-900">
-                        Integrity Matrix
-                      </h4>
-                    </div>
-
-                    <div className="space-y-2.5 text-xs font-body text-slate-600">
-                      <div className="flex items-center justify-between p-2 rounded-xl bg-white border border-slate-200/80">
-                        <span className="flex items-center gap-2">
-                          <Monitor size={14} className={hasMultipleDisplays ? 'text-rose-500' : 'text-emerald-600'} />
-                          Single Display Bounds
-                        </span>
-                        <Badge variant={hasMultipleDisplays ? "error" : "teal"} size="xs">
-                          {hasMultipleDisplays ? 'Multi-Screen Detected' : 'Verified'}
-                        </Badge>
-                      </div>
-
-                      <div className="flex items-center justify-between p-2 rounded-xl bg-white border border-slate-200/80">
-                        <span className="flex items-center gap-2">
-                          <Lock size={14} className="text-emerald-600" />
-                          Clipboard Lockdown
-                        </span>
-                        <span className="text-[11px] font-bold text-emerald-700">Active</span>
-                      </div>
-
-                      <div className="flex items-center justify-between p-2 rounded-xl bg-white border border-slate-200/80">
-                        <span className="flex items-center gap-2">
-                          <Shield size={14} className="text-emerald-600" />
-                          Tab Blur Event Monitor
-                        </span>
-                        <span className="text-[11px] font-bold text-emerald-700">Active</span>
-                      </div>
-                    </div>
                   </div>
                 </div>
 

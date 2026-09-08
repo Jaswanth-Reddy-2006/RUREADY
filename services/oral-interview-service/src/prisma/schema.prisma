@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model OralSession {
+  id              String         @id @default(cuid())
+  userId          String
+  resumeId        String?
+  interviewType   String
+  targetRole      String
+  targetCompany   String?
+  industry        String
+  experienceLevel String
+  focusAreas      String[]
+  interviewGoal   String?
+  durationMins    Int            @default(20)
+  status          String         @default("SETUP")
+  startedAt       DateTime?
+  completedAt     DateTime?
+  createdAt       DateTime       @default(now())
+
+  questions       OralQuestion[]
+  chatHistory     OralChatHistory[]
+
+  @@index([userId])
+  @@map("oral_sessions")
+}
+
+model OralQuestion {
+  id           String      @id @default(cuid())
+  sessionId    String
+  session      OralSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  orderIndex   Int
+  questionText String
+  questionType String
+  difficulty   String
+  answerText   String?
+  answeredAt   DateTime?
+  timeTakenSecs Int?
+  evalScore    Int?
+  evalFeedback String?
+  evalStrengths String[]
+  evalWeaknesses String[]
+  betterAnswer String?
+
+  @@index([sessionId])
+  @@map("oral_questions")
+}
+
+model OralChatHistory {
+  id        String      @id @default(uuid())
+  sessionId String
+  session   OralSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  role      String
+  content   String
+  score     Int?
+  critique  String?
+  timestamp DateTime    @default(now())
+
+  @@index([sessionId, timestamp])
+  @@map("oral_chat_history")
+}

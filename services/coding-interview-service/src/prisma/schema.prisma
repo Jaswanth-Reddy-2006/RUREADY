@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model CodingSession {
+  id               String   @id @default(cuid())
+  userId           String
+  targetRole       String
+  difficulty       String   @default("MEDIUM")
+  selectedLanguage String   @default("javascript")
+  status           String   @default("IN_PROGRESS")
+  testCasesPassed  Int?     @default(0)
+  startedAt        DateTime @default(now())
+  completedAt      DateTime?
+
+  executionDeltas  CodeExecutionDelta[]
+
+  @@index([userId])
+  @@map("coding_sessions")
+}
+
+model PreDefinedProblem {
+  id              String @id @default(uuid())
+  title           String
+  difficulty      String
+  pattern         String
+  description     String
+  starterCode     Json
+  testCases       Json
+  optimalSolution String
+  optimalTime     String
+  optimalSpace    String
+
+  @@map("pre_defined_problems")
+}
+
+model CodeExecutionDelta {
+  id        String        @id @default(uuid())
+  sessionId String
+  session   CodingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  code      String
+  language  String
+  output    String?
+  success   Boolean?
+  timestamp DateTime      @default(now())
+
+  @@index([sessionId, timestamp])
+  @@map("code_execution_deltas")
+}

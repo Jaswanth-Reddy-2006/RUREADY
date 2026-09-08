@@ -1,0 +1,101 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  adminId   String
+  action    String
+  targetId  String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@map("audit_logs")
+}
+
+model SystemMetric {
+  id        String   @id @default(cuid())
+  metric    String
+  value     Float
+  timestamp DateTime @default(now())
+
+  @@map("system_metrics")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("users")
+}
+
+model OralSession {
+  id              String    @id @default(cuid())
+  userId          String
+  resumeId        String?
+  interviewType   String
+  targetRole      String
+  targetCompany   String?
+  industry        String
+  experienceLevel String
+  focusAreas      String[]
+  interviewGoal   String?
+  durationMins    Int       @default(20)
+  status          String    @default("SETUP")
+  startedAt       DateTime?
+  completedAt     DateTime?
+  createdAt       DateTime  @default(now())
+
+  @@index([userId])
+  @@map("oral_sessions")
+}
+
+model CodingSession {
+  id               String    @id @default(cuid())
+  userId           String
+  targetRole       String
+  difficulty       String    @default("MEDIUM")
+  selectedLanguage String    @default("javascript")
+  status           String    @default("IN_PROGRESS")
+  testCasesPassed  Int?      @default(0)
+  startedAt        DateTime  @default(now())
+  completedAt      DateTime?
+
+  @@index([userId])
+  @@map("coding_sessions")
+}
+
+model Subscription {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  plan             String   @default("FREE")
+  status           String   @default("ACTIVE")
+  currentPeriodEnd DateTime
+  createdAt        DateTime @default(now())
+
+  @@map("subscriptions")
+}
+
+model Order {
+  id              String   @id @default(cuid())
+  userId          String
+  planId          String
+  amount          Float
+  currency        String   @default("USD")
+  status          String   @default("CREATED")
+  providerOrderId String?
+  createdAt       DateTime @default(now())
+
+  @@index([userId])
+  @@map("orders")
+}
