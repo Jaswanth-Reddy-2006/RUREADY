@@ -579,6 +579,92 @@ importers:
         specifier: ^5.7.0
         version: 5.9.3
 
+  services/resume-service:
+    dependencies:
+      '@prisma/client':
+        specifier: ^6.2.0
+        version: 6.19.3(prisma@6.19.3(typescript@5.9.3))(typescript@5.9.3)
+      '@ru-ready/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
+      cors:
+        specifier: ^2.8.5
+        version: 2.8.6
+      dotenv:
+        specifier: ^16.4.7
+        version: 16.6.1
+      express:
+        specifier: ^4.21.0
+        version: 4.22.2
+      helmet:
+        specifier: ^8.0.0
+        version: 8.1.0
+      zod:
+        specifier: ^3.24.0
+        version: 3.25.76
+    devDependencies:
+      '@types/cors':
+        specifier: ^2.8.17
+        version: 2.8.19
+      '@types/express':
+        specifier: ^5.0.0
+        version: 5.0.6
+      '@types/node':
+        specifier: ^22.10.0
+        version: 22.19.19
+      prisma:
+        specifier: ^6.2.0
+        version: 6.19.3(typescript@5.9.3)
+      tsx:
+        specifier: ^4.19.0
+        version: 4.22.3
+      typescript:
+        specifier: ^5.7.0
+        version: 5.9.3
+
+  services/roadmap-service:
+    dependencies:
+      '@prisma/client':
+        specifier: ^6.2.0
+        version: 6.19.3(prisma@6.19.3(typescript@5.9.3))(typescript@5.9.3)
+      '@ru-ready/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
+      cors:
+        specifier: ^2.8.5
+        version: 2.8.6
+      dotenv:
+        specifier: ^16.4.7
+        version: 16.6.1
+      express:
+        specifier: ^4.21.0
+        version: 4.22.2
+      helmet:
+        specifier: ^8.0.0
+        version: 8.1.0
+      zod:
+        specifier: ^3.24.0
+        version: 3.25.76
+    devDependencies:
+      '@types/cors':
+        specifier: ^2.8.17
+        version: 2.8.19
+      '@types/express':
+        specifier: ^5.0.0
+        version: 5.0.6
+      '@types/node':
+        specifier: ^22.10.0
+        version: 22.19.19
+      prisma:
+        specifier: ^6.2.0
+        version: 6.19.3(typescript@5.9.3)
+      tsx:
+        specifier: ^4.19.0
+        version: 4.22.3
+      typescript:
+        specifier: ^5.7.0
+        version: 5.9.3
+
   services/user-service:
     dependencies:
       '@prisma/client':

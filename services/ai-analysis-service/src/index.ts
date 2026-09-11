@@ -18,9 +18,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { AppError } from './lib/errors.js';
 import aiRoutes from './routes/ai.routes.js';
 import analysisRoutes from './routes/analysis.routes.js';
-import atsRoutes from './routes/ats.routes.js';
-import roadmapRoutes from './routes/roadmap.routes.js';
-import discussRoutes from './routes/discuss.routes.js';
 import { analysisController } from './controllers/analysis.controller.js';
 
 const app: express.Express = express();
@@ -45,14 +42,8 @@ app.get('/health', (_req: Request, res: Response) => {
 
 app.use('/api/ai', aiRoutes);
 app.use('/api/analysis', analysisRoutes);
-app.use('/api/ats', atsRoutes);
-app.use('/api/roadmap', roadmapRoutes);
-app.use('/api/discuss', discussRoutes);
 app.use('/', aiRoutes);
 app.use('/', analysisRoutes);
-app.use('/ats', atsRoutes);
-app.use('/roadmap', roadmapRoutes);
-app.use('/discuss', discussRoutes);
 
 // Internal Service RPC Endpoints
 app.post('/internal/evaluate-session', analysisController.evaluateSessionInternal);

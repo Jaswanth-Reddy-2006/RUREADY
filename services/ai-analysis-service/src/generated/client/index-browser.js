@@ -193,47 +193,6 @@ exports.Prisma.PreDefinedProblemScalarFieldEnum = {
   optimalSpace: 'optimalSpace'
 };
 
-exports.Prisma.AtsMatchScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  jobTitle: 'jobTitle',
-  companyName: 'companyName',
-  matchScore: 'matchScore',
-  summary: 'summary',
-  matchedSkills: 'matchedSkills',
-  missingSkills: 'missingSkills',
-  experienceMatch: 'experienceMatch',
-  atsWarnings: 'atsWarnings',
-  bulletRewrites: 'bulletRewrites',
-  tailoredQuestions: 'tailoredQuestions',
-  createdAt: 'createdAt'
-};
-
-exports.Prisma.CareerRoadmapScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  rolePath: 'rolePath',
-  targetCompanyTier: 'targetCompanyTier',
-  overallReadiness: 'overallReadiness',
-  nodesData: 'nodesData',
-  customTechStack: 'customTechStack',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-};
-
-exports.Prisma.DiscussionPostScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  userName: 'userName',
-  roleCategory: 'roleCategory',
-  title: 'title',
-  content: 'content',
-  tags: 'tags',
-  upvotes: 'upvotes',
-  aiReply: 'aiReply',
-  createdAt: 'createdAt'
-};
-
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -280,10 +239,7 @@ exports.Prisma.ModelName = {
   Analysis: 'Analysis',
   InterviewSession: 'InterviewSession',
   Question: 'Question',
-  PreDefinedProblem: 'PreDefinedProblem',
-  AtsMatch: 'AtsMatch',
-  CareerRoadmap: 'CareerRoadmap',
-  DiscussionPost: 'DiscussionPost'
+  PreDefinedProblem: 'PreDefinedProblem'
 };
 
 /**

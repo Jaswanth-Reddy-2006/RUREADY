@@ -31,6 +31,8 @@ const USER_SERVICE_URL = process.env.USER_SERVICE_URL || 'http://localhost:4005'
 const CODING_INTERVIEW_SERVICE_URL = process.env.CODING_INTERVIEW_SERVICE_URL || 'http://localhost:4006';
 const PAYMENT_SERVICE_URL = process.env.PAYMENT_SERVICE_URL || 'http://localhost:4007';
 const ADMIN_SERVICE_URL = process.env.ADMIN_SERVICE_URL || 'http://localhost:4008';
+const RESUME_SERVICE_URL = process.env.RESUME_SERVICE_URL || 'http://localhost:3009';
+const ROADMAP_SERVICE_URL = process.env.ROADMAP_SERVICE_URL || 'http://localhost:3010';
 
 // Parse CORS origins from env
 const corsOrigins = process.env.CORS_ORIGIN
@@ -190,7 +192,7 @@ app.use(
 app.use(
   '/api/ats',
   createProxyMiddleware({
-    target: AI_SERVICE_URL,
+    target: RESUME_SERVICE_URL,
     changeOrigin: true,
     ws: true,
   }),
@@ -199,7 +201,7 @@ app.use(
 app.use(
   '/api/roadmap',
   createProxyMiddleware({
-    target: AI_SERVICE_URL,
+    target: ROADMAP_SERVICE_URL,
     changeOrigin: true,
     ws: true,
   }),
@@ -208,7 +210,7 @@ app.use(
 app.use(
   '/api/discuss',
   createProxyMiddleware({
-    target: AI_SERVICE_URL,
+    target: ROADMAP_SERVICE_URL,
     changeOrigin: true,
     ws: true,
   }),

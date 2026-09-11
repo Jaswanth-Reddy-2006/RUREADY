@@ -1,0 +1,43 @@
+// ═══════════════════════════════════════════════════════════════
+// Career Roadmap & Discussion Hub Microservice — Prisma Schema
+// Data ownership: career_roadmaps, discussion_posts
+// ═══════════════════════════════════════════════════════════════
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model CareerRoadmap {
+  id                String   @id @default(cuid())
+  userId            String
+  rolePath          String
+  targetCompanyTier String   @default("FAANG")
+  overallReadiness  Int      @default(0)
+  nodesData         Json
+  customTechStack   Json?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("career_roadmaps")
+}
+
+model DiscussionPost {
+  id           String   @id @default(cuid())
+  userId       String
+  userName     String
+  roleCategory String
+  title        String
+  content      String   @db.Text
+  tags         String[]
+  upvotes      Int      @default(0)
+  aiReply      String?  @db.Text
+  createdAt    DateTime @default(now())
+
+  @@map("discussion_posts")
+}

@@ -1,0 +1,79 @@
+// ═══════════════════════════════════════════════════════════════
+// Resume & ATS Microservice — Prisma Schema
+// Data ownership: ats_matches, tailored interview sessions
+// ═══════════════════════════════════════════════════════════════
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model AtsMatch {
+  id                String   @id @default(cuid())
+  userId            String
+  jobTitle          String
+  companyName       String?
+  matchScore        Int
+  summary           String
+  matchedSkills     String[]
+  missingSkills     String[]
+  experienceMatch   String?
+  atsWarnings       String[]
+  bulletRewrites    Json
+  tailoredQuestions Json
+  createdAt         DateTime @default(now())
+
+  @@map("ats_matches")
+}
+
+model InterviewSession {
+  id               String    @id @default(cuid())
+  userId           String
+  interviewType    String
+  targetRole       String
+  targetCompany    String?
+  industry         String
+  experienceLevel  String    @default("MID")
+  focusAreas       String[]
+  interviewGoal    String?
+  durationMins     Int       @default(20)
+  status           String    @default("SETUP")
+  startedAt        DateTime?
+  completedAt      DateTime?
+  createdAt        DateTime  @default(now())
+  mode             String    @default("ORAL")
+  hintCount        Int       @default(0)
+  testCasesPassed  Int?
+  selectedLanguage String?
+  isDeleted        Boolean   @default(false)
+
+  questions Question[]
+
+  @@map("ats_interview_sessions")
+}
+
+model Question {
+  id            String           @id @default(cuid())
+  sessionId     String
+  session       InterviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  orderIndex    Int
+  questionText  String
+  questionType  String
+  difficulty    String
+  answerText    String?
+  answeredAt    DateTime?
+  timeTakenSecs Int?
+
+  evalScore      Int?
+  evalFeedback   String?
+  evalStrengths  String[]
+  evalWeaknesses String[]
+  betterAnswer   String?
+
+  @@map("ats_questions")
+}
