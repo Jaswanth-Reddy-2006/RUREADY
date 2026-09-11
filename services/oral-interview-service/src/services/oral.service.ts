@@ -226,15 +226,45 @@ export const oralService = {
       const session = await this.getSession(sessionId, userId);
       const existingCount = session.questions ? session.questions.length : 0;
       const nextOrder = existingCount + 1;
+      const role = session.targetRole || 'Software Engineer';
+      const roleLower = role.toLowerCase();
 
-      const questionPrompts = [
-        `Could you describe a challenging technical problem you solved recently in a project?`,
-        `How do you handle performance optimization and trade-offs when building scalable applications?`,
-        `Can you explain your approach to testing and ensuring code reliability in production?`,
-        `How do you handle cross-functional collaboration and conflicting technical requirements?`,
-      ];
+      const questionMatrix: Record<string, string[]> = {
+        frontend: [
+          `Walk me through how you optimize Web Vitals (LCP, CLS, INP) for a high-traffic ${role} application.`,
+          'How do you manage complex client-side state across deeply nested component hierarchies without triggering cascading re-renders?',
+          'Explain your strategy for client-side caching, service workers, and offline resilience in modern Web apps.',
+          'How do you defend against XSS, CSRF, and third-party script vulnerabilities in frontend architectures?',
+        ],
+        backend: [
+          `How do you design database indexing and partitioning strategies for a ${role} backend facing heavy write traffic?`,
+          'Walk me through your design for a resilient distributed locking mechanism across microservices.',
+          'How do you prevent data inconsistency and handle eventual consistency in event-driven architectures using Kafka or RabbitMQ?',
+          'Explain how you implement zero-downtime database schema migrations on a live production table with millions of rows.',
+        ],
+        fullstack: [
+          `Walk me through the end-to-end data pipeline from the browser event to the database transaction in a ${role} system.`,
+          'How do you balance server-side rendering (SSR) vs client-side hydration for dynamic data-heavy platforms?',
+          'Explain your approach to rate-limiting, API gateway management, and token authentication at scale.',
+          'How do you structure microservices or modular monoliths to maintain clean separation of concerns?',
+        ],
+        general: [
+          `Could you describe a challenging technical architecture problem you solved recently for ${role}?`,
+          `How do you handle performance optimization and architectural trade-offs when building scalable applications?`,
+          `Can you explain your approach to automated testing and ensuring code reliability in production?`,
+          `How do you handle cross-functional technical disagreements and conflicting system requirements?`,
+        ]
+      };
 
-      const promptText = questionPrompts[(nextOrder - 1) % questionPrompts.length];
+      let category = 'general';
+      if (/front|react|vue|angular|js|ts|ui/i.test(roleLower)) category = 'frontend';
+      else if (/back|node|spring|java|python|go|golang|postgres|sql/i.test(roleLower)) category = 'backend';
+      else if (/full/i.test(roleLower)) category = 'fullstack';
+
+      const pool = questionMatrix[category] || questionMatrix.general;
+      const hash = (sessionId || 'seed').split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      const selectedIdx = (hash + (nextOrder - 1) * 7) % pool.length;
+      const promptText = pool[selectedIdx];
 
       return await prisma.oralQuestion.create({
         data: {
@@ -251,19 +281,24 @@ export const oralService = {
       console.warn('[OralService] DB getNextQuestion fallback:', (err as Error).message);
       const questions = memoryQuestions.get(sessionId) || [];
       const nextOrder = questions.length + 1;
+      const memSession = memorySessions.get(sessionId) || {};
+      const role = memSession.targetRole || 'Software Engineer';
 
       const questionPrompts = [
-        `Could you describe a challenging technical problem you solved recently in a project?`,
-        `How do you handle performance optimization and trade-offs when building scalable applications?`,
+        `Could you describe a challenging technical problem you solved recently in a ${role} project?`,
+        `How do you handle performance optimization and trade-offs when building scalable ${role} applications?`,
         `Can you explain your approach to testing and ensuring code reliability in production?`,
         `How do you handle cross-functional collaboration and conflicting technical requirements?`,
       ];
+
+      const hash = (sessionId || 'seed').split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      const selectedIdx = (hash + (nextOrder - 1) * 7) % questionPrompts.length;
 
       const newQ = {
         id: `q_${uuidv4().slice(0, 8)}`,
         sessionId,
         orderIndex: nextOrder,
-        questionText: questionPrompts[(nextOrder - 1) % questionPrompts.length],
+        questionText: questionPrompts[selectedIdx],
         questionType: 'TECHNICAL',
         difficulty: 'MEDIUM',
         evalStrengths: [],

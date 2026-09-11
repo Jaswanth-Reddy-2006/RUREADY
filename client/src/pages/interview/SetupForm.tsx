@@ -387,13 +387,13 @@ export default function SetupForm() {
       
       {/* Submitting Overlay */}
       {isSubmitting && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-navy-deep/70 backdrop-blur-md">
-          <div className="mx-4 max-w-md w-full rounded-3xl border border-navy-border/60 bg-navy-deep p-8 text-center shadow-card-dark animate-in fade-in zoom-in duration-300">
-            <div className="mx-auto mb-6 h-12 w-12 animate-spin rounded-full border-4 border-orange-primary border-t-transparent" />
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#11183D]/70 backdrop-blur-md">
+          <div className="mx-4 max-w-md w-full rounded-3xl border border-[#DCE7F2] bg-[#11183D] p-8 text-center shadow-xl animate-in fade-in zoom-in duration-300">
+            <div className="mx-auto mb-6 h-12 w-12 animate-spin rounded-full border-4 border-[#4A8BDF] border-t-transparent" />
             <h3 className="text-lg font-bold font-display text-white mb-2">
               Calibrating Interview Engine
             </h3>
-            <p className="text-xs text-slate-300 font-body">
+            <p className="text-xs text-[#DCE7F2] font-body">
               {prepMessage || 'Please wait...'}
             </p>
           </div>
@@ -402,10 +402,10 @@ export default function SetupForm() {
 
       {/* Header */}
       <div className="mb-8 text-center max-w-xl mx-auto">
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-navy-deep font-display tracking-tight mb-2">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-[#11183D] font-display tracking-tight mb-2">
           Configure Your Session
         </h1>
-        <p className="text-sm text-warm-muted font-body">
+        <p className="text-sm text-[#526078] font-body">
           Launch immediately with your onboarding calibration or customize category, role, and focus tags.
         </p>
       </div>
@@ -422,23 +422,23 @@ export default function SetupForm() {
             <div className="flex items-center gap-2.5">
               <div className={`h-8 w-8 rounded-full flex items-center justify-center font-display text-xs font-bold transition-all duration-300 ${
                 currentStep === s.step 
-                  ? 'bg-orange-primary text-white shadow-orange ring-4 ring-orange-primary/20' 
+                  ? 'bg-[#4A8BDF] text-white shadow-md ring-4 ring-[#4A8BDF]/20' 
                   : currentStep > s.step 
-                    ? 'bg-status-success text-white' 
-                    : 'bg-warm-border text-warm-muted'
+                    ? 'bg-[#168A62] text-white' 
+                    : 'bg-[#EFFAFD] text-[#7B8799] border border-[#DCE7F2]'
               }`}>
                 {currentStep > s.step ? <Check size={14} /> : s.step}
               </div>
               <span className={`hidden sm:inline text-xs font-semibold font-display ${
-                currentStep === s.step ? 'text-navy-deep' : 'text-warm-muted'
+                currentStep === s.step ? 'text-[#11183D]' : 'text-[#7B8799]'
               }`}>
                 {s.label}
               </span>
             </div>
             {idx < 3 && (
-              <div className="flex-1 h-[2px] mx-3 bg-warm-border relative">
+              <div className="flex-1 h-[2px] mx-3 bg-[#DCE7F2] relative">
                 <div 
-                  className="absolute top-0 left-0 h-full bg-orange-primary transition-all duration-500"
+                  className="absolute top-0 left-0 h-full bg-[#4A8BDF] transition-all duration-500"
                   style={{ width: currentStep > s.step ? '100%' : '0%' }}
                 />
               </div>
@@ -449,7 +449,7 @@ export default function SetupForm() {
 
       {/* Validation Banner */}
       {validationError && (
-        <div className="flex items-start gap-3 rounded-2xl bg-red-50 border border-status-error/25 p-4 text-xs text-status-error font-body shadow-subtle mb-6 animate-in fade-in slide-in-from-top-3 duration-200">
+        <div className="flex items-start gap-3 rounded-2xl bg-[#FDF0F0] border border-[#D64545]/25 p-4 text-xs text-[#D64545] font-body shadow-sm mb-6 animate-in fade-in slide-in-from-top-3 duration-200">
           <AlertCircle size={16} className="shrink-0 mt-0.5" />
           <div className="flex-1">
             <span className="font-bold font-display block mb-0.5">Configuration Notice:</span>
@@ -458,7 +458,7 @@ export default function SetupForm() {
           <button 
             type="button" 
             onClick={() => setValidationError(null)} 
-            className="text-status-error hover:opacity-75 transition-opacity"
+            className="text-[#D64545] hover:opacity-75 transition-opacity"
           >
             <X size={16} />
           </button>
@@ -466,7 +466,7 @@ export default function SetupForm() {
       )}
 
       {/* Main Container Card */}
-      <Card padding="lg" className="shadow-card border-warm-border bg-white">
+      <Card padding="lg" className="shadow-sm border-[#DCE7F2] bg-white">
         
         <AnimatePresence mode="wait">
           {/* ─── STEP 1: CATEGORY SELECTION ─── */}
@@ -479,22 +479,23 @@ export default function SetupForm() {
               transition={{ duration: 0.2 }}
               className="space-y-6"
             >
-              {/* Quick Start from Profile Pathway */}
+              {/* Quick Start from Profile Pathway - Signature AI Eggplant Styling */}
               {profileData.targetRole && (
-                <div className="p-5 rounded-2xl bg-gradient-to-r from-orange-50 via-white to-orange-50/40 border-2 border-orange-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="p-5 rounded-2xl bg-[#F8EAF4] border border-[#A0006D]/30 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="space-y-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <Sparkles size={16} className="text-[#FF7A00]" />
-                      <h4 className="text-sm font-bold text-slate-900 font-display">
+                      <Sparkles size={16} className="text-[#A0006D]" />
+                      <h4 className="text-sm font-bold text-[#11183D] font-display">
                         1-Click Quick Launch from Your Profile
                       </h4>
                     </div>
-                    <p className="text-xs text-slate-600 font-body">
-                      Role: <span className="font-semibold text-slate-800">{profileData.targetRole}</span> • Target: <span className="font-semibold text-slate-800">{profileData.targetCompany || 'Top Tech Companies'}</span> • Level: <span className="font-semibold text-slate-800 capitalize">{profileData.seniority || 'Fresher'}</span>
+                    <p className="text-xs text-[#526078] font-body">
+                      Role: <span className="font-semibold text-[#11183D]">{profileData.targetRole}</span> • Target: <span className="font-semibold text-[#11183D]">{profileData.targetCompany || 'Top Tech Companies'}</span> • Level: <span className="font-semibold text-[#11183D] capitalize">{profileData.seniority || 'Fresher'}</span>
                     </p>
                   </div>
                   <Button
                     size="md"
+                    variant="ai"
                     onClick={handleQuickStartFromProfile}
                     disabled={isSubmitting}
                     iconRight={<ArrowRight size={14} />}
@@ -505,11 +506,11 @@ export default function SetupForm() {
                 </div>
               )}
 
-              <div className="border-b border-warm-border pb-4">
-                <h3 className="text-base font-bold font-display text-navy-deep">
+              <div className="border-b border-[#DCE7F2] pb-4">
+                <h3 className="text-base font-bold font-display text-[#11183D]">
                   {profileData.targetRole ? 'Or Choose a Custom Interview Category' : 'Select Interview Category'}
                 </h3>
-                <p className="text-xs text-warm-muted font-body mt-0.5">
+                <p className="text-xs text-[#526078] font-body mt-0.5">
                   Choose the interview paradigm to load domain defaults and evaluation criteria.
                 </p>
               </div>
@@ -527,29 +528,29 @@ export default function SetupForm() {
                       onClick={() => handleCategorySelect(cat)}
                       className={`text-left p-4.5 rounded-2xl border transition-all duration-200 flex items-start gap-3.5 group cursor-pointer ${
                         isSelected
-                          ? 'border-orange-primary bg-orange-soft/40 ring-1 ring-orange-primary/30 shadow-subtle'
-                          : 'border-warm-border bg-white hover:border-orange-primary/40 hover:bg-warm-surface/50 hover:shadow-card'
+                          ? 'border-[#4A8BDF] bg-[#EFF7FD] ring-1 ring-[#4A8BDF]/30 shadow-sm'
+                          : 'border-[#DCE7F2] bg-white hover:border-[#4A8BDF]/40 hover:bg-[#EFFAFD]'
                       }`}
                     >
                       <div className={`p-2.5 rounded-xl shrink-0 transition-colors ${
                         isSelected 
-                          ? 'bg-orange-primary text-white shadow-sm' 
-                          : 'bg-warm-surface text-navy-deep group-hover:bg-orange-soft/60 group-hover:text-orange-primary'
+                          ? 'bg-[#4A8BDF] text-white shadow-sm' 
+                          : 'bg-[#EFFAFD] text-[#11183D] group-hover:bg-[#EFF7FD] group-hover:text-[#4A8BDF]'
                       }`}>
                         <IconComponent size={18} />
                       </div>
                       <div className="space-y-1 flex-1 min-w-0">
                         <div className="flex items-center justify-between">
-                          <h4 className="text-sm font-bold font-display text-navy-deep leading-snug">
+                          <h4 className="text-sm font-bold font-display text-[#11183D] leading-snug">
                             {meta.title}
                           </h4>
                           {isSelected && (
-                            <span className="h-4 w-4 rounded-full bg-orange-primary text-white flex items-center justify-center shrink-0">
+                            <span className="h-4 w-4 rounded-full bg-[#4A8BDF] text-white flex items-center justify-center shrink-0">
                               <Check size={10} />
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-warm-muted leading-relaxed font-body">
+                        <p className="text-xs text-[#526078] leading-relaxed font-body">
                           {meta.desc}
                         </p>
                       </div>
@@ -570,27 +571,27 @@ export default function SetupForm() {
               transition={{ duration: 0.2 }}
               className="space-y-6"
             >
-              <div className="border-b border-warm-border pb-4 flex justify-between items-center">
+              <div className="border-b border-[#DCE7F2] pb-4 flex justify-between items-center">
                 <div>
-                  <h3 className="text-base font-bold font-display text-navy-deep">
+                  <h3 className="text-base font-bold font-display text-[#11183D]">
                     Target Profile & Level
                   </h3>
-                  <p className="text-xs text-warm-muted font-body mt-0.5">
+                  <p className="text-xs text-[#526078] font-body mt-0.5">
                     Specify role parameters to calibrate Ava’s question depth.
                   </p>
                 </div>
-                <Badge variant="orange" size="xs">Phase 2 of 4</Badge>
+                <Badge variant="royal" size="xs">Phase 2 of 4</Badge>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 
                 {/* Target Role with Autocomplete */}
                 <div className="space-y-1.5 relative">
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-navy-deep/70 font-display">
-                    Target Role <span className="text-status-error">*</span>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-[#526078] font-display">
+                    Target Role <span className="text-[#D64545]">*</span>
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-navy-deep/40">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#7B8799]">
                       <Briefcase size={16} />
                     </div>
                     <input
@@ -603,14 +604,14 @@ export default function SetupForm() {
                       }}
                       onFocus={() => setShowRoleDropdown(true)}
                       onBlur={() => setTimeout(() => setShowRoleDropdown(false), 200)}
-                      className="w-full rounded-xl border border-warm-border bg-white pl-10 pr-9 py-2.5 text-sm font-body text-navy-deep placeholder:text-warm-muted/60 focus:outline-none focus:ring-2 focus:ring-orange-primary/30 focus:border-orange-primary transition-all shadow-subtle"
+                      className="w-full rounded-xl border border-[#DCE7F2] bg-white pl-10 pr-9 py-2.5 text-sm font-body text-[#11183D] placeholder:text-[#7B8799] focus:outline-none focus:ring-2 focus:ring-[#4A8BDF]/30 focus:border-[#4A8BDF] transition-all shadow-sm"
                     />
                     <button
                       type="button"
                       onClick={() => setShowRoleDropdown(!showRoleDropdown)}
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-navy-deep/40"
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-[#7B8799]"
                     >
-                      <ChevronDown size={14} className={`transition-transform duration-200 ${showRoleDropdown ? 'rotate-180 text-orange-primary' : ''}`} />
+                      <ChevronDown size={14} className={`transition-transform duration-200 ${showRoleDropdown ? 'rotate-180 text-[#4A8BDF]' : ''}`} />
                     </button>
                   </div>
 
@@ -620,7 +621,7 @@ export default function SetupForm() {
                         initial={{ opacity: 0, y: -4 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -4 }}
-                        className="absolute z-50 mt-1 max-h-48 w-full overflow-y-auto border border-warm-border bg-white py-1 shadow-card rounded-xl font-body text-xs text-navy-deep"
+                        className="absolute z-50 mt-1 max-h-48 w-full overflow-y-auto border border-[#DCE7F2] bg-white py-1 shadow-md rounded-xl font-body text-xs text-[#11183D]"
                       >
                         {filteredRoles.length > 0 ? (
                           filteredRoles.map((role) => (
@@ -633,15 +634,15 @@ export default function SetupForm() {
                               }}
                               className={`flex w-full items-center px-3.5 py-2 text-left transition-colors cursor-pointer ${
                                 roleSearch === role
-                                  ? 'bg-orange-soft/60 text-orange-bright font-semibold'
-                                  : 'hover:bg-warm-surface text-navy-deep/80'
+                                  ? 'bg-[#EFF7FD] text-[#4A8BDF] font-semibold'
+                                  : 'hover:bg-[#EFFAFD] text-[#526078]'
                               }`}
                             >
                               {role}
                             </button>
                           ))
                         ) : (
-                          <div className="px-3.5 py-2 text-xs text-warm-muted italic">
+                          <div className="px-3.5 py-2 text-xs text-[#7B8799] italic">
                             Press Enter to use custom: "{roleSearch}"
                           </div>
                         )}
@@ -652,21 +653,21 @@ export default function SetupForm() {
 
                 {/* Industry Domain */}
                 <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-navy-deep/70 font-display">
-                    Industry Domain <span className="text-status-error">*</span>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-[#526078] font-display">
+                    Industry Domain <span className="text-[#D64545]">*</span>
                   </label>
                   <input
                     type="text"
                     placeholder="e.g. Technology, Fintech, Healthcare..."
                     value={formData.industry}
                     onChange={(e) => updateField('industry', e.target.value)}
-                    className="w-full rounded-xl border border-warm-border bg-white px-3.5 py-2.5 text-sm font-body text-navy-deep placeholder:text-warm-muted/60 focus:outline-none focus:ring-2 focus:ring-orange-primary/30 focus:border-orange-primary transition-all shadow-subtle"
+                    className="w-full rounded-xl border border-[#DCE7F2] bg-white px-3.5 py-2.5 text-sm font-body text-[#11183D] placeholder:text-[#7B8799] focus:outline-none focus:ring-2 focus:ring-[#4A8BDF]/30 focus:border-[#4A8BDF] transition-all shadow-sm"
                   />
                 </div>
 
                 {/* Target Company (Optional) */}
                 <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-navy-deep/70 font-display">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-[#526078] font-display">
                     Target Company (Optional)
                   </label>
                   <input
@@ -674,14 +675,14 @@ export default function SetupForm() {
                     placeholder="e.g. Google, Stripe, Meta..."
                     value={formData.targetCompany}
                     onChange={(e) => updateField('targetCompany', e.target.value)}
-                    className="w-full rounded-xl border border-warm-border bg-white px-3.5 py-2.5 text-sm font-body text-navy-deep placeholder:text-warm-muted/60 focus:outline-none focus:ring-2 focus:ring-orange-primary/30 focus:border-orange-primary transition-all shadow-subtle"
+                    className="w-full rounded-xl border border-[#DCE7F2] bg-white px-3.5 py-2.5 text-sm font-body text-[#11183D] placeholder:text-[#7B8799] focus:outline-none focus:ring-2 focus:ring-[#4A8BDF]/30 focus:border-[#4A8BDF] transition-all shadow-sm"
                   />
                 </div>
 
                 {/* Experience Level Selector */}
                 <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-navy-deep/70 font-display">
-                    Experience Level <span className="text-status-error">*</span>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-[#526078] font-display">
+                    Experience Level <span className="text-[#D64545]">*</span>
                   </label>
                   <div className="grid grid-cols-3 gap-2">
                     {[
@@ -701,11 +702,11 @@ export default function SetupForm() {
                           }}
                           className={`flex flex-col items-center justify-center p-2.5 rounded-xl border transition-all cursor-pointer ${
                             isSelected
-                              ? 'border-orange-primary bg-orange-soft/40 text-orange-bright font-semibold shadow-subtle'
-                              : 'border-warm-border bg-white text-warm-muted hover:border-orange-primary/30 hover:bg-warm-surface/50'
+                              ? 'border-[#4A8BDF] bg-[#EFF7FD] text-[#4A8BDF] font-semibold shadow-sm'
+                              : 'border-[#DCE7F2] bg-white text-[#526078] hover:border-[#4A8BDF]/30 hover:bg-[#EFFAFD]'
                           }`}
                         >
-                          <IconComponent className={`h-4 w-4 mb-1 ${isSelected ? 'text-orange-primary' : 'text-warm-muted'}`} />
+                          <IconComponent className={`h-4 w-4 mb-1 ${isSelected ? 'text-[#4A8BDF]' : 'text-[#7B8799]'}`} />
                           <span className="text-[11px] font-display text-center leading-tight">{exp.label}</span>
                         </button>
                       );
@@ -727,30 +728,30 @@ export default function SetupForm() {
               transition={{ duration: 0.2 }}
               className="space-y-6"
             >
-              <div className="border-b border-warm-border pb-4 flex justify-between items-center">
+              <div className="border-b border-[#DCE7F2] pb-4 flex justify-between items-center">
                 <div>
-                  <h3 className="text-base font-bold font-display text-navy-deep">
+                  <h3 className="text-base font-bold font-display text-[#11183D]">
                     Focus Domains & Call Duration
                   </h3>
-                  <p className="text-xs text-warm-muted font-body mt-0.5">
+                  <p className="text-xs text-[#526078] font-body mt-0.5">
                     Select diagnostic tags and time constraints for the live conversation.
                   </p>
                 </div>
-                <Badge variant="orange" size="xs">Phase 3 of 4</Badge>
+                <Badge variant="royal" size="xs">Phase 3 of 4</Badge>
               </div>
 
               {/* Tag Selection Matrix */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-navy-deep/70 font-display">
-                    Diagnostic Syllabus Tags <span className="text-status-error">*</span>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-[#526078] font-display">
+                    Diagnostic Syllabus Tags <span className="text-[#D64545]">*</span>
                   </label>
                   {formData.category === 'JOB' && formData.experienceLevel === 'SENIOR' && (
                     <Badge variant="success" size="xs">Senior Architecture Active</Badge>
                   )}
                 </div>
 
-                <div className="flex flex-wrap gap-2 p-4 rounded-2xl border border-warm-border bg-warm-surface/40 max-h-56 overflow-y-auto">
+                <div className="flex flex-wrap gap-2 p-4 rounded-2xl border border-[#DCE7F2] bg-[#EFFAFD]/40 max-h-56 overflow-y-auto">
                   {currentPills.map((pill) => {
                     const isChecked = formData.focusDomains.includes(pill);
                     const isLocked = isPillLocked(pill);
@@ -763,9 +764,9 @@ export default function SetupForm() {
                         className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-full border transition-all cursor-pointer ${
                           isChecked
                             ? isLocked
-                              ? 'bg-warm-border text-warm-muted border-warm-border cursor-not-allowed'
-                              : 'bg-orange-primary text-white border-orange-primary shadow-subtle'
-                            : 'bg-white text-navy-deep/70 border-warm-border hover:border-orange-primary/40 hover:text-orange-primary hover:bg-warm-surface'
+                              ? 'bg-[#DCE7F2] text-[#7B8799] border-[#DCE7F2] cursor-not-allowed'
+                              : 'bg-[#4A8BDF] text-white border-[#4A8BDF] shadow-sm'
+                            : 'bg-white text-[#526078] border-[#DCE7F2] hover:border-[#4A8BDF]/40 hover:text-[#4A8BDF] hover:bg-[#EFFAFD]'
                         }`}
                       >
                         {isLocked && <Lock className="h-3 w-3 mr-0.5" />}
@@ -775,7 +776,7 @@ export default function SetupForm() {
                     );
                   })}
                 </div>
-                <p className="text-[11px] text-warm-muted font-body">
+                <p className="text-[11px] text-[#7B8799] font-body">
                   {formData.category === 'CODING' 
                     ? '* Coding round mandates DSA and System Design.'
                     : '* Toggle matching technical and behavioral topics to focus the questioning.'}
@@ -783,13 +784,13 @@ export default function SetupForm() {
               </div>
 
               {/* Duration Slider */}
-              <div className="space-y-3 pt-4 border-t border-warm-border">
+              <div className="space-y-3 pt-4 border-t border-[#DCE7F2]">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-navy-deep/70 font-display flex items-center gap-1.5">
-                    <Clock size={14} className="text-orange-primary" />
+                  <label className="text-xs font-semibold uppercase tracking-wider text-[#526078] font-display flex items-center gap-1.5">
+                    <Clock size={14} className="text-[#4A8BDF]" />
                     <span>Allocated Interview Duration</span>
                   </label>
-                  <span className="text-xs font-bold bg-orange-soft text-orange-bright border border-orange-primary/20 px-3 py-0.5 rounded-full font-mono">
+                  <span className="text-xs font-bold bg-[#EFF7FD] text-[#4A8BDF] border border-[#4A8BDF]/20 px-3 py-0.5 rounded-full font-mono">
                     {formData.durationMinutes} Minutes
                   </span>
                 </div>
@@ -802,9 +803,9 @@ export default function SetupForm() {
                     step={durationConstraints.step}
                     value={formData.durationMinutes}
                     onChange={(e) => updateField('durationMinutes', parseInt(e.target.value, 10))}
-                    className="w-full h-2 bg-warm-border rounded-lg appearance-none cursor-pointer accent-orange-primary focus:outline-none"
+                    className="w-full h-2 bg-[#DCE7F2] rounded-lg appearance-none cursor-pointer accent-[#4A8BDF] focus:outline-none"
                   />
-                  <div className="flex justify-between text-[10px] text-warm-muted font-mono mt-1.5">
+                  <div className="flex justify-between text-[10px] text-[#7B8799] font-mono mt-1.5">
                     <span>{durationConstraints.min}m (Speed Run)</span>
                     <span>{durationConstraints.max}m (Full Depth)</span>
                   </div>
@@ -824,21 +825,21 @@ export default function SetupForm() {
               transition={{ duration: 0.2 }}
               className="space-y-6"
             >
-              <div className="border-b border-warm-border pb-4 flex justify-between items-center">
+              <div className="border-b border-[#DCE7F2] pb-4 flex justify-between items-center">
                 <div>
-                  <h3 className="text-base font-bold font-display text-navy-deep">
+                  <h3 className="text-base font-bold font-display text-[#11183D]">
                     Review Configuration & Resume
                   </h3>
-                  <p className="text-xs text-warm-muted font-body mt-0.5">
+                  <p className="text-xs text-[#526078] font-body mt-0.5">
                     Verify simulation parameters before launching live room.
                   </p>
                 </div>
-                <Badge variant="orange" size="xs">Final Step</Badge>
+                <Badge variant="royal" size="xs">Final Step</Badge>
               </div>
 
               {/* Resume Drag/Drop Area */}
               <div className="space-y-2">
-                <label className="block text-xs font-semibold uppercase tracking-wider text-navy-deep/70 font-display">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#526078] font-display">
                   Resume Context Integration (Optional)
                 </label>
 
@@ -860,10 +861,10 @@ export default function SetupForm() {
                   }}
                   className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all flex flex-col items-center justify-center ${
                     formData.resumeFileName
-                      ? 'border-status-success bg-emerald-50/50'
+                      ? 'border-[#168A62] bg-[#E8F5F0]/50'
                       : uploadError
-                        ? 'border-status-error bg-red-50/50'
-                        : 'border-warm-border hover:border-orange-primary/50 hover:bg-orange-soft/20 bg-warm-surface/30'
+                        ? 'border-[#D64545] bg-[#FDF0F0]/50'
+                        : 'border-[#DCE7F2] hover:border-[#4A8BDF]/50 hover:bg-[#EFF7FD]/50 bg-[#EFFAFD]/30'
                   }`}
                 >
                   <input
@@ -876,33 +877,33 @@ export default function SetupForm() {
 
                   {isUploading ? (
                     <div className="flex flex-col items-center justify-center space-y-2">
-                      <div className="h-7 w-7 animate-spin rounded-full border-3 border-orange-primary border-t-transparent" />
-                      <p className="text-xs font-semibold text-navy-deep">Parsing tech stack from CV...</p>
+                      <div className="h-7 w-7 animate-spin rounded-full border-3 border-[#4A8BDF] border-t-transparent" />
+                      <p className="text-xs font-semibold text-[#11183D]">Parsing tech stack from CV...</p>
                     </div>
                   ) : formData.resumeFileName ? (
                     <div className="flex flex-col items-center justify-center space-y-2">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-status-success text-white">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#168A62] text-white">
                         <CheckCircle2 size={20} />
                       </div>
-                      <p className="text-xs font-bold text-status-success font-display">Resume Context Synced</p>
-                      <p className="text-xs text-navy-deep/70 font-body flex items-center gap-1.5 border border-warm-border px-3 py-1 bg-white rounded-full">
-                        <FileText size={12} className="text-orange-primary" />
+                      <p className="text-xs font-bold text-[#168A62] font-display">Resume Context Synced</p>
+                      <p className="text-xs text-[#526078] font-body flex items-center gap-1.5 border border-[#DCE7F2] px-3 py-1 bg-white rounded-full">
+                        <FileText size={12} className="text-[#4A8BDF]" />
                         {formData.resumeFileName}
                       </p>
                     </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center space-y-1.5">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-orange-soft text-orange-bright">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#EFF7FD] text-[#4A8BDF]">
                         <Upload size={16} />
                       </div>
-                      <p className="text-xs font-bold text-navy-deep">Upload resume to ground questions in your real projects</p>
-                      <p className="text-[10px] text-warm-muted">PDF or DOCX format (Max 5MB)</p>
+                      <p className="text-xs font-bold text-[#11183D]">Upload resume to ground questions in your real projects</p>
+                      <p className="text-[10px] text-[#7B8799]">PDF or DOCX format (Max 5MB)</p>
                     </div>
                   )}
                 </div>
 
                 {uploadError && (
-                  <div className="flex items-start gap-2 rounded-xl bg-red-50 border border-status-error/25 p-3 text-xs text-status-error font-medium">
+                  <div className="flex items-start gap-2 rounded-xl bg-[#FDF0F0] border border-[#D64545]/25 p-3 text-xs text-[#D64545] font-medium">
                     <AlertCircle size={14} className="shrink-0 mt-0.5" />
                     <span>{uploadError}</span>
                   </div>
@@ -910,45 +911,45 @@ export default function SetupForm() {
               </div>
 
               {/* Summary Matrix */}
-              <div className="space-y-2 pt-3 border-t border-warm-border">
-                <label className="block text-xs font-semibold uppercase tracking-wider text-navy-deep/70 font-display">
+              <div className="space-y-2 pt-3 border-t border-[#DCE7F2]">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#526078] font-display">
                   Configuration Summary
                 </label>
                 
-                <div className="grid grid-cols-2 gap-3.5 bg-warm-surface/60 border border-warm-border rounded-2xl p-4 font-body text-xs text-navy-deep">
+                <div className="grid grid-cols-2 gap-3.5 bg-[#EFFAFD]/60 border border-[#DCE7F2] rounded-2xl p-4 font-body text-xs text-[#11183D]">
                   <div>
-                    <span className="text-[10px] text-warm-muted uppercase tracking-wider font-semibold block">Track Format</span>
-                    <span className="font-bold text-navy-deep font-display text-sm">{formData.category}</span>
+                    <span className="text-[10px] text-[#7B8799] uppercase tracking-wider font-semibold block">Track Format</span>
+                    <span className="font-bold text-[#11183D] font-display text-sm">{formData.category}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-warm-muted uppercase tracking-wider font-semibold block">Target Position</span>
-                    <span className="font-semibold text-navy-deep text-sm">{formData.targetRole || 'Not Specified'}</span>
+                    <span className="text-[10px] text-[#7B8799] uppercase tracking-wider font-semibold block">Target Position</span>
+                    <span className="font-semibold text-[#11183D] text-sm">{formData.targetRole || 'Not Specified'}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-warm-muted uppercase tracking-wider font-semibold block">Target Enterprise</span>
-                    <span className="text-navy-deep font-medium">{formData.targetCompany || 'General Practice'}</span>
+                    <span className="text-[10px] text-[#7B8799] uppercase tracking-wider font-semibold block">Target Enterprise</span>
+                    <span className="text-[#11183D] font-medium">{formData.targetCompany || 'General Practice'}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-warm-muted uppercase tracking-wider font-semibold block">Experience Level</span>
-                    <span className="text-navy-deep font-medium">{formData.experienceLevel || 'Not Specified'}</span>
+                    <span className="text-[10px] text-[#7B8799] uppercase tracking-wider font-semibold block">Experience Level</span>
+                    <span className="text-[#11183D] font-medium">{formData.experienceLevel || 'Not Specified'}</span>
                   </div>
-                  <div className="col-span-2 border-t border-warm-border/80 pt-2.5">
-                    <span className="text-[10px] text-warm-muted uppercase tracking-wider font-semibold block mb-1">Focus Topics</span>
+                  <div className="col-span-2 border-t border-[#DCE7F2]/80 pt-2.5">
+                    <span className="text-[10px] text-[#7B8799] uppercase tracking-wider font-semibold block mb-1">Focus Topics</span>
                     <div className="flex flex-wrap gap-1">
                       {formData.focusDomains.map(d => (
-                        <span key={d} className="bg-orange-soft text-orange-bright border border-orange-primary/20 text-[11px] px-2 py-0.5 rounded-full font-medium font-body">
+                        <span key={d} className="bg-[#EFF7FD] text-[#4A8BDF] border border-[#4A8BDF]/20 text-[11px] px-2 py-0.5 rounded-full font-medium font-body">
                           {d}
                         </span>
                       ))}
                     </div>
                   </div>
-                  <div className="border-t border-warm-border/80 pt-2">
-                    <span className="text-[10px] text-warm-muted uppercase tracking-wider font-semibold block">Session Duration</span>
-                    <span className="font-semibold text-navy-deep">{formData.durationMinutes} Minutes</span>
+                  <div className="border-t border-[#DCE7F2]/80 pt-2">
+                    <span className="text-[10px] text-[#7B8799] uppercase tracking-wider font-semibold block">Session Duration</span>
+                    <span className="font-semibold text-[#11183D]">{formData.durationMinutes} Minutes</span>
                   </div>
-                  <div className="border-t border-warm-border/80 pt-2">
-                    <span className="text-[10px] text-warm-muted uppercase tracking-wider font-semibold block">Resume Status</span>
-                    <span className={`font-semibold ${formData.resumeFileName ? 'text-status-success' : 'text-warm-muted'}`}>
+                  <div className="border-t border-[#DCE7F2]/80 pt-2">
+                    <span className="text-[10px] text-[#7B8799] uppercase tracking-wider font-semibold block">Resume Status</span>
+                    <span className={`font-semibold ${formData.resumeFileName ? 'text-[#168A62]' : 'text-[#7B8799]'}`}>
                       {formData.resumeFileName ? 'Attached' : 'None'}
                     </span>
                   </div>
@@ -960,7 +961,7 @@ export default function SetupForm() {
         </AnimatePresence>
 
         {/* Step Action Buttons */}
-        <div className="flex justify-between items-center pt-6 mt-6 border-t border-warm-border font-display">
+        <div className="flex justify-between items-center pt-6 mt-6 border-t border-[#DCE7F2] font-display">
           {currentStep > 1 ? (
             <Button
               type="button"

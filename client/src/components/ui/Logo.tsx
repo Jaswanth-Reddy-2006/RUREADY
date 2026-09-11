@@ -15,19 +15,19 @@ const sizeMap = {
 export default function Logo({ size = 'md', theme = 'light', className }: LogoProps) {
   const s = sizeMap[size];
   const isDark = theme === 'dark';
-  const textColor = isDark ? 'text-white' : 'text-slate-950';
+  const textColor = isDark ? 'text-white' : 'text-[#11183D]';
 
   return (
     <div
       className={clsx(
-        'flex items-center leading-none font-display font-extrabold select-none tracking-tight gap-0.5',
+        'flex items-center leading-none font-display font-black select-none tracking-tight gap-0.5',
         className,
       )}
     >
       <span className={clsx(s.text, textColor)}>
         R U Ready
       </span>
-      <span className={clsx(s.qMark, 'text-[#F97316] font-black drop-shadow-sm animate-pulse-subtle')}>
+      <span className={clsx(s.qMark, 'text-[#A0006D] font-black drop-shadow-sm')}>
         ?
       </span>
     </div>

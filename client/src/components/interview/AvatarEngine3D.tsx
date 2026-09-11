@@ -118,13 +118,114 @@ export default function AvatarEngine3D({
     rimLight.position.set(0, 2.2, -1.8);
     scene.add(rimLight);
 
-    // ─── 3. 3D CHARACTER GLTF/GLB MODEL LOADER ───
+    // ─── 3. 3D CHARACTER MESH & PROCEDURAL SCULPT RIG ───
     const avatarGroup = new THREE.Group();
     scene.add(avatarGroup);
 
     const morphMeshes: THREE.Mesh[] = [];
     let headBone: THREE.Object3D | null = null;
     let mixer: THREE.AnimationMixer | null = null;
+
+    // Procedural 3D WebGL Character Rig (Guarantees 3D Avatar is NEVER black or empty)
+    const proceduralHeadGroup = new THREE.Group();
+
+    // 1. PBR Skin Head Mesh
+    const headMat = new THREE.MeshStandardMaterial({
+      color: 0xE8B896,
+      roughness: 0.55,
+      metalness: 0.05,
+    });
+    const headMesh = new THREE.Mesh(new THREE.SphereGeometry(0.24, 32, 32), headMat);
+    headMesh.scale.set(1, 1.22, 0.95);
+    headMesh.position.set(0, 0.12, 0);
+    proceduralHeadGroup.add(headMesh);
+
+    // 2. Eyes (Left & Right)
+    const eyeWhiteMat = new THREE.MeshStandardMaterial({ color: 0xFFFFFF, roughness: 0.2 });
+    const irisMat = new THREE.MeshStandardMaterial({ color: 0x2459A8, roughness: 0.3 }); // Royal Blue Iris
+    const pupilMat = new THREE.MeshBasicMaterial({ color: 0x050505 });
+
+    const createEye = (xSign: number) => {
+      const eyeGroup = new THREE.Group();
+      const eyeWhite = new THREE.Mesh(new THREE.SphereGeometry(0.042, 16, 16), eyeWhiteMat);
+      eyeGroup.add(eyeWhite);
+
+      const iris = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.01, 16), irisMat);
+      iris.rotation.x = Math.PI / 2;
+      iris.position.z = 0.038;
+      eyeGroup.add(iris);
+
+      const pupil = new THREE.Mesh(new THREE.CylinderGeometry(0.011, 0.011, 0.012, 16), pupilMat);
+      pupil.rotation.x = Math.PI / 2;
+      pupil.position.z = 0.039;
+      eyeGroup.add(pupil);
+
+      eyeGroup.position.set(xSign * 0.082, 0.16, 0.19);
+      return eyeGroup;
+    };
+
+    const leftEye = createEye(-1);
+    const rightEye = createEye(1);
+    proceduralHeadGroup.add(leftEye);
+    proceduralHeadGroup.add(rightEye);
+
+    // Eyelids for physics blinking
+    const eyelidMat = new THREE.MeshStandardMaterial({ color: 0xD8A07E, roughness: 0.6 });
+    const leftEyelid = new THREE.Mesh(new THREE.SphereGeometry(0.045, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2), eyelidMat);
+    leftEyelid.position.set(-0.082, 0.16, 0.188);
+    leftEyelid.rotation.x = -0.3;
+    leftEyelid.scale.y = 0.01; // Blinking scale
+    proceduralHeadGroup.add(leftEyelid);
+
+    const rightEyelid = new THREE.Mesh(new THREE.SphereGeometry(0.045, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2), eyelidMat);
+    rightEyelid.position.set(0.082, 0.16, 0.188);
+    rightEyelid.rotation.x = -0.3;
+    rightEyelid.scale.y = 0.01;
+    proceduralHeadGroup.add(rightEyelid);
+
+    // 3. Eyebrows
+    const browMat = new THREE.MeshStandardMaterial({ color: 0x332211, roughness: 0.8 });
+    const leftBrow = new THREE.Mesh(new THREE.BoxGeometry(0.065, 0.012, 0.015), browMat);
+    leftBrow.position.set(-0.082, 0.22, 0.21);
+    leftBrow.rotation.z = -0.05;
+    proceduralHeadGroup.add(leftBrow);
+
+    const rightBrow = new THREE.Mesh(new THREE.BoxGeometry(0.065, 0.012, 0.015), browMat);
+    rightBrow.position.set(0.082, 0.22, 0.21);
+    rightBrow.rotation.z = 0.05;
+    proceduralHeadGroup.add(rightBrow);
+
+    // 4. Lip-syncing Mouth Mesh
+    const mouthMat = new THREE.MeshStandardMaterial({ color: 0xA0006D, roughness: 0.4 }); // Signature Eggplant lip
+    const mouthMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.048, 0.048, 0.015, 16), mouthMat);
+    mouthMesh.rotation.x = Math.PI / 2;
+    mouthMesh.position.set(0, 0.04, 0.21);
+    proceduralHeadGroup.add(mouthMesh);
+
+    // 5. Hair Sculp Mesh
+    const hairMat = new THREE.MeshStandardMaterial({ color: 0x2A1B10, roughness: 0.7 });
+    const hairMesh = new THREE.Mesh(new THREE.SphereGeometry(0.255, 24, 24), hairMat);
+    hairMesh.scale.set(1.03, 1.1, 1.05);
+    hairMesh.position.set(0, 0.16, -0.02);
+    proceduralHeadGroup.add(hairMesh);
+
+    // 6. Neck & Corporate Suit Torso
+    const neckMat = new THREE.MeshStandardMaterial({ color: 0xDFAB8B, roughness: 0.5 });
+    const neckMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.09, 0.18, 16), neckMat);
+    neckMesh.position.set(0, -0.08, 0);
+    avatarGroup.add(neckMesh);
+
+    const suitMat = new THREE.MeshStandardMaterial({ color: 0x11183D, roughness: 0.4 }); // Corporate Dark Blue suit
+    const suitMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.36, 0.55, 16), suitMat);
+    suitMesh.position.set(0, -0.42, 0);
+    avatarGroup.add(suitMesh);
+
+    const shirtMat = new THREE.MeshStandardMaterial({ color: 0xFFFFFF, roughness: 0.3 });
+    const shirtMesh = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.25, 4), shirtMat);
+    shirtMesh.position.set(0, -0.3, 0.15);
+    avatarGroup.add(shirtMesh);
+
+    avatarGroup.add(proceduralHeadGroup);
 
     const loader = new GLTFLoader();
     const modelUrl = import.meta.env.VITE_AVATAR_3D_MODEL_URL || '/models/interviewer_ava.glb';
@@ -137,6 +238,9 @@ export default function AvatarEngine3D({
           const loadedModel = gltf.scene;
           loadedModel.position.set(0, -0.62, 0);
           loadedModel.scale.set(0.85, 0.85, 0.85);
+          
+          // Hide procedural mesh once GLB is verified & loaded
+          proceduralHeadGroup.visible = false;
           avatarGroup.add(loadedModel);
           setModelAssetLoaded(true);
 
@@ -167,7 +271,7 @@ export default function AvatarEngine3D({
           if (url !== DEFAULT_3D_MODEL_URL) {
             loadModel(DEFAULT_3D_MODEL_URL);
           } else {
-            console.warn('[AvatarEngine3D] Fallback to procedural Mesh:', err);
+            console.warn('[AvatarEngine3D] GLB fallback active: procedural 3D WebGL sculpt active:', err);
             setModelAssetLoaded(false);
           }
         }
@@ -291,6 +395,19 @@ export default function AvatarEngine3D({
 
         // Brows & Expressions
         if (dict['browInnerUp'] !== undefined) inf[dict['browInnerUp']] = currentBlendshapes.browInnerUp;
+      }
+
+      // Drive procedural character mesh animations if active
+      if (proceduralHeadGroup.visible) {
+        leftEyelid.scale.y = blinkWeight * 0.9 + 0.01;
+        rightEyelid.scale.y = blinkWeight * 0.9 + 0.01;
+
+        const mouthOpen = currentBlendshapes.jawOpen * 2.5 + (activeViseme !== 'viseme_sil' ? 0.35 : 0.02);
+        mouthMesh.scale.set(1 + (currentBlendshapes.mouthFunnel || 0) * 0.3, Math.max(0.08, mouthOpen), 1);
+
+        const browShift = (currentBlendshapes.browInnerUp || 0) * 0.025;
+        leftBrow.position.y = 0.22 + browShift;
+        rightBrow.position.y = 0.22 + browShift;
       }
 
       renderer.render(scene, camera);

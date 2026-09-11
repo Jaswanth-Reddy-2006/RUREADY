@@ -36,10 +36,10 @@ describe('Empirical M1 Stress Testing — UI Primitives & Layout Shell', () => {
   describe('1. Button Component Stress & Adversarial Tests', () => {
     it('should render standard button with primary variant and default props', () => {
       const html = renderToString(React.createElement(Button, null, 'Click Me'));
-      expect(html).toContain('bg-gradient-to-r from-solar-orange-500 to-solar-orange-600');
+      expect(html).toContain('bg-[#4A8BDF]');
       expect(html).toContain('type="button"');
       expect(html).toContain('Click Me');
-      expect(html).toContain('focus-visible:ring-solar-orange-500');
+      expect(html).toContain('focus-visible:ring-[#4A8BDF]');
     });
 
     it('should handle all 6 button variants without throwing', () => {
@@ -102,9 +102,8 @@ describe('Empirical M1 Stress Testing — UI Primitives & Layout Shell', () => {
     it('should verify focus-visible accessibility ring styles', () => {
       const html = renderToString(React.createElement(Button, null, 'Focus Ring Test'));
       expect(html).toContain('focus-visible:ring-2');
-      expect(html).toContain('focus-visible:ring-solar-orange-500');
+      expect(html).toContain('focus-visible:ring-[#4A8BDF]');
       expect(html).toContain('focus-visible:ring-offset-2');
-      expect(html).toContain('focus-visible:ring-offset-obsidian-950');
     });
 
     it('should suppress click events when disabled or loading in simulated DOM', () => {
@@ -143,7 +142,7 @@ describe('Empirical M1 Stress Testing — UI Primitives & Layout Shell', () => {
 
       // Unknown variant fallback to default
       const fallbackHtml = renderToString(React.createElement(Card, { variant: 'unsupported' as any }, 'Fallback'));
-      expect(fallbackHtml).toContain('bg-obsidian-900/90');
+      expect(fallbackHtml).toContain('bg-white');
     });
 
     it('should apply all padding sizes correctly', () => {
@@ -165,22 +164,22 @@ describe('Empirical M1 Stress Testing — UI Primitives & Layout Shell', () => {
 
     it('should handle glow modes: boolean, orange, subtle, none', () => {
       const orangeHtml = renderToString(React.createElement(Card, { glow: 'orange' }, 'Orange'));
-      expect(orangeHtml).toContain('border-solar-orange-500/30');
+      expect(orangeHtml).toContain('border-[#DCE7F2]');
 
       const boolHtml = renderToString(React.createElement(Card, { glow: true }, 'True'));
-      expect(boolHtml).toContain('border-solar-orange-500/30');
+      expect(boolHtml).toContain('border-[#DCE7F2]');
 
       const subtleHtml = renderToString(React.createElement(Card, { glow: 'subtle' }, 'Subtle'));
-      expect(subtleHtml).toContain('border-white/[0.16]');
+      expect(subtleHtml).toContain('border-[#DCE7F2]');
 
       const noneHtml = renderToString(React.createElement(Card, { glow: 'none' }, 'None'));
-      expect(noneHtml).not.toContain('border-solar-orange-500/30');
+      expect(noneHtml).toContain('border-[#DCE7F2]');
     });
 
     it('should apply hover transitions when hover=true', () => {
       const html = renderToString(React.createElement(Card, { hover: true }, 'Hoverable'));
-      expect(html).toContain('hover:shadow-card-hover');
-      expect(html).toContain('hover:-translate-y-1');
+      expect(html).toContain('hover:shadow-md');
+      expect(html).toContain('hover:-translate-y-0.5');
       expect(html).toContain('cursor-pointer');
     });
 
@@ -220,7 +219,7 @@ describe('Empirical M1 Stress Testing — UI Primitives & Layout Shell', () => {
       expect(html).toContain('id="test-field-error"');
       expect(html).toContain('role="alert"');
       expect(html).toContain('Critical validation failure');
-      expect(html).toContain('border-red-500/80');
+      expect(html).toContain('border-[#D64545]');
     });
 
     it('should suppress hint when error is present and point aria-describedby to error', () => {
@@ -254,7 +253,7 @@ describe('Empirical M1 Stress Testing — UI Primitives & Layout Shell', () => {
     it('should handle disabled state with opacity-50 and pointer-events-none', () => {
       const html = renderToString(React.createElement(Input, { disabled: true, label: 'Disabled Input' }));
       expect(html).toContain('disabled=""');
-      expect(html).toContain('opacity-50 cursor-not-allowed bg-obsidian-950/60 pointer-events-none');
+      expect(html).toContain('opacity-50 cursor-not-allowed bg-[#EFFAFD] pointer-events-none');
     });
 
     it('should render left icon and right icon with proper padding classes', () => {
@@ -290,7 +289,7 @@ describe('Empirical M1 Stress Testing — UI Primitives & Layout Shell', () => {
 
     it('should fallback gracefully to neutral on unrecognized variant', () => {
       const html = renderToString(React.createElement(Badge, { variant: 'rogue-variant' as any }, 'Safe Fallback'));
-      expect(html).toContain('bg-white/[0.06]');
+      expect(html).toContain('bg-[#EFF7FD]');
       expect(html).toContain('Safe Fallback');
     });
 

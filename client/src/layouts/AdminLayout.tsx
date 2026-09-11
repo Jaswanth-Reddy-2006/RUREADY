@@ -90,10 +90,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   };
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-slate-100 font-body text-slate-900 selection:bg-emerald-500/20 selection:text-emerald-900">
+    <div className="flex h-screen w-screen overflow-hidden bg-[#EFFAFD] font-body text-[#11183D] selection:bg-[#4A8BDF]/20 selection:text-[#2459A8]">
       
       {/* ─── Desktop Dedicated Admin Sidebar ─── */}
-      <aside className="hidden lg:flex w-64 xl:w-72 h-full bg-[#0F172A] text-white flex-col justify-between border-r border-slate-800/80 shrink-0 select-none shadow-2xl relative z-30">
+      <aside className="hidden lg:flex w-64 xl:w-72 h-full bg-[#11183D] text-white flex-col justify-between border-r border-[#2459A8]/30 shrink-0 select-none shadow-2xl relative z-30">
         
         {/* Top Branding */}
         <div className="p-6 space-y-6">
@@ -102,11 +102,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           </Link>
 
           {/* Live Online Indicator */}
-          <div className="p-3 rounded-2xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
-            <span className="text-[11px] font-medium text-slate-400">Live Active</span>
+          <div className="p-3 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between">
+            <span className="text-[11px] font-medium text-slate-300">Live Active</span>
             <div className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-xs font-bold font-mono text-emerald-400">{onlineCount} Online</span>
+              <span className="h-2 w-2 rounded-full bg-[#168A62] animate-pulse" />
+              <span className="text-xs font-bold font-mono text-[#168A62]">{onlineCount} Online</span>
             </div>
           </div>
 
@@ -127,13 +127,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                     clsx(
                       'flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all group',
                       isActive
-                        ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/20 font-bold'
-                        : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                        ? 'bg-[#4A8BDF] text-white shadow-md shadow-[#4A8BDF]/20 font-bold'
+                        : 'text-slate-300 hover:text-white hover:bg-white/10'
                     )
                   }
                 >
                   <div className="flex items-center gap-3">
-                    <Icon size={16} className={clsx(isActive ? 'text-white' : 'text-slate-400 group-hover:text-emerald-400')} />
+                    <Icon size={16} className={clsx(isActive ? 'text-white' : 'text-slate-400 group-hover:text-[#4A8BDF]')} />
                     <span>{item.label}</span>
                   </div>
                 </NavLink>
@@ -143,24 +143,24 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         </div>
 
         {/* Bottom Switch to Candidate View & Admin Profile */}
-        <div className="p-5 border-t border-slate-800/80 bg-slate-950/70 space-y-3">
+        <div className="p-5 border-t border-white/10 bg-black/20 space-y-3">
           
           {/* Quick Switcher Button */}
           <button
             onClick={() => navigate('/dashboard')}
-            className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-500/40 text-xs text-slate-300 hover:text-white transition-all cursor-pointer group shadow-sm"
+            className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 hover:border-[#4A8BDF]/60 text-xs text-slate-300 hover:text-white transition-all cursor-pointer group shadow-sm"
           >
             <div className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-[#FF7A00]" />
+              <span className="h-2 w-2 rounded-full bg-[#A0006D]" />
               <span className="font-semibold">Candidate View</span>
             </div>
-            <ArrowRight size={13} className="text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-0.5 transition-transform" />
+            <ArrowRight size={13} className="text-slate-400 group-hover:text-[#4A8BDF] group-hover:translate-x-0.5 transition-transform" />
           </button>
 
           {/* Admin User Info */}
           <div className="flex items-center justify-between pt-1">
             <div className="flex items-center gap-2.5 overflow-hidden">
-              <div className="h-8 w-8 rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 font-bold font-display flex items-center justify-center text-xs shrink-0">
+              <div className="h-8 w-8 rounded-xl bg-[#4A8BDF]/20 border border-[#4A8BDF]/30 text-[#4A8BDF] font-bold font-display flex items-center justify-center text-xs shrink-0">
                 {user?.name?.charAt(0) || 'A'}
               </div>
               <div className="overflow-hidden">
@@ -172,7 +172,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             <button
               onClick={handleLogout}
               title="Log out"
-              className="p-2 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-900 transition-colors cursor-pointer shrink-0"
+              className="p-2 rounded-lg text-slate-400 hover:text-[#D64545] hover:bg-white/10 transition-colors cursor-pointer shrink-0"
             >
               <LogOut size={15} />
             </button>
@@ -183,17 +183,17 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       </aside>
 
       {/* ─── Main Content Canvas ─── */}
-      <div className="flex-1 flex flex-col h-full overflow-hidden bg-slate-100">
+      <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#EFFAFD]">
         
         {/* Mobile Header Bar */}
-        <header className="lg:hidden h-14 bg-[#0F172A] text-white px-4 flex items-center justify-between border-b border-slate-800 shrink-0 z-20">
+        <header className="lg:hidden h-14 bg-[#11183D] text-white px-4 flex items-center justify-between border-b border-white/10 shrink-0 z-20">
           <Link to="/admin">
             <Logo size="sm" theme="dark" />
           </Link>
 
           <button
             onClick={() => setMobileMenuOpen(prev => !prev)}
-            className="p-2 rounded-lg bg-slate-800 text-slate-300 hover:text-white"
+            className="p-2 rounded-lg bg-white/10 text-slate-300 hover:text-white"
           >
             {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
           </button>

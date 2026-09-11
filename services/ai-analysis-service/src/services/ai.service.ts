@@ -143,45 +143,80 @@ ${rawTranscript}
     orderIndex: number
   ): GeneratedQuestionAI {
     const role = session.targetRole || 'Software Engineer';
+    const roleLower = role.toLowerCase();
 
     if (previousQA.length > 0) {
       const last = previousQA[previousQA.length - 1];
-      if (last.needsFollowUp && last.gaps && last.gaps.length > 0) {
+      if (last.answerText && last.answerText.length > 10) {
+        const words = last.answerText.split(' ');
+        const keyTerm = words.find(w => w.length > 5 && !['because', 'through', 'building', 'project'].includes(w.toLowerCase())) || 'that approach';
         return {
-          questionText: `Follow-up: You mentioned ${last.gaps[0]}. Could you elaborate on how you handled that specific constraint?`,
+          questionText: `Follow-up: In your previous response, you highlighted using ${keyTerm}. How did you handle edge-case failure modes or performance trade-offs with that architecture?`,
           questionType: QuestionType.TECHNICAL,
           difficulty: Difficulty.MEDIUM,
-          rationale: 'Deep-dive follow-up on identified candidate gap',
+          rationale: 'Deep-dive Socratic challenge on candidate spoken answer',
           isFollowUp: true,
         };
       }
     }
 
-    const standardQuestions: Record<string, string[]> = {
-      INTERNSHIP: [
-        `Tell me about a challenging programming project you worked on for ${role}.`,
-        'How do you test and debug your code when something unexpected happens?',
-        'Describe a situation where you had to quickly learn a new technology or framework.',
+    const domainMatrix: Record<string, string[]> = {
+      frontend: [
+        `Walk me through how you optimize Web Vital metrics (LCP, CLS, INP) for a high-traffic ${role} application.`,
+        'How do you manage complex client-side state across deeply nested component hierarchies without triggering cascading re-renders?',
+        'Explain your strategy for client-side caching, service workers, and offline resilience in modern Web apps.',
+        'How do you defend against XSS, CSRF, and third-party script vulnerabilities in frontend architectures?',
       ],
-      JOB: [
-        `Walk me through a complex production feature you built in a ${role} position.`,
-        'How do you design systems to handle high concurrency and prevent data loss?',
-        'Describe a time when you had a technical disagreement with a team member and how you resolved it.',
+      backend: [
+        `How do you design database indexing and partitioning strategies for a ${role} backend facing heavy write traffic?`,
+        'Walk me through your design for a resilient distributed locking mechanism across microservices.',
+        'How do you prevent data inconsistency and handle eventual consistency in event-driven architectures using Kafka or RabbitMQ?',
+        'Explain how you implement zero-downtime database schema migrations on a live production table with millions of rows.',
       ],
-      CODING: [
-        'Explain the time and space complexity of your proposed approach before implementation.',
-        'How would you handle boundary edge cases in your algorithm?',
+      fullstack: [
+        `Walk me through the end-to-end data pipeline from the browser event to the database transaction in a ${role} system.`,
+        'How do you balance server-side rendering (SSR) vs client-side hydration for dynamic data-heavy platforms?',
+        'Explain your approach to rate-limiting, API gateway management, and token authentication at scale.',
+        'How do you structure microservices or modular monoliths to maintain clean separation of concerns?',
       ],
+      aiml: [
+        `How do you handle model latency, GPU memory optimization, and batching when serving LLM/ML models in production?`,
+        'Walk me through your pipeline for data validation, feature engineering, and model drift detection.',
+        'Explain how you optimize fine-tuning vs retrieval-augmented generation (RAG) for enterprise domain knowledge.',
+        'How do you evaluate model accuracy and prevent hallucinations in production AI agents?',
+      ],
+      devops: [
+        `How do you structure GitOps deployment pipelines, Kubernetes cluster autoscaling, and zero-downtime canary rollouts?`,
+        'Explain your strategy for distributed tracing, log aggregation, and real-time incident alerting at scale.',
+        'How do you enforce Infrastructure as Code (Terraform/Ansible) security scans and policy compliance?',
+        'Describe how you handle disaster recovery, multi-region failovers, and database point-in-time recovery.',
+      ],
+      general: [
+        `Describe a complex architecture challenge you faced in a ${role} role and how you evaluated alternative trade-offs.`,
+        'How do you handle technical debt while balancing aggressive feature delivery deadlines?',
+        'Walk me through a production outage or critical bug you debugged. What was the root cause and long-term mitigation?',
+        'Describe a scenario where you led a technical design choice against team disagreements. How did you align stakeholders?',
+      ]
     };
 
-    const qList = standardQuestions[session.interviewType] || standardQuestions.JOB;
-    const selectedQ = qList[orderIndex % qList.length];
+    let domainKey = 'general';
+    if (/front|react|vue|angular|js|ts|ui/i.test(roleLower)) domainKey = 'frontend';
+    else if (/back|node|spring|java|python|go|golang|postgres|sql/i.test(roleLower)) domainKey = 'backend';
+    else if (/full/i.test(roleLower)) domainKey = 'fullstack';
+    else if (/ai|ml|data|learning|nlp/i.test(roleLower)) domainKey = 'aiml';
+    else if (/devops|sre|cloud|kubernetes|docker|aws/i.test(roleLower)) domainKey = 'devops';
+
+    const pool = domainMatrix[domainKey] || domainMatrix.general;
+    // Session uniqueness seed calculation
+    const hash = (session.id || 'seed').split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const selectedIdx = (hash + orderIndex * 7) % pool.length;
+    const selectedQ = pool[selectedIdx];
 
     return {
       questionText: selectedQ,
       questionType: orderIndex % 2 === 0 ? QuestionType.TECHNICAL : QuestionType.BEHAVIOURAL,
       difficulty: session.experienceLevel === ExperienceLevel.SENIOR ? Difficulty.HARD : Difficulty.MEDIUM,
-      rationale: 'Standard mock question blueprint',
+      rationale: 'Seeded unique domain question blueprint',
       isFollowUp: false,
     };
   },
@@ -247,17 +282,27 @@ ${rawTranscript}
       archetype = 'devops';
     }
 
-    const last = previousQA[previousQA.length - 1];
-    const userPrompt = `Candidate Session Details:
+    const previousHistoryFormatted = previousQA.map((qa, i) => `Q${i + 1}: "${qa.questionText}"\nCandidate Answer: "${qa.answerText || '[No answer recorded]'}"`).join('\n\n');
+
+    const userPrompt = `Candidate Session Context:
+- Session ID: ${session.id} (Randomization Seed)
 - Interview Type: ${session.interviewType}
 - Target Role: ${session.targetRole} (Archetype: ${archetype})
-- Target Company: ${session.targetCompany || 'Not specified'}
+- Target Company: ${session.targetCompany || 'Top Tech Companies'}
 - Industry: ${session.industry}
 - Experience Level: ${session.experienceLevel}
 - Focus Areas: ${session.focusAreas.join(', ')}
-- Question Number in Sequence: ${orderIndex + 1}
+- Sequence Number: Question ${orderIndex + 1}
 
-Suggested Blueprint: "${baselineMock.questionText}"`;
+Previous Interview Q&A Transcript History:
+"""
+${previousHistoryFormatted || 'No prior questions asked yet. This is Question 1.'}
+"""
+
+INSTRUCTIONS:
+Generate a completely unique, highly technical, sharp, and non-repeating question for this candidate.
+If the candidate mentioned a specific technology in their previous answer (e.g. Redis, Postgres, React, Kafka, Docker), trigger an Architectural Challenge questioning why they chose that specific tool over alternatives.
+Ensure this question is DIFFERENT from all prior questions in history.`;
 
     try {
       const raw = await callAICompletions<GeneratedQuestionAI>(systemPrompt, userPrompt, 25000);

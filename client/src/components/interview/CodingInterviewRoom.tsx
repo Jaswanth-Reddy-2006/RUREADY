@@ -46,7 +46,9 @@ const LANGUAGES = [
   { value: 'javascript', label: 'JavaScript (Node.js)' },
   { value: 'typescript', label: 'TypeScript' },
   { value: 'python', label: 'Python 3' },
-  { value: 'java', label: 'Java 17' }
+  { value: 'java', label: 'Java 17' },
+  { value: 'cpp', label: 'C++ (GCC)' },
+  { value: 'go', label: 'Go (Golang)' }
 ];
 
 const LANGUAGE_BOILERPLATES: Record<string, string> = {
@@ -85,6 +87,35 @@ public class Solution {
     public static void main(String[] args) {
         System.out.println("Solution initialized.");
     }
+}`,
+  cpp: `// Write your C++ solution here
+#include <iostream>
+#include <vector>
+
+class Solution {
+public:
+    void solve() {
+        // 1. Clarify constraints & edge cases
+        // 2. Implement your optimal algorithm
+    }
+};
+
+int main() {
+    std::cout << "Solution initialized." << std::endl;
+    return 0;
+}`,
+  go: `// Write your Go solution here
+package main
+
+import "fmt"
+
+func solve() {
+    // 1. Clarify constraints & edge cases
+    // 2. Implement your optimal algorithm
+}
+
+func main() {
+    fmt.Println("Solution initialized.")
 }`
 };
 
@@ -748,13 +779,13 @@ export default function CodingInterviewRoom() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-[#11183D]/60 backdrop-blur-sm"
           >
-            <div className="max-w-md w-full bg-slate-900 border border-slate-700 rounded-3xl p-8 text-center space-y-4 shadow-2xl">
-              <div className="mx-auto h-12 w-12 border-3 border-[#FF7A00] border-t-transparent animate-spin rounded-full" />
+            <div className="max-w-md w-full bg-white border border-[#DCE7F2] rounded-3xl p-8 text-center space-y-4 shadow-2xl">
+              <div className="mx-auto h-12 w-12 border-3 border-[#A0006D] border-t-transparent animate-spin rounded-full" />
               <div>
-                <h3 className="text-sm font-bold font-display uppercase tracking-wider text-white">Ava Socratic Engine</h3>
-                <p className="text-xs text-slate-400 mt-1 font-body">{processingLabel}</p>
+                <h3 className="text-sm font-bold font-display uppercase tracking-wider text-[#11183D]">Ava Socratic AI Engine</h3>
+                <p className="text-xs text-[#526078] mt-1 font-body">{processingLabel}</p>
               </div>
             </div>
           </motion.div>
@@ -762,16 +793,16 @@ export default function CodingInterviewRoom() {
       </AnimatePresence>
 
       {/* Top Header Bar */}
-      <header className="h-14 border-b border-slate-800 bg-slate-900/95 backdrop-blur px-6 flex items-center justify-between shrink-0">
+      <header className="h-14 border-b border-[#DCE7F2] bg-white/95 backdrop-blur px-6 flex items-center justify-between shrink-0 shadow-xs">
         <div className="flex items-center gap-3">
-          <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-[#FF7A00] to-[#E66E00] flex items-center justify-center text-white font-bold text-xs shadow-sm">
+          <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-[#4A8BDF] to-[#2459A8] flex items-center justify-center text-white font-bold text-xs shadow-sm">
             <Code2 size={16} />
           </div>
           <div>
-            <span className="text-xs font-bold text-white font-display tracking-tight block">
-              RU READY Technical Coding Assessment
+            <span className="text-xs font-bold text-[#11183D] font-display tracking-tight block">
+              R U Ready? Technical Coding Assessment
             </span>
-            <span className="text-[10px] text-slate-400 font-mono">
+            <span className="text-[10px] text-[#526078] font-mono">
               {session?.targetRole || 'Software Engineer'} • {currentQuestion?.difficulty || 'MEDIUM'} Track
             </span>
           </div>
@@ -779,12 +810,12 @@ export default function CodingInterviewRoom() {
 
         {/* Telemetry & Timer */}
         <div className="flex items-center gap-4">
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700 text-xs font-mono">
-            <span className="text-slate-400">Eye Gaze:</span>
-            <span className="text-emerald-400 font-bold">{eyeGazeScore}%</span>
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-[#EFFAFD] border border-[#DCE7F2] text-xs font-mono">
+            <span className="text-[#526078]">Eye Gaze:</span>
+            <span className="text-[#168A62] font-bold">{eyeGazeScore}%</span>
           </div>
 
-          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-xs font-bold">
+          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full border border-[#168A62]/30 bg-[#168A62]/10 text-[#168A62] text-xs font-bold">
             <Shield size={13} />
             <span className="hidden md:inline">ANTI-CHEAT ACTIVE</span>
           </div>
@@ -796,13 +827,13 @@ export default function CodingInterviewRoom() {
       </header>
 
       {/* Main Studio 2-Pane Split */}
-      <main className="flex-1 flex overflow-hidden min-h-0">
+      <main className="flex-1 flex overflow-hidden min-h-0 bg-[#EFFAFD]">
         
         {/* LEFT PANE (42vw): Problem Details, Socratic Dialogue & Ava AI Avatar */}
-        <section className="w-[42vw] h-full flex flex-col border-r border-slate-800 bg-slate-900 min-w-[380px] overflow-hidden">
+        <section className="w-[42vw] h-full flex flex-col border-r border-[#DCE7F2] bg-white min-w-[380px] overflow-hidden">
           
           {/* Left Navigation Tabs */}
-          <div className="h-11 shrink-0 bg-slate-950/80 border-b border-slate-800 px-4 flex items-center justify-between">
+          <div className="h-11 shrink-0 bg-[#EFFAFD] border-b border-[#DCE7F2] px-4 flex items-center justify-between">
             <div className="flex items-center gap-1">
               {[
                 { id: 'problem', label: 'Problem', icon: BookOpen },
@@ -818,11 +849,11 @@ export default function CodingInterviewRoom() {
                     onClick={() => setLeftTab(tab.id as any)}
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold font-display transition-all cursor-pointer ${
                       isSelected
-                        ? 'bg-slate-800 text-white shadow-xs'
-                        : 'text-slate-400 hover:text-white'
+                        ? 'bg-white text-[#4A8BDF] shadow-xs border border-[#DCE7F2]'
+                        : 'text-[#526078] hover:text-[#11183D]'
                     }`}
                   >
-                    <Icon size={13} className={isSelected ? 'text-[#FF7A00]' : ''} />
+                    <Icon size={13} className={isSelected ? 'text-[#4A8BDF]' : ''} />
                     <span>{tab.label}</span>
                   </button>
                 );
@@ -832,7 +863,7 @@ export default function CodingInterviewRoom() {
             <button
               onClick={handleAskForHint}
               disabled={isProcessing || hintCount >= 3}
-              className="flex items-center gap-1 px-3 py-1 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 font-bold rounded-lg text-xs cursor-pointer transition-all active:scale-[0.98]"
+              className="flex items-center gap-1 px-3 py-1 bg-[#F8EAF4] hover:bg-[#A0006D]/15 border border-[#A0006D]/30 text-[#A0006D] font-bold rounded-lg text-xs cursor-pointer transition-all active:scale-[0.98]"
               title="Get a progressive Socratic hint from Ava"
             >
               <Lightbulb size={12} />
@@ -847,43 +878,43 @@ export default function CodingInterviewRoom() {
             {leftTab === 'problem' && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-base font-bold font-display text-white">
+                  <h2 className="text-base font-bold font-display text-[#11183D]">
                     {currentQuestion?.questionText.split('\n')[0] || 'Algorithmic Problem'}
                   </h2>
-                  <Badge variant="orange" size="xs">
+                  <Badge variant="navy" size="xs">
                     {currentQuestion?.difficulty || 'Medium'}
                   </Badge>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800/80 text-xs leading-relaxed text-slate-300 font-body space-y-3">
+                <div className="p-4 rounded-2xl bg-[#EFFAFD] border border-[#DCE7F2] text-xs leading-relaxed text-[#11183D] font-body space-y-3">
                   <p className="whitespace-pre-wrap">
                     {currentQuestion?.questionText || 'Given an array of integers, return the indices of two numbers that add up to target.'}
                   </p>
                 </div>
 
                 <div className="space-y-2">
-                  <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider font-display">
+                  <h4 className="text-xs font-bold text-[#526078] uppercase tracking-wider font-display">
                     Constraints & Socratic Goals
                   </h4>
-                  <ul className="text-xs text-slate-400 space-y-1 font-body list-disc list-inside">
+                  <ul className="text-xs text-[#526078] space-y-1 font-body list-disc list-inside">
                     <li>Optimal Time Complexity: \(O(N)\) or \(O(N \log N)\)</li>
                     <li>Auxiliary Space Complexity: \(O(1)\) to \(O(N)\)</li>
                     <li>Handle edge cases with empty arrays or negative values.</li>
                   </ul>
                 </div>
 
-                {/* Quick Approach Review CTA */}
-                <div className="p-4 rounded-2xl bg-gradient-to-r from-orange-500/10 via-slate-950 to-slate-950 border border-orange-500/30 space-y-2">
+                {/* Quick Approach Review CTA (Eggplant AI Accent) */}
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-[#F8EAF4] via-white to-white border border-[#A0006D]/30 space-y-2">
                   <div className="flex items-center gap-2">
-                    <Sparkles size={14} className="text-[#FF7A00]" />
-                    <span className="text-xs font-bold text-white font-display">Discuss with Ava</span>
+                    <Sparkles size={14} className="text-[#A0006D]" />
+                    <span className="text-xs font-bold text-[#11183D] font-display">Discuss with Ava AI</span>
                   </div>
-                  <p className="text-[11px] text-slate-400 font-body">
+                  <p className="text-[11px] text-[#526078] font-body">
                     Explain your algorithmic approach or brute-force intuition out loud to receive immediate feedback.
                   </p>
                   <Button
                     size="sm"
-                    variant="secondary"
+                    variant="eggplant"
                     onClick={() => handleSendClarificationToAva("Ava, I'd like to clarify my approach before coding.")}
                     icon={<Mic size={12} />}
                   >
@@ -902,17 +933,17 @@ export default function CodingInterviewRoom() {
                       key={entry.id}
                       className={`p-3.5 rounded-2xl text-xs leading-relaxed font-body ${
                         entry.speaker === 'ai'
-                          ? 'bg-slate-800/70 border border-slate-700/60 text-slate-200 ml-0 mr-4'
-                          : 'bg-orange-500/15 border border-orange-500/30 text-orange-200 ml-4 mr-0'
+                          ? 'bg-[#F8EAF4] border border-[#A0006D]/30 text-[#11183D] ml-0 mr-4'
+                          : 'bg-[#EFFAFD] border border-[#4A8BDF]/30 text-[#11183D] ml-4 mr-0'
                       }`}
                     >
                       <div className="flex items-center gap-1.5 font-bold mb-1 font-display text-[10px] uppercase">
                         {entry.speaker === 'ai' ? (
-                          <span className="text-[#FF7A00] flex items-center gap-1">
+                          <span className="text-[#A0006D] flex items-center gap-1">
                             <Sparkles size={10} /> Ava Socratic AI
                           </span>
                         ) : (
-                          <span className="text-slate-300">You (Candidate)</span>
+                          <span className="text-[#4A8BDF]">You (Candidate)</span>
                         )}
                       </div>
                       <p>{entry.text}</p>
@@ -921,19 +952,19 @@ export default function CodingInterviewRoom() {
                 </div>
 
                 {/* Voice / Text Question Box to Ava */}
-                <div className="pt-2 border-t border-slate-800 flex items-center gap-2">
+                <div className="pt-2 border-t border-[#DCE7F2] flex items-center gap-2">
                   <input
                     type="text"
                     placeholder="Ask Ava for clarification or complexity feedback..."
                     value={clarificationInput}
                     onChange={(e) => setClarificationInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSendClarificationToAva()}
-                    className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#FF7A00]"
+                    className="flex-1 bg-white border border-[#DCE7F2] rounded-xl px-3 py-2 text-xs text-[#11183D] placeholder:text-[#7B8799] focus:outline-none focus:border-[#4A8BDF]"
                   />
                   <button
                     onClick={() => handleSendClarificationToAva()}
                     disabled={isProcessing || !clarificationInput.trim()}
-                    className="p-2.5 rounded-xl bg-[#FF7A00] hover:bg-[#E66E00] text-white disabled:opacity-40 transition-colors cursor-pointer"
+                    className="p-2.5 rounded-xl bg-[#4A8BDF] hover:bg-[#2459A8] text-white disabled:opacity-40 transition-colors cursor-pointer"
                   >
                     <Send size={13} />
                   </button>
@@ -945,31 +976,31 @@ export default function CodingInterviewRoom() {
             {leftTab === 'hints' && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 font-display">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-[#526078] font-display">
                     Socratic Hints Protocol
                   </h3>
-                  <span className="text-xs text-amber-400 font-mono font-bold">
+                  <span className="text-xs text-[#A0006D] font-mono font-bold">
                     Level {hintCount} of 3
                   </span>
                 </div>
 
                 {unlockedHints.length === 0 ? (
-                  <div className="text-center py-10 space-y-3 p-6 rounded-2xl bg-slate-950/60 border border-slate-800">
-                    <Lightbulb size={24} className="text-slate-600 mx-auto" />
-                    <p className="text-xs text-slate-400 font-body">
+                  <div className="text-center py-10 space-y-3 p-6 rounded-2xl bg-[#EFFAFD] border border-[#DCE7F2]">
+                    <Lightbulb size={24} className="text-[#7B8799] mx-auto" />
+                    <p className="text-xs text-[#526078] font-body">
                       No hints consumed yet. Try solving first, or click [Hint] if you get stuck.
                     </p>
-                    <Button size="sm" onClick={handleAskForHint} disabled={hintCount >= 3}>
+                    <Button size="sm" variant="eggplant" onClick={handleAskForHint} disabled={hintCount >= 3}>
                       Unlock Level 1 Hint
                     </Button>
                   </div>
                 ) : (
                   unlockedHints.map((hint, idx) => (
-                    <div key={idx} className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 space-y-1">
-                      <span className="text-[10px] font-bold text-amber-400 uppercase font-mono">
+                    <div key={idx} className="p-4 rounded-2xl bg-[#F8EAF4] border border-[#A0006D]/30 space-y-1">
+                      <span className="text-[10px] font-bold text-[#A0006D] uppercase font-mono">
                         Progressive Hint Level 0{idx + 1}
                       </span>
-                      <p className="text-xs text-slate-200 font-body leading-relaxed">{hint}</p>
+                      <p className="text-xs text-[#11183D] font-body leading-relaxed">{hint}</p>
                     </div>
                   ))
                 )}
@@ -979,10 +1010,10 @@ export default function CodingInterviewRoom() {
           </div>
 
           {/* Bottom Left: Ava AI Avatar & Candidate Video Strip */}
-          <div className="h-44 shrink-0 border-t border-slate-800 bg-slate-950 p-4 grid grid-cols-2 gap-3 items-center">
+          <div className="h-44 shrink-0 border-t border-[#DCE7F2] bg-[#EFFAFD] p-4 grid grid-cols-2 gap-3 items-center">
             {/* Ava AI Avatar Box */}
-            <div className="h-full rounded-2xl bg-slate-900 border border-slate-800 p-3 flex items-center gap-3 relative overflow-hidden">
-              <div className="h-16 w-16 rounded-xl bg-slate-950 border border-slate-700 shrink-0 overflow-hidden flex items-center justify-center">
+            <div className="h-full rounded-2xl bg-white border border-[#DCE7F2] p-3 flex items-center gap-3 relative overflow-hidden shadow-xs">
+              <div className="h-16 w-16 rounded-xl bg-[#EFFAFD] border border-[#DCE7F2] shrink-0 overflow-hidden flex items-center justify-center">
                 <AIAvatar
                   state={avatarState}
                   isSpeaking={aiIsSpeaking}
@@ -992,17 +1023,17 @@ export default function CodingInterviewRoom() {
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5 mb-0.5">
-                  <span className="text-[10px] font-bold text-white font-display">Ava AI</span>
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#FF7A00] animate-pulse" />
+                  <span className="text-[10px] font-bold text-[#A0006D] font-display">Ava AI</span>
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#A0006D] animate-pulse" />
                 </div>
-                <p className="text-[10px] text-slate-400 leading-snug truncate">
+                <p className="text-[10px] text-[#526078] leading-snug truncate">
                   {aiIsSpeaking ? spokenWord || 'Speaking...' : 'Listening to candidate...'}
                 </p>
               </div>
             </div>
 
             {/* Candidate User Video Box */}
-            <div className="h-full rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden relative flex items-center justify-center">
+            <div className="h-full rounded-2xl bg-[#11183D] border border-[#DCE7F2] overflow-hidden relative flex items-center justify-center">
               <UserCamera
                 stream={mediaStream}
                 isMicActive={isMicOn}
@@ -1010,8 +1041,8 @@ export default function CodingInterviewRoom() {
                 className="w-full h-full object-cover scale-x-[-1]"
                 userName="You"
               />
-              <div className="absolute top-2 left-2 flex items-center gap-1 px-1.5 py-0.5 bg-black/60 rounded text-[9px] text-emerald-400 font-mono">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <div className="absolute top-2 left-2 flex items-center gap-1 px-1.5 py-0.5 bg-black/60 rounded text-[9px] text-[#168A62] font-mono">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#168A62] animate-pulse" />
                 <span>Verified</span>
               </div>
             </div>
@@ -1020,16 +1051,16 @@ export default function CodingInterviewRoom() {
         </section>
 
         {/* RIGHT PANE (58vw): Monaco Code Studio & Interactive Test Console */}
-        <section className="flex-1 h-full flex flex-col bg-slate-950 min-w-[500px]">
+        <section className="flex-1 h-full flex flex-col bg-[#EFFAFD] min-w-[500px]">
           
           {/* Top IDE Toolbar */}
-          <div className="h-11 shrink-0 bg-slate-900 border-b border-slate-800 px-4 flex items-center justify-between">
+          <div className="h-11 shrink-0 bg-white border-b border-[#DCE7F2] px-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <span className="text-xs font-bold text-slate-400 uppercase font-mono">Language:</span>
+              <span className="text-xs font-bold text-[#526078] uppercase font-mono">Language:</span>
               <select
                 value={codeLanguage}
                 onChange={(e) => handleLanguageChange(e.target.value)}
-                className="bg-slate-950 border border-slate-700 text-xs font-semibold text-white px-2.5 py-1 rounded-lg focus:outline-none focus:border-[#FF7A00] cursor-pointer"
+                className="bg-[#EFFAFD] border border-[#DCE7F2] text-xs font-semibold text-[#11183D] px-2.5 py-1 rounded-lg focus:outline-none focus:border-[#4A8BDF] cursor-pointer"
               >
                 {LANGUAGES.map((lang) => (
                   <option key={lang.value} value={lang.value}>
@@ -1043,16 +1074,17 @@ export default function CodingInterviewRoom() {
             <div className="flex items-center gap-2">
               <Button
                 size="sm"
-                variant="secondary"
+                variant="royal"
                 onClick={handleRunCode}
                 disabled={isRunningCode || isProcessing}
-                icon={<Play size={12} className="text-[#FF7A00]" />}
+                icon={<Play size={12} className="text-white" />}
               >
                 {isRunningCode ? 'Running Sandbox...' : 'Run Test Cases'}
               </Button>
 
               <Button
                 size="sm"
+                variant="eggplant"
                 onClick={submitSolution}
                 disabled={isProcessing}
                 iconRight={<ChevronRight size={14} />}
@@ -1066,13 +1098,20 @@ export default function CodingInterviewRoom() {
           <div className="flex-1 min-h-0 relative bg-[#1E1E1E]">
             <Editor
               height="100%"
-              language={codeLanguage === 'python' ? 'python' : codeLanguage === 'java' ? 'java' : 'javascript'}
+              language={
+                codeLanguage === 'cpp' ? 'cpp' :
+                codeLanguage === 'go' ? 'go' :
+                codeLanguage === 'python' ? 'python' :
+                codeLanguage === 'java' ? 'java' :
+                codeLanguage === 'typescript' ? 'typescript' :
+                'javascript'
+              }
               theme="vs-dark"
               value={codeValue}
               onChange={(val) => setCodeValue(val || '')}
               onMount={handleEditorDidMount}
               options={{
-                fontSize: 13,
+                fontSize: 14,
                 fontFamily: 'JetBrains Mono, Fira Code, monospace',
                 minimap: { enabled: false },
                 lineNumbers: 'on',
@@ -1081,15 +1120,17 @@ export default function CodingInterviewRoom() {
                 automaticLayout: true,
                 padding: { top: 12, bottom: 12 },
                 scrollBeyondLastLine: false,
+                bracketPairColorization: { enabled: true },
+                formatOnType: true,
               }}
             />
           </div>
 
           {/* Bottom Expandable Test Cases & Compiler Console */}
-          <div className={`shrink-0 border-t border-slate-800 bg-slate-900 flex flex-col transition-all duration-300 ${isConsoleOpen ? 'h-52' : 'h-10'}`}>
+          <div className={`shrink-0 border-t border-[#DCE7F2] bg-white flex flex-col transition-all duration-300 ${isConsoleOpen ? 'h-52' : 'h-10'}`}>
             
             {/* Console Header Bar */}
-            <div className="h-10 border-b border-slate-800 bg-slate-950 px-4 flex items-center justify-between shrink-0">
+            <div className="h-10 border-b border-[#DCE7F2] bg-[#EFFAFD] px-4 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2">
                 <button
                   type="button"
@@ -1098,7 +1139,7 @@ export default function CodingInterviewRoom() {
                     setConsoleTab('testcases');
                   }}
                   className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                    consoleTab === 'testcases' ? 'bg-slate-800 text-[#FF7A00]' : 'text-slate-400 hover:text-white'
+                    consoleTab === 'testcases' ? 'bg-white text-[#4A8BDF] border border-[#DCE7F2] shadow-xs' : 'text-[#526078] hover:text-[#11183D]'
                   }`}
                 >
                   Unit Test Cases {testResults ? `(${testResults.passedCount}/${testResults.totalCount})` : ''}
@@ -1111,7 +1152,7 @@ export default function CodingInterviewRoom() {
                     setConsoleTab('terminal');
                   }}
                   className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                    consoleTab === 'terminal' ? 'bg-slate-800 text-[#FF7A00]' : 'text-slate-400 hover:text-white'
+                    consoleTab === 'terminal' ? 'bg-white text-[#4A8BDF] border border-[#DCE7F2] shadow-xs' : 'text-[#526078] hover:text-[#11183D]'
                   }`}
                 >
                   Compiler Output
@@ -1120,7 +1161,7 @@ export default function CodingInterviewRoom() {
 
               <button
                 onClick={() => setIsConsoleOpen(prev => !prev)}
-                className="text-xs text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center gap-1"
+                className="text-xs text-[#526078] hover:text-[#11183D] transition-colors cursor-pointer flex items-center gap-1"
               >
                 {isConsoleOpen ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
                 <span>{isConsoleOpen ? 'Collapse' : 'Expand'}</span>
@@ -1129,7 +1170,7 @@ export default function CodingInterviewRoom() {
 
             {/* Console Body */}
             {isConsoleOpen && (
-              <div className="flex-1 p-4 overflow-y-auto bg-slate-950 font-mono text-xs">
+              <div className="flex-1 p-4 overflow-y-auto bg-[#11183D] font-mono text-xs text-slate-100">
                 {consoleTab === 'testcases' ? (
                   <div className="space-y-3">
                     {testResults ? (
@@ -1193,7 +1234,7 @@ export default function CodingInterviewRoom() {
                         )}
                       </div>
                     ) : (
-                      <div className="text-slate-500 italic p-4 text-center">
+                      <div className="text-slate-400 italic p-4 text-center">
                         Click [Run Test Cases] to test your code against sandbox test cases.
                       </div>
                     )}
@@ -1213,14 +1254,14 @@ export default function CodingInterviewRoom() {
       </main>
 
       {/* Bottom Status Bar */}
-      <footer className="h-10 shrink-0 border-t border-slate-800 bg-slate-950 px-6 flex items-center justify-between text-xs text-slate-400 font-mono">
+      <footer className="h-10 shrink-0 border-t border-[#DCE7F2] bg-white px-6 flex items-center justify-between text-xs text-[#526078] font-mono">
         <div className="flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full bg-emerald-500" />
+          <span className="h-2 w-2 rounded-full bg-[#168A62]" />
           <span>Monaco Sandbox Node.js VM • Sandboxed</span>
         </div>
 
         {answerText && (
-          <div className="flex items-center gap-2 text-orange-400 font-sans italic truncate max-w-md">
+          <div className="flex items-center gap-2 text-[#4A8BDF] font-sans italic truncate max-w-md">
             <Mic size={12} className="animate-pulse" />
             <span className="truncate">"{answerText}"</span>
           </div>
@@ -1232,7 +1273,7 @@ export default function CodingInterviewRoom() {
               navigate('/dashboard');
             }
           }}
-          className="text-slate-500 hover:text-rose-400 transition-colors cursor-pointer"
+          className="text-[#526078] hover:text-[#D64545] transition-colors cursor-pointer"
         >
           Abandon Assessment
         </button>
@@ -1240,4 +1281,3 @@ export default function CodingInterviewRoom() {
     </div>
   );
 }
-

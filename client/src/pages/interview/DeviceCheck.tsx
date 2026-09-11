@@ -353,7 +353,7 @@ export default function DeviceCheck() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 p-4 sm:p-8">
+    <div className="min-h-screen bg-[#EFFAFD] text-[#11183D] p-4 sm:p-8">
       
       {/* Violation / Anti-Cheat Modal Overlay */}
       <AnimatePresence>
@@ -362,20 +362,20 @@ export default function DeviceCheck() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 backdrop-blur-sm p-4 text-center select-none"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-[#11183D]/70 backdrop-blur-sm p-4 text-center select-none"
           >
-            <div className="max-w-md w-full bg-white border border-rose-200 p-8 rounded-3xl shadow-2xl relative overflow-hidden">
-              <div className="mx-auto h-14 w-14 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mb-4 shadow-sm">
+            <div className="max-w-md w-full bg-white border border-[#D64545]/20 p-8 rounded-3xl shadow-2xl relative overflow-hidden">
+              <div className="mx-auto h-14 w-14 rounded-2xl bg-[#FDF0F0] text-[#D64545] flex items-center justify-center mb-4 shadow-sm">
                 <ShieldAlert size={28} />
               </div>
-              <h2 className="text-xl font-bold font-display text-slate-900 mb-2">
+              <h2 className="text-xl font-bold font-display text-[#11183D] mb-2">
                 Security Deviation Flagged
               </h2>
-              <p className="text-xs text-slate-600 leading-relaxed font-body mb-5">
+              <p className="text-xs text-[#526078] leading-relaxed font-body mb-5">
                 You minimized the full-screen view or switched tabs. RU READY simulations require uninterrupted focus. Please re-enter full-screen to continue.
               </p>
               
-              <div className="rounded-xl border border-rose-200 bg-rose-50/80 p-3 mb-5 text-left text-xs text-rose-700 font-semibold flex items-center justify-between">
+              <div className="rounded-xl border border-[#D64545]/20 bg-[#FDF0F0] p-3 mb-5 text-left text-xs text-[#D64545] font-semibold flex items-center justify-between">
                 <span>Security Notice Count:</span>
                 <span className="font-mono text-sm">{violations}</span>
               </div>
@@ -387,7 +387,7 @@ export default function DeviceCheck() {
                   setShowViolationOverlay(false);
                   handleFullscreenLock();
                 }}
-                className="bg-rose-600 hover:bg-rose-700 text-white shadow-sm"
+                className="bg-[#D64545] hover:bg-[#D64545]/90 text-white shadow-sm"
               >
                 Re-enter Fullscreen & Continue
               </Button>
@@ -402,27 +402,27 @@ export default function DeviceCheck() {
         <div className="flex items-center justify-between">
           <Link 
             to="/interview/new"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors font-display"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#526078] hover:text-[#11183D] transition-colors font-display"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             <span>Back to Setup</span>
           </Link>
-          <span className="text-xs text-slate-400 font-mono">Session ID: {id?.slice(0, 8)}...</span>
+          <span className="text-xs text-[#7B8799] font-mono">Session ID: {id?.slice(0, 8)}...</span>
         </div>
 
         {/* Top Header Card */}
-        <div className="bg-white border border-slate-200 p-6 rounded-3xl shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="bg-white border border-[#DCE7F2] p-6 rounded-3xl shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
-            <h1 className="text-2xl font-extrabold font-display text-slate-900 tracking-tight">
+            <h1 className="text-2xl font-extrabold font-display text-[#11183D] tracking-tight">
               Device Check & System Integrity Setup
             </h1>
-            <p className="text-xs text-slate-500 font-body">
+            <p className="text-xs text-[#526078] font-body">
               Follow the 4-step check below to ensure optimal audio, video, and proctoring conditions.
             </p>
           </div>
           <div className="shrink-0 flex items-center gap-2">
-            <span className="text-xs text-slate-400 font-display uppercase tracking-wider">Role:</span>
-            <Badge variant="orange" size="sm">
+            <span className="text-xs text-[#7B8799] font-display uppercase tracking-wider">Role:</span>
+            <Badge variant="royal" size="sm">
               {session?.targetRole || 'Software Engineer'}
             </Badge>
           </div>
@@ -440,26 +440,26 @@ export default function DeviceCheck() {
                 onClick={() => setActiveStep(step.num)}
                 className={`p-3.5 rounded-2xl border text-left transition-all flex items-center gap-3 cursor-pointer ${
                   isCurrent
-                    ? 'bg-orange-50/70 border-[#FF7A00] shadow-sm ring-1 ring-[#FF7A00]/20'
+                    ? 'bg-[#EFF7FD] border-[#4A8BDF] shadow-sm ring-1 ring-[#4A8BDF]/20'
                     : step.isDone
-                      ? 'bg-white border-emerald-300 hover:border-emerald-400'
-                      : 'bg-white border-slate-200 hover:border-slate-300'
+                      ? 'bg-white border-[#168A62]/40 hover:border-[#168A62]'
+                      : 'bg-white border-[#DCE7F2] hover:border-[#4A8BDF]/30'
                 }`}
               >
                 <div className={`h-8 w-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold font-display transition-colors ${
                   step.isDone 
-                    ? 'bg-emerald-500 text-white shadow-xs' 
+                    ? 'bg-[#168A62] text-white shadow-xs' 
                     : isCurrent 
-                      ? 'bg-[#FF7A00] text-white shadow-xs' 
-                      : 'bg-slate-100 text-slate-500'
+                      ? 'bg-[#4A8BDF] text-white shadow-xs' 
+                      : 'bg-[#EFFAFD] text-[#7B8799]'
                 }`}>
                   {step.isDone ? <Check size={14} /> : <Icon size={14} />}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block font-mono">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#7B8799] block font-mono">
                     Step 0{step.num}
                   </span>
-                  <p className={`text-xs font-bold truncate font-display ${isCurrent ? 'text-[#FF7A00]' : 'text-slate-800'}`}>
+                  <p className={`text-xs font-bold truncate font-display ${isCurrent ? 'text-[#4A8BDF]' : 'text-[#11183D]'}`}>
                     {step.label}
                   </p>
                 </div>
@@ -470,20 +470,20 @@ export default function DeviceCheck() {
 
         {/* Validation Notice Alert */}
         {validationError && (
-          <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-xs text-rose-700 font-body shadow-sm flex items-start gap-3 animate-in fade-in slide-in-from-top-2 duration-200">
-            <AlertTriangle size={16} className="shrink-0 mt-0.5 text-rose-600" />
+          <div className="rounded-2xl border border-[#D64545]/25 bg-[#FDF0F0] p-4 text-xs text-[#D64545] font-body shadow-sm flex items-start gap-3 animate-in fade-in slide-in-from-top-2 duration-200">
+            <AlertTriangle size={16} className="shrink-0 mt-0.5 text-[#D64545]" />
             <div className="flex-1">
               <span className="font-bold font-display block mb-0.5">Verification Required:</span>
               <span>{validationError}</span>
             </div>
-            <button type="button" onClick={() => setValidationError(null)} className="text-rose-600 hover:opacity-75">
+            <button type="button" onClick={() => setValidationError(null)} className="text-[#D64545] hover:opacity-75">
               <X size={16} />
             </button>
           </div>
         )}
 
         {/* ─── ACTIVE STEP WIZARD CONTAINER ─── */}
-        <Card padding="lg" className="shadow-sm border-slate-200 bg-white">
+        <Card padding="lg" className="shadow-sm border-[#DCE7F2] bg-white">
           <AnimatePresence mode="wait">
             
             {/* ═══ STEP 1: CAMERA ALIGNMENT ═══ */}
@@ -496,12 +496,12 @@ export default function DeviceCheck() {
                 transition={{ duration: 0.2 }}
                 className="space-y-6"
               >
-                <div className="border-b border-slate-100 pb-4 flex items-center justify-between">
+                <div className="border-b border-[#DCE7F2] pb-4 flex items-center justify-between">
                   <div>
-                    <h3 className="text-base font-bold font-display text-slate-900">
+                    <h3 className="text-base font-bold font-display text-[#11183D]">
                       Step 1: Webcam & Face Alignment
                     </h3>
-                    <p className="text-xs text-slate-500 font-body mt-0.5">
+                    <p className="text-xs text-[#526078] font-body mt-0.5">
                       Ensure your camera is enabled, lens is clean, and your face is positioned in good lighting.
                     </p>
                   </div>
@@ -510,7 +510,7 @@ export default function DeviceCheck() {
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
                   {/* Video Viewport Frame with Face Framing Guide */}
                   <div className="md:col-span-8">
-                    <div className="w-full aspect-video border border-slate-200 bg-slate-100 rounded-2xl overflow-hidden relative flex items-center justify-center shadow-inner">
+                    <div className="w-full aspect-video border border-[#DCE7F2] bg-[#11183D] rounded-2xl overflow-hidden relative flex items-center justify-center shadow-inner">
                       {cameraStatus === 'ALLOWED' ? (
                         <>
                           <video 
@@ -523,7 +523,7 @@ export default function DeviceCheck() {
                           {/* Face Guideline Oval Overlay */}
                           <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
                             <div className="w-48 h-64 border-2 border-dashed border-white/60 rounded-[50%] shadow-[0_0_20px_rgba(0,0,0,0.15)] flex flex-col items-center justify-between py-4">
-                              <span className="text-[10px] font-bold text-white bg-slate-900/70 px-2 py-0.5 rounded-full font-mono">
+                              <span className="text-[10px] font-bold text-white bg-[#11183D]/70 px-2 py-0.5 rounded-full font-mono">
                                 Center Face Here
                               </span>
                               <span className="text-[9px] text-white/80 font-body">Eye Level</span>
@@ -532,14 +532,14 @@ export default function DeviceCheck() {
                         </>
                       ) : cameraStatus === 'PENDING' ? (
                         <div className="text-center space-y-2 font-body p-6">
-                          <div className="h-6 w-6 border-2 border-[#FF7A00] border-t-transparent animate-spin rounded-full mx-auto" />
-                          <p className="text-xs text-slate-700 font-semibold">Connecting to camera device...</p>
+                          <div className="h-6 w-6 border-2 border-[#4A8BDF] border-t-transparent animate-spin rounded-full mx-auto" />
+                          <p className="text-xs text-white font-semibold">Connecting to camera device...</p>
                         </div>
                       ) : (
                         <div className="text-center p-6 space-y-3 max-w-xs font-body">
-                          <AlertTriangle size={24} className="mx-auto text-rose-500 animate-pulse" />
-                          <p className="text-xs font-bold text-slate-900">Camera Access Denied</p>
-                          <p className="text-[11px] text-slate-600 leading-relaxed">
+                          <AlertTriangle size={24} className="mx-auto text-[#D64545] animate-pulse" />
+                          <p className="text-xs font-bold text-white">Camera Access Denied</p>
+                          <p className="text-[11px] text-white/70 leading-relaxed">
                             Please allow camera permissions in your browser address bar and reload.
                           </p>
                           <Button size="sm" variant="secondary" onClick={setupHardware}>
@@ -548,8 +548,8 @@ export default function DeviceCheck() {
                         </div>
                       )}
 
-                      <div className="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-sm border border-white/10 px-3 py-1 text-[10px] font-bold text-white rounded-full uppercase tracking-wider flex items-center gap-1.5">
-                        <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                      <div className="absolute top-3 left-3 bg-[#11183D]/80 backdrop-blur-sm border border-white/10 px-3 py-1 text-[10px] font-bold text-white rounded-full uppercase tracking-wider flex items-center gap-1.5">
+                        <span className="h-2 w-2 rounded-full bg-[#168A62] animate-pulse" />
                         <span>Live Stream</span>
                       </div>
                     </div>
@@ -581,46 +581,46 @@ export default function DeviceCheck() {
                 transition={{ duration: 0.2 }}
                 className="space-y-6"
               >
-                <div className="border-b border-slate-100 pb-4 flex items-center justify-between">
+                <div className="border-b border-[#DCE7F2] pb-4 flex items-center justify-between">
                   <div>
-                    <h3 className="text-base font-bold font-display text-slate-900">
+                    <h3 className="text-base font-bold font-display text-[#11183D]">
                       Step 2: Microphone Input & Speech Detection
                     </h3>
-                    <p className="text-xs text-slate-500 font-body mt-0.5">
+                    <p className="text-xs text-[#526078] font-body mt-0.5">
                       Speak out loud to verify your microphone sensitivity and real-time audio waveforms.
                     </p>
                   </div>
-                  <Badge variant={isMicReady ? "success" : "amber"} size="sm" dot>
+                  <Badge variant={isMicReady ? "success" : "warning"} size="sm" dot>
                     {isMicReady ? 'Voice Detected ✓' : 'Listening...'}
                   </Badge>
                 </div>
 
                 {/* Speak Phrase Banner */}
-                <div className="p-5 rounded-2xl bg-orange-50/70 border border-orange-200 text-center space-y-2">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#FF7A00] font-display block">
+                <div className="p-5 rounded-2xl bg-[#EFF7FD] border border-[#4A8BDF]/30 text-center space-y-2">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#4A8BDF] font-display block">
                     Please speak this sentence clearly:
                   </span>
-                  <p className="text-lg font-bold font-display text-slate-900">
+                  <p className="text-lg font-bold font-display text-[#11183D]">
                     "I am ready to begin my interview simulation."
                   </p>
-                  <p className="text-xs text-slate-500 font-body">
+                  <p className="text-xs text-[#526078] font-body">
                     The frequency visualizer below will react in real time to your vocal volume.
                   </p>
                 </div>
 
                 {/* Live Audio Visualizer Frequency Bars */}
-                <div className="space-y-3 p-6 rounded-2xl bg-slate-900 border border-slate-800 text-white">
+                <div className="space-y-3 p-6 rounded-2xl bg-[#11183D] border border-[#2459A8]/40 text-white">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-semibold text-slate-300 flex items-center gap-2">
-                      <Mic size={14} className="text-[#FF7A00]" />
+                    <span className="font-semibold text-[#EFFAFD] flex items-center gap-2">
+                      <Mic size={14} className="text-[#4A8BDF]" />
                       Real-time Audio Input Decibels
                     </span>
-                    <span className="font-mono text-emerald-400 font-bold">
+                    <span className="font-mono text-[#168A62] font-bold">
                       {Math.round(decibels)} dB
                     </span>
                   </div>
 
-                  <div className="flex justify-between items-end h-16 bg-slate-950/80 rounded-xl p-3 border border-slate-800">
+                  <div className="flex justify-between items-end h-16 bg-[#11183D]/90 rounded-xl p-3 border border-white/10">
                     {Array.from({ length: 32 }).map((_, idx) => {
                       const barThresh = idx * 3;
                       const isActive = micStatus === 'ALLOWED' && decibels > barThresh;
@@ -631,14 +631,14 @@ export default function DeviceCheck() {
                           className="w-1.5 rounded-full transition-all duration-75"
                           style={{
                             height: isActive ? `${Math.min(100, Math.max(12, (decibels - barThresh) * 5))}%` : '4px',
-                            backgroundColor: isActive ? (idx > 24 ? '#FF7A00' : '#10B981') : '#334155'
+                            backgroundColor: isActive ? (idx > 24 ? '#A0006D' : '#4A8BDF') : '#526078'
                           }}
                         />
                       );
                     })}
                   </div>
 
-                  <div className="flex justify-between text-[10px] text-slate-400 font-body">
+                  <div className="flex justify-between text-[10px] text-[#7B8799] font-body">
                     <span>Silent (0 dB)</span>
                     <span>Ideal Conversation Level (25 - 60 dB)</span>
                     <span>Peak Loud (80+ dB)</span>
@@ -649,12 +649,12 @@ export default function DeviceCheck() {
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
                   <div className="flex items-center gap-2 text-xs">
                     {voiceDetected ? (
-                      <span className="flex items-center gap-1.5 text-emerald-700 font-bold bg-emerald-50 px-3 py-1 rounded-xl border border-emerald-200">
-                        <CheckCircle2 size={15} className="text-emerald-600" />
+                      <span className="flex items-center gap-1.5 text-[#168A62] font-bold bg-[#E8F5F0] px-3 py-1 rounded-xl border border-[#168A62]/30">
+                        <CheckCircle2 size={15} className="text-[#168A62]" />
                         Microphone Input Confirmed!
                       </span>
                     ) : (
-                      <span className="text-slate-500 italic">
+                      <span className="text-[#7B8799] italic">
                         Awaiting voice input... Say a few words to calibrate.
                       </span>
                     )}
@@ -692,32 +692,32 @@ export default function DeviceCheck() {
                 transition={{ duration: 0.2 }}
                 className="space-y-6"
               >
-                <div className="border-b border-slate-100 pb-4 flex items-center justify-between">
+                <div className="border-b border-[#DCE7F2] pb-4 flex items-center justify-between">
                   <div>
-                    <h3 className="text-base font-bold font-display text-slate-900">
+                    <h3 className="text-base font-bold font-display text-[#11183D]">
                       Step 3: Audio Output & Speaker Check
                     </h3>
-                    <p className="text-xs text-slate-500 font-body mt-0.5">
+                    <p className="text-xs text-[#526078] font-body mt-0.5">
                       Verify you can clearly hear Ava’s interview questions and AI feedback.
                     </p>
                   </div>
-                  <Badge variant={soundConfirmed ? "success" : "amber"} size="sm" dot>
+                  <Badge variant={soundConfirmed ? "success" : "warning"} size="sm" dot>
                     {soundConfirmed ? 'Audio Output Ready ✓' : 'Pending Test'}
                   </Badge>
                 </div>
 
-                <div className="p-8 rounded-3xl bg-slate-50 border border-slate-200 text-center space-y-5 max-w-lg mx-auto">
+                <div className="p-8 rounded-3xl bg-[#EFFAFD] border border-[#DCE7F2] text-center space-y-5 max-w-lg mx-auto">
                   <div className={`h-16 w-16 rounded-2xl flex items-center justify-center mx-auto transition-transform ${
-                    isPlayingAudio ? 'bg-[#FF7A00] text-white scale-110 shadow-lg animate-pulse' : 'bg-orange-50 text-[#FF7A00] border border-orange-200'
+                    isPlayingAudio ? 'bg-[#4A8BDF] text-white scale-110 shadow-lg animate-pulse' : 'bg-[#EFF7FD] text-[#4A8BDF] border border-[#4A8BDF]/30'
                   }`}>
                     <Volume2 size={32} />
                   </div>
 
                   <div className="space-y-1">
-                    <h4 className="text-base font-bold font-display text-slate-900">
+                    <h4 className="text-base font-bold font-display text-[#11183D]">
                       Test AI Voice Synthesis
                     </h4>
-                    <p className="text-xs text-slate-600 font-body">
+                    <p className="text-xs text-[#526078] font-body">
                       Click the button below to play a sample audio greeting.
                     </p>
                   </div>
@@ -733,8 +733,8 @@ export default function DeviceCheck() {
                   </Button>
 
                   {soundTested && (
-                    <div className="pt-4 border-t border-slate-200 space-y-3">
-                      <p className="text-xs font-bold text-slate-800 font-display">
+                    <div className="pt-4 border-t border-[#DCE7F2] space-y-3">
+                      <p className="text-xs font-bold text-[#11183D] font-display">
                         Did you hear the sample voice clearly?
                       </p>
                       <div className="flex justify-center gap-3">
@@ -743,8 +743,8 @@ export default function DeviceCheck() {
                           onClick={() => setSoundConfirmed(true)}
                           className={`px-5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                             soundConfirmed
-                              ? 'bg-emerald-600 text-white shadow-sm ring-2 ring-emerald-300'
-                              : 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100'
+                              ? 'bg-[#168A62] text-white shadow-sm ring-2 ring-[#168A62]/30'
+                              : 'bg-[#E8F5F0] text-[#168A62] border border-[#168A62]/30 hover:bg-[#E8F5F0]/80'
                           }`}
                         >
                           ✓ Yes, I Hear It Clearly
@@ -752,7 +752,7 @@ export default function DeviceCheck() {
                         <button
                           type="button"
                           onClick={playTestAudio}
-                          className="px-4 py-2 rounded-xl text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 cursor-pointer"
+                          className="px-4 py-2 rounded-xl text-xs font-semibold bg-white border border-[#DCE7F2] text-[#526078] hover:bg-[#EFFAFD] cursor-pointer"
                         >
                           Replay Sound
                         </button>
@@ -792,31 +792,31 @@ export default function DeviceCheck() {
                 transition={{ duration: 0.2 }}
                 className="space-y-6"
               >
-                <div className="border-b border-slate-100 pb-4 flex items-center justify-between">
+                <div className="border-b border-[#DCE7F2] pb-4 flex items-center justify-between">
                   <div>
-                    <h3 className="text-base font-bold font-display text-slate-900">
+                    <h3 className="text-base font-bold font-display text-[#11183D]">
                       Step 4: Fullscreen Viewport & Workspace Lock
                     </h3>
-                    <p className="text-xs text-slate-500 font-body mt-0.5">
+                    <p className="text-xs text-[#526078] font-body mt-0.5">
                       Enable dedicated full-screen mode to unlock the live interview room.
                     </p>
                   </div>
-                  <Badge variant={isFullscreenActive ? "success" : "amber"} size="sm" dot>
+                  <Badge variant={isFullscreenActive ? "success" : "warning"} size="sm" dot>
                     {isFullscreenActive ? 'Fullscreen Locked ✓' : 'Fullscreen Required'}
                   </Badge>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   {/* Fullscreen Trigger Card */}
-                  <div className="p-6 rounded-3xl bg-slate-50 border border-slate-200 space-y-4 flex flex-col justify-between">
+                  <div className="p-6 rounded-3xl bg-[#EFFAFD] border border-[#DCE7F2] space-y-4 flex flex-col justify-between">
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
-                        <Maximize2 size={18} className="text-[#FF7A00]" />
-                        <h4 className="text-sm font-bold font-display text-slate-900">
+                        <Maximize2 size={18} className="text-[#4A8BDF]" />
+                        <h4 className="text-sm font-bold font-display text-[#11183D]">
                           Fullscreen Mode
                         </h4>
                       </div>
-                      <p className="text-xs text-slate-600 font-body leading-relaxed">
+                      <p className="text-xs text-[#526078] font-body leading-relaxed">
                         To maintain high fidelity, this interview runs in dedicated full screen. Exiting fullscreen or pressing Escape triggers a security deviation alert.
                       </p>
                     </div>
@@ -844,7 +844,7 @@ export default function DeviceCheck() {
                   >
                     Back
                   </Button>
-                  <span className="text-xs font-semibold text-slate-500 font-display">
+                  <span className="text-xs font-semibold text-[#526078] font-display">
                     {isFullscreenActive ? 'All checks verified!' : 'Please enable fullscreen to continue'}
                   </span>
                 </div>
@@ -855,25 +855,25 @@ export default function DeviceCheck() {
         </Card>
 
         {/* ─── FINAL LAUNCH ROOM BAR ─── */}
-        <div className="bg-white border-2 border-slate-200 p-6 sm:p-7 rounded-3xl shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+        <div className="bg-white border-2 border-[#DCE7F2] p-6 sm:p-7 rounded-3xl shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="space-y-1.5 max-w-lg">
             <div className="flex items-center gap-2">
-              <Sparkles size={16} className={isAllReady ? "text-[#FF7A00]" : "text-slate-400"} />
-              <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900 font-display">
+              <Sparkles size={16} className={isAllReady ? "text-[#A0006D]" : "text-[#7B8799]"} />
+              <h3 className="text-sm font-bold uppercase tracking-wider text-[#11183D] font-display">
                 Candidate Calibration Summary
               </h3>
             </div>
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-600 font-body">
-              <span className={`flex items-center gap-1 ${isCameraReady ? 'text-emerald-700 font-semibold' : 'text-slate-400'}`}>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[#526078] font-body">
+              <span className={`flex items-center gap-1 ${isCameraReady ? 'text-[#168A62] font-semibold' : 'text-[#7B8799]'}`}>
                 <Check size={12} /> Camera
               </span>
-              <span className={`flex items-center gap-1 ${isMicReady ? 'text-emerald-700 font-semibold' : 'text-slate-400'}`}>
+              <span className={`flex items-center gap-1 ${isMicReady ? 'text-[#168A62] font-semibold' : 'text-[#7B8799]'}`}>
                 <Check size={12} /> Microphone
               </span>
-              <span className={`flex items-center gap-1 ${isSoundReady ? 'text-emerald-700 font-semibold' : 'text-slate-400'}`}>
+              <span className={`flex items-center gap-1 ${isSoundReady ? 'text-[#168A62] font-semibold' : 'text-[#7B8799]'}`}>
                 <Check size={12} /> Sound Output
               </span>
-              <span className={`flex items-center gap-1 ${isFullscreenReady ? 'text-emerald-700 font-semibold' : 'text-slate-400'}`}>
+              <span className={`flex items-center gap-1 ${isFullscreenReady ? 'text-[#168A62] font-semibold' : 'text-[#7B8799]'}`}>
                 <Check size={12} /> Fullscreen Lock
               </span>
             </div>

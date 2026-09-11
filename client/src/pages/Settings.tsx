@@ -28,18 +28,18 @@ export default function Settings() {
   };
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8 space-y-8 bg-obsidian-950 text-slate-100">
+    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8 space-y-8 bg-[#EFFAFD] min-h-[calc(100vh-80px)] text-[#11183D]">
       
       {/* Header */}
       <div>
-        <div className="inline-flex items-center gap-1.5 rounded-full bg-solar-orange-500/10 border border-solar-orange-500/30 px-3 py-1 text-xs text-solar-orange-400 font-bold font-display mb-2">
-          <Sliders size={12} className="text-solar-orange-400" />
+        <div className="inline-flex items-center gap-1.5 rounded-full bg-[#4A8BDF]/10 border border-[#4A8BDF]/30 px-3 py-1 text-xs text-[#4A8BDF] font-bold font-display mb-2">
+          <Sliders size={12} className="text-[#4A8BDF]" />
           <span>System Preferences</span>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-white font-display tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#11183D] font-display tracking-tight">
           Settings & Credentials
         </h1>
-        <p className="text-xs text-slate-400 font-body">
+        <p className="text-xs text-[#526078] font-body">
           Configure interview preferences, AI model persona, voice telemetry, and custom API keys.
         </p>
       </div>
@@ -47,15 +47,15 @@ export default function Settings() {
       <div className="space-y-6">
         
         {/* 1. Profile Section */}
-        <div className="bg-obsidian-card backdrop-blur-xl border border-white/10 rounded-2xl p-6 sm:p-8 shadow-card-dark space-y-5">
-          <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
+        <div className="bg-white border border-[#DCE7F2] rounded-2xl p-6 sm:p-8 shadow-card space-y-5">
+          <div className="flex items-center justify-between border-b border-[#DCE7F2] pb-3">
             <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-xl bg-solar-orange-500/10 text-solar-orange-400 border border-solar-orange-500/20">
+              <div className="p-2 rounded-xl bg-[#4A8BDF]/10 text-[#4A8BDF] border border-[#4A8BDF]/20">
                 <User size={16} />
               </div>
-              <h2 className="text-sm font-bold font-display text-white">Candidate Profile</h2>
+              <h2 className="text-sm font-bold font-display text-[#11183D]">Candidate Profile</h2>
             </div>
-            <Badge variant="orange" size="xs">Verified Account</Badge>
+            <Badge variant="navy" size="xs">Verified Account</Badge>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -83,20 +83,20 @@ export default function Settings() {
         </div>
 
         {/* 2. AI & Interview Calibration */}
-        <div className="bg-obsidian-card backdrop-blur-xl border border-white/10 rounded-2xl p-6 sm:p-8 shadow-card-dark space-y-5">
-          <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
+        <div className="bg-white border border-[#DCE7F2] rounded-2xl p-6 sm:p-8 shadow-card space-y-5">
+          <div className="flex items-center justify-between border-b border-[#DCE7F2] pb-3">
             <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-xl bg-blue-500/15 text-blue-400 border border-blue-500/25">
+              <div className="p-2 rounded-xl bg-[#F8EAF4] text-[#A0006D] border border-[#A0006D]/20">
                 <Sparkles size={16} />
               </div>
-              <h2 className="text-sm font-bold font-display text-white">AI Persona & Grading Calibration</h2>
+              <h2 className="text-sm font-bold font-display text-[#11183D]">AI Persona & Grading Calibration</h2>
             </div>
-            <Badge variant="navy" size="xs">Ava v1.2</Badge>
+            <Badge variant="eggplant" size="xs">Ava v1.2</Badge>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div className="space-y-2">
-              <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 font-display">
+              <label className="text-xs font-semibold uppercase tracking-wider text-[#526078] font-display">
                 Grading Bar & Strictness
               </label>
               <div className="space-y-2">
@@ -110,15 +110,15 @@ export default function Settings() {
                     onClick={() => setStrictness(tier.id)}
                     className={`w-full text-left p-3.5 rounded-xl border transition-all cursor-pointer ${
                       strictness === tier.id
-                        ? 'border-solar-orange-500/60 bg-solar-orange-500/10 ring-1 ring-solar-orange-500/30 text-white'
-                        : 'border-white/[0.08] bg-obsidian-950/60 hover:bg-obsidian-800/60 text-slate-300 hover:text-white'
+                        ? 'border-[#4A8BDF] bg-[#EFFAFD] ring-1 ring-[#4A8BDF]/30 text-[#11183D]'
+                        : 'border-[#DCE7F2] bg-white hover:bg-[#EFFAFD]/50 text-[#526078] hover:text-[#11183D]'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-bold font-display">{tier.title}</span>
-                      {strictness === tier.id && <Check size={14} className="text-solar-orange-400" />}
+                      {strictness === tier.id && <Check size={14} className="text-[#4A8BDF]" />}
                     </div>
-                    <p className="text-[11px] text-slate-400 font-body mt-0.5">{tier.desc}</p>
+                    <p className="text-[11px] text-[#526078] font-body mt-0.5">{tier.desc}</p>
                   </button>
                 ))}
               </div>
@@ -126,9 +126,9 @@ export default function Settings() {
 
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 font-display flex items-center justify-between">
+                <label className="text-xs font-semibold uppercase tracking-wider text-[#526078] font-display flex items-center justify-between">
                   <span>Voice Synthesis Volume</span>
-                  <span className="text-xs font-mono font-bold text-solar-orange-400">{voiceVolume}%</span>
+                  <span className="text-xs font-mono font-bold text-[#4A8BDF]">{voiceVolume}%</span>
                 </label>
                 <input
                   type="range"
@@ -136,13 +136,13 @@ export default function Settings() {
                   max="100"
                   value={voiceVolume}
                   onChange={(e) => setVoiceVolume(parseInt(e.target.value, 10))}
-                  className="w-full h-2 bg-obsidian-800 rounded-lg appearance-none cursor-pointer accent-solar-orange-500 focus:outline-none"
+                  className="w-full h-2 bg-[#EFFAFD] rounded-lg appearance-none cursor-pointer accent-[#4A8BDF] focus:outline-none"
                 />
               </div>
 
-              <div className="p-3.5 rounded-xl bg-obsidian-950/60 border border-white/[0.06] space-y-1">
-                <span className="text-xs font-bold text-white font-display">Socratic Hint Mode</span>
-                <p className="text-[11px] text-slate-400 font-body">
+              <div className="p-3.5 rounded-xl bg-[#EFFAFD] border border-[#DCE7F2] space-y-1">
+                <span className="text-xs font-bold text-[#11183D] font-display">Socratic Hint Mode</span>
+                <p className="text-[11px] text-[#526078] font-body">
                   When active, Ava guides with conceptual questions rather than giving immediate code answers.
                 </p>
               </div>
@@ -151,19 +151,19 @@ export default function Settings() {
         </div>
 
         {/* 3. Custom Gateway & API Keys */}
-        <div className="bg-obsidian-card backdrop-blur-xl border border-white/10 rounded-2xl p-6 sm:p-8 shadow-card-dark space-y-4">
-          <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
+        <div className="bg-white border border-[#DCE7F2] rounded-2xl p-6 sm:p-8 shadow-card space-y-4">
+          <div className="flex items-center justify-between border-b border-[#DCE7F2] pb-3">
             <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/25">
+              <div className="p-2 rounded-xl bg-[#4A8BDF]/10 text-[#4A8BDF] border border-[#4A8BDF]/20">
                 <Key size={16} />
               </div>
-              <h2 className="text-sm font-bold font-display text-white">Custom LLM Gateway (BYOK)</h2>
+              <h2 className="text-sm font-bold font-display text-[#11183D]">Custom LLM Gateway (BYOK)</h2>
             </div>
             <Badge variant="teal" size="xs">Optional Override</Badge>
           </div>
 
-          <p className="text-xs text-slate-400 font-body leading-relaxed">
-            By default, RU READY? uses the hosted cloud AI model. You can optionally supply your own OpenAI-compatible endpoint.
+          <p className="text-xs text-[#526078] font-body leading-relaxed">
+            By default, R U Ready? uses the hosted cloud AI model. You can optionally supply your own OpenAI-compatible endpoint.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -184,21 +184,21 @@ export default function Settings() {
         </div>
 
         {/* 4. Privacy & Telemetry */}
-        <div className="bg-obsidian-card backdrop-blur-xl border border-white/10 rounded-2xl p-6 sm:p-8 shadow-card-dark space-y-4">
-          <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
+        <div className="bg-white border border-[#DCE7F2] rounded-2xl p-6 sm:p-8 shadow-card space-y-4">
+          <div className="flex items-center justify-between border-b border-[#DCE7F2] pb-3">
             <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+              <div className="p-2 rounded-xl bg-[#168A62]/10 text-[#168A62] border border-[#168A62]/20">
                 <Shield size={16} />
               </div>
-              <h2 className="text-sm font-bold font-display text-white">Privacy & Telemetry</h2>
+              <h2 className="text-sm font-bold font-display text-[#11183D]">Privacy & Telemetry</h2>
             </div>
             <Badge variant="success" size="xs" dot>Secure</Badge>
           </div>
 
-          <div className="flex items-center justify-between p-3.5 rounded-xl bg-obsidian-950/60 border border-white/[0.08]">
+          <div className="flex items-center justify-between p-3.5 rounded-xl bg-[#EFFAFD] border border-[#DCE7F2]">
             <div className="space-y-0.5">
-              <p className="text-xs font-bold text-white font-display">Eye-Contact & Facial Stress Telemetry</p>
-              <p className="text-[11px] text-slate-400 font-body">
+              <p className="text-xs font-bold text-[#11183D] font-display">Eye-Contact & Facial Stress Telemetry</p>
+              <p className="text-[11px] text-[#526078] font-body">
                 Processed locally in real-time on your browser canvas. No raw video is stored on disk.
               </p>
             </div>
@@ -206,7 +206,7 @@ export default function Settings() {
               type="checkbox"
               checked={telemetryEnabled}
               onChange={(e) => setTelemetryEnabled(e.target.checked)}
-              className="h-4 w-4 rounded accent-solar-orange-500 cursor-pointer"
+              className="h-4 w-4 rounded accent-[#4A8BDF] cursor-pointer"
             />
           </div>
         </div>
@@ -225,6 +225,7 @@ export default function Settings() {
 
           <Button
             size="lg"
+            variant="royal"
             onClick={handleSaveSettings}
             icon={<Save size={16} />}
           >

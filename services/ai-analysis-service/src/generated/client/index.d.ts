@@ -33,6 +33,21 @@ export type Question = $Result.DefaultSelection<Prisma.$QuestionPayload>
  * 
  */
 export type PreDefinedProblem = $Result.DefaultSelection<Prisma.$PreDefinedProblemPayload>
+/**
+ * Model AtsMatch
+ * 
+ */
+export type AtsMatch = $Result.DefaultSelection<Prisma.$AtsMatchPayload>
+/**
+ * Model CareerRoadmap
+ * 
+ */
+export type CareerRoadmap = $Result.DefaultSelection<Prisma.$CareerRoadmapPayload>
+/**
+ * Model DiscussionPost
+ * 
+ */
+export type DiscussionPost = $Result.DefaultSelection<Prisma.$DiscussionPostPayload>
 
 /**
  * Enums
@@ -223,6 +238,36 @@ export class PrismaClient<
     * ```
     */
   get preDefinedProblem(): Prisma.PreDefinedProblemDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.atsMatch`: Exposes CRUD operations for the **AtsMatch** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more AtsMatches
+    * const atsMatches = await prisma.atsMatch.findMany()
+    * ```
+    */
+  get atsMatch(): Prisma.AtsMatchDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.careerRoadmap`: Exposes CRUD operations for the **CareerRoadmap** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more CareerRoadmaps
+    * const careerRoadmaps = await prisma.careerRoadmap.findMany()
+    * ```
+    */
+  get careerRoadmap(): Prisma.CareerRoadmapDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.discussionPost`: Exposes CRUD operations for the **DiscussionPost** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more DiscussionPosts
+    * const discussionPosts = await prisma.discussionPost.findMany()
+    * ```
+    */
+  get discussionPost(): Prisma.DiscussionPostDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -667,7 +712,10 @@ export namespace Prisma {
     Analysis: 'Analysis',
     InterviewSession: 'InterviewSession',
     Question: 'Question',
-    PreDefinedProblem: 'PreDefinedProblem'
+    PreDefinedProblem: 'PreDefinedProblem',
+    AtsMatch: 'AtsMatch',
+    CareerRoadmap: 'CareerRoadmap',
+    DiscussionPost: 'DiscussionPost'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -686,7 +734,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "analysis" | "interviewSession" | "question" | "preDefinedProblem"
+      modelProps: "analysis" | "interviewSession" | "question" | "preDefinedProblem" | "atsMatch" | "careerRoadmap" | "discussionPost"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -986,6 +1034,228 @@ export namespace Prisma {
           }
         }
       }
+      AtsMatch: {
+        payload: Prisma.$AtsMatchPayload<ExtArgs>
+        fields: Prisma.AtsMatchFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.AtsMatchFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AtsMatchPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.AtsMatchFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AtsMatchPayload>
+          }
+          findFirst: {
+            args: Prisma.AtsMatchFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AtsMatchPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.AtsMatchFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AtsMatchPayload>
+          }
+          findMany: {
+            args: Prisma.AtsMatchFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AtsMatchPayload>[]
+          }
+          create: {
+            args: Prisma.AtsMatchCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AtsMatchPayload>
+          }
+          createMany: {
+            args: Prisma.AtsMatchCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.AtsMatchCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AtsMatchPayload>[]
+          }
+          delete: {
+            args: Prisma.AtsMatchDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AtsMatchPayload>
+          }
+          update: {
+            args: Prisma.AtsMatchUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AtsMatchPayload>
+          }
+          deleteMany: {
+            args: Prisma.AtsMatchDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.AtsMatchUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.AtsMatchUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AtsMatchPayload>[]
+          }
+          upsert: {
+            args: Prisma.AtsMatchUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AtsMatchPayload>
+          }
+          aggregate: {
+            args: Prisma.AtsMatchAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateAtsMatch>
+          }
+          groupBy: {
+            args: Prisma.AtsMatchGroupByArgs<ExtArgs>
+            result: $Utils.Optional<AtsMatchGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.AtsMatchCountArgs<ExtArgs>
+            result: $Utils.Optional<AtsMatchCountAggregateOutputType> | number
+          }
+        }
+      }
+      CareerRoadmap: {
+        payload: Prisma.$CareerRoadmapPayload<ExtArgs>
+        fields: Prisma.CareerRoadmapFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.CareerRoadmapFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CareerRoadmapPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.CareerRoadmapFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CareerRoadmapPayload>
+          }
+          findFirst: {
+            args: Prisma.CareerRoadmapFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CareerRoadmapPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.CareerRoadmapFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CareerRoadmapPayload>
+          }
+          findMany: {
+            args: Prisma.CareerRoadmapFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CareerRoadmapPayload>[]
+          }
+          create: {
+            args: Prisma.CareerRoadmapCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CareerRoadmapPayload>
+          }
+          createMany: {
+            args: Prisma.CareerRoadmapCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.CareerRoadmapCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CareerRoadmapPayload>[]
+          }
+          delete: {
+            args: Prisma.CareerRoadmapDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CareerRoadmapPayload>
+          }
+          update: {
+            args: Prisma.CareerRoadmapUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CareerRoadmapPayload>
+          }
+          deleteMany: {
+            args: Prisma.CareerRoadmapDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.CareerRoadmapUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.CareerRoadmapUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CareerRoadmapPayload>[]
+          }
+          upsert: {
+            args: Prisma.CareerRoadmapUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CareerRoadmapPayload>
+          }
+          aggregate: {
+            args: Prisma.CareerRoadmapAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateCareerRoadmap>
+          }
+          groupBy: {
+            args: Prisma.CareerRoadmapGroupByArgs<ExtArgs>
+            result: $Utils.Optional<CareerRoadmapGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.CareerRoadmapCountArgs<ExtArgs>
+            result: $Utils.Optional<CareerRoadmapCountAggregateOutputType> | number
+          }
+        }
+      }
+      DiscussionPost: {
+        payload: Prisma.$DiscussionPostPayload<ExtArgs>
+        fields: Prisma.DiscussionPostFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.DiscussionPostFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscussionPostPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.DiscussionPostFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscussionPostPayload>
+          }
+          findFirst: {
+            args: Prisma.DiscussionPostFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscussionPostPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.DiscussionPostFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscussionPostPayload>
+          }
+          findMany: {
+            args: Prisma.DiscussionPostFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscussionPostPayload>[]
+          }
+          create: {
+            args: Prisma.DiscussionPostCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscussionPostPayload>
+          }
+          createMany: {
+            args: Prisma.DiscussionPostCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.DiscussionPostCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscussionPostPayload>[]
+          }
+          delete: {
+            args: Prisma.DiscussionPostDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscussionPostPayload>
+          }
+          update: {
+            args: Prisma.DiscussionPostUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscussionPostPayload>
+          }
+          deleteMany: {
+            args: Prisma.DiscussionPostDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.DiscussionPostUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.DiscussionPostUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscussionPostPayload>[]
+          }
+          upsert: {
+            args: Prisma.DiscussionPostUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscussionPostPayload>
+          }
+          aggregate: {
+            args: Prisma.DiscussionPostAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateDiscussionPost>
+          }
+          groupBy: {
+            args: Prisma.DiscussionPostGroupByArgs<ExtArgs>
+            result: $Utils.Optional<DiscussionPostGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.DiscussionPostCountArgs<ExtArgs>
+            result: $Utils.Optional<DiscussionPostCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1086,6 +1356,9 @@ export namespace Prisma {
     interviewSession?: InterviewSessionOmit
     question?: QuestionOmit
     preDefinedProblem?: PreDefinedProblemOmit
+    atsMatch?: AtsMatchOmit
+    careerRoadmap?: CareerRoadmapOmit
+    discussionPost?: DiscussionPostOmit
   }
 
   /* Types for Logging */
@@ -6031,6 +6304,3282 @@ export namespace Prisma {
 
 
   /**
+   * Model AtsMatch
+   */
+
+  export type AggregateAtsMatch = {
+    _count: AtsMatchCountAggregateOutputType | null
+    _avg: AtsMatchAvgAggregateOutputType | null
+    _sum: AtsMatchSumAggregateOutputType | null
+    _min: AtsMatchMinAggregateOutputType | null
+    _max: AtsMatchMaxAggregateOutputType | null
+  }
+
+  export type AtsMatchAvgAggregateOutputType = {
+    matchScore: number | null
+  }
+
+  export type AtsMatchSumAggregateOutputType = {
+    matchScore: number | null
+  }
+
+  export type AtsMatchMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    jobTitle: string | null
+    companyName: string | null
+    matchScore: number | null
+    summary: string | null
+    experienceMatch: string | null
+    createdAt: Date | null
+  }
+
+  export type AtsMatchMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    jobTitle: string | null
+    companyName: string | null
+    matchScore: number | null
+    summary: string | null
+    experienceMatch: string | null
+    createdAt: Date | null
+  }
+
+  export type AtsMatchCountAggregateOutputType = {
+    id: number
+    userId: number
+    jobTitle: number
+    companyName: number
+    matchScore: number
+    summary: number
+    matchedSkills: number
+    missingSkills: number
+    experienceMatch: number
+    atsWarnings: number
+    bulletRewrites: number
+    tailoredQuestions: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type AtsMatchAvgAggregateInputType = {
+    matchScore?: true
+  }
+
+  export type AtsMatchSumAggregateInputType = {
+    matchScore?: true
+  }
+
+  export type AtsMatchMinAggregateInputType = {
+    id?: true
+    userId?: true
+    jobTitle?: true
+    companyName?: true
+    matchScore?: true
+    summary?: true
+    experienceMatch?: true
+    createdAt?: true
+  }
+
+  export type AtsMatchMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    jobTitle?: true
+    companyName?: true
+    matchScore?: true
+    summary?: true
+    experienceMatch?: true
+    createdAt?: true
+  }
+
+  export type AtsMatchCountAggregateInputType = {
+    id?: true
+    userId?: true
+    jobTitle?: true
+    companyName?: true
+    matchScore?: true
+    summary?: true
+    matchedSkills?: true
+    missingSkills?: true
+    experienceMatch?: true
+    atsWarnings?: true
+    bulletRewrites?: true
+    tailoredQuestions?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type AtsMatchAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AtsMatch to aggregate.
+     */
+    where?: AtsMatchWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AtsMatches to fetch.
+     */
+    orderBy?: AtsMatchOrderByWithRelationInput | AtsMatchOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: AtsMatchWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AtsMatches from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AtsMatches.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned AtsMatches
+    **/
+    _count?: true | AtsMatchCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: AtsMatchAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: AtsMatchSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: AtsMatchMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: AtsMatchMaxAggregateInputType
+  }
+
+  export type GetAtsMatchAggregateType<T extends AtsMatchAggregateArgs> = {
+        [P in keyof T & keyof AggregateAtsMatch]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateAtsMatch[P]>
+      : GetScalarType<T[P], AggregateAtsMatch[P]>
+  }
+
+
+
+
+  export type AtsMatchGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AtsMatchWhereInput
+    orderBy?: AtsMatchOrderByWithAggregationInput | AtsMatchOrderByWithAggregationInput[]
+    by: AtsMatchScalarFieldEnum[] | AtsMatchScalarFieldEnum
+    having?: AtsMatchScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: AtsMatchCountAggregateInputType | true
+    _avg?: AtsMatchAvgAggregateInputType
+    _sum?: AtsMatchSumAggregateInputType
+    _min?: AtsMatchMinAggregateInputType
+    _max?: AtsMatchMaxAggregateInputType
+  }
+
+  export type AtsMatchGroupByOutputType = {
+    id: string
+    userId: string
+    jobTitle: string
+    companyName: string | null
+    matchScore: number
+    summary: string
+    matchedSkills: string[]
+    missingSkills: string[]
+    experienceMatch: string | null
+    atsWarnings: string[]
+    bulletRewrites: JsonValue
+    tailoredQuestions: JsonValue
+    createdAt: Date
+    _count: AtsMatchCountAggregateOutputType | null
+    _avg: AtsMatchAvgAggregateOutputType | null
+    _sum: AtsMatchSumAggregateOutputType | null
+    _min: AtsMatchMinAggregateOutputType | null
+    _max: AtsMatchMaxAggregateOutputType | null
+  }
+
+  type GetAtsMatchGroupByPayload<T extends AtsMatchGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<AtsMatchGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof AtsMatchGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], AtsMatchGroupByOutputType[P]>
+            : GetScalarType<T[P], AtsMatchGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type AtsMatchSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    jobTitle?: boolean
+    companyName?: boolean
+    matchScore?: boolean
+    summary?: boolean
+    matchedSkills?: boolean
+    missingSkills?: boolean
+    experienceMatch?: boolean
+    atsWarnings?: boolean
+    bulletRewrites?: boolean
+    tailoredQuestions?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["atsMatch"]>
+
+  export type AtsMatchSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    jobTitle?: boolean
+    companyName?: boolean
+    matchScore?: boolean
+    summary?: boolean
+    matchedSkills?: boolean
+    missingSkills?: boolean
+    experienceMatch?: boolean
+    atsWarnings?: boolean
+    bulletRewrites?: boolean
+    tailoredQuestions?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["atsMatch"]>
+
+  export type AtsMatchSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    jobTitle?: boolean
+    companyName?: boolean
+    matchScore?: boolean
+    summary?: boolean
+    matchedSkills?: boolean
+    missingSkills?: boolean
+    experienceMatch?: boolean
+    atsWarnings?: boolean
+    bulletRewrites?: boolean
+    tailoredQuestions?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["atsMatch"]>
+
+  export type AtsMatchSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    jobTitle?: boolean
+    companyName?: boolean
+    matchScore?: boolean
+    summary?: boolean
+    matchedSkills?: boolean
+    missingSkills?: boolean
+    experienceMatch?: boolean
+    atsWarnings?: boolean
+    bulletRewrites?: boolean
+    tailoredQuestions?: boolean
+    createdAt?: boolean
+  }
+
+  export type AtsMatchOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "jobTitle" | "companyName" | "matchScore" | "summary" | "matchedSkills" | "missingSkills" | "experienceMatch" | "atsWarnings" | "bulletRewrites" | "tailoredQuestions" | "createdAt", ExtArgs["result"]["atsMatch"]>
+
+  export type $AtsMatchPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "AtsMatch"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      jobTitle: string
+      companyName: string | null
+      matchScore: number
+      summary: string
+      matchedSkills: string[]
+      missingSkills: string[]
+      experienceMatch: string | null
+      atsWarnings: string[]
+      bulletRewrites: Prisma.JsonValue
+      tailoredQuestions: Prisma.JsonValue
+      createdAt: Date
+    }, ExtArgs["result"]["atsMatch"]>
+    composites: {}
+  }
+
+  type AtsMatchGetPayload<S extends boolean | null | undefined | AtsMatchDefaultArgs> = $Result.GetResult<Prisma.$AtsMatchPayload, S>
+
+  type AtsMatchCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<AtsMatchFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: AtsMatchCountAggregateInputType | true
+    }
+
+  export interface AtsMatchDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['AtsMatch'], meta: { name: 'AtsMatch' } }
+    /**
+     * Find zero or one AtsMatch that matches the filter.
+     * @param {AtsMatchFindUniqueArgs} args - Arguments to find a AtsMatch
+     * @example
+     * // Get one AtsMatch
+     * const atsMatch = await prisma.atsMatch.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends AtsMatchFindUniqueArgs>(args: SelectSubset<T, AtsMatchFindUniqueArgs<ExtArgs>>): Prisma__AtsMatchClient<$Result.GetResult<Prisma.$AtsMatchPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one AtsMatch that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {AtsMatchFindUniqueOrThrowArgs} args - Arguments to find a AtsMatch
+     * @example
+     * // Get one AtsMatch
+     * const atsMatch = await prisma.atsMatch.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends AtsMatchFindUniqueOrThrowArgs>(args: SelectSubset<T, AtsMatchFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AtsMatchClient<$Result.GetResult<Prisma.$AtsMatchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AtsMatch that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AtsMatchFindFirstArgs} args - Arguments to find a AtsMatch
+     * @example
+     * // Get one AtsMatch
+     * const atsMatch = await prisma.atsMatch.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends AtsMatchFindFirstArgs>(args?: SelectSubset<T, AtsMatchFindFirstArgs<ExtArgs>>): Prisma__AtsMatchClient<$Result.GetResult<Prisma.$AtsMatchPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AtsMatch that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AtsMatchFindFirstOrThrowArgs} args - Arguments to find a AtsMatch
+     * @example
+     * // Get one AtsMatch
+     * const atsMatch = await prisma.atsMatch.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends AtsMatchFindFirstOrThrowArgs>(args?: SelectSubset<T, AtsMatchFindFirstOrThrowArgs<ExtArgs>>): Prisma__AtsMatchClient<$Result.GetResult<Prisma.$AtsMatchPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more AtsMatches that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AtsMatchFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all AtsMatches
+     * const atsMatches = await prisma.atsMatch.findMany()
+     * 
+     * // Get first 10 AtsMatches
+     * const atsMatches = await prisma.atsMatch.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const atsMatchWithIdOnly = await prisma.atsMatch.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends AtsMatchFindManyArgs>(args?: SelectSubset<T, AtsMatchFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AtsMatchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a AtsMatch.
+     * @param {AtsMatchCreateArgs} args - Arguments to create a AtsMatch.
+     * @example
+     * // Create one AtsMatch
+     * const AtsMatch = await prisma.atsMatch.create({
+     *   data: {
+     *     // ... data to create a AtsMatch
+     *   }
+     * })
+     * 
+     */
+    create<T extends AtsMatchCreateArgs>(args: SelectSubset<T, AtsMatchCreateArgs<ExtArgs>>): Prisma__AtsMatchClient<$Result.GetResult<Prisma.$AtsMatchPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many AtsMatches.
+     * @param {AtsMatchCreateManyArgs} args - Arguments to create many AtsMatches.
+     * @example
+     * // Create many AtsMatches
+     * const atsMatch = await prisma.atsMatch.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends AtsMatchCreateManyArgs>(args?: SelectSubset<T, AtsMatchCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many AtsMatches and returns the data saved in the database.
+     * @param {AtsMatchCreateManyAndReturnArgs} args - Arguments to create many AtsMatches.
+     * @example
+     * // Create many AtsMatches
+     * const atsMatch = await prisma.atsMatch.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many AtsMatches and only return the `id`
+     * const atsMatchWithIdOnly = await prisma.atsMatch.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends AtsMatchCreateManyAndReturnArgs>(args?: SelectSubset<T, AtsMatchCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AtsMatchPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a AtsMatch.
+     * @param {AtsMatchDeleteArgs} args - Arguments to delete one AtsMatch.
+     * @example
+     * // Delete one AtsMatch
+     * const AtsMatch = await prisma.atsMatch.delete({
+     *   where: {
+     *     // ... filter to delete one AtsMatch
+     *   }
+     * })
+     * 
+     */
+    delete<T extends AtsMatchDeleteArgs>(args: SelectSubset<T, AtsMatchDeleteArgs<ExtArgs>>): Prisma__AtsMatchClient<$Result.GetResult<Prisma.$AtsMatchPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one AtsMatch.
+     * @param {AtsMatchUpdateArgs} args - Arguments to update one AtsMatch.
+     * @example
+     * // Update one AtsMatch
+     * const atsMatch = await prisma.atsMatch.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends AtsMatchUpdateArgs>(args: SelectSubset<T, AtsMatchUpdateArgs<ExtArgs>>): Prisma__AtsMatchClient<$Result.GetResult<Prisma.$AtsMatchPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more AtsMatches.
+     * @param {AtsMatchDeleteManyArgs} args - Arguments to filter AtsMatches to delete.
+     * @example
+     * // Delete a few AtsMatches
+     * const { count } = await prisma.atsMatch.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends AtsMatchDeleteManyArgs>(args?: SelectSubset<T, AtsMatchDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AtsMatches.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AtsMatchUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many AtsMatches
+     * const atsMatch = await prisma.atsMatch.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends AtsMatchUpdateManyArgs>(args: SelectSubset<T, AtsMatchUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AtsMatches and returns the data updated in the database.
+     * @param {AtsMatchUpdateManyAndReturnArgs} args - Arguments to update many AtsMatches.
+     * @example
+     * // Update many AtsMatches
+     * const atsMatch = await prisma.atsMatch.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more AtsMatches and only return the `id`
+     * const atsMatchWithIdOnly = await prisma.atsMatch.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends AtsMatchUpdateManyAndReturnArgs>(args: SelectSubset<T, AtsMatchUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AtsMatchPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one AtsMatch.
+     * @param {AtsMatchUpsertArgs} args - Arguments to update or create a AtsMatch.
+     * @example
+     * // Update or create a AtsMatch
+     * const atsMatch = await prisma.atsMatch.upsert({
+     *   create: {
+     *     // ... data to create a AtsMatch
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the AtsMatch we want to update
+     *   }
+     * })
+     */
+    upsert<T extends AtsMatchUpsertArgs>(args: SelectSubset<T, AtsMatchUpsertArgs<ExtArgs>>): Prisma__AtsMatchClient<$Result.GetResult<Prisma.$AtsMatchPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of AtsMatches.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AtsMatchCountArgs} args - Arguments to filter AtsMatches to count.
+     * @example
+     * // Count the number of AtsMatches
+     * const count = await prisma.atsMatch.count({
+     *   where: {
+     *     // ... the filter for the AtsMatches we want to count
+     *   }
+     * })
+    **/
+    count<T extends AtsMatchCountArgs>(
+      args?: Subset<T, AtsMatchCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], AtsMatchCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a AtsMatch.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AtsMatchAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends AtsMatchAggregateArgs>(args: Subset<T, AtsMatchAggregateArgs>): Prisma.PrismaPromise<GetAtsMatchAggregateType<T>>
+
+    /**
+     * Group by AtsMatch.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AtsMatchGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends AtsMatchGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: AtsMatchGroupByArgs['orderBy'] }
+        : { orderBy?: AtsMatchGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, AtsMatchGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAtsMatchGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the AtsMatch model
+   */
+  readonly fields: AtsMatchFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for AtsMatch.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__AtsMatchClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the AtsMatch model
+   */
+  interface AtsMatchFieldRefs {
+    readonly id: FieldRef<"AtsMatch", 'String'>
+    readonly userId: FieldRef<"AtsMatch", 'String'>
+    readonly jobTitle: FieldRef<"AtsMatch", 'String'>
+    readonly companyName: FieldRef<"AtsMatch", 'String'>
+    readonly matchScore: FieldRef<"AtsMatch", 'Int'>
+    readonly summary: FieldRef<"AtsMatch", 'String'>
+    readonly matchedSkills: FieldRef<"AtsMatch", 'String[]'>
+    readonly missingSkills: FieldRef<"AtsMatch", 'String[]'>
+    readonly experienceMatch: FieldRef<"AtsMatch", 'String'>
+    readonly atsWarnings: FieldRef<"AtsMatch", 'String[]'>
+    readonly bulletRewrites: FieldRef<"AtsMatch", 'Json'>
+    readonly tailoredQuestions: FieldRef<"AtsMatch", 'Json'>
+    readonly createdAt: FieldRef<"AtsMatch", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * AtsMatch findUnique
+   */
+  export type AtsMatchFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AtsMatch
+     */
+    select?: AtsMatchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AtsMatch
+     */
+    omit?: AtsMatchOmit<ExtArgs> | null
+    /**
+     * Filter, which AtsMatch to fetch.
+     */
+    where: AtsMatchWhereUniqueInput
+  }
+
+  /**
+   * AtsMatch findUniqueOrThrow
+   */
+  export type AtsMatchFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AtsMatch
+     */
+    select?: AtsMatchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AtsMatch
+     */
+    omit?: AtsMatchOmit<ExtArgs> | null
+    /**
+     * Filter, which AtsMatch to fetch.
+     */
+    where: AtsMatchWhereUniqueInput
+  }
+
+  /**
+   * AtsMatch findFirst
+   */
+  export type AtsMatchFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AtsMatch
+     */
+    select?: AtsMatchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AtsMatch
+     */
+    omit?: AtsMatchOmit<ExtArgs> | null
+    /**
+     * Filter, which AtsMatch to fetch.
+     */
+    where?: AtsMatchWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AtsMatches to fetch.
+     */
+    orderBy?: AtsMatchOrderByWithRelationInput | AtsMatchOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AtsMatches.
+     */
+    cursor?: AtsMatchWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AtsMatches from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AtsMatches.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AtsMatches.
+     */
+    distinct?: AtsMatchScalarFieldEnum | AtsMatchScalarFieldEnum[]
+  }
+
+  /**
+   * AtsMatch findFirstOrThrow
+   */
+  export type AtsMatchFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AtsMatch
+     */
+    select?: AtsMatchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AtsMatch
+     */
+    omit?: AtsMatchOmit<ExtArgs> | null
+    /**
+     * Filter, which AtsMatch to fetch.
+     */
+    where?: AtsMatchWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AtsMatches to fetch.
+     */
+    orderBy?: AtsMatchOrderByWithRelationInput | AtsMatchOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AtsMatches.
+     */
+    cursor?: AtsMatchWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AtsMatches from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AtsMatches.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AtsMatches.
+     */
+    distinct?: AtsMatchScalarFieldEnum | AtsMatchScalarFieldEnum[]
+  }
+
+  /**
+   * AtsMatch findMany
+   */
+  export type AtsMatchFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AtsMatch
+     */
+    select?: AtsMatchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AtsMatch
+     */
+    omit?: AtsMatchOmit<ExtArgs> | null
+    /**
+     * Filter, which AtsMatches to fetch.
+     */
+    where?: AtsMatchWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AtsMatches to fetch.
+     */
+    orderBy?: AtsMatchOrderByWithRelationInput | AtsMatchOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing AtsMatches.
+     */
+    cursor?: AtsMatchWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AtsMatches from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AtsMatches.
+     */
+    skip?: number
+    distinct?: AtsMatchScalarFieldEnum | AtsMatchScalarFieldEnum[]
+  }
+
+  /**
+   * AtsMatch create
+   */
+  export type AtsMatchCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AtsMatch
+     */
+    select?: AtsMatchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AtsMatch
+     */
+    omit?: AtsMatchOmit<ExtArgs> | null
+    /**
+     * The data needed to create a AtsMatch.
+     */
+    data: XOR<AtsMatchCreateInput, AtsMatchUncheckedCreateInput>
+  }
+
+  /**
+   * AtsMatch createMany
+   */
+  export type AtsMatchCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many AtsMatches.
+     */
+    data: AtsMatchCreateManyInput | AtsMatchCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AtsMatch createManyAndReturn
+   */
+  export type AtsMatchCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AtsMatch
+     */
+    select?: AtsMatchSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AtsMatch
+     */
+    omit?: AtsMatchOmit<ExtArgs> | null
+    /**
+     * The data used to create many AtsMatches.
+     */
+    data: AtsMatchCreateManyInput | AtsMatchCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AtsMatch update
+   */
+  export type AtsMatchUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AtsMatch
+     */
+    select?: AtsMatchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AtsMatch
+     */
+    omit?: AtsMatchOmit<ExtArgs> | null
+    /**
+     * The data needed to update a AtsMatch.
+     */
+    data: XOR<AtsMatchUpdateInput, AtsMatchUncheckedUpdateInput>
+    /**
+     * Choose, which AtsMatch to update.
+     */
+    where: AtsMatchWhereUniqueInput
+  }
+
+  /**
+   * AtsMatch updateMany
+   */
+  export type AtsMatchUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update AtsMatches.
+     */
+    data: XOR<AtsMatchUpdateManyMutationInput, AtsMatchUncheckedUpdateManyInput>
+    /**
+     * Filter which AtsMatches to update
+     */
+    where?: AtsMatchWhereInput
+    /**
+     * Limit how many AtsMatches to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * AtsMatch updateManyAndReturn
+   */
+  export type AtsMatchUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AtsMatch
+     */
+    select?: AtsMatchSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AtsMatch
+     */
+    omit?: AtsMatchOmit<ExtArgs> | null
+    /**
+     * The data used to update AtsMatches.
+     */
+    data: XOR<AtsMatchUpdateManyMutationInput, AtsMatchUncheckedUpdateManyInput>
+    /**
+     * Filter which AtsMatches to update
+     */
+    where?: AtsMatchWhereInput
+    /**
+     * Limit how many AtsMatches to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * AtsMatch upsert
+   */
+  export type AtsMatchUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AtsMatch
+     */
+    select?: AtsMatchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AtsMatch
+     */
+    omit?: AtsMatchOmit<ExtArgs> | null
+    /**
+     * The filter to search for the AtsMatch to update in case it exists.
+     */
+    where: AtsMatchWhereUniqueInput
+    /**
+     * In case the AtsMatch found by the `where` argument doesn't exist, create a new AtsMatch with this data.
+     */
+    create: XOR<AtsMatchCreateInput, AtsMatchUncheckedCreateInput>
+    /**
+     * In case the AtsMatch was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<AtsMatchUpdateInput, AtsMatchUncheckedUpdateInput>
+  }
+
+  /**
+   * AtsMatch delete
+   */
+  export type AtsMatchDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AtsMatch
+     */
+    select?: AtsMatchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AtsMatch
+     */
+    omit?: AtsMatchOmit<ExtArgs> | null
+    /**
+     * Filter which AtsMatch to delete.
+     */
+    where: AtsMatchWhereUniqueInput
+  }
+
+  /**
+   * AtsMatch deleteMany
+   */
+  export type AtsMatchDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AtsMatches to delete
+     */
+    where?: AtsMatchWhereInput
+    /**
+     * Limit how many AtsMatches to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * AtsMatch without action
+   */
+  export type AtsMatchDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AtsMatch
+     */
+    select?: AtsMatchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AtsMatch
+     */
+    omit?: AtsMatchOmit<ExtArgs> | null
+  }
+
+
+  /**
+   * Model CareerRoadmap
+   */
+
+  export type AggregateCareerRoadmap = {
+    _count: CareerRoadmapCountAggregateOutputType | null
+    _avg: CareerRoadmapAvgAggregateOutputType | null
+    _sum: CareerRoadmapSumAggregateOutputType | null
+    _min: CareerRoadmapMinAggregateOutputType | null
+    _max: CareerRoadmapMaxAggregateOutputType | null
+  }
+
+  export type CareerRoadmapAvgAggregateOutputType = {
+    overallReadiness: number | null
+  }
+
+  export type CareerRoadmapSumAggregateOutputType = {
+    overallReadiness: number | null
+  }
+
+  export type CareerRoadmapMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    rolePath: string | null
+    targetCompanyTier: string | null
+    overallReadiness: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type CareerRoadmapMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    rolePath: string | null
+    targetCompanyTier: string | null
+    overallReadiness: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type CareerRoadmapCountAggregateOutputType = {
+    id: number
+    userId: number
+    rolePath: number
+    targetCompanyTier: number
+    overallReadiness: number
+    nodesData: number
+    customTechStack: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type CareerRoadmapAvgAggregateInputType = {
+    overallReadiness?: true
+  }
+
+  export type CareerRoadmapSumAggregateInputType = {
+    overallReadiness?: true
+  }
+
+  export type CareerRoadmapMinAggregateInputType = {
+    id?: true
+    userId?: true
+    rolePath?: true
+    targetCompanyTier?: true
+    overallReadiness?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type CareerRoadmapMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    rolePath?: true
+    targetCompanyTier?: true
+    overallReadiness?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type CareerRoadmapCountAggregateInputType = {
+    id?: true
+    userId?: true
+    rolePath?: true
+    targetCompanyTier?: true
+    overallReadiness?: true
+    nodesData?: true
+    customTechStack?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type CareerRoadmapAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CareerRoadmap to aggregate.
+     */
+    where?: CareerRoadmapWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CareerRoadmaps to fetch.
+     */
+    orderBy?: CareerRoadmapOrderByWithRelationInput | CareerRoadmapOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: CareerRoadmapWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CareerRoadmaps from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CareerRoadmaps.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned CareerRoadmaps
+    **/
+    _count?: true | CareerRoadmapCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: CareerRoadmapAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: CareerRoadmapSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: CareerRoadmapMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: CareerRoadmapMaxAggregateInputType
+  }
+
+  export type GetCareerRoadmapAggregateType<T extends CareerRoadmapAggregateArgs> = {
+        [P in keyof T & keyof AggregateCareerRoadmap]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateCareerRoadmap[P]>
+      : GetScalarType<T[P], AggregateCareerRoadmap[P]>
+  }
+
+
+
+
+  export type CareerRoadmapGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CareerRoadmapWhereInput
+    orderBy?: CareerRoadmapOrderByWithAggregationInput | CareerRoadmapOrderByWithAggregationInput[]
+    by: CareerRoadmapScalarFieldEnum[] | CareerRoadmapScalarFieldEnum
+    having?: CareerRoadmapScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: CareerRoadmapCountAggregateInputType | true
+    _avg?: CareerRoadmapAvgAggregateInputType
+    _sum?: CareerRoadmapSumAggregateInputType
+    _min?: CareerRoadmapMinAggregateInputType
+    _max?: CareerRoadmapMaxAggregateInputType
+  }
+
+  export type CareerRoadmapGroupByOutputType = {
+    id: string
+    userId: string
+    rolePath: string
+    targetCompanyTier: string
+    overallReadiness: number
+    nodesData: JsonValue
+    customTechStack: JsonValue | null
+    createdAt: Date
+    updatedAt: Date
+    _count: CareerRoadmapCountAggregateOutputType | null
+    _avg: CareerRoadmapAvgAggregateOutputType | null
+    _sum: CareerRoadmapSumAggregateOutputType | null
+    _min: CareerRoadmapMinAggregateOutputType | null
+    _max: CareerRoadmapMaxAggregateOutputType | null
+  }
+
+  type GetCareerRoadmapGroupByPayload<T extends CareerRoadmapGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<CareerRoadmapGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof CareerRoadmapGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], CareerRoadmapGroupByOutputType[P]>
+            : GetScalarType<T[P], CareerRoadmapGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type CareerRoadmapSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    rolePath?: boolean
+    targetCompanyTier?: boolean
+    overallReadiness?: boolean
+    nodesData?: boolean
+    customTechStack?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["careerRoadmap"]>
+
+  export type CareerRoadmapSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    rolePath?: boolean
+    targetCompanyTier?: boolean
+    overallReadiness?: boolean
+    nodesData?: boolean
+    customTechStack?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["careerRoadmap"]>
+
+  export type CareerRoadmapSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    rolePath?: boolean
+    targetCompanyTier?: boolean
+    overallReadiness?: boolean
+    nodesData?: boolean
+    customTechStack?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["careerRoadmap"]>
+
+  export type CareerRoadmapSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    rolePath?: boolean
+    targetCompanyTier?: boolean
+    overallReadiness?: boolean
+    nodesData?: boolean
+    customTechStack?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type CareerRoadmapOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "rolePath" | "targetCompanyTier" | "overallReadiness" | "nodesData" | "customTechStack" | "createdAt" | "updatedAt", ExtArgs["result"]["careerRoadmap"]>
+
+  export type $CareerRoadmapPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "CareerRoadmap"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      rolePath: string
+      targetCompanyTier: string
+      overallReadiness: number
+      nodesData: Prisma.JsonValue
+      customTechStack: Prisma.JsonValue | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["careerRoadmap"]>
+    composites: {}
+  }
+
+  type CareerRoadmapGetPayload<S extends boolean | null | undefined | CareerRoadmapDefaultArgs> = $Result.GetResult<Prisma.$CareerRoadmapPayload, S>
+
+  type CareerRoadmapCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<CareerRoadmapFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: CareerRoadmapCountAggregateInputType | true
+    }
+
+  export interface CareerRoadmapDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['CareerRoadmap'], meta: { name: 'CareerRoadmap' } }
+    /**
+     * Find zero or one CareerRoadmap that matches the filter.
+     * @param {CareerRoadmapFindUniqueArgs} args - Arguments to find a CareerRoadmap
+     * @example
+     * // Get one CareerRoadmap
+     * const careerRoadmap = await prisma.careerRoadmap.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends CareerRoadmapFindUniqueArgs>(args: SelectSubset<T, CareerRoadmapFindUniqueArgs<ExtArgs>>): Prisma__CareerRoadmapClient<$Result.GetResult<Prisma.$CareerRoadmapPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one CareerRoadmap that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {CareerRoadmapFindUniqueOrThrowArgs} args - Arguments to find a CareerRoadmap
+     * @example
+     * // Get one CareerRoadmap
+     * const careerRoadmap = await prisma.careerRoadmap.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends CareerRoadmapFindUniqueOrThrowArgs>(args: SelectSubset<T, CareerRoadmapFindUniqueOrThrowArgs<ExtArgs>>): Prisma__CareerRoadmapClient<$Result.GetResult<Prisma.$CareerRoadmapPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first CareerRoadmap that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CareerRoadmapFindFirstArgs} args - Arguments to find a CareerRoadmap
+     * @example
+     * // Get one CareerRoadmap
+     * const careerRoadmap = await prisma.careerRoadmap.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends CareerRoadmapFindFirstArgs>(args?: SelectSubset<T, CareerRoadmapFindFirstArgs<ExtArgs>>): Prisma__CareerRoadmapClient<$Result.GetResult<Prisma.$CareerRoadmapPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first CareerRoadmap that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CareerRoadmapFindFirstOrThrowArgs} args - Arguments to find a CareerRoadmap
+     * @example
+     * // Get one CareerRoadmap
+     * const careerRoadmap = await prisma.careerRoadmap.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends CareerRoadmapFindFirstOrThrowArgs>(args?: SelectSubset<T, CareerRoadmapFindFirstOrThrowArgs<ExtArgs>>): Prisma__CareerRoadmapClient<$Result.GetResult<Prisma.$CareerRoadmapPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more CareerRoadmaps that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CareerRoadmapFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all CareerRoadmaps
+     * const careerRoadmaps = await prisma.careerRoadmap.findMany()
+     * 
+     * // Get first 10 CareerRoadmaps
+     * const careerRoadmaps = await prisma.careerRoadmap.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const careerRoadmapWithIdOnly = await prisma.careerRoadmap.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends CareerRoadmapFindManyArgs>(args?: SelectSubset<T, CareerRoadmapFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CareerRoadmapPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a CareerRoadmap.
+     * @param {CareerRoadmapCreateArgs} args - Arguments to create a CareerRoadmap.
+     * @example
+     * // Create one CareerRoadmap
+     * const CareerRoadmap = await prisma.careerRoadmap.create({
+     *   data: {
+     *     // ... data to create a CareerRoadmap
+     *   }
+     * })
+     * 
+     */
+    create<T extends CareerRoadmapCreateArgs>(args: SelectSubset<T, CareerRoadmapCreateArgs<ExtArgs>>): Prisma__CareerRoadmapClient<$Result.GetResult<Prisma.$CareerRoadmapPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many CareerRoadmaps.
+     * @param {CareerRoadmapCreateManyArgs} args - Arguments to create many CareerRoadmaps.
+     * @example
+     * // Create many CareerRoadmaps
+     * const careerRoadmap = await prisma.careerRoadmap.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends CareerRoadmapCreateManyArgs>(args?: SelectSubset<T, CareerRoadmapCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many CareerRoadmaps and returns the data saved in the database.
+     * @param {CareerRoadmapCreateManyAndReturnArgs} args - Arguments to create many CareerRoadmaps.
+     * @example
+     * // Create many CareerRoadmaps
+     * const careerRoadmap = await prisma.careerRoadmap.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many CareerRoadmaps and only return the `id`
+     * const careerRoadmapWithIdOnly = await prisma.careerRoadmap.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends CareerRoadmapCreateManyAndReturnArgs>(args?: SelectSubset<T, CareerRoadmapCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CareerRoadmapPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a CareerRoadmap.
+     * @param {CareerRoadmapDeleteArgs} args - Arguments to delete one CareerRoadmap.
+     * @example
+     * // Delete one CareerRoadmap
+     * const CareerRoadmap = await prisma.careerRoadmap.delete({
+     *   where: {
+     *     // ... filter to delete one CareerRoadmap
+     *   }
+     * })
+     * 
+     */
+    delete<T extends CareerRoadmapDeleteArgs>(args: SelectSubset<T, CareerRoadmapDeleteArgs<ExtArgs>>): Prisma__CareerRoadmapClient<$Result.GetResult<Prisma.$CareerRoadmapPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one CareerRoadmap.
+     * @param {CareerRoadmapUpdateArgs} args - Arguments to update one CareerRoadmap.
+     * @example
+     * // Update one CareerRoadmap
+     * const careerRoadmap = await prisma.careerRoadmap.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends CareerRoadmapUpdateArgs>(args: SelectSubset<T, CareerRoadmapUpdateArgs<ExtArgs>>): Prisma__CareerRoadmapClient<$Result.GetResult<Prisma.$CareerRoadmapPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more CareerRoadmaps.
+     * @param {CareerRoadmapDeleteManyArgs} args - Arguments to filter CareerRoadmaps to delete.
+     * @example
+     * // Delete a few CareerRoadmaps
+     * const { count } = await prisma.careerRoadmap.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends CareerRoadmapDeleteManyArgs>(args?: SelectSubset<T, CareerRoadmapDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more CareerRoadmaps.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CareerRoadmapUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many CareerRoadmaps
+     * const careerRoadmap = await prisma.careerRoadmap.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends CareerRoadmapUpdateManyArgs>(args: SelectSubset<T, CareerRoadmapUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more CareerRoadmaps and returns the data updated in the database.
+     * @param {CareerRoadmapUpdateManyAndReturnArgs} args - Arguments to update many CareerRoadmaps.
+     * @example
+     * // Update many CareerRoadmaps
+     * const careerRoadmap = await prisma.careerRoadmap.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more CareerRoadmaps and only return the `id`
+     * const careerRoadmapWithIdOnly = await prisma.careerRoadmap.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends CareerRoadmapUpdateManyAndReturnArgs>(args: SelectSubset<T, CareerRoadmapUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CareerRoadmapPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one CareerRoadmap.
+     * @param {CareerRoadmapUpsertArgs} args - Arguments to update or create a CareerRoadmap.
+     * @example
+     * // Update or create a CareerRoadmap
+     * const careerRoadmap = await prisma.careerRoadmap.upsert({
+     *   create: {
+     *     // ... data to create a CareerRoadmap
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the CareerRoadmap we want to update
+     *   }
+     * })
+     */
+    upsert<T extends CareerRoadmapUpsertArgs>(args: SelectSubset<T, CareerRoadmapUpsertArgs<ExtArgs>>): Prisma__CareerRoadmapClient<$Result.GetResult<Prisma.$CareerRoadmapPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of CareerRoadmaps.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CareerRoadmapCountArgs} args - Arguments to filter CareerRoadmaps to count.
+     * @example
+     * // Count the number of CareerRoadmaps
+     * const count = await prisma.careerRoadmap.count({
+     *   where: {
+     *     // ... the filter for the CareerRoadmaps we want to count
+     *   }
+     * })
+    **/
+    count<T extends CareerRoadmapCountArgs>(
+      args?: Subset<T, CareerRoadmapCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], CareerRoadmapCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a CareerRoadmap.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CareerRoadmapAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends CareerRoadmapAggregateArgs>(args: Subset<T, CareerRoadmapAggregateArgs>): Prisma.PrismaPromise<GetCareerRoadmapAggregateType<T>>
+
+    /**
+     * Group by CareerRoadmap.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CareerRoadmapGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends CareerRoadmapGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: CareerRoadmapGroupByArgs['orderBy'] }
+        : { orderBy?: CareerRoadmapGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, CareerRoadmapGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCareerRoadmapGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the CareerRoadmap model
+   */
+  readonly fields: CareerRoadmapFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for CareerRoadmap.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__CareerRoadmapClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the CareerRoadmap model
+   */
+  interface CareerRoadmapFieldRefs {
+    readonly id: FieldRef<"CareerRoadmap", 'String'>
+    readonly userId: FieldRef<"CareerRoadmap", 'String'>
+    readonly rolePath: FieldRef<"CareerRoadmap", 'String'>
+    readonly targetCompanyTier: FieldRef<"CareerRoadmap", 'String'>
+    readonly overallReadiness: FieldRef<"CareerRoadmap", 'Int'>
+    readonly nodesData: FieldRef<"CareerRoadmap", 'Json'>
+    readonly customTechStack: FieldRef<"CareerRoadmap", 'Json'>
+    readonly createdAt: FieldRef<"CareerRoadmap", 'DateTime'>
+    readonly updatedAt: FieldRef<"CareerRoadmap", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * CareerRoadmap findUnique
+   */
+  export type CareerRoadmapFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CareerRoadmap
+     */
+    select?: CareerRoadmapSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CareerRoadmap
+     */
+    omit?: CareerRoadmapOmit<ExtArgs> | null
+    /**
+     * Filter, which CareerRoadmap to fetch.
+     */
+    where: CareerRoadmapWhereUniqueInput
+  }
+
+  /**
+   * CareerRoadmap findUniqueOrThrow
+   */
+  export type CareerRoadmapFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CareerRoadmap
+     */
+    select?: CareerRoadmapSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CareerRoadmap
+     */
+    omit?: CareerRoadmapOmit<ExtArgs> | null
+    /**
+     * Filter, which CareerRoadmap to fetch.
+     */
+    where: CareerRoadmapWhereUniqueInput
+  }
+
+  /**
+   * CareerRoadmap findFirst
+   */
+  export type CareerRoadmapFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CareerRoadmap
+     */
+    select?: CareerRoadmapSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CareerRoadmap
+     */
+    omit?: CareerRoadmapOmit<ExtArgs> | null
+    /**
+     * Filter, which CareerRoadmap to fetch.
+     */
+    where?: CareerRoadmapWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CareerRoadmaps to fetch.
+     */
+    orderBy?: CareerRoadmapOrderByWithRelationInput | CareerRoadmapOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CareerRoadmaps.
+     */
+    cursor?: CareerRoadmapWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CareerRoadmaps from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CareerRoadmaps.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CareerRoadmaps.
+     */
+    distinct?: CareerRoadmapScalarFieldEnum | CareerRoadmapScalarFieldEnum[]
+  }
+
+  /**
+   * CareerRoadmap findFirstOrThrow
+   */
+  export type CareerRoadmapFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CareerRoadmap
+     */
+    select?: CareerRoadmapSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CareerRoadmap
+     */
+    omit?: CareerRoadmapOmit<ExtArgs> | null
+    /**
+     * Filter, which CareerRoadmap to fetch.
+     */
+    where?: CareerRoadmapWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CareerRoadmaps to fetch.
+     */
+    orderBy?: CareerRoadmapOrderByWithRelationInput | CareerRoadmapOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CareerRoadmaps.
+     */
+    cursor?: CareerRoadmapWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CareerRoadmaps from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CareerRoadmaps.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CareerRoadmaps.
+     */
+    distinct?: CareerRoadmapScalarFieldEnum | CareerRoadmapScalarFieldEnum[]
+  }
+
+  /**
+   * CareerRoadmap findMany
+   */
+  export type CareerRoadmapFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CareerRoadmap
+     */
+    select?: CareerRoadmapSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CareerRoadmap
+     */
+    omit?: CareerRoadmapOmit<ExtArgs> | null
+    /**
+     * Filter, which CareerRoadmaps to fetch.
+     */
+    where?: CareerRoadmapWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CareerRoadmaps to fetch.
+     */
+    orderBy?: CareerRoadmapOrderByWithRelationInput | CareerRoadmapOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing CareerRoadmaps.
+     */
+    cursor?: CareerRoadmapWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CareerRoadmaps from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CareerRoadmaps.
+     */
+    skip?: number
+    distinct?: CareerRoadmapScalarFieldEnum | CareerRoadmapScalarFieldEnum[]
+  }
+
+  /**
+   * CareerRoadmap create
+   */
+  export type CareerRoadmapCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CareerRoadmap
+     */
+    select?: CareerRoadmapSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CareerRoadmap
+     */
+    omit?: CareerRoadmapOmit<ExtArgs> | null
+    /**
+     * The data needed to create a CareerRoadmap.
+     */
+    data: XOR<CareerRoadmapCreateInput, CareerRoadmapUncheckedCreateInput>
+  }
+
+  /**
+   * CareerRoadmap createMany
+   */
+  export type CareerRoadmapCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many CareerRoadmaps.
+     */
+    data: CareerRoadmapCreateManyInput | CareerRoadmapCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * CareerRoadmap createManyAndReturn
+   */
+  export type CareerRoadmapCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CareerRoadmap
+     */
+    select?: CareerRoadmapSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the CareerRoadmap
+     */
+    omit?: CareerRoadmapOmit<ExtArgs> | null
+    /**
+     * The data used to create many CareerRoadmaps.
+     */
+    data: CareerRoadmapCreateManyInput | CareerRoadmapCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * CareerRoadmap update
+   */
+  export type CareerRoadmapUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CareerRoadmap
+     */
+    select?: CareerRoadmapSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CareerRoadmap
+     */
+    omit?: CareerRoadmapOmit<ExtArgs> | null
+    /**
+     * The data needed to update a CareerRoadmap.
+     */
+    data: XOR<CareerRoadmapUpdateInput, CareerRoadmapUncheckedUpdateInput>
+    /**
+     * Choose, which CareerRoadmap to update.
+     */
+    where: CareerRoadmapWhereUniqueInput
+  }
+
+  /**
+   * CareerRoadmap updateMany
+   */
+  export type CareerRoadmapUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update CareerRoadmaps.
+     */
+    data: XOR<CareerRoadmapUpdateManyMutationInput, CareerRoadmapUncheckedUpdateManyInput>
+    /**
+     * Filter which CareerRoadmaps to update
+     */
+    where?: CareerRoadmapWhereInput
+    /**
+     * Limit how many CareerRoadmaps to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * CareerRoadmap updateManyAndReturn
+   */
+  export type CareerRoadmapUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CareerRoadmap
+     */
+    select?: CareerRoadmapSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the CareerRoadmap
+     */
+    omit?: CareerRoadmapOmit<ExtArgs> | null
+    /**
+     * The data used to update CareerRoadmaps.
+     */
+    data: XOR<CareerRoadmapUpdateManyMutationInput, CareerRoadmapUncheckedUpdateManyInput>
+    /**
+     * Filter which CareerRoadmaps to update
+     */
+    where?: CareerRoadmapWhereInput
+    /**
+     * Limit how many CareerRoadmaps to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * CareerRoadmap upsert
+   */
+  export type CareerRoadmapUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CareerRoadmap
+     */
+    select?: CareerRoadmapSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CareerRoadmap
+     */
+    omit?: CareerRoadmapOmit<ExtArgs> | null
+    /**
+     * The filter to search for the CareerRoadmap to update in case it exists.
+     */
+    where: CareerRoadmapWhereUniqueInput
+    /**
+     * In case the CareerRoadmap found by the `where` argument doesn't exist, create a new CareerRoadmap with this data.
+     */
+    create: XOR<CareerRoadmapCreateInput, CareerRoadmapUncheckedCreateInput>
+    /**
+     * In case the CareerRoadmap was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<CareerRoadmapUpdateInput, CareerRoadmapUncheckedUpdateInput>
+  }
+
+  /**
+   * CareerRoadmap delete
+   */
+  export type CareerRoadmapDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CareerRoadmap
+     */
+    select?: CareerRoadmapSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CareerRoadmap
+     */
+    omit?: CareerRoadmapOmit<ExtArgs> | null
+    /**
+     * Filter which CareerRoadmap to delete.
+     */
+    where: CareerRoadmapWhereUniqueInput
+  }
+
+  /**
+   * CareerRoadmap deleteMany
+   */
+  export type CareerRoadmapDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CareerRoadmaps to delete
+     */
+    where?: CareerRoadmapWhereInput
+    /**
+     * Limit how many CareerRoadmaps to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * CareerRoadmap without action
+   */
+  export type CareerRoadmapDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CareerRoadmap
+     */
+    select?: CareerRoadmapSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CareerRoadmap
+     */
+    omit?: CareerRoadmapOmit<ExtArgs> | null
+  }
+
+
+  /**
+   * Model DiscussionPost
+   */
+
+  export type AggregateDiscussionPost = {
+    _count: DiscussionPostCountAggregateOutputType | null
+    _avg: DiscussionPostAvgAggregateOutputType | null
+    _sum: DiscussionPostSumAggregateOutputType | null
+    _min: DiscussionPostMinAggregateOutputType | null
+    _max: DiscussionPostMaxAggregateOutputType | null
+  }
+
+  export type DiscussionPostAvgAggregateOutputType = {
+    upvotes: number | null
+  }
+
+  export type DiscussionPostSumAggregateOutputType = {
+    upvotes: number | null
+  }
+
+  export type DiscussionPostMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    userName: string | null
+    roleCategory: string | null
+    title: string | null
+    content: string | null
+    upvotes: number | null
+    aiReply: string | null
+    createdAt: Date | null
+  }
+
+  export type DiscussionPostMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    userName: string | null
+    roleCategory: string | null
+    title: string | null
+    content: string | null
+    upvotes: number | null
+    aiReply: string | null
+    createdAt: Date | null
+  }
+
+  export type DiscussionPostCountAggregateOutputType = {
+    id: number
+    userId: number
+    userName: number
+    roleCategory: number
+    title: number
+    content: number
+    tags: number
+    upvotes: number
+    aiReply: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type DiscussionPostAvgAggregateInputType = {
+    upvotes?: true
+  }
+
+  export type DiscussionPostSumAggregateInputType = {
+    upvotes?: true
+  }
+
+  export type DiscussionPostMinAggregateInputType = {
+    id?: true
+    userId?: true
+    userName?: true
+    roleCategory?: true
+    title?: true
+    content?: true
+    upvotes?: true
+    aiReply?: true
+    createdAt?: true
+  }
+
+  export type DiscussionPostMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    userName?: true
+    roleCategory?: true
+    title?: true
+    content?: true
+    upvotes?: true
+    aiReply?: true
+    createdAt?: true
+  }
+
+  export type DiscussionPostCountAggregateInputType = {
+    id?: true
+    userId?: true
+    userName?: true
+    roleCategory?: true
+    title?: true
+    content?: true
+    tags?: true
+    upvotes?: true
+    aiReply?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type DiscussionPostAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DiscussionPost to aggregate.
+     */
+    where?: DiscussionPostWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DiscussionPosts to fetch.
+     */
+    orderBy?: DiscussionPostOrderByWithRelationInput | DiscussionPostOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: DiscussionPostWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DiscussionPosts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DiscussionPosts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned DiscussionPosts
+    **/
+    _count?: true | DiscussionPostCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: DiscussionPostAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: DiscussionPostSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: DiscussionPostMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: DiscussionPostMaxAggregateInputType
+  }
+
+  export type GetDiscussionPostAggregateType<T extends DiscussionPostAggregateArgs> = {
+        [P in keyof T & keyof AggregateDiscussionPost]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateDiscussionPost[P]>
+      : GetScalarType<T[P], AggregateDiscussionPost[P]>
+  }
+
+
+
+
+  export type DiscussionPostGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DiscussionPostWhereInput
+    orderBy?: DiscussionPostOrderByWithAggregationInput | DiscussionPostOrderByWithAggregationInput[]
+    by: DiscussionPostScalarFieldEnum[] | DiscussionPostScalarFieldEnum
+    having?: DiscussionPostScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: DiscussionPostCountAggregateInputType | true
+    _avg?: DiscussionPostAvgAggregateInputType
+    _sum?: DiscussionPostSumAggregateInputType
+    _min?: DiscussionPostMinAggregateInputType
+    _max?: DiscussionPostMaxAggregateInputType
+  }
+
+  export type DiscussionPostGroupByOutputType = {
+    id: string
+    userId: string
+    userName: string
+    roleCategory: string
+    title: string
+    content: string
+    tags: string[]
+    upvotes: number
+    aiReply: string | null
+    createdAt: Date
+    _count: DiscussionPostCountAggregateOutputType | null
+    _avg: DiscussionPostAvgAggregateOutputType | null
+    _sum: DiscussionPostSumAggregateOutputType | null
+    _min: DiscussionPostMinAggregateOutputType | null
+    _max: DiscussionPostMaxAggregateOutputType | null
+  }
+
+  type GetDiscussionPostGroupByPayload<T extends DiscussionPostGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<DiscussionPostGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof DiscussionPostGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], DiscussionPostGroupByOutputType[P]>
+            : GetScalarType<T[P], DiscussionPostGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type DiscussionPostSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    userName?: boolean
+    roleCategory?: boolean
+    title?: boolean
+    content?: boolean
+    tags?: boolean
+    upvotes?: boolean
+    aiReply?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["discussionPost"]>
+
+  export type DiscussionPostSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    userName?: boolean
+    roleCategory?: boolean
+    title?: boolean
+    content?: boolean
+    tags?: boolean
+    upvotes?: boolean
+    aiReply?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["discussionPost"]>
+
+  export type DiscussionPostSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    userName?: boolean
+    roleCategory?: boolean
+    title?: boolean
+    content?: boolean
+    tags?: boolean
+    upvotes?: boolean
+    aiReply?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["discussionPost"]>
+
+  export type DiscussionPostSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    userName?: boolean
+    roleCategory?: boolean
+    title?: boolean
+    content?: boolean
+    tags?: boolean
+    upvotes?: boolean
+    aiReply?: boolean
+    createdAt?: boolean
+  }
+
+  export type DiscussionPostOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "userName" | "roleCategory" | "title" | "content" | "tags" | "upvotes" | "aiReply" | "createdAt", ExtArgs["result"]["discussionPost"]>
+
+  export type $DiscussionPostPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "DiscussionPost"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      userName: string
+      roleCategory: string
+      title: string
+      content: string
+      tags: string[]
+      upvotes: number
+      aiReply: string | null
+      createdAt: Date
+    }, ExtArgs["result"]["discussionPost"]>
+    composites: {}
+  }
+
+  type DiscussionPostGetPayload<S extends boolean | null | undefined | DiscussionPostDefaultArgs> = $Result.GetResult<Prisma.$DiscussionPostPayload, S>
+
+  type DiscussionPostCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<DiscussionPostFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: DiscussionPostCountAggregateInputType | true
+    }
+
+  export interface DiscussionPostDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['DiscussionPost'], meta: { name: 'DiscussionPost' } }
+    /**
+     * Find zero or one DiscussionPost that matches the filter.
+     * @param {DiscussionPostFindUniqueArgs} args - Arguments to find a DiscussionPost
+     * @example
+     * // Get one DiscussionPost
+     * const discussionPost = await prisma.discussionPost.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends DiscussionPostFindUniqueArgs>(args: SelectSubset<T, DiscussionPostFindUniqueArgs<ExtArgs>>): Prisma__DiscussionPostClient<$Result.GetResult<Prisma.$DiscussionPostPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one DiscussionPost that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {DiscussionPostFindUniqueOrThrowArgs} args - Arguments to find a DiscussionPost
+     * @example
+     * // Get one DiscussionPost
+     * const discussionPost = await prisma.discussionPost.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends DiscussionPostFindUniqueOrThrowArgs>(args: SelectSubset<T, DiscussionPostFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DiscussionPostClient<$Result.GetResult<Prisma.$DiscussionPostPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DiscussionPost that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DiscussionPostFindFirstArgs} args - Arguments to find a DiscussionPost
+     * @example
+     * // Get one DiscussionPost
+     * const discussionPost = await prisma.discussionPost.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends DiscussionPostFindFirstArgs>(args?: SelectSubset<T, DiscussionPostFindFirstArgs<ExtArgs>>): Prisma__DiscussionPostClient<$Result.GetResult<Prisma.$DiscussionPostPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DiscussionPost that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DiscussionPostFindFirstOrThrowArgs} args - Arguments to find a DiscussionPost
+     * @example
+     * // Get one DiscussionPost
+     * const discussionPost = await prisma.discussionPost.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends DiscussionPostFindFirstOrThrowArgs>(args?: SelectSubset<T, DiscussionPostFindFirstOrThrowArgs<ExtArgs>>): Prisma__DiscussionPostClient<$Result.GetResult<Prisma.$DiscussionPostPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more DiscussionPosts that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DiscussionPostFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all DiscussionPosts
+     * const discussionPosts = await prisma.discussionPost.findMany()
+     * 
+     * // Get first 10 DiscussionPosts
+     * const discussionPosts = await prisma.discussionPost.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const discussionPostWithIdOnly = await prisma.discussionPost.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends DiscussionPostFindManyArgs>(args?: SelectSubset<T, DiscussionPostFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DiscussionPostPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a DiscussionPost.
+     * @param {DiscussionPostCreateArgs} args - Arguments to create a DiscussionPost.
+     * @example
+     * // Create one DiscussionPost
+     * const DiscussionPost = await prisma.discussionPost.create({
+     *   data: {
+     *     // ... data to create a DiscussionPost
+     *   }
+     * })
+     * 
+     */
+    create<T extends DiscussionPostCreateArgs>(args: SelectSubset<T, DiscussionPostCreateArgs<ExtArgs>>): Prisma__DiscussionPostClient<$Result.GetResult<Prisma.$DiscussionPostPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many DiscussionPosts.
+     * @param {DiscussionPostCreateManyArgs} args - Arguments to create many DiscussionPosts.
+     * @example
+     * // Create many DiscussionPosts
+     * const discussionPost = await prisma.discussionPost.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends DiscussionPostCreateManyArgs>(args?: SelectSubset<T, DiscussionPostCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many DiscussionPosts and returns the data saved in the database.
+     * @param {DiscussionPostCreateManyAndReturnArgs} args - Arguments to create many DiscussionPosts.
+     * @example
+     * // Create many DiscussionPosts
+     * const discussionPost = await prisma.discussionPost.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many DiscussionPosts and only return the `id`
+     * const discussionPostWithIdOnly = await prisma.discussionPost.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends DiscussionPostCreateManyAndReturnArgs>(args?: SelectSubset<T, DiscussionPostCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DiscussionPostPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a DiscussionPost.
+     * @param {DiscussionPostDeleteArgs} args - Arguments to delete one DiscussionPost.
+     * @example
+     * // Delete one DiscussionPost
+     * const DiscussionPost = await prisma.discussionPost.delete({
+     *   where: {
+     *     // ... filter to delete one DiscussionPost
+     *   }
+     * })
+     * 
+     */
+    delete<T extends DiscussionPostDeleteArgs>(args: SelectSubset<T, DiscussionPostDeleteArgs<ExtArgs>>): Prisma__DiscussionPostClient<$Result.GetResult<Prisma.$DiscussionPostPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one DiscussionPost.
+     * @param {DiscussionPostUpdateArgs} args - Arguments to update one DiscussionPost.
+     * @example
+     * // Update one DiscussionPost
+     * const discussionPost = await prisma.discussionPost.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends DiscussionPostUpdateArgs>(args: SelectSubset<T, DiscussionPostUpdateArgs<ExtArgs>>): Prisma__DiscussionPostClient<$Result.GetResult<Prisma.$DiscussionPostPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more DiscussionPosts.
+     * @param {DiscussionPostDeleteManyArgs} args - Arguments to filter DiscussionPosts to delete.
+     * @example
+     * // Delete a few DiscussionPosts
+     * const { count } = await prisma.discussionPost.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends DiscussionPostDeleteManyArgs>(args?: SelectSubset<T, DiscussionPostDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DiscussionPosts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DiscussionPostUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many DiscussionPosts
+     * const discussionPost = await prisma.discussionPost.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends DiscussionPostUpdateManyArgs>(args: SelectSubset<T, DiscussionPostUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DiscussionPosts and returns the data updated in the database.
+     * @param {DiscussionPostUpdateManyAndReturnArgs} args - Arguments to update many DiscussionPosts.
+     * @example
+     * // Update many DiscussionPosts
+     * const discussionPost = await prisma.discussionPost.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more DiscussionPosts and only return the `id`
+     * const discussionPostWithIdOnly = await prisma.discussionPost.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends DiscussionPostUpdateManyAndReturnArgs>(args: SelectSubset<T, DiscussionPostUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DiscussionPostPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one DiscussionPost.
+     * @param {DiscussionPostUpsertArgs} args - Arguments to update or create a DiscussionPost.
+     * @example
+     * // Update or create a DiscussionPost
+     * const discussionPost = await prisma.discussionPost.upsert({
+     *   create: {
+     *     // ... data to create a DiscussionPost
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the DiscussionPost we want to update
+     *   }
+     * })
+     */
+    upsert<T extends DiscussionPostUpsertArgs>(args: SelectSubset<T, DiscussionPostUpsertArgs<ExtArgs>>): Prisma__DiscussionPostClient<$Result.GetResult<Prisma.$DiscussionPostPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of DiscussionPosts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DiscussionPostCountArgs} args - Arguments to filter DiscussionPosts to count.
+     * @example
+     * // Count the number of DiscussionPosts
+     * const count = await prisma.discussionPost.count({
+     *   where: {
+     *     // ... the filter for the DiscussionPosts we want to count
+     *   }
+     * })
+    **/
+    count<T extends DiscussionPostCountArgs>(
+      args?: Subset<T, DiscussionPostCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], DiscussionPostCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a DiscussionPost.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DiscussionPostAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends DiscussionPostAggregateArgs>(args: Subset<T, DiscussionPostAggregateArgs>): Prisma.PrismaPromise<GetDiscussionPostAggregateType<T>>
+
+    /**
+     * Group by DiscussionPost.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DiscussionPostGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends DiscussionPostGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: DiscussionPostGroupByArgs['orderBy'] }
+        : { orderBy?: DiscussionPostGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, DiscussionPostGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDiscussionPostGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the DiscussionPost model
+   */
+  readonly fields: DiscussionPostFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for DiscussionPost.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__DiscussionPostClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the DiscussionPost model
+   */
+  interface DiscussionPostFieldRefs {
+    readonly id: FieldRef<"DiscussionPost", 'String'>
+    readonly userId: FieldRef<"DiscussionPost", 'String'>
+    readonly userName: FieldRef<"DiscussionPost", 'String'>
+    readonly roleCategory: FieldRef<"DiscussionPost", 'String'>
+    readonly title: FieldRef<"DiscussionPost", 'String'>
+    readonly content: FieldRef<"DiscussionPost", 'String'>
+    readonly tags: FieldRef<"DiscussionPost", 'String[]'>
+    readonly upvotes: FieldRef<"DiscussionPost", 'Int'>
+    readonly aiReply: FieldRef<"DiscussionPost", 'String'>
+    readonly createdAt: FieldRef<"DiscussionPost", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * DiscussionPost findUnique
+   */
+  export type DiscussionPostFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionPost
+     */
+    select?: DiscussionPostSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionPost
+     */
+    omit?: DiscussionPostOmit<ExtArgs> | null
+    /**
+     * Filter, which DiscussionPost to fetch.
+     */
+    where: DiscussionPostWhereUniqueInput
+  }
+
+  /**
+   * DiscussionPost findUniqueOrThrow
+   */
+  export type DiscussionPostFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionPost
+     */
+    select?: DiscussionPostSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionPost
+     */
+    omit?: DiscussionPostOmit<ExtArgs> | null
+    /**
+     * Filter, which DiscussionPost to fetch.
+     */
+    where: DiscussionPostWhereUniqueInput
+  }
+
+  /**
+   * DiscussionPost findFirst
+   */
+  export type DiscussionPostFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionPost
+     */
+    select?: DiscussionPostSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionPost
+     */
+    omit?: DiscussionPostOmit<ExtArgs> | null
+    /**
+     * Filter, which DiscussionPost to fetch.
+     */
+    where?: DiscussionPostWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DiscussionPosts to fetch.
+     */
+    orderBy?: DiscussionPostOrderByWithRelationInput | DiscussionPostOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DiscussionPosts.
+     */
+    cursor?: DiscussionPostWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DiscussionPosts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DiscussionPosts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DiscussionPosts.
+     */
+    distinct?: DiscussionPostScalarFieldEnum | DiscussionPostScalarFieldEnum[]
+  }
+
+  /**
+   * DiscussionPost findFirstOrThrow
+   */
+  export type DiscussionPostFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionPost
+     */
+    select?: DiscussionPostSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionPost
+     */
+    omit?: DiscussionPostOmit<ExtArgs> | null
+    /**
+     * Filter, which DiscussionPost to fetch.
+     */
+    where?: DiscussionPostWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DiscussionPosts to fetch.
+     */
+    orderBy?: DiscussionPostOrderByWithRelationInput | DiscussionPostOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DiscussionPosts.
+     */
+    cursor?: DiscussionPostWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DiscussionPosts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DiscussionPosts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DiscussionPosts.
+     */
+    distinct?: DiscussionPostScalarFieldEnum | DiscussionPostScalarFieldEnum[]
+  }
+
+  /**
+   * DiscussionPost findMany
+   */
+  export type DiscussionPostFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionPost
+     */
+    select?: DiscussionPostSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionPost
+     */
+    omit?: DiscussionPostOmit<ExtArgs> | null
+    /**
+     * Filter, which DiscussionPosts to fetch.
+     */
+    where?: DiscussionPostWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DiscussionPosts to fetch.
+     */
+    orderBy?: DiscussionPostOrderByWithRelationInput | DiscussionPostOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing DiscussionPosts.
+     */
+    cursor?: DiscussionPostWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DiscussionPosts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DiscussionPosts.
+     */
+    skip?: number
+    distinct?: DiscussionPostScalarFieldEnum | DiscussionPostScalarFieldEnum[]
+  }
+
+  /**
+   * DiscussionPost create
+   */
+  export type DiscussionPostCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionPost
+     */
+    select?: DiscussionPostSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionPost
+     */
+    omit?: DiscussionPostOmit<ExtArgs> | null
+    /**
+     * The data needed to create a DiscussionPost.
+     */
+    data: XOR<DiscussionPostCreateInput, DiscussionPostUncheckedCreateInput>
+  }
+
+  /**
+   * DiscussionPost createMany
+   */
+  export type DiscussionPostCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many DiscussionPosts.
+     */
+    data: DiscussionPostCreateManyInput | DiscussionPostCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * DiscussionPost createManyAndReturn
+   */
+  export type DiscussionPostCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionPost
+     */
+    select?: DiscussionPostSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionPost
+     */
+    omit?: DiscussionPostOmit<ExtArgs> | null
+    /**
+     * The data used to create many DiscussionPosts.
+     */
+    data: DiscussionPostCreateManyInput | DiscussionPostCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * DiscussionPost update
+   */
+  export type DiscussionPostUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionPost
+     */
+    select?: DiscussionPostSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionPost
+     */
+    omit?: DiscussionPostOmit<ExtArgs> | null
+    /**
+     * The data needed to update a DiscussionPost.
+     */
+    data: XOR<DiscussionPostUpdateInput, DiscussionPostUncheckedUpdateInput>
+    /**
+     * Choose, which DiscussionPost to update.
+     */
+    where: DiscussionPostWhereUniqueInput
+  }
+
+  /**
+   * DiscussionPost updateMany
+   */
+  export type DiscussionPostUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update DiscussionPosts.
+     */
+    data: XOR<DiscussionPostUpdateManyMutationInput, DiscussionPostUncheckedUpdateManyInput>
+    /**
+     * Filter which DiscussionPosts to update
+     */
+    where?: DiscussionPostWhereInput
+    /**
+     * Limit how many DiscussionPosts to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * DiscussionPost updateManyAndReturn
+   */
+  export type DiscussionPostUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionPost
+     */
+    select?: DiscussionPostSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionPost
+     */
+    omit?: DiscussionPostOmit<ExtArgs> | null
+    /**
+     * The data used to update DiscussionPosts.
+     */
+    data: XOR<DiscussionPostUpdateManyMutationInput, DiscussionPostUncheckedUpdateManyInput>
+    /**
+     * Filter which DiscussionPosts to update
+     */
+    where?: DiscussionPostWhereInput
+    /**
+     * Limit how many DiscussionPosts to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * DiscussionPost upsert
+   */
+  export type DiscussionPostUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionPost
+     */
+    select?: DiscussionPostSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionPost
+     */
+    omit?: DiscussionPostOmit<ExtArgs> | null
+    /**
+     * The filter to search for the DiscussionPost to update in case it exists.
+     */
+    where: DiscussionPostWhereUniqueInput
+    /**
+     * In case the DiscussionPost found by the `where` argument doesn't exist, create a new DiscussionPost with this data.
+     */
+    create: XOR<DiscussionPostCreateInput, DiscussionPostUncheckedCreateInput>
+    /**
+     * In case the DiscussionPost was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<DiscussionPostUpdateInput, DiscussionPostUncheckedUpdateInput>
+  }
+
+  /**
+   * DiscussionPost delete
+   */
+  export type DiscussionPostDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionPost
+     */
+    select?: DiscussionPostSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionPost
+     */
+    omit?: DiscussionPostOmit<ExtArgs> | null
+    /**
+     * Filter which DiscussionPost to delete.
+     */
+    where: DiscussionPostWhereUniqueInput
+  }
+
+  /**
+   * DiscussionPost deleteMany
+   */
+  export type DiscussionPostDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DiscussionPosts to delete
+     */
+    where?: DiscussionPostWhereInput
+    /**
+     * Limit how many DiscussionPosts to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * DiscussionPost without action
+   */
+  export type DiscussionPostDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionPost
+     */
+    select?: DiscussionPostSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionPost
+     */
+    omit?: DiscussionPostOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -6126,6 +9675,56 @@ export namespace Prisma {
   };
 
   export type PreDefinedProblemScalarFieldEnum = (typeof PreDefinedProblemScalarFieldEnum)[keyof typeof PreDefinedProblemScalarFieldEnum]
+
+
+  export const AtsMatchScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    jobTitle: 'jobTitle',
+    companyName: 'companyName',
+    matchScore: 'matchScore',
+    summary: 'summary',
+    matchedSkills: 'matchedSkills',
+    missingSkills: 'missingSkills',
+    experienceMatch: 'experienceMatch',
+    atsWarnings: 'atsWarnings',
+    bulletRewrites: 'bulletRewrites',
+    tailoredQuestions: 'tailoredQuestions',
+    createdAt: 'createdAt'
+  };
+
+  export type AtsMatchScalarFieldEnum = (typeof AtsMatchScalarFieldEnum)[keyof typeof AtsMatchScalarFieldEnum]
+
+
+  export const CareerRoadmapScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    rolePath: 'rolePath',
+    targetCompanyTier: 'targetCompanyTier',
+    overallReadiness: 'overallReadiness',
+    nodesData: 'nodesData',
+    customTechStack: 'customTechStack',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type CareerRoadmapScalarFieldEnum = (typeof CareerRoadmapScalarFieldEnum)[keyof typeof CareerRoadmapScalarFieldEnum]
+
+
+  export const DiscussionPostScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    userName: 'userName',
+    roleCategory: 'roleCategory',
+    title: 'title',
+    content: 'content',
+    tags: 'tags',
+    upvotes: 'upvotes',
+    aiReply: 'aiReply',
+    createdAt: 'createdAt'
+  };
+
+  export type DiscussionPostScalarFieldEnum = (typeof DiscussionPostScalarFieldEnum)[keyof typeof DiscussionPostScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -6715,6 +10314,253 @@ export namespace Prisma {
     optimalSpace?: StringWithAggregatesFilter<"PreDefinedProblem"> | string
   }
 
+  export type AtsMatchWhereInput = {
+    AND?: AtsMatchWhereInput | AtsMatchWhereInput[]
+    OR?: AtsMatchWhereInput[]
+    NOT?: AtsMatchWhereInput | AtsMatchWhereInput[]
+    id?: StringFilter<"AtsMatch"> | string
+    userId?: StringFilter<"AtsMatch"> | string
+    jobTitle?: StringFilter<"AtsMatch"> | string
+    companyName?: StringNullableFilter<"AtsMatch"> | string | null
+    matchScore?: IntFilter<"AtsMatch"> | number
+    summary?: StringFilter<"AtsMatch"> | string
+    matchedSkills?: StringNullableListFilter<"AtsMatch">
+    missingSkills?: StringNullableListFilter<"AtsMatch">
+    experienceMatch?: StringNullableFilter<"AtsMatch"> | string | null
+    atsWarnings?: StringNullableListFilter<"AtsMatch">
+    bulletRewrites?: JsonFilter<"AtsMatch">
+    tailoredQuestions?: JsonFilter<"AtsMatch">
+    createdAt?: DateTimeFilter<"AtsMatch"> | Date | string
+  }
+
+  export type AtsMatchOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    jobTitle?: SortOrder
+    companyName?: SortOrderInput | SortOrder
+    matchScore?: SortOrder
+    summary?: SortOrder
+    matchedSkills?: SortOrder
+    missingSkills?: SortOrder
+    experienceMatch?: SortOrderInput | SortOrder
+    atsWarnings?: SortOrder
+    bulletRewrites?: SortOrder
+    tailoredQuestions?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type AtsMatchWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: AtsMatchWhereInput | AtsMatchWhereInput[]
+    OR?: AtsMatchWhereInput[]
+    NOT?: AtsMatchWhereInput | AtsMatchWhereInput[]
+    userId?: StringFilter<"AtsMatch"> | string
+    jobTitle?: StringFilter<"AtsMatch"> | string
+    companyName?: StringNullableFilter<"AtsMatch"> | string | null
+    matchScore?: IntFilter<"AtsMatch"> | number
+    summary?: StringFilter<"AtsMatch"> | string
+    matchedSkills?: StringNullableListFilter<"AtsMatch">
+    missingSkills?: StringNullableListFilter<"AtsMatch">
+    experienceMatch?: StringNullableFilter<"AtsMatch"> | string | null
+    atsWarnings?: StringNullableListFilter<"AtsMatch">
+    bulletRewrites?: JsonFilter<"AtsMatch">
+    tailoredQuestions?: JsonFilter<"AtsMatch">
+    createdAt?: DateTimeFilter<"AtsMatch"> | Date | string
+  }, "id">
+
+  export type AtsMatchOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    jobTitle?: SortOrder
+    companyName?: SortOrderInput | SortOrder
+    matchScore?: SortOrder
+    summary?: SortOrder
+    matchedSkills?: SortOrder
+    missingSkills?: SortOrder
+    experienceMatch?: SortOrderInput | SortOrder
+    atsWarnings?: SortOrder
+    bulletRewrites?: SortOrder
+    tailoredQuestions?: SortOrder
+    createdAt?: SortOrder
+    _count?: AtsMatchCountOrderByAggregateInput
+    _avg?: AtsMatchAvgOrderByAggregateInput
+    _max?: AtsMatchMaxOrderByAggregateInput
+    _min?: AtsMatchMinOrderByAggregateInput
+    _sum?: AtsMatchSumOrderByAggregateInput
+  }
+
+  export type AtsMatchScalarWhereWithAggregatesInput = {
+    AND?: AtsMatchScalarWhereWithAggregatesInput | AtsMatchScalarWhereWithAggregatesInput[]
+    OR?: AtsMatchScalarWhereWithAggregatesInput[]
+    NOT?: AtsMatchScalarWhereWithAggregatesInput | AtsMatchScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"AtsMatch"> | string
+    userId?: StringWithAggregatesFilter<"AtsMatch"> | string
+    jobTitle?: StringWithAggregatesFilter<"AtsMatch"> | string
+    companyName?: StringNullableWithAggregatesFilter<"AtsMatch"> | string | null
+    matchScore?: IntWithAggregatesFilter<"AtsMatch"> | number
+    summary?: StringWithAggregatesFilter<"AtsMatch"> | string
+    matchedSkills?: StringNullableListFilter<"AtsMatch">
+    missingSkills?: StringNullableListFilter<"AtsMatch">
+    experienceMatch?: StringNullableWithAggregatesFilter<"AtsMatch"> | string | null
+    atsWarnings?: StringNullableListFilter<"AtsMatch">
+    bulletRewrites?: JsonWithAggregatesFilter<"AtsMatch">
+    tailoredQuestions?: JsonWithAggregatesFilter<"AtsMatch">
+    createdAt?: DateTimeWithAggregatesFilter<"AtsMatch"> | Date | string
+  }
+
+  export type CareerRoadmapWhereInput = {
+    AND?: CareerRoadmapWhereInput | CareerRoadmapWhereInput[]
+    OR?: CareerRoadmapWhereInput[]
+    NOT?: CareerRoadmapWhereInput | CareerRoadmapWhereInput[]
+    id?: StringFilter<"CareerRoadmap"> | string
+    userId?: StringFilter<"CareerRoadmap"> | string
+    rolePath?: StringFilter<"CareerRoadmap"> | string
+    targetCompanyTier?: StringFilter<"CareerRoadmap"> | string
+    overallReadiness?: IntFilter<"CareerRoadmap"> | number
+    nodesData?: JsonFilter<"CareerRoadmap">
+    customTechStack?: JsonNullableFilter<"CareerRoadmap">
+    createdAt?: DateTimeFilter<"CareerRoadmap"> | Date | string
+    updatedAt?: DateTimeFilter<"CareerRoadmap"> | Date | string
+  }
+
+  export type CareerRoadmapOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    rolePath?: SortOrder
+    targetCompanyTier?: SortOrder
+    overallReadiness?: SortOrder
+    nodesData?: SortOrder
+    customTechStack?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type CareerRoadmapWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: CareerRoadmapWhereInput | CareerRoadmapWhereInput[]
+    OR?: CareerRoadmapWhereInput[]
+    NOT?: CareerRoadmapWhereInput | CareerRoadmapWhereInput[]
+    userId?: StringFilter<"CareerRoadmap"> | string
+    rolePath?: StringFilter<"CareerRoadmap"> | string
+    targetCompanyTier?: StringFilter<"CareerRoadmap"> | string
+    overallReadiness?: IntFilter<"CareerRoadmap"> | number
+    nodesData?: JsonFilter<"CareerRoadmap">
+    customTechStack?: JsonNullableFilter<"CareerRoadmap">
+    createdAt?: DateTimeFilter<"CareerRoadmap"> | Date | string
+    updatedAt?: DateTimeFilter<"CareerRoadmap"> | Date | string
+  }, "id">
+
+  export type CareerRoadmapOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    rolePath?: SortOrder
+    targetCompanyTier?: SortOrder
+    overallReadiness?: SortOrder
+    nodesData?: SortOrder
+    customTechStack?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: CareerRoadmapCountOrderByAggregateInput
+    _avg?: CareerRoadmapAvgOrderByAggregateInput
+    _max?: CareerRoadmapMaxOrderByAggregateInput
+    _min?: CareerRoadmapMinOrderByAggregateInput
+    _sum?: CareerRoadmapSumOrderByAggregateInput
+  }
+
+  export type CareerRoadmapScalarWhereWithAggregatesInput = {
+    AND?: CareerRoadmapScalarWhereWithAggregatesInput | CareerRoadmapScalarWhereWithAggregatesInput[]
+    OR?: CareerRoadmapScalarWhereWithAggregatesInput[]
+    NOT?: CareerRoadmapScalarWhereWithAggregatesInput | CareerRoadmapScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"CareerRoadmap"> | string
+    userId?: StringWithAggregatesFilter<"CareerRoadmap"> | string
+    rolePath?: StringWithAggregatesFilter<"CareerRoadmap"> | string
+    targetCompanyTier?: StringWithAggregatesFilter<"CareerRoadmap"> | string
+    overallReadiness?: IntWithAggregatesFilter<"CareerRoadmap"> | number
+    nodesData?: JsonWithAggregatesFilter<"CareerRoadmap">
+    customTechStack?: JsonNullableWithAggregatesFilter<"CareerRoadmap">
+    createdAt?: DateTimeWithAggregatesFilter<"CareerRoadmap"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"CareerRoadmap"> | Date | string
+  }
+
+  export type DiscussionPostWhereInput = {
+    AND?: DiscussionPostWhereInput | DiscussionPostWhereInput[]
+    OR?: DiscussionPostWhereInput[]
+    NOT?: DiscussionPostWhereInput | DiscussionPostWhereInput[]
+    id?: StringFilter<"DiscussionPost"> | string
+    userId?: StringFilter<"DiscussionPost"> | string
+    userName?: StringFilter<"DiscussionPost"> | string
+    roleCategory?: StringFilter<"DiscussionPost"> | string
+    title?: StringFilter<"DiscussionPost"> | string
+    content?: StringFilter<"DiscussionPost"> | string
+    tags?: StringNullableListFilter<"DiscussionPost">
+    upvotes?: IntFilter<"DiscussionPost"> | number
+    aiReply?: StringNullableFilter<"DiscussionPost"> | string | null
+    createdAt?: DateTimeFilter<"DiscussionPost"> | Date | string
+  }
+
+  export type DiscussionPostOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    userName?: SortOrder
+    roleCategory?: SortOrder
+    title?: SortOrder
+    content?: SortOrder
+    tags?: SortOrder
+    upvotes?: SortOrder
+    aiReply?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type DiscussionPostWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: DiscussionPostWhereInput | DiscussionPostWhereInput[]
+    OR?: DiscussionPostWhereInput[]
+    NOT?: DiscussionPostWhereInput | DiscussionPostWhereInput[]
+    userId?: StringFilter<"DiscussionPost"> | string
+    userName?: StringFilter<"DiscussionPost"> | string
+    roleCategory?: StringFilter<"DiscussionPost"> | string
+    title?: StringFilter<"DiscussionPost"> | string
+    content?: StringFilter<"DiscussionPost"> | string
+    tags?: StringNullableListFilter<"DiscussionPost">
+    upvotes?: IntFilter<"DiscussionPost"> | number
+    aiReply?: StringNullableFilter<"DiscussionPost"> | string | null
+    createdAt?: DateTimeFilter<"DiscussionPost"> | Date | string
+  }, "id">
+
+  export type DiscussionPostOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    userName?: SortOrder
+    roleCategory?: SortOrder
+    title?: SortOrder
+    content?: SortOrder
+    tags?: SortOrder
+    upvotes?: SortOrder
+    aiReply?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    _count?: DiscussionPostCountOrderByAggregateInput
+    _avg?: DiscussionPostAvgOrderByAggregateInput
+    _max?: DiscussionPostMaxOrderByAggregateInput
+    _min?: DiscussionPostMinOrderByAggregateInput
+    _sum?: DiscussionPostSumOrderByAggregateInput
+  }
+
+  export type DiscussionPostScalarWhereWithAggregatesInput = {
+    AND?: DiscussionPostScalarWhereWithAggregatesInput | DiscussionPostScalarWhereWithAggregatesInput[]
+    OR?: DiscussionPostScalarWhereWithAggregatesInput[]
+    NOT?: DiscussionPostScalarWhereWithAggregatesInput | DiscussionPostScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"DiscussionPost"> | string
+    userId?: StringWithAggregatesFilter<"DiscussionPost"> | string
+    userName?: StringWithAggregatesFilter<"DiscussionPost"> | string
+    roleCategory?: StringWithAggregatesFilter<"DiscussionPost"> | string
+    title?: StringWithAggregatesFilter<"DiscussionPost"> | string
+    content?: StringWithAggregatesFilter<"DiscussionPost"> | string
+    tags?: StringNullableListFilter<"DiscussionPost">
+    upvotes?: IntWithAggregatesFilter<"DiscussionPost"> | number
+    aiReply?: StringNullableWithAggregatesFilter<"DiscussionPost"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"DiscussionPost"> | Date | string
+  }
+
   export type AnalysisCreateInput = {
     id?: string
     overallScore: number
@@ -7223,6 +11069,293 @@ export namespace Prisma {
     optimalSolution?: StringFieldUpdateOperationsInput | string
     optimalTime?: StringFieldUpdateOperationsInput | string
     optimalSpace?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type AtsMatchCreateInput = {
+    id?: string
+    userId: string
+    jobTitle: string
+    companyName?: string | null
+    matchScore: number
+    summary: string
+    matchedSkills?: AtsMatchCreatematchedSkillsInput | string[]
+    missingSkills?: AtsMatchCreatemissingSkillsInput | string[]
+    experienceMatch?: string | null
+    atsWarnings?: AtsMatchCreateatsWarningsInput | string[]
+    bulletRewrites: JsonNullValueInput | InputJsonValue
+    tailoredQuestions: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+  }
+
+  export type AtsMatchUncheckedCreateInput = {
+    id?: string
+    userId: string
+    jobTitle: string
+    companyName?: string | null
+    matchScore: number
+    summary: string
+    matchedSkills?: AtsMatchCreatematchedSkillsInput | string[]
+    missingSkills?: AtsMatchCreatemissingSkillsInput | string[]
+    experienceMatch?: string | null
+    atsWarnings?: AtsMatchCreateatsWarningsInput | string[]
+    bulletRewrites: JsonNullValueInput | InputJsonValue
+    tailoredQuestions: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+  }
+
+  export type AtsMatchUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    jobTitle?: StringFieldUpdateOperationsInput | string
+    companyName?: NullableStringFieldUpdateOperationsInput | string | null
+    matchScore?: IntFieldUpdateOperationsInput | number
+    summary?: StringFieldUpdateOperationsInput | string
+    matchedSkills?: AtsMatchUpdatematchedSkillsInput | string[]
+    missingSkills?: AtsMatchUpdatemissingSkillsInput | string[]
+    experienceMatch?: NullableStringFieldUpdateOperationsInput | string | null
+    atsWarnings?: AtsMatchUpdateatsWarningsInput | string[]
+    bulletRewrites?: JsonNullValueInput | InputJsonValue
+    tailoredQuestions?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AtsMatchUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    jobTitle?: StringFieldUpdateOperationsInput | string
+    companyName?: NullableStringFieldUpdateOperationsInput | string | null
+    matchScore?: IntFieldUpdateOperationsInput | number
+    summary?: StringFieldUpdateOperationsInput | string
+    matchedSkills?: AtsMatchUpdatematchedSkillsInput | string[]
+    missingSkills?: AtsMatchUpdatemissingSkillsInput | string[]
+    experienceMatch?: NullableStringFieldUpdateOperationsInput | string | null
+    atsWarnings?: AtsMatchUpdateatsWarningsInput | string[]
+    bulletRewrites?: JsonNullValueInput | InputJsonValue
+    tailoredQuestions?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AtsMatchCreateManyInput = {
+    id?: string
+    userId: string
+    jobTitle: string
+    companyName?: string | null
+    matchScore: number
+    summary: string
+    matchedSkills?: AtsMatchCreatematchedSkillsInput | string[]
+    missingSkills?: AtsMatchCreatemissingSkillsInput | string[]
+    experienceMatch?: string | null
+    atsWarnings?: AtsMatchCreateatsWarningsInput | string[]
+    bulletRewrites: JsonNullValueInput | InputJsonValue
+    tailoredQuestions: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+  }
+
+  export type AtsMatchUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    jobTitle?: StringFieldUpdateOperationsInput | string
+    companyName?: NullableStringFieldUpdateOperationsInput | string | null
+    matchScore?: IntFieldUpdateOperationsInput | number
+    summary?: StringFieldUpdateOperationsInput | string
+    matchedSkills?: AtsMatchUpdatematchedSkillsInput | string[]
+    missingSkills?: AtsMatchUpdatemissingSkillsInput | string[]
+    experienceMatch?: NullableStringFieldUpdateOperationsInput | string | null
+    atsWarnings?: AtsMatchUpdateatsWarningsInput | string[]
+    bulletRewrites?: JsonNullValueInput | InputJsonValue
+    tailoredQuestions?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AtsMatchUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    jobTitle?: StringFieldUpdateOperationsInput | string
+    companyName?: NullableStringFieldUpdateOperationsInput | string | null
+    matchScore?: IntFieldUpdateOperationsInput | number
+    summary?: StringFieldUpdateOperationsInput | string
+    matchedSkills?: AtsMatchUpdatematchedSkillsInput | string[]
+    missingSkills?: AtsMatchUpdatemissingSkillsInput | string[]
+    experienceMatch?: NullableStringFieldUpdateOperationsInput | string | null
+    atsWarnings?: AtsMatchUpdateatsWarningsInput | string[]
+    bulletRewrites?: JsonNullValueInput | InputJsonValue
+    tailoredQuestions?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CareerRoadmapCreateInput = {
+    id?: string
+    userId: string
+    rolePath: string
+    targetCompanyTier?: string
+    overallReadiness?: number
+    nodesData: JsonNullValueInput | InputJsonValue
+    customTechStack?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type CareerRoadmapUncheckedCreateInput = {
+    id?: string
+    userId: string
+    rolePath: string
+    targetCompanyTier?: string
+    overallReadiness?: number
+    nodesData: JsonNullValueInput | InputJsonValue
+    customTechStack?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type CareerRoadmapUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    rolePath?: StringFieldUpdateOperationsInput | string
+    targetCompanyTier?: StringFieldUpdateOperationsInput | string
+    overallReadiness?: IntFieldUpdateOperationsInput | number
+    nodesData?: JsonNullValueInput | InputJsonValue
+    customTechStack?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CareerRoadmapUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    rolePath?: StringFieldUpdateOperationsInput | string
+    targetCompanyTier?: StringFieldUpdateOperationsInput | string
+    overallReadiness?: IntFieldUpdateOperationsInput | number
+    nodesData?: JsonNullValueInput | InputJsonValue
+    customTechStack?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CareerRoadmapCreateManyInput = {
+    id?: string
+    userId: string
+    rolePath: string
+    targetCompanyTier?: string
+    overallReadiness?: number
+    nodesData: JsonNullValueInput | InputJsonValue
+    customTechStack?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type CareerRoadmapUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    rolePath?: StringFieldUpdateOperationsInput | string
+    targetCompanyTier?: StringFieldUpdateOperationsInput | string
+    overallReadiness?: IntFieldUpdateOperationsInput | number
+    nodesData?: JsonNullValueInput | InputJsonValue
+    customTechStack?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CareerRoadmapUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    rolePath?: StringFieldUpdateOperationsInput | string
+    targetCompanyTier?: StringFieldUpdateOperationsInput | string
+    overallReadiness?: IntFieldUpdateOperationsInput | number
+    nodesData?: JsonNullValueInput | InputJsonValue
+    customTechStack?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DiscussionPostCreateInput = {
+    id?: string
+    userId: string
+    userName: string
+    roleCategory: string
+    title: string
+    content: string
+    tags?: DiscussionPostCreatetagsInput | string[]
+    upvotes?: number
+    aiReply?: string | null
+    createdAt?: Date | string
+  }
+
+  export type DiscussionPostUncheckedCreateInput = {
+    id?: string
+    userId: string
+    userName: string
+    roleCategory: string
+    title: string
+    content: string
+    tags?: DiscussionPostCreatetagsInput | string[]
+    upvotes?: number
+    aiReply?: string | null
+    createdAt?: Date | string
+  }
+
+  export type DiscussionPostUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    userName?: StringFieldUpdateOperationsInput | string
+    roleCategory?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    tags?: DiscussionPostUpdatetagsInput | string[]
+    upvotes?: IntFieldUpdateOperationsInput | number
+    aiReply?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DiscussionPostUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    userName?: StringFieldUpdateOperationsInput | string
+    roleCategory?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    tags?: DiscussionPostUpdatetagsInput | string[]
+    upvotes?: IntFieldUpdateOperationsInput | number
+    aiReply?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DiscussionPostCreateManyInput = {
+    id?: string
+    userId: string
+    userName: string
+    roleCategory: string
+    title: string
+    content: string
+    tags?: DiscussionPostCreatetagsInput | string[]
+    upvotes?: number
+    aiReply?: string | null
+    createdAt?: Date | string
+  }
+
+  export type DiscussionPostUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    userName?: StringFieldUpdateOperationsInput | string
+    roleCategory?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    tags?: DiscussionPostUpdatetagsInput | string[]
+    upvotes?: IntFieldUpdateOperationsInput | number
+    aiReply?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DiscussionPostUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    userName?: StringFieldUpdateOperationsInput | string
+    roleCategory?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    tags?: DiscussionPostUpdatetagsInput | string[]
+    upvotes?: IntFieldUpdateOperationsInput | number
+    aiReply?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type StringFilter<$PrismaModel = never> = {
@@ -7817,6 +11950,137 @@ export namespace Prisma {
     optimalSpace?: SortOrder
   }
 
+  export type AtsMatchCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    jobTitle?: SortOrder
+    companyName?: SortOrder
+    matchScore?: SortOrder
+    summary?: SortOrder
+    matchedSkills?: SortOrder
+    missingSkills?: SortOrder
+    experienceMatch?: SortOrder
+    atsWarnings?: SortOrder
+    bulletRewrites?: SortOrder
+    tailoredQuestions?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type AtsMatchAvgOrderByAggregateInput = {
+    matchScore?: SortOrder
+  }
+
+  export type AtsMatchMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    jobTitle?: SortOrder
+    companyName?: SortOrder
+    matchScore?: SortOrder
+    summary?: SortOrder
+    experienceMatch?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type AtsMatchMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    jobTitle?: SortOrder
+    companyName?: SortOrder
+    matchScore?: SortOrder
+    summary?: SortOrder
+    experienceMatch?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type AtsMatchSumOrderByAggregateInput = {
+    matchScore?: SortOrder
+  }
+
+  export type CareerRoadmapCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    rolePath?: SortOrder
+    targetCompanyTier?: SortOrder
+    overallReadiness?: SortOrder
+    nodesData?: SortOrder
+    customTechStack?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type CareerRoadmapAvgOrderByAggregateInput = {
+    overallReadiness?: SortOrder
+  }
+
+  export type CareerRoadmapMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    rolePath?: SortOrder
+    targetCompanyTier?: SortOrder
+    overallReadiness?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type CareerRoadmapMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    rolePath?: SortOrder
+    targetCompanyTier?: SortOrder
+    overallReadiness?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type CareerRoadmapSumOrderByAggregateInput = {
+    overallReadiness?: SortOrder
+  }
+
+  export type DiscussionPostCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    userName?: SortOrder
+    roleCategory?: SortOrder
+    title?: SortOrder
+    content?: SortOrder
+    tags?: SortOrder
+    upvotes?: SortOrder
+    aiReply?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type DiscussionPostAvgOrderByAggregateInput = {
+    upvotes?: SortOrder
+  }
+
+  export type DiscussionPostMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    userName?: SortOrder
+    roleCategory?: SortOrder
+    title?: SortOrder
+    content?: SortOrder
+    upvotes?: SortOrder
+    aiReply?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type DiscussionPostMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    userName?: SortOrder
+    roleCategory?: SortOrder
+    title?: SortOrder
+    content?: SortOrder
+    upvotes?: SortOrder
+    aiReply?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type DiscussionPostSumOrderByAggregateInput = {
+    upvotes?: SortOrder
+  }
+
   export type AnalysisCreatestrengthsInput = {
     set: string[]
   }
@@ -8006,6 +12270,42 @@ export namespace Prisma {
     upsert?: InterviewSessionUpsertWithoutQuestionsInput
     connect?: InterviewSessionWhereUniqueInput
     update?: XOR<XOR<InterviewSessionUpdateToOneWithWhereWithoutQuestionsInput, InterviewSessionUpdateWithoutQuestionsInput>, InterviewSessionUncheckedUpdateWithoutQuestionsInput>
+  }
+
+  export type AtsMatchCreatematchedSkillsInput = {
+    set: string[]
+  }
+
+  export type AtsMatchCreatemissingSkillsInput = {
+    set: string[]
+  }
+
+  export type AtsMatchCreateatsWarningsInput = {
+    set: string[]
+  }
+
+  export type AtsMatchUpdatematchedSkillsInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type AtsMatchUpdatemissingSkillsInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type AtsMatchUpdateatsWarningsInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type DiscussionPostCreatetagsInput = {
+    set: string[]
+  }
+
+  export type DiscussionPostUpdatetagsInput = {
+    set?: string[]
+    push?: string | string[]
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {

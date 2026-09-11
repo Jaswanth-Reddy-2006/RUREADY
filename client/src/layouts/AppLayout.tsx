@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import SidebarNav from '../components/SidebarNav';
+import Logo from '../components/ui/Logo';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -95,11 +96,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
       {/* Workspace Main Area */}
       <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0">
         {/* Mobile top bar with hamburger */}
-        <header className="md:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-slate-200 text-slate-900 shrink-0">
+        <header className="md:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-[#DCE7F2] text-[#11183D] shrink-0">
           <div className="flex items-center gap-2">
-            <span className="font-display font-black text-sm tracking-tight text-slate-900 flex items-center gap-0.5">
-              RU READY<span className="text-[#FF7A00]">?</span>
-            </span>
+            <Logo size="sm" theme="light" />
           </div>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}

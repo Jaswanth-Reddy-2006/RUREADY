@@ -5,6 +5,9 @@ import {
   Video, 
   TrendingUp, 
   Code2,
+  FileText,
+  Compass,
+  Users,
   LogOut,
   X,
   Briefcase,
@@ -12,7 +15,8 @@ import {
   Building2,
   Sparkles,
   Mail,
-  ShieldCheck
+  ShieldCheck,
+  Brain
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import clsx from 'clsx';
@@ -25,21 +29,43 @@ const baseNavItems = [
     label: 'Dashboard',
     href: '/dashboard',
     icon: LayoutDashboard,
+    isAi: false,
   },
   {
     label: 'Oral Interview',
     href: '/interview/new',
     icon: Video,
+    isAi: true,
   },
   {
     label: 'Coding Interview',
     href: '/interview/coding/new',
     icon: Code2,
+    isAi: true,
+  },
+  {
+    label: 'AI Resume & ATS',
+    href: '/ats',
+    icon: FileText,
+    isAi: true,
+  },
+  {
+    label: 'Career Roadmaps',
+    href: '/roadmap',
+    icon: Compass,
+    isAi: true,
+  },
+  {
+    label: 'Role Discussion Hub',
+    href: '/discuss',
+    icon: Users,
+    isAi: true,
   },
   {
     label: 'Analytics & Insights',
     href: '/analytics',
     icon: TrendingUp,
+    isAi: false,
   },
 ];
 
@@ -68,6 +94,7 @@ export default function SidebarNav() {
           label: 'Admin Portal',
           href: '/admin',
           icon: ShieldCheck,
+          isAi: false,
         },
       ]
     : baseNavItems;
@@ -118,23 +145,23 @@ export default function SidebarNav() {
     <>
       <aside 
         aria-label="Workspace navigation sidebar"
-        className="w-[260px] h-screen bg-white border-r border-slate-200 flex flex-col shrink-0 text-slate-700 font-body select-none sticky top-0 shadow-sm"
+        className="w-[260px] h-screen bg-white border-r border-[#DCE7F2] flex flex-col shrink-0 text-[#526078] font-body select-none sticky top-0 shadow-sm"
       >
         
         {/* Brand Header */}
-        <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+        <div className="p-5 border-b border-[#DCE7F2] flex items-center justify-between">
           <NavLink 
             to="/dashboard" 
-            className="flex items-center gap-2 group rounded-xl p-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF7A00]"
+            className="flex items-center gap-2 group rounded-xl p-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A8BDF]"
             aria-label="Go to Dashboard"
           >
-            <Logo size="sm" theme="light" />
+            <Logo size="md" theme="light" />
           </NavLink>
         </div>
 
         {/* Navigation Links */}
         <nav aria-label="Main menu" className="flex-1 py-5 px-3 space-y-1 overflow-y-auto">
-          <p className="px-3 pb-2 text-[11px] font-bold text-slate-400 uppercase tracking-wider font-display">
+          <p className="px-3 pb-2 text-[11px] font-bold text-[#7B8799] uppercase tracking-wider font-display">
             Platform Menu
           </p>
           {navItems.map((item) => {
@@ -145,10 +172,10 @@ export default function SidebarNav() {
                 to={item.href}
                 className={({ isActive }) =>
                   clsx(
-                    "relative flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group outline-none focus-visible:ring-2 focus-visible:ring-[#FF7A00]",
+                    "relative flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 group outline-none focus-visible:ring-2 focus-visible:ring-[#4A8BDF]",
                     isActive
-                      ? "bg-orange-50/80 text-[#FF7A00] font-semibold border border-orange-200 shadow-sm"
-                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-50 border border-transparent"
+                      ? "bg-[#EFF7FD] text-[#4A8BDF] font-bold shadow-sm"
+                      : "text-[#526078] hover:text-[#11183D] hover:bg-[#EFFAFD]"
                   )
                 }
               >
@@ -158,13 +185,23 @@ export default function SidebarNav() {
                       size={18} 
                       className={clsx(
                         "transition-colors duration-200 shrink-0",
-                        isActive ? "text-[#FF7A00]" : "text-slate-400 group-hover:text-slate-600"
+                        isActive
+                          ? "text-[#4A8BDF]"
+                          : item.isAi
+                          ? "text-[#A0006D]"
+                          : "text-[#526078] group-hover:text-[#11183D]"
                       )}
                     />
                     <span className="truncate">{item.label}</span>
+
+                    {item.isAi && (
+                      <span className="ml-auto px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#F8EAF4] text-[#A0006D]">
+                        AI
+                      </span>
+                    )}
                     
                     {isActive && (
-                      <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 bg-[#FF7A00] rounded-r-full shadow-sm" />
+                      <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 bg-[#4A8BDF] rounded-r-full shadow-sm" />
                     )}
                   </>
                 )}
@@ -174,28 +211,28 @@ export default function SidebarNav() {
         </nav>
 
         {/* User Profile Trigger Footer */}
-        <div className="p-3 border-t border-slate-100 bg-slate-50/80 shrink-0">
+        <div className="p-3 border-t border-[#DCE7F2] bg-[#EFFAFD] shrink-0">
           <button
             type="button"
             onClick={() => setShowProfileModal(true)}
-            className="w-full flex items-center justify-between p-2 rounded-xl bg-white border border-slate-200 hover:border-orange-300 hover:shadow-sm transition-all text-left cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF7A00]"
+            className="w-full flex items-center justify-between p-2 rounded-xl bg-white border border-[#DCE7F2] hover:border-[#4A8BDF] hover:shadow-sm transition-all text-left cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A8BDF]"
             title="View Full Profile"
             aria-label="Open candidate profile view"
           >
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-[#FF7A00] to-[#E66E00] flex items-center justify-center text-white font-bold text-sm font-display shrink-0 shadow-sm group-hover:scale-105 transition-transform">
+              <div className="h-9 w-9 rounded-xl bg-[#4A8BDF] flex items-center justify-center text-white font-bold text-sm font-display shrink-0 shadow-sm group-hover:scale-105 transition-transform">
                 {user?.name?.charAt(0).toUpperCase() || 'U'}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-bold text-slate-800 truncate font-display group-hover:text-[#FF7A00] transition-colors">
+                <p className="text-xs font-bold text-[#11183D] truncate font-display group-hover:text-[#4A8BDF] transition-colors">
                   {user?.name || 'Candidate'}
                 </p>
-                <p className="text-[11px] text-slate-400 truncate">
+                <p className="text-[11px] text-[#526078] truncate">
                   {getRoleDisplayName(profileData.targetRole)}
                 </p>
               </div>
             </div>
-            <div className="h-2 w-2 rounded-full bg-emerald-500 shrink-0 shadow-sm ring-2 ring-white" />
+            <div className="h-2 w-2 rounded-full bg-[#168A62] shrink-0 shadow-sm ring-2 ring-white" />
           </button>
         </div>
 
@@ -204,29 +241,29 @@ export default function SidebarNav() {
       {/* Profile Flyout Modal */}
       <AnimatePresence>
         {showProfileModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#11183D]/40 backdrop-blur-sm">
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
               transition={{ duration: 0.2 }}
-              className="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-lg w-full overflow-hidden flex flex-col"
+              className="bg-white rounded-2xl border border-[#DCE7F2] shadow-2xl max-w-lg w-full overflow-hidden flex flex-col"
               role="dialog"
               aria-modal="true"
               aria-labelledby="profile-modal-title"
             >
               {/* Header */}
-              <div className="p-6 bg-gradient-to-r from-orange-50 via-white to-orange-50/30 border-b border-slate-100 flex items-center justify-between">
+              <div className="p-6 bg-[#EFFAFD] border-b border-[#DCE7F2] flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-[#FF7A00] to-[#E66E00] flex items-center justify-center text-white font-extrabold text-lg font-display shadow-md">
+                  <div className="h-12 w-12 rounded-xl bg-[#4A8BDF] flex items-center justify-center text-white font-extrabold text-lg font-display shadow-md">
                     {user?.name?.charAt(0).toUpperCase() || 'U'}
                   </div>
                   <div>
-                    <h3 id="profile-modal-title" className="text-base font-bold font-display text-slate-900">
+                    <h3 id="profile-modal-title" className="text-base font-bold font-display text-[#11183D]">
                       {user?.name || 'Candidate Profile'}
                     </h3>
-                    <p className="text-xs text-slate-500 flex items-center gap-1.5 mt-0.5">
-                      <Mail size={12} className="text-slate-400" />
+                    <p className="text-xs text-[#526078] flex items-center gap-1.5 mt-0.5">
+                      <Mail size={12} className="text-[#7B8799]" />
                       <span>{user?.email || 'Registered Candidate'}</span>
                     </p>
                   </div>
@@ -234,7 +271,7 @@ export default function SidebarNav() {
                 <button
                   type="button"
                   onClick={() => setShowProfileModal(false)}
-                  className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                  className="p-2 rounded-xl text-[#7B8799] hover:text-[#11183D] hover:bg-[#EFFAFD] transition-colors cursor-pointer"
                   aria-label="Close profile"
                 >
                   <X size={18} />
@@ -246,87 +283,68 @@ export default function SidebarNav() {
                 
                 {/* Calibration Highlights */}
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
-                    <div className="flex items-center gap-2 text-slate-500 text-xs font-medium mb-1">
-                      <Briefcase size={14} className="text-[#FF7A00]" />
+                  <div className="p-3.5 rounded-xl bg-[#EFFAFD] border border-[#DCE7F2]">
+                    <div className="flex items-center gap-2 text-[#526078] text-xs font-medium mb-1">
+                      <Briefcase size={14} className="text-[#4A8BDF]" />
                       <span>Target Role</span>
                     </div>
-                    <p className="text-sm font-bold text-slate-800 font-display">
+                    <p className="text-sm font-bold text-[#11183D] font-display">
                       {getRoleDisplayName(profileData.targetRole)}
                     </p>
                   </div>
 
-                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
-                    <div className="flex items-center gap-2 text-slate-500 text-xs font-medium mb-1">
-                      <Award size={14} className="text-[#FF7A00]" />
+                  <div className="p-3.5 rounded-xl bg-[#EFFAFD] border border-[#DCE7F2]">
+                    <div className="flex items-center gap-2 text-[#526078] text-xs font-medium mb-1">
+                      <Award size={14} className="text-[#4A8BDF]" />
                       <span>Seniority</span>
                     </div>
-                    <p className="text-sm font-bold text-slate-800 font-display">
+                    <p className="text-sm font-bold text-[#11183D] font-display">
                       {getSeniorityDisplayName(profileData.seniority)}
                     </p>
                   </div>
                 </div>
 
                 {/* Target Company & Timeline */}
-                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-3">
+                <div className="p-4 rounded-xl bg-[#EFFAFD] border border-[#DCE7F2] space-y-3">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-xs font-medium text-slate-600">
-                      <Building2 size={14} className="text-[#FF7A00]" />
+                    <div className="flex items-center gap-2 text-xs font-medium text-[#526078]">
+                      <Building2 size={14} className="text-[#4A8BDF]" />
                       <span>Target Company</span>
                     </div>
-                    <span className="text-xs font-bold text-slate-900">
+                    <span className="text-xs font-bold text-[#11183D]">
                       {profileData.targetCompany || 'Top Tech Companies'}
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between pt-2 border-t border-slate-200/60">
-                    <div className="flex items-center gap-2 text-xs font-medium text-slate-600">
-                      <Sparkles size={14} className="text-[#FF7A00]" />
+                  <div className="flex items-center justify-between pt-2 border-t border-[#DCE7F2]">
+                    <div className="flex items-center gap-2 text-xs font-medium text-[#526078]">
+                      <Sparkles size={14} className="text-[#A0006D]" />
                       <span>Interview Timeline</span>
                     </div>
-                    <span className="text-xs font-semibold text-orange-600">
+                    <span className="text-xs font-bold text-[#A0006D]">
                       {profileData.timeline === 'asap' ? 'Immediate / Next 2 weeks' : 'Within 1-3 months'}
                     </span>
                   </div>
                 </div>
 
-                {/* Skills & Tech Stack */}
-                {profileData.techStack && profileData.techStack.length > 0 && (
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-slate-400 font-display">
-                      Calibrated Focus & Tech Stack
-                    </label>
-                    <div className="flex flex-wrap gap-1.5">
-                      {profileData.techStack.map((tech) => (
-                        <span 
-                          key={tech}
-                          className="px-2.5 py-1 rounded-lg bg-orange-50 text-[#FF7A00] border border-orange-200 text-xs font-semibold font-mono"
-                        >
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
                 {/* Account Status Badge */}
-                <div className="flex items-center justify-between p-3.5 rounded-2xl bg-emerald-50/60 border border-emerald-200 text-emerald-800 text-xs">
+                <div className="flex items-center justify-between p-3.5 rounded-xl bg-[#E8F5F0] border border-[#168A62]/30 text-[#168A62] text-xs font-semibold">
                   <div className="flex items-center gap-2 font-medium">
-                    <ShieldCheck size={16} className="text-emerald-600" />
-                    <span>RU READY Active Onboarding Verified</span>
+                    <ShieldCheck size={16} className="text-[#168A62]" />
+                    <span>R U Ready? Verified Candidate Account</span>
                   </div>
-                  <span className="font-bold font-mono">READY</span>
+                  <span className="font-bold font-mono">ACTIVE</span>
                 </div>
 
               </div>
 
               {/* Footer Actions */}
-              <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+              <div className="p-4 bg-[#EFFAFD] border-t border-[#DCE7F2] flex items-center justify-between">
                 <button
                   type="button"
                   onClick={handleLogout}
                   disabled={isLoggingOut}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 border border-rose-200 transition-colors cursor-pointer"
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-[#D64545] hover:bg-[#FDF2F2] border border-[#D64545]/30 transition-colors cursor-pointer"
                 >
                   <LogOut size={14} />
                   <span>Log Out</span>
@@ -334,7 +352,7 @@ export default function SidebarNav() {
                 <button
                   type="button"
                   onClick={() => setShowProfileModal(false)}
-                  className="px-5 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-900 text-white transition-colors cursor-pointer"
+                  className="px-5 py-2 rounded-xl text-xs font-bold bg-[#4A8BDF] hover:bg-[#2459A8] text-white transition-colors cursor-pointer"
                 >
                   Done
                 </button>

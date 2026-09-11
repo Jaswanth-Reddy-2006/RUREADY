@@ -21,7 +21,13 @@ import CodingInterviewRoom from './components/interview/CodingInterviewRoom';
 // Analysis pages
 import Dashboard from './pages/analysis/Dashboard';
 import SessionDetail from './pages/analysis/SessionDetail';
+import AnalyticsPage from './pages/analysis/AnalyticsPage';
 import Settings from './pages/Settings';
+import AtsScanner from './pages/ats/AtsScanner';
+import AtsReport from './pages/ats/AtsReport';
+import RoadmapCatalog from './pages/roadmap/RoadmapCatalog';
+import RoadmapView from './pages/roadmap/RoadmapView';
+import DiscussPage from './pages/discuss/DiscussPage';
 
 // Layout shell
 import AppLayout from './layouts/AppLayout';
@@ -104,7 +110,7 @@ function App() {
                 path="/analytics"
                 element={
                   <ProtectedRoute>
-                    <Dashboard />
+                    <AnalyticsPage />
                   </ProtectedRoute>
                 }
               />
@@ -113,6 +119,46 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Settings />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/ats"
+                element={
+                  <ProtectedRoute>
+                    <AtsScanner />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/ats/report/:id"
+                element={
+                  <ProtectedRoute>
+                    <AtsReport />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/roadmap"
+                element={
+                  <ProtectedRoute>
+                    <RoadmapCatalog />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/roadmap/:id"
+                element={
+                  <ProtectedRoute>
+                    <RoadmapView />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/discuss"
+                element={
+                  <ProtectedRoute>
+                    <DiscussPage />
                   </ProtectedRoute>
                 }
               />

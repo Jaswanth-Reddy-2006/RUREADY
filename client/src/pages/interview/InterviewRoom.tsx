@@ -991,22 +991,22 @@ export default function InterviewRoom() {
 
   if (loadError) {
     return (
-      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0A0A0A] px-6">
-        <div className="max-w-md text-center space-y-4">
-          <h2 className="font-display text-2xl font-bold text-white">Could not start interview</h2>
-          <p className="text-sm text-white/50">{loadError}</p>
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#EFFAFD] px-6">
+        <div className="max-w-md text-center space-y-4 bg-white p-8 rounded-3xl border border-[#DCE7F2] shadow-sm">
+          <h2 className="font-display text-2xl font-bold text-[#11183D]">Could not start interview</h2>
+          <p className="text-sm text-[#526078]">{loadError}</p>
           <div className="flex flex-wrap justify-center gap-3 pt-2">
             <button
               type="button"
               onClick={() => navigate('/interview/setup')}
-              className="rounded-xl bg-[#F5A623] px-5 py-2.5 text-sm font-semibold text-[#1A1A1A]"
+              className="rounded-xl bg-[#4A8BDF] hover:bg-[#2459A8] px-5 py-2.5 text-sm font-semibold text-white transition-all cursor-pointer font-display"
             >
               Back to setup
             </button>
             <button
               type="button"
               onClick={() => navigate('/login')}
-              className="rounded-xl border border-white/20 px-5 py-2.5 text-sm font-semibold text-white/80"
+              className="rounded-xl border border-[#DCE7F2] px-5 py-2.5 text-sm font-semibold text-[#526078] hover:bg-[#EFFAFD] transition-all cursor-pointer font-display"
             >
               Log in again
             </button>
@@ -1018,7 +1018,7 @@ export default function InterviewRoom() {
 
   if (isLoading) {
     return (
-      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0A0A0A]">
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#EFFAFD]">
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -1030,22 +1030,22 @@ export default function InterviewRoom() {
             animate={{
               scale: [1, 1.1, 1],
               boxShadow: [
-                '0 0 0 0 rgba(245,166,35,0.4)',
-                '0 0 0 30px rgba(245,166,35,0)',
-                '0 0 0 0 rgba(245,166,35,0.4)',
+                '0 0 0 0 rgba(74,139,223,0.4)',
+                '0 0 0 30px rgba(74,139,223,0)',
+                '0 0 0 0 rgba(74,139,223,0.4)',
               ],
             }}
             transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-            className="mx-auto flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br from-[#F5A623] to-[#E85D24]"
+            className="mx-auto flex h-24 w-24 items-center justify-center rounded-3xl bg-[#4A8BDF] text-white"
           >
-            <span className="font-display text-4xl font-black text-[#1A1A1A]">RU</span>
+            <span className="font-display text-4xl font-black text-white">RU</span>
           </motion.div>
 
           <div className="space-y-2">
-            <h2 className="font-display text-2xl font-bold text-white">
+            <h2 className="font-display text-2xl font-bold text-[#11183D]">
               Preparing your interview
             </h2>
-            <p className="text-sm text-white/40">
+            <p className="text-sm text-[#526078]">
               {loadingMessage}
             </p>
           </div>
@@ -1055,7 +1055,7 @@ export default function InterviewRoom() {
             {[0, 1, 2].map((i) => (
               <motion.div
                 key={i}
-                className="h-2 w-2 rounded-full bg-[#F5A623]"
+                className="h-2 w-2 rounded-full bg-[#4A8BDF]"
                 animate={{ opacity: [0.3, 1, 0.3] }}
                 transition={{ duration: 1.2, delay: i * 0.2, repeat: Infinity }}
               />
@@ -1068,12 +1068,12 @@ export default function InterviewRoom() {
 
   if (!currentQuestion) {
     return (
-      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0A0A0A] px-6">
-        <p className="text-white/70 text-sm mb-4">Interview room is still loading…</p>
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#EFFAFD] px-6">
+        <p className="text-[#526078] text-sm mb-4">Interview room is still loading…</p>
         <button
           type="button"
           onClick={() => navigate('/interview/setup')}
-          className="rounded-xl bg-[#F5A623] px-5 py-2.5 text-sm font-semibold text-[#1A1A1A]"
+          className="rounded-xl bg-[#4A8BDF] hover:bg-[#2459A8] px-5 py-2.5 text-sm font-semibold text-white font-display"
         >
           Back to setup
         </button>
@@ -1103,23 +1103,23 @@ export default function InterviewRoom() {
     const canJoin = isMicOn && isCameraOn && !verifyingSystem && backgroundVerified;
 
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0C0C0E] text-white p-4 sm:p-8 overflow-y-auto">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#EFFAFD] text-[#11183D] p-4 sm:p-8 overflow-y-auto">
         {/* Ambient background glows */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute top-1/4 left-1/4 h-[400px] w-[400px] rounded-full bg-[#F5A623]/10 blur-[130px]" />
-          <div className="absolute bottom-1/4 right-1/4 h-[350px] w-[350px] rounded-full bg-[#00897B]/10 blur-[120px]" />
+          <div className="absolute top-1/4 left-1/4 h-[400px] w-[400px] rounded-full bg-[#4A8BDF]/10 blur-[130px]" />
+          <div className="absolute bottom-1/4 right-1/4 h-[350px] w-[350px] rounded-full bg-[#A0006D]/10 blur-[120px]" />
         </div>
 
         <div className="relative z-10 max-w-5xl w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center py-6">
           
           {/* LEFT: Video stream preview */}
           <div className="lg:col-span-7 flex flex-col items-center space-y-6 w-full">
-            <h2 className="text-xl font-bold font-display text-white/80 self-start px-2 flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-[#F5A623] animate-pulse" />
+            <h2 className="text-xl font-bold font-display text-[#11183D] self-start px-2 flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-[#4A8BDF] animate-pulse" />
               Webcam & Mic Preview
             </h2>
             
-            <div className="w-full aspect-video rounded-3xl overflow-hidden border border-white/10 shadow-2xl relative bg-[#121214] flex items-center justify-center">
+            <div className="w-full aspect-video rounded-3xl overflow-hidden border border-[#DCE7F2] shadow-sm relative bg-white flex items-center justify-center">
               <UserCamera
                 stream={mediaStream}
                 isMicActive={isMicOn}
@@ -1132,17 +1132,17 @@ export default function InterviewRoom() {
 
           {/* RIGHT: Interview Profile Summary */}
           <div className="lg:col-span-5 flex flex-col space-y-6 w-full">
-            <div className="rounded-3xl border border-white/5 bg-[#141416]/90 p-6 sm:p-8 backdrop-blur-xl shadow-2xl space-y-6 relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#F5A623] to-[#E85D24]" />
+            <div className="rounded-3xl border border-[#DCE7F2] bg-white p-6 sm:p-8 shadow-sm space-y-6 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#4A8BDF] to-[#A0006D]" />
               
               <div className="space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#F5A623] font-display">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#A0006D] font-display">
                   Live Lobby
                 </span>
-                <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white font-display">
+                <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-[#11183D] font-display">
                   Ready to Join?
                 </h1>
-                <p className="text-xs text-white/50 font-body">
+                <p className="text-xs text-[#526078] font-body">
                   Confirm your interview parameters and check your devices before starting.
                 </p>
               </div>
@@ -1151,39 +1151,39 @@ export default function InterviewRoom() {
               <div className="space-y-3.5 pt-2">
                 
                 {/* Target Role */}
-                <div className="flex items-center justify-between rounded-xl bg-white/[0.03] border border-white/5 px-4 py-3">
-                  <span className="text-xs font-semibold text-white/40">Target Role</span>
-                  <span className="text-xs font-bold text-white bg-[#F5A623]/10 border border-[#F5A623]/25 px-2.5 py-1 rounded-lg">
+                <div className="flex items-center justify-between rounded-xl bg-[#EFFAFD] border border-[#DCE7F2] px-4 py-3">
+                  <span className="text-xs font-semibold text-[#526078]">Target Role</span>
+                  <span className="text-xs font-bold text-[#4A8BDF] bg-[#EFF7FD] border border-[#4A8BDF]/25 px-2.5 py-1 rounded-lg">
                     {session?.targetRole}
                   </span>
                 </div>
 
                 {/* Experience Level & Difficulty */}
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="flex flex-col justify-center rounded-xl bg-white/[0.03] border border-white/5 px-4 py-2.5">
-                    <span className="text-[10px] text-white/40">Experience</span>
-                    <span className="text-xs font-bold text-white/90 mt-0.5">{session?.experienceLevel}</span>
+                  <div className="flex flex-col justify-center rounded-xl bg-[#EFFAFD] border border-[#DCE7F2] px-4 py-2.5">
+                    <span className="text-[10px] text-[#7B8799]">Experience</span>
+                    <span className="text-xs font-bold text-[#11183D] mt-0.5">{session?.experienceLevel}</span>
                   </div>
-                  <div className="flex flex-col justify-center rounded-xl bg-white/[0.03] border border-white/5 px-4 py-2.5">
-                    <span className="text-[10px] text-white/40">Difficulty</span>
-                    <span className="text-xs font-bold text-[#F5A623] mt-0.5">{meta.difficulty}</span>
+                  <div className="flex flex-col justify-center rounded-xl bg-[#EFFAFD] border border-[#DCE7F2] px-4 py-2.5">
+                    <span className="text-[10px] text-[#7B8799]">Difficulty</span>
+                    <span className="text-xs font-bold text-[#4A8BDF] mt-0.5">{meta.difficulty}</span>
                   </div>
                 </div>
 
                 {/* Duration / Question Count */}
-                <div className="flex items-center justify-between rounded-xl bg-white/[0.03] border border-white/5 px-4 py-3">
+                <div className="flex items-center justify-between rounded-xl bg-[#EFFAFD] border border-[#DCE7F2] px-4 py-3">
                   <div className="flex items-center gap-2">
-                    <Clock size={14} className="text-[#F5A623]" />
-                    <span className="text-xs font-semibold text-white/40">Duration</span>
+                    <Clock size={14} className="text-[#4A8BDF]" />
+                    <span className="text-xs font-semibold text-[#526078]">Duration</span>
                   </div>
-                  <span className="text-xs font-bold text-white/90">
+                  <span className="text-xs font-bold text-[#11183D]">
                     {meta.timer} Mins ({meta.timer === 10 ? '3' : meta.timer === 20 ? '5' : '8'} questions)
                   </span>
                 </div>
 
                 {/* Resume Status */}
                 {session?.resumeId && (
-                  <div className="flex items-center gap-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 px-4 py-3 text-emerald-400">
+                  <div className="flex items-center gap-2.5 rounded-xl bg-[#E8F5F0] border border-[#168A62]/20 px-4 py-3 text-[#168A62]">
                     <FileText size={16} />
                     <span className="text-xs font-semibold">Resume context integrated</span>
                   </div>
@@ -1192,10 +1192,10 @@ export default function InterviewRoom() {
                 {/* Custom Subjects if present */}
                 {meta.subjects.length > 0 && (
                   <div className="space-y-1.5">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-white/40">Core Subjects</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#7B8799]">Core Subjects</span>
                     <div className="flex flex-wrap gap-1.5">
                       {meta.subjects.map((sub, i) => (
-                        <span key={i} className="text-[10px] font-semibold text-white/85 bg-white/5 border border-white/10 px-2.5 py-1 rounded-lg">
+                        <span key={i} className="text-[10px] font-semibold text-[#11183D] bg-[#EFFAFD] border border-[#DCE7F2] px-2.5 py-1 rounded-lg">
                           {sub}
                         </span>
                       ))}
@@ -1206,10 +1206,10 @@ export default function InterviewRoom() {
                 {/* Custom Skills if present */}
                 {meta.skills.length > 0 && (
                   <div className="space-y-1.5">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-white/40">Skills & Tech Stack</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#7B8799]">Skills & Tech Stack</span>
                     <div className="flex flex-wrap gap-1.5">
                       {meta.skills.map((skill, i) => (
-                        <span key={i} className="text-[10px] font-semibold text-white/85 bg-white/5 border border-white/10 px-2.5 py-1 rounded-lg">
+                        <span key={i} className="text-[10px] font-semibold text-[#11183D] bg-[#EFFAFD] border border-[#DCE7F2] px-2.5 py-1 rounded-lg">
                           {skill}
                         </span>
                       ))}
@@ -1220,10 +1220,10 @@ export default function InterviewRoom() {
                 {/* Custom Tools if present */}
                 {meta.tools.length > 0 && (
                   <div className="space-y-1.5">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-white/40">Custom Tools</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#7B8799]">Custom Tools</span>
                     <div className="flex flex-wrap gap-1.5">
                       {meta.tools.map((tool, i) => (
-                        <span key={i} className="text-[10px] font-semibold text-white/85 bg-white/5 border border-white/10 px-2.5 py-1 rounded-lg">
+                        <span key={i} className="text-[10px] font-semibold text-[#11183D] bg-[#EFFAFD] border border-[#DCE7F2] px-2.5 py-1 rounded-lg">
                           {tool}
                         </span>
                       ))}
@@ -1239,29 +1239,29 @@ export default function InterviewRoom() {
                   type="button"
                   disabled={!canJoin}
                   onClick={handleJoinCall}
-                  className={`w-full flex items-center justify-center gap-2.5 rounded-2xl px-6 py-4 text-sm font-bold tracking-wide transition-all shadow-lg ${
+                  className={`w-full flex items-center justify-center gap-2.5 rounded-2xl px-6 py-4 text-sm font-bold tracking-wide transition-all shadow-md font-display ${
                     canJoin
-                      ? 'bg-gradient-to-r from-[#F5A623] to-[#E85D24] text-white hover:brightness-105 active:scale-[0.98] shadow-[#F5A623]/25 cursor-pointer'
-                      : 'bg-white/5 border border-white/10 text-white/30 cursor-not-allowed'
+                      ? 'bg-[#4A8BDF] hover:bg-[#2459A8] text-white active:scale-[0.98] shadow-[#4A8BDF]/25 cursor-pointer'
+                      : 'bg-[#EFFAFD] border border-[#DCE7F2] text-[#7B8799] cursor-not-allowed'
                   }`}
                 >
-                  <Play size={16} fill={canJoin ? "currentColor" : "none"} className={canJoin ? "text-white" : "text-white/20"} />
+                  <Play size={16} fill={canJoin ? "currentColor" : "none"} className={canJoin ? "text-white" : "text-[#7B8799]"} />
                   Join Call & Go Fullscreen
                 </button>
 
                 {/* Pre-Interview Requirements Checklist Widget */}
-                <div className="mt-4 rounded-2xl border border-white/5 bg-white/[0.02] p-4 space-y-3">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-white/40 block mb-1">
+                <div className="mt-4 rounded-2xl border border-[#DCE7F2] bg-[#EFFAFD]/60 p-4 space-y-3">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#7B8799] block mb-1">
                     Pre-Interview Requirements
                   </span>
 
                   {/* 1. Camera check */}
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-white/50 flex items-center gap-2">
-                      <Video size={14} className={isCameraOn ? "text-emerald-400" : "text-white/35"} />
+                    <span className="text-[#526078] flex items-center gap-2">
+                      <Video size={14} className={isCameraOn ? "text-[#168A62]" : "text-[#7B8799]"} />
                       Webcam Status
                     </span>
-                    <span className={`font-bold flex items-center gap-1 ${isCameraOn ? "text-emerald-400" : "text-red-400 animate-pulse"}`}>
+                    <span className={`font-bold flex items-center gap-1 ${isCameraOn ? "text-[#168A62]" : "text-[#D64545] animate-pulse"}`}>
                       {isCameraOn ? (
                         <>
                           <CheckCircle2 size={12} /> Active
@@ -1276,11 +1276,11 @@ export default function InterviewRoom() {
 
                   {/* 2. Mic check */}
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-white/50 flex items-center gap-2">
-                      <Mic size={14} className={isMicOn ? "text-emerald-400" : "text-white/35"} />
+                    <span className="text-[#526078] flex items-center gap-2">
+                      <Mic size={14} className={isMicOn ? "text-[#168A62]" : "text-[#7B8799]"} />
                       Microphone Status
                     </span>
-                    <span className={`font-bold flex items-center gap-1 ${isMicOn ? "text-emerald-400" : "text-red-400 animate-pulse"}`}>
+                    <span className={`font-bold flex items-center gap-1 ${isMicOn ? "text-[#168A62]" : "text-[#D64545] animate-pulse"}`}>
                       {isMicOn ? (
                         <>
                           <CheckCircle2 size={12} /> Active
@@ -1295,23 +1295,23 @@ export default function InterviewRoom() {
 
                   {/* 3. System security check */}
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-white/50 flex items-center gap-2">
-                      <Shield size={14} className={backgroundVerified ? "text-emerald-400" : "text-[#F5A623]"} />
+                    <span className="text-[#526078] flex items-center gap-2">
+                      <Shield size={14} className={backgroundVerified ? "text-[#168A62]" : "text-[#4A8BDF]"} />
                       Proctoring Scan (Third-Party Apps)
                     </span>
                     <span className={`font-bold flex items-center gap-1 ${
                       verifyingSystem 
-                        ? "text-[#F5A623] animate-pulse" 
+                        ? "text-[#4A8BDF] animate-pulse" 
                         : backgroundVerified 
-                          ? "text-emerald-400" 
-                          : "text-red-400"
+                          ? "text-[#168A62]" 
+                          : "text-[#D64545]"
                     }`}>
                       {verifyingSystem ? (
                         <span className="flex items-center gap-1.5">
                           <motion.span
                             animate={{ rotate: 360 }}
                             transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                            className="inline-block h-3 w-3 rounded-full border-2 border-transparent border-t-[#F5A623]"
+                            className="inline-block h-3 w-3 rounded-full border-2 border-transparent border-t-[#4A8BDF]"
                           />
                           Scanning...
                         </span>
@@ -1328,7 +1328,7 @@ export default function InterviewRoom() {
                   </div>
 
                   {!canJoin && (
-                    <p className="text-[10px] text-amber-500/90 font-medium leading-relaxed pt-2 border-t border-white/5 flex items-start gap-1.5">
+                    <p className="text-[10px] text-[#D99020] font-medium leading-relaxed pt-2 border-t border-[#DCE7F2] flex items-start gap-1.5">
                       <AlertCircle size={12} className="shrink-0 mt-0.5" />
                       {!isCameraOn || !isMicOn
                         ? "Please turn on both camera and microphone from the preview panel controls on the left."
@@ -1337,7 +1337,7 @@ export default function InterviewRoom() {
                   )}
                 </div>
 
-                <p className="text-[9px] text-center text-white/30 font-body leading-relaxed mt-2">
+                <p className="text-[9px] text-center text-[#7B8799] font-body leading-relaxed mt-2">
                   Recommended for absolute focus. Fullscreen mode prevents accidental exits during the live feedback tracking session.
                 </p>
               </div>
@@ -1354,19 +1354,19 @@ export default function InterviewRoom() {
 
   if (isAnalyzing) {
     return (
-      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#F8FAFC] text-slate-800 p-6 overflow-hidden">
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#EFFAFD] text-[#11183D] p-6 overflow-hidden">
         {/* Soft background glows */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[500px] rounded-full bg-[#F5A623]/5 blur-[140px]" />
-          <div className="absolute bottom-10 right-10 h-[300px] w-[300px] rounded-full bg-emerald-500/5 blur-[120px]" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[500px] rounded-full bg-[#4A8BDF]/10 blur-[140px]" />
+          <div className="absolute bottom-10 right-10 h-[300px] w-[300px] rounded-full bg-[#A0006D]/10 blur-[120px]" />
         </div>
 
         <motion.div
           initial={{ scale: 0.95, opacity: 0, y: 15 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
-          className="max-w-md w-full bg-white border border-slate-200/80 p-8 rounded-3xl shadow-xl space-y-8 relative overflow-hidden"
+          className="max-w-md w-full bg-white border border-[#DCE7F2] p-8 rounded-3xl shadow-xl space-y-8 relative overflow-hidden"
         >
-          <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#F5A623] to-[#E85D24]" />
+          <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#4A8BDF] to-[#A0006D]" />
           
           <div className="text-center space-y-3">
             <div className="relative mx-auto h-20 w-20 flex items-center justify-center">
@@ -1374,18 +1374,18 @@ export default function InterviewRoom() {
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }}
-                className="absolute inset-0 rounded-full border-2 border-dashed border-slate-200"
+                className="absolute inset-0 rounded-full border-2 border-dashed border-[#DCE7F2]"
               />
               <motion.div
                 animate={{ scale: [1, 1.15, 1], opacity: [0.4, 0.8, 0.4] }}
                 transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                className="h-14 w-14 rounded-full bg-[#F5A623]/10 flex items-center justify-center text-[#F5A623]"
+                className="h-14 w-14 rounded-full bg-[#F8EAF4] flex items-center justify-center text-[#A0006D]"
               >
                 <Sparkles size={24} />
               </motion.div>
             </div>
-            <h2 className="text-2xl font-black font-display tracking-tight text-slate-800">Analyzing Your Responses</h2>
-            <p className="text-xs text-slate-500 font-body">Ava is compiling your high-fidelity mock interview report...</p>
+            <h2 className="text-2xl font-black font-display tracking-tight text-[#11183D]">Analyzing Your Responses</h2>
+            <p className="text-xs text-[#526078] font-body">Ava is compiling your high-fidelity mock interview report...</p>
           </div>
 
           {/* Checklist */}
@@ -1405,22 +1405,22 @@ export default function InterviewRoom() {
                   key={idx}
                   className={`flex items-center gap-3.5 p-3 rounded-xl border transition-all ${
                     isDone 
-                      ? 'border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold'
+                      ? 'border-[#168A62]/30 bg-[#E8F5F0] text-[#168A62] font-semibold'
                       : isActive
-                        ? 'border-amber-200 bg-amber-50 text-amber-700 font-semibold shadow-sm'
-                        : 'border-slate-100 bg-slate-50/50 text-slate-400'
+                        ? 'border-[#A0006D]/30 bg-[#F8EAF4] text-[#A0006D] font-semibold shadow-sm'
+                        : 'border-[#DCE7F2] bg-[#EFFAFD]/50 text-[#7B8799]'
                   }`}
                 >
                   {isDone ? (
-                    <CheckCircle2 size={16} className="text-emerald-650 flex-shrink-0" />
+                    <CheckCircle2 size={16} className="text-[#168A62] flex-shrink-0" />
                   ) : isActive ? (
                     <motion.div
                       animate={{ rotate: 360 }}
                       transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                      className="h-4 w-4 rounded-full border-2 border-transparent border-t-[#F5A623] flex-shrink-0"
+                      className="h-4 w-4 rounded-full border-2 border-transparent border-t-[#A0006D] flex-shrink-0"
                     />
                   ) : (
-                    <div className="h-4 w-4 rounded-full border border-slate-200 flex-shrink-0" />
+                    <div className="h-4 w-4 rounded-full border border-[#DCE7F2] flex-shrink-0" />
                   )}
                   <span className="text-xs font-body leading-none">{text}</span>
                 </div>
@@ -1428,7 +1428,7 @@ export default function InterviewRoom() {
             })}
           </div>
 
-          <p className="text-[10px] text-center text-slate-400 font-body">
+          <p className="text-[10px] text-center text-[#7B8799] font-body">
             Camera and audio streams deactivated. Compilation phase active.
           </p>
         </motion.div>

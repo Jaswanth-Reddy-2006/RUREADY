@@ -177,9 +177,36 @@ app.use(
   }),
 );
 
-// 7. AI Analysis Service
+// 7. AI Analysis Service & ATS Engine
 app.use(
   '/api/ai',
+  createProxyMiddleware({
+    target: AI_SERVICE_URL,
+    changeOrigin: true,
+    ws: true,
+  }),
+);
+
+app.use(
+  '/api/ats',
+  createProxyMiddleware({
+    target: AI_SERVICE_URL,
+    changeOrigin: true,
+    ws: true,
+  }),
+);
+
+app.use(
+  '/api/roadmap',
+  createProxyMiddleware({
+    target: AI_SERVICE_URL,
+    changeOrigin: true,
+    ws: true,
+  }),
+);
+
+app.use(
+  '/api/discuss',
   createProxyMiddleware({
     target: AI_SERVICE_URL,
     changeOrigin: true,

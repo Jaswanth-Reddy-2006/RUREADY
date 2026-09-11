@@ -60,7 +60,7 @@ function getPasswordStrength(password: string): StrengthResult {
     0: '',
     1: 'bg-red-500',
     2: 'bg-amber-500',
-    3: 'bg-[#FF7A00]',
+    3: 'bg-[#4A8BDF]',
     4: 'bg-emerald-500',
   };
 
@@ -335,16 +335,16 @@ export default function Register() {
   const currentQuote = STEP_QUOTES[currentStep - 1];
 
   return (
-    <div className="min-h-screen lg:h-screen w-full bg-white text-slate-800 grid grid-cols-1 lg:grid-cols-12 selection:bg-primary-500/20 selection:text-primary-900 overflow-x-hidden lg:overflow-hidden">
-      {/* ─── Left Column: Interactive Form & Onboarding Wizard ─── */}
+    <div className="min-h-screen lg:h-screen w-full bg-[#EFFAFD] text-[#11183D] grid grid-cols-1 lg:grid-cols-12 selection:bg-[#4A8BDF]/20 selection:text-[#2459A8] overflow-x-hidden lg:overflow-hidden">
+      {/* ─── Left Column: Interactive Form & Onboarding Wizard Card ─── */}
       <motion.div
         initial={{ x: '-60%', opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: '60%', opacity: 0 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="lg:col-span-7 xl:col-span-7 px-5 py-5 sm:px-10 sm:py-7 lg:px-12 lg:py-5 xl:px-16 flex flex-col justify-center items-center bg-white min-h-screen lg:h-screen lg:overflow-hidden overflow-y-auto"
+        className="lg:col-span-7 xl:col-span-7 px-4 py-4 sm:px-8 sm:py-6 lg:px-10 lg:py-4 xl:px-12 flex flex-col justify-center items-center bg-[#EFFAFD] min-h-screen lg:h-screen lg:overflow-hidden overflow-y-auto"
       >
-        <div className="max-w-lg w-full my-auto flex flex-col justify-center">
+        <div className="max-w-xl w-full my-auto flex flex-col justify-center bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-[#DCE7F2]">
           {/* Mobile Logo */}
           <div className="lg:hidden mb-3 flex justify-center">
             <Link to="/">
@@ -357,7 +357,7 @@ export default function Register() {
             {currentStep === 1 ? (
               <Link
                 to="/"
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors font-display"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#526078] hover:text-[#11183D] transition-colors font-display"
               >
                 <ArrowLeft className="h-3.5 w-3.5" />
                 Back to home
@@ -366,7 +366,7 @@ export default function Register() {
               <button
                 type="button"
                 onClick={() => setCurrentStep((prev) => (prev > 1 ? ((prev - 1) as 1 | 2 | 3) : 1))}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary-500 hover:text-primary-600 transition-colors font-display cursor-pointer"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#4A8BDF] hover:text-[#2459A8] transition-colors font-display cursor-pointer"
               >
                 <ArrowLeft className="h-3.5 w-3.5" />
                 Back to Step {currentStep - 1}
@@ -374,7 +374,7 @@ export default function Register() {
             )}
 
             {/* Step Progress Pill */}
-            <div className="flex items-center gap-1.5 bg-slate-100 px-3 py-1 rounded-full">
+            <div className="flex items-center gap-1.5 bg-[#EFFAFD] px-3 py-1 rounded-full border border-[#DCE7F2]">
               {[1, 2, 3].map((stepNum) => (
                 <div
                   key={stepNum}
@@ -385,15 +385,15 @@ export default function Register() {
                   }}
                   className={`cursor-pointer transition-all duration-300 ${
                     stepNum === currentStep
-                      ? 'w-6 h-2 rounded-full bg-[#FF7A00]'
+                      ? 'w-6 h-2 rounded-full bg-[#4A8BDF]'
                       : stepNum < currentStep
-                      ? 'w-2 h-2 rounded-full bg-slate-400'
-                      : 'w-2 h-2 rounded-full bg-slate-200'
+                      ? 'w-2 h-2 rounded-full bg-[#4A8BDF]/40'
+                      : 'w-2 h-2 rounded-full bg-[#DCE7F2]'
                   }`}
                   title={`Step ${stepNum}`}
                 />
               ))}
-              <span className="text-[10.5px] font-mono font-bold text-slate-500 ml-1">
+              <span className="text-[10.5px] font-mono font-bold text-[#526078] ml-1">
                 {currentStep}/3
               </span>
             </div>
@@ -411,10 +411,10 @@ export default function Register() {
                 transition={{ duration: 0.25 }}
               >
                 <div className="mb-3.5 sm:mb-4">
-                  <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-slate-950 mb-1 tracking-tight">
+                  <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-[#11183D] mb-1 tracking-tight">
                     Create your account
                   </h1>
-                  <p className="font-body text-xs sm:text-sm text-slate-600">
+                  <p className="font-body text-xs sm:text-sm text-[#526078]">
                     Step 1: Set your login credentials for personalized mock assessments.
                   </p>
                 </div>
@@ -442,22 +442,22 @@ export default function Register() {
                       icon={<Mail className="h-4 w-4" />}
                       iconRight={
                         isCheckingEmail ? (
-                          <Loader2 className="h-4 w-4 animate-spin text-[#FF7A00]" />
+                          <Loader2 className="h-4 w-4 animate-spin text-[#4A8BDF]" />
                         ) : emailExists ? (
-                          <X className="h-4 w-4 text-red-500" />
+                          <X className="h-4 w-4 text-[#D64545]" />
                         ) : form.email.length > 5 && !errors.email ? (
-                          <Check className="h-4 w-4 text-emerald-500" />
+                          <Check className="h-4 w-4 text-[#168A62]" />
                         ) : undefined
                       }
                       autoComplete="email"
                       variant="light"
                     />
                     {emailExists && (
-                      <div className="flex items-center justify-between text-xs text-red-600 bg-red-50/90 border border-red-200 px-3 py-1.5 rounded-lg mt-1.5 font-body">
+                      <div className="flex items-center justify-between text-xs text-[#D64545] bg-[#D64545]/10 border border-[#D64545]/20 px-3 py-1.5 rounded-lg mt-1.5 font-body">
                         <span>An account with this email already exists.</span>
                         <Link
                           to="/login"
-                          className="font-bold underline text-[#FF7A00] hover:text-[#E66E00] ml-2 shrink-0"
+                          className="font-bold underline text-[#4A8BDF] hover:text-[#2459A8] ml-2 shrink-0"
                         >
                           Sign in instead →
                         </Link>
@@ -477,7 +477,7 @@ export default function Register() {
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="hover:text-primary-500 text-slate-400 transition-colors cursor-pointer"
+                        className="hover:text-[#4A8BDF] text-[#7B8799] transition-colors cursor-pointer"
                         tabIndex={-1}
                         aria-label={showPassword ? 'Hide password' : 'Show password'}
                       >
@@ -492,8 +492,8 @@ export default function Register() {
                   {form.password && (
                     <div className="space-y-1 -mt-0.5">
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-slate-500 font-body">Strength:</span>
-                        <span className="font-semibold text-slate-900 font-display">
+                        <span className="text-[#526078] font-body">Strength:</span>
+                        <span className="font-semibold text-[#11183D] font-display">
                           {strength.label}
                         </span>
                       </div>
@@ -502,7 +502,7 @@ export default function Register() {
                           <div
                             key={level}
                             className={`flex-1 rounded-full transition-colors duration-300 ${
-                              level <= strength.score ? strength.color : 'bg-slate-200'
+                              level <= strength.score ? strength.color : 'bg-[#DCE7F2]'
                             }`}
                           />
                         ))}
@@ -515,13 +515,13 @@ export default function Register() {
                             className="flex items-center gap-1.5 text-[10.5px] font-body"
                           >
                             {check.met ? (
-                              <Check className="h-3 w-3 text-emerald-600 shrink-0" />
+                              <Check className="h-3 w-3 text-[#168A62] shrink-0" />
                             ) : (
-                              <X className="h-3 w-3 text-slate-300 shrink-0" />
+                              <X className="h-3 w-3 text-[#7B8799] shrink-0" />
                             )}
                             <span
                               className={
-                                check.met ? 'text-slate-800 font-medium' : 'text-slate-400'
+                                check.met ? 'text-[#11183D] font-medium' : 'text-[#7B8799]'
                               }
                             >
                               {check.label}
@@ -544,7 +544,7 @@ export default function Register() {
                       <button
                         type="button"
                         onClick={() => setShowConfirm(!showConfirm)}
-                        className="hover:text-primary-500 text-slate-400 transition-colors cursor-pointer"
+                        className="hover:text-[#4A8BDF] text-[#7B8799] transition-colors cursor-pointer"
                         tabIndex={-1}
                         aria-label={showConfirm ? 'Hide password' : 'Show password'}
                       >
@@ -559,17 +559,17 @@ export default function Register() {
                     type="submit"
                     size="lg"
                     fullWidth
-                    className="w-full bg-[#FF7A00] hover:bg-[#E66E00] text-white font-display font-bold text-sm sm:text-base py-3 rounded-xl shadow-lg shadow-[#FF7A00]/25 transition-all mt-1 cursor-pointer"
+                    className="w-full bg-[#4A8BDF] hover:bg-[#2459A8] text-white font-display font-bold text-sm sm:text-base py-3 rounded-xl shadow-md shadow-[#4A8BDF]/20 transition-all mt-1 cursor-pointer"
                   >
                     Continue to Target Track →
                   </Button>
                 </form>
 
-                <p className="text-center font-body text-xs sm:text-sm text-slate-500 mt-3.5 sm:mt-4">
+                <p className="text-center font-body text-xs sm:text-sm text-[#526078] mt-3.5 sm:mt-4">
                   Already have an account?{' '}
                   <Link
                     to="/login"
-                    className="font-bold text-primary-500 hover:text-primary-600 transition-colors underline decoration-primary-500/40 underline-offset-4"
+                    className="font-bold text-[#4A8BDF] hover:text-[#2459A8] transition-colors underline decoration-[#4A8BDF]/40 underline-offset-4"
                   >
                     Sign in
                   </Link>
@@ -588,10 +588,10 @@ export default function Register() {
                 className="space-y-3.5"
               >
                 <div>
-                  <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-slate-950 tracking-tight">
+                  <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-[#11183D] tracking-tight">
                     What is your target role?
                   </h2>
-                  <p className="font-body text-xs sm:text-sm text-slate-600">
+                  <p className="font-body text-xs sm:text-sm text-[#526078]">
                     We tune the interviewer persona and questions to match your exact career path.
                   </p>
                 </div>
@@ -608,16 +608,16 @@ export default function Register() {
                         onClick={() => updateField('targetRole', role.id)}
                         className={`p-2.5 sm:p-3 rounded-xl border text-left transition-all duration-200 flex flex-col justify-between cursor-pointer ${
                           isSelected
-                            ? 'border-[#FF7A00] bg-orange-50/60 shadow-sm ring-2 ring-[#FF7A00]/20'
-                            : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50'
+                            ? 'border-[#4A8BDF] bg-[#EFF7FD] shadow-sm ring-2 ring-[#4A8BDF]/20'
+                            : 'border-[#DCE7F2] bg-white hover:border-[#4A8BDF]/40 hover:bg-[#EFFAFD]/40'
                         }`}
                       >
                         <div className="flex items-center justify-between w-full mb-1">
                           <div
                             className={`p-1.5 rounded-lg ${
                               isSelected
-                                ? 'bg-[#FF7A00] text-white'
-                                : 'bg-slate-100 text-slate-600'
+                                ? 'bg-[#4A8BDF] text-white'
+                                : 'bg-[#EFFAFD] text-[#526078]'
                             }`}
                           >
                             <Icon className="h-4 w-4" />
@@ -625,8 +625,8 @@ export default function Register() {
                           <span
                             className={`text-[9.5px] font-mono font-semibold px-1.5 py-0.5 rounded ${
                               isSelected
-                                ? 'bg-orange-200/80 text-[#FF7A00]'
-                                : 'bg-slate-100 text-slate-500'
+                                ? 'bg-[#4A8BDF]/15 text-[#4A8BDF]'
+                                : 'bg-[#EFFAFD] text-[#7B8799]'
                             }`}
                           >
                             {role.badge}
@@ -635,12 +635,12 @@ export default function Register() {
                         <div>
                           <p
                             className={`font-display font-bold text-xs sm:text-sm leading-snug ${
-                              isSelected ? 'text-slate-950' : 'text-slate-800'
+                              isSelected ? 'text-[#11183D]' : 'text-[#526078]'
                             }`}
                           >
                             {role.title}
                           </p>
-                          <p className="font-body text-[10.5px] text-slate-500 line-clamp-1 mt-0.5">
+                          <p className="font-body text-[10.5px] text-[#7B8799] line-clamp-1 mt-0.5">
                             {role.description}
                           </p>
                         </div>
@@ -651,7 +651,7 @@ export default function Register() {
 
                 {/* Experience Level Segmented Selector */}
                 <div>
-                  <label className="text-xs font-display font-semibold uppercase tracking-wider text-slate-600 block mb-1.5">
+                  <label className="text-xs font-display font-semibold uppercase tracking-wider text-[#526078] block mb-1.5">
                     Your Seniority Level
                   </label>
                   <div className="grid grid-cols-4 gap-1.5">
@@ -664,8 +664,8 @@ export default function Register() {
                           onClick={() => updateField('experienceLevel', exp.id)}
                           className={`py-2 px-1 rounded-xl border text-center transition-all cursor-pointer ${
                             isSelected
-                              ? 'border-[#FF7A00] bg-[#FF7A00] text-white shadow-sm'
-                              : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-700'
+                              ? 'border-[#4A8BDF] bg-[#4A8BDF] text-white shadow-sm'
+                              : 'border-[#DCE7F2] bg-white hover:bg-[#EFFAFD] text-[#526078]'
                           }`}
                         >
                           <div className="font-display font-bold text-[11px] sm:text-xs">
@@ -673,7 +673,7 @@ export default function Register() {
                           </div>
                           <div
                             className={`text-[9.5px] font-mono ${
-                              isSelected ? 'text-white/85' : 'text-slate-400'
+                              isSelected ? 'text-white/85' : 'text-[#7B8799]'
                             }`}
                           >
                             {exp.range}
@@ -690,7 +690,7 @@ export default function Register() {
                     size="lg"
                     fullWidth
                     onClick={handleNextStep}
-                    className="w-full bg-[#FF7A00] hover:bg-[#E66E00] text-white font-display font-bold text-sm sm:text-base py-3 rounded-xl shadow-lg shadow-[#FF7A00]/25 transition-all cursor-pointer"
+                    className="w-full bg-[#4A8BDF] hover:bg-[#2459A8] text-white font-display font-bold text-sm sm:text-base py-3 rounded-xl shadow-md shadow-[#4A8BDF]/20 transition-all cursor-pointer"
                   >
                     Continue to Practice Goals →
                   </Button>
@@ -709,15 +709,15 @@ export default function Register() {
                 className="space-y-3.5"
               >
                 <div>
-                  <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-slate-950 tracking-tight">
+                  <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-[#11183D] tracking-tight">
                     What is your primary interview focus?
                   </h2>
-                  <p className="font-body text-xs sm:text-sm text-slate-600">
+                  <p className="font-body text-xs sm:text-sm text-[#526078]">
                     We will configure your first mock session with calibrated difficulty and live metrics.
                   </p>
                 </div>
 
-                {/* Focus Options (4 options) */}
+                {/* Focus Options (4 options - Eggplant AI Signature styling) */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5">
                   {FOCUS_OPTIONS.map((foc) => {
                     const Icon = foc.icon;
@@ -729,16 +729,16 @@ export default function Register() {
                         onClick={() => updateField('primaryFocus', foc.id)}
                         className={`p-2.5 sm:p-3 rounded-xl border text-left transition-all duration-200 flex flex-col justify-between cursor-pointer ${
                           isSelected
-                            ? 'border-[#FF7A00] bg-orange-50/60 shadow-sm ring-2 ring-[#FF7A00]/20'
-                            : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50'
+                            ? 'border-[#A0006D] bg-[#F8EAF4] shadow-sm ring-2 ring-[#A0006D]/20'
+                            : 'border-[#DCE7F2] bg-white hover:border-[#A0006D]/30 hover:bg-[#F8EAF4]/30'
                         }`}
                       >
                         <div className="flex items-center gap-2 mb-1">
                           <div
                             className={`p-1.5 rounded-lg ${
                               isSelected
-                                ? 'bg-[#FF7A00] text-white'
-                                : 'bg-slate-100 text-slate-600'
+                                ? 'bg-[#A0006D] text-white'
+                                : 'bg-[#EFFAFD] text-[#526078]'
                             }`}
                           >
                             <Icon className="h-4 w-4" />
@@ -746,8 +746,8 @@ export default function Register() {
                           <span
                             className={`text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded ${
                               isSelected
-                                ? 'bg-orange-200/80 text-[#FF7A00]'
-                                : 'bg-slate-100 text-slate-500'
+                                ? 'bg-[#A0006D]/15 text-[#A0006D]'
+                                : 'bg-[#EFFAFD] text-[#7B8799]'
                             }`}
                           >
                             {foc.pill}
@@ -756,12 +756,12 @@ export default function Register() {
                         <div>
                           <p
                             className={`font-display font-bold text-xs sm:text-sm ${
-                              isSelected ? 'text-slate-950' : 'text-slate-800'
+                              isSelected ? 'text-[#11183D]' : 'text-[#526078]'
                             }`}
                           >
                             {foc.title}
                           </p>
-                          <p className="font-body text-[10.5px] text-slate-500 line-clamp-1 mt-0.5">
+                          <p className="font-body text-[10.5px] text-[#7B8799] line-clamp-1 mt-0.5">
                             {foc.desc}
                           </p>
                         </div>
@@ -772,7 +772,7 @@ export default function Register() {
 
                 {/* Timeline Urgency */}
                 <div>
-                  <label className="text-xs font-display font-semibold uppercase tracking-wider text-slate-600 block mb-1.5">
+                  <label className="text-xs font-display font-semibold uppercase tracking-wider text-[#526078] block mb-1.5">
                     Interview Readiness Timeline
                   </label>
                   <div className="grid grid-cols-3 gap-2">
@@ -785,18 +785,18 @@ export default function Register() {
                           onClick={() => updateField('timeline', time.id)}
                           className={`p-2 rounded-xl border text-center transition-all cursor-pointer ${
                             isSelected
-                              ? 'border-[#FF7A00] bg-orange-50/80 ring-2 ring-[#FF7A00]/20'
-                              : 'border-slate-200 bg-white hover:bg-slate-50'
+                              ? 'border-[#4A8BDF] bg-[#EFF7FD] ring-2 ring-[#4A8BDF]/20'
+                              : 'border-[#DCE7F2] bg-white hover:bg-[#EFFAFD]'
                           }`}
                         >
                           <div
                             className={`font-display font-bold text-xs ${
-                              isSelected ? 'text-[#FF7A00]' : 'text-slate-800'
+                              isSelected ? 'text-[#4A8BDF]' : 'text-[#11183D]'
                             }`}
                           >
                             {time.label}
                           </div>
-                          <div className="text-[10px] font-body text-slate-500">
+                          <div className="text-[10px] font-body text-[#7B8799]">
                             {time.sub}
                           </div>
                         </button>
@@ -812,7 +812,7 @@ export default function Register() {
                     fullWidth
                     isLoading={isRegistering}
                     onClick={handleSubmitFinal}
-                    className="w-full bg-[#FF7A00] hover:bg-[#E66E00] text-white font-display font-bold text-sm sm:text-base py-3 rounded-xl shadow-lg shadow-[#FF7A00]/25 transition-all cursor-pointer"
+                    className="w-full bg-[#4A8BDF] hover:bg-[#2459A8] text-white font-display font-bold text-sm sm:text-base py-3 rounded-xl shadow-md shadow-[#4A8BDF]/20 transition-all cursor-pointer"
                   >
                     Complete Onboarding & Start Practice →
                   </Button>
@@ -823,17 +823,17 @@ export default function Register() {
         </div>
       </motion.div>
 
-      {/* ─── Right Column: Solar Orange Full-Bleed Quotation Screen ─── */}
+      {/* ─── Right Column: Royal Blue Full-Bleed Quotation Screen ─── */}
       <motion.div
         initial={{ x: '100%', opacity: 0.9 }}
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: '-100%', opacity: 0.9 }}
         transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-        className="hidden lg:flex lg:col-span-5 xl:col-span-5 bg-gradient-to-br from-[#FF7A00] via-[#FF7A00] to-[#E66E00] text-white p-10 xl:p-14 flex-col justify-between relative overflow-hidden select-none min-h-screen lg:h-screen shadow-2xl z-10"
+        className="hidden lg:flex lg:col-span-5 xl:col-span-5 bg-gradient-to-br from-[#2459A8] via-[#2459A8] to-[#11183D] text-white p-10 xl:p-14 flex-col justify-between relative overflow-hidden select-none min-h-screen lg:h-screen shadow-2xl z-10"
       >
         {/* Subtle ambient lighting */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-[90px] pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-black/10 rounded-full blur-[80px] pointer-events-none" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[#4A8BDF]/20 rounded-full blur-[90px] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#A0006D]/20 rounded-full blur-[80px] pointer-events-none" />
 
         {/* Top Header Logo */}
         <div className="relative z-10 flex items-center justify-between">
@@ -844,7 +844,7 @@ export default function Register() {
 
         {/* Dynamic Quotation Body based on Active Step */}
         <div className="relative z-10 my-auto py-6 space-y-5 max-w-md">
-          <div className="w-12 h-12 rounded-2xl bg-white/15 flex items-center justify-center backdrop-blur-md shadow-sm">
+          <div className="w-12 h-12 rounded-2xl bg-white/15 flex items-center justify-center backdrop-blur-md shadow-sm border border-white/10">
             <Quote className="w-6 h-6 text-white" />
           </div>
           <blockquote className="font-display font-black text-2xl xl:text-3xl text-white leading-snug tracking-tight">

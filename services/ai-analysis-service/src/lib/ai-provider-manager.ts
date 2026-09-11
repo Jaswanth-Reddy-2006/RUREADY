@@ -211,6 +211,13 @@ class AIProviderManager {
       throw error;
     }
   }
+
+  public async generateText(prompt: string): Promise<string> {
+    if (this.config.provider === 'mock') {
+      throw new Error('AI_PROVIDER is mock mode.');
+    }
+    return this.callChatCompletion('You are an expert AI assistant.', prompt);
+  }
 }
 
 export const aiProviderManager = new AIProviderManager();
