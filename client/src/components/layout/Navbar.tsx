@@ -59,7 +59,7 @@ export default function Navbar() {
             <a
               key={link.label}
               href={link.href}
-              className="text-sm font-semibold text-slate-600 hover:text-[#F97316] transition-colors duration-200 font-body"
+              className="text-sm font-semibold text-slate-600 hover:text-[#FF7A00] transition-colors duration-200 font-body"
             >
               {link.label}
             </a>
@@ -73,10 +73,10 @@ export default function Navbar() {
               {/* Profile Avatar Icon */}
               <button
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
-                className="flex items-center gap-2.5 p-1.5 rounded-full hover:ring-2 hover:ring-[#F97316]/30 transition-all duration-200 bg-slate-100 border border-slate-200 cursor-pointer"
+                className="flex items-center gap-2.5 p-1.5 rounded-full hover:ring-2 hover:ring-[#FF7A00]/30 transition-all duration-200 bg-slate-100 border border-slate-200 cursor-pointer"
                 aria-label="User Profile Menu"
               >
-                <div className="h-9 w-9 rounded-full bg-gradient-to-tr from-[#EA580C] via-[#F97316] to-[#FB923C] flex items-center justify-center text-white font-black text-sm font-display shadow-md shadow-orange-500/20">
+                <div className="h-9 w-9 rounded-full bg-gradient-to-tr from-[#E66E00] via-[#FF7A00] to-[#FF8A00] flex items-center justify-center text-white font-black text-sm font-display shadow-md shadow-orange-500/20">
                   {user?.name?.charAt(0).toUpperCase() || 'U'}
                 </div>
               </button>
@@ -105,21 +105,21 @@ export default function Navbar() {
                     <div className="space-y-1">
                       <Link
                         to="/settings"
-                        className="flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-semibold text-slate-700 hover:text-[#F97316] hover:bg-orange-50/70 rounded-xl transition-colors font-body"
+                        className="flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-semibold text-slate-700 hover:text-[#FF7A00] hover:bg-orange-50/70 rounded-xl transition-colors font-body"
                       >
-                        <SettingsIcon className="h-4 w-4 text-[#F97316]" />
+                        <SettingsIcon className="h-4 w-4 text-[#FF7A00]" />
                         <span>Profile & Settings</span>
                       </Link>
                       <Link
                         to="/interview/setup"
-                        className="flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-semibold text-slate-700 hover:text-[#F97316] hover:bg-orange-50/70 rounded-xl transition-colors font-body"
+                        className="flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-semibold text-slate-700 hover:text-[#FF7A00] hover:bg-orange-50/70 rounded-xl transition-colors font-body"
                       >
                         <Video className="h-4 w-4 text-violet-600" />
                         <span>Mock Interview</span>
                       </Link>
                       <Link
                         to="/analysis"
-                        className="flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-semibold text-slate-700 hover:text-[#F97316] hover:bg-orange-50/70 rounded-xl transition-colors font-body"
+                        className="flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-semibold text-slate-700 hover:text-[#FF7A00] hover:bg-orange-50/70 rounded-xl transition-colors font-body"
                       >
                         <LayoutDashboard className="h-4 w-4 text-emerald-600" />
                         <span>Analysis Dashboard</span>
@@ -149,7 +149,7 @@ export default function Navbar() {
                 </button>
               </Link>
               <Link to="/register">
-                <button className="inline-flex items-center gap-2 bg-[#F97316] hover:bg-[#EA580C] text-white font-display font-bold text-sm px-6 py-2.5 rounded-full shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 active:scale-98 transition-all duration-200 cursor-pointer">
+                <button className="inline-flex items-center gap-2 bg-[#FF7A00] hover:bg-[#E66E00] text-white font-display font-bold text-sm px-6 py-2.5 rounded-full shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 active:scale-98 transition-all duration-200 cursor-pointer">
                   <span>Get Started</span>
                   <ArrowRight className="h-3.5 w-3.5" />
                 </button>
@@ -189,7 +189,7 @@ export default function Navbar() {
                   key={link.label}
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
-                  className="text-base font-semibold text-slate-700 hover:text-[#F97316] py-2 font-body transition-colors"
+                  className="text-base font-semibold text-slate-700 hover:text-[#FF7A00] py-2 font-body transition-colors"
                 >
                   {link.label}
                 </a>
@@ -204,15 +204,15 @@ export default function Navbar() {
                   <Link
                     to="/settings"
                     onClick={() => setMobileOpen(false)}
-                    className="flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-slate-700 hover:text-[#F97316] rounded-xl font-body"
+                    className="flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-slate-700 hover:text-[#FF7A00] rounded-xl font-body"
                   >
-                    <SettingsIcon className="h-4 w-4 text-[#F97316]" />
+                    <SettingsIcon className="h-4 w-4 text-[#FF7A00]" />
                     Profile & Settings
                   </Link>
                   <Link
                     to="/interview/setup"
                     onClick={() => setMobileOpen(false)}
-                    className="flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-slate-700 hover:text-[#F97316] rounded-xl font-body"
+                    className="flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-slate-700 hover:text-[#FF7A00] rounded-xl font-body"
                   >
                     <Video className="h-4 w-4 text-violet-600" />
                     Mock Interview
@@ -220,7 +220,7 @@ export default function Navbar() {
                   <Link
                     to="/analysis"
                     onClick={() => setMobileOpen(false)}
-                    className="flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-slate-700 hover:text-[#F97316] rounded-xl font-body"
+                    className="flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-slate-700 hover:text-[#FF7A00] rounded-xl font-body"
                   >
                     <LayoutDashboard className="h-4 w-4 text-emerald-600" />
                     Analysis Dashboard
@@ -244,7 +244,7 @@ export default function Navbar() {
                     </button>
                   </Link>
                   <Link to="/register" onClick={() => setMobileOpen(false)}>
-                    <button className="w-full inline-flex items-center justify-center gap-2 bg-[#F97316] hover:bg-[#EA580C] text-white font-display font-bold text-sm px-6 py-2.5 rounded-full shadow-lg shadow-orange-500/25 transition-all">
+                    <button className="w-full inline-flex items-center justify-center gap-2 bg-[#FF7A00] hover:bg-[#E66E00] text-white font-display font-bold text-sm px-6 py-2.5 rounded-full shadow-lg shadow-orange-500/25 transition-all">
                       Get Started
                       <ArrowRight className="h-3.5 w-3.5" />
                     </button>

@@ -1,7 +1,7 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { motion, AnimatePresence, useInView, useScroll, useTransform } from 'framer-motion';
+import { motion, AnimatePresence, useInView, useScroll, useTransform, animate } from 'framer-motion';
 import {
   Brain,
   ArrowRight,
@@ -25,8 +25,6 @@ import {
   Activity,
   BarChart3,
   Sliders,
-  Radio,
-  Target,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 
@@ -51,26 +49,69 @@ const FAQ_ITEMS = [
   },
 ];
 
+// ─── Dynamic Animated Number Counter ─────────────────────────
+
+function AnimatedCounter({
+  target,
+  duration = 2,
+  decimals = 0,
+  prefix = '',
+  suffix = '',
+}: {
+  target: number;
+  duration?: number;
+  decimals?: number;
+  prefix?: string;
+  suffix?: string;
+}) {
+  const [value, setValue] = useState(0);
+  const ref = useRef<HTMLSpanElement>(null);
+  const isInView = useInView(ref, { once: true, margin: '-50px' });
+
+  useEffect(() => {
+    if (!isInView) return;
+    const controls = animate(0, target, {
+      duration,
+      ease: [0.25, 0.46, 0.45, 0.94],
+      onUpdate: (latest) => setValue(latest),
+    });
+    return () => controls.stop();
+  }, [isInView, target, duration]);
+
+  const formatted =
+    decimals > 0
+      ? value.toFixed(decimals)
+      : Math.floor(value).toLocaleString('en-US');
+
+  return (
+    <span ref={ref}>
+      {prefix}
+      {formatted}
+      {suffix}
+    </span>
+  );
+}
+
 // ─── Animation Variants ──────────────────────────────────────
 
 const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: { opacity: 0, y: 35 },
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: i * 0.12, duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] },
+    transition: { delay: i * 0.1, duration: 0.65, ease: [0.25, 0.46, 0.45, 0.94] },
   }),
 };
 
 const staggerContainer = {
   hidden: {},
   visible: {
-    transition: { staggerChildren: 0.12 },
+    transition: { staggerChildren: 0.1 },
   },
 };
 
 const scaleIn = {
-  hidden: { opacity: 0, scale: 0.95 },
+  hidden: { opacity: 0, scale: 0.93 },
   visible: {
     opacity: 1,
     scale: 1,
@@ -91,7 +132,7 @@ const SCORECARD_DATA: Record<string, ScorecardCategory> = {
   overall: {
     title: 'Executive Overall Score',
     score: 87,
-    colorTheme: 'from-[#F97316] to-[#EA580C]',
+    colorTheme: 'from-[#FF7A00] to-[#E66E00]',
     breakdown: [
       { label: 'Technical Accuracy & Edge-cases', val: 94 },
       { label: 'Communication Clarity & Tone', val: 82 },
@@ -135,7 +176,7 @@ const SCORECARD_DATA: Record<string, ScorecardCategory> = {
   suggestions: {
     title: 'High-Impact Action Items',
     score: 91,
-    colorTheme: 'from-rose-500 to-[#F97316]',
+    colorTheme: 'from-rose-500 to-[#FF7A00]',
     breakdown: [
       { label: 'State assumptions before coding', val: 92 },
       { label: 'Quantify metrics in past project wins', val: 89 },
@@ -157,7 +198,7 @@ function Section({
   id?: string;
 }) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: '-80px' });
+  const isInView = useInView(ref, { once: true, margin: '-70px' });
 
   return (
     <motion.section
@@ -177,25 +218,36 @@ function Section({
 
 export default function Landing() {
   const heroRef = useRef(null);
+  const containerRef = useRef(null);
   const { isAuthenticated } = useAuthStore();
   const [activeScoreTab, setActiveScoreTab] = useState<string>('overall');
   const [workflowStep, setWorkflowStep] = useState<number>(0);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const currentCategory = SCORECARD_DATA[activeScoreTab] || SCORECARD_DATA.overall;
 
-  const { scrollYProgress } = useScroll({
+  // Global Page Scroll Progress Bar
+  const { scrollYProgress: pageScrollProgress } = useScroll({ target: containerRef });
+  
+  // Hero Parallax Scroll Effect
+  const { scrollYProgress: heroScrollProgress } = useScroll({
     target: heroRef,
     offset: ['start start', 'end start'],
   });
-  const heroY = useTransform(scrollYProgress, [0, 1], [0, 60]);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.85], [1, 0]);
+  const heroY = useTransform(heroScrollProgress, [0, 1], [0, 70]);
+  const heroOpacity = useTransform(heroScrollProgress, [0, 0.85], [1, 0]);
 
   return (
-    <div className="min-h-screen bg-white text-slate-800 overflow-hidden selection:bg-[#F97316]/20 selection:text-[#EA580C]">
+    <div ref={containerRef} className="min-h-screen bg-white text-slate-800 overflow-hidden selection:bg-[#FF7A00]/20 selection:text-[#E66E00]">
       <Helmet>
         <title>R U Ready? — AI-Powered Mock Interview Platform</title>
         <meta name="description" content="Master technical & behavioral interviews with calibrated AI agents. Practice on realistic scenarios with brutal honesty." />
       </Helmet>
+
+      {/* Top Scroll Indicator Progress Bar */}
+      <motion.div
+        style={{ scaleX: pageScrollProgress }}
+        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FF7A00] via-[#FF8A00] to-[#E66E00] z-50 transform origin-left"
+      />
 
       {/* ════════════════════════════════════════════════════════ */}
       {/* HERO SECTION                                           */}
@@ -204,7 +256,7 @@ export default function Landing() {
         ref={heroRef}
         className="relative min-h-[90vh] flex items-center pt-24 pb-16 lg:pt-28 lg:pb-24 overflow-hidden bg-white"
       >
-        {/* Mid-orange radial background glows */}
+        {/* Mid-Orange Radial Glow Orbs */}
         <div className="absolute top-0 right-0 w-[650px] h-[650px] bg-gradient-to-bl from-orange-200/60 via-amber-100/40 to-transparent rounded-full blur-[110px] pointer-events-none -z-0" />
         <div className="absolute top-1/3 left-[-100px] w-[400px] h-[400px] bg-orange-100/50 rounded-full blur-[95px] pointer-events-none -z-0" />
 
@@ -220,9 +272,9 @@ export default function Landing() {
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-orange-50 border border-orange-200/80 text-[#F97316] font-display font-bold text-xs mb-6 shadow-sm"
+                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-orange-50 border border-orange-200/80 text-[#FF7A00] font-display font-bold text-xs mb-6 shadow-sm"
               >
-                <Sparkles className="w-3.5 h-3.5 text-[#F97316]" />
+                <Sparkles className="w-3.5 h-3.5 text-[#FF7A00]" />
                 <span>Next-Gen Calibrated AI Evaluator</span>
               </motion.div>
 
@@ -235,7 +287,7 @@ export default function Landing() {
               >
                 Stop Guessing.
                 <br />
-                <span className="text-[#F97316]">
+                <span className="text-[#FF7A00]">
                   Start Interviewing.
                 </span>
               </motion.h1>
@@ -248,7 +300,7 @@ export default function Landing() {
                 className="font-body text-base sm:text-lg text-slate-600 mb-8 leading-relaxed max-w-xl"
               >
                 Experience adversarial, real-time mock evaluations with{' '}
-                <span className="font-semibold text-slate-900 underline decoration-[#F97316]/40 decoration-2 underline-offset-4">
+                <span className="font-semibold text-slate-900 underline decoration-[#FF7A00]/40 decoration-2 underline-offset-4">
                   uninflated feedback
                 </span>
                 . Calibrate your STAR structure, verbal pacing, and coding complexity under real interview pressure.
@@ -262,7 +314,7 @@ export default function Landing() {
                 className="flex flex-wrap items-center gap-4 mb-8"
               >
                 <Link to={isAuthenticated ? "/dashboard" : "/register"} className="group shrink-0">
-                  <button className="inline-flex items-center gap-2.5 bg-[#F97316] hover:bg-[#EA580C] text-white font-display font-bold text-base px-8 py-4 rounded-full shadow-lg shadow-orange-500/30 hover:shadow-orange-500/45 hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer">
+                  <button className="inline-flex items-center gap-2.5 bg-[#FF7A00] hover:bg-[#E66E00] text-white font-display font-bold text-base px-8 py-4 rounded-full shadow-lg shadow-orange-500/30 hover:shadow-orange-500/45 hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer">
                     <span>{isAuthenticated ? 'Go to Dashboard' : 'Start Free Interview'}</span>
                     <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </button>
@@ -276,7 +328,7 @@ export default function Landing() {
               </motion.div>
             </div>
 
-            {/* ── RIGHT COLUMN: Candidate Visual & Colorful Floating Metric Cards ── */}
+            {/* ── RIGHT COLUMN: Candidate Visual & Floating Metric Cards ── */}
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -284,7 +336,7 @@ export default function Landing() {
               className="lg:col-span-5 relative"
             >
               {/* Candidate Photo Card */}
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl bg-slate-950 border border-slate-200 group">
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl bg-zinc-950 border border-slate-200 group">
                 <img
                   src="/images/hero-3d.jpg"
                   alt="Candidate live video interview"
@@ -340,7 +392,7 @@ export default function Landing() {
                 }}
                 className="absolute top-6 sm:top-10 -right-2 sm:-right-6 bg-white/95 backdrop-blur-xl rounded-2xl p-3.5 shadow-2xl border border-orange-100 flex flex-col items-center justify-center z-20 hover:scale-105 transition-transform"
               >
-                <p className="text-[10px] font-bold text-[#F97316] uppercase tracking-wider font-mono mb-1">
+                <p className="text-[10px] font-bold text-[#FF7A00] uppercase tracking-wider font-mono mb-1">
                   STAR Score
                 </p>
                 <div className="relative w-14 h-14 flex items-center justify-center">
@@ -350,7 +402,7 @@ export default function Landing() {
                       cx="28"
                       cy="28"
                       r="22"
-                      stroke="#F97316"
+                      stroke="#FF7A00"
                       strokeWidth="4"
                       strokeDasharray="138"
                       initial={{ strokeDashoffset: 138 }}
@@ -381,7 +433,7 @@ export default function Landing() {
                   { label: 'Eye Contact', checked: true, color: 'text-emerald-500' },
                   { label: 'Speech Pacing (145 WPM)', checked: true, color: 'text-sky-500' },
                   { label: 'STAR Adherence', checked: true, color: 'text-violet-500' },
-                  { label: 'Big-O Complexity', checked: true, color: 'text-[#F97316]' },
+                  { label: 'Big-O Complexity', checked: true, color: 'text-[#FF7A00]' },
                   { label: 'Filler Words (Zero)', checked: true, color: 'text-emerald-500' },
                 ].map((item, i) => (
                   <div key={i} className="flex items-center gap-2 text-[11px] font-medium text-slate-700">
@@ -396,13 +448,13 @@ export default function Landing() {
       </section>
 
       {/* ════════════════════════════════════════════════════════ */}
-      {/* TRUST BAR (Colorful Accent Pills)                       */}
+      {/* TRUST BAR (Clean White Surfaces with Colorful Icons)    */}
       {/* ════════════════════════════════════════════════════════ */}
       <Section className="py-8 lg:py-10 bg-white">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <motion.div variants={fadeUp} custom={0} className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             {[
-              { icon: Shield, title: 'Proctor Secure', desc: 'Cheat-resistant', iconColor: 'text-[#F97316]', bg: 'bg-orange-50' },
+              { icon: Shield, title: 'Proctor Secure', desc: 'Cheat-resistant', iconColor: 'text-[#FF7A00]', bg: 'bg-orange-50' },
               { icon: Zap, title: 'Real-time Feedback', desc: 'Sub-300ms AI engine', iconColor: 'text-violet-600', bg: 'bg-violet-50' },
               { icon: TrendingUp, title: 'Detailed Insights', desc: '5-Axis Radar metrics', iconColor: 'text-emerald-600', bg: 'bg-emerald-50' },
               { icon: Lock, title: 'Privacy First', desc: '100% telemetry privacy', iconColor: 'text-sky-600', bg: 'bg-sky-50' },
@@ -420,12 +472,12 @@ export default function Landing() {
       </Section>
 
       {/* ════════════════════════════════════════════════════════ */}
-      {/* FEATURES — Bento Showcase with Vibrant Accents           */}
+      {/* FEATURES — Bento Showcase (Ultra Obsidian Dark & Mid-Orange) */}
       {/* ════════════════════════════════════════════════════════ */}
       <Section id="features" className="py-16 sm:py-24 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 bg-white">
         <motion.div variants={fadeUp} custom={0} className="text-center mb-14">
           <h2 className="font-display font-black text-3xl sm:text-4xl lg:text-5xl text-slate-950 tracking-tight mb-3">
-            Interview prep, <span className="text-[#F97316]">reimagined.</span>
+            Interview prep, <span className="text-[#FF7A00]">reimagined.</span>
           </h2>
           <p className="font-body text-sm sm:text-base text-slate-600 max-w-xl mx-auto leading-relaxed">
             Deep telemetry, adversarial conversation trees, and strict assessment diagnostics built inside an elite cockpit wrapper.
@@ -435,10 +487,10 @@ export default function Landing() {
         {/* Bento Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           
-          {/* Card 1: Adversarial AI Mock Interviews (Violet & Orange Theme) */}
+          {/* Card 1: Adversarial AI Mock Interviews (Obsidian & Mid-Orange Theme) */}
           <motion.div
             variants={scaleIn}
-            className="rounded-3xl p-6 sm:p-8 bg-[#0D1628] text-white border border-slate-800 shadow-2xl flex flex-col justify-between hover:border-[#F97316]/40 transition-all duration-300 relative overflow-hidden"
+            className="rounded-3xl p-6 sm:p-8 bg-[#09090B] text-white border border-zinc-800 shadow-2xl flex flex-col justify-between hover:border-[#FF7A00]/40 transition-all duration-300 relative overflow-hidden"
           >
             <div className="absolute top-0 right-0 w-64 h-64 bg-violet-500/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -458,19 +510,19 @@ export default function Landing() {
               {/* Chat Simulation */}
               <div className="mt-6 space-y-3 font-body text-xs">
                 <div className="flex gap-2.5 items-start">
-                  <div className="w-6 h-6 rounded-lg bg-[#F97316] text-white font-black text-[10px] flex items-center justify-center shrink-0 shadow-sm">
+                  <div className="w-6 h-6 rounded-lg bg-[#FF7A00] text-white font-black text-[10px] flex items-center justify-center shrink-0 shadow-sm">
                     AI
                   </div>
-                  <div className="bg-[#17223B] border border-slate-700/60 p-3 rounded-2xl rounded-tl-sm text-slate-200 flex-1">
+                  <div className="bg-[#18181B] border border-zinc-800 p-3 rounded-2xl rounded-tl-sm text-slate-200 flex-1">
                     You mentioned designing a distributed queue. How do you guarantee exact-once delivery during network partitions?
                   </div>
                 </div>
 
                 <div className="flex gap-2.5 items-start justify-end">
-                  <div className="bg-[#F97316]/20 border border-[#F97316]/40 p-2.5 rounded-2xl rounded-tr-sm text-white max-w-[80%]">
+                  <div className="bg-[#FF7A00]/20 border border-[#FF7A00]/40 p-2.5 rounded-2xl rounded-tr-sm text-white max-w-[80%]">
                     We use idempotent consumer IDs combined with consensus log replication...
                   </div>
-                  <div className="w-6 h-6 rounded-lg bg-slate-700 text-white flex items-center justify-center shrink-0">
+                  <div className="w-6 h-6 rounded-lg bg-zinc-800 text-white flex items-center justify-center shrink-0">
                     <User size={12} />
                   </div>
                 </div>
@@ -479,7 +531,7 @@ export default function Landing() {
                   <div className="w-6 h-6 rounded-lg bg-violet-600 text-white font-black text-[10px] flex items-center justify-center shrink-0 shadow-sm">
                     AI
                   </div>
-                  <div className="bg-[#17223B] border border-slate-700/60 p-3 rounded-2xl rounded-tl-sm text-slate-200 flex-1">
+                  <div className="bg-[#18181B] border border-zinc-800 p-3 rounded-2xl rounded-tl-sm text-slate-200 flex-1">
                     <span className="text-violet-400 font-semibold">[Bar Raiser Probe]</span> Excellent. What is the impact on P99 latency?
                   </div>
                 </div>
@@ -487,10 +539,10 @@ export default function Landing() {
             </div>
           </motion.div>
 
-          {/* Card 2: Multi-Modal Behavioral Telemetry (Sky Blue & Emerald Theme) */}
+          {/* Card 2: Multi-Modal Behavioral Telemetry (Obsidian & Sky Blue Theme) */}
           <motion.div
             variants={scaleIn}
-            className="rounded-3xl p-6 sm:p-8 bg-[#0D1628] text-white border border-slate-800 shadow-2xl flex flex-col justify-between hover:border-sky-500/40 transition-all duration-300 relative overflow-hidden"
+            className="rounded-3xl p-6 sm:p-8 bg-[#09090B] text-white border border-zinc-800 shadow-2xl flex flex-col justify-between hover:border-sky-500/40 transition-all duration-300 relative overflow-hidden"
           >
             <div className="absolute top-0 right-0 w-64 h-64 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -508,7 +560,7 @@ export default function Landing() {
               </div>
 
               {/* Telemetry Preview */}
-              <div className="mt-6 relative rounded-2xl overflow-hidden bg-[#111A2E] border border-slate-700/60 flex items-center justify-center aspect-[16/10]">
+              <div className="mt-6 relative rounded-2xl overflow-hidden bg-[#18181B] border border-zinc-800 flex items-center justify-center aspect-[16/10]">
                 <img
                   src="/images/telemetry-3d.jpg"
                   alt="3D Candidate video telemetry"
@@ -516,7 +568,7 @@ export default function Landing() {
                 />
 
                 {/* Live REC Indicator */}
-                <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/70 backdrop-blur-sm text-[10px] font-mono text-white border border-rose-500/30">
+                <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/80 backdrop-blur-sm text-[10px] font-mono text-white border border-rose-500/30">
                   <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
                   LIVE TELEMETRY
                 </div>
@@ -539,10 +591,10 @@ export default function Landing() {
                 </div>
 
                 {/* Bottom Waveform Bar */}
-                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between px-3 py-1.5 rounded-xl bg-black/80 backdrop-blur-md border border-white/10">
+                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between px-3 py-1.5 rounded-xl bg-black/90 backdrop-blur-md border border-white/10">
                   <div className="flex items-center gap-1 h-3.5">
                     {[40, 70, 90, 60, 30, 80, 100, 75, 45, 60, 85, 95, 50].map((h, i) => (
-                      <div key={i} className="w-0.5 bg-[#F97316] rounded-full" style={{ height: `${h}%` }} />
+                      <div key={i} className="w-0.5 bg-[#FF7A00] rounded-full" style={{ height: `${h}%` }} />
                     ))}
                   </div>
                   <span className="font-mono text-[10px] text-sky-300 font-semibold">Sub-300ms Audio Pipeline</span>
@@ -552,14 +604,14 @@ export default function Landing() {
           </motion.div>
         </div>
 
-        {/* Card 3: Uninflated Scorecard Insights (Interactive Category Tabs) */}
+        {/* Card 3: Uninflated Scorecard Insights (Obsidian Background) */}
         <motion.div
           variants={scaleIn}
-          className="rounded-3xl p-6 sm:p-8 bg-[#0D1628] text-white border border-slate-800 shadow-2xl relative overflow-hidden"
+          className="rounded-3xl p-6 sm:p-8 bg-[#09090B] text-white border border-zinc-800 shadow-2xl relative overflow-hidden"
         >
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-9 h-9 rounded-xl bg-[#F97316]/20 text-[#F97316] flex items-center justify-center border border-[#F97316]/30">
-              <BarChart3 className="w-5 h-5 text-[#F97316]" />
+            <div className="w-9 h-9 rounded-xl bg-[#FF7A00]/20 text-[#FF7A00] flex items-center justify-center border border-[#FF7A00]/30">
+              <BarChart3 className="w-5 h-5 text-[#FF7A00]" />
             </div>
             <div>
               <h3 className="font-display font-bold text-base text-white">Uninflated STAR Scorecard Insights</h3>
@@ -574,7 +626,7 @@ export default function Landing() {
             {/* Left Nav Menu Buttons */}
             <div className="md:col-span-3 space-y-1.5 font-body text-xs">
               {[
-                { id: 'overall', label: 'Overall', icon: Flame, color: 'text-[#F97316]' },
+                { id: 'overall', label: 'Overall', icon: Flame, color: 'text-[#FF7A00]' },
                 { id: 'technical', label: 'Technical Skills', icon: Code2, color: 'text-violet-400' },
                 { id: 'communication', label: 'Communication', icon: Users, color: 'text-sky-400' },
                 { id: 'behavioral', label: 'Behavioral', icon: Zap, color: 'text-emerald-400' },
@@ -588,8 +640,8 @@ export default function Landing() {
                     onClick={() => setActiveScoreTab(tab.id)}
                     className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl transition-all duration-200 text-left font-semibold cursor-pointer ${
                       isActive
-                        ? 'bg-[#F97316] text-white shadow-md shadow-orange-500/25'
-                        : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                        ? 'bg-[#FF7A00] text-white shadow-md shadow-orange-500/25'
+                        : 'text-slate-400 hover:text-white hover:bg-zinc-800/70'
                     }`}
                   >
                     <Icon className={`w-4 h-4 ${isActive ? 'text-white' : tab.color}`} />
@@ -603,12 +655,12 @@ export default function Landing() {
             <div className="md:col-span-4 flex flex-col items-center justify-center py-4">
               <div className="relative w-40 h-40 flex items-center justify-center">
                 <svg className="w-40 h-40 transform -rotate-90">
-                  <circle cx="80" cy="80" r="56" stroke="#17223B" strokeWidth="8" fill="none" />
+                  <circle cx="80" cy="80" r="56" stroke="#27272A" strokeWidth="8" fill="none" />
                   <motion.circle
                     cx="80"
                     cy="80"
                     r="56"
-                    stroke="#F97316"
+                    stroke="#FF7A00"
                     strokeWidth="8"
                     strokeDasharray={2 * Math.PI * 56}
                     animate={{ strokeDashoffset: (2 * Math.PI * 56) - (currentCategory.score / 100) * (2 * Math.PI * 56) }}
@@ -627,7 +679,7 @@ export default function Landing() {
                     {currentCategory.score}{' '}
                     <span className="text-sm font-normal text-slate-400">/ 100</span>
                   </motion.span>
-                  <span className="text-[10px] text-[#F97316] font-mono font-bold mt-0.5 max-w-[130px] text-center truncate">
+                  <span className="text-[10px] text-[#FF7A00] font-mono font-bold mt-0.5 max-w-[130px] text-center truncate">
                     {currentCategory.title}
                   </span>
                 </div>
@@ -640,7 +692,7 @@ export default function Landing() {
                 <p className="font-bold text-slate-300 text-xs uppercase tracking-wider font-mono">
                   Rubric Metrics
                 </p>
-                <span className="text-[10px] text-[#F97316] font-mono font-bold">
+                <span className="text-[10px] text-[#FF7A00] font-mono font-bold">
                   {currentCategory.title}
                 </span>
               </div>
@@ -660,9 +712,9 @@ export default function Landing() {
                         <span className="text-slate-300">{b.label}</span>
                         <span className="font-mono text-white font-bold">{b.val}%</span>
                       </div>
-                      <div className="w-full h-1.5 bg-[#17223B] rounded-full overflow-hidden">
+                      <div className="w-full h-1.5 bg-[#27272A] rounded-full overflow-hidden">
                         <motion.div
-                          className="h-full bg-[#F97316] rounded-full"
+                          className="h-full bg-[#FF7A00] rounded-full"
                           initial={{ width: 0 }}
                           animate={{ width: `${b.val}%` }}
                           transition={{ duration: 0.6, delay: i * 0.05 }}
@@ -676,7 +728,7 @@ export default function Landing() {
               <div className="pt-2 flex justify-end">
                 <Link
                   to="/register"
-                  className="inline-flex items-center gap-1.5 text-xs text-[#F97316] hover:text-orange-400 font-bold transition-colors"
+                  className="inline-flex items-center gap-1.5 text-xs text-[#FF7A00] hover:text-orange-400 font-bold transition-colors"
                 >
                   View Sample Analysis Report <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
@@ -687,13 +739,13 @@ export default function Landing() {
       </Section>
 
       {/* ════════════════════════════════════════════════════════ */}
-      {/* STATS: Vibrant Accent Cards                             */}
+      {/* STATS: Dynamic Animated Numbers ("Number Speak")        */}
       {/* ════════════════════════════════════════════════════════ */}
       <Section className="py-16 sm:py-24 bg-slate-50/70 border-y border-slate-100">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <motion.div variants={fadeUp} custom={0} className="text-center mb-14">
             <h2 className="font-display font-black text-3xl sm:text-4xl lg:text-5xl text-slate-950 tracking-tight leading-tight">
-              Numbers that <span className="text-[#F97316]">speak</span>
+              Numbers that <span className="text-[#FF7A00]">speak</span>
             </h2>
           </motion.div>
 
@@ -701,16 +753,18 @@ export default function Landing() {
             {[
               {
                 icon: Flame,
-                number: '885+',
+                targetNumber: 885,
+                suffix: '+',
                 title: 'Engineers Prepared',
                 desc: 'From students to Staff Engineers ready for Tier-1 interviews.',
-                color: 'text-[#F97316]',
+                color: 'text-[#FF7A00]',
                 bgColor: 'bg-orange-50',
                 border: 'border-orange-100',
               },
               {
                 icon: Brain,
-                number: '11,067+',
+                targetNumber: 11067,
+                suffix: '+',
                 title: 'Socratic Prompts',
                 desc: 'Adversarial questions generated from resumes and targets.',
                 color: 'text-violet-600',
@@ -719,7 +773,8 @@ export default function Landing() {
               },
               {
                 icon: TrendingUp,
-                number: '25%',
+                targetNumber: 25,
+                suffix: '%',
                 title: 'STAR Adherence',
                 desc: 'Candidates show 25% growth in structured delivery within 3 runs.',
                 color: 'text-emerald-600',
@@ -728,7 +783,9 @@ export default function Landing() {
               },
               {
                 icon: Star,
-                number: '4.8/5',
+                targetNumber: 4.8,
+                suffix: '/5',
+                decimals: 1,
                 title: 'Satisfaction Score',
                 desc: 'Loved by candidates preparing for top tech companies.',
                 color: 'text-sky-600',
@@ -740,8 +797,12 @@ export default function Landing() {
                 <div className={`bg-white border ${stat.border} rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-200 h-full flex flex-col justify-between group hover:-translate-y-0.5`}>
                   <div>
                     <div className="flex items-center justify-between mb-4">
-                      <span className={`font-display font-black text-3xl ${stat.color}`}>
-                        {stat.number}
+                      <span className={`font-display font-black text-3xl sm:text-4xl ${stat.color}`}>
+                        <AnimatedCounter
+                          target={stat.targetNumber}
+                          decimals={stat.decimals || 0}
+                          suffix={stat.suffix}
+                        />
                       </span>
                       <div className={`h-10 w-10 ${stat.bgColor} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform`}>
                         <stat.icon className={`h-5 w-5 ${stat.color}`} />
@@ -762,7 +823,7 @@ export default function Landing() {
           {/* Trust badges */}
           <motion.div variants={fadeUp} custom={2} className="mt-12 flex flex-wrap items-center justify-center gap-6 sm:gap-8 text-slate-600">
             {[
-              { icon: Shield, text: 'Strict Environmental Privacy', color: 'text-[#F97316]' },
+              { icon: Shield, text: 'Strict Environmental Privacy', color: 'text-[#FF7A00]' },
               { icon: Zap, text: 'Adversarial Socratic Engine v1.0', color: 'text-violet-600' },
               { icon: CheckCircle2, text: 'Zero Cost Baseline Evaluation', color: 'text-emerald-600' },
               { icon: Monitor, text: 'Works on Any Browser', color: 'text-sky-600' },
@@ -783,7 +844,7 @@ export default function Landing() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <motion.div variants={fadeUp} custom={0} className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="font-display font-black text-3xl sm:text-4xl lg:text-5xl text-slate-950 tracking-tight leading-tight mb-4">
-              How <span className="text-[#F97316]">R U Ready?</span> Works
+              How <span className="text-[#FF7A00]">R U Ready?</span> Works
             </h2>
             <p className="font-body text-slate-600 text-sm sm:text-base leading-relaxed">
               Experience the full rigor of technical and behavioral hiring loops in 4 calibrated steps.
@@ -798,7 +859,7 @@ export default function Landing() {
                 desc: 'Upload target JD, choose level (Junior to Staff), and select persona: Hiring Manager, Architect, or Bar Raiser.',
                 icon: Sliders,
                 tag: 'Step 1',
-                color: 'text-[#F97316]',
+                color: 'text-[#FF7A00]',
                 bg: 'bg-orange-50',
                 border: 'border-orange-100',
               },
@@ -843,12 +904,12 @@ export default function Landing() {
                   onClick={() => setWorkflowStep(i)}
                   className={`relative rounded-3xl p-6 sm:p-7 shadow-sm transition-all duration-300 flex flex-col justify-between cursor-pointer group ${
                     isSelected
-                      ? 'bg-white border-2 border-[#F97316] shadow-xl shadow-orange-500/10 -translate-y-1'
+                      ? 'bg-white border-2 border-[#FF7A00] shadow-xl shadow-orange-500/10 -translate-y-1'
                       : 'bg-white border border-slate-200 hover:border-slate-300 hover:shadow-md'
                   }`}
                 >
                   <div className={`absolute -top-3 right-6 px-3 py-1 rounded-full font-mono text-[10px] font-black tracking-widest uppercase shadow transition-colors ${
-                    isSelected ? 'bg-[#F97316] text-white' : 'bg-slate-900 text-white'
+                    isSelected ? 'bg-[#FF7A00] text-white' : 'bg-slate-900 text-white'
                   }`}>
                     STEP {card.step}
                   </div>
@@ -856,12 +917,12 @@ export default function Landing() {
                   <div>
                     <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-5 transition-all duration-300 shadow-sm ${
                       isSelected
-                        ? 'bg-[#F97316] text-white scale-105'
-                        : `${card.bg} border ${card.border} ${card.color} group-hover:bg-[#F97316] group-hover:text-white`
+                        ? 'bg-[#FF7A00] text-white scale-105'
+                        : `${card.bg} border ${card.border} ${card.color} group-hover:bg-[#FF7A00] group-hover:text-white`
                     }`}>
                       <Icon className="w-6 h-6" />
                     </div>
-                    <span className="text-[10px] font-bold text-[#F97316] font-mono uppercase tracking-wider block mb-1">
+                    <span className="text-[10px] font-bold text-[#FF7A00] font-mono uppercase tracking-wider block mb-1">
                       {card.tag}
                     </span>
                     <h3 className="font-display font-bold text-lg text-slate-900 mb-2.5 leading-snug">
@@ -876,7 +937,7 @@ export default function Landing() {
                     <span className="text-[10px] font-mono text-slate-400 font-medium block">
                       Calibration Loop
                     </span>
-                    <ChevronRight className={`w-4 h-4 transition-transform ${isSelected ? 'text-[#F97316] translate-x-0.5' : 'text-slate-300'}`} />
+                    <ChevronRight className={`w-4 h-4 transition-transform ${isSelected ? 'text-[#FF7A00] translate-x-0.5' : 'text-slate-300'}`} />
                   </div>
                 </motion.div>
               );
@@ -887,7 +948,7 @@ export default function Landing() {
             <Link to="/register">
               <button className="inline-flex items-center gap-2 bg-slate-950 hover:bg-slate-900 text-white font-display font-bold text-xs sm:text-sm px-8 py-3.5 rounded-full shadow hover:shadow-md transition-all cursor-pointer">
                 <span>Start Practice Workflow</span>
-                <ArrowRight className="w-4 h-4 text-[#F97316]" />
+                <ArrowRight className="w-4 h-4 text-[#FF7A00]" />
               </button>
             </Link>
           </div>
@@ -901,7 +962,7 @@ export default function Landing() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <motion.div variants={fadeUp} custom={0} className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="font-display font-black text-3xl sm:text-4xl lg:text-5xl text-slate-950 tracking-tight leading-tight mb-4">
-              Practice That Fits Your <span className="text-[#F97316]">Budget</span>
+              Practice That Fits Your <span className="text-[#FF7A00]">Budget</span>
             </h2>
             <p className="font-body text-slate-600 text-sm sm:text-base leading-relaxed">
               No locked subscriptions or hidden fees. Calibrate your readiness with flexible session bundles.
@@ -957,7 +1018,7 @@ export default function Landing() {
               className="rounded-3xl bg-white border border-slate-200 p-6 sm:p-7 shadow-sm flex flex-col justify-between hover:shadow-md transition-all duration-300"
             >
               <div>
-                <div className="inline-block px-3 py-1 rounded-full bg-orange-50 text-[#F97316] border border-orange-200 text-[10px] font-bold font-mono uppercase tracking-wider mb-4">
+                <div className="inline-block px-3 py-1 rounded-full bg-orange-50 text-[#FF7A00] border border-orange-200 text-[10px] font-bold font-mono uppercase tracking-wider mb-4">
                   Quick Sprint
                 </div>
                 <h3 className="font-display font-black text-xl text-slate-900 mb-1">Single Pass</h3>
@@ -978,7 +1039,7 @@ export default function Landing() {
                     'Session Audio & Full Transcript Replay',
                   ].map((feat, idx) => (
                     <li key={idx} className="flex items-start gap-2.5">
-                      <Check className="w-4 h-4 text-[#F97316] shrink-0 mt-0.5" />
+                      <Check className="w-4 h-4 text-[#FF7A00] shrink-0 mt-0.5" />
                       <span>{feat}</span>
                     </li>
                   ))}
@@ -986,7 +1047,7 @@ export default function Landing() {
               </div>
 
               <Link to="/register" className="w-full">
-                <button className="w-full py-3 rounded-xl bg-[#F97316] hover:bg-[#EA580C] text-white font-display font-bold text-xs shadow-sm hover:shadow transition-all cursor-pointer">
+                <button className="w-full py-3 rounded-xl bg-[#FF7A00] hover:bg-[#E66E00] text-white font-display font-bold text-xs shadow-sm hover:shadow transition-all cursor-pointer">
                   Get Pass — ₹69
                 </button>
               </Link>
@@ -996,26 +1057,26 @@ export default function Landing() {
             <motion.div
               variants={fadeUp}
               custom={2}
-              className="rounded-3xl bg-[#0D1628] text-white border-2 border-[#F97316] p-6 sm:p-7 shadow-2xl relative flex flex-col justify-between hover:scale-[1.02] transition-all duration-300"
+              className="rounded-3xl bg-[#09090B] text-white border-2 border-[#FF7A00] p-6 sm:p-7 shadow-2xl relative flex flex-col justify-between hover:scale-[1.02] transition-all duration-300"
             >
-              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-[#F97316] text-white text-[10px] font-black font-mono uppercase tracking-widest shadow-lg shadow-orange-500/30 flex items-center gap-1">
+              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-[#FF7A00] text-white text-[10px] font-black font-mono uppercase tracking-widest shadow-lg shadow-orange-500/30 flex items-center gap-1">
                 <Star className="w-3 h-3 fill-white text-white" />
                 <span>Most Popular</span>
               </div>
 
               <div>
-                <div className="inline-block px-3 py-1 rounded-full bg-[#F97316]/20 text-[#F97316] text-[10px] font-bold font-mono uppercase tracking-wider mb-4 mt-2 border border-[#F97316]/30">
+                <div className="inline-block px-3 py-1 rounded-full bg-[#FF7A00]/20 text-[#FF7A00] text-[10px] font-bold font-mono uppercase tracking-wider mb-4 mt-2 border border-[#FF7A00]/30">
                   Career Ready Pro
                 </div>
                 <h3 className="font-display font-black text-xl text-white mb-1">5-Session Bundle</h3>
                 <p className="text-xs text-slate-400 font-body mb-6">Complete interview prep for Tier-1 engineering roles.</p>
 
                 <div className="mb-6 flex items-baseline gap-1">
-                  <span className="font-display font-extrabold text-4xl text-[#F97316]">₹159</span>
+                  <span className="font-display font-extrabold text-4xl text-[#FF7A00]">₹159</span>
                   <span className="text-xs font-mono text-slate-400">/ 5 sessions (₹31/ea)</span>
                 </div>
 
-                <ul className="space-y-3 text-xs font-body text-slate-300 mb-8 border-t border-slate-800 pt-6">
+                <ul className="space-y-3 text-xs font-body text-slate-300 mb-8 border-t border-zinc-800 pt-6">
                   {[
                     '5 Full Multi-Modal Mock Sessions (Oral + Coding)',
                     'Live Coding Sandbox & Test Case Runner',
@@ -1026,7 +1087,7 @@ export default function Landing() {
                     'Priority Sub-150ms Neural Pipeline',
                   ].map((feat, idx) => (
                     <li key={idx} className="flex items-start gap-2.5">
-                      <Check className="w-4 h-4 text-[#F97316] shrink-0 mt-0.5" />
+                      <Check className="w-4 h-4 text-[#FF7A00] shrink-0 mt-0.5" />
                       <span>{feat}</span>
                     </li>
                   ))}
@@ -1034,7 +1095,7 @@ export default function Landing() {
               </div>
 
               <Link to="/register" className="w-full">
-                <button className="w-full py-3.5 rounded-xl bg-[#F97316] hover:bg-[#EA580C] text-white font-display font-bold text-xs shadow-lg shadow-orange-500/30 transition-all cursor-pointer">
+                <button className="w-full py-3.5 rounded-xl bg-[#FF7A00] hover:bg-[#E66E00] text-white font-display font-bold text-xs shadow-lg shadow-orange-500/30 transition-all cursor-pointer">
                   Unlock Pro Pack — ₹159
                 </button>
               </Link>
@@ -1101,7 +1162,7 @@ export default function Landing() {
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <motion.div variants={fadeUp} custom={0} className="text-center mb-14">
             <h2 className="font-display font-black text-3xl sm:text-4xl text-slate-950 tracking-tight leading-tight mb-3">
-              Frequently Asked <span className="text-[#F97316]">Questions</span>
+              Frequently Asked <span className="text-[#FF7A00]">Questions</span>
             </h2>
             <p className="font-body text-slate-600 text-sm sm:text-base leading-relaxed">
               Everything you need to know about calibrated mock evaluations.
@@ -1120,12 +1181,12 @@ export default function Landing() {
                 >
                   <button
                     onClick={() => setOpenFaq(isOpen ? null : i)}
-                    className="w-full flex items-center justify-between p-5 text-left font-display font-bold text-sm sm:text-base text-slate-900 hover:text-[#F97316] transition-colors cursor-pointer"
+                    className="w-full flex items-center justify-between p-5 text-left font-display font-bold text-sm sm:text-base text-slate-900 hover:text-[#FF7A00] transition-colors cursor-pointer"
                   >
                     <span>{faq.q}</span>
                     <ChevronDown
                       className={`w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200 ${
-                        isOpen ? 'transform rotate-180 text-[#F97316]' : ''
+                        isOpen ? 'transform rotate-180 text-[#FF7A00]' : ''
                       }`}
                     />
                   </button>
@@ -1152,22 +1213,22 @@ export default function Landing() {
       </Section>
 
       {/* ════════════════════════════════════════════════════════ */}
-      {/* CTA BANNER                                              */}
+      {/* CTA BANNER (Ultra Obsidian Dark Card with Mid-Orange Glow) */}
       {/* ════════════════════════════════════════════════════════ */}
       <Section className="pb-16 sm:pb-24 px-4 sm:px-6 lg:px-8 bg-white">
         <motion.div
           variants={scaleIn}
-          className="mx-auto max-w-5xl relative overflow-hidden rounded-3xl bg-[#0D1628] text-white p-8 sm:p-12 lg:p-14 shadow-2xl border border-slate-800 text-center"
+          className="mx-auto max-w-5xl relative overflow-hidden rounded-3xl bg-[#09090B] text-white p-8 sm:p-12 lg:p-14 shadow-2xl border border-zinc-800 text-center"
         >
           {/* Mid-orange Glow */}
-          <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 bg-[#F97316]/20 rounded-full blur-[100px] pointer-events-none" />
+          <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 bg-[#FF7A00]/20 rounded-full blur-[100px] pointer-events-none" />
 
           <div className="relative z-10 max-w-2xl mx-auto space-y-4">
-            <span className="text-[10px] font-bold text-[#F97316] font-mono uppercase tracking-widest">
+            <span className="text-[10px] font-bold text-[#FF7A00] font-mono uppercase tracking-widest">
               YOUR NEXT OPPORTUNITY DESERVES A BETTER YOU
             </span>
             <h2 className="font-display font-black text-3xl sm:text-4xl lg:text-5xl text-white tracking-tight leading-tight">
-              Ready to meet <span className="text-[#F97316]">AVA?</span>
+              Ready to meet <span className="text-[#FF7A00]">AVA?</span>
             </h2>
             <p className="font-body text-slate-300 text-sm sm:text-base leading-relaxed max-w-lg mx-auto">
               Join thousands of engineers who stopped guessing and calibrated their technical capacity.
@@ -1175,23 +1236,23 @@ export default function Landing() {
 
             <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
               <Link to="/register" className="group shrink-0">
-                <button className="inline-flex items-center gap-2 bg-[#F97316] hover:bg-[#EA580C] text-white font-display font-bold text-sm sm:text-base px-8 py-3.5 rounded-full shadow-lg shadow-orange-500/30 transition-all cursor-pointer">
+                <button className="inline-flex items-center gap-2 bg-[#FF7A00] hover:bg-[#E66E00] text-white font-display font-bold text-sm sm:text-base px-8 py-3.5 rounded-full shadow-lg shadow-orange-500/30 transition-all cursor-pointer">
                   Start Assessment — It's Free
                   <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
                 </button>
               </Link>
               <a href="#features" className="shrink-0">
-                <button className="inline-flex items-center gap-2 border border-slate-700 bg-slate-800/60 hover:bg-slate-800 text-slate-200 px-6 py-3.5 rounded-full text-sm sm:text-base font-semibold transition-all cursor-pointer">
-                  <Play className="w-3.5 h-3.5 fill-current text-[#F97316]" />
+                <button className="inline-flex items-center gap-2 border border-zinc-700 bg-zinc-800/60 hover:bg-zinc-800 text-slate-200 px-6 py-3.5 rounded-full text-sm sm:text-base font-semibold transition-all cursor-pointer">
+                  <Play className="w-3.5 h-3.5 fill-current text-[#FF7A00]" />
                   Watch Demo
                 </button>
               </a>
             </div>
 
             {/* Cursive annotation */}
-            <div className="pt-6 font-script text-xl text-[#F97316] text-right pr-6 pointer-events-none flex items-center justify-end gap-1.5">
+            <div className="pt-6 font-script text-xl text-[#FF7A00] text-right pr-6 pointer-events-none flex items-center justify-end gap-1.5">
               <span>Better Interviews, Brighter You</span>
-              <Sparkles className="w-4 h-4 text-[#F97316] inline" />
+              <Sparkles className="w-4 h-4 text-[#FF7A00] inline" />
             </div>
           </div>
         </motion.div>
