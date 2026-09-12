@@ -70,14 +70,14 @@ export default function Login() {
           <div className="w-12 h-12 rounded-2xl bg-white/15 flex items-center justify-center backdrop-blur-md shadow-sm border border-white/10">
             <Quote className="w-6 h-6 text-white" />
           </div>
-          <blockquote className="font-display font-black text-2xl xl:text-3xl text-white leading-snug tracking-tight">
+          <blockquote className="font-editorial font-bold text-2xl xl:text-3xl text-white leading-snug tracking-tight">
             &ldquo;The only way to do great work is to love what you do.&rdquo;
           </blockquote>
           <div className="pt-3 border-t border-white/20">
-            <p className="font-mono text-sm uppercase tracking-widest font-bold text-white">
+            <p className="font-mono text-sm uppercase tracking-widest font-semibold text-white">
               — Steve Jobs
             </p>
-            <p className="text-xs text-white/80 font-body mt-0.5">
+            <p className="text-xs text-white/80 font-sans mt-0.5">
               Co-founder, Apple Inc.
             </p>
           </div>
@@ -102,17 +102,17 @@ export default function Login() {
 
           <Link
             to="/"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#526078] hover:text-[#11183D] transition-colors mb-3 sm:mb-4 font-display self-start"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#526078] hover:text-[#11183D] transition-colors mb-3 sm:mb-4 font-sans self-start"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             Back to home
           </Link>
 
           <div className="mb-4 sm:mb-5">
-            <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-[#11183D] mb-1 tracking-tight">
+            <h1 className="font-sans font-bold text-2xl sm:text-3xl text-[#11183D] mb-1 tracking-tight">
               Welcome back
             </h1>
-            <p className="font-body text-xs sm:text-sm text-[#526078]">
+            <p className="font-sans text-xs sm:text-sm text-[#526078]">
               Log in to continue your mock interview calibration.
             </p>
           </div>

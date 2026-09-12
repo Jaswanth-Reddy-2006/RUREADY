@@ -37,7 +37,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="text-xs font-bold text-[#11183D] uppercase tracking-wider font-display"
+            className="text-xs font-semibold text-[#11183D] tracking-wide font-sans"
           >
             {label}
           </label>
@@ -58,7 +58,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             aria-invalid={!!error}
             aria-describedby={error ? errorId : hint ? hintId : undefined}
             className={clsx(
-              'w-full rounded-xl border border-[#DCE7F2] bg-white px-4 py-2.5 text-sm font-body text-[#11183D] placeholder:text-[#7B8799] shadow-sm transition-all duration-200 ease-out focus:outline-none focus:border-[#4A8BDF] focus:ring-2 focus:ring-[#4A8BDF]/20',
+              'w-full rounded-xl border border-[#DCE7F2] bg-white px-4 py-2.5 text-sm font-sans text-[#11183D] placeholder:text-[#7B8799] shadow-sm transition-all duration-200 ease-out focus:outline-none focus:border-[#4A8BDF] focus:ring-2 focus:ring-[#4A8BDF]/20',
               error && 'border-[#D64545] text-[#D64545] focus:border-[#D64545] focus:ring-[#D64545]/20',
               disabled && 'opacity-50 cursor-not-allowed bg-[#EFFAFD] pointer-events-none',
               icon && 'pl-10',

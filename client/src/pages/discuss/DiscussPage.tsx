@@ -119,11 +119,11 @@ export default function DiscussPage() {
         {/* Hero Header */}
         <div className="bg-white rounded-2xl p-6 sm:p-8 border border-[#DCE7F2] shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F8EAF4] border border-[#A0006D]/20 text-[#A0006D] text-xs font-bold font-display">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F8EAF4] border border-[#A0006D]/20 text-[#A0006D] text-xs font-semibold font-sans">
               <Sparkles size={14} />
               <span>AI-Moderated Tech Community</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold font-display text-[#11183D]">
+            <h1 className="text-2xl sm:text-3xl font-bold font-sans text-[#11183D]">
               Role Discussion & Technical Hub
             </h1>
             <p className="text-sm text-[#526078] max-w-2xl">

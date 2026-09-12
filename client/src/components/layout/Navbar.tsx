@@ -36,32 +36,32 @@ export default function Navbar() {
     setUserMenuOpen(false);
   }, [location.pathname]);
 
-  const navBg = scrolled
-    ? 'bg-white/95 backdrop-blur-xl border-b border-[#DCE7F2] shadow-sm'
-    : isLanding
-    ? 'bg-[#EFFAFD]/80 backdrop-blur-md border-b border-[#DCE7F2]/40'
-    : 'bg-white/95 backdrop-blur-xl border-b border-[#DCE7F2] shadow-sm';
-
   return (
     <header
       className={clsx(
-        'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
-        navBg,
+        'fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 pt-3.5 pb-2 transition-all duration-300 pointer-events-none',
       )}
     >
-      <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8 h-16 lg:h-20">
+      <nav
+        className={clsx(
+          'pointer-events-auto max-w-5xl mx-auto rounded-full transition-all duration-300 px-5 sm:px-7 py-2.5 flex items-center justify-between border shadow-lg',
+          scrolled || !isLanding
+            ? 'bg-white/95 backdrop-blur-xl border-[#DCE7F2] shadow-[#11183D]/5'
+            : 'bg-white/90 backdrop-blur-md border-[#DCE7F2]/80 shadow-[#11183D]/5',
+        )}
+      >
         {/* Left: Brand Logo */}
-        <Link to="/" className="shrink-0">
+        <Link to="/" className="shrink-0 flex items-center">
           <Logo size="md" theme="light" />
         </Link>
 
         {/* Center: Nav Links */}
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden md:flex items-center gap-7 lg:gap-8">
           {NAV_LINKS.map((link) => (
             <a
               key={link.label}
               href={link.href}
-              className="text-sm font-semibold text-[#526078] hover:text-[#4A8BDF] transition-colors duration-200 font-body"
+              className="text-sm font-medium text-[#526078] hover:text-[#11183D] transition-colors duration-200 font-sans"
             >
               {link.label}
             </a>
@@ -69,7 +69,7 @@ export default function Navbar() {
         </div>
 
         {/* Right: Auth Buttons (Logged Out) OR Profile Avatar Dropdown (Logged In) */}
-        <div className="hidden md:flex items-center gap-4">
+        <div className="hidden md:flex items-center gap-3">
           {isAuthenticated ? (
             <div className="relative">
               {/* Profile Avatar Icon */}
@@ -78,7 +78,7 @@ export default function Navbar() {
                 className="flex items-center gap-2.5 p-1 rounded-full hover:ring-2 hover:ring-[#4A8BDF]/40 transition-all duration-200 bg-white border border-[#DCE7F2] shadow-xs cursor-pointer"
                 aria-label="User Profile Menu"
               >
-                <div className="h-9 w-9 rounded-full bg-[#4A8BDF] flex items-center justify-center text-white font-black text-sm font-display shadow-sm">
+                <div className="h-9 w-9 rounded-full bg-[#4A8BDF] flex items-center justify-center text-white font-bold text-sm font-sans shadow-sm">
                   {user?.name?.charAt(0).toUpperCase() || 'U'}
                 </div>
               </button>
@@ -95,10 +95,10 @@ export default function Navbar() {
                   >
                     {/* User Info Header */}
                     <div className="px-3.5 py-3 rounded-xl bg-[#EFFAFD] border border-[#DCE7F2] mb-2">
-                      <p className="text-sm font-bold text-[#11183D] font-display truncate">
+                      <p className="text-sm font-bold text-[#11183D] font-sans truncate">
                         {user?.name || 'Candidate'}
                       </p>
-                      <p className="text-xs text-[#526078] font-body truncate">
+                      <p className="text-xs text-[#526078] font-sans truncate">
                         {user?.email || 'user@ruready.app'}
                       </p>
                     </div>
@@ -107,14 +107,14 @@ export default function Navbar() {
                     <div className="space-y-1">
                       <Link
                         to="/settings"
-                        className="flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-semibold text-[#526078] hover:text-[#4A8BDF] hover:bg-[#EFFAFD] rounded-xl transition-colors font-body"
+                        className="flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-semibold text-[#526078] hover:text-[#4A8BDF] hover:bg-[#EFFAFD] rounded-xl transition-colors font-sans"
                       >
                         <SettingsIcon className="h-4 w-4 text-[#4A8BDF]" />
                         <span>Profile & Settings</span>
                       </Link>
                       <Link
                         to="/interview/setup"
-                        className="flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-semibold text-[#526078] hover:text-[#A0006D] hover:bg-[#F8EAF4] rounded-xl transition-colors font-body"
+                        className="flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-semibold text-[#526078] hover:text-[#A0006D] hover:bg-[#F8EAF4] rounded-xl transition-colors font-sans"
                       >
                         <Video className="h-4 w-4 text-[#A0006D]" />
                         <span>Mock Interview</span>
@@ -122,7 +122,7 @@ export default function Navbar() {
                       </Link>
                       <Link
                         to="/ats"
-                        className="flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-semibold text-[#526078] hover:text-[#4A8BDF] hover:bg-[#EFFAFD] rounded-xl transition-colors font-body"
+                        className="flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-semibold text-[#526078] hover:text-[#4A8BDF] hover:bg-[#EFFAFD] rounded-xl transition-colors font-sans"
                       >
                         <FileText className="h-4 w-4 text-[#4A8BDF]" />
                         <span>ATS Scanner</span>
@@ -130,7 +130,7 @@ export default function Navbar() {
                       </Link>
                       <Link
                         to="/analysis"
-                        className="flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-semibold text-[#526078] hover:text-[#4A8BDF] hover:bg-[#EFFAFD] rounded-xl transition-colors font-body"
+                        className="flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-semibold text-[#526078] hover:text-[#4A8BDF] hover:bg-[#EFFAFD] rounded-xl transition-colors font-sans"
                       >
                         <LayoutDashboard className="h-4 w-4 text-[#4A8BDF]" />
                         <span>Analysis Dashboard</span>
@@ -142,7 +142,7 @@ export default function Navbar() {
                       <button
                         onClick={() => logout()}
                         disabled={isLoggingOut}
-                        className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-semibold text-[#D64545] hover:bg-[#FDF2F2] rounded-xl transition-colors font-body cursor-pointer"
+                        className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-semibold text-[#D64545] hover:bg-[#FDF2F2] rounded-xl transition-colors font-sans cursor-pointer"
                       >
                         <LogOut className="h-4 w-4 text-[#D64545]" />
                         <span>{isLoggingOut ? 'Signing out...' : 'Sign out'}</span>
@@ -155,12 +155,12 @@ export default function Navbar() {
           ) : (
             <>
               <Link to="/login">
-                <button className="px-5 py-2 text-sm font-semibold font-body text-[#11183D] hover:text-[#4A8BDF] border border-[#DCE7F2] rounded-xl bg-white hover:bg-[#EFFAFD] transition-all duration-200 shadow-sm cursor-pointer">
+                <button className="px-4.5 py-2 text-xs sm:text-sm font-semibold font-sans text-[#11183D] bg-[#F8FAFC] hover:bg-[#F1F5F9] border border-[#DCE7F2] rounded-full transition-all duration-200 cursor-pointer">
                   Login
                 </button>
               </Link>
               <Link to="/register">
-                <button className="inline-flex items-center gap-2 bg-[#4A8BDF] hover:bg-[#2459A8] text-white font-display font-bold text-sm px-6 py-2.5 rounded-xl shadow-sm hover:shadow-md active:scale-98 transition-all duration-200 cursor-pointer">
+                <button className="inline-flex items-center gap-1.5 bg-[#11183D] hover:bg-[#1E293B] text-white font-sans font-semibold text-xs sm:text-sm px-5 py-2 rounded-full shadow-sm hover:shadow active:scale-98 transition-all duration-200 cursor-pointer">
                   <span>Get Started</span>
                   <ArrowRight className="h-3.5 w-3.5" />
                 </button>
@@ -172,13 +172,13 @@ export default function Navbar() {
         {/* Mobile: Hamburger Button */}
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="md:hidden p-2 rounded-xl hover:bg-[#EFFAFD] transition-colors text-[#11183D]"
+          className="md:hidden p-2 rounded-full hover:bg-[#EFFAFD] transition-colors text-[#11183D]"
           aria-label="Toggle menu"
         >
           {mobileOpen ? (
-            <X className="h-6 w-6 text-[#11183D]" />
+            <X className="h-5 w-5 text-[#11183D]" />
           ) : (
-            <Menu className="h-6 w-6 text-[#11183D]" />
+            <Menu className="h-5 w-5 text-[#11183D]" />
           )}
         </button>
       </nav>
@@ -187,19 +187,19 @@ export default function Navbar() {
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.25, ease: 'easeOut' }}
-            className="md:hidden overflow-hidden bg-[#EFFAFD] border-b border-[#DCE7F2] shadow-xl"
+            initial={{ opacity: 0, y: -10, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.98 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="pointer-events-auto md:hidden max-w-5xl mx-auto mt-2 rounded-3xl bg-white/98 backdrop-blur-xl border border-[#DCE7F2] shadow-2xl overflow-hidden p-5"
           >
-            <div className="px-4 py-4 flex flex-col gap-2">
+            <div className="flex flex-col gap-2">
               {NAV_LINKS.map((link) => (
                 <a
                   key={link.label}
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
-                  className="text-base font-semibold text-[#526078] hover:text-[#4A8BDF] py-2 font-body transition-colors"
+                  className="text-base font-semibold text-[#526078] hover:text-[#11183D] py-2 font-sans transition-colors"
                 >
                   {link.label}
                 </a>
@@ -207,14 +207,14 @@ export default function Navbar() {
 
               {isAuthenticated ? (
                 <div className="pt-3 mt-2 border-t border-[#DCE7F2] space-y-2">
-                  <div className="px-3 py-2 bg-white border border-[#DCE7F2] rounded-xl">
-                    <p className="text-sm font-bold text-[#11183D] font-display">{user?.name}</p>
-                    <p className="text-xs text-[#526078] font-body">{user?.email}</p>
+                  <div className="px-3 py-2 bg-[#EFFAFD] border border-[#DCE7F2] rounded-2xl">
+                    <p className="text-sm font-bold text-[#11183D] font-sans">{user?.name}</p>
+                    <p className="text-xs text-[#526078] font-sans">{user?.email}</p>
                   </div>
                   <Link
                     to="/settings"
                     onClick={() => setMobileOpen(false)}
-                    className="flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-[#526078] hover:text-[#4A8BDF] rounded-xl font-body"
+                    className="flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-[#526078] hover:text-[#4A8BDF] rounded-xl font-sans"
                   >
                     <SettingsIcon className="h-4 w-4 text-[#4A8BDF]" />
                     Profile & Settings
@@ -222,7 +222,7 @@ export default function Navbar() {
                   <Link
                     to="/interview/setup"
                     onClick={() => setMobileOpen(false)}
-                    className="flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-[#526078] hover:text-[#A0006D] rounded-xl font-body"
+                    className="flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-[#526078] hover:text-[#A0006D] rounded-xl font-sans"
                   >
                     <Video className="h-4 w-4 text-[#A0006D]" />
                     Mock Interview
@@ -230,7 +230,7 @@ export default function Navbar() {
                   <Link
                     to="/analysis"
                     onClick={() => setMobileOpen(false)}
-                    className="flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-[#526078] rounded-xl font-body"
+                    className="flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-[#526078] rounded-xl font-sans"
                   >
                     <LayoutDashboard className="h-4 w-4 text-[#4A8BDF]" />
                     Analysis Dashboard
@@ -240,21 +240,21 @@ export default function Navbar() {
                       logout();
                       setMobileOpen(false);
                     }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-[#D64545] hover:bg-[#FDF2F2] rounded-xl font-body text-left"
+                    className="w-full flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-[#D64545] hover:bg-[#FDF2F2] rounded-xl font-sans text-left"
                   >
                     <LogOut className="h-4 w-4 text-[#D64545]" />
                     Sign out
                   </button>
                 </div>
               ) : (
-                <div className="flex flex-col gap-2 pt-3 mt-2 border-t border-[#DCE7F2]">
+                <div className="flex flex-col gap-2.5 pt-3 mt-2 border-t border-[#DCE7F2]">
                   <Link to="/login" onClick={() => setMobileOpen(false)}>
-                    <button className="w-full px-5 py-2.5 text-sm font-semibold font-body text-[#11183D] hover:text-[#4A8BDF] border border-[#DCE7F2] rounded-xl bg-white transition-all">
+                    <button className="w-full px-5 py-2.5 text-sm font-semibold font-sans text-[#11183D] bg-[#F8FAFC] border border-[#DCE7F2] rounded-full hover:bg-[#F1F5F9] transition-all">
                       Login
                     </button>
                   </Link>
                   <Link to="/register" onClick={() => setMobileOpen(false)}>
-                    <button className="w-full inline-flex items-center justify-center gap-2 bg-[#4A8BDF] hover:bg-[#2459A8] text-white font-display font-bold text-sm px-6 py-2.5 rounded-xl shadow-sm transition-all">
+                    <button className="w-full inline-flex items-center justify-center gap-2 bg-[#11183D] hover:bg-[#1E293B] text-white font-sans font-semibold text-sm px-6 py-2.5 rounded-full shadow-sm transition-all">
                       Get Started
                       <ArrowRight className="h-3.5 w-3.5" />
                     </button>
@@ -268,3 +268,4 @@ export default function Navbar() {
     </header>
   );
 }
+

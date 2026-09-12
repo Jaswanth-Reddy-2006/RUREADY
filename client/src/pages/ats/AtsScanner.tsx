@@ -96,13 +96,13 @@ export default function AtsScanner() {
         
         {/* Header Section */}
         <div className="text-center space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F8EAF4] border border-[#A0006D]/30 text-[#A0006D] text-xs font-bold font-display uppercase tracking-wider">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F8EAF4] border border-[#A0006D]/30 text-[#A0006D] text-xs font-semibold font-sans uppercase tracking-wider">
             <Sparkles size={14} /> AI ATS Match & Resume Tailor
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold font-display text-[#11183D] tracking-tight">
+          <h1 className="text-3xl sm:text-4xl font-bold font-sans text-[#11183D] tracking-tight">
             Optimize Your Resume & Unlock Tailored Interviews
           </h1>
-          <p className="text-sm text-[#526078] max-w-2xl mx-auto font-body leading-relaxed">
+          <p className="text-sm text-[#526078] max-w-2xl mx-auto font-sans leading-relaxed">
             Upload your resume and paste your target job description. Our AI ATS Engine calculates your keyword match score, identifies critical skill gaps, rewrites your bullet points with STAR methodology, and builds a custom mock interview loop.
           </p>
         </div>

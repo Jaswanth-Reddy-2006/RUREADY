@@ -32,15 +32,15 @@ export interface BadgeProps {
 
 const variantStyles: Record<string, { container: string; dot: string }> = {
   ai: {
-    container: 'bg-[#F8EAF4] text-[#A0006D] border-rgba(160,0,109,0.25) font-bold',
+    container: 'bg-[#F8EAF4] text-[#A0006D] border-rgba(160,0,109,0.25) font-semibold',
     dot: 'bg-[#A0006D]',
   },
   eggplant: {
-    container: 'bg-[#F8EAF4] text-[#A0006D] border-rgba(160,0,109,0.25) font-bold',
+    container: 'bg-[#F8EAF4] text-[#A0006D] border-rgba(160,0,109,0.25) font-semibold',
     dot: 'bg-[#A0006D]',
   },
   premium: {
-    container: 'bg-[#F8EAF4] text-[#780052] border-rgba(120,0,82,0.25) font-bold',
+    container: 'bg-[#F8EAF4] text-[#780052] border-rgba(120,0,82,0.25) font-semibold',
     dot: 'bg-[#780052]',
   },
   normal: {
@@ -117,7 +117,7 @@ export default function Badge({
   return (
     <span
       className={clsx(
-        'inline-flex items-center font-display font-semibold rounded-full border whitespace-nowrap tracking-wide select-none',
+        'inline-flex items-center font-sans font-semibold rounded-full border whitespace-nowrap tracking-wide select-none',
         v.container,
         sizeStyles[size],
         className,

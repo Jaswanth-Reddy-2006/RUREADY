@@ -148,13 +148,13 @@ export default function RoadmapCatalog() {
         
         {/* Title Header */}
         <div className="text-center space-y-3">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#F8EAF4] border border-[#A0006D]/30 text-[#A0006D] text-xs font-bold font-display uppercase tracking-wider">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#F8EAF4] border border-[#A0006D]/30 text-[#A0006D] text-xs font-semibold font-sans uppercase tracking-wider">
             <Compass size={14} /> AI Career Tech-Tree Engine
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold font-display text-[#11183D] tracking-tight">
+          <h1 className="text-3xl sm:text-4xl font-bold font-sans text-[#11183D] tracking-tight">
             Role-Based Career Roadmaps & Tech-Stack Customizer
           </h1>
-          <p className="text-sm text-[#526078] max-w-2xl mx-auto font-body leading-relaxed">
+          <p className="text-sm text-[#526078] max-w-2xl mx-auto font-sans leading-relaxed">
             Follow active roadmaps or pick a popular target role. Customize your exact technology stack to build your final tailored interview readiness tree.
           </p>
         </div>

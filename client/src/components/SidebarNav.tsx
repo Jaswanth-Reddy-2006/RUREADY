@@ -161,7 +161,7 @@ export default function SidebarNav() {
 
         {/* Navigation Links */}
         <nav aria-label="Main menu" className="flex-1 py-5 px-3 space-y-1 overflow-y-auto">
-          <p className="px-3 pb-2 text-[11px] font-bold text-[#7B8799] uppercase tracking-wider font-display">
+          <p className="px-3 pb-2 text-[11px] font-semibold text-[#7B8799] uppercase tracking-wider font-sans">
             Platform Menu
           </p>
           {navItems.map((item) => {
@@ -174,7 +174,7 @@ export default function SidebarNav() {
                   clsx(
                     "relative flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 group outline-none focus-visible:ring-2 focus-visible:ring-[#4A8BDF]",
                     isActive
-                      ? "bg-[#EFF7FD] text-[#4A8BDF] font-bold shadow-sm"
+                      ? "bg-[#EFF7FD] text-[#4A8BDF] font-semibold shadow-sm"
                       : "text-[#526078] hover:text-[#11183D] hover:bg-[#EFFAFD]"
                   )
                 }
@@ -195,7 +195,7 @@ export default function SidebarNav() {
                     <span className="truncate">{item.label}</span>
 
                     {item.isAi && (
-                      <span className="ml-auto px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#F8EAF4] text-[#A0006D]">
+                      <span className="ml-auto px-1.5 py-0.5 rounded text-[10px] font-semibold bg-[#F8EAF4] text-[#A0006D]">
                         AI
                       </span>
                     )}
@@ -220,11 +220,11 @@ export default function SidebarNav() {
             aria-label="Open candidate profile view"
           >
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="h-9 w-9 rounded-xl bg-[#4A8BDF] flex items-center justify-center text-white font-bold text-sm font-display shrink-0 shadow-sm group-hover:scale-105 transition-transform">
+              <div className="h-9 w-9 rounded-xl bg-[#4A8BDF] flex items-center justify-center text-white font-semibold text-sm font-sans shrink-0 shadow-sm group-hover:scale-105 transition-transform">
                 {user?.name?.charAt(0).toUpperCase() || 'U'}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-bold text-[#11183D] truncate font-display group-hover:text-[#4A8BDF] transition-colors">
+                <p className="text-xs font-semibold text-[#11183D] truncate font-sans group-hover:text-[#4A8BDF] transition-colors">
                   {user?.name || 'Candidate'}
                 </p>
                 <p className="text-[11px] text-[#526078] truncate">

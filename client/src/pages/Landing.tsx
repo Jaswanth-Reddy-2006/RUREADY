@@ -14,7 +14,6 @@ import {
   Lock,
   Star,
   Flame,
-  Monitor,
   User,
   Play,
   ChevronRight,
@@ -25,27 +24,82 @@ import {
   Activity,
   BarChart3,
   Sliders,
+  FileText,
+  Compass,
+  Layers,
+  Search,
+  BookOpen,
+  Award,
+  Globe,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
+
+// ─── Inline Brand Logo SVGs for Orbital Hero Rings ──────────────
+
+function GoogleLogo({ className = "w-5 h-5" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24">
+      <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z" />
+      <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.96H1.27v3.13C3.26 21.3 7.31 24 12 24z" />
+      <path fill="#FBBC05" d="M5.28 14.22c-.25-.72-.38-1.49-.38-2.22s.13-1.5.38-2.22V6.65H1.27C.46 8.26 0 10.07 0 12s.46 3.74 1.27 5.35l4.01-3.13z" />
+      <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.27 6.65l4.01 3.13c.95-2.85 3.6-4.96 6.72-4.96z" />
+    </svg>
+  );
+}
+
+function MetaLogo({ className = "w-5 h-5" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="#0668E1">
+      <path d="M16.78 3.01c-1.89 0-3.66.9-4.78 2.37-1.12-1.47-2.89-2.37-4.78-2.37-3.47 0-6.22 2.78-6.22 6.25 0 4.19 3.64 8.01 9.94 11.45l1.06.58 1.06-.58c6.3-3.44 9.94-7.26 9.94-11.45 0-3.47-2.75-6.25-6.22-6.25z" />
+    </svg>
+  );
+}
+
+function AWSLogo({ className = "w-5 h-5" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="#FF9900">
+      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#FF9900" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+    </svg>
+  );
+}
+
+function SlackLogo({ className = "w-5 h-5" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24">
+      <path fill="#E01E5A" d="M6 15a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5zm0-7.5A2.5 2.5 0 0 1 8.5 10H6V7.5z" />
+      <path fill="#36C5F0" d="M9 6a2.5 2.5 0 1 1 5 0 2.5 2.5 0 0 1-5 0zm7.5 0A2.5 2.5 0 0 1 14 8.5V6h2.5z" />
+      <path fill="#2EB67D" d="M18 9a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zm0 7.5a2.5 2.5 0 0 1-2.5-2.5H18v2.5z" />
+      <path fill="#ECB22E" d="M15 18a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0zm-7.5 0A2.5 2.5 0 0 1 10 15.5V18H7.5z" />
+    </svg>
+  );
+}
+
+function StripeLogo({ className = "w-5 h-5" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="#635BFF">
+      <path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-4.116C17.72 2.148 15.228 1.5 12.35 1.5 7.42 1.5 4.09 3.99 4.09 7.962c0 4.707 4.908 5.626 8.358 6.892 2.457.9 3.284 1.65 3.284 2.614 0 .997-.936 1.558-2.385 1.558-2.614 0-5.32-1.157-7.234-2.19l-.92 4.195c2.052 1.053 4.937 1.768 8.017 1.768 5.253 0 8.793-2.392 8.793-6.619 0-4.887-4.757-5.836-8.027-7.022z" />
+    </svg>
+  );
+}
 
 // ─── Frequently Asked Questions ──────────────────────────────
 
 const FAQ_ITEMS = [
   {
+    q: 'How does the AI Resume & ATS Engine work?',
+    a: 'Simply upload your PDF/DOCX resume and paste any target job description or URL. Our AI extracts requirements, computes your keyword match score, highlights missing skills, rewrites bullet points into STAR format, and generates a customized mock interview loop.',
+  },
+  {
+    q: 'What are Career Roadmaps & Tech Stack Customizers?',
+    a: 'Roadmaps provide complete step-by-step career pathways for roles like Full Stack Developer, Data Analyst, Cloud Architect, and System Design Lead. You can customize your tech stack and track your learning progress interactively.',
+  },
+  {
+    q: 'What is the Role Discussion Community?',
+    a: 'It is an open group forum where candidates preparing for specific roles (Frontend, Backend, System Design, Data) discuss interview questions, share feedback, and collaborate on prep strategies.',
+  },
+  {
     q: 'What does "uninflated" scoring mean?',
-    a: 'Unlike generic AI chatbots that give polite or flattering scores, R U Ready? evaluates answers strictly against Tier-1 calibrated rubrics (Situation, Task, Action specificity, and Measurable Results). You receive the unfiltered truth about where your answers lack depth or structure.',
-  },
-  {
-    q: 'How do the different interviewer personas work?',
-    a: 'You can choose between the supportive Hiring Manager (evaluates communication & collaboration), the pragmatic Technical Architect (drills into system architecture & edge cases), and the adversarial Bar Raiser (challenges your assumptions with probing Socratic follow-ups).',
-  },
-  {
-    q: 'Can I practice coding interviews directly in the browser?',
-    a: 'Yes! The Coding Interview Room features a Monaco-based code editor, automated test case runner, live Big-O complexity analysis, and progressive Socratic hints if you get stuck.',
-  },
-  {
-    q: 'Is my voice and camera data kept private?',
-    a: 'Absolutely. All live facial and audio telemetry (gaze tracking, speech pacing, audio waveforms) is computed in real time for scoring and is never shared, sold, or used for model training.',
+    a: 'Unlike generic AI chatbots that give polite or flattering scores, R U Ready? evaluates answers strictly against Tier-1 calibrated rubrics (Situation, Task, Action specificity, and Measurable Results). You receive the unfiltered truth about where your answers lack depth.',
   },
 ];
 
@@ -129,7 +183,7 @@ interface ScorecardCategory {
 
 const SCORECARD_DATA: Record<string, ScorecardCategory> = {
   overall: {
-    title: 'Executive Overall Score',
+    title: 'Executive Overall Readiness',
     score: 87,
     breakdown: [
       { label: 'Technical Accuracy & Edge-cases', val: 94 },
@@ -215,657 +269,421 @@ export default function Landing() {
   const containerRef = useRef(null);
   const { isAuthenticated } = useAuthStore();
   const [activeScoreTab, setActiveScoreTab] = useState<string>('overall');
-  const [workflowStep, setWorkflowStep] = useState<number>(0);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const currentCategory = SCORECARD_DATA[activeScoreTab] || SCORECARD_DATA.overall;
+  const [activeRoadmap, setActiveRoadmap] = useState<string>('fullstack');
 
+  const currentCategory = SCORECARD_DATA[activeScoreTab] || SCORECARD_DATA.overall;
   const { scrollYProgress: pageScrollProgress } = useScroll({ target: containerRef });
-  
-  const { scrollYProgress: heroScrollProgress } = useScroll({
-    target: heroRef,
-    offset: ['start start', 'end start'],
-  });
-  const heroY = useTransform(heroScrollProgress, [0, 1], [0, 60]);
-  const heroOpacity = useTransform(heroScrollProgress, [0, 0.85], [1, 0]);
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-[#EFFAFD] text-[#11183D] overflow-hidden selection:bg-[#4A8BDF]/20 selection:text-[#2459A8]">
+    <div ref={containerRef} className="min-h-screen bg-[#EFFAFD] text-[#11183D] overflow-hidden selection:bg-[#4A8BDF]/20 selection:text-[#2459A8] font-sans">
       <Helmet>
-        <title>R U Ready? — AI-Powered Mock Interview Platform</title>
-        <meta name="description" content="Master technical & behavioral interviews with calibrated AI agents. Practice on realistic scenarios with brutal honesty." />
+        <title>R U Ready? — Check Your Standards & Upgrade Yourself to Get Placed</title>
+        <meta name="description" content="AI Mock Interviews, ATS Resume Match Engine, Custom Career Roadmaps & Candidate Role Discussion Communities." />
       </Helmet>
 
-      {/* Top Scroll Indicator Progress Bar */}
+      {/* Top Scroll Progress Bar */}
       <motion.div
         style={{ scaleX: pageScrollProgress }}
         className="fixed top-0 left-0 right-0 h-1 bg-[#4A8BDF] z-50 transform origin-left"
       />
 
       {/* ════════════════════════════════════════════════════════ */}
-      {/* HERO SECTION                                           */}
+      {/* CONCENTRIC ORBITAL HERO SECTION                         */}
       {/* ════════════════════════════════════════════════════════ */}
       <section
         ref={heroRef}
-        className="relative min-h-[90vh] flex items-center pt-24 pb-16 lg:pt-28 lg:pb-24 overflow-hidden bg-[#EFFAFD]"
+        className="relative min-h-[92vh] flex flex-col items-center justify-center pt-28 pb-16 lg:pt-32 lg:pb-24 overflow-hidden bg-gradient-to-b from-[#EFFAFD] via-white to-[#EFFAFD]"
       >
-        <motion.div
-          style={{ y: heroY, opacity: heroOpacity }}
-          className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full"
-        >
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-            {/* ── LEFT COLUMN: Headline & CTAs ── */}
-            <div className="lg:col-span-7 max-w-2xl">
-              {/* AI Badge */}
-              <motion.div
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#F8EAF4] border border-[#A0006D]/20 text-[#A0006D] font-display font-bold text-xs mb-6 shadow-sm"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-[#A0006D]" />
-                <span>AI-Powered Interview Intelligence</span>
-              </motion.div>
+        {/* SVG Concentric Orbit Rings Background */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden z-0">
+          <svg className="w-[1100px] h-[1100px] opacity-40 text-[#4A8BDF]/20" viewBox="0 0 1000 1000">
+            <circle cx="500" cy="500" r="160" stroke="currentColor" strokeWidth="1" fill="none" strokeDasharray="6 6" />
+            <circle cx="500" cy="500" r="280" stroke="currentColor" strokeWidth="1" fill="none" />
+            <circle cx="500" cy="500" r="400" stroke="currentColor" strokeWidth="1" fill="none" strokeDasharray="4 4" />
+            <circle cx="500" cy="500" r="490" stroke="currentColor" strokeWidth="1" fill="none" />
+          </svg>
+        </div>
 
-              {/* Headline */}
-              <motion.h1
-                initial={{ opacity: 0, y: 25 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.1 }}
-                className="font-display font-black text-[2.85rem] sm:text-[3.75rem] md:text-[4.35rem] lg:text-[4.75rem] text-[#11183D] leading-[1.05] tracking-tight mb-6"
-              >
-                Stop Guessing.
-                <br />
-                <span className="text-[#4A8BDF]">
-                  Start Interviewing.
-                </span>
-              </motion.h1>
+        {/* Floating Tech Brand Logos on Orbit Orbits */}
+        <div className="absolute inset-0 max-w-6xl mx-auto pointer-events-none z-10 hidden sm:block">
+          {/* Inner Orbit Badges */}
+          <motion.div
+            animate={{ y: [-4, 4, -4] }}
+            transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+            className="absolute top-[22%] left-[18%] p-3 rounded-full bg-white border border-[#DCE7F2] shadow-md flex items-center justify-center"
+          >
+            <GoogleLogo className="w-5 h-5" />
+          </motion.div>
+          
+          <motion.div
+            animate={{ y: [4, -4, 4] }}
+            transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
+            className="absolute top-[20%] right-[20%] p-3 rounded-full bg-white border border-[#DCE7F2] shadow-md flex items-center justify-center"
+          >
+            <MetaLogo className="w-5 h-5" />
+          </motion.div>
 
-              {/* Subheading */}
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.25 }}
-                className="font-body text-base sm:text-lg text-[#526078] mb-8 leading-relaxed max-w-xl"
-              >
-                Experience adversarial, real-time mock evaluations with{' '}
-                <span className="font-semibold text-[#11183D] underline decoration-[#4A8BDF]/40 decoration-2 underline-offset-4">
-                  uninflated AI feedback
-                </span>
-                . Calibrate your STAR structure, verbal pacing, and coding complexity under real interview pressure.
-              </motion.p>
+          {/* Middle Orbit Badges */}
+          <motion.div
+            animate={{ y: [-6, 6, -6] }}
+            transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+            className="absolute top-[45%] left-[8%] p-3 rounded-full bg-white border border-[#DCE7F2] shadow-md flex items-center justify-center"
+          >
+            <AWSLogo className="w-5.5 h-5.5" />
+          </motion.div>
 
-              {/* CTA Buttons */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                className="flex flex-wrap items-center gap-4 mb-8"
-              >
-                <Link to={isAuthenticated ? "/dashboard" : "/register"} className="group shrink-0">
-                  <button className="inline-flex items-center gap-2.5 bg-[#4A8BDF] hover:bg-[#2459A8] text-white font-display font-bold text-base px-8 py-4 rounded-xl shadow-md hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer">
-                    <span>{isAuthenticated ? 'Go to Dashboard' : 'Start Free Practice'}</span>
-                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                  </button>
-                </Link>
+          <motion.div
+            animate={{ y: [6, -6, 6] }}
+            transition={{ duration: 5.2, repeat: Infinity, ease: 'easeInOut' }}
+            className="absolute top-[48%] right-[10%] p-3 rounded-full bg-white border border-[#DCE7F2] shadow-md flex items-center justify-center"
+          >
+            <SlackLogo className="w-5.5 h-5.5" />
+          </motion.div>
 
-                <a href="#features" className="group shrink-0">
-                  <button className="inline-flex items-center gap-2 bg-white hover:bg-[#EFFAFD] text-[#4A8BDF] font-display font-semibold text-base px-7 py-4 rounded-xl border border-[#DCE7F2] shadow-sm hover:shadow transition-all cursor-pointer">
-                    <span>Explore Features</span>
-                  </button>
-                </a>
-              </motion.div>
+          {/* Outer Orbit Badges */}
+          <motion.div
+            animate={{ y: [-5, 5, -5] }}
+            transition={{ duration: 4.8, repeat: Infinity, ease: 'easeInOut' }}
+            className="absolute bottom-[22%] left-[16%] p-3 rounded-full bg-white border border-[#DCE7F2] shadow-md flex items-center justify-center"
+          >
+            <StripeLogo className="w-5 h-5" />
+          </motion.div>
+
+          <motion.div
+            animate={{ y: [5, -5, 5] }}
+            transition={{ duration: 4.6, repeat: Infinity, ease: 'easeInOut' }}
+            className="absolute bottom-[24%] right-[17%] p-3 rounded-full bg-white border border-[#DCE7F2] shadow-md flex items-center justify-center"
+          >
+            <div className="w-5 h-5 rounded-full bg-[#11183D] flex items-center justify-center text-[10px] font-bold text-white font-mono">
+              Uber
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Center Hero Content Container */}
+        <div className="relative z-20 mx-auto max-w-4xl px-4 sm:px-6 text-center space-y-6">
+          
+          {/* Top Trust Ratings & AI Badge */}
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            {/* Pink AI Pill Badge (Matching reference image) */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FCE8F3] border border-[#F4B4D6] text-[#A0006D] font-sans font-semibold text-xs shadow-xs"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-[#A0006D]" />
+              <span>AI-Powered Interview Intelligence</span>
+            </motion.div>
+
+            {/* Google / Trustpilot rating badge */}
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-[#DCE7F2] text-[#526078] text-xs font-medium shadow-xs">
+              <span className="font-bold text-[#11183D] flex items-center gap-1">
+                <GoogleLogo className="w-3.5 h-3.5" /> 4.6 Google
+              </span>
+              <span>•</span>
+              <span className="font-bold text-[#168A62] flex items-center gap-1">
+                <Star className="w-3.5 h-3.5 fill-[#168A62] text-[#168A62]" /> 4.9 Trustpilot
+              </span>
+            </div>
+          </div>
+
+          {/* Main Hero Headline */}
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.1 }}
+            className="font-sans font-extrabold text-4xl sm:text-5xl lg:text-6xl text-[#11183D] leading-[1.12] tracking-tight max-w-3xl mx-auto"
+          >
+            Check Your Standards &{' '}
+            <span className="text-[#4A8BDF] underline decoration-[#4A8BDF]/30 underline-offset-8">
+              Upgrade Yourself
+            </span>{' '}
+            to Get Placed
+          </motion.h1>
+
+          {/* Hero Subheadline */}
+          <motion.p
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.25 }}
+            className="font-sans text-base sm:text-lg text-[#526078] max-w-2xl mx-auto leading-relaxed"
+          >
+            From ATS resume alignment to Socratic mock interviews and custom career roadmaps — benchmark your real readiness against Tier-1 tech hiring bars.
+          </motion.p>
+
+          {/* Hero Action Pill Buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="flex flex-wrap items-center justify-center gap-3.5 pt-2"
+          >
+            <Link to={isAuthenticated ? "/dashboard" : "/register"}>
+              <button className="inline-flex items-center gap-2 bg-[#11183D] hover:bg-[#1E293B] text-white font-sans font-semibold text-sm sm:text-base px-8 py-3.5 rounded-full shadow-md hover:shadow-lg active:scale-98 transition-all cursor-pointer">
+                <span>{isAuthenticated ? 'Go to Dashboard' : 'Start Free Practice'}</span>
+                <ArrowRight className="h-4 w-4 text-white" />
+              </button>
+            </Link>
+
+            <Link to="/roadmaps">
+              <button className="inline-flex items-center gap-2 bg-white hover:bg-[#EFFAFD] text-[#11183D] font-sans font-semibold text-sm sm:text-base px-7 py-3.5 rounded-full border border-[#DCE7F2] shadow-xs hover:shadow transition-all cursor-pointer">
+                <Compass className="w-4 h-4 text-[#4A8BDF]" />
+                <span>Explore Roadmaps</span>
+              </button>
+            </Link>
+          </motion.div>
+
+          {/* Stacked Live Candidate Activity Notification Cards (Matching reference image) */}
+          <motion.div
+            initial={{ opacity: 0, y: 25 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.55 }}
+            className="pt-8 max-w-md mx-auto relative"
+          >
+            <div className="bg-white/95 backdrop-blur-md rounded-2xl border border-[#DCE7F2] shadow-xl p-3.5 flex items-center gap-3 relative z-30 transition-all hover:scale-[1.02]">
+              <div className="w-10 h-10 rounded-full bg-[#4A8BDF] text-white font-bold flex items-center justify-center shrink-0 shadow-xs">
+                WC
+              </div>
+              <div className="text-left flex-1 min-w-0">
+                <p className="text-xs font-bold text-[#11183D] truncate">
+                  Wei Chen <span className="font-normal text-[#526078]">joined</span> System Design Loop
+                </p>
+                <p className="text-[11px] text-[#7B8799] font-mono">8 min ago • Orixcreative Dribbble</p>
+              </div>
+              <span className="w-2 h-2 rounded-full bg-[#168A62] animate-pulse shrink-0" />
             </div>
 
-            {/* ── RIGHT COLUMN: Candidate Visual & Floating Cards ── */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.9, delay: 0.2 }}
-              className="lg:col-span-5 relative"
-            >
-              {/* Candidate Surface Card */}
-              <div className="relative rounded-2xl overflow-hidden shadow-xl bg-white border border-[#DCE7F2] p-2 group">
-                <img
-                  src="/images/hero-3d.jpg"
-                  alt="Candidate live video interview"
-                  className="w-full h-auto object-cover rounded-xl aspect-[4/3.2] group-hover:scale-[1.02] transition-transform duration-500"
-                  loading="eager"
-                />
+            {/* Sub-Card Stack Layer 1 */}
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-[#DCE7F2] shadow-md p-3 flex items-center gap-3 relative -mt-3.5 mx-3 z-20 text-left">
+              <div className="w-8 h-8 rounded-full bg-[#A0006D] text-white text-xs font-bold flex items-center justify-center shrink-0">
+                MJ
               </div>
-
-              {/* Floating Top-Left Card: Eggplant AI Coach Badge */}
-              <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: [-3, 3, -3] }}
-                transition={{ opacity: { duration: 0.6, delay: 0.5 }, y: { duration: 4.5, repeat: Infinity, ease: 'easeInOut' } }}
-                className="absolute -top-4 sm:-top-6 -left-3 sm:-left-6 bg-white rounded-2xl p-3.5 shadow-xl border border-[#DCE7F2] flex items-center gap-3 z-20 max-w-[260px] sm:max-w-xs"
-              >
-                <div className="w-10 h-10 rounded-xl bg-[#F8EAF4] text-[#A0006D] flex items-center justify-center shrink-0 shadow-sm">
-                  <Brain className="w-5 h-5 text-[#A0006D]" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#A0006D] font-mono">
-                      AI Bar Raiser
-                    </span>
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#A0006D] animate-pulse" />
-                  </div>
-                  <p className="text-xs font-semibold text-[#11183D] leading-snug">
-                    "Tell me about a challenging project trade-off?"
-                  </p>
-                </div>
-              </motion.div>
-
-              {/* Floating Top-Right Card: Royal Blue Score 87% */}
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, y: [3, -3, 3] }}
-                transition={{ opacity: { duration: 0.6, delay: 0.7 }, y: { duration: 5, repeat: Infinity, ease: 'easeInOut' } }}
-                className="absolute top-6 sm:top-10 -right-2 sm:-right-6 bg-white rounded-2xl p-3.5 shadow-xl border border-[#DCE7F2] flex flex-col items-center justify-center z-20 hover:scale-105 transition-transform"
-              >
-                <p className="text-[10px] font-bold text-[#4A8BDF] uppercase tracking-wider font-mono mb-1">
-                  STAR Score
+              <div className="flex-1 min-w-0">
+                <p className="text-[11px] font-bold text-[#11183D] truncate">
+                  Matthew Johnson <span className="font-normal text-[#526078]">• Senior Frontend Role Matched 94%</span>
                 </p>
-                <div className="relative w-14 h-14 flex items-center justify-center">
-                  <svg className="w-14 h-14 transform -rotate-90">
-                    <circle cx="28" cy="28" r="22" stroke="#EFFAFD" strokeWidth="4" fill="none" />
-                    <motion.circle
-                      cx="28"
-                      cy="28"
-                      r="22"
-                      stroke="#4A8BDF"
-                      strokeWidth="4"
-                      strokeDasharray="138"
-                      initial={{ strokeDashoffset: 138 }}
-                      animate={{ strokeDashoffset: 18 }}
-                      transition={{ duration: 1.5, delay: 0.9, ease: 'easeOut' }}
-                      strokeLinecap="round"
-                      fill="none"
-                    />
-                  </svg>
-                  <span className="absolute text-xs font-black text-[#11183D] font-display">87%</span>
-                </div>
-              </motion.div>
+              </div>
+            </div>
 
-              {/* Floating Bottom-Right Card: Checklist Card */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: [-3, 3, -3] }}
-                transition={{ opacity: { duration: 0.6, delay: 0.9 }, y: { duration: 5.2, repeat: Infinity, ease: 'easeInOut' } }}
-                className="absolute -bottom-4 sm:-bottom-6 -right-2 sm:-right-4 bg-white rounded-2xl p-3.5 shadow-xl border border-[#DCE7F2] z-20 space-y-1.5 min-w-[175px]"
-              >
-                {[
-                  { label: 'Eye Contact', checked: true, color: 'text-[#168A62]' },
-                  { label: 'Speech Pacing (145 WPM)', checked: true, color: 'text-[#4A8BDF]' },
-                  { label: 'STAR Adherence', checked: true, color: 'text-[#A0006D]' },
-                  { label: 'Big-O Complexity', checked: true, color: 'text-[#4A8BDF]' },
-                ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-2 text-[11px] font-medium text-[#11183D]">
-                    <CheckCircle2 className={`w-3.5 h-3.5 ${item.color}`} />
-                    <span>{item.label}</span>
-                  </div>
-                ))}
-              </motion.div>
-            </motion.div>
+            {/* Sub-Card Stack Layer 2 */}
+            <div className="bg-white/60 backdrop-blur-xs rounded-2xl border border-[#DCE7F2]/60 shadow-xs p-2.5 flex items-center gap-3 relative -mt-3.5 mx-6 z-10 text-left">
+              <div className="w-7 h-7 rounded-full bg-[#168A62] text-white text-[10px] font-bold flex items-center justify-center shrink-0">
+                TL
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] font-bold text-[#526078] truncate">
+                  Terry Lipshutz <span className="font-normal text-[#7B8799]">• STAR Bullet Rewritten</span>
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Bottom Trust Logo Bar */}
+        <div className="mt-16 pt-8 border-t border-[#DCE7F2]/60 w-full max-w-5xl mx-auto px-4 text-center z-20">
+          <p className="text-xs font-bold font-mono uppercase tracking-widest text-[#7B8799] mb-5">
+            Trusted by 200,000+ candidates preparing for top tech companies
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-12 opacity-70 font-display font-bold text-sm text-[#526078]">
+            <span>Google</span>
+            <span>Airbnb</span>
+            <span>Coinbase</span>
+            <span>Notion</span>
+            <span>Gumroad</span>
+            <span>PayPal</span>
+            <span>Upwork</span>
+            <span>Shopify</span>
+            <span>Stripe</span>
+            <span>Zoom</span>
           </div>
-        </motion.div>
+        </div>
       </section>
 
       {/* ════════════════════════════════════════════════════════ */}
-      {/* TRUST BAR                                              */}
+      {/* FEATURE 1: AI RESUME & ATS MATCH ENGINE                 */}
       {/* ════════════════════════════════════════════════════════ */}
-      <Section className="py-8 lg:py-10 bg-[#EFFAFD]">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <motion.div variants={fadeUp} custom={0} className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-            {[
-              { icon: Shield, title: 'Proctor Secure', desc: 'Cheat-resistant', iconColor: 'text-[#4A8BDF]', bg: 'bg-[#EFFAFD]' },
-              { icon: Zap, title: 'Real-time Feedback', desc: 'Sub-300ms AI engine', iconColor: 'text-[#A0006D]', bg: 'bg-[#F8EAF4]' },
-              { icon: TrendingUp, title: 'Detailed Insights', desc: '5-Axis Radar metrics', iconColor: 'text-[#168A62]', bg: 'bg-[#E8F5F0]' },
-              { icon: Lock, title: 'Privacy First', desc: '100% telemetry privacy', iconColor: 'text-[#4A8BDF]', bg: 'bg-[#EFFAFD]' },
-            ].map((item, i) => (
-              <div key={i} className="flex flex-col items-center text-center p-4 rounded-2xl bg-white border border-[#DCE7F2] shadow-sm hover:shadow-md transition-all duration-200 group">
-                <div className={`h-11 w-11 rounded-xl ${item.bg} flex items-center justify-center mb-2 group-hover:scale-105 transition-transform`}>
-                  <item.icon className={`h-5.5 w-5.5 ${item.iconColor}`} />
-                </div>
-                <h4 className="font-display font-bold text-xs sm:text-sm text-[#11183D]">{item.title}</h4>
-                <p className="text-[11px] text-[#526078] font-body">{item.desc}</p>
-              </div>
-            ))}
-          </motion.div>
-        </div>
-      </Section>
-
-      {/* ════════════════════════════════════════════════════════ */}
-      {/* FEATURES — White Content Cards on Pale Blue Background   */}
-      {/* ════════════════════════════════════════════════════════ */}
-      <Section id="features" className="py-16 sm:py-24 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 bg-[#EFFAFD]">
-        <motion.div variants={fadeUp} custom={0} className="text-center mb-14">
-          <h2 className="font-display font-black text-3xl sm:text-4xl lg:text-5xl text-[#11183D] tracking-tight mb-3">
-            Interview prep, <span className="text-[#4A8BDF]">reimagined.</span>
+      <Section id="ats-engine" className="py-20 sm:py-28 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <div className="text-center max-w-3xl mx-auto mb-14">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#F8EAF4] border border-[#A0006D]/30 text-[#A0006D] text-xs font-semibold uppercase tracking-wider mb-3">
+            <FileText size={14} /> NEW: ATS Scorecard Engine
+          </div>
+          <h2 className="font-sans font-bold text-3xl sm:text-4xl lg:text-5xl text-[#11183D] tracking-tight mb-4">
+            AI Resume & Job Description <span className="text-[#A0006D]">Match Engine</span>
           </h2>
-          <p className="font-body text-sm sm:text-base text-[#526078] max-w-xl mx-auto leading-relaxed">
-            Deep telemetry, adversarial conversation trees, and strict assessment diagnostics built inside a modern SaaS cockpit.
+          <p className="font-sans text-sm sm:text-base text-[#526078] leading-relaxed">
+            Upload your resume and paste any target job description. Get instant keyword match scoring, missing skill gap analysis, and automated STAR bullet point rewrites.
           </p>
-        </motion.div>
-
-        {/* Bento Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          
-          {/* Card 1: Adversarial AI Socratic Interviewer (AI Accent Card) */}
-          <motion.div
-            variants={scaleIn}
-            className="rounded-2xl p-6 sm:p-8 bg-white border border-[#DCE7F2] shadow-md flex flex-col justify-between hover:border-[#A0006D] transition-all duration-300 relative overflow-hidden"
-          >
-            <div>
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-9 h-9 rounded-xl bg-[#F8EAF4] text-[#A0006D] flex items-center justify-center border border-[#A0006D]/20">
-                  <MessageCircle className="w-5 h-5 text-[#A0006D]" />
-                </div>
-                <div>
-                  <h3 className="font-display font-bold text-base text-[#11183D]">Adversarial AI Socratic Interviewer</h3>
-                  <p className="text-xs text-[#526078]">
-                    AI challenges you with role-specific follow-ups, testing your assumptions without sugarcoating.
-                  </p>
-                </div>
-              </div>
-
-              {/* Chat Simulation */}
-              <div className="mt-6 space-y-3 font-body text-xs">
-                <div className="flex gap-2.5 items-start">
-                  <div className="w-6 h-6 rounded-lg bg-[#A0006D] text-white font-black text-[10px] flex items-center justify-center shrink-0 shadow-sm">
-                    AI
-                  </div>
-                  <div className="bg-[#F8EAF4] border border-[#A0006D]/20 p-3 rounded-2xl rounded-tl-sm text-[#11183D] flex-1">
-                    You mentioned designing a distributed queue. How do you guarantee exact-once delivery during network partitions?
-                  </div>
-                </div>
-
-                <div className="flex gap-2.5 items-start justify-end">
-                  <div className="bg-[#EFFAFD] border border-[#4A8BDF]/30 p-2.5 rounded-2xl rounded-tr-sm text-[#11183D] max-w-[80%]">
-                    We use idempotent consumer IDs combined with consensus log replication...
-                  </div>
-                  <div className="w-6 h-6 rounded-lg bg-[#4A8BDF] text-white flex items-center justify-center shrink-0">
-                    <User size={12} />
-                  </div>
-                </div>
-
-                <div className="flex gap-2.5 items-start">
-                  <div className="w-6 h-6 rounded-lg bg-[#A0006D] text-white font-black text-[10px] flex items-center justify-center shrink-0 shadow-sm">
-                    AI
-                  </div>
-                  <div className="bg-[#F8EAF4] border border-[#A0006D]/20 p-3 rounded-2xl rounded-tl-sm text-[#11183D] flex-1">
-                    <span className="text-[#A0006D] font-bold">[Bar Raiser Probe]</span> Excellent. What is the impact on P99 latency?
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Card 2: Multi-Modal Behavioral Telemetry (Royal Blue Card) */}
-          <motion.div
-            variants={scaleIn}
-            className="rounded-2xl p-6 sm:p-8 bg-white border border-[#DCE7F2] shadow-md flex flex-col justify-between hover:border-[#4A8BDF] transition-all duration-300 relative overflow-hidden"
-          >
-            <div>
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-9 h-9 rounded-xl bg-[#EFFAFD] text-[#4A8BDF] flex items-center justify-center border border-[#DCE7F2]">
-                  <Activity className="w-5 h-5 text-[#4A8BDF]" />
-                </div>
-                <div>
-                  <h3 className="font-display font-bold text-base text-[#11183D]">Multi-Modal Telemetry Engine</h3>
-                  <p className="text-xs text-[#526078]">
-                    Real-time analysis of eye contact stability, speech pacing (WPM), audio waveforms, and code syntax.
-                  </p>
-                </div>
-              </div>
-
-              {/* Telemetry Preview */}
-              <div className="mt-6 relative rounded-xl overflow-hidden bg-[#EFFAFD] border border-[#DCE7F2] flex items-center justify-center aspect-[16/10]">
-                <img
-                  src="/images/telemetry-3d.jpg"
-                  alt="Candidate video telemetry"
-                  className="w-full h-full object-cover object-top opacity-90"
-                />
-
-                {/* Live REC Indicator */}
-                <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-sm text-[10px] font-mono text-[#11183D] border border-[#DCE7F2] shadow-sm">
-                  <span className="w-2 h-2 rounded-full bg-[#168A62] animate-pulse" />
-                  LIVE TELEMETRY
-                </div>
-
-                {/* Telemetry Tags */}
-                <div className="absolute top-3 right-3 space-y-1.5">
-                  {[
-                    { label: 'Eye Focus 94%', bg: 'bg-[#E8F5F0] text-[#168A62] border-[#168A62]/30' },
-                    { label: 'Speech 142 WPM', bg: 'bg-[#EFFAFD] text-[#4A8BDF] border-[#DCE7F2]' },
-                    { label: 'AI Score 88%', bg: 'bg-[#F8EAF4] text-[#A0006D] border-[#A0006D]/30' },
-                  ].map((t, idx) => (
-                    <div
-                      key={idx}
-                      className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold border shadow-sm ${t.bg}`}
-                    >
-                      <span>{t.label}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </motion.div>
         </div>
 
-        {/* Card 3: Uninflated Scorecard Insights */}
+        {/* ATS Showcase Card */}
         <motion.div
           variants={scaleIn}
-          className="rounded-2xl p-6 sm:p-8 bg-white border border-[#DCE7F2] shadow-md relative overflow-hidden"
+          className="rounded-3xl bg-white border border-[#DCE7F2] p-6 sm:p-10 shadow-lg relative overflow-hidden"
         >
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-9 h-9 rounded-xl bg-[#EFFAFD] text-[#4A8BDF] flex items-center justify-center border border-[#DCE7F2]">
-              <BarChart3 className="w-5 h-5 text-[#4A8BDF]" />
-            </div>
-            <div>
-              <h3 className="font-display font-bold text-base text-[#11183D]">Uninflated STAR Scorecard Insights</h3>
-              <p className="text-xs text-[#526078]">
-                Calibrated diagnostics across technical, behavioral, and communication metrics. Click categories to inspect live breakdowns.
-              </p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             
-            {/* Left Nav Menu Buttons */}
-            <div className="md:col-span-3 space-y-1.5 font-body text-xs">
-              {[
-                { id: 'overall', label: 'Overall', icon: Flame, color: 'text-[#4A8BDF]' },
-                { id: 'technical', label: 'Technical Skills', icon: Code2, color: 'text-[#4A8BDF]' },
-                { id: 'communication', label: 'Communication', icon: Users, color: 'text-[#4A8BDF]' },
-                { id: 'behavioral', label: 'Behavioral', icon: Zap, color: 'text-[#168A62]' },
-                { id: 'suggestions', label: 'AI Action Plan', icon: Sparkles, color: 'text-[#A0006D]' },
-              ].map((tab) => {
-                const Icon = tab.icon;
-                const isActive = activeScoreTab === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveScoreTab(tab.id)}
-                    className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl transition-all duration-200 text-left font-semibold cursor-pointer ${
-                      isActive
-                        ? 'bg-[#4A8BDF] text-white shadow-sm'
-                        : 'text-[#526078] hover:text-[#11183D] hover:bg-[#EFFAFD]'
-                    }`}
-                  >
-                    <Icon className={`w-4 h-4 ${isActive ? 'text-white' : tab.color}`} />
-                    <span>{tab.label}</span>
-                  </button>
-                );
-              })}
+            {/* Left: ATS Metric Highlights */}
+            <div className="lg:col-span-5 space-y-6">
+              <div className="space-y-2">
+                <span className="text-xs font-mono font-bold text-[#A0006D] uppercase tracking-wider">
+                  Target Alignment: Senior Full Stack Engineer @ Stripe
+                </span>
+                <h3 className="font-sans font-bold text-2xl text-[#11183D]">
+                  Uncover Missing Keywords & Build 100% Custom Mock Loops
+                </h3>
+                <p className="text-xs text-[#526078] leading-relaxed">
+                  Our ATS engine parses your experience against exact job requirements, converting resume bullet points into high-impact STAR metrics.
+                </p>
+              </div>
+
+              <div className="space-y-3 font-sans text-xs">
+                {[
+                  { title: 'Keyword Match Score', desc: 'Computes exact semantic alignment percentage (88% match)', color: 'text-[#168A62]' },
+                  { title: 'Missing Skill Gap Identifier', desc: 'Detects absent keywords like Redis Caching, GraphQL, & K8s', color: 'text-[#4A8BDF]' },
+                  { title: 'STAR Method Bullet Rewriter', desc: 'Transforms vague lines into quantified achievement statements', color: 'text-[#A0006D]' },
+                  { title: 'Custom Mock Suite Generation', desc: 'Creates a 100% custom interview loop from the target posting', color: 'text-[#11183D]' },
+                ].map((item, idx) => (
+                  <div key={idx} className="flex items-start gap-3 p-3 rounded-2xl bg-[#EFFAFD] border border-[#DCE7F2]">
+                    <CheckCircle2 className={`w-4 h-4 ${item.color} shrink-0 mt-0.5`} />
+                    <div>
+                      <p className="font-bold text-[#11183D]">{item.title}</p>
+                      <p className="text-[#526078] text-[11px]">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <Link to="/ats">
+                <button className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#A0006D] hover:bg-[#780052] text-white font-sans font-semibold text-sm px-7 py-3.5 rounded-2xl shadow-md transition-all cursor-pointer">
+                  <span>Launch ATS Scanner</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </Link>
             </div>
 
-            {/* Center: Dynamic Animated Gauge */}
-            <div className="md:col-span-4 flex flex-col items-center justify-center py-4">
-              <div className="relative w-40 h-40 flex items-center justify-center">
-                <svg className="w-40 h-40 transform -rotate-90">
-                  <circle cx="80" cy="80" r="56" stroke="#DCE7F2" strokeWidth="8" fill="none" />
-                  <motion.circle
-                    cx="80"
-                    cy="80"
-                    r="56"
-                    stroke="#4A8BDF"
-                    strokeWidth="8"
-                    strokeDasharray={2 * Math.PI * 56}
-                    animate={{ strokeDashoffset: (2 * Math.PI * 56) - (currentCategory.score / 100) * (2 * Math.PI * 56) }}
-                    transition={{ duration: 0.8, ease: 'easeOut' }}
-                    strokeLinecap="round"
-                    fill="none"
-                  />
-                </svg>
-                <div className="absolute flex flex-col items-center">
-                  <motion.span
-                    key={currentCategory.score}
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    className="font-display font-black text-3xl text-[#11183D]"
-                  >
-                    {currentCategory.score}{' '}
-                    <span className="text-sm font-normal text-[#526078]">/ 100</span>
-                  </motion.span>
-                  <span className="text-[10px] text-[#4A8BDF] font-mono font-bold mt-0.5 max-w-[130px] text-center truncate">
-                    {currentCategory.title}
-                  </span>
+            {/* Right: Interactive ATS Scorecard Mockup */}
+            <div className="lg:col-span-7 bg-[#EFFAFD] rounded-2xl border border-[#DCE7F2] p-5 sm:p-7 space-y-5">
+              
+              {/* ATS Top Score Ribbon */}
+              <div className="bg-white p-4 rounded-xl border border-[#DCE7F2] shadow-xs flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-mono text-[#7B8799] uppercase tracking-wider font-bold">Overall ATS Score</p>
+                  <p className="text-2xl font-bold font-sans text-[#168A62]">92% Match</p>
+                </div>
+                <div className="px-3 py-1 rounded-full bg-[#E8F5F0] text-[#168A62] font-mono font-bold text-xs">
+                  ATS Verified
                 </div>
               </div>
-            </div>
 
-            {/* Right: Detailed Breakdown Bars */}
-            <div className="md:col-span-5 space-y-3.5 text-xs font-body">
-              <div className="flex items-center justify-between mb-2">
-                <p className="font-bold text-[#526078] text-xs uppercase tracking-wider font-mono">
-                  Rubric Metrics
-                </p>
-                <span className="text-[10px] text-[#4A8BDF] font-mono font-bold">
-                  {currentCategory.title}
-                </span>
+              {/* STAR Bullet Point Rewrite Box */}
+              <div className="bg-white p-4 rounded-xl border border-[#DCE7F2] shadow-xs space-y-2">
+                <p className="text-xs font-bold text-[#11183D]">STAR Bullet Optimization</p>
+                <div className="p-2.5 rounded-lg bg-[#FDF2F2] border border-[#D64545]/20 text-[11px] text-[#D64545] font-sans">
+                  <span className="font-bold">Before:</span> "Worked on database performance and optimized SQL queries."
+                </div>
+                <div className="p-2.5 rounded-lg bg-[#E8F5F0] border border-[#168A62]/30 text-[11px] text-[#168A62] font-sans">
+                  <span className="font-bold">After (STAR):</span> "Redesigned PostgreSQL query indexing, reducing P99 latency by 42% across 1.2M daily active user requests."
+                </div>
               </div>
 
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={activeScoreTab}
-                  initial={{ opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -6 }}
-                  transition={{ duration: 0.2 }}
-                  className="space-y-3"
-                >
-                  {currentCategory.breakdown.map((b: { label: string; val: number }, i: number) => (
-                    <div key={i} className="space-y-1">
-                      <div className="flex justify-between text-[11px]">
-                        <span className="text-[#526078]">{b.label}</span>
-                        <span className="font-mono text-[#11183D] font-bold">{b.val}%</span>
-                      </div>
-                      <div className="w-full h-1.5 bg-[#DCE7F2] rounded-full overflow-hidden">
-                        <motion.div
-                          className="h-full bg-[#4A8BDF] rounded-full"
-                          initial={{ width: 0 }}
-                          animate={{ width: `${b.val}%` }}
-                          transition={{ duration: 0.6, delay: i * 0.05 }}
-                        />
-                      </div>
-                    </div>
+              {/* Missing Keywords Pills */}
+              <div className="bg-white p-4 rounded-xl border border-[#DCE7F2] shadow-xs space-y-2">
+                <p className="text-xs font-bold text-[#11183D]">Missing Skill Keywords to Add</p>
+                <div className="flex flex-wrap gap-2">
+                  {['Distributed Caching', 'Kafka Streaming', 'CI/CD Pipelines', 'System Observability'].map((kw, i) => (
+                    <span key={i} className="px-2.5 py-1 rounded-full bg-[#F8EAF4] border border-[#A0006D]/20 text-[#A0006D] text-[11px] font-mono font-semibold">
+                      + {kw}
+                    </span>
                   ))}
-                </motion.div>
-              </AnimatePresence>
+                </div>
+              </div>
             </div>
           </div>
         </motion.div>
       </Section>
 
       {/* ════════════════════════════════════════════════════════ */}
-      {/* STATS                                                   */}
+      {/* FEATURE 2: ADVANCED CAREER ROADMAPS                     */}
       {/* ════════════════════════════════════════════════════════ */}
-      <Section className="py-16 sm:py-24 bg-[#EFFAFD]">
+      <Section id="roadmaps" className="py-20 sm:py-28 bg-white border-y border-[#DCE7F2]">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <motion.div variants={fadeUp} custom={0} className="text-center mb-14">
-            <h2 className="font-display font-black text-3xl sm:text-4xl lg:text-5xl text-[#11183D] tracking-tight leading-tight">
-              Numbers that <span className="text-[#4A8BDF]">speak</span>
+          <div className="text-center max-w-3xl mx-auto mb-14">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#EFFAFD] border border-[#4A8BDF]/30 text-[#4A8BDF] text-xs font-semibold uppercase tracking-wider mb-3">
+              <Compass size={14} /> NEW: Role Mastery Pathways
+            </div>
+            <h2 className="font-sans font-bold text-3xl sm:text-4xl lg:text-5xl text-[#11183D] tracking-tight mb-4">
+              Advanced Career <span className="text-[#4A8BDF]">Roadmaps & Customizer</span>
             </h2>
-          </motion.div>
+            <p className="font-sans text-sm sm:text-base text-[#526078] leading-relaxed">
+              Step-by-step tech stack roadmaps for Full Stack Developers, Data Analysts, DevOps Leads, and System Architects with live progress tracking and custom stack creation.
+            </p>
+          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Interactive Roadmap Selector & Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             {[
               {
-                icon: Flame,
-                targetNumber: 885,
-                suffix: '+',
-                title: 'Engineers Prepared',
-                desc: 'From students to Staff Engineers ready for Tier-1 interviews.',
-                color: 'text-[#4A8BDF]',
-                bgColor: 'bg-[#EFFAFD]',
+                id: 'fullstack',
+                title: 'Full Stack Engineering',
+                role: 'Senior Full Stack Developer',
+                topics: ['React / Next.js', 'Node.js & Microservices', 'PostgreSQL & Redis', 'System Design & Distributed Queues'],
+                color: 'border-[#4A8BDF] text-[#4A8BDF]',
+                bg: 'bg-[#EFFAFD]',
               },
               {
-                icon: Brain,
-                targetNumber: 11067,
-                suffix: '+',
-                title: 'Socratic Prompts',
-                desc: 'Adversarial questions generated from resumes and targets.',
-                color: 'text-[#A0006D]',
-                bgColor: 'bg-[#F8EAF4]',
+                id: 'data',
+                title: 'Data & Analytics Lead',
+                role: 'Data Analyst & BI Specialist',
+                topics: ['SQL & Data Modeling', 'Python & Pandas', 'Tableau & PowerBI', 'ETL Pipelines & Snowflake'],
+                color: 'border-[#A0006D] text-[#A0006D]',
+                bg: 'bg-[#F8EAF4]',
               },
               {
-                icon: TrendingUp,
-                targetNumber: 25,
-                suffix: '%',
-                title: 'STAR Adherence',
-                desc: 'Candidates show 25% growth in structured delivery within 3 runs.',
-                color: 'text-[#168A62]',
-                bgColor: 'bg-[#E8F5F0]',
+                id: 'cloud',
+                title: 'Cloud & DevOps Architect',
+                role: 'DevOps & Infrastructure Engineer',
+                topics: ['Docker & Kubernetes', 'Terraform & IaC', 'AWS / GCP Cloud Architecture', 'CI/CD & Observability'],
+                color: 'border-[#168A62] text-[#168A62]',
+                bg: 'bg-[#E8F5F0]',
               },
-              {
-                icon: Star,
-                targetNumber: 4.8,
-                suffix: '/5',
-                decimals: 1,
-                title: 'Satisfaction Score',
-                desc: 'Loved by candidates preparing for top tech companies.',
-                color: 'text-[#4A8BDF]',
-                bgColor: 'bg-[#EFFAFD]',
-              },
-            ].map((stat, i) => (
-              <motion.div key={i} variants={scaleIn} custom={i}>
-                <div className="bg-white border border-[#DCE7F2] rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-200 h-full flex flex-col justify-between group hover:-translate-y-0.5">
-                  <div>
-                    <div className="flex items-center justify-between mb-4">
-                      <span className={`font-display font-black text-3xl sm:text-4xl ${stat.color}`}>
-                        <AnimatedCounter
-                          target={stat.targetNumber}
-                          decimals={stat.decimals || 0}
-                          suffix={stat.suffix}
-                        />
-                      </span>
-                      <div className={`h-10 w-10 ${stat.bgColor} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                        <stat.icon className={`h-5 w-5 ${stat.color}`} />
-                      </div>
-                    </div>
-                    <h4 className="text-sm font-bold text-[#11183D] font-display mb-1.5">
-                      {stat.title}
-                    </h4>
+            ].map((rm) => (
+              <motion.div
+                key={rm.id}
+                variants={scaleIn}
+                onClick={() => setActiveRoadmap(rm.id)}
+                className={`p-6 rounded-3xl border-2 transition-all cursor-pointer bg-white shadow-sm flex flex-col justify-between ${
+                  activeRoadmap === rm.id ? `${rm.color} shadow-md` : 'border-[#DCE7F2] hover:border-[#4A8BDF]'
+                }`}
+              >
+                <div>
+                  <div className={`inline-block px-3 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider mb-3 ${rm.bg} ${rm.color}`}>
+                    {rm.title}
                   </div>
-                  <p className="text-xs text-[#526078] font-body leading-relaxed">
-                    {stat.desc}
-                  </p>
+                  <h3 className="font-sans font-bold text-xl text-[#11183D] mb-4">{rm.role}</h3>
+                  <div className="space-y-2">
+                    {rm.topics.map((t, idx) => (
+                      <div key={idx} className="flex items-center gap-2 text-xs text-[#526078] font-sans">
+                        <CheckCircle2 className="w-4 h-4 text-[#168A62] shrink-0" />
+                        <span>{t}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="pt-5 mt-5 border-t border-[#DCE7F2] flex items-center justify-between text-xs font-bold">
+                  <span className="text-[#11183D]">Interactive Pathway</span>
+                  <ChevronRight className="w-4 h-4 text-[#4A8BDF]" />
                 </div>
               </motion.div>
             ))}
           </div>
-        </div>
-      </Section>
 
-      {/* ════════════════════════════════════════════════════════ */}
-      {/* WORKFLOW / HOW IT WORKS                                 */}
-      {/* ════════════════════════════════════════════════════════ */}
-      <Section id="workflow" className="py-20 sm:py-28 bg-[#EFFAFD] relative">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <motion.div variants={fadeUp} custom={0} className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="font-display font-black text-3xl sm:text-4xl lg:text-5xl text-[#11183D] tracking-tight leading-tight mb-4">
-              How <span className="text-[#4A8BDF]">R U Ready?</span> Works
-            </h2>
-            <p className="font-body text-[#526078] text-sm sm:text-base leading-relaxed">
-              Experience the full rigor of technical and behavioral hiring loops in 4 calibrated steps.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              {
-                step: '01',
-                title: 'Persona Calibration',
-                desc: 'Upload target JD, choose level (Junior to Staff), and select persona: Hiring Manager, Architect, or Bar Raiser.',
-                icon: Sliders,
-                tag: 'Step 1',
-                color: 'text-[#4A8BDF]',
-                bg: 'bg-[#EFFAFD]',
-              },
-              {
-                step: '02',
-                title: 'Socratic Voice Room',
-                desc: 'AVA asks role-specific scenarios, listens actively, and poses probing follow-ups if answers lack depth.',
-                icon: MessageCircle,
-                tag: 'Step 2',
-                color: 'text-[#A0006D]',
-                bg: 'bg-[#F8EAF4]',
-              },
-              {
-                step: '03',
-                title: 'Live Telemetry',
-                desc: 'Continuous tracking of audio waveforms, speech pacing (WPM), filler words, gaze stability, and code syntax.',
-                icon: Activity,
-                tag: 'Step 3',
-                color: 'text-[#4A8BDF]',
-                bg: 'bg-[#EFFAFD]',
-              },
-              {
-                step: '04',
-                title: 'Uninflated Scorecard',
-                desc: 'Receive uncompromising scores across Situation, Task, Action, and Result with line-by-line action items.',
-                icon: BarChart3,
-                tag: 'Step 4',
-                color: 'text-[#168A62]',
-                bg: 'bg-[#E8F5F0]',
-              },
-            ].map((card, i) => {
-              const Icon = card.icon;
-              const isSelected = workflowStep === i;
-              return (
-                <motion.div
-                  key={i}
-                  variants={fadeUp}
-                  custom={i}
-                  onClick={() => setWorkflowStep(i)}
-                  className={`relative rounded-2xl p-6 sm:p-7 shadow-sm transition-all duration-250 flex flex-col justify-between cursor-pointer group ${
-                    isSelected
-                      ? 'bg-white border-2 border-[#4A8BDF] shadow-md -translate-y-1'
-                      : 'bg-white border border-[#DCE7F2] hover:border-[#4A8BDF]'
-                  }`}
-                >
-                  <div className={`absolute -top-3 right-6 px-3 py-1 rounded-full font-mono text-[10px] font-black tracking-widest uppercase shadow transition-colors ${
-                    isSelected ? 'bg-[#4A8BDF] text-white' : 'bg-[#11183D] text-white'
-                  }`}>
-                    STEP {card.step}
-                  </div>
-
-                  <div>
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-5 transition-all duration-200 shadow-sm ${
-                      isSelected
-                        ? 'bg-[#4A8BDF] text-white scale-105'
-                        : `${card.bg} border border-[#DCE7F2] ${card.color} group-hover:bg-[#4A8BDF] group-hover:text-white`
-                    }`}>
-                      <Icon className="w-6 h-6" />
-                    </div>
-                    <span className="text-[10px] font-bold text-[#4A8BDF] font-mono uppercase tracking-wider block mb-1">
-                      {card.tag}
-                    </span>
-                    <h3 className="font-display font-bold text-lg text-[#11183D] mb-2.5 leading-snug">
-                      {card.title}
-                    </h3>
-                    <p className="text-xs text-[#526078] font-body leading-relaxed mb-4">
-                      {card.desc}
-                    </p>
-                  </div>
-
-                  <div className="pt-4 border-t border-[#DCE7F2] flex items-center justify-between">
-                    <span className="text-[10px] font-mono text-[#7B8799] font-medium block">
-                      Calibration Loop
-                    </span>
-                    <ChevronRight className={`w-4 h-4 transition-transform ${isSelected ? 'text-[#4A8BDF] translate-x-0.5' : 'text-[#7B8799]'}`} />
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
-
-          <div className="mt-12 text-center">
-            <Link to="/register">
-              <button className="inline-flex items-center gap-2 bg-[#4A8BDF] hover:bg-[#2459A8] text-white font-display font-bold text-xs sm:text-sm px-8 py-3.5 rounded-xl shadow-sm hover:shadow transition-all cursor-pointer">
-                <span>Start Practice Workflow</span>
-                <ArrowRight className="w-4 h-4 text-white" />
+          <div className="text-center">
+            <Link to="/roadmaps">
+              <button className="inline-flex items-center gap-2 bg-[#4A8BDF] hover:bg-[#2459A8] text-white font-sans font-semibold text-sm px-8 py-3.5 rounded-2xl shadow-md transition-all cursor-pointer">
+                <span>Browse All Popular Roadmaps & Customize Yours</span>
+                <ArrowRight className="w-4 h-4" />
               </button>
             </Link>
           </div>
@@ -873,193 +691,251 @@ export default function Landing() {
       </Section>
 
       {/* ════════════════════════════════════════════════════════ */}
-      {/* PRICING SECTION                                         */}
+      {/* FEATURE 3: ROLE DISCUSSION COMMUNITIES                   */}
+      {/* ════════════════════════════════════════════════════════ */}
+      <Section id="discuss-community" className="py-20 sm:py-28 bg-[#EFFAFD]">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-14">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#E8F5F0] border border-[#168A62]/30 text-[#168A62] text-xs font-semibold uppercase tracking-wider mb-3">
+              <Users size={14} /> NEW: Role Discussion Forum
+            </div>
+            <h2 className="font-sans font-bold text-3xl sm:text-4xl lg:text-5xl text-[#11183D] tracking-tight mb-4">
+              Open Group <span className="text-[#168A62]">Role Communities</span>
+            </h2>
+            <p className="font-sans text-sm sm:text-base text-[#526078] leading-relaxed">
+              Connect with candidate peers preparing for identical roles. Discuss real interview questions, exchange feedback, and compare roadmap milestones.
+            </p>
+          </div>
+
+          {/* Group Forum Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {[
+              {
+                group: 'Frontend & UI Architecture',
+                members: '1,420 Candidates',
+                topic: 'How to explain React Concurrent Mode & Fiber Reconciliation in Staff interviews?',
+                replies: 48,
+                tag: 'Frontend',
+              },
+              {
+                group: 'Backend & Distributed Systems',
+                members: '2,150 Candidates',
+                topic: 'Best approach for Rate Limiter design: Token Bucket vs Sliding Window Counter?',
+                replies: 76,
+                tag: 'Backend',
+              },
+            ].map((forum, i) => (
+              <motion.div
+                key={i}
+                variants={scaleIn}
+                className="p-6 rounded-3xl bg-white border border-[#DCE7F2] shadow-sm hover:shadow-md transition-all space-y-4"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="px-3 py-1 rounded-full bg-[#EFFAFD] text-[#4A8BDF] font-mono text-[10px] font-bold uppercase border border-[#DCE7F2]">
+                    {forum.tag} Group
+                  </span>
+                  <span className="text-xs text-[#7B8799] font-sans">{forum.members}</span>
+                </div>
+                <h3 className="font-sans font-bold text-lg text-[#11183D]">{forum.group}</h3>
+                <div className="p-3.5 rounded-2xl bg-[#EFFAFD] border border-[#DCE7F2] text-xs text-[#526078]">
+                  "{forum.topic}"
+                </div>
+                <div className="flex items-center justify-between text-xs text-[#7B8799] pt-2">
+                  <span>{forum.replies} Active Replies</span>
+                  <Link to="/discuss" className="text-[#4A8BDF] font-bold hover:underline flex items-center gap-1">
+                    Join Discussion <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </Section>
+
+      {/* ════════════════════════════════════════════════════════ */}
+      {/* FEATURE 4: ADVERSARIAL SOCRATIC INTERVIEW & TELEMETRY   */}
+      {/* ════════════════════════════════════════════════════════ */}
+      <Section id="features" className="py-20 sm:py-28 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 bg-[#EFFAFD]">
+        <div className="text-center max-w-3xl mx-auto mb-14">
+          <h2 className="font-sans font-bold text-3xl sm:text-4xl lg:text-5xl text-[#11183D] tracking-tight mb-3">
+            Socratic AI Interviewer & <span className="text-[#4A8BDF]">Audio Telemetry</span>
+          </h2>
+          <p className="font-sans text-sm sm:text-base text-[#526078] max-w-xl mx-auto leading-relaxed">
+            Multi-agent personas (Hiring Manager, Architect, Bar Raiser) with sub-300ms real-time audio telemetry and Monaco coding runner.
+          </p>
+        </div>
+
+        {/* Bento Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          
+          {/* Card 1: Personas */}
+          <motion.div
+            variants={scaleIn}
+            className="rounded-3xl p-6 sm:p-8 bg-white border border-[#DCE7F2] shadow-md flex flex-col justify-between hover:border-[#A0006D] transition-all"
+          >
+            <div>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-9 h-9 rounded-xl bg-[#F8EAF4] text-[#A0006D] flex items-center justify-center border border-[#A0006D]/20">
+                  <MessageCircle className="w-5 h-5 text-[#A0006D]" />
+                </div>
+                <div>
+                  <h3 className="font-sans font-bold text-base text-[#11183D]">Multi-Agent Socratic Personas</h3>
+                  <p className="text-xs text-[#526078]">Hiring Manager, Technical Architect, & Bar Raiser.</p>
+                </div>
+              </div>
+
+              <div className="mt-6 space-y-3 font-sans text-xs">
+                <div className="flex gap-2.5 items-start">
+                  <div className="w-6 h-6 rounded-lg bg-[#A0006D] text-white font-black text-[10px] flex items-center justify-center shrink-0 shadow-sm">
+                    AI
+                  </div>
+                  <div className="bg-[#F8EAF4] border border-[#A0006D]/20 p-3 rounded-2xl text-[#11183D] flex-1">
+                    How do you guarantee exact-once delivery during network partitions in your queue architecture?
+                  </div>
+                </div>
+                <div className="flex gap-2.5 items-start justify-end">
+                  <div className="bg-[#EFFAFD] border border-[#4A8BDF]/30 p-2.5 rounded-2xl text-[#11183D] max-w-[80%]">
+                    We use idempotent consumer IDs combined with consensus log replication...
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Card 2: Audio Telemetry */}
+          <motion.div
+            variants={scaleIn}
+            className="rounded-3xl p-6 sm:p-8 bg-white border border-[#DCE7F2] shadow-md flex flex-col justify-between hover:border-[#4A8BDF] transition-all"
+          >
+            <div>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-9 h-9 rounded-xl bg-[#EFFAFD] text-[#4A8BDF] flex items-center justify-center border border-[#DCE7F2]">
+                  <Activity className="w-5 h-5 text-[#4A8BDF]" />
+                </div>
+                <div>
+                  <h3 className="font-sans font-bold text-base text-[#11183D]">Real-Time Audio Telemetry</h3>
+                  <p className="text-xs text-[#526078]">Speech pacing (145 WPM), eye gaze stability, & waveform analysis.</p>
+                </div>
+              </div>
+
+              <div className="mt-6 relative rounded-2xl overflow-hidden bg-[#EFFAFD] border border-[#DCE7F2] p-4 text-center">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <span className="w-2 h-2 rounded-full bg-[#168A62] animate-pulse" />
+                  <span className="text-[11px] font-mono font-bold text-[#11183D]">LIVE AUDIO TELEMETRY ACTIVE</span>
+                </div>
+                <div className="flex justify-center gap-1.5 py-3">
+                  {[40, 75, 30, 90, 60, 100, 45, 80, 50].map((h, idx) => (
+                    <motion.div
+                      key={idx}
+                      animate={{ height: [h * 0.4, h, h * 0.4] }}
+                      transition={{ duration: 1.2, repeat: Infinity, delay: idx * 0.1 }}
+                      className="w-1.5 bg-[#4A8BDF] rounded-full h-8"
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </Section>
+
+      {/* ════════════════════════════════════════════════════════ */}
+      {/* PRICING BUNDLES                                         */}
       {/* ════════════════════════════════════════════════════════ */}
       <Section id="pricing" className="py-20 sm:py-28 bg-[#EFFAFD] relative">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <motion.div variants={fadeUp} custom={0} className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="font-display font-black text-3xl sm:text-4xl lg:text-5xl text-[#11183D] tracking-tight leading-tight mb-4">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="font-sans font-bold text-3xl sm:text-4xl lg:text-5xl text-[#11183D] tracking-tight mb-4">
               Practice That Fits Your <span className="text-[#4A8BDF]">Budget</span>
             </h2>
-            <p className="font-body text-[#526078] text-sm sm:text-base leading-relaxed">
+            <p className="font-sans text-[#526078] text-sm sm:text-base leading-relaxed">
               No locked subscriptions or hidden fees. Calibrate your readiness with flexible session bundles.
             </p>
-          </motion.div>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
             {/* Plan 1: Free */}
-            <motion.div
-              variants={fadeUp}
-              custom={0}
-              className="rounded-2xl bg-white border border-[#DCE7F2] p-6 sm:p-7 shadow-sm flex flex-col justify-between hover:shadow-md transition-all duration-300"
-            >
+            <div className="rounded-3xl bg-white border border-[#DCE7F2] p-6 sm:p-7 shadow-sm flex flex-col justify-between">
               <div>
                 <div className="inline-block px-3 py-1 rounded-full bg-[#EFFAFD] text-[#526078] text-[10px] font-bold font-mono uppercase tracking-wider mb-4 border border-[#DCE7F2]">
                   Starter
                 </div>
-                <h3 className="font-display font-black text-xl text-[#11183D] mb-1">Free Tier</h3>
-                <p className="text-xs text-[#526078] font-body mb-6">Test the platform and benchmark your baseline.</p>
-
+                <h3 className="font-sans font-bold text-xl text-[#11183D] mb-1">Free Tier</h3>
                 <div className="mb-6 flex items-baseline gap-1">
-                  <span className="font-display font-extrabold text-4xl text-[#11183D]">₹0</span>
+                  <span className="font-sans font-extrabold text-4xl text-[#11183D]">₹0</span>
                   <span className="text-xs font-mono text-[#7B8799]">/ forever free</span>
                 </div>
-
-                <ul className="space-y-3 text-xs font-body text-[#526078] mb-8 border-t border-[#DCE7F2] pt-6">
-                  {[
-                    '2 Practice Sessions / month',
-                    'Standard Behavioral STAR Evaluation',
-                    'Standard AI Model Latency',
-                    'Executive Score Overview',
-                    'Web & Mobile Responsive Access',
-                  ].map((feat, idx) => (
-                    <li key={idx} className="flex items-start gap-2.5">
-                      <Check className="w-4 h-4 text-[#7B8799] shrink-0 mt-0.5" />
-                      <span>{feat}</span>
-                    </li>
-                  ))}
+                <ul className="space-y-3 text-xs font-sans text-[#526078] mb-8 border-t border-[#DCE7F2] pt-6">
+                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#7B8799]" /> 2 Practice Sessions / month</li>
+                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#7B8799]" /> Standard Behavioral STAR Evaluation</li>
+                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#7B8799]" /> Web & Mobile Responsive Access</li>
                 </ul>
               </div>
+              <Link to="/register"><button className="w-full py-3 rounded-full border border-[#DCE7F2] hover:bg-[#EFFAFD] font-semibold text-xs text-[#4A8BDF]">Start Free</button></Link>
+            </div>
 
-              <Link to="/register" className="w-full">
-                <button className="w-full py-3 rounded-xl border border-[#DCE7F2] hover:bg-[#EFFAFD] font-display font-bold text-xs text-[#4A8BDF] transition-all cursor-pointer">
-                  Start Free
-                </button>
-              </Link>
-            </motion.div>
-
-            {/* Plan 2: ₹69 Single Pass */}
-            <motion.div
-              variants={fadeUp}
-              custom={1}
-              className="rounded-2xl bg-white border border-[#DCE7F2] p-6 sm:p-7 shadow-sm flex flex-col justify-between hover:shadow-md transition-all duration-300"
-            >
+            {/* Plan 2: ₹69 */}
+            <div className="rounded-3xl bg-white border border-[#DCE7F2] p-6 sm:p-7 shadow-sm flex flex-col justify-between">
               <div>
                 <div className="inline-block px-3 py-1 rounded-full bg-[#EFFAFD] text-[#4A8BDF] border border-[#DCE7F2] text-[10px] font-bold font-mono uppercase tracking-wider mb-4">
                   Quick Sprint
                 </div>
-                <h3 className="font-display font-black text-xl text-[#11183D] mb-1">Single Pass</h3>
-                <p className="text-xs text-[#526078] font-body mb-6">Got an interview tomorrow? Run a targeted mock.</p>
-
+                <h3 className="font-sans font-bold text-xl text-[#11183D] mb-1">Single Pass</h3>
                 <div className="mb-6 flex items-baseline gap-1">
-                  <span className="font-display font-extrabold text-4xl text-[#11183D]">₹69</span>
+                  <span className="font-sans font-extrabold text-4xl text-[#11183D]">₹69</span>
                   <span className="text-xs font-mono text-[#7B8799]">/ single session</span>
                 </div>
-
-                <ul className="space-y-3 text-xs font-body text-[#526078] mb-8 border-t border-[#DCE7F2] pt-6">
-                  {[
-                    '1 Full Adaptive Mock Session',
-                    'Choice of Any Persona (Hiring Mgr / Bar Raiser)',
-                    'Live Audio Waveform & Speech Pacing',
-                    'Granular STAR Breakdown & Scorecard',
-                    'Instant PDF Feedback Download',
-                    'Session Audio & Full Transcript Replay',
-                  ].map((feat, idx) => (
-                    <li key={idx} className="flex items-start gap-2.5">
-                      <Check className="w-4 h-4 text-[#4A8BDF] shrink-0 mt-0.5" />
-                      <span>{feat}</span>
-                    </li>
-                  ))}
+                <ul className="space-y-3 text-xs font-sans text-[#526078] mb-8 border-t border-[#DCE7F2] pt-6">
+                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#4A8BDF]" /> 1 Full Adaptive Mock Session</li>
+                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#4A8BDF]" /> ATS Resume Match Scanner</li>
+                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#4A8BDF]" /> Instant PDF Feedback Download</li>
                 </ul>
               </div>
+              <Link to="/register"><button className="w-full py-3 rounded-full bg-[#4A8BDF] text-white font-semibold text-xs shadow-sm">Get Pass — ₹69</button></Link>
+            </div>
 
-              <Link to="/register" className="w-full">
-                <button className="w-full py-3 rounded-xl bg-[#4A8BDF] hover:bg-[#2459A8] text-white font-display font-bold text-xs shadow-sm hover:shadow transition-all cursor-pointer">
-                  Get Pass — ₹69
-                </button>
-              </Link>
-            </motion.div>
-
-            {/* Plan 3: ₹159 Pro Pack (HIGHLIGHTED ROYAL BLUE) */}
-            <motion.div
-              variants={fadeUp}
-              custom={2}
-              className="rounded-2xl bg-white border-2 border-[#4A8BDF] p-6 sm:p-7 shadow-xl relative flex flex-col justify-between hover:scale-[1.02] transition-all duration-300"
-            >
-              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-[#4A8BDF] text-white text-[10px] font-black font-mono uppercase tracking-widest shadow-md flex items-center gap-1">
-                <Star className="w-3 h-3 fill-white text-white" />
-                <span>Most Popular</span>
+            {/* Plan 3: ₹159 Pro */}
+            <div className="rounded-3xl bg-white border-2 border-[#4A8BDF] p-6 sm:p-7 shadow-xl relative flex flex-col justify-between">
+              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-[#4A8BDF] text-white text-[10px] font-bold font-mono uppercase tracking-widest shadow-sm">
+                Most Popular
               </div>
-
               <div>
-                <div className="inline-block px-3 py-1 rounded-full bg-[#F8EAF4] text-[#A0006D] text-[10px] font-bold font-mono uppercase tracking-wider mb-4 mt-2 border border-[#A0006D]/20">
+                <div className="inline-block px-3 py-1 rounded-full bg-[#F8EAF4] text-[#A0006D] text-[10px] font-bold font-mono uppercase tracking-wider mb-4 mt-2">
                   AI Career Pro
                 </div>
-                <h3 className="font-display font-black text-xl text-[#11183D] mb-1">5-Session Bundle</h3>
-                <p className="text-xs text-[#526078] font-body mb-6">Complete interview prep for Tier-1 engineering roles.</p>
-
+                <h3 className="font-sans font-bold text-xl text-[#11183D] mb-1">5-Session Bundle</h3>
                 <div className="mb-6 flex items-baseline gap-1">
-                  <span className="font-display font-extrabold text-4xl text-[#4A8BDF]">₹159</span>
-                  <span className="text-xs font-mono text-[#7B8799]">/ 5 sessions (₹31/ea)</span>
+                  <span className="font-sans font-extrabold text-4xl text-[#4A8BDF]">₹159</span>
+                  <span className="text-xs font-mono text-[#7B8799]">/ 5 sessions</span>
                 </div>
-
-                <ul className="space-y-3 text-xs font-body text-[#526078] mb-8 border-t border-[#DCE7F2] pt-6">
-                  {[
-                    '5 Full Multi-Modal Mock Sessions (Oral + Coding)',
-                    'Live Coding Sandbox & Test Case Runner',
-                    'Adversarial Bar Raiser Persona with Probing',
-                    'Facial Gaze & Voice Telemetry Analytics',
-                    'Custom Resume & Job Description Calibration',
-                    'Progressive Hint Unlocks during coding',
-                    'Priority Sub-150ms Neural Pipeline',
-                  ].map((feat, idx) => (
-                    <li key={idx} className="flex items-start gap-2.5">
-                      <Check className="w-4 h-4 text-[#4A8BDF] shrink-0 mt-0.5" />
-                      <span>{feat}</span>
-                    </li>
-                  ))}
+                <ul className="space-y-3 text-xs font-sans text-[#526078] mb-8 border-t border-[#DCE7F2] pt-6">
+                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#4A8BDF]" /> 5 Mock Sessions (Oral + Coding)</li>
+                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#4A8BDF]" /> Full ATS Resume & STAR Engine</li>
+                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#4A8BDF]" /> Career Roadmap Access</li>
                 </ul>
               </div>
+              <Link to="/register"><button className="w-full py-3.5 rounded-full bg-[#4A8BDF] text-white font-semibold text-xs shadow-md">Unlock Pro Pack — ₹159</button></Link>
+            </div>
 
-              <Link to="/register" className="w-full">
-                <button className="w-full py-3.5 rounded-xl bg-[#4A8BDF] hover:bg-[#2459A8] text-white font-display font-bold text-xs shadow-md transition-all cursor-pointer">
-                  Unlock Pro Pack — ₹159
-                </button>
-              </Link>
-            </motion.div>
-
-            {/* Plan 4: ₹249 AI Mastery Pack (EGGPLANT AI HIGHLIGHT) */}
-            <motion.div
-              variants={fadeUp}
-              custom={3}
-              className="rounded-2xl bg-white border border-[#DCE7F2] p-6 sm:p-7 shadow-sm flex flex-col justify-between hover:shadow-md transition-all duration-300"
-            >
+            {/* Plan 4: ₹249 Elite */}
+            <div className="rounded-3xl bg-white border border-[#DCE7F2] p-6 sm:p-7 shadow-sm flex flex-col justify-between">
               <div>
-                <div className="inline-block px-3 py-1 rounded-full bg-[#F8EAF4] text-[#A0006D] text-[10px] font-bold font-mono uppercase tracking-wider mb-4 border border-[#A0006D]/20">
+                <div className="inline-block px-3 py-1 rounded-full bg-[#F8EAF4] text-[#A0006D] text-[10px] font-bold font-mono uppercase tracking-wider mb-4">
                   Full AI Mastery
                 </div>
-                <h3 className="font-display font-black text-xl text-[#11183D] mb-1">15-Session Elite</h3>
-                <p className="text-xs text-[#526078] font-body mb-6">Comprehensive mastery for Staff & FAANG roles.</p>
-
+                <h3 className="font-sans font-bold text-xl text-[#11183D] mb-1">15-Session Elite</h3>
                 <div className="mb-6 flex items-baseline gap-1">
-                  <span className="font-display font-extrabold text-4xl text-[#11183D]">₹249</span>
-                  <span className="text-xs font-mono text-[#7B8799]">/ 15 sessions (₹16/ea)</span>
+                  <span className="font-sans font-extrabold text-4xl text-[#11183D]">₹249</span>
+                  <span className="text-xs font-mono text-[#7B8799]">/ 15 sessions</span>
                 </div>
-
-                <ul className="space-y-3 text-xs font-body text-[#526078] mb-8 border-t border-[#DCE7F2] pt-6">
-                  {[
-                    '15 Full Multi-Modal Mock Sessions',
-                    'All 3 Interviewer Personas Unlocked',
-                    'Automated Code Complexity & Big-O Breakdown',
-                    'Full Historical Analytics & 5-Axis Radar Chart',
-                    'Line-by-Line Code Refactor Suggestions',
-                    'Personalized Weakness Diagnosis Roadmap',
-                    '24/7 Priority Support & Calibration',
-                  ].map((feat, idx) => (
-                    <li key={idx} className="flex items-start gap-2.5">
-                      <Check className="w-4 h-4 text-[#A0006D] shrink-0 mt-0.5" />
-                      <span>{feat}</span>
-                    </li>
-                  ))}
+                <ul className="space-y-3 text-xs font-sans text-[#526078] mb-8 border-t border-[#DCE7F2] pt-6">
+                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#A0006D]" /> 15 Full Multi-Modal Mock Sessions</li>
+                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#A0006D]" /> Priority ATS & Roadmap Calibration</li>
+                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#A0006D]" /> Open Role Community VIP Access</li>
                 </ul>
               </div>
-
-              <Link to="/register" className="w-full">
-                <button className="w-full py-3 rounded-xl bg-[#A0006D] hover:bg-[#780052] text-white font-display font-bold text-xs shadow-sm hover:shadow transition-all cursor-pointer">
-                  Get Ultimate — ₹249
-                </button>
-              </Link>
-            </motion.div>
+              <Link to="/register"><button className="w-full py-3 rounded-full bg-[#A0006D] text-white font-semibold text-xs">Get Ultimate — ₹249</button></Link>
+            </div>
           </div>
         </div>
       </Section>
@@ -1069,52 +945,30 @@ export default function Landing() {
       {/* ════════════════════════════════════════════════════════ */}
       <Section id="about" className="py-20 sm:py-28 bg-[#EFFAFD]">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <motion.div variants={fadeUp} custom={0} className="text-center mb-14">
-            <h2 className="font-display font-black text-3xl sm:text-4xl text-[#11183D] tracking-tight leading-tight mb-3">
+          <div className="text-center mb-14">
+            <h2 className="font-sans font-bold text-3xl sm:text-4xl text-[#11183D] tracking-tight mb-3">
               Frequently Asked <span className="text-[#4A8BDF]">Questions</span>
             </h2>
-            <p className="font-body text-[#526078] text-sm sm:text-base leading-relaxed">
-              Everything you need to know about calibrated mock evaluations.
-            </p>
-          </motion.div>
+          </div>
 
           <div className="space-y-4">
             {FAQ_ITEMS.map((faq, i) => {
               const isOpen = openFaq === i;
               return (
-                <motion.div
-                  key={i}
-                  variants={fadeUp}
-                  custom={i}
-                  className="rounded-2xl bg-white border border-[#DCE7F2] overflow-hidden shadow-sm transition-all"
-                >
+                <div key={i} className="rounded-2xl bg-white border border-[#DCE7F2] overflow-hidden shadow-xs">
                   <button
                     onClick={() => setOpenFaq(isOpen ? null : i)}
-                    className="w-full flex items-center justify-between p-5 text-left font-display font-bold text-sm sm:text-base text-[#11183D] hover:text-[#4A8BDF] transition-colors cursor-pointer"
+                    className="w-full flex items-center justify-between p-5 text-left font-sans font-bold text-sm sm:text-base text-[#11183D] hover:text-[#4A8BDF] transition-colors cursor-pointer"
                   >
                     <span>{faq.q}</span>
-                    <ChevronDown
-                      className={`w-4 h-4 text-[#7B8799] shrink-0 transition-transform duration-200 ${
-                        isOpen ? 'transform rotate-180 text-[#4A8BDF]' : ''
-                      }`}
-                    />
+                    <ChevronDown className={`w-4 h-4 text-[#7B8799] transition-transform ${isOpen ? 'rotate-180 text-[#4A8BDF]' : ''}`} />
                   </button>
-
-                  <AnimatePresence>
-                    {isOpen && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.25, ease: 'easeInOut' }}
-                      >
-                        <div className="px-5 pb-5 pt-1 text-xs sm:text-sm text-[#526078] font-body leading-relaxed border-t border-[#DCE7F2]">
-                          {faq.a}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
+                  {isOpen && (
+                    <div className="px-5 pb-5 pt-1 text-xs sm:text-sm text-[#526078] font-sans leading-relaxed border-t border-[#DCE7F2]">
+                      {faq.a}
+                    </div>
+                  )}
+                </div>
               );
             })}
           </div>
@@ -1125,37 +979,26 @@ export default function Landing() {
       {/* CTA BANNER                                              */}
       {/* ════════════════════════════════════════════════════════ */}
       <Section className="pb-16 sm:pb-24 px-4 sm:px-6 lg:px-8 bg-[#EFFAFD]">
-        <motion.div
-          variants={scaleIn}
-          className="mx-auto max-w-5xl relative overflow-hidden rounded-2xl bg-white text-[#11183D] p-8 sm:p-12 lg:p-14 shadow-xl border border-[#DCE7F2] text-center"
-        >
-          <div className="relative z-10 max-w-2xl mx-auto space-y-4">
-            <span className="text-[10px] font-bold text-[#A0006D] font-mono uppercase tracking-widest bg-[#F8EAF4] px-3 py-1 rounded-full border border-[#A0006D]/20 inline-block">
-              AI CAREER TECHNOLOGY
-            </span>
-            <h2 className="font-display font-black text-3xl sm:text-4xl lg:text-5xl text-[#11183D] tracking-tight leading-tight">
-              Ready to meet <span className="text-[#4A8BDF]">AVA?</span>
-            </h2>
-            <p className="font-body text-[#526078] text-sm sm:text-base leading-relaxed max-w-lg mx-auto">
-              Join thousands of engineers who stopped guessing and calibrated their technical capacity.
-            </p>
+        <div className="mx-auto max-w-5xl rounded-3xl bg-white text-[#11183D] p-8 sm:p-14 shadow-xl border border-[#DCE7F2] text-center space-y-5">
+          <span className="text-[10px] font-bold text-[#A0006D] font-mono uppercase tracking-widest bg-[#F8EAF4] px-3 py-1 rounded-full border border-[#A0006D]/20 inline-block">
+            AI CAREER INTELLIGENCE
+          </span>
+          <h2 className="font-sans font-bold text-3xl sm:text-4xl lg:text-5xl text-[#11183D] tracking-tight">
+            Ready to Check Your Standards & Get Placed?
+          </h2>
+          <p className="font-sans text-[#526078] text-sm sm:text-base leading-relaxed max-w-lg mx-auto">
+            Join thousands of candidates using R U Ready? for ATS alignment, mock interviews, and career roadmaps.
+          </p>
 
-            <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
-              <Link to="/register" className="group shrink-0">
-                <button className="inline-flex items-center gap-2 bg-[#4A8BDF] hover:bg-[#2459A8] text-white font-display font-bold text-sm sm:text-base px-8 py-3.5 rounded-xl shadow-md transition-all cursor-pointer">
-                  Start Assessment — It's Free
-                  <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
-                </button>
-              </Link>
-              <a href="#features" className="shrink-0">
-                <button className="inline-flex items-center gap-2 border border-[#DCE7F2] bg-white hover:bg-[#EFFAFD] text-[#4A8BDF] px-6 py-3.5 rounded-xl text-sm sm:text-base font-semibold transition-all cursor-pointer shadow-sm">
-                  <Play className="w-3.5 h-3.5 fill-current text-[#4A8BDF]" />
-                  Watch Demo
-                </button>
-              </a>
-            </div>
+          <div className="pt-2 flex flex-wrap items-center justify-center gap-4">
+            <Link to="/register">
+              <button className="inline-flex items-center gap-2 bg-[#11183D] hover:bg-[#1E293B] text-white font-sans font-semibold text-sm sm:text-base px-8 py-3.5 rounded-full shadow-md transition-all cursor-pointer">
+                <span>Start Free Assessment</span>
+                <ArrowRight className="h-4 w-4 text-white" />
+              </button>
+            </Link>
           </div>
-        </motion.div>
+        </div>
       </Section>
     </div>
   );

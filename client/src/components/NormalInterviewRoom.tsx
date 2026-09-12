@@ -71,7 +71,7 @@ export default function NormalInterviewRoom({
       <header className="h-16 px-6 sm:px-8 flex items-center justify-between z-20 shrink-0 border-b border-[#DCE7F2] bg-white shadow-xs">
         {/* Left: Brand */}
         <div className="flex items-center gap-2">
-          <span className="text-base sm:text-lg font-black tracking-tight font-display text-[#11183D]">
+          <span className="text-base sm:text-lg font-bold tracking-tight font-sans text-[#11183D]">
             R U Ready<span className="text-[#A0006D]">?</span>
           </span>
         </div>
@@ -79,7 +79,7 @@ export default function NormalInterviewRoom({
         {/* Right: Leave Meeting Action */}
         <button
           onClick={onEndInterview}
-          className="bg-[#D64545] hover:bg-[#D64545]/90 text-white px-5 py-2 rounded-full font-semibold text-xs sm:text-sm flex items-center gap-2 shadow-sm transition-all cursor-pointer active:scale-95 font-display"
+          className="bg-[#D64545] hover:bg-[#D64545]/90 text-white px-5 py-2 rounded-full font-semibold text-xs sm:text-sm flex items-center gap-2 shadow-sm transition-all cursor-pointer active:scale-95 font-sans"
         >
           <PhoneOff size={16} />
           <span>Leave Room</span>

@@ -402,10 +402,10 @@ export default function SetupForm() {
 
       {/* Header */}
       <div className="mb-8 text-center max-w-xl mx-auto">
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-[#11183D] font-display tracking-tight mb-2">
+        <h1 className="text-3xl sm:text-4xl font-bold text-[#11183D] font-sans tracking-tight mb-2">
           Configure Your Session
         </h1>
-        <p className="text-sm text-[#526078] font-body">
+        <p className="text-sm text-[#526078] font-sans">
           Launch immediately with your onboarding calibration or customize category, role, and focus tags.
         </p>
       </div>

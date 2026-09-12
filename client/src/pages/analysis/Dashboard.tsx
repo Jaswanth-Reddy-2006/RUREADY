@@ -142,16 +142,16 @@ export default function Dashboard() {
           <div className="max-w-2xl space-y-3">
             <div className="inline-flex items-center gap-2 rounded-full bg-[#F8EAF4] border border-[#A0006D]/20 px-3.5 py-1 text-[#A0006D]">
               <Sparkles className="h-3.5 w-3.5" />
-              <span className="text-[11px] font-bold font-display tracking-wider uppercase">
+              <span className="text-[11px] font-semibold font-sans tracking-wider uppercase">
                 AI Interview Calibration Active
               </span>
             </div>
             
-            <h1 className="font-display font-extrabold text-2xl sm:text-3xl lg:text-4xl text-[#11183D] tracking-tight">
+            <h1 className="font-sans font-bold text-2xl sm:text-3xl lg:text-4xl text-[#11183D] tracking-tight">
               Welcome back, {user?.name?.split(' ')[0] || 'Candidate'}
             </h1>
             
-            <p className="font-body text-[#526078] text-sm sm:text-base leading-relaxed">
+            <p className="font-sans text-[#526078] text-sm sm:text-base leading-relaxed">
               {completedSessions.length === 0 
                 ? "Your onboarding profile is ready. Launch a calibrated oral or coding interview to build real hiring readiness."
                 : `You have completed ${completedSessions.length} sessions with an average uninflated readiness score of ${avgScore}%. Keep practicing.`}
@@ -266,12 +266,12 @@ export default function Dashboard() {
 
                 <div>
                   <div className="flex items-baseline gap-1">
-                    <span className="font-display font-extrabold text-2xl sm:text-3xl text-[#11183D]">
+                    <span className="font-sans font-bold text-2xl sm:text-3xl text-[#11183D]">
                       {metric.score > 0 ? metric.score : '--'}
                     </span>
                     <span className="text-xs text-[#7B8799] font-mono">/100</span>
                   </div>
-                  <p className="text-[11px] text-[#526078] font-body mt-1 truncate">
+                  <p className="text-[11px] text-[#526078] font-sans mt-1 truncate">
                     {metric.desc}
                   </p>
                 </div>

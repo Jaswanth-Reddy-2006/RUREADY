@@ -75,13 +75,13 @@ export default function AnalyticsPage() {
         {/* Header Title */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#EFFAFD] border border-[#4A8BDF]/30 text-[#4A8BDF] text-xs font-bold font-display uppercase tracking-wider mb-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#EFFAFD] border border-[#4A8BDF]/30 text-[#4A8BDF] text-xs font-semibold font-sans uppercase tracking-wider mb-2">
               <TrendingUp size={14} /> Analytics & Competency Intelligence
             </div>
-            <h1 className="text-3xl font-extrabold font-display text-[#11183D] tracking-tight">
+            <h1 className="text-3xl font-bold font-sans text-[#11183D] tracking-tight">
               Longitudinal Career Readiness Matrix
             </h1>
-            <p className="text-xs text-[#526078] mt-1 font-body">
+            <p className="text-xs text-[#526078] mt-1 font-sans">
               Deep evaluation of your technical, communication, STAR structural, and proctoring telemetry trends.
             </p>
           </div>
@@ -94,39 +94,39 @@ export default function AnalyticsPage() {
         {/* 4 KPI Summary Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="p-5 bg-white border-[#DCE7F2] shadow-sm rounded-3xl space-y-2">
-            <span className="text-[11px] font-bold text-[#526078] uppercase font-display">Overall Readiness</span>
+            <span className="text-[11px] font-medium text-[#526078] uppercase font-sans">Overall Readiness</span>
             <div className="flex items-baseline justify-between">
-              <span className="text-3xl font-black font-display text-[#A0006D]">{avgOverall || '--'}%</span>
+              <span className="text-3xl font-bold font-sans text-[#A0006D]">{avgOverall || '--'}%</span>
               <Award className="text-[#A0006D]" size={20} />
             </div>
-            <p className="text-[10px] text-[#526078]">Aggregate candidate score</p>
+            <p className="text-[10px] text-[#526078] font-sans">Aggregate candidate score</p>
           </Card>
 
           <Card className="p-5 bg-white border-[#DCE7F2] shadow-sm rounded-3xl space-y-2">
-            <span className="text-[11px] font-bold text-[#526078] uppercase font-display">Technical Depth</span>
+            <span className="text-[11px] font-medium text-[#526078] uppercase font-sans">Technical Depth</span>
             <div className="flex items-baseline justify-between">
-              <span className="text-3xl font-black font-display text-[#4A8BDF]">{avgTech || '--'}%</span>
+              <span className="text-3xl font-bold font-sans text-[#4A8BDF]">{avgTech || '--'}%</span>
               <Brain className="text-[#4A8BDF]" size={20} />
             </div>
-            <p className="text-[10px] text-[#526078]">Algorithmic & system design</p>
+            <p className="text-[10px] text-[#526078] font-sans">Algorithmic & system design</p>
           </Card>
 
           <Card className="p-5 bg-white border-[#DCE7F2] shadow-sm rounded-3xl space-y-2">
-            <span className="text-[11px] font-bold text-[#526078] uppercase font-display">Communication STAR</span>
+            <span className="text-[11px] font-medium text-[#526078] uppercase font-sans">Communication STAR</span>
             <div className="flex items-baseline justify-between">
-              <span className="text-3xl font-black font-display text-[#168A62]">{avgComm || '--'}%</span>
+              <span className="text-3xl font-bold font-sans text-[#168A62]">{avgComm || '--'}%</span>
               <Zap className="text-[#168A62]" size={20} />
             </div>
-            <p className="text-[10px] text-[#526078]">Speech clarity & STAR pacing</p>
+            <p className="text-[10px] text-[#526078] font-sans">Speech clarity & STAR pacing</p>
           </Card>
 
           <Card className="p-5 bg-white border-[#DCE7F2] shadow-sm rounded-3xl space-y-2">
-            <span className="text-[11px] font-bold text-[#526078] uppercase font-display">Eye Gaze & Focus</span>
+            <span className="text-[11px] font-medium text-[#526078] uppercase font-sans">Eye Gaze & Focus</span>
             <div className="flex items-baseline justify-between">
-              <span className="text-3xl font-black font-display text-[#2459A8]">{avgEyeGaze || 85}%</span>
+              <span className="text-3xl font-bold font-sans text-[#2459A8]">{avgEyeGaze || 85}%</span>
               <Eye className="text-[#2459A8]" size={20} />
             </div>
-            <p className="text-[10px] text-[#526078]">Proctoring camera telemetry</p>
+            <p className="text-[10px] text-[#526078] font-sans">Proctoring camera telemetry</p>
           </Card>
         </div>
 

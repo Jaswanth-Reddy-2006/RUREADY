@@ -78,7 +78,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         aria-busy={isLoading}
         aria-disabled={isDisabled}
         className={clsx(
-          'inline-flex items-center justify-center font-display transition-all duration-200 ease-out select-none cursor-pointer',
+          'inline-flex items-center justify-center font-sans transition-all duration-200 ease-out select-none cursor-pointer',
           'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#4A8BDF] focus-visible:ring-offset-2',
           variantStyles[variant],
           sizeStyles[size],
