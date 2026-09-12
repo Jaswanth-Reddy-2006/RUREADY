@@ -31,6 +31,9 @@ import {
   BookOpen,
   Award,
   Globe,
+  ThumbsUp,
+  Cpu,
+  CheckCircle,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 
@@ -271,6 +274,10 @@ export default function Landing() {
   const [activeScoreTab, setActiveScoreTab] = useState<string>('overall');
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [activeRoadmap, setActiveRoadmap] = useState<string>('fullstack');
+  const [activePersona, setActivePersona] = useState<string>('bar-raiser');
+  const [starViewToggle, setStarViewToggle] = useState<'after' | 'before'>('after');
+  const [likeCount, setLikeCount] = useState<number>(142);
+  const [isLiked, setIsLiked] = useState<boolean>(false);
 
   const currentCategory = SCORECARD_DATA[activeScoreTab] || SCORECARD_DATA.overall;
   const { scrollYProgress: pageScrollProgress } = useScroll({ target: containerRef });
@@ -295,40 +302,48 @@ export default function Landing() {
         ref={heroRef}
         className="relative min-h-[92vh] flex flex-col items-center justify-center pt-28 pb-16 lg:pt-32 lg:pb-24 overflow-hidden bg-gradient-to-b from-[#EFFAFD] via-white to-[#EFFAFD]"
       >
-        {/* SVG Concentric Orbit Rings Background */}
+        {/* Glowing Ambient Light Orbs */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-[#4A8BDF]/10 rounded-full blur-[120px] pointer-events-none z-0" />
+        <div className="absolute top-1/3 left-1/3 w-[300px] h-[300px] bg-[#A0006D]/8 rounded-full blur-[100px] pointer-events-none z-0" />
+
+        {/* SVG Rotating Concentric Orbit Rings Background */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden z-0">
-          <svg className="w-[1100px] h-[1100px] opacity-40 text-[#4A8BDF]/20" viewBox="0 0 1000 1000">
-            <circle cx="500" cy="500" r="160" stroke="currentColor" strokeWidth="1" fill="none" strokeDasharray="6 6" />
-            <circle cx="500" cy="500" r="280" stroke="currentColor" strokeWidth="1" fill="none" />
-            <circle cx="500" cy="500" r="400" stroke="currentColor" strokeWidth="1" fill="none" strokeDasharray="4 4" />
-            <circle cx="500" cy="500" r="490" stroke="currentColor" strokeWidth="1" fill="none" />
-          </svg>
+          <motion.svg
+            animate={{ rotate: 360 }}
+            transition={{ duration: 160, repeat: Infinity, ease: 'linear' }}
+            className="w-[1100px] h-[1100px] opacity-40 text-[#4A8BDF]/25"
+            viewBox="0 0 1000 1000"
+          >
+            <circle cx="500" cy="500" r="160" stroke="currentColor" strokeWidth="1.2" fill="none" strokeDasharray="8 8" />
+            <circle cx="500" cy="500" r="280" stroke="currentColor" strokeWidth="1.2" fill="none" />
+            <circle cx="500" cy="500" r="400" stroke="currentColor" strokeWidth="1.2" fill="none" strokeDasharray="6 6" />
+            <circle cx="500" cy="500" r="490" stroke="currentColor" strokeWidth="1.2" fill="none" />
+          </motion.svg>
         </div>
 
         {/* Floating Tech Brand Logos on Orbit Orbits */}
         <div className="absolute inset-0 max-w-6xl mx-auto pointer-events-none z-10 hidden sm:block">
-          {/* Inner Orbit Badges */}
+          {/* Orbit Badges with Soft Hover Elevation */}
           <motion.div
-            animate={{ y: [-4, 4, -4] }}
+            animate={{ y: [-5, 5, -5] }}
             transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute top-[22%] left-[18%] p-3 rounded-full bg-white border border-[#DCE7F2] shadow-md flex items-center justify-center"
+            className="absolute top-[22%] left-[18%] p-3 rounded-full bg-white border border-[#DCE7F2] shadow-md flex items-center justify-center pointer-events-auto hover:scale-110 transition-transform cursor-pointer"
           >
             <GoogleLogo className="w-5 h-5" />
           </motion.div>
           
           <motion.div
-            animate={{ y: [4, -4, 4] }}
+            animate={{ y: [5, -5, 5] }}
             transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute top-[20%] right-[20%] p-3 rounded-full bg-white border border-[#DCE7F2] shadow-md flex items-center justify-center"
+            className="absolute top-[20%] right-[20%] p-3 rounded-full bg-white border border-[#DCE7F2] shadow-md flex items-center justify-center pointer-events-auto hover:scale-110 transition-transform cursor-pointer"
           >
             <MetaLogo className="w-5 h-5" />
           </motion.div>
 
-          {/* Middle Orbit Badges */}
           <motion.div
             animate={{ y: [-6, 6, -6] }}
             transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute top-[45%] left-[8%] p-3 rounded-full bg-white border border-[#DCE7F2] shadow-md flex items-center justify-center"
+            className="absolute top-[45%] left-[8%] p-3 rounded-full bg-white border border-[#DCE7F2] shadow-md flex items-center justify-center pointer-events-auto hover:scale-110 transition-transform cursor-pointer"
           >
             <AWSLogo className="w-5.5 h-5.5" />
           </motion.div>
@@ -336,16 +351,15 @@ export default function Landing() {
           <motion.div
             animate={{ y: [6, -6, 6] }}
             transition={{ duration: 5.2, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute top-[48%] right-[10%] p-3 rounded-full bg-white border border-[#DCE7F2] shadow-md flex items-center justify-center"
+            className="absolute top-[48%] right-[10%] p-3 rounded-full bg-white border border-[#DCE7F2] shadow-md flex items-center justify-center pointer-events-auto hover:scale-110 transition-transform cursor-pointer"
           >
             <SlackLogo className="w-5.5 h-5.5" />
           </motion.div>
 
-          {/* Outer Orbit Badges */}
           <motion.div
             animate={{ y: [-5, 5, -5] }}
             transition={{ duration: 4.8, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute bottom-[22%] left-[16%] p-3 rounded-full bg-white border border-[#DCE7F2] shadow-md flex items-center justify-center"
+            className="absolute bottom-[22%] left-[16%] p-3 rounded-full bg-white border border-[#DCE7F2] shadow-md flex items-center justify-center pointer-events-auto hover:scale-110 transition-transform cursor-pointer"
           >
             <StripeLogo className="w-5 h-5" />
           </motion.div>
@@ -353,7 +367,7 @@ export default function Landing() {
           <motion.div
             animate={{ y: [5, -5, 5] }}
             transition={{ duration: 4.6, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute bottom-[24%] right-[17%] p-3 rounded-full bg-white border border-[#DCE7F2] shadow-md flex items-center justify-center"
+            className="absolute bottom-[24%] right-[17%] p-3 rounded-full bg-white border border-[#DCE7F2] shadow-md flex items-center justify-center pointer-events-auto hover:scale-110 transition-transform cursor-pointer"
           >
             <div className="w-5 h-5 rounded-full bg-[#11183D] flex items-center justify-center text-[10px] font-bold text-white font-mono">
               Uber
@@ -371,14 +385,18 @@ export default function Landing() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FCE8F3] border border-[#F4B4D6] text-[#A0006D] font-sans font-semibold text-xs shadow-xs"
+              whileHover={{ scale: 1.03 }}
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FCE8F3] border border-[#F4B4D6] text-[#A0006D] font-sans font-semibold text-xs shadow-xs cursor-default"
             >
               <Sparkles className="w-3.5 h-3.5 text-[#A0006D]" />
               <span>AI-Powered Interview Intelligence</span>
             </motion.div>
 
             {/* Google / Trustpilot rating badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-[#DCE7F2] text-[#526078] text-xs font-medium shadow-xs">
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-[#DCE7F2] text-[#526078] text-xs font-medium shadow-xs"
+            >
               <span className="font-bold text-[#11183D] flex items-center gap-1">
                 <GoogleLogo className="w-3.5 h-3.5" /> 4.6 Google
               </span>
@@ -386,7 +404,7 @@ export default function Landing() {
               <span className="font-bold text-[#168A62] flex items-center gap-1">
                 <Star className="w-3.5 h-3.5 fill-[#168A62] text-[#168A62]" /> 4.9 Trustpilot
               </span>
-            </div>
+            </motion.div>
           </div>
 
           {/* Main Hero Headline */}
@@ -421,28 +439,39 @@ export default function Landing() {
             className="flex flex-wrap items-center justify-center gap-3.5 pt-2"
           >
             <Link to={isAuthenticated ? "/dashboard" : "/register"}>
-              <button className="inline-flex items-center gap-2 bg-[#11183D] hover:bg-[#1E293B] text-white font-sans font-semibold text-sm sm:text-base px-8 py-3.5 rounded-full shadow-md hover:shadow-lg active:scale-98 transition-all cursor-pointer">
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                className="inline-flex items-center gap-2 bg-[#11183D] hover:bg-[#1E293B] text-white font-sans font-semibold text-sm sm:text-base px-8 py-3.5 rounded-full shadow-md hover:shadow-lg transition-all cursor-pointer"
+              >
                 <span>{isAuthenticated ? 'Go to Dashboard' : 'Start Free Practice'}</span>
                 <ArrowRight className="h-4 w-4 text-white" />
-              </button>
+              </motion.button>
             </Link>
 
             <Link to="/roadmaps">
-              <button className="inline-flex items-center gap-2 bg-white hover:bg-[#EFFAFD] text-[#11183D] font-sans font-semibold text-sm sm:text-base px-7 py-3.5 rounded-full border border-[#DCE7F2] shadow-xs hover:shadow transition-all cursor-pointer">
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                className="inline-flex items-center gap-2 bg-white hover:bg-[#EFFAFD] text-[#11183D] font-sans font-semibold text-sm sm:text-base px-7 py-3.5 rounded-full border border-[#DCE7F2] shadow-xs hover:shadow transition-all cursor-pointer"
+              >
                 <Compass className="w-4 h-4 text-[#4A8BDF]" />
                 <span>Explore Roadmaps</span>
-              </button>
+              </motion.button>
             </Link>
           </motion.div>
 
-          {/* Stacked Live Candidate Activity Notification Cards (Matching reference image) */}
+          {/* Stacked Live Candidate Activity Notification Cards */}
           <motion.div
             initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.55 }}
             className="pt-8 max-w-md mx-auto relative"
           >
-            <div className="bg-white/95 backdrop-blur-md rounded-2xl border border-[#DCE7F2] shadow-xl p-3.5 flex items-center gap-3 relative z-30 transition-all hover:scale-[1.02]">
+            <motion.div
+              whileHover={{ y: -2 }}
+              className="bg-white/95 backdrop-blur-md rounded-2xl border border-[#DCE7F2] shadow-xl p-3.5 flex items-center gap-3 relative z-30 transition-all"
+            >
               <div className="w-10 h-10 rounded-full bg-[#4A8BDF] text-white font-bold flex items-center justify-center shrink-0 shadow-xs">
                 WC
               </div>
@@ -453,7 +482,7 @@ export default function Landing() {
                 <p className="text-[11px] text-[#7B8799] font-mono">8 min ago • Orixcreative Dribbble</p>
               </div>
               <span className="w-2 h-2 rounded-full bg-[#168A62] animate-pulse shrink-0" />
-            </div>
+            </motion.div>
 
             {/* Sub-Card Stack Layer 1 */}
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-[#DCE7F2] shadow-md p-3 flex items-center gap-3 relative -mt-3.5 mx-3 z-20 text-left">
@@ -520,7 +549,8 @@ export default function Landing() {
         {/* ATS Showcase Card */}
         <motion.div
           variants={scaleIn}
-          className="rounded-3xl bg-white border border-[#DCE7F2] p-6 sm:p-10 shadow-lg relative overflow-hidden"
+          whileHover={{ y: -3 }}
+          className="rounded-3xl bg-white border border-[#DCE7F2] p-6 sm:p-10 shadow-lg relative overflow-hidden transition-all duration-300"
         >
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             
@@ -545,21 +575,29 @@ export default function Landing() {
                   { title: 'STAR Method Bullet Rewriter', desc: 'Transforms vague lines into quantified achievement statements', color: 'text-[#A0006D]' },
                   { title: 'Custom Mock Suite Generation', desc: 'Creates a 100% custom interview loop from the target posting', color: 'text-[#11183D]' },
                 ].map((item, idx) => (
-                  <div key={idx} className="flex items-start gap-3 p-3 rounded-2xl bg-[#EFFAFD] border border-[#DCE7F2]">
+                  <motion.div
+                    key={idx}
+                    whileHover={{ x: 4 }}
+                    className="flex items-start gap-3 p-3 rounded-2xl bg-[#EFFAFD] border border-[#DCE7F2] transition-transform"
+                  >
                     <CheckCircle2 className={`w-4 h-4 ${item.color} shrink-0 mt-0.5`} />
                     <div>
                       <p className="font-bold text-[#11183D]">{item.title}</p>
                       <p className="text-[#526078] text-[11px]">{item.desc}</p>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
 
               <Link to="/ats">
-                <button className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#A0006D] hover:bg-[#780052] text-white font-sans font-semibold text-sm px-7 py-3.5 rounded-2xl shadow-md transition-all cursor-pointer">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#A0006D] hover:bg-[#780052] text-white font-sans font-semibold text-sm px-7 py-3.5 rounded-2xl shadow-md transition-all cursor-pointer"
+                >
                   <span>Launch ATS Scanner</span>
                   <ArrowRight className="w-4 h-4" />
-                </button>
+                </motion.button>
               </Link>
             </div>
 
@@ -577,15 +615,53 @@ export default function Landing() {
                 </div>
               </div>
 
-              {/* STAR Bullet Point Rewrite Box */}
-              <div className="bg-white p-4 rounded-xl border border-[#DCE7F2] shadow-xs space-y-2">
-                <p className="text-xs font-bold text-[#11183D]">STAR Bullet Optimization</p>
-                <div className="p-2.5 rounded-lg bg-[#FDF2F2] border border-[#D64545]/20 text-[11px] text-[#D64545] font-sans">
-                  <span className="font-bold">Before:</span> "Worked on database performance and optimized SQL queries."
+              {/* Interactive STAR Bullet Point Rewrite Box */}
+              <div className="bg-white p-4 rounded-xl border border-[#DCE7F2] shadow-xs space-y-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-bold text-[#11183D]">STAR Bullet Optimization</p>
+                  <div className="flex items-center gap-1 bg-[#EFFAFD] p-1 rounded-lg border border-[#DCE7F2]">
+                    <button
+                      onClick={() => setStarViewToggle('after')}
+                      className={`px-2.5 py-1 text-[10px] font-bold rounded-md transition-all cursor-pointer ${
+                        starViewToggle === 'after' ? 'bg-[#A0006D] text-white' : 'text-[#526078]'
+                      }`}
+                    >
+                      STAR Method
+                    </button>
+                    <button
+                      onClick={() => setStarViewToggle('before')}
+                      className={`px-2.5 py-1 text-[10px] font-bold rounded-md transition-all cursor-pointer ${
+                        starViewToggle === 'before' ? 'bg-[#D64545] text-white' : 'text-[#526078]'
+                      }`}
+                    >
+                      Original
+                    </button>
+                  </div>
                 </div>
-                <div className="p-2.5 rounded-lg bg-[#E8F5F0] border border-[#168A62]/30 text-[11px] text-[#168A62] font-sans">
-                  <span className="font-bold">After (STAR):</span> "Redesigned PostgreSQL query indexing, reducing P99 latency by 42% across 1.2M daily active user requests."
-                </div>
+
+                <AnimatePresence mode="wait">
+                  {starViewToggle === 'after' ? (
+                    <motion.div
+                      key="after"
+                      initial={{ opacity: 0, y: 4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -4 }}
+                      className="p-3 rounded-lg bg-[#E8F5F0] border border-[#168A62]/30 text-xs text-[#168A62] font-sans"
+                    >
+                      <span className="font-bold">After (STAR Method):</span> "Redesigned PostgreSQL query indexing, reducing P99 latency by 42% across 1.2M daily active user requests."
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="before"
+                      initial={{ opacity: 0, y: 4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -4 }}
+                      className="p-3 rounded-lg bg-[#FDF2F2] border border-[#D64545]/20 text-xs text-[#D64545] font-sans"
+                    >
+                      <span className="font-bold">Before:</span> "Worked on database performance and optimized SQL queries."
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
               {/* Missing Keywords Pills */}
@@ -593,9 +669,13 @@ export default function Landing() {
                 <p className="text-xs font-bold text-[#11183D]">Missing Skill Keywords to Add</p>
                 <div className="flex flex-wrap gap-2">
                   {['Distributed Caching', 'Kafka Streaming', 'CI/CD Pipelines', 'System Observability'].map((kw, i) => (
-                    <span key={i} className="px-2.5 py-1 rounded-full bg-[#F8EAF4] border border-[#A0006D]/20 text-[#A0006D] text-[11px] font-mono font-semibold">
+                    <motion.span
+                      key={i}
+                      whileHover={{ scale: 1.05 }}
+                      className="px-2.5 py-1 rounded-full bg-[#F8EAF4] border border-[#A0006D]/20 text-[#A0006D] text-[11px] font-mono font-semibold cursor-pointer"
+                    >
                       + {kw}
-                    </span>
+                    </motion.span>
                   ))}
                 </div>
               </div>
@@ -652,6 +732,7 @@ export default function Landing() {
               <motion.div
                 key={rm.id}
                 variants={scaleIn}
+                whileHover={{ y: -5 }}
                 onClick={() => setActiveRoadmap(rm.id)}
                 className={`p-6 rounded-3xl border-2 transition-all cursor-pointer bg-white shadow-sm flex flex-col justify-between ${
                   activeRoadmap === rm.id ? `${rm.color} shadow-md` : 'border-[#DCE7F2] hover:border-[#4A8BDF]'
@@ -681,10 +762,14 @@ export default function Landing() {
 
           <div className="text-center">
             <Link to="/roadmaps">
-              <button className="inline-flex items-center gap-2 bg-[#4A8BDF] hover:bg-[#2459A8] text-white font-sans font-semibold text-sm px-8 py-3.5 rounded-2xl shadow-md transition-all cursor-pointer">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="inline-flex items-center gap-2 bg-[#4A8BDF] hover:bg-[#2459A8] text-white font-sans font-semibold text-sm px-8 py-3.5 rounded-2xl shadow-md transition-all cursor-pointer"
+              >
                 <span>Browse All Popular Roadmaps & Customize Yours</span>
                 <ArrowRight className="w-4 h-4" />
-              </button>
+              </motion.button>
             </Link>
           </div>
         </div>
@@ -728,6 +813,7 @@ export default function Landing() {
               <motion.div
                 key={i}
                 variants={scaleIn}
+                whileHover={{ y: -4 }}
                 className="p-6 rounded-3xl bg-white border border-[#DCE7F2] shadow-sm hover:shadow-md transition-all space-y-4"
               >
                 <div className="flex items-center justify-between">
@@ -741,7 +827,20 @@ export default function Landing() {
                   "{forum.topic}"
                 </div>
                 <div className="flex items-center justify-between text-xs text-[#7B8799] pt-2">
-                  <span>{forum.replies} Active Replies</span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => {
+                        setIsLiked(!isLiked);
+                        setLikeCount(prev => (isLiked ? prev - 1 : prev + 1));
+                      }}
+                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border text-[11px] font-bold transition-all cursor-pointer ${
+                        isLiked ? 'bg-[#EFFAFD] border-[#4A8BDF] text-[#4A8BDF]' : 'bg-white border-[#DCE7F2] text-[#526078]'
+                      }`}
+                    >
+                      <ThumbsUp size={12} /> {likeCount} Upvotes
+                    </button>
+                    <span>{forum.replies} Replies</span>
+                  </div>
                   <Link to="/discuss" className="text-[#4A8BDF] font-bold hover:underline flex items-center gap-1">
                     Join Discussion <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
@@ -761,7 +860,7 @@ export default function Landing() {
             Socratic AI Interviewer & <span className="text-[#4A8BDF]">Audio Telemetry</span>
           </h2>
           <p className="font-sans text-sm sm:text-base text-[#526078] max-w-xl mx-auto leading-relaxed">
-            Multi-agent personas (Hiring Manager, Architect, Bar Raiser) with sub-300ms real-time audio telemetry and Monaco coding runner.
+            Multi-agent personas (Hiring Manager, Technical Architect, Bar Raiser) with sub-300ms real-time audio telemetry and Monaco coding runner.
           </p>
         </div>
 
@@ -771,6 +870,7 @@ export default function Landing() {
           {/* Card 1: Personas */}
           <motion.div
             variants={scaleIn}
+            whileHover={{ y: -3 }}
             className="rounded-3xl p-6 sm:p-8 bg-white border border-[#DCE7F2] shadow-md flex flex-col justify-between hover:border-[#A0006D] transition-all"
           >
             <div>
@@ -784,13 +884,34 @@ export default function Landing() {
                 </div>
               </div>
 
-              <div className="mt-6 space-y-3 font-sans text-xs">
+              {/* Persona Interactive Tabs */}
+              <div className="flex items-center gap-2 mt-4 mb-3">
+                {[
+                  { id: 'bar-raiser', label: 'Bar Raiser' },
+                  { id: 'architect', label: 'Architect' },
+                  { id: 'hiring-manager', label: 'Hiring Mgr' },
+                ].map((p) => (
+                  <button
+                    key={p.id}
+                    onClick={() => setActivePersona(p.id)}
+                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      activePersona === p.id ? 'bg-[#A0006D] text-white' : 'bg-[#EFFAFD] text-[#526078]'
+                    }`}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+
+              <div className="mt-2 space-y-3 font-sans text-xs">
                 <div className="flex gap-2.5 items-start">
                   <div className="w-6 h-6 rounded-lg bg-[#A0006D] text-white font-black text-[10px] flex items-center justify-center shrink-0 shadow-sm">
                     AI
                   </div>
                   <div className="bg-[#F8EAF4] border border-[#A0006D]/20 p-3 rounded-2xl text-[#11183D] flex-1">
-                    How do you guarantee exact-once delivery during network partitions in your queue architecture?
+                    {activePersona === 'bar-raiser' && "How do you guarantee exact-once delivery during network partitions in your queue architecture?"}
+                    {activePersona === 'architect' && "What are the trade-offs between Monolithic and Event-Driven microservices for this scale?"}
+                    {activePersona === 'hiring-manager' && "Tell me about a time you resolved a major technical disagreement with senior stakeholders?"}
                   </div>
                 </div>
                 <div className="flex gap-2.5 items-start justify-end">
@@ -805,6 +926,7 @@ export default function Landing() {
           {/* Card 2: Audio Telemetry */}
           <motion.div
             variants={scaleIn}
+            whileHover={{ y: -3 }}
             className="rounded-3xl p-6 sm:p-8 bg-white border border-[#DCE7F2] shadow-md flex flex-col justify-between hover:border-[#4A8BDF] transition-all"
           >
             <div>
@@ -833,9 +955,85 @@ export default function Landing() {
                     />
                   ))}
                 </div>
+                <div className="flex justify-between items-center text-[10px] font-mono text-[#526078] border-t border-[#DCE7F2] pt-2">
+                  <span>Pacing: 145 WPM</span>
+                  <span>Gaze: 94% Stable</span>
+                  <span>Latency: 280ms</span>
+                </div>
               </div>
             </div>
           </motion.div>
+        </div>
+      </Section>
+
+      {/* ════════════════════════════════════════════════════════ */}
+      {/* CANDIDATE PLACEMENT TESTIMONIALS                        */}
+      {/* ════════════════════════════════════════════════════════ */}
+      <Section className="py-20 sm:py-28 bg-white border-y border-[#DCE7F2]">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-14">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#E8F5F0] border border-[#168A62]/30 text-[#168A62] text-xs font-semibold uppercase tracking-wider mb-3">
+              <Award size={14} /> Candidate Success Stories
+            </div>
+            <h2 className="font-sans font-bold text-3xl sm:text-4xl lg:text-5xl text-[#11183D] tracking-tight mb-4">
+              Placed at <span className="text-[#168A62]">Tier-1 Tech Companies</span>
+            </h2>
+            <p className="font-sans text-sm sm:text-base text-[#526078] leading-relaxed">
+              Real engineers who used R U Ready? to upgrade their STAR delivery and clear rigorous interviews.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              {
+                name: 'Aarav Sharma',
+                role: 'Senior Backend Engineer',
+                company: 'Google',
+                boost: '+₹22L Compensation Boost',
+                quote: 'The Bar Raiser persona drilled into my distributed system trade-offs with zero sugarcoating. Helped me speak with real conviction.',
+              },
+              {
+                name: 'Priya Nair',
+                role: 'Lead Full Stack Engineer',
+                company: 'Meta',
+                boost: '+48% Salary Increase',
+                quote: 'The ATS scanner caught missing keywords I had completely overlooked. Re-writing my bullets into STAR format made a massive difference.',
+              },
+              {
+                name: 'Rohan Mehta',
+                role: 'Data Engineering Specialist',
+                company: 'Stripe',
+                boost: 'L5 Offer Received',
+                quote: 'The custom career roadmaps helped me structure my prep step-by-step. The live telemetry pacing feedback was invaluable.',
+              },
+            ].map((t, idx) => (
+              <motion.div
+                key={idx}
+                variants={scaleIn}
+                whileHover={{ y: -4 }}
+                className="p-6 rounded-3xl bg-[#EFFAFD] border border-[#DCE7F2] shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="w-10 h-10 rounded-full bg-[#4A8BDF] text-white font-bold flex items-center justify-center text-sm shadow-xs">
+                      {t.name.split(' ').map(n => n[0]).join('')}
+                    </div>
+                    <span className="px-2.5 py-1 rounded-full bg-[#E8F5F0] text-[#168A62] text-[10px] font-mono font-bold">
+                      {t.company} Verified
+                    </span>
+                  </div>
+                  <p className="text-xs text-[#526078] font-sans leading-relaxed italic mb-4">
+                    "{t.quote}"
+                  </p>
+                </div>
+                <div className="pt-4 border-t border-[#DCE7F2]">
+                  <p className="text-sm font-bold text-[#11183D]">{t.name}</p>
+                  <p className="text-xs text-[#526078]">{t.role}</p>
+                  <p className="text-[11px] font-mono font-bold text-[#4A8BDF] mt-1">{t.boost}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </Section>
 
@@ -855,7 +1053,7 @@ export default function Landing() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
             {/* Plan 1: Free */}
-            <div className="rounded-3xl bg-white border border-[#DCE7F2] p-6 sm:p-7 shadow-sm flex flex-col justify-between">
+            <motion.div whileHover={{ y: -4 }} className="rounded-3xl bg-white border border-[#DCE7F2] p-6 sm:p-7 shadow-sm flex flex-col justify-between transition-all">
               <div>
                 <div className="inline-block px-3 py-1 rounded-full bg-[#EFFAFD] text-[#526078] text-[10px] font-bold font-mono uppercase tracking-wider mb-4 border border-[#DCE7F2]">
                   Starter
@@ -872,10 +1070,10 @@ export default function Landing() {
                 </ul>
               </div>
               <Link to="/register"><button className="w-full py-3 rounded-full border border-[#DCE7F2] hover:bg-[#EFFAFD] font-semibold text-xs text-[#4A8BDF]">Start Free</button></Link>
-            </div>
+            </motion.div>
 
             {/* Plan 2: ₹69 */}
-            <div className="rounded-3xl bg-white border border-[#DCE7F2] p-6 sm:p-7 shadow-sm flex flex-col justify-between">
+            <motion.div whileHover={{ y: -4 }} className="rounded-3xl bg-white border border-[#DCE7F2] p-6 sm:p-7 shadow-sm flex flex-col justify-between transition-all">
               <div>
                 <div className="inline-block px-3 py-1 rounded-full bg-[#EFFAFD] text-[#4A8BDF] border border-[#DCE7F2] text-[10px] font-bold font-mono uppercase tracking-wider mb-4">
                   Quick Sprint
@@ -892,10 +1090,10 @@ export default function Landing() {
                 </ul>
               </div>
               <Link to="/register"><button className="w-full py-3 rounded-full bg-[#4A8BDF] text-white font-semibold text-xs shadow-sm">Get Pass — ₹69</button></Link>
-            </div>
+            </motion.div>
 
             {/* Plan 3: ₹159 Pro */}
-            <div className="rounded-3xl bg-white border-2 border-[#4A8BDF] p-6 sm:p-7 shadow-xl relative flex flex-col justify-between">
+            <motion.div whileHover={{ y: -4 }} className="rounded-3xl bg-white border-2 border-[#4A8BDF] p-6 sm:p-7 shadow-xl relative flex flex-col justify-between transition-all">
               <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-[#4A8BDF] text-white text-[10px] font-bold font-mono uppercase tracking-widest shadow-sm">
                 Most Popular
               </div>
@@ -915,10 +1113,10 @@ export default function Landing() {
                 </ul>
               </div>
               <Link to="/register"><button className="w-full py-3.5 rounded-full bg-[#4A8BDF] text-white font-semibold text-xs shadow-md">Unlock Pro Pack — ₹159</button></Link>
-            </div>
+            </motion.div>
 
             {/* Plan 4: ₹249 Elite */}
-            <div className="rounded-3xl bg-white border border-[#DCE7F2] p-6 sm:p-7 shadow-sm flex flex-col justify-between">
+            <motion.div whileHover={{ y: -4 }} className="rounded-3xl bg-white border border-[#DCE7F2] p-6 sm:p-7 shadow-sm flex flex-col justify-between transition-all">
               <div>
                 <div className="inline-block px-3 py-1 rounded-full bg-[#F8EAF4] text-[#A0006D] text-[10px] font-bold font-mono uppercase tracking-wider mb-4">
                   Full AI Mastery
@@ -935,7 +1133,7 @@ export default function Landing() {
                 </ul>
               </div>
               <Link to="/register"><button className="w-full py-3 rounded-full bg-[#A0006D] text-white font-semibold text-xs">Get Ultimate — ₹249</button></Link>
-            </div>
+            </motion.div>
           </div>
         </div>
       </Section>
@@ -992,10 +1190,14 @@ export default function Landing() {
 
           <div className="pt-2 flex flex-wrap items-center justify-center gap-4">
             <Link to="/register">
-              <button className="inline-flex items-center gap-2 bg-[#11183D] hover:bg-[#1E293B] text-white font-sans font-semibold text-sm sm:text-base px-8 py-3.5 rounded-full shadow-md transition-all cursor-pointer">
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                className="inline-flex items-center gap-2 bg-[#11183D] hover:bg-[#1E293B] text-white font-sans font-semibold text-sm sm:text-base px-8 py-3.5 rounded-full shadow-md transition-all cursor-pointer"
+              >
                 <span>Start Free Assessment</span>
                 <ArrowRight className="h-4 w-4 text-white" />
-              </button>
+              </motion.button>
             </Link>
           </div>
         </div>
