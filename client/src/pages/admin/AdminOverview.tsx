@@ -21,7 +21,8 @@ import {
   Calendar,
   Layers,
   IndianRupee,
-  Cpu
+  Cpu,
+  Lightbulb
 } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
@@ -376,8 +377,9 @@ export default function AdminOverview() {
             })}
           </div>
 
-          <div className="text-[11px] text-slate-500 font-mono pt-1">
-            <span className="text-slate-400">💡 Insight:</span> Highest mock interview load occurs between 6 PM to 9 PM IST.
+          <div className="text-[11px] text-slate-500 font-mono pt-1 flex items-center gap-1">
+            <Lightbulb size={13} className="text-amber-500 shrink-0" />
+            <span><strong className="text-slate-400">Insight:</strong> Highest mock interview load occurs between 6 PM to 9 PM IST.</span>
           </div>
         </Card>
 

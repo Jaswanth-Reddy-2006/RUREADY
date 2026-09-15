@@ -1,7 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import AIAvatar, { type AvatarState } from './interview/AIAvatar';
-import { Mic, MicOff, Video, VideoOff, Volume2, PhoneOff } from 'lucide-react';
-import { useParams } from 'react-router-dom';
+import { type OculusViseme } from './interview/visemeMapper';
+import { type VideoAnalysisMetrics } from '../hooks/useVideoAnalysisML';
+import { 
+  Volume2, Shield, Clock, Edit3, Maximize2
+} from 'lucide-react';
+import Badge from './ui/Badge';
 
 interface NormalInterviewRoomProps {
   mediaStream: MediaStream | null;
@@ -9,12 +13,22 @@ interface NormalInterviewRoomProps {
   avatarState: AvatarState;
   mouthOpenness: number;
   spokenWord: string;
+  activeVisemeShape?: OculusViseme;
   currentQuestionText: string;
   candidateTranscription: string;
   onSubmitAnswer: (answer: string) => void;
   onEndInterview: () => void;
   isProcessing: boolean;
   processingLabel: string;
+  questionIndex?: number;
+  totalQuestions?: number;
+  questionDifficulty?: string;
+  focusArea?: string;
+  silenceCountdown?: number | null;
+  isFullscreen?: boolean;
+  onReEnterFullscreen?: () => void;
+  onTranscriptionChange?: (text: string) => void;
+  videoMLMetrics?: VideoAnalysisMetrics;
 }
 
 export default function NormalInterviewRoom({
@@ -23,19 +37,45 @@ export default function NormalInterviewRoom({
   avatarState,
   mouthOpenness,
   spokenWord,
+  activeVisemeShape,
   currentQuestionText,
   candidateTranscription,
   onSubmitAnswer,
   onEndInterview,
   isProcessing,
   processingLabel,
+  questionIndex = 1,
+  totalQuestions = 5,
+  questionDifficulty = 'Medium',
+  focusArea = 'System & STAR Competency',
+  silenceCountdown = null,
+  isFullscreen = true,
+  onReEnterFullscreen,
+  onTranscriptionChange,
+  videoMLMetrics,
 }: NormalInterviewRoomProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isMicMuted, setIsMicMuted] = useState(false);
-  const [isCameraOff, setIsCameraOff] = useState(false);
-  const [captionsEnabled, setCaptionsEnabled] = useState(true);
+  const [isEditingTranscript, setIsEditingTranscript] = useState(false);
+  const [manualText, setManualText] = useState('');
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
-  // Bind candidate media stream
+  // Synchronize manual text with live transcription when not actively typing
+  useEffect(() => {
+    if (!isEditingTranscript) {
+      setManualText(candidateTranscription);
+    }
+  }, [candidateTranscription, isEditingTranscript]);
+
+  // Question elapsed timer
+  useEffect(() => {
+    setElapsedSeconds(0);
+    const interval = setInterval(() => {
+      setElapsedSeconds((prev) => prev + 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [currentQuestionText]);
+
+  // Bind candidate media stream (strictly locked on)
   useEffect(() => {
     if (videoRef.current && mediaStream) {
       videoRef.current.srcObject = mediaStream;
@@ -45,165 +85,189 @@ export default function NormalInterviewRoom({
     }
   }, [mediaStream]);
 
-  // Handle local track toggle
-  const toggleMic = () => {
-    if (mediaStream) {
-      mediaStream.getAudioTracks().forEach((track) => {
-        track.enabled = isMicMuted;
-      });
-      setIsMicMuted(!isMicMuted);
+  const formatPacingTime = (secs: number) => {
+    const mins = Math.floor(secs / 60);
+    const remainingSecs = secs % 60;
+    return `${mins}:${remainingSecs < 10 ? '0' : ''}${remainingSecs}`;
+  };
+
+  const handleInsertStructureTag = (tag: string) => {
+    const prefix = `[${tag}]: `;
+    const updated = manualText ? `${manualText}\n${prefix}` : prefix;
+    setManualText(updated);
+    setIsEditingTranscript(true);
+    if (onTranscriptionChange) {
+      onTranscriptionChange(updated);
     }
   };
 
-  const toggleCamera = () => {
-    if (mediaStream) {
-      mediaStream.getVideoTracks().forEach((track) => {
-        track.enabled = isCameraOff;
-      });
-      setIsCameraOff(!isCameraOff);
+  const handleDirectSubmit = () => {
+    const finalAnswer = isEditingTranscript ? manualText : (candidateTranscription || manualText);
+    if (!finalAnswer.trim() || isProcessing) return;
+    onSubmitAnswer(finalAnswer);
+    setIsEditingTranscript(false);
+    setManualText('');
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      handleDirectSubmit();
     }
   };
+
+  const activeAnswer = isEditingTranscript ? manualText : candidateTranscription;
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-[#EFFAFD] text-[#11183D] font-sans select-none overflow-hidden">
+    <div 
+      className="fixed inset-0 z-50 flex flex-col bg-[#EFFAFD] text-[#11183D] font-sans select-none overflow-hidden"
+      onKeyDown={handleKeyDown}
+    >
       
-      {/* ─── 1. TOP MINIMAL BAR ─── */}
-      <header className="h-16 px-6 sm:px-8 flex items-center justify-between z-20 shrink-0 border-b border-[#DCE7F2] bg-white shadow-xs">
-        {/* Left: Brand */}
-        <div className="flex items-center gap-2">
-          <span className="text-base sm:text-lg font-bold tracking-tight font-sans text-[#11183D]">
-            R U Ready<span className="text-[#A0006D]">?</span>
+      {/* ─── 1. TOP MINIMAL BRAND & EXIT BAR ─── */}
+      <header className="px-6 py-3 shrink-0 border-b border-[#DCE7F2] bg-white shadow-xs z-20 flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-[#4A8BDF] to-[#2459A8] flex items-center justify-center text-white font-bold text-xs shadow-xs font-display">
+            RU
+          </div>
+          <span className="text-sm font-bold text-[#11183D] font-display">
+            RU Ready
           </span>
         </div>
 
-        {/* Right: Leave Meeting Action */}
+        {/* Discreet End Call */}
         <button
+          type="button"
           onClick={onEndInterview}
-          className="bg-[#D64545] hover:bg-[#D64545]/90 text-white px-5 py-2 rounded-full font-semibold text-xs sm:text-sm flex items-center gap-2 shadow-sm transition-all cursor-pointer active:scale-95 font-sans"
+          className="bg-[#D64545] hover:bg-[#D64545]/90 text-white px-4 py-1.5 rounded-full font-bold text-xs shadow-xs transition-all cursor-pointer active:scale-95 font-display"
         >
-          <PhoneOff size={16} />
-          <span>Leave Room</span>
+          End Call
         </button>
       </header>
 
-      {/* ─── 2. MAIN 2-PANEL EQUAL STAGE (Desktop Split / Mobile Stacked) ─── */}
-      <main className="flex-1 w-full max-w-[1700px] mx-auto p-4 sm:p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 items-center min-h-0">
+      {/* ─── 2. MAIN 2-PANEL EQUAL STAGE ─── */}
+      <main className="flex-1 w-full max-w-[1750px] mx-auto p-4 sm:p-5 grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch min-h-0 relative overflow-hidden">
         
-        {/* ─── LEFT: 3D AI INTERVIEWER STAGE ─── */}
-        <div className="w-full h-full aspect-[4/3] md:aspect-auto bg-white border border-[#DCE7F2] rounded-2xl sm:rounded-3xl overflow-hidden relative flex items-center justify-center shadow-sm">
-          <AIAvatar
-            state={avatarState}
-            isSpeaking={aiIsSpeaking}
-            mouthOpenness={mouthOpenness}
-            currentWord={spokenWord}
-            persona="AVA"
-            className="w-full h-full object-cover"
-          />
+        {/* ─── LEFT: AVA'S STAGE ─── */}
+        <div className="w-full h-full flex flex-col bg-white border border-[#DCE7F2] rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm">
+          
+          {/* 3D Avatar Canvas */}
+          <div className="relative flex-1 min-h-[260px] w-full flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#0e172e] via-[#090e1c] to-[#04060c]">
+            <AIAvatar
+              state={avatarState}
+              isSpeaking={aiIsSpeaking}
+              mouthOpenness={mouthOpenness}
+              activeVisemeShape={activeVisemeShape}
+              currentWord={spokenWord}
+              persona="AVA"
+              className="w-full h-full object-cover"
+            />
 
-          {/* Subtitle / Sub-Caption Overlay (Question or Speech) */}
-          {captionsEnabled && (currentQuestionText || candidateTranscription) && (
-            <div className="absolute bottom-6 left-6 right-6 z-10">
-              <div className="bg-[#11183D]/90 backdrop-blur-md border border-[#DCE7F2]/30 px-4 sm:px-5 py-3 rounded-2xl shadow-lg max-w-xl text-left animate-fade-in flex items-start gap-3">
-                <div className="h-5 w-5 rounded-full bg-[#4A8BDF]/20 flex items-center justify-center shrink-0 mt-0.5 text-[#4A8BDF]">
-                  <Volume2 size={12} />
+            {/* Clean Ava Tag */}
+            <div className="absolute top-4 left-4 z-10 px-3 py-1 rounded-full bg-[#11183D]/80 backdrop-blur-md border border-white/10 text-white text-xs font-bold font-display shadow-md">
+              Ava
+            </div>
+
+            {/* Processing Indicator */}
+            {isProcessing && (
+              <div className="absolute inset-0 bg-[#070b14]/70 backdrop-blur-xs flex items-center justify-center z-20">
+                <div className="bg-[#11183D] border border-white/20 px-5 py-2.5 rounded-full text-xs text-white font-mono flex items-center gap-2.5 shadow-xl">
+                  <div className="h-3.5 w-3.5 border-2 border-[#4A8BDF] border-t-transparent animate-spin rounded-full" />
+                  <span>{processingLabel || 'Ava is evaluating response...'}</span>
                 </div>
-                <div className="space-y-0.5">
-                  <p className="text-xs sm:text-sm text-white font-medium leading-relaxed font-body">
-                    {aiIsSpeaking ? (spokenWord || currentQuestionText) : (currentQuestionText || candidateTranscription)}
+              </div>
+            )}
+          </div>
+
+          {/* ─── AVA'S BOTTOM CAPTION BOX ─── */}
+          {/* Speaks question, then displays 'Come on, you can start your question' */}
+          <div className="bg-[#11183D] p-5 shrink-0 z-10">
+            <div className="min-h-[72px] max-h-36 overflow-y-auto pr-1 flex flex-col justify-center">
+              {aiIsSpeaking ? (
+                <div>
+                  <span className="text-[10px] font-mono text-[#7dd3fc] uppercase tracking-wider block mb-1">
+                    Ava Speaking
+                  </span>
+                  <p className="text-sm sm:text-base text-white font-medium leading-relaxed font-body">
+                    {currentQuestionText || 'Preparing question...'}
                   </p>
                 </div>
-              </div>
+              ) : (
+                <div className="space-y-1">
+                  <p className="text-sm sm:text-base font-bold text-[#38bdf8] font-display tracking-tight">
+                    Come on, you can start your question
+                  </p>
+                  <p className="text-xs sm:text-sm text-slate-300 font-normal leading-relaxed font-body line-clamp-2">
+                    {currentQuestionText}
+                  </p>
+                </div>
+              )}
             </div>
-          )}
+          </div>
 
-          {/* Processing Indicator */}
-          {isProcessing && (
-            <div className="absolute inset-0 bg-[#11183D]/60 backdrop-blur-xs flex items-center justify-center z-20">
-              <div className="bg-[#11183D] border border-[#DCE7F2]/20 px-5 py-2.5 rounded-full text-xs text-white font-mono flex items-center gap-2 shadow-xl">
-                <div className="h-3 w-3 border-2 border-[#4A8BDF] border-t-transparent animate-spin rounded-full" />
-                <span>{processingLabel || 'Ava is thinking...'}</span>
-              </div>
-            </div>
-          )}
         </div>
 
-        {/* ─── RIGHT: CANDIDATE WEBCAM STAGE ─── */}
-        <div className="w-full h-full aspect-[4/3] md:aspect-auto bg-white border border-[#DCE7F2] rounded-2xl sm:rounded-3xl overflow-hidden relative flex items-center justify-center shadow-sm">
-          {mediaStream && !isCameraOff ? (
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              muted
-              className="w-full h-full object-cover transform scale-x-[-1]"
-            />
-          ) : (
-            <div className="text-center space-y-2 p-6">
-              <div className="h-16 w-16 rounded-full bg-[#EFFAFD] border border-[#DCE7F2] flex items-center justify-center mx-auto text-[#7B8799]">
-                <VideoOff size={24} />
+        {/* ─── RIGHT: CANDIDATE STAGE ─── */}
+        <div className="w-full h-full flex flex-col bg-white border border-[#DCE7F2] rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm justify-between">
+          
+          {/* Candidate Webcam Feed Area */}
+          <div className="relative flex-1 bg-[#11183D] min-h-[260px] flex items-center justify-center overflow-hidden">
+            {mediaStream ? (
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                className="w-full h-full object-cover transform scale-x-[-1]"
+              />
+            ) : (
+              <div className="text-center space-y-2 p-6">
+                <div className="h-3 w-3 rounded-full bg-emerald-500 animate-pulse mx-auto" />
+                <p className="text-xs text-white/70 font-medium font-body">Camera Active</p>
               </div>
-              <p className="text-xs text-[#526078] font-medium font-body">Camera Paused</p>
+            )}
+
+            {/* Clean You Tag */}
+            <div className="absolute top-4 left-4 z-10 px-3 py-1 rounded-full bg-[#11183D]/80 backdrop-blur-md border border-white/10 text-white text-xs font-bold font-display shadow-md">
+              You
             </div>
-          )}
+
+            {/* Live On-Device ML Telemetry Indicator (Zero Video Recording) */}
+            <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
+              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-[#11183D]/85 backdrop-blur-md border border-emerald-500/30 text-white text-xs font-medium font-body shadow-md">
+                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-[10px] text-emerald-300 font-mono tracking-wider">LIVE ML</span>
+                <span className="text-white/30">•</span>
+                <span className="text-[11px] text-slate-200">Confidence {videoMLMetrics?.confidenceScore ?? 88}%</span>
+                <span className="text-white/30">•</span>
+                <span className="text-[11px] text-[#7dd3fc]">{videoMLMetrics?.composureLevel ?? 'Calm & Composed'}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* ─── CANDIDATE'S BOTTOM TRANSCRIPTION BOX ─── */}
+          {/* Live transcription appears here in real time as candidate speaks */}
+          <div className="bg-[#11183D] p-5 shrink-0 z-10 border-t border-[#1e295d]">
+            <div className="min-h-[72px] max-h-36 overflow-y-auto pr-1 flex flex-col justify-center">
+              <span className="text-[10px] font-mono text-emerald-400 uppercase tracking-wider block mb-1">
+                Your Response
+              </span>
+              <p className="text-sm sm:text-base text-white font-medium leading-relaxed font-body">
+                {activeAnswer.trim() ? (
+                  activeAnswer
+                ) : (
+                  <span className="text-slate-400 italic">
+                    Speak your answer aloud into your microphone...
+                  </span>
+                )}
+              </p>
+            </div>
+          </div>
+
         </div>
 
       </main>
-
-      {/* ─── 3. BOTTOM MINIMAL FLOATING CONTROLS DOCK ─── */}
-      <footer className="h-20 px-6 flex items-center justify-center shrink-0 bg-white border-t border-[#DCE7F2] z-20 shadow-xs">
-        <div className="flex items-center gap-3 sm:gap-4 bg-[#EFFAFD] border border-[#DCE7F2] p-2 rounded-full shadow-sm">
-          {/* Mic Toggle */}
-          <button
-            onClick={toggleMic}
-            className={`h-11 w-11 sm:h-12 sm:w-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${
-              isMicMuted
-                ? 'bg-[#D64545] text-white shadow-md'
-                : 'bg-white hover:bg-[#EFF7FD] text-[#11183D] border border-[#DCE7F2]'
-            }`}
-            title={isMicMuted ? 'Unmute Microphone' : 'Mute Microphone'}
-          >
-            {isMicMuted ? <MicOff size={18} /> : <Mic size={18} />}
-          </button>
-
-          {/* Camera Toggle */}
-          <button
-            onClick={toggleCamera}
-            className={`h-11 w-11 sm:h-12 sm:w-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${
-              isCameraOff
-                ? 'bg-[#D64545] text-white shadow-md'
-                : 'bg-white hover:bg-[#EFF7FD] text-[#11183D] border border-[#DCE7F2]'
-            }`}
-            title={isCameraOff ? 'Turn On Camera' : 'Turn Off Camera'}
-          >
-            {isCameraOff ? <VideoOff size={18} /> : <Video size={18} />}
-          </button>
-
-          {/* Subtitles Toggle */}
-          <button
-            onClick={() => setCaptionsEnabled(!captionsEnabled)}
-            className={`h-11 w-11 sm:h-12 sm:w-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${
-              captionsEnabled
-                ? 'bg-[#4A8BDF] text-white font-bold text-xs shadow-md'
-                : 'bg-white hover:bg-[#EFF7FD] text-[#11183D] border border-[#DCE7F2]'
-            }`}
-            title="Toggle Subtitles"
-          >
-            CC
-          </button>
-
-          {/* Submit / Finish Answer Button */}
-          {candidateTranscription.trim() && (
-            <button
-              disabled={isProcessing}
-              onClick={() => onSubmitAnswer(candidateTranscription)}
-              className="px-5 py-2.5 rounded-full bg-[#4A8BDF] text-white font-bold text-xs sm:text-sm hover:bg-[#2459A8] transition-all cursor-pointer shadow-md ml-2 animate-fade-in font-display"
-            >
-              Submit Answer →
-            </button>
-          )}
-        </div>
-      </footer>
-
     </div>
   );
 }
+

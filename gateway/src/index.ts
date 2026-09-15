@@ -149,6 +149,22 @@ app.use(
   }),
 );
 
+// Route coding run/hint/ideal/dialogue directly to coding interview microservice
+app.use(
+  [
+    '/api/interview/session/:id/run',
+    '/api/interview/session/:id/hint',
+    '/api/interview/session/:id/ideal',
+    '/api/interview/session/:id/dialogue'
+  ],
+  createProxyMiddleware({
+    target: CODING_INTERVIEW_SERVICE_URL,
+    changeOrigin: true,
+    ws: true,
+  }),
+);
+
+
 // Generic Interview backward compatibility route
 app.use(
   '/api/interview',

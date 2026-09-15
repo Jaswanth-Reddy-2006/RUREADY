@@ -1,19 +1,19 @@
 import { createSpeechVisemeTimeline, VisemeId, VisemeShape, VISEME_SHAPES, charToViseme } from './visemeEngine';
 
-/** Map a spoken character/word to mouth openness 0–1 for backwards compatibility */
+/** Map a spoken character/word to mouth openness 0–1 for backwards compatibility (calibrated for natural speech) */
 export function visemeOpenness(fragment: string): number {
   const t = fragment.toLowerCase().trim();
-  if (!t) return 0.08;
-  if (/[aeiou]/.test(t) && t.length <= 2) return 0.85;
-  if (/^(th|oh|ow|ay|ee|oo|ah|uh)/.test(t)) return 0.75;
-  if (/[bmpw]/.test(t.charAt(0))) return 0.12;
-  if (/[fv]/.test(t.charAt(0))) return 0.35;
-  if (/[lr]/.test(t.charAt(0))) return 0.45;
-  if (/[sztcndkg]/.test(t)) return 0.55;
+  if (!t) return 0.04;
+  if (/[aeiou]/.test(t) && t.length <= 2) return 0.30;
+  if (/^(th|oh|ow|ay|ee|oo|ah|uh)/.test(t)) return 0.28;
+  if (/[bmpw]/.test(t.charAt(0))) return 0.04;
+  if (/[fv]/.test(t.charAt(0))) return 0.10;
+  if (/[lr]/.test(t.charAt(0))) return 0.14;
+  if (/[sztcndkg]/.test(t)) return 0.12;
   const vowelCount = (t.match(/[aeiou]/g) || []).length;
-  if (vowelCount >= 2) return 0.8;
-  if (vowelCount === 1) return 0.65;
-  return 0.4;
+  if (vowelCount >= 2) return 0.26;
+  if (vowelCount === 1) return 0.20;
+  return 0.12;
 }
 
 export type LipSyncCallbacks = {

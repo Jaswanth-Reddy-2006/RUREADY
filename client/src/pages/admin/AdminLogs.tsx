@@ -24,7 +24,8 @@ import {
   Terminal,
   ShieldCheck,
   Cpu,
-  Radio
+  Radio,
+  Zap
 } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
@@ -321,8 +322,9 @@ export default function AdminLogs() {
 
                 <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 space-y-1">
                   <span className="text-[10px] uppercase font-bold text-slate-400 font-display">Background Tasks</span>
-                  <p className="text-xs text-slate-700 font-mono font-semibold truncate">
-                    ⚡ {svc.backgroundJobs}
+                  <p className="text-xs text-slate-700 font-mono font-semibold truncate flex items-center gap-1.5">
+                    <Zap size={13} className="text-amber-500 fill-amber-500 shrink-0" />
+                    <span>{svc.backgroundJobs}</span>
                   </p>
                 </div>
 

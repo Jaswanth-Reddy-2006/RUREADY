@@ -172,11 +172,16 @@ const STEP_QUOTES = [
     author: 'Satya Nadella',
     role: 'CEO, Microsoft',
   },
+  {
+    quote: 'Education is not the learning of facts, but the training of the mind to think.',
+    author: 'Albert Einstein',
+    role: 'Theoretical Physicist & Nobel Laureate',
+  },
 ];
 
 export default function Register() {
   const { register, isRegistering } = useAuth();
-  const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
+  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(1);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [isCheckingEmail, setIsCheckingEmail] = useState(false);
@@ -196,6 +201,13 @@ export default function Register() {
     experienceLevel: 'mid',
     primaryFocus: 'coding',
     timeline: 'urgent',
+    college: '',
+    degree: '',
+    graduationYear: '2025',
+    cgpa: '',
+    coreSkills: '',
+    githubUrl: '',
+    linkedinUrl: '',
   });
 
   const strength = getPasswordStrength(form.password);
@@ -294,8 +306,9 @@ export default function Register() {
       setCurrentStep(2);
     } else if (currentStep === 2) {
       setCurrentStep(3);
+    } else if (currentStep === 3) {
+      setCurrentStep(4);
     } else {
-      // Step 3 submission
       handleSubmitFinal();
     }
   };
@@ -313,6 +326,22 @@ export default function Register() {
           completedAt: new Date().toISOString(),
         }),
       );
+
+      if (form.college || form.degree || form.coreSkills) {
+        localStorage.setItem(
+          'ru_ready_student_profile',
+          JSON.stringify({
+            college: form.college.trim(),
+            degree: form.degree.trim(),
+            graduationYear: form.graduationYear,
+            cgpa: form.cgpa.trim(),
+            coreSkills: form.coreSkills.split(',').map((s) => s.trim()).filter(Boolean),
+            githubUrl: form.githubUrl.trim(),
+            linkedinUrl: form.linkedinUrl.trim(),
+            savedAt: new Date().toISOString(),
+          }),
+        );
+      }
     } catch {
       // Ignore storage error
     }
@@ -365,7 +394,7 @@ export default function Register() {
             ) : (
               <button
                 type="button"
-                onClick={() => setCurrentStep((prev) => (prev > 1 ? ((prev - 1) as 1 | 2 | 3) : 1))}
+                onClick={() => setCurrentStep((prev) => (prev > 1 ? ((prev - 1) as 1 | 2 | 3 | 4) : 1))}
                 className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#4A8BDF] hover:text-[#2459A8] transition-colors font-display cursor-pointer"
               >
                 <ArrowLeft className="h-3.5 w-3.5" />
@@ -375,12 +404,12 @@ export default function Register() {
 
             {/* Step Progress Pill */}
             <div className="flex items-center gap-1.5 bg-[#EFFAFD] px-3 py-1 rounded-full border border-[#DCE7F2]">
-              {[1, 2, 3].map((stepNum) => (
+              {[1, 2, 3, 4].map((stepNum) => (
                 <div
                   key={stepNum}
                   onClick={() => {
                     if (stepNum < currentStep || (stepNum === 2 && validateStep1())) {
-                      setCurrentStep(stepNum as 1 | 2 | 3);
+                      setCurrentStep(stepNum as 1 | 2 | 3 | 4);
                     }
                   }}
                   className={`cursor-pointer transition-all duration-300 ${
@@ -394,7 +423,7 @@ export default function Register() {
                 />
               ))}
               <span className="text-[10.5px] font-mono font-bold text-[#526078] ml-1">
-                {currentStep}/3
+                {currentStep}/4
               </span>
             </div>
           </div>
@@ -805,7 +834,112 @@ export default function Register() {
                   </div>
                 </div>
 
-                <div className="pt-1">
+                <div className="pt-2 flex flex-col gap-2">
+                  <Button
+                    type="button"
+                    size="lg"
+                    fullWidth
+                    onClick={() => setCurrentStep(4)}
+                    className="w-full bg-[#4A8BDF] hover:bg-[#2459A8] text-white font-display font-bold text-sm sm:text-base py-3 rounded-xl shadow-md shadow-[#4A8BDF]/20 transition-all cursor-pointer"
+                  >
+                    Continue to Academic Profile (Optional) →
+                  </Button>
+                  <button
+                    type="button"
+                    onClick={handleSubmitFinal}
+                    disabled={isRegistering}
+                    className="text-xs text-[#526078] hover:text-[#11183D] underline font-medium py-1 transition-colors text-center cursor-pointer"
+                  >
+                    Skip & Create Account Now
+                  </button>
+                </div>
+              </motion.div>
+            )}
+
+            {/* ═════════ STEP 4: Academic & Student Profile (Optional) ═════════ */}
+            {currentStep === 4 && (
+              <motion.div
+                key="step-4"
+                initial={{ opacity: 0, x: -15 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 15 }}
+                transition={{ duration: 0.25 }}
+                className="space-y-3.5"
+              >
+                <div>
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#EFF7FD] text-[#2459A8] border border-[#2459A8]/20 mb-1 font-mono uppercase">
+                    Optional Profile Setup
+                  </div>
+                  <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-[#11183D] tracking-tight">
+                    Your Academic & Student Profile
+                  </h2>
+                  <p className="font-body text-xs sm:text-sm text-[#526078]">
+                    Fill these details to pre-populate your resumes and tailored company interview kits. You can also skip and complete later.
+                  </p>
+                </div>
+
+                <div className="space-y-2.5">
+                  <Input
+                    label="College / University"
+                    placeholder="e.g. Stanford University or NIT Trichy"
+                    value={form.college}
+                    onChange={(e) => updateField('college', e.target.value)}
+                    variant="light"
+                  />
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <Input
+                      label="Degree & Major"
+                      placeholder="e.g. B.Tech Computer Science"
+                      value={form.degree}
+                      onChange={(e) => updateField('degree', e.target.value)}
+                      variant="light"
+                    />
+                    <Input
+                      label="Graduation Year"
+                      placeholder="e.g. 2025"
+                      value={form.graduationYear}
+                      onChange={(e) => updateField('graduationYear', e.target.value)}
+                      variant="light"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <Input
+                      label="CGPA / GPA (Optional)"
+                      placeholder="e.g. 8.8 / 10 or 3.9 / 4.0"
+                      value={form.cgpa}
+                      onChange={(e) => updateField('cgpa', e.target.value)}
+                      variant="light"
+                    />
+                    <Input
+                      label="Core Skills (comma separated)"
+                      placeholder="e.g. React, Python, SQL, Docker"
+                      value={form.coreSkills}
+                      onChange={(e) => updateField('coreSkills', e.target.value)}
+                      variant="light"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <Input
+                      label="GitHub Profile URL"
+                      placeholder="https://github.com/username"
+                      value={form.githubUrl}
+                      onChange={(e) => updateField('githubUrl', e.target.value)}
+                      variant="light"
+                    />
+                    <Input
+                      label="LinkedIn Profile URL"
+                      placeholder="https://linkedin.com/in/username"
+                      value={form.linkedinUrl}
+                      onChange={(e) => updateField('linkedinUrl', e.target.value)}
+                      variant="light"
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-2 flex flex-col gap-2">
                   <Button
                     type="button"
                     size="lg"
@@ -814,8 +948,17 @@ export default function Register() {
                     onClick={handleSubmitFinal}
                     className="w-full bg-[#4A8BDF] hover:bg-[#2459A8] text-white font-display font-bold text-sm sm:text-base py-3 rounded-xl shadow-md shadow-[#4A8BDF]/20 transition-all cursor-pointer"
                   >
-                    Complete Onboarding & Start Practice →
+                    Save Profile & Complete Registration →
                   </Button>
+
+                  <button
+                    type="button"
+                    onClick={handleSubmitFinal}
+                    disabled={isRegistering}
+                    className="text-xs text-[#526078] hover:text-[#11183D] underline font-medium py-1 transition-colors text-center cursor-pointer"
+                  >
+                    Skip for now & Create Account
+                  </button>
                 </div>
               </motion.div>
             )}

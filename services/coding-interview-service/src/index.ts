@@ -35,6 +35,7 @@ app.get('/health', (_req: Request, res: Response) => {
 });
 
 app.use('/api/interview/coding', codingRoutes);
+app.use('/api/interview', codingRoutes);
 app.use('/', codingRoutes);
 
 // Global Error Handler

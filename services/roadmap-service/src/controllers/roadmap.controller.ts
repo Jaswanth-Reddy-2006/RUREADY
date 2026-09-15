@@ -80,4 +80,42 @@ export const roadmapController = {
       next(err);
     }
   },
+
+  async getCatalog(req: Request, res: Response, next: NextFunction) {
+    try {
+      const roadmaps = await roadmapService.getPublicCatalog();
+      res.status(200).json({
+        success: true,
+        data: roadmaps,
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async createManualRoadmap(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = getUserId(req);
+      const roadmap = await roadmapService.createManualRoadmap(userId, req.body);
+      res.status(201).json({
+        success: true,
+        data: roadmap,
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async getUserRoadmapsByCreator(req: Request, res: Response, next: NextFunction) {
+    try {
+      const targetUserId = req.params.userId as string;
+      const roadmaps = await roadmapService.getUserCreatedRoadmaps(targetUserId);
+      res.status(200).json({
+        success: true,
+        data: roadmaps,
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
 };

@@ -18,6 +18,7 @@ const submitAnswerSchema = z.object({
   questionId: z.string().min(1),
   answerText: z.string().min(1),
   timeTaken: z.number().min(1),
+  isSkip: z.boolean().optional().default(false),
 });
 
 export const oralController = {
@@ -50,8 +51,8 @@ export const oralController = {
     try {
       const userId = (req as any).user?.userId || (req.headers['x-user-id'] as string) || 'demo-user-123';
       const sessionId = req.params.id as string;
-      const { questionId, answerText, timeTaken } = submitAnswerSchema.parse(req.body);
-      const updated = await oralService.submitAnswer(sessionId, userId, questionId, answerText, timeTaken);
+      const { questionId, answerText, timeTaken, isSkip } = submitAnswerSchema.parse(req.body);
+      const updated = await oralService.submitAnswer(sessionId, userId, questionId, answerText, timeTaken, isSkip);
       res.status(200).json(updated);
     } catch (err) {
       next(err);
@@ -99,5 +100,9 @@ export const oralController = {
     } catch (err) {
       next(err);
     }
+  },
+
+  async submitTelemetry(req: Request, res: Response): Promise<void> {
+    res.status(200).json({ success: true, message: 'Telemetry received' });
   },
 };

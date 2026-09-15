@@ -8,35 +8,36 @@ const footerLinks = [
     links: [
       { label: 'Oral Interview', href: '/interview/new' },
       { label: 'Coding Playground', href: '/interview/coding/new' },
-      { label: 'Performance Report', href: '/history' },
-      { label: 'Socratic AI Engine', href: '/#features' },
+      { label: 'ATS Resume Match', href: '/ats' },
+      { label: 'Career Roadmaps', href: '/roadmap' },
+      { label: 'Role Communities', href: '/discuss' },
     ],
   },
   {
     title: 'Company',
     links: [
-      { label: 'About', href: '/#about' },
-      { label: 'Careers', href: '#' },
-      { label: 'Blog', href: '#' },
-      { label: 'Contact', href: '#' },
+      { label: 'About Us', href: '/about' },
+      { label: 'Contact', href: '/contact' },
+      { label: 'Pricing Plans', href: '/#pricing' },
+      { label: 'FAQ', href: '/#faq' },
     ],
   },
   {
-    title: 'Support',
+    title: 'Legal & Security',
     links: [
-      { label: 'Help Center', href: '#' },
-      { label: 'Privacy Policy', href: '#' },
-      { label: 'Terms of Service', href: '#' },
-      { label: 'Security Bar', href: '#' },
+      { label: 'Privacy Policy', href: '/privacy' },
+      { label: 'Terms of Service', href: '/terms' },
+      { label: 'Data Protection', href: '/privacy' },
+      { label: 'Support Helpdesk', href: '/contact' },
     ],
   },
 ];
 
 const socialLinks = [
-  { icon: Linkedin, href: '#', label: 'LinkedIn' },
-  { icon: Youtube, href: '#', label: 'YouTube' },
-  { icon: Twitter, href: '#', label: 'Twitter' },
-  { icon: Instagram, href: '#', label: 'Instagram' },
+  { icon: Linkedin, href: 'https://linkedin.com', label: 'LinkedIn' },
+  { icon: Youtube, href: 'https://youtube.com', label: 'YouTube' },
+  { icon: Twitter, href: 'https://twitter.com', label: 'Twitter' },
+  { icon: Instagram, href: 'https://instagram.com', label: 'Instagram' },
 ];
 
 export default function Footer() {
@@ -51,13 +52,15 @@ export default function Footer() {
               </Link>
             </div>
             <p className="text-xs text-[#526078] font-body max-w-xs leading-relaxed mb-6">
-              Realistic mock interviews with uninflated feedback. Build authentic technical confidence and get hired.
+              Realistic mock interviews with uninflated feedback. Build authentic technical confidence and get placed.
             </p>
             <div className="flex items-center gap-2.5">
               {socialLinks.map((social) => (
                 <a
                   key={social.label}
                   href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label={social.label}
                   className="h-8 w-8 rounded-xl bg-[#EFFAFD] flex items-center justify-center hover:bg-[#4A8BDF] hover:text-white transition-all duration-200 text-[#526078] border border-[#DCE7F2]"
                 >
@@ -75,12 +78,21 @@ export default function Footer() {
               <ul className="flex flex-col gap-2">
                 {group.links.map((link) => (
                   <li key={link.label}>
-                    <a
-                      href={link.href}
-                      className="text-xs text-[#526078] hover:text-[#4A8BDF] transition-colors font-body"
-                    >
-                      {link.label}
-                    </a>
+                    {link.href.startsWith('/#') ? (
+                      <a
+                        href={link.href}
+                        className="text-xs text-[#526078] hover:text-[#4A8BDF] transition-colors font-body"
+                      >
+                        {link.label}
+                      </a>
+                    ) : (
+                      <Link
+                        to={link.href}
+                        className="text-xs text-[#526078] hover:text-[#4A8BDF] transition-colors font-body"
+                      >
+                        {link.label}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>

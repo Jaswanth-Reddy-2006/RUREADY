@@ -57,8 +57,8 @@ export function useFaceTelemetry(
           bufferRef.current = [];
           lastPostTimeRef.current = Date.now();
 
-          apiClient.post(`/interview/session/${activeSessionId}/telemetry`, dataToFlush)
-            .catch((err) => console.warn('Simulated telemetry batch post failed:', err));
+          apiClient.post(`/analysis/session/${activeSessionId}/telemetry`, dataToFlush)
+            .catch(() => undefined);
         }
       }, 500);
 
@@ -77,7 +77,7 @@ export function useFaceTelemetry(
     let canvas: any = document.createElement('canvas');
     canvas.width = 320;
     canvas.height = 240;
-    let ctx: any = canvas.getContext('2d');
+    let ctx: any = canvas.getContext('2d', { willReadFrequently: true });
 
     // Instantiate native face detector if supported
     let faceDetector: any = null;
@@ -325,8 +325,8 @@ export function useFaceTelemetry(
       bufferRef.current = []; // Clear local queue buffer
       lastPostTimeRef.current = Date.now();
 
-      apiClient.post(`/interview/session/${activeSessionId}/telemetry`, telemetryBatch)
-        .catch((err) => console.error('Failed to post telemetry batch:', err));
+      apiClient.post(`/analysis/session/${activeSessionId}/telemetry`, telemetryBatch)
+        .catch(() => undefined);
 
       // Reset blink counts for the next window
       blinkCountRef.current = 0;

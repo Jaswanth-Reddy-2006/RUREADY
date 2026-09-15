@@ -313,7 +313,8 @@ export default function DeviceCheck() {
     }
     
     setAntiCheatStatus('SECURED');
-    navigate(`/interview/${id}`);
+    const targetPath = session?.interviewType === 'CODING' ? `/interview/coding/${id}` : `/interview/${id}`;
+    navigate(targetPath);
   };
 
   if (loadError) {
@@ -591,25 +592,25 @@ export default function DeviceCheck() {
                     </p>
                   </div>
                   <Badge variant={isMicReady ? "success" : "warning"} size="sm" dot>
-                    {isMicReady ? 'Voice Detected ✓' : 'Listening...'}
+                    {isMicReady ? 'Voice Detected' : 'Listening...'}
                   </Badge>
                 </div>
 
                 {/* Speak Phrase Banner */}
                 <div className="p-5 rounded-2xl bg-[#EFF7FD] border border-[#4A8BDF]/30 text-center space-y-2">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-[#4A8BDF] font-display block">
-                    Please speak this sentence clearly:
+                    Interactive Speech Test:
                   </span>
                   <p className="text-lg font-bold font-display text-[#11183D]">
-                    "I am ready to begin my interview simulation."
+                    "Hello Ava, I am ready to begin my interview."
                   </p>
-                  <p className="text-xs text-[#526078] font-body">
-                    The frequency visualizer below will react in real time to your vocal volume.
+                  <p className="text-xs text-[#334155] font-body">
+                    Speak into your microphone. Both audio volume and real-time speech recognition will calibrate below.
                   </p>
                 </div>
 
                 {/* Live Audio Visualizer Frequency Bars */}
-                <div className="space-y-3 p-6 rounded-2xl bg-[#11183D] border border-[#2459A8]/40 text-white">
+                <div className="space-y-3 p-6 rounded-2xl bg-[#11183D] border border-[#2459A8]/40 text-white shadow-sm">
                   <div className="flex items-center justify-between text-xs">
                     <span className="font-semibold text-[#EFFAFD] flex items-center gap-2">
                       <Mic size={14} className="text-[#4A8BDF]" />
@@ -622,7 +623,7 @@ export default function DeviceCheck() {
 
                   <div className="flex justify-between items-end h-16 bg-[#11183D]/90 rounded-xl p-3 border border-white/10">
                     {Array.from({ length: 32 }).map((_, idx) => {
-                      const barThresh = idx * 3;
+                      const barThresh = idx * 2.5;
                       const isActive = micStatus === 'ALLOWED' && decibels > barThresh;
                       
                       return (
@@ -649,12 +650,12 @@ export default function DeviceCheck() {
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
                   <div className="flex items-center gap-2 text-xs">
                     {voiceDetected ? (
-                      <span className="flex items-center gap-1.5 text-[#168A62] font-bold bg-[#E8F5F0] px-3 py-1 rounded-xl border border-[#168A62]/30">
+                      <span className="flex items-center gap-1.5 text-[#168A62] font-bold bg-[#E8F5F0] px-3 py-1.5 rounded-xl border border-[#168A62]/30">
                         <CheckCircle2 size={15} className="text-[#168A62]" />
-                        Microphone Input Confirmed!
+                        Microphone Input & Voice Detected!
                       </span>
                     ) : (
-                      <span className="text-[#7B8799] italic">
+                      <span className="text-[#526078] italic bg-[#EFFAFD] px-3 py-1.5 rounded-xl border border-[#DCE7F2]">
                         Awaiting voice input... Say a few words to calibrate.
                       </span>
                     )}
@@ -702,7 +703,7 @@ export default function DeviceCheck() {
                     </p>
                   </div>
                   <Badge variant={soundConfirmed ? "success" : "warning"} size="sm" dot>
-                    {soundConfirmed ? 'Audio Output Ready ✓' : 'Pending Test'}
+                    {soundConfirmed ? 'Audio Output Ready' : 'Pending Test'}
                   </Badge>
                 </div>
 
@@ -741,13 +742,14 @@ export default function DeviceCheck() {
                         <button
                           type="button"
                           onClick={() => setSoundConfirmed(true)}
-                          className={`px-5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                          className={`inline-flex items-center gap-1.5 px-5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                             soundConfirmed
                               ? 'bg-[#168A62] text-white shadow-sm ring-2 ring-[#168A62]/30'
                               : 'bg-[#E8F5F0] text-[#168A62] border border-[#168A62]/30 hover:bg-[#E8F5F0]/80'
                           }`}
                         >
-                          ✓ Yes, I Hear It Clearly
+                          <Check size={14} />
+                          <span>Yes, I Hear It Clearly</span>
                         </button>
                         <button
                           type="button"
@@ -768,41 +770,41 @@ export default function DeviceCheck() {
                     onClick={() => setActiveStep(2)}
                     icon={<ArrowLeft size={14} />}
                   >
-                    Back
+                    Back to Mic
                   </Button>
                   <Button
+                    variant={soundConfirmed ? "primary" : "secondary"}
                     size="md"
                     disabled={!soundConfirmed}
                     onClick={() => setActiveStep(4)}
-                    iconRight={<ArrowRight size={14} />}
+                    icon={<ArrowRight size={14} />}
                   >
-                    Next: Fullscreen & Security Lock
+                    Proceed to Proctoring
                   </Button>
                 </div>
               </motion.div>
             )}
 
-            {/* ═══ STEP 4: FULLSCREEN & ANTI-CHEAT LOCK ═══ */}
+            {/* STEP 4: Fullscreen Mode Lock */}
             {activeStep === 4 && (
               <motion.div
-                key="step4"
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2 }}
+                key="step-4"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
                 className="space-y-6"
               >
-                <div className="border-b border-[#DCE7F2] pb-4 flex items-center justify-between">
+                <div className="flex items-center justify-between border-b border-[#DCE7F2] pb-4">
                   <div>
                     <h3 className="text-base font-bold font-display text-[#11183D]">
-                      Step 4: Fullscreen Viewport & Workspace Lock
+                      Step 4: Fullscreen Proctoring Lock
                     </h3>
                     <p className="text-xs text-[#526078] font-body mt-0.5">
                       Enable dedicated full-screen mode to unlock the live interview room.
                     </p>
                   </div>
                   <Badge variant={isFullscreenActive ? "success" : "warning"} size="sm" dot>
-                    {isFullscreenActive ? 'Fullscreen Locked ✓' : 'Fullscreen Required'}
+                    {isFullscreenActive ? 'Fullscreen Locked' : 'Fullscreen Required'}
                   </Badge>
                 </div>
 
@@ -827,10 +829,10 @@ export default function DeviceCheck() {
                       size="lg"
                       fullWidth
                       onClick={handleFullscreenLock}
-                      icon={<Maximize2 size={16} />}
+                      icon={isFullscreenActive ? <Check size={16} /> : <Maximize2 size={16} />}
                       className="shadow-sm"
                     >
-                      {isFullscreenActive ? 'Fullscreen Active ✓' : 'Enable Fullscreen Mode'}
+                      {isFullscreenActive ? 'Fullscreen Active' : 'Enable Fullscreen Mode'}
                     </Button>
                   </div>
                 </div>

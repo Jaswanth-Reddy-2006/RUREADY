@@ -30,7 +30,7 @@ const variantStyles: Record<ButtonVariant, string> = {
   royal:
     'bg-[#4A8BDF] hover:bg-[#2459A8] text-white font-semibold shadow-sm active:scale-[0.98] border border-transparent',
   secondary:
-    'bg-white text-[#4A8BDF] font-semibold border border-[#DCE7F2] hover:bg-[#EFFAFD] hover:border-[#4A8BDF] active:scale-[0.98] shadow-sm',
+    'bg-white text-[#11183D] font-semibold border border-[#DCE7F2] hover:bg-[#EFFAFD] hover:border-[#4A8BDF] hover:text-[#4A8BDF] active:scale-[0.98] shadow-sm',
   ai:
     'bg-[#A0006D] hover:bg-[#780052] text-white font-semibold shadow-sm active:scale-[0.98] border border-transparent',
   eggplant:

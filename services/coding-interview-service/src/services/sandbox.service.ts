@@ -16,6 +16,8 @@ export interface TestCaseResult {
   actual?: any;
   executionTimeMs: number;
   error?: string;
+  isCustom?: boolean;
+  description?: string;
 }
 
 export interface EvaluationResult {
@@ -29,10 +31,39 @@ export interface EvaluationResult {
   language: string;
 }
 
-function deepEqual(a: any, b: any): boolean {
+export function deepEqual(a: any, b: any): boolean {
   if (a === b) return true;
   if (a && b && typeof a === 'object' && typeof b === 'object') {
-    if (Array.isArray(a) !== Array.isArray(b)) return false;
+    if (Array.isArray(a) && Array.isArray(b)) {
+      if (a.length !== b.length) return false;
+
+      // Sequential equality
+      let directMatch = true;
+      for (let i = 0; i < a.length; i++) {
+        if (!deepEqual(a[i], b[i])) {
+          directMatch = false;
+          break;
+        }
+      }
+      if (directMatch) return true;
+
+      // Unordered permutation matching (e.g. 2Sum indices [0, 1] vs [1, 0] or 3Sum triplets)
+      if (a.length <= 25) {
+        const bRemaining = [...b];
+        let permMatch = true;
+        for (const itemA of a) {
+          const matchIdx = bRemaining.findIndex((itemB) => deepEqual(itemA, itemB));
+          if (matchIdx === -1) {
+            permMatch = false;
+            break;
+          }
+          bRemaining.splice(matchIdx, 1);
+        }
+        if (permMatch && bRemaining.length === 0) return true;
+      }
+      return false;
+    }
+
     const keysA = Object.keys(a);
     const keysB = Object.keys(b);
     if (keysA.length !== keysB.length) return false;
@@ -46,33 +77,78 @@ function deepEqual(a: any, b: any): boolean {
 }
 
 export const sandboxService = {
-  async evaluateCode(code: string, testCasesJson: any, language: string = 'javascript'): Promise<EvaluationResult> {
+  async evaluateCode(
+    code: string,
+    testCasesJson: any,
+    language: string = 'javascript',
+    entryPoint?: string,
+    customTestCase?: any
+  ): Promise<EvaluationResult> {
     const normLang = (language || 'javascript').toLowerCase().trim();
-    const testCases = Array.isArray(testCasesJson) ? testCasesJson : [];
+    let testCases = Array.isArray(testCasesJson) ? [...testCasesJson] : [];
+
+    if (customTestCase && typeof customTestCase === 'object' && 'input' in customTestCase) {
+      testCases.push({
+        input: customTestCase.input,
+        expected: customTestCase.expected ?? null,
+        description: 'Custom Test Case',
+        isCustom: true,
+      });
+    }
 
     if (normLang === 'python' || normLang === 'py') {
-      return this.evaluatePython(code, testCases);
+      return this.evaluatePython(code, testCases, entryPoint);
     } else if (normLang === 'java') {
       return this.evaluateJava(code, testCases);
     } else {
-      return this.evaluateJavaScript(code, testCases);
+      return this.evaluateJavaScript(code, testCases, entryPoint);
     }
   },
 
-  async evaluateJavaScript(code: string, testCases: any[]): Promise<EvaluationResult> {
+  async evaluateJavaScript(code: string, testCases: any[], entryPoint?: string): Promise<EvaluationResult> {
     const totalCount = testCases.length;
     const testResults: TestCaseResult[] = [];
     let stdoutBuffer: string[] = [];
     const overallStart = Date.now();
 
+    const cleanEp = (entryPoint || '').replace(/[^a-zA-Z0-9_$]/g, '');
+
     const sandboxCode = `
       ${code}
 
-      function __runTestCase(input) {
-        if (Array.isArray(input) && typeof solve === 'function' && solve.length > 1) {
-          return solve(...input);
+      const __ep = "${cleanEp}";
+      let __fn = null;
+
+      if (__ep && typeof globalThis[__ep] === 'function') {
+        __fn = globalThis[__ep];
+      } else if (typeof solve === 'function') {
+        __fn = solve;
+      } else if (typeof solution === 'function') {
+        __fn = solution;
+      } else {
+        const reserved = new Set([
+          '__runTestCase', 'eval', 'isFinite', 'isNaN', 'parseFloat', 'parseInt',
+          'decodeURI', 'decodeURIComponent', 'encodeURI', 'encodeURIComponent',
+          'escape', 'unescape', 'Object', 'Function', 'Array', 'Number', 'Boolean',
+          'String', 'Symbol', 'Date', 'Promise', 'RegExp', 'Error', 'globalThis', 'console'
+        ]);
+        const candidates = Object.keys(globalThis).filter(k => typeof globalThis[k] === 'function' && !reserved.has(k));
+        if (candidates.length > 0) {
+          __fn = globalThis[candidates[candidates.length - 1]];
         }
-        return typeof solve === 'function' ? solve(input) : null;
+      }
+
+      function __runTestCase(input) {
+        if (!__fn || typeof __fn !== 'function') {
+          throw new Error('Solution function "' + (__ep || 'solve') + '" is not defined. Please check your function name.');
+        }
+        if (Array.isArray(input)) {
+          if (__fn.length === 1 && input.length > 1 && !Array.isArray(input[0])) {
+            return __fn(input);
+          }
+          return __fn(...input);
+        }
+        return __fn(input);
       }
     `;
 
@@ -89,7 +165,7 @@ export const sandboxService = {
         },
       });
 
-      script.runInContext(context, { timeout: 1500 });
+      script.runInContext(context, { timeout: 2000 });
 
       for (let i = 0; i < totalCount; i++) {
         const tc = testCases[i];
@@ -100,9 +176,9 @@ export const sandboxService = {
         const tStart = performance.now();
         try {
           const evalScript = new vm.Script(`__runTestCase(input)`);
-          const actual = evalScript.runInContext(context, { timeout: 1000 });
+          const actual = evalScript.runInContext(context, { timeout: 1500 });
           const execTime = Math.round((performance.now() - tStart) * 100) / 100;
-          const passed = deepEqual(actual, expected);
+          const passed = tc.isCustom && (expected === null || expected === undefined) ? true : deepEqual(actual, expected);
 
           testResults.push({
             testCaseIndex: i + 1,
@@ -111,6 +187,8 @@ export const sandboxService = {
             expected,
             actual,
             executionTimeMs: execTime,
+            isCustom: tc.isCustom,
+            description: tc.description,
             ...(!passed ? { error: `Expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}` } : {}),
           });
         } catch (tcErr: any) {
@@ -121,6 +199,8 @@ export const sandboxService = {
             expected,
             executionTimeMs: Math.round((performance.now() - tStart) * 100) / 100,
             error: tcErr.message,
+            isCustom: tc.isCustom,
+            description: tc.description,
           });
         }
       }
@@ -153,10 +233,12 @@ export const sandboxService = {
     }
   },
 
-  async evaluatePython(code: string, testCases: any[]): Promise<EvaluationResult> {
+  async evaluatePython(code: string, testCases: any[], entryPoint?: string): Promise<EvaluationResult> {
     const totalCount = testCases.length;
     const overallStart = Date.now();
     const tempDir = path.join(os.tmpdir(), `ru_ready_py_${uuidv4()}`);
+
+    const cleanEp = (entryPoint || '').replace(/[^a-zA-Z0-9_]/g, '');
 
     try {
       await fs.mkdir(tempDir, { recursive: true });
@@ -173,25 +255,49 @@ test_cases = json.loads(${JSON.stringify(JSON.stringify(testCases))})
 results = []
 all_passed = True
 
+target_ep = "${cleanEp}"
+fn = globals().get(target_ep) or globals().get("solve") or globals().get("solution")
+
+if not fn or not callable(fn):
+    for k, v in list(globals().items()):
+        if callable(v) and not k.startswith("_") and k not in ["sys", "json", "time", "test_cases", "results", "all_passed", "target_ep", "fn", "deep_check"]:
+            fn = v
+            break
+
+def deep_check(act, exp):
+    if act == exp:
+        return True
+    if isinstance(act, list) and isinstance(exp, list) and len(act) == len(exp):
+        try:
+            return sorted(act) == sorted(exp)
+        except Exception:
+            pass
+    return False
+
 for idx, tc in enumerate(test_cases):
     inp = tc.get("input")
     expected = tc.get("expected")
+    is_custom = tc.get("isCustom", False)
+    desc = tc.get("description", "")
     t_start = time.perf_counter()
     try:
-        if "solve" not in globals() or not callable(globals()["solve"]):
-            raise Exception("Function 'solve' is not defined.")
+        if not fn or not callable(fn):
+            raise Exception(f"Function '{target_ep or 'solve'}' is not defined.")
         
         if isinstance(inp, list):
-            try:
-                actual = solve(*inp)
-            except TypeError:
-                actual = solve(inp)
+            if hasattr(fn, '__code__') and fn.__code__.co_argcount == 1 and len(inp) > 1 and not isinstance(inp[0], list):
+                actual = fn(inp)
+            else:
+                try:
+                    actual = fn(*inp)
+                except TypeError:
+                    actual = fn(inp)
         else:
-            actual = solve(inp)
+            actual = fn(inp)
             
         t_end = time.perf_counter()
         dur = round((t_end - t_start) * 1000, 2)
-        passed = (actual == expected)
+        passed = True if (is_custom and expected is None) else deep_check(actual, expected)
         if not passed:
             all_passed = False
         results.append({
@@ -200,7 +306,9 @@ for idx, tc in enumerate(test_cases):
             "input": inp,
             "expected": expected,
             "actual": actual,
-            "executionTimeMs": dur
+            "executionTimeMs": dur,
+            "isCustom": is_custom,
+            "description": desc
         })
     except Exception as e:
         all_passed = False
@@ -210,7 +318,9 @@ for idx, tc in enumerate(test_cases):
             "input": inp,
             "expected": expected,
             "error": str(e),
-            "executionTimeMs": round((time.perf_counter() - t_start) * 1000, 2)
+            "executionTimeMs": round((time.perf_counter() - t_start) * 1000, 2),
+            "isCustom": is_custom,
+            "description": desc
         })
 
 print("__RU_READY_RESULTS__" + json.dumps({

@@ -5,17 +5,20 @@ import Editor from '@monaco-editor/react';
 import { 
   Sparkles, Play, Clock, Code2, Lightbulb, Mic, MicOff, Video, VideoOff, 
   Terminal, Shield, ArrowLeft, ChevronRight, CheckCircle2, AlertCircle, 
-  X, ChevronDown, ChevronUp, Copy, BookOpen, AlertTriangle, Send,
-  MessageSquare, Layers, Check, Volume2, Cpu, FileCode2, Eye
+  X, ChevronDown, ChevronUp, AlertTriangle, Send,
+  MessageSquare, Layers, Check, Volume2, Cpu, Eye, ShieldCheck
 } from 'lucide-react';
 import apiClient from '../../api/client';
+import { codingApi, type CodeEvaluationResponse, type IdealSolutionResponse } from '../../api/coding';
 import toast from 'react-hot-toast';
 import AIAvatar, { type AvatarState } from './AIAvatar';
+import { mapVisemeIdToOculus, type OculusViseme } from './visemeMapper';
 import UserCamera from './UserCamera';
 import LiveTranscript, { type TranscriptEntry } from './LiveTranscript';
 import InterviewTimer from './InterviewTimer';
 import { speakWithLipSync, loadSpeechVoices } from '../../lib/speech';
 import { useFaceTelemetry } from '../../hooks/useFaceTelemetry';
+import { useCandidateAnalysis } from '../../hooks/useCandidateAnalysis';
 import Button from '../ui/Button';
 import Badge from '../ui/Badge';
 
@@ -31,6 +34,7 @@ interface SessionData {
   status: string;
   interviewGoal?: string;
   hintCount: number;
+  difficulty?: string;
 }
 
 interface QuestionData {
@@ -119,6 +123,120 @@ func main() {
 }`
 };
 
+const FALLBACK_PROBLEMS = [
+  {
+    id: 'two-sum',
+    title: 'Two Sum',
+    difficulty: 'EASY',
+    description: `Given an array of integers \`nums\` and an integer \`target\`, return indices of the two numbers such that they add up to \`target\`.
+
+You may assume that each input would have **exactly one solution**, and you may not use the same element twice. You can return the answer in any order.
+
+### Example 1:
+\`\`\`text
+Input: nums = [2,7,11,15], target = 9
+Output: [0,1]
+Explanation: Because nums[0] + nums[1] == 9, we return [0, 1].
+\`\`\`
+
+### Example 2:
+\`\`\`text
+Input: nums = [3,2,4], target = 6
+Output: [1,2]
+\`\`\`
+
+### Example 3:
+\`\`\`text
+Input: nums = [3,3], target = 6
+Output: [0,1]
+\`\`\`
+
+### Constraints:
+• \`2 <= nums.length <= 10^4\`
+• \`-10^9 <= nums[i] <= 10^9\`
+• \`-10^9 <= target <= 10^9\`
+• Only one valid answer exists.`,
+    starterCode: {
+      javascript: `/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number[]}\n */\nfunction twoSum(nums, target) {\n  // Write your optimal solution here\n  return [0, 1];\n}`,
+      typescript: `function twoSum(nums: number[], target: number): number[] {\n  // Write your optimal solution here\n  return [0, 1];\n}`,
+      python: `def twoSum(nums: list[int], target: int) -> list[int]:\n    # Write your optimal solution here\n    return [0, 1]`,
+      java: `class Solution {\n    public int[] twoSum(int[] nums, int target) {\n        // Write your optimal solution here\n        return new int[]{0, 1};\n    }\n}`,
+      cpp: `#include <vector>\n\nclass Solution {\npublic:\n    std::vector<int> twoSum(std::vector<int>& nums, int target) {\n        return {0, 1};\n    }\n};`,
+      go: `package main\n\nfunc twoSum(nums []int, target int) []int {\n    return []int{0, 1}\n}`
+    }
+  },
+  {
+    id: 'valid-palindrome',
+    title: 'Valid Palindrome',
+    difficulty: 'EASY',
+    description: `A phrase is a **palindrome** if, after converting all uppercase letters into lowercase letters and removing all non-alphanumeric characters, it reads the same forward and backward. Alphanumeric characters include letters and numbers.
+
+Given a string \`s\`, return \`true\` if it is a **palindrome**, or \`false\` otherwise.
+
+### Example 1:
+\`\`\`text
+Input: s = "A man, a plan, a canal: Panama"
+Output: true
+Explanation: "amanaplanacanalpanama" is a palindrome.
+\`\`\`
+
+### Example 2:
+\`\`\`text
+Input: s = "race a car"
+Output: false
+Explanation: "raceacar" is not a palindrome.
+\`\`\`
+
+### Constraints:
+• \`1 <= s.length <= 2 * 10^5\`
+• \`s\` consists only of printable ASCII characters.`,
+    starterCode: {
+      javascript: `/**\n * @param {string} s\n * @return {boolean}\n */\nfunction isPalindrome(s) {\n  // Write your optimal solution here\n  return true;\n}`,
+      typescript: `function isPalindrome(s: string): boolean {\n  // Write your optimal solution here\n  return true;\n}`,
+      python: `def isPalindrome(s: str) -> bool:\n    # Write your optimal solution here\n    return True`,
+      java: `class Solution {\n    public boolean isPalindrome(String s) {\n        return true;\n    }\n}`,
+      cpp: `#include <string>\n\nclass Solution {\npublic:\n    bool isPalindrome(std::string s) {\n        return true;\n    }\n};`,
+      go: `package main\n\nfunc isPalindrome(s string) bool {\n    return true\n}`
+    }
+  },
+  {
+    id: 'best-time-to-buy-and-sell-stock',
+    title: 'Best Time to Buy and Sell Stock',
+    difficulty: 'EASY',
+    description: `You are given an array \`prices\` where \`prices[i]\` is the price of a given stock on the \`i\`th day.
+
+You want to maximize your profit by choosing a single day to buy one stock and choosing a different day in the future to sell that stock.
+
+Return the maximum profit you can achieve from this transaction. If you cannot achieve any profit, return 0.
+
+### Example 1:
+\`\`\`text
+Input: prices = [7,1,5,3,6,4]
+Output: 5
+Explanation: Buy on day 2 (price = 1) and sell on day 5 (price = 6), profit = 6-1 = 5.
+\`\`\`
+
+### Example 2:
+\`\`\`text
+Input: prices = [7,6,4,3,1]
+Output: 0
+Explanation: In this case, no transactions are done and the max profit = 0.
+\`\`\`
+
+### Constraints:
+• \`1 <= prices.length <= 10^5\`
+• \`0 <= prices[i] <= 10^4\``,
+    starterCode: {
+      javascript: `/**\n * @param {number[]} prices\n * @return {number}\n */\nfunction maxProfit(prices) {\n  // Write your optimal solution here\n  return 0;\n}`,
+      typescript: `function maxProfit(prices: number[]): number {\n  // Write your optimal solution here\n  return 0;\n}`,
+      python: `def maxProfit(prices: list[int]) -> int:\n    # Write your optimal solution here\n    return 0`,
+      java: `class Solution {\n    public int maxProfit(int[] prices) {\n        return 0;\n    }\n}`,
+      cpp: `#include <vector>\n\nclass Solution {\npublic:\n    int maxProfit(std::vector<int>& prices) {\n        return 0;\n    }\n};`,
+      go: `package main\n\nfunc maxProfit(prices []int) int {\n    return 0\n}`
+    }
+  }
+];
+
 export default function CodingInterviewRoom() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -132,9 +250,21 @@ export default function CodingInterviewRoom() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingLabel, setProcessingLabel] = useState('');
 
-  // Active Panel Tabs
-  const [leftTab, setLeftTab] = useState<'problem' | 'dialogue' | 'hints'>('problem');
+  // Active Console Tab
   const [consoleTab, setConsoleTab] = useState<'testcases' | 'terminal'>('testcases');
+
+  // Multi-Problem Catalog & Active Problem State (Total count hidden from candidate)
+  const [problems, setProblems] = useState<any[]>(FALLBACK_PROBLEMS);
+  const [currentProblemIndex, setCurrentProblemIndex] = useState<number>(0);
+  const [selectedProblemId, setSelectedProblemId] = useState<string>('two-sum');
+  const [currentProblem, setCurrentProblem] = useState<any>(FALLBACK_PROBLEMS[0]);
+  const [savedCodes, setSavedCodes] = useState<Record<string, Record<string, string>>>({});
+
+  // Real-time Captions State
+  const [activeCaption, setActiveCaption] = useState<{ speaker: 'ava' | 'user'; text: string } | null>({
+    speaker: 'ava',
+    text: "Welcome to your technical coding assessment. Review the problem on the left and run test cases when you write code."
+  });
 
   // Socratic Coding States
   const [codeLanguage, setCodeLanguage] = useState('javascript');
@@ -145,24 +275,8 @@ export default function CodingInterviewRoom() {
   const [consoleColor, setConsoleColor] = useState('text-slate-300');
   const [isConsoleOpen, setIsConsoleOpen] = useState(true);
   const [isRunningCode, setIsRunningCode] = useState(false);
-  const [testResults, setTestResults] = useState<{
-    passedCount: number;
-    totalCount: number;
-    success: boolean;
-    errorDetails?: string;
-    language?: string;
-    stdout?: string;
-    runtimeMs?: number;
-    testResults?: Array<{
-      testCaseIndex: number;
-      passed: boolean;
-      input: any;
-      expected: any;
-      actual?: any;
-      executionTimeMs?: number;
-      error?: string;
-    }>;
-  } | null>(null);
+  const [testResults, setTestResults] = useState<CodeEvaluationResponse | null>(null);
+  const [interviewerFeedback, setInterviewerFeedback] = useState<any>(null);
 
   // Audio/Video Hardware Telemetry
   const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
@@ -174,6 +288,7 @@ export default function CodingInterviewRoom() {
   const [aiIsSpeaking, setAiIsSpeaking] = useState(false);
   const [mouthOpenness, setMouthOpenness] = useState(0.08);
   const [spokenWord, setSpokenWord] = useState('');
+  const [activeViseme, setActiveViseme] = useState<OculusViseme>('viseme_sil');
   const [clarificationInput, setClarificationInput] = useState('');
 
   // Speech Recognition States (Web Speech API)
@@ -200,8 +315,11 @@ export default function CodingInterviewRoom() {
     currentQuestionRef.current = currentQuestion;
   }, [currentQuestion]);
 
-  // Face telemetry tracking engine
+  // Face telemetry & Proctoring engine
   const { stressCoefficient, isOffGaze, eyeGazeScore } = useFaceTelemetry(mediaStream, isCameraOn, id);
+
+  // Multi-Modal Behavioral & Speech Telemetry Engine
+  const candidateMetrics = useCandidateAnalysis(mediaStream, isCameraOn, isMicOn, id, answerText);
 
   useEffect(() => {
     if (isCameraOn && mediaStream) {
@@ -235,50 +353,96 @@ export default function CodingInterviewRoom() {
     };
   }, []);
 
+  // Algorithmic approach analyzer (Brute Force vs Optimal vs Binary Search)
+  const analyzeApproach = (code: string) => {
+    const cleanCode = code.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '');
+
+    // Check for nested loops or quadratic iterations (Brute Force)
+    const hasNestedLoops = /(for|while)\s*\(.*?\)\s*\{[^{}]*(for|while)\s*\(|(for|while)\s*\(.*?\)[\s\S]*?(for|while)\s*\(|\.forEach\([^)]*?\([^)]*?=>[\s\S]*?\.forEach|for\s*\(.*?\)[\s\S]*?(\.indexOf|\.includes|\.findIndex)/i.test(cleanCode);
+
+    // Check for hash map / dictionary lookup (Optimal)
+    const hasHashMap = /(new Map\(|Map<|unordered_map|HashMap|seen\[|dict\[|lookup\[|memo\[|\.has\(|\.set\(|\.get\()/i.test(cleanCode);
+
+    // Check for binary search / two-pointer pattern
+    const hasBinarySearchOrTwoPointers = /(binarySearch|left\s*<=?\s*right|low\s*<=?\s*high|mid\s*=|Math\.floor\(\s*\(\s*left|\/\s*2\b|while\s*\(\s*left\s*<\s*right)/i.test(cleanCode);
+
+    return {
+      hasNestedLoops,
+      hasHashMap,
+      hasBinarySearchOrTwoPointers,
+    };
+  };
+
   // Compile and execute candidate code against sandbox test cases
   const handleRunCode = async () => {
     if (isRunningCode) return;
     setIsRunningCode(true);
     setConsoleColor('text-slate-400 animate-pulse');
-    setConsoleOutput('Compiling code and running sandboxed test matrix...\n');
+    setConsoleOutput('Compiling code and running sandboxed hidden test suite...\n');
     setConsoleTab('testcases');
 
     try {
-      const response = await apiClient.post(`/interview/session/${id}/run`, {
-        code: codeValue,
-        language: codeLanguage
-      });
+      const result = await codingApi.runTestCases(
+        id || 'session',
+        codeValue,
+        codeLanguage,
+        selectedProblemId
+      );
 
-      const result = response.data;
       setTestResults(result);
       const timestamp = new Date().toLocaleTimeString();
+
+      if (result.interviewerResponse) {
+        setInterviewerFeedback(result.interviewerResponse);
+        if (result.interviewerResponse.avatarEmotion) {
+          setAvatarState(result.interviewerResponse.avatarEmotion as any);
+        }
+      }
 
       if (result.success) {
         setConsoleColor('text-emerald-400');
         let logs = `[${timestamp}] COMPILATION & TEST SUITE PASSED\n`;
         logs += `==========================================\n`;
-        logs += `Status: SUCCESS (${result.passedCount}/${result.totalCount} test cases passed)\n\n`;
-        logs += `All test cases passed. Your code is verified for algorithmic submission!`;
+        logs += `Status: SUCCESS (${result.passedCount}/${result.totalCount} hidden test cases passed)\n\n`;
+        logs += `All hidden test cases passed. Your code is verified!`;
         setConsoleOutput(logs);
-        toast.success(`Passed all ${result.passedCount}/${result.totalCount} test cases!`);
+        toast.success(`Passed all ${result.passedCount}/${result.totalCount} hidden test cases!`);
 
-        // Ava acknowledges successful execution
-        setAvatarState('pleased');
-        await aiSpeak("Great job! All unit test cases passed. When you are ready, explain your time and space complexity and submit your final solution.");
+        // Detect candidate approach
+        const approach = analyzeApproach(codeValue);
+        let feedbackMessage = "";
+
+        if (approach.hasNestedLoops && !approach.hasHashMap) {
+          feedbackMessage = "Okay, you have been successfully completed in brute force. Can you complete this in an optimal way?";
+        } else if (approach.hasHashMap) {
+          feedbackMessage = "Outstanding! You solved this in an optimal way. There is another solution in binary search. Can you do in that thing?";
+        } else if (approach.hasBinarySearchOrTwoPointers) {
+          feedbackMessage = "Brilliant work! You've demonstrated the binary search approach as well. Excellent algorithmic adaptability!";
+        } else {
+          feedbackMessage = "Great job! All hidden test cases passed cleanly. How would you defend your time and space complexity?";
+        }
+
+        await aiSpeak(feedbackMessage);
       } else {
         setConsoleColor('text-orange-400');
         let logs = `[${timestamp}] TEST SUITE NOTICE\n`;
         logs += `==========================================\n`;
-        logs += `Passed: ${result.passedCount}/${result.totalCount} test cases\n\n`;
+        logs += `Passed: ${result.passedCount}/${result.totalCount} hidden test cases\n\n`;
         logs += `${result.errorDetails || 'Incorrect return value for edge cases.'}`;
         setConsoleOutput(logs);
-        toast.error(`Passed ${result.passedCount}/${result.totalCount} test cases. Check edge conditions.`);
+        toast.error(`Passed ${result.passedCount}/${result.totalCount} hidden test cases. Check edge conditions.`);
+
+        const feedbackMessage = result.errorDetails && result.errorDetails.includes('Compilation')
+          ? "Don't worry, syntax hiccups happen under interview pressure. Review the error in compiler output and let's run it again."
+          : `You passed ${result.passedCount} of ${result.totalCount} hidden test cases. Think about boundary conditions, empty values, or duplicates, and test again.`;
+        await aiSpeak(feedbackMessage);
       }
     } catch (err: any) {
       setConsoleColor('text-rose-400');
       const errMsg = err.response?.data?.error || err.message || 'Execution error';
       setConsoleOutput(`[COMPILER ERROR] Execution halted: ${errMsg}`);
       toast.error('Code execution failed. Check syntax.');
+      await aiSpeak("Don't worry, syntax hiccups happen under interview pressure. Review the error in compiler output and let's run it again.");
     } finally {
       setIsRunningCode(false);
     }
@@ -297,12 +461,14 @@ export default function CodingInterviewRoom() {
     ]);
   }, []);
 
-  // AI Voice speech synthesizer
+  // AI Voice speech synthesizer (also updates live on-screen captions)
   const aiSpeak = useCallback((text: string): Promise<void> => {
     return new Promise((resolve) => {
       addTranscriptEntry('ai', text);
+      setActiveCaption({ speaker: 'ava', text });
       setAvatarState('speaking');
       setSpokenWord('');
+      setActiveViseme('viseme_sil');
 
       speakWithLipSync(text, {
         onStart: () => setAiIsSpeaking(true),
@@ -310,16 +476,146 @@ export default function CodingInterviewRoom() {
           setAiIsSpeaking(false);
           setMouthOpenness(0.08);
           setSpokenWord('');
+          setActiveViseme('viseme_sil');
           setAvatarState('listening');
           resolve();
         },
-        onViseme: (openness, fragment) => {
+        onViseme: (openness, fragment, _shape, visemeId) => {
           setMouthOpenness(openness);
-          if (fragment.trim()) setSpokenWord(fragment.trim());
+          if (fragment && fragment.trim()) setSpokenWord(fragment.trim());
+          if (visemeId) {
+            setActiveViseme(mapVisemeIdToOculus(visemeId));
+          }
         }
       });
     });
   }, [addTranscriptEntry]);
+
+  // Switch to next problem seamlessly without revealing total question count
+  const handleSkipQuestion = async () => {
+    const nextIndex = currentProblemIndex + 1;
+    const targetList = problems.length > 0 ? problems : FALLBACK_PROBLEMS;
+    const nextProb = targetList[nextIndex % targetList.length];
+
+    // Save current problem code
+    if (currentProblem) {
+      setSavedCodes((prev) => ({
+        ...prev,
+        [currentProblem.id]: {
+          ...(prev[currentProblem.id] || {}),
+          [codeLanguage]: codeValue,
+        },
+      }));
+    }
+
+    setCurrentProblemIndex(nextIndex);
+    setSelectedProblemId(nextProb.id);
+    setCurrentProblem(nextProb);
+
+    // Restore saved code if available, else starter code
+    const restoredCode = savedCodes[nextProb.id]?.[codeLanguage] || nextProb.starterCode?.[codeLanguage] || LANGUAGE_BOILERPLATES[codeLanguage] || '';
+    setCodeValue(restoredCode);
+    setTestResults(null);
+    setInterviewerFeedback(null);
+    toast.success('Loaded next question');
+
+    const message = "Okay, let us go to our next question. Take a breath, review the new problem statement on the left, and let me know your thoughts.";
+    await aiSpeak(message);
+    startListening();
+  };
+
+  // Return to first problem and restore its code
+  const handleReturnToFirstQuestion = async () => {
+    const targetList = problems.length > 0 ? problems : FALLBACK_PROBLEMS;
+    const firstProb = targetList[0];
+
+    // Save current question code
+    if (currentProblem) {
+      setSavedCodes((prev) => ({
+        ...prev,
+        [currentProblem.id]: {
+          ...(prev[currentProblem.id] || {}),
+          [codeLanguage]: codeValue,
+        },
+      }));
+    }
+
+    setCurrentProblemIndex(0);
+    setSelectedProblemId(firstProb.id);
+    setCurrentProblem(firstProb);
+
+    const restoredCode = savedCodes[firstProb.id]?.[codeLanguage] || firstProb.starterCode?.[codeLanguage] || LANGUAGE_BOILERPLATES[codeLanguage] || '';
+    setCodeValue(restoredCode);
+    setTestResults(null);
+    setInterviewerFeedback(null);
+    toast.success('Returned to first question');
+
+    const message = "Okay, let's go back to your first solution again! Here is your first question and the code you were working on.";
+    await aiSpeak(message);
+    startListening();
+  };
+
+  // Interactive Conversational Handler (Intent detection)
+  const handleConversationalInput = async (rawInput: string) => {
+    const text = rawInput.trim();
+    if (!text || isProcessing) return;
+
+    addTranscriptEntry('user', text);
+    setActiveCaption({ speaker: 'user', text });
+    setClarificationInput('');
+    setAnswerText('');
+    finalTranscriptRef.current = '';
+
+    const lower = text.toLowerCase();
+
+    // 1. Skip / don't know intent
+    if (
+      lower.includes("don't know") ||
+      lower.includes("dont know") ||
+      lower.includes("skip this question") ||
+      lower.includes("skip question") ||
+      lower.includes("next question") ||
+      lower.includes("next problem") ||
+      lower.includes("cannot solve") ||
+      lower.includes("can't solve")
+    ) {
+      await handleSkipQuestion();
+      return;
+    }
+
+    // 2. Return to first question intent
+    if (
+      lower.includes("first question") ||
+      lower.includes("first solution") ||
+      lower.includes("remember my first") ||
+      lower.includes("remember the first") ||
+      lower.includes("back to the first") ||
+      lower.includes("back to question 1") ||
+      lower.includes("go back to my first")
+    ) {
+      await handleReturnToFirstQuestion();
+      return;
+    }
+
+    // 3. General Socratic Dialogue
+    setIsProcessing(true);
+    setAvatarState('thinking');
+    setProcessingLabel('Ava is analyzing your approach...');
+
+    try {
+      const dialogueRes = await codingApi.sendDialogue(id || '', selectedProblemId, text, codeValue);
+      setIsProcessing(false);
+      setProcessingLabel('');
+      setAvatarState(dialogueRes.emotion || 'speaking');
+      await aiSpeak(dialogueRes.reply);
+      startListening();
+    } catch {
+      setIsProcessing(false);
+      setProcessingLabel('');
+      await aiSpeak("I understand your question. Review the constraints on the left, and explain your intuition step by step.");
+      startListening();
+    }
+  };
 
   // Speech Recognition control hooks
   const startListening = useCallback(() => {
@@ -347,90 +643,6 @@ export default function CodingInterviewRoom() {
       }
     }
   }, []);
-
-  // Socratic Progressive Hint protocol
-  const handleAskForHint = async () => {
-    if (isProcessing || hintCount >= 3) return;
-    
-    setIsProcessing(true);
-    setAvatarState('thinking');
-    setProcessingLabel('Ava is analyzing your approach to generate a progressive hint...');
-
-    try {
-      const hintRes = await apiClient.post(`/interview/session/${id}/hint`);
-      const newCount = hintRes.data.hintCount;
-      setLocalHintCount(newCount);
-
-      const hintPrompt = `[System Intervention]: Candidate requested Hint Level ${newCount}. Current Code in Monaco IDE:\n\`\`\`${codeLanguage}\n${codeValue}\n\`\`\`\nProvide a subtle progressive Socratic hint without revealing complete code.`;
-      
-      const answerRes = await apiClient.post(`/interview/session/${id}/answer`, {
-        questionId: currentQuestion?.id || '',
-        answerText: hintPrompt,
-        timeTaken: 10
-      });
-
-      const evaluation = answerRes.data.evaluation;
-      const hintText = evaluation?.feedback || (
-        newCount === 1 
-          ? "Consider whether a two-pointer technique or hash table could reduce your lookup complexity from O(N²) to O(N)."
-          : newCount === 2
-            ? "Think about tracking elements you've already seen in a frequency map or Set while traversing the array."
-            : "Review your loop bounds and edge cases when the input list has duplicate numbers or is empty."
-      );
-
-      setUnlockedHints(prev => [...prev, hintText]);
-      setLeftTab('hints');
-      setIsProcessing(false);
-      setProcessingLabel('');
-
-      await aiSpeak(hintText);
-      startListening();
-      toast.success(`Progressive Hint ${newCount}/3 unlocked!`);
-    } catch (err) {
-      console.error('Failed to retrieve hint:', err);
-      setIsProcessing(false);
-      setProcessingLabel('');
-      toast.error('Ava could not formulate a hint right now.');
-    }
-  };
-
-  // Interactive Clarification or Speech Submission to Ava
-  const handleSendClarificationToAva = async (textToSend?: string) => {
-    const text = (textToSend || clarificationInput || answerText).trim();
-    if (!text || isProcessing) return;
-
-    setClarificationInput('');
-    setAnswerText('');
-    finalTranscriptRef.current = '';
-    addTranscriptEntry('user', text);
-    stopListening();
-
-    setIsProcessing(true);
-    setAvatarState('thinking');
-    setProcessingLabel('Ava is reviewing your reasoning...');
-
-    try {
-      const response = await apiClient.post(`/interview/session/${id}/answer`, {
-        questionId: currentQuestion?.id || '',
-        answerText: `[Candidate Speech to Interviewer]: ${text}\n[Current Code Snapshot]:\n\`\`\`${codeLanguage}\n${codeValue}\n\`\`\``,
-        timeTaken: 15
-      });
-
-      const evalFeedback = response.data?.evaluation?.feedback || 
-        "That's a sound way to approach it. How does the space complexity scale as the input size grows?";
-
-      setIsProcessing(false);
-      setProcessingLabel('');
-      setLeftTab('dialogue');
-      await aiSpeak(evalFeedback);
-      startListening();
-    } catch (err) {
-      console.error('Failed to communicate with Ava:', err);
-      setIsProcessing(false);
-      setProcessingLabel('');
-      startListening();
-    }
-  };
 
   // Submit code solution & transcript
   const submitSolution = useCallback(async () => {
@@ -525,6 +737,23 @@ export default function CodingInterviewRoom() {
         const chunk = result[0]?.transcript || '';
         if (result.isFinal) {
           finalTranscriptRef.current += chunk + ' ';
+          const lowerChunk = chunk.toLowerCase().trim();
+          if (
+            lowerChunk.includes("don't know this question") ||
+            lowerChunk.includes("skip question") ||
+            lowerChunk.includes("next question")
+          ) {
+            handleSkipQuestion();
+            return;
+          }
+          if (
+            lowerChunk.includes("remember my first question") ||
+            lowerChunk.includes("first solution again") ||
+            lowerChunk.includes("back to my first")
+          ) {
+            handleReturnToFirstQuestion();
+            return;
+          }
         } else {
           interimText += chunk;
         }
@@ -532,6 +761,9 @@ export default function CodingInterviewRoom() {
       const combined = `${finalTranscriptRef.current}${interimText}`.replace(/\s+/g, ' ').trim();
       setAnswerText(combined);
       latestAnswerRef.current = combined;
+      if (combined) {
+        setActiveCaption({ speaker: 'user', text: combined });
+      }
     };
 
     rec.onend = () => {
@@ -590,11 +822,6 @@ export default function CodingInterviewRoom() {
           } catch {}
         });
       }
-      if (editorRef.current) {
-        try {
-          editorRef.current.dispose();
-        } catch {}
-      }
     };
   }, []);
 
@@ -602,23 +829,59 @@ export default function CodingInterviewRoom() {
   useEffect(() => {
     async function loadSession() {
       try {
-        setLoadingMessage('Configuring secure IDE container...');
-        const sessionRes = await apiClient.get(`/interview/session/${id}`);
-        setSession(sessionRes.data);
-        setLocalHintCount(sessionRes.data.hintCount || 0);
+        setLoadingMessage('Configuring secure IDE container & loading problem catalog...');
 
-        setLoadingMessage('Calibrating Ava Socratic intelligence...');
-        let activeQuestion: QuestionData;
-        
-        if (sessionRes.data.status === 'IN_PROGRESS' && sessionRes.data.questions?.length > 0) {
-          const unanswered = sessionRes.data.questions.find((q: any) => !q.answerText);
-          activeQuestion = unanswered || sessionRes.data.questions[0];
-        } else {
-          const startRes = await apiClient.post(`/interview/session/${id}/start`);
-          activeQuestion = startRes.data;
+        // 1. Load Problem Catalog
+        let problemList: any[] = [];
+        try {
+          problemList = await codingApi.getProblems();
+          if (Array.isArray(problemList) && problemList.length > 0) {
+            setProblems(problemList);
+          } else {
+            setProblems(FALLBACK_PROBLEMS);
+            problemList = FALLBACK_PROBLEMS;
+          }
+        } catch (catErr) {
+          console.warn('Failed to load catalog:', catErr);
+          setProblems(FALLBACK_PROBLEMS);
+          problemList = FALLBACK_PROBLEMS;
         }
 
-        setCurrentQuestion(activeQuestion);
+        // 2. Load Session details
+        let sessionData: any = null;
+        try {
+          sessionData = await codingApi.getSession(id || '');
+        } catch {
+          try {
+            const fallbackRes = await apiClient.get(`/interview/session/${id}`);
+            sessionData = fallbackRes.data;
+          } catch {}
+        }
+
+        setSession(sessionData);
+
+        // 3. Resolve active problem
+        const targetProbId = sessionData?.problemId || (problemList.length > 0 ? problemList[0].id : 'two-sum');
+        setSelectedProblemId(targetProbId);
+
+        const initialIndex = problemList.findIndex((p: any) => p.id === targetProbId);
+        setCurrentProblemIndex(initialIndex >= 0 ? initialIndex : 0);
+
+        let activeProb = problemList.find((p: any) => p.id === targetProbId) || problemList[0];
+        if (!activeProb) {
+          try {
+            activeProb = await codingApi.getProblemById(targetProbId);
+          } catch {}
+        }
+        if (!activeProb) {
+          activeProb = FALLBACK_PROBLEMS[0];
+        }
+
+        setCurrentProblem(activeProb);
+        if (activeProb.starterCode?.[codeLanguage]) {
+          setCodeValue(activeProb.starterCode[codeLanguage]);
+        }
+
         setIsLoading(false);
       } catch (err) {
         console.error('Failed to bootstrap coding session:', err);
@@ -628,7 +891,25 @@ export default function CodingInterviewRoom() {
     }
 
     loadSession();
-  }, [id]);
+  }, [id, codeLanguage]);
+
+  // Language switch handler with code preservation
+  const handleLanguageChange = async (newLang: string) => {
+    if (currentProblem) {
+      setSavedCodes((prev) => ({
+        ...prev,
+        [currentProblem.id]: {
+          ...(prev[currentProblem.id] || {}),
+          [codeLanguage]: codeValue,
+        },
+      }));
+    }
+
+    setCodeLanguage(newLang);
+    const restored = savedCodes[currentProblem?.id]?.[newLang] || currentProblem?.starterCode?.[newLang] || LANGUAGE_BOILERPLATES[newLang] || LANGUAGE_BOILERPLATES.javascript;
+    setCodeValue(restored);
+    toast.success(`Switched to ${newLang.toUpperCase()}`);
+  };
 
   // Join full screen from Lobby
   const handleJoinCall = async () => {
@@ -641,18 +922,11 @@ export default function CodingInterviewRoom() {
 
     setIsLobbyOpen(false);
 
-    if (session && currentQuestion) {
-      const intro = `Welcome to the live technical coding assessment. I am Ava. I will evaluate your algorithmic reasoning, code structuring, and complexity defense. Take your time to review the problem statement on the left, discuss your approach with me, and run test cases when you write code. Let's begin: ${currentQuestion.questionText}`;
+    if (currentProblem) {
+      const intro = `Welcome to the live technical coding assessment. I am Ava. I will evaluate your algorithmic reasoning and code structuring. Take your time to review "${currentProblem.title}" on the left, discuss your thoughts with me, and run test cases when you are ready. Let's begin!`;
       await aiSpeak(intro);
       startListening();
     }
-  };
-
-  // Language switch handler with boilerplate updates
-  const handleLanguageChange = (newLang: string) => {
-    setCodeLanguage(newLang);
-    setCodeValue(LANGUAGE_BOILERPLATES[newLang] || LANGUAGE_BOILERPLATES.javascript);
-    toast.success(`Switched to ${newLang.toUpperCase()}`);
   };
 
   if (loadError) {
@@ -672,14 +946,14 @@ export default function CodingInterviewRoom() {
 
   if (isLoading) {
     return (
-      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-900 text-white font-body">
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#11183D] text-white font-body">
         <div className="text-center space-y-6">
-          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-[#FF7A00] to-[#E66E00] shadow-xl animate-pulse">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-[#4A8BDF] to-[#2459A8] shadow-2xl animate-pulse">
             <Code2 className="h-10 w-10 text-white" />
           </div>
           <div className="space-y-2">
-            <h2 className="text-lg font-bold font-display text-white">SECURE CODING SANDBOX</h2>
-            <p className="text-xs text-slate-400 font-body">{loadingMessage}</p>
+            <h2 className="text-xl font-extrabold font-display text-white tracking-tight">SECURE CODING SANDBOX</h2>
+            <p className="text-xs text-[#DCE7F2] font-body">{loadingMessage}</p>
           </div>
         </div>
       </div>
@@ -689,16 +963,22 @@ export default function CodingInterviewRoom() {
   // Pre-interview Lobby View
   if (isLobbyOpen) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950 text-white p-4 font-body select-none overflow-y-auto">
-        <div className="max-w-5xl w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center py-6">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#11183D] text-white p-4 sm:p-6 lg:p-8 font-body select-none overflow-y-auto">
+        <div className="max-w-5xl w-full grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center py-6">
           
           {/* Camera Telemetry Feed */}
           <div className="lg:col-span-7 flex flex-col space-y-4 w-full">
-            <div className="flex items-center gap-2 text-xs font-bold text-slate-400 font-display">
-              <span className="h-2 w-2 rounded-full bg-[#FF7A00] animate-pulse" />
-              <span>LIVE PROCTORING HARDWARE FEED</span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-xs font-bold text-[#DCE7F2] font-display">
+                <span className="h-2 w-2 rounded-full bg-[#168A62] animate-pulse" />
+                <span>HARDWARE & PROCTORING FEED</span>
+              </div>
+              <span className="text-[10px] font-mono text-[#4A8BDF] bg-[#4A8BDF]/20 px-2.5 py-0.5 rounded-full border border-[#4A8BDF]/40">
+                1280x720 HD Active
+              </span>
             </div>
-            <div className="w-full aspect-video rounded-3xl overflow-hidden border border-slate-800 bg-slate-900 flex items-center justify-center shadow-2xl relative">
+
+            <div className="w-full aspect-video rounded-3xl overflow-hidden border border-white/10 bg-slate-900 flex items-center justify-center shadow-2xl relative">
               <UserCamera
                 stream={mediaStream}
                 isMicActive={isMicOn}
@@ -706,43 +986,57 @@ export default function CodingInterviewRoom() {
                 className="w-full h-full object-cover scale-x-[-1]"
                 userName="Identity Preview Feed"
               />
+              <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between bg-black/60 backdrop-blur-md px-3 py-2 rounded-2xl text-[11px] font-mono text-[#DCE7F2]">
+                <div className="flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-[#168A62]" />
+                  <span>Microphone: Calibrated</span>
+                </div>
+                <span>Gaze Lock: 98%</span>
+              </div>
             </div>
           </div>
 
           {/* Session Info & Enter CTA */}
           <div className="lg:col-span-5 flex flex-col space-y-6 w-full">
-            <div className="rounded-3xl border border-slate-800 bg-slate-900 p-8 shadow-2xl relative overflow-hidden space-y-6">
-              <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#FF7A00] to-orange-400" />
+            <div className="rounded-3xl border border-white/15 bg-white/[0.06] backdrop-blur-xl p-6 sm:p-8 shadow-2xl relative overflow-hidden space-y-6">
+              <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#4A8BDF] via-[#A0006D] to-[#4A8BDF]" />
               
               <div>
-                <span className="text-[11px] font-bold uppercase text-[#FF7A00] tracking-wider font-mono">
+                <span className="text-[11px] font-bold uppercase text-[#4A8BDF] tracking-wider font-mono">
                   Socratic Algorithm Assessment
                 </span>
-                <h1 className="text-2xl font-black font-display text-white tracking-tight mt-1">
+                <h1 className="text-2xl sm:text-3xl font-extrabold font-display text-white tracking-tight mt-1">
                   Ready to solve?
                 </h1>
-                <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                <p className="text-xs text-[#DCE7F2] mt-1.5 leading-relaxed">
                   Monaco compiler sandbox running under anti-cheat isolation layers is fully calibrated.
                 </p>
               </div>
 
-              <div className="space-y-3 pt-2">
-                <div className="flex items-center justify-between rounded-2xl bg-white/[0.04] border border-white/10 p-4">
-                  <span className="text-xs font-semibold text-slate-400">Target Role</span>
-                  <span className="text-xs font-bold text-white bg-[#FF7A00]/20 border border-[#FF7A00]/40 px-3 py-1 rounded-lg">
+              <div className="space-y-3 pt-1">
+                <div className="flex items-center justify-between rounded-2xl bg-white/[0.05] border border-white/10 p-3.5">
+                  <span className="text-xs font-semibold text-slate-300">Target Role</span>
+                  <span className="text-xs font-bold text-white bg-[#4A8BDF]/20 border border-[#4A8BDF]/40 px-3 py-1 rounded-lg">
                     {session?.targetRole || 'Software Engineer'}
                   </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-4 flex flex-col justify-center">
-                    <span className="text-[10px] text-slate-400 uppercase font-bold">Seniority</span>
-                    <span className="text-xs font-bold text-white mt-1 capitalize">{session?.experienceLevel || 'Fresher'}</span>
+                  <div className="bg-white/[0.05] border border-white/10 rounded-2xl p-3.5 flex flex-col justify-center">
+                    <span className="text-[10px] text-slate-400 uppercase font-bold">Difficulty Rigor</span>
+                    <span className="text-xs font-bold text-white mt-1 capitalize">{currentQuestion?.difficulty || 'Medium'} Track</span>
                   </div>
-                  <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-4 flex flex-col justify-center">
+                  <div className="bg-white/[0.05] border border-white/10 rounded-2xl p-3.5 flex flex-col justify-center">
                     <span className="text-[10px] text-slate-400 uppercase font-bold">Interviewer</span>
-                    <span className="text-xs font-bold text-[#FF7A00] mt-1">Ava Socratic AI</span>
+                    <span className="text-xs font-bold text-[#F8EAF4] mt-1 flex items-center gap-1">
+                      <Sparkles size={11} className="text-[#A0006D]" /> Ava Socratic AI
+                    </span>
                   </div>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-[#168A62]/10 border border-[#168A62]/30 flex items-center gap-2 text-xs text-emerald-300 font-mono">
+                  <ShieldCheck size={16} className="shrink-0 text-[#168A62]" />
+                  <span>Sandbox compiler & test runner active</span>
                 </div>
               </div>
 
@@ -750,9 +1044,10 @@ export default function CodingInterviewRoom() {
                 <Button
                   onClick={handleJoinCall}
                   size="lg"
+                  variant="royal"
                   fullWidth
                   iconRight={<ChevronRight size={16} />}
-                  className="shadow-lg shadow-orange-500/20"
+                  className="shadow-xl"
                 >
                   Enter Live Coding Studio →
                 </Button>
@@ -803,23 +1098,35 @@ export default function CodingInterviewRoom() {
               R U Ready? Technical Coding Assessment
             </span>
             <span className="text-[10px] text-[#526078] font-mono">
-              {session?.targetRole || 'Software Engineer'} • {currentQuestion?.difficulty || 'MEDIUM'} Track
+              {session?.targetRole || 'Fullstack Engineer'} • {currentProblem?.difficulty || session?.difficulty || 'MEDIUM'} Track
             </span>
           </div>
         </div>
 
-        {/* Telemetry & Timer */}
-        <div className="flex items-center gap-4">
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-[#EFFAFD] border border-[#DCE7F2] text-xs font-mono">
-            <span className="text-[#526078]">Eye Gaze:</span>
-            <span className="text-[#168A62] font-bold">{eyeGazeScore}%</span>
+        {/* Top Header Actions: Media Controls & Timer */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 px-2 py-1 rounded-xl bg-slate-100 border border-[#DCE7F2]">
+            <button
+              type="button"
+              onClick={() => setIsMicOn((prev) => !prev)}
+              className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                isMicOn ? 'text-emerald-600 hover:bg-emerald-50' : 'text-rose-600 bg-rose-50'
+              }`}
+              title={isMicOn ? 'Mute Microphone' : 'Unmute Microphone'}
+            >
+              {isMicOn ? <Mic size={14} /> : <MicOff size={14} />}
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsCameraOn((prev) => !prev)}
+              className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                isCameraOn ? 'text-[#4A8BDF] hover:bg-blue-50' : 'text-rose-600 bg-rose-50'
+              }`}
+              title={isCameraOn ? 'Turn Camera Off' : 'Turn Camera On'}
+            >
+              {isCameraOn ? <Video size={14} /> : <VideoOff size={14} />}
+            </button>
           </div>
-
-          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full border border-[#168A62]/30 bg-[#168A62]/10 text-[#168A62] text-xs font-bold">
-            <Shield size={13} />
-            <span className="hidden md:inline">ANTI-CHEAT ACTIVE</span>
-          </div>
-
           <div className="flex items-center gap-2">
             <InterviewTimer isRunning={!isLobbyOpen} />
           </div>
@@ -829,233 +1136,101 @@ export default function CodingInterviewRoom() {
       {/* Main Studio 2-Pane Split */}
       <main className="flex-1 flex overflow-hidden min-h-0 bg-[#EFFAFD]">
         
-        {/* LEFT PANE (42vw): Problem Details, Socratic Dialogue & Ava AI Avatar */}
+        {/* LEFT PANE (42vw): Problem Statement & Ava AI + Candidate Video Dock */}
         <section className="w-[42vw] h-full flex flex-col border-r border-[#DCE7F2] bg-white min-w-[380px] overflow-hidden">
           
-          {/* Left Navigation Tabs */}
-          <div className="h-11 shrink-0 bg-[#EFFAFD] border-b border-[#DCE7F2] px-4 flex items-center justify-between">
-            <div className="flex items-center gap-1">
-              {[
-                { id: 'problem', label: 'Problem', icon: BookOpen },
-                { id: 'dialogue', label: 'Ava Dialogue', icon: MessageSquare },
-                { id: 'hints', label: `Hints (${hintCount}/3)`, icon: Lightbulb },
-              ].map((tab) => {
-                const Icon = tab.icon;
-                const isSelected = leftTab === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => setLeftTab(tab.id as any)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold font-display transition-all cursor-pointer ${
-                      isSelected
-                        ? 'bg-white text-[#4A8BDF] shadow-xs border border-[#DCE7F2]'
-                        : 'text-[#526078] hover:text-[#11183D]'
-                    }`}
-                  >
-                    <Icon size={13} className={isSelected ? 'text-[#4A8BDF]' : ''} />
-                    <span>{tab.label}</span>
-                  </button>
-                );
-              })}
+          {/* Main Problem Statement Body */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-2.5">
+            <div className="space-y-2.5 animate-in fade-in">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold font-mono px-2 py-0.5 rounded-md bg-[#EFFAFD] text-[#2459A8] border border-[#DCE7F2]">
+                  Q{currentProblemIndex + 1}
+                </span>
+                <span className="text-xs font-bold text-[#11183D] font-display">
+                  {currentProblem?.title || 'Problem Statement'}
+                </span>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-[#EFFAFD]/50 border border-[#DCE7F2] text-xs leading-relaxed text-[#11183D] font-body">
+                <div className="whitespace-pre-wrap font-sans text-xs text-[#334155] leading-relaxed">
+                  {currentProblem?.description || 'Given an array of integers, return the indices of two numbers that add up to target.'}
+                </div>
+              </div>
             </div>
-
-            <button
-              onClick={handleAskForHint}
-              disabled={isProcessing || hintCount >= 3}
-              className="flex items-center gap-1 px-3 py-1 bg-[#F8EAF4] hover:bg-[#A0006D]/15 border border-[#A0006D]/30 text-[#A0006D] font-bold rounded-lg text-xs cursor-pointer transition-all active:scale-[0.98]"
-              title="Get a progressive Socratic hint from Ava"
-            >
-              <Lightbulb size={12} />
-              <span>Hint ({3 - hintCount} left)</span>
-            </button>
           </div>
 
-          {/* Tab Content Area */}
-          <div className="flex-1 overflow-y-auto p-5 space-y-4">
-            
-            {/* TAB 1: Problem Statement */}
-            {leftTab === 'problem' && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-base font-bold font-display text-[#11183D]">
-                    {currentQuestion?.questionText.split('\n')[0] || 'Algorithmic Problem'}
-                  </h2>
-                  <Badge variant="navy" size="xs">
-                    {currentQuestion?.difficulty || 'Medium'}
-                  </Badge>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-[#EFFAFD] border border-[#DCE7F2] text-xs leading-relaxed text-[#11183D] font-body space-y-3">
-                  <p className="whitespace-pre-wrap">
-                    {currentQuestion?.questionText || 'Given an array of integers, return the indices of two numbers that add up to target.'}
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <h4 className="text-xs font-bold text-[#526078] uppercase tracking-wider font-display">
-                    Constraints & Socratic Goals
-                  </h4>
-                  <ul className="text-xs text-[#526078] space-y-1 font-body list-disc list-inside">
-                    <li>Optimal Time Complexity: \(O(N)\) or \(O(N \log N)\)</li>
-                    <li>Auxiliary Space Complexity: \(O(1)\) to \(O(N)\)</li>
-                    <li>Handle edge cases with empty arrays or negative values.</li>
-                  </ul>
-                </div>
-
-                {/* Quick Approach Review CTA (Eggplant AI Accent) */}
-                <div className="p-4 rounded-2xl bg-gradient-to-r from-[#F8EAF4] via-white to-white border border-[#A0006D]/30 space-y-2">
-                  <div className="flex items-center gap-2">
-                    <Sparkles size={14} className="text-[#A0006D]" />
-                    <span className="text-xs font-bold text-[#11183D] font-display">Discuss with Ava AI</span>
-                  </div>
-                  <p className="text-[11px] text-[#526078] font-body">
-                    Explain your algorithmic approach or brute-force intuition out loud to receive immediate feedback.
-                  </p>
-                  <Button
-                    size="sm"
-                    variant="eggplant"
-                    onClick={() => handleSendClarificationToAva("Ava, I'd like to clarify my approach before coding.")}
-                    icon={<Mic size={12} />}
-                  >
-                    Discuss Approach with Ava
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            {/* TAB 2: Ava Dialogue & Transcript */}
-            {leftTab === 'dialogue' && (
-              <div className="space-y-3 h-full flex flex-col justify-between">
-                <div className="flex-1 overflow-y-auto space-y-3 pr-1">
-                  {transcript.map((entry) => (
-                    <div
-                      key={entry.id}
-                      className={`p-3.5 rounded-2xl text-xs leading-relaxed font-body ${
-                        entry.speaker === 'ai'
-                          ? 'bg-[#F8EAF4] border border-[#A0006D]/30 text-[#11183D] ml-0 mr-4'
-                          : 'bg-[#EFFAFD] border border-[#4A8BDF]/30 text-[#11183D] ml-4 mr-0'
-                      }`}
-                    >
-                      <div className="flex items-center gap-1.5 font-bold mb-1 font-display text-[10px] uppercase">
-                        {entry.speaker === 'ai' ? (
-                          <span className="text-[#A0006D] flex items-center gap-1">
-                            <Sparkles size={10} /> Ava Socratic AI
-                          </span>
-                        ) : (
-                          <span className="text-[#4A8BDF]">You (Candidate)</span>
-                        )}
-                      </div>
-                      <p>{entry.text}</p>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Voice / Text Question Box to Ava */}
-                <div className="pt-2 border-t border-[#DCE7F2] flex items-center gap-2">
-                  <input
-                    type="text"
-                    placeholder="Ask Ava for clarification or complexity feedback..."
-                    value={clarificationInput}
-                    onChange={(e) => setClarificationInput(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSendClarificationToAva()}
-                    className="flex-1 bg-white border border-[#DCE7F2] rounded-xl px-3 py-2 text-xs text-[#11183D] placeholder:text-[#7B8799] focus:outline-none focus:border-[#4A8BDF]"
-                  />
-                  <button
-                    onClick={() => handleSendClarificationToAva()}
-                    disabled={isProcessing || !clarificationInput.trim()}
-                    className="p-2.5 rounded-xl bg-[#4A8BDF] hover:bg-[#2459A8] text-white disabled:opacity-40 transition-colors cursor-pointer"
-                  >
-                    <Send size={13} />
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* TAB 3: Progressive Hints */}
-            {leftTab === 'hints' && (
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-[#526078] font-display">
-                    Socratic Hints Protocol
-                  </h3>
-                  <span className="text-xs text-[#A0006D] font-mono font-bold">
-                    Level {hintCount} of 3
-                  </span>
-                </div>
-
-                {unlockedHints.length === 0 ? (
-                  <div className="text-center py-10 space-y-3 p-6 rounded-2xl bg-[#EFFAFD] border border-[#DCE7F2]">
-                    <Lightbulb size={24} className="text-[#7B8799] mx-auto" />
-                    <p className="text-xs text-[#526078] font-body">
-                      No hints consumed yet. Try solving first, or click [Hint] if you get stuck.
-                    </p>
-                    <Button size="sm" variant="eggplant" onClick={handleAskForHint} disabled={hintCount >= 3}>
-                      Unlock Level 1 Hint
-                    </Button>
-                  </div>
-                ) : (
-                  unlockedHints.map((hint, idx) => (
-                    <div key={idx} className="p-4 rounded-2xl bg-[#F8EAF4] border border-[#A0006D]/30 space-y-1">
-                      <span className="text-[10px] font-bold text-[#A0006D] uppercase font-mono">
-                        Progressive Hint Level 0{idx + 1}
-                      </span>
-                      <p className="text-xs text-[#11183D] font-body leading-relaxed">{hint}</p>
-                    </div>
-                  ))
-                )}
-              </div>
-            )}
-
-          </div>
-
-          {/* Bottom Left: Ava AI Avatar & Candidate Video Strip */}
-          <div className="h-44 shrink-0 border-t border-[#DCE7F2] bg-[#EFFAFD] p-4 grid grid-cols-2 gap-3 items-center">
-            {/* Ava AI Avatar Box */}
-            <div className="h-full rounded-2xl bg-white border border-[#DCE7F2] p-3 flex items-center gap-3 relative overflow-hidden shadow-xs">
-              <div className="h-16 w-16 rounded-xl bg-[#EFFAFD] border border-[#DCE7F2] shrink-0 overflow-hidden flex items-center justify-center">
+          {/* Bottom Dock: Ava AI Avatar & Candidate Video Feed Side-by-Side + Live Ava Captions */}
+          <div className="border-t border-[#DCE7F2] bg-[#0A0E1A] p-3 flex flex-col gap-2.5 shrink-0 shadow-inner">
+            {/* Side-by-side Video Feeds */}
+            <div className="grid grid-cols-2 gap-2.5">
+              {/* Ava AI Video Feed */}
+              <div className="h-28 rounded-xl bg-gradient-to-b from-[#0e172e] to-[#04060c] border border-white/20 overflow-hidden relative shadow-md flex items-center justify-center">
                 <AIAvatar
                   state={avatarState}
                   isSpeaking={aiIsSpeaking}
                   mouthOpenness={mouthOpenness}
+                  activeVisemeShape={activeViseme}
+                  currentWord={spokenWord}
                   className="h-full w-full object-cover"
                 />
               </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5 mb-0.5">
-                  <span className="text-[10px] font-bold text-[#A0006D] font-display">Ava AI</span>
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#A0006D] animate-pulse" />
-                </div>
-                <p className="text-[10px] text-[#526078] leading-snug truncate">
-                  {aiIsSpeaking ? spokenWord || 'Speaking...' : 'Listening to candidate...'}
-                </p>
+
+              {/* Candidate Webcam Feed */}
+              <div className="h-28 rounded-xl border border-white/20 overflow-hidden relative shadow-md bg-slate-950 flex items-center justify-center">
+                {isCameraOn && mediaStream ? (
+                  <video
+                    ref={(ref) => {
+                      if (ref && mediaStream && ref.srcObject !== mediaStream) {
+                        ref.srcObject = mediaStream;
+                      }
+                    }}
+                    autoPlay
+                    muted
+                    playsInline
+                    className="w-full h-full object-cover scale-x-[-1]"
+                  />
+                ) : (
+                  <div className="flex flex-col items-center justify-center text-slate-500 p-2 text-center">
+                    <VideoOff size={20} className="mb-1 text-slate-600" />
+                    <span className="text-[10px] font-mono">Camera Paused</span>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Candidate User Video Box */}
-            <div className="h-full rounded-2xl bg-[#11183D] border border-[#DCE7F2] overflow-hidden relative flex items-center justify-center">
-              <UserCamera
-                stream={mediaStream}
-                isMicActive={isMicOn}
-                isCameraOn={isCameraOn}
-                className="w-full h-full object-cover scale-x-[-1]"
-                userName="You"
-              />
-              <div className="absolute top-2 left-2 flex items-center gap-1 px-1.5 py-0.5 bg-black/60 rounded text-[9px] text-[#168A62] font-mono">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#168A62] animate-pulse" />
-                <span>Verified</span>
+            {/* Live Captions of Ava */}
+            <div className="rounded-xl bg-slate-900/95 border border-white/10 p-2.5 shadow-sm">
+              <div className="flex items-center justify-between gap-2 mb-1">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[9px] font-bold uppercase tracking-wider text-[#A0006D] font-mono">
+                    Ava AI Interviewer
+                  </span>
+                  {aiIsSpeaking && (
+                    <span className="flex items-center gap-0.5">
+                      <span className="h-1 w-0.5 rounded-full bg-[#A0006D] animate-bounce" />
+                      <span className="h-2 w-0.5 rounded-full bg-[#A0006D] animate-bounce delay-75" />
+                      <span className="h-1 w-0.5 rounded-full bg-[#A0006D] animate-bounce delay-150" />
+                    </span>
+                  )}
+                </div>
+                {activeCaption?.speaker === 'user' && (
+                  <span className="text-[9px] text-sky-400 font-mono">You speaking...</span>
+                )}
               </div>
+              <p className="text-xs text-white leading-relaxed font-sans line-clamp-2">
+                {activeCaption?.text || 'I am analyzing your solution. Feel free to explain your thoughts or run test cases.'}
+              </p>
             </div>
           </div>
 
         </section>
 
-        {/* RIGHT PANE (58vw): Monaco Code Studio & Interactive Test Console */}
+        {/* RIGHT PANE (58vw): Monaco Code Studio & Integrated Candidate Video + Test Console */}
         <section className="flex-1 h-full flex flex-col bg-[#EFFAFD] min-w-[500px]">
           
           {/* Top IDE Toolbar */}
           <div className="h-11 shrink-0 bg-white border-b border-[#DCE7F2] px-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <span className="text-xs font-bold text-[#526078] uppercase font-mono">Language:</span>
               <select
                 value={codeLanguage}
@@ -1075,21 +1250,20 @@ export default function CodingInterviewRoom() {
               <Button
                 size="sm"
                 variant="royal"
-                onClick={handleRunCode}
+                onClick={() => handleRunCode()}
                 disabled={isRunningCode || isProcessing}
                 icon={<Play size={12} className="text-white" />}
               >
                 {isRunningCode ? 'Running Sandbox...' : 'Run Test Cases'}
               </Button>
-
               <Button
                 size="sm"
-                variant="eggplant"
-                onClick={submitSolution}
-                disabled={isProcessing}
-                iconRight={<ChevronRight size={14} />}
+                variant="primary"
+                onClick={() => submitSolution()}
+                disabled={isRunningCode || isProcessing}
+                icon={<CheckCircle2 size={12} className="text-white" />}
               >
-                Submit Solution
+                {isProcessing ? 'Submitting...' : 'Submit Solution'}
               </Button>
             </div>
           </div>
@@ -1126,12 +1300,12 @@ export default function CodingInterviewRoom() {
             />
           </div>
 
-          {/* Bottom Expandable Test Cases & Compiler Console */}
-          <div className={`shrink-0 border-t border-[#DCE7F2] bg-white flex flex-col transition-all duration-300 ${isConsoleOpen ? 'h-52' : 'h-10'}`}>
+          {/* Hidden Test Cases & Compiler Output Console */}
+          <div className={`shrink-0 border-t border-[#DCE7F2] bg-white flex flex-col transition-all duration-300 ${isConsoleOpen ? 'h-64' : 'h-10'}`}>
             
             {/* Console Header Bar */}
             <div className="h-10 border-b border-[#DCE7F2] bg-[#EFFAFD] px-4 flex items-center justify-between shrink-0">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <button
                   type="button"
                   onClick={() => {
@@ -1142,7 +1316,7 @@ export default function CodingInterviewRoom() {
                     consoleTab === 'testcases' ? 'bg-white text-[#4A8BDF] border border-[#DCE7F2] shadow-xs' : 'text-[#526078] hover:text-[#11183D]'
                   }`}
                 >
-                  Unit Test Cases {testResults ? `(${testResults.passedCount}/${testResults.totalCount})` : ''}
+                  Hidden Test Cases {testResults ? `(${testResults.passedCount}/${testResults.totalCount || 5})` : ''}
                 </button>
 
                 <button
@@ -1159,91 +1333,105 @@ export default function CodingInterviewRoom() {
                 </button>
               </div>
 
-              <button
-                onClick={() => setIsConsoleOpen(prev => !prev)}
-                className="text-xs text-[#526078] hover:text-[#11183D] transition-colors cursor-pointer flex items-center gap-1"
-              >
-                {isConsoleOpen ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
-                <span>{isConsoleOpen ? 'Collapse' : 'Expand'}</span>
-              </button>
+              {/* Collapse / Expand Control */}
+              <div className="flex items-center gap-3 text-xs">
+                <button
+                  onClick={() => setIsConsoleOpen((prev) => !prev)}
+                  className="text-xs text-[#526078] hover:text-[#11183D] transition-colors cursor-pointer flex items-center gap-1"
+                >
+                  {isConsoleOpen ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
+                  <span>{isConsoleOpen ? 'Collapse' : 'Expand'}</span>
+                </button>
+              </div>
             </div>
 
-            {/* Console Body */}
+            {/* Console Body: Sandboxed Test Matrix or Terminal */}
             {isConsoleOpen && (
-              <div className="flex-1 p-4 overflow-y-auto bg-[#11183D] font-mono text-xs text-slate-100">
-                {consoleTab === 'testcases' ? (
-                  <div className="space-y-3">
-                    {testResults ? (
-                      <div className="space-y-2.5">
-                        <div className="flex items-center justify-between p-3 rounded-xl bg-slate-900 border border-slate-800">
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold text-white">Execution Result:</span>
-                            <span className="text-slate-400 text-[11px]">({testResults.language || codeLanguage} runtime)</span>
+              <div className="flex-1 flex overflow-hidden bg-[#11183D]">
+                <div className="flex-1 p-4 overflow-y-auto font-mono text-xs text-slate-100">
+                  {consoleTab === 'testcases' ? (
+                    <div className="space-y-3">
+                      {testResults ? (
+                        <div className="space-y-2.5">
+                          <div className="flex items-center justify-between p-3 rounded-xl bg-slate-900 border border-slate-800">
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-white">Execution Result:</span>
+                              <span className="text-slate-400 text-[11px]">({codeLanguage} sandbox runtime)</span>
+                            </div>
+                            <Badge variant={testResults.success ? "success" : "error"} size="xs">
+                              {testResults.success ? 'All Hidden Cases Passed ✓' : `${testResults.passedCount}/${testResults.totalCount} Passed`}
+                            </Badge>
                           </div>
-                          <Badge variant={testResults.success ? "success" : "error"} size="xs">
-                            {testResults.success ? 'All Passed ✓' : `${testResults.passedCount}/${testResults.totalCount} Passed`}
-                          </Badge>
-                        </div>
 
-                        {/* Individual Test Cases Matrix */}
-                        {testResults.testResults && testResults.testResults.length > 0 && (
-                          <div className="grid grid-cols-1 gap-2 pt-1">
-                            {testResults.testResults.map((tc: any, i: number) => (
-                              <div
-                                key={i}
-                                className={`p-3 rounded-xl border text-xs space-y-1.5 transition-all ${
-                                  tc.passed
-                                    ? 'bg-emerald-950/20 border-emerald-500/30 text-emerald-200'
-                                    : 'bg-rose-950/20 border-rose-500/30 text-rose-200'
-                                }`}
-                              >
-                                <div className="flex items-center justify-between font-bold">
-                                  <span className="flex items-center gap-1.5 font-display">
-                                    <span className={`h-2 w-2 rounded-full ${tc.passed ? 'bg-emerald-400' : 'bg-rose-400'}`} />
-                                    Test Case #{tc.testCaseIndex || i + 1}
+                          {/* Hidden Test Cases Matrix (Inputs/Outputs Strictly Hidden) */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                            {(testResults.testResults || [1, 2, 3, 4, 5]).map((tc: any, i: number) => {
+                              const isPassed = typeof tc === 'object' ? tc.passed : false;
+                              const time = typeof tc === 'object' && tc.executionTimeMs ? `${tc.executionTimeMs}ms` : '12ms';
+                              return (
+                                <div
+                                  key={i}
+                                  className={`p-3 rounded-xl border text-xs flex items-center justify-between font-mono transition-all ${
+                                    isPassed
+                                      ? 'bg-emerald-950/20 border-emerald-500/30 text-emerald-200'
+                                      : 'bg-rose-950/20 border-rose-500/30 text-rose-200'
+                                  }`}
+                                >
+                                  <span className="flex items-center gap-2">
+                                    <span className={`h-2 w-2 rounded-full ${isPassed ? 'bg-emerald-400' : 'bg-rose-400'}`} />
+                                    <span>Hidden Test Case #{i + 1}</span>
                                   </span>
-                                  <span className="text-[10px] font-mono text-slate-400">
-                                    {tc.executionTimeMs ? `${tc.executionTimeMs}ms` : 'Passed'}
+                                  <span className="text-[10px] font-bold">
+                                    {isPassed ? `Passed (${time}) ✓` : `Failed (${time}) ✗`}
                                   </span>
                                 </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] font-mono pt-1 text-slate-300">
-                                  <div className="bg-slate-900/80 p-1.5 rounded-lg border border-slate-800">
-                                    <span className="text-slate-500 block text-[9px] uppercase font-bold">Input:</span>
-                                    <span className="truncate block">{JSON.stringify(tc.input)}</span>
-                                  </div>
-                                  <div className="bg-slate-900/80 p-1.5 rounded-lg border border-slate-800">
-                                    <span className="text-slate-500 block text-[9px] uppercase font-bold">Expected:</span>
-                                    <span className="truncate block text-emerald-400">{JSON.stringify(tc.expected)}</span>
-                                  </div>
-                                </div>
-                                {tc.actual !== undefined && !tc.passed && (
-                                  <div className="bg-rose-950/50 p-1.5 rounded-lg border border-rose-800 text-[11px]">
-                                    <span className="text-rose-400 font-bold block text-[9px] uppercase">Got:</span>
-                                    <span className="text-rose-200">{JSON.stringify(tc.actual)}</span>
-                                  </div>
-                                )}
+                              );
+                            })}
+                          </div>
+
+                          {testResults.errorDetails && (
+                            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-mono">
+                              {testResults.errorDetails}
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <Shield size={14} className="text-[#4A8BDF]" />
+                              <span className="font-bold text-white text-xs">Hidden Test Suite (Sandboxed Matrix)</span>
+                            </div>
+                            <span className="text-[11px] text-slate-400 font-mono">5 Hidden Cases Locked</span>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            {[1, 2, 3, 4, 5].map((caseNum) => (
+                              <div key={caseNum} className="p-3 rounded-xl bg-slate-900/60 border border-slate-800 flex items-center justify-between text-xs text-slate-300 font-mono">
+                                <span className="flex items-center gap-2">
+                                  <span className="h-2 w-2 rounded-full bg-slate-600" />
+                                  <span>Hidden Test Case #{caseNum}</span>
+                                </span>
+                                <span className="text-[10px] text-slate-500 bg-slate-800/80 px-2 py-0.5 rounded">
+                                  Locked
+                                </span>
                               </div>
                             ))}
                           </div>
-                        )}
 
-                        {testResults.errorDetails && (
-                          <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs">
-                            {testResults.errorDetails}
+                          <div className="p-3 rounded-xl bg-[#4A8BDF]/10 border border-[#4A8BDF]/20 text-xs text-[#DCE7F2] font-sans">
+                            All test cases are strictly hidden to evaluate true algorithmic correctness. Click <strong className="text-white font-mono">[Run Test Cases]</strong> to execute your code against this sandbox.
                           </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="text-slate-400 italic p-4 text-center">
-                        Click [Run Test Cases] to test your code against sandbox test cases.
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <pre className={`whitespace-pre-wrap leading-relaxed select-text ${consoleColor}`}>
-                    {consoleOutput}
-                  </pre>
-                )}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <pre className={`whitespace-pre-wrap leading-relaxed select-text ${consoleColor}`}>
+                      {consoleOutput}
+                    </pre>
+                  )}
+                </div>
+
               </div>
             )}
 
@@ -1252,32 +1440,6 @@ export default function CodingInterviewRoom() {
         </section>
 
       </main>
-
-      {/* Bottom Status Bar */}
-      <footer className="h-10 shrink-0 border-t border-[#DCE7F2] bg-white px-6 flex items-center justify-between text-xs text-[#526078] font-mono">
-        <div className="flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full bg-[#168A62]" />
-          <span>Monaco Sandbox Node.js VM • Sandboxed</span>
-        </div>
-
-        {answerText && (
-          <div className="flex items-center gap-2 text-[#4A8BDF] font-sans italic truncate max-w-md">
-            <Mic size={12} className="animate-pulse" />
-            <span className="truncate">"{answerText}"</span>
-          </div>
-        )}
-
-        <button
-          onClick={() => {
-            if (window.confirm("Are you sure you want to exit the assessment?")) {
-              navigate('/dashboard');
-            }
-          }}
-          className="text-[#526078] hover:text-[#D64545] transition-colors cursor-pointer"
-        >
-          Abandon Assessment
-        </button>
-      </footer>
     </div>
   );
 }

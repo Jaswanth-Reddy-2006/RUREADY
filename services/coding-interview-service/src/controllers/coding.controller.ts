@@ -5,8 +5,14 @@ export const codingController = {
   async createSession(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = (req as any).user?.userId || (req.headers['x-user-id'] as string);
-      const { targetRole, difficulty, selectedLanguage } = req.body;
-      const session = await codingService.createSession(userId, targetRole || 'Software Engineer', difficulty, selectedLanguage);
+      const { targetRole, difficulty, selectedLanguage, problemId } = req.body;
+      const session = await codingService.createSession(
+        userId,
+        targetRole || 'Software Engineer',
+        difficulty,
+        selectedLanguage,
+        problemId
+      );
       res.status(201).json(session);
     } catch (err) {
       next(err);
@@ -36,9 +42,47 @@ export const codingController = {
     try {
       const userId = (req as any).user?.userId || (req.headers['x-user-id'] as string);
       const sessionId = req.params.id as string;
-      const { code, language } = req.body;
-      const result = await codingService.runTestCases(sessionId, userId, code, language);
+      const { code, language, problemId, customTestCase } = req.body;
+      const result = await codingService.runTestCases(
+        sessionId,
+        userId,
+        code,
+        language,
+        problemId,
+        customTestCase
+      );
       res.status(200).json(result);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async getIdealSolution(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const problemId = (req.params.problemId || req.query.problemId || 'two-sum') as string;
+      const language = (req.query.language || 'javascript') as string;
+      const ideal = await codingService.getIdealSolution(problemId, language);
+      res.status(200).json(ideal);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async getProgressiveHint(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { problemId, hintLevel, code } = req.body;
+      const hint = await codingService.getProgressiveHint(problemId || 'two-sum', hintLevel || 1, code);
+      res.status(200).json(hint);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async getSocraticDialogue(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { problemId, message, code } = req.body;
+      const dialogue = await codingService.getSocraticDialogue(problemId || 'two-sum', message || '', code);
+      res.status(200).json(dialogue);
     } catch (err) {
       next(err);
     }

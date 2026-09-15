@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { Agentation } from 'agentation';
+import { useProfileStore } from './store/useProfileStore';
 import ProtectedRoute from './components/layout/ProtectedRoute';
 import ErrorBoundary from './components/ui/ErrorBoundary';
 import Navbar from './components/layout/Navbar';
@@ -8,6 +10,10 @@ import Footer from './components/layout/Footer';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import About from './pages/About';
+import Contact from './pages/Contact';
+import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
 
 // Interview flow pages
 import SetupForm from './pages/interview/SetupForm';
@@ -27,7 +33,10 @@ import AtsScanner from './pages/ats/AtsScanner';
 import AtsReport from './pages/ats/AtsReport';
 import RoadmapCatalog from './pages/roadmap/RoadmapCatalog';
 import RoadmapView from './pages/roadmap/RoadmapView';
+import RoadmapBuilderPage from './pages/roadmap/RoadmapBuilderPage';
 import DiscussPage from './pages/discuss/DiscussPage';
+import DiscussDetail from './pages/discuss/DiscussDetail';
+import ProfilePage from './pages/profile/ProfilePage';
 
 // Layout shell
 import AppLayout from './layouts/AppLayout';
@@ -39,13 +48,28 @@ import AdminLogs from './pages/admin/AdminLogs';
 import AdminAnalytics from './pages/admin/AdminAnalytics';
 import AdminSessionDetail from './pages/admin/AdminSessionDetail';
 
-/** The global marketing header/footer should only render on public marketing landing. */
+/** The global marketing header/footer should only render on public marketing pages. */
 function shouldShowHeaderFooter(pathname: string): boolean {
-  return pathname === '/';
+  return (
+    pathname === '/' ||
+    pathname === '/about' ||
+    pathname === '/contact' ||
+    pathname === '/terms' ||
+    pathname === '/privacy'
+  );
 }
 
 function App() {
   const location = useLocation();
+  const { preferences } = useProfileStore();
+
+  // Maintain crisp light SaaS theme globally on root html
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.remove('dark');
+    root.style.colorScheme = 'light';
+  }, [preferences.themeMode]);
+
   const showHeaderFooter = shouldShowHeaderFooter(location.pathname);
   const isLiveInterviewRoom =
     /^\/interview\/(coding\/)?[^/]+$/.test(location.pathname) &&
@@ -72,6 +96,10 @@ function App() {
               <Route path="/" element={<Landing />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/privacy" element={<Privacy />} />
 
               {/* Workspace Dashboard & Navigation links */}
               <Route
@@ -115,6 +143,22 @@ function App() {
                 }
               />
               <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <ProfilePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/profile/:username"
+                element={
+                  <ProtectedRoute>
+                    <ProfilePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/settings"
                 element={
                   <ProtectedRoute>
@@ -147,6 +191,22 @@ function App() {
                 }
               />
               <Route
+                path="/roadmap/builder"
+                element={
+                  <ProtectedRoute>
+                    <RoadmapBuilderPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/roadmap/create"
+                element={
+                  <ProtectedRoute>
+                    <RoadmapBuilderPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/roadmap/:id"
                 element={
                   <ProtectedRoute>
@@ -159,6 +219,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <DiscussPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/discuss/:id"
+                element={
+                  <ProtectedRoute>
+                    <DiscussDetail />
                   </ProtectedRoute>
                 }
               />

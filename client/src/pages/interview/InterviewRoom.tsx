@@ -12,10 +12,12 @@ import UserCamera from '../../components/interview/UserCamera';
 import LiveTranscript, { type TranscriptEntry } from '../../components/interview/LiveTranscript';
 import InterviewTimer from '../../components/interview/InterviewTimer';
 import { useEyeContact } from '../../hooks/useEyeContact';
+import { useVideoAnalysisML } from '../../hooks/useVideoAnalysisML';
 import { authApi } from '../../api/auth';
 import { useAuthStore } from '../../store/authStore';
 import { useInterviewStore } from '../../store/useInterviewStore';
 import { speakWithLipSync, loadSpeechVoices } from '../../lib/speech';
+import { OculusViseme, mapVisemeIdToOculus } from '../../components/interview/visemeMapper';
 import { Maximize2, Minimize2, Mic, MicOff, Video, VideoOff, Play, Shield, BookOpen, Wrench, Sparkles, FileText, Clock, AlertCircle, CheckCircle2, PhoneOff, Code2, Terminal } from 'lucide-react';
 import NormalInterviewRoom from '../../components/NormalInterviewRoom';
 
@@ -141,6 +143,7 @@ export default function InterviewRoom() {
   const [aiIsSpeaking, setAiIsSpeaking] = useState(false);
   const [mouthOpenness, setMouthOpenness] = useState(0.08);
   const [spokenWord, setSpokenWord] = useState('');
+  const [activeViseme, setActiveViseme] = useState<OculusViseme>('viseme_sil');
   const [processingLabel, setProcessingLabel] = useState('');
 
   // Speech recognition
@@ -149,8 +152,23 @@ export default function InterviewRoom() {
   const recognitionRef = useRef<any>(null);
   const isListeningRef = useRef(false);
   const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [silenceCountdown, setSilenceCountdown] = useState<number | null>(null);
   const lastSpeechRef = useRef<number>(Date.now());
   const latestAnswerRef = useRef('');
+
+  // Clear silence timers and countdown state safely
+  const clearSilenceTimers = useCallback(() => {
+    if (silenceTimerRef.current) {
+      clearTimeout(silenceTimerRef.current);
+      silenceTimerRef.current = null;
+    }
+    if (countdownIntervalRef.current) {
+      clearInterval(countdownIntervalRef.current);
+      countdownIntervalRef.current = null;
+    }
+    setSilenceCountdown(null);
+  }, []);
 
   // End Interview & Analysis States
   const [showEndConfirmation, setShowEndConfirmation] = useState(false);
@@ -177,16 +195,31 @@ export default function InterviewRoom() {
     }
   }, [isLobbyOpen]);
 
-  // Fullscreen state
+  // Fullscreen state & Escape key locking
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  const toggleFullScreen = useCallback(() => {
+  const toggleFullScreen = useCallback(async () => {
     if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().then(() => {
+      try {
+        const container = document.documentElement;
+        if (container.requestFullscreen) {
+          await container.requestFullscreen();
+        } else if ((container as any).webkitRequestFullscreen) {
+          await (container as any).webkitRequestFullscreen();
+        } else if ((container as any).msRequestFullscreen) {
+          await (container as any).msRequestFullscreen();
+        }
         setIsFullscreen(true);
-      }).catch(err => {
+        if ('keyboard' in navigator && (navigator as any).keyboard?.lock) {
+          try {
+            await (navigator as any).keyboard.lock(['Escape']);
+          } catch (kErr) {
+            console.warn('Keyboard lock API not permitted:', kErr);
+          }
+        }
+      } catch (err) {
         console.error('Error attempting to enable fullscreen:', err);
-      });
+      }
     } else {
       document.exitFullscreen().then(() => {
         setIsFullscreen(false);
@@ -199,8 +232,19 @@ export default function InterviewRoom() {
       setIsFullscreen(!!document.fullscreenElement);
     };
     document.addEventListener('fullscreenchange', handleFullscreenChange);
+
+    // Guard against Escape key breaking stage layout
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown, true);
+
     return () => {
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      window.removeEventListener('keydown', handleGlobalKeyDown, true);
       if (document.fullscreenElement) {
         document.exitFullscreen().catch(err => console.error('Exit fullscreen failed on unmount:', err));
       }
@@ -221,14 +265,90 @@ export default function InterviewRoom() {
 
   const isUserSignoff = useCallback((text: string) => {
     const normalized = text.toLowerCase().replace(/\s+/g, ' ').trim();
-    return ["that's it", "that's all", 'thats it', 'thats all', 'done', 'no more', 'nothing else', 'i dont know', "i don't know", 'skip', 'next question']
+    return ["that's it", "that's all", 'thats it', 'thats all', 'done', 'no more', 'nothing else']
       .some((phrase) => normalized.includes(phrase));
   }, []);
 
+  // Verbal Repeat Question Detector — triggers whenever candidate asks Ava to repeat
   const isRepeatRequest = useCallback((text: string) => {
-    const normalized = text.toLowerCase().replace(/\s+/g, ' ').trim();
-    return ["please repeat", "can you repeat", "repeat please", "repeat again", "can you repeat that", "repeat the question", "could you repeat", "say again", "pardon me"]
-      .some((phrase) => normalized.includes(phrase));
+    const normalized = text.toLowerCase().replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!normalized) return false;
+    const repeatPhrases = [
+      "repeat",
+      "repeat please",
+      "please repeat",
+      "can you repeat",
+      "could you repeat",
+      "repeat the question",
+      "repeat question",
+      "can you repeat the question",
+      "could you repeat the question",
+      "please repeat the question",
+      "can you repeat that",
+      "could you repeat that",
+      "repeat again",
+      "say again",
+      "say that again",
+      "pardon",
+      "pardon me",
+      "what was the question",
+      "what was the question again",
+      "what is the question",
+      "tell me the question again",
+      "one more time"
+    ];
+    return repeatPhrases.some((phrase) => normalized === phrase || normalized.includes(phrase));
+  }, []);
+
+  // Verbal Skip / "I Don't Know" Detector — detects when candidate expresses unfamiliarity or wishes to skip
+  const isSkipOrUnknownRequest = useCallback((text: string) => {
+    const normalized = text.toLowerCase().replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!normalized) return false;
+    const skipPhrases = [
+      "i don't know",
+      "i dont know",
+      "i do not know",
+      "dont know",
+      "don't know",
+      "sorry i don't know",
+      "sorry i dont know",
+      "sorry i do not know",
+      "sorry i don't know this answer",
+      "sorry i dont know this answer",
+      "sorry i don't know the answer",
+      "sorry i dont know the answer",
+      "i don't know this answer",
+      "i dont know this answer",
+      "i do not know this answer",
+      "i don't know the answer",
+      "i haven't learned this",
+      "i have not learned this",
+      "i haven't learned this yet",
+      "i have not learned this yet",
+      "not learned this yet",
+      "haven't learned this",
+      "have not learned this",
+      "i am not familiar with this",
+      "i'm not familiar with this",
+      "not familiar with this",
+      "i am not familiar",
+      "i'm not familiar",
+      "not familiar",
+      "i am not sure",
+      "i'm not sure",
+      "not sure",
+      "no idea",
+      "i have no idea",
+      "skip this question",
+      "skip question",
+      "can we skip this",
+      "can we skip",
+      "please skip",
+      "pass this question",
+      "pass",
+      "next question please",
+    ];
+    return skipPhrases.some((phrase) => normalized === phrase || normalized.includes(phrase));
   }, []);
 
   const answerMetricsRef = useRef<Array<{ wordCount: number; durationMs: number; pauseCount: number }>>([]);
@@ -251,6 +371,11 @@ export default function InterviewRoom() {
   }, []);
 
   useEyeContact(mediaStream, isCameraOn, handleGazeSample);
+
+  // Live in-browser on-device ML video telemetry (Strict Zero Recording guarantee)
+  const videoMLMetrics = useVideoAnalysisML(mediaStream, isCameraOn, (m) => {
+    handleGazeSample(m.eyeContactScore);
+  });
 
   // ─── Media Setup ───────────────────────────────────────────
 
@@ -359,6 +484,7 @@ export default function InterviewRoom() {
       const combined = `${finalTranscriptRef.current}${interimText}`.replace(/\s+/g, ' ').trim();
       
       if (isRepeatRequest(combined)) {
+        clearSilenceTimers();
         stopListening();
         setAnswerText('');
         finalTranscriptRef.current = '';
@@ -367,13 +493,24 @@ export default function InterviewRoom() {
         
         setTimeout(async () => {
           if (currentQuestionRef.current) {
-            await aiSpeak(`Sure, let me repeat: ${currentQuestionRef.current.questionText}`);
+            await aiSpeak(`Sure, let me repeat the question: ${currentQuestionRef.current.questionText}`);
             startListening();
           }
         }, 100);
         return;
       }
 
+      if (isSkipOrUnknownRequest(combined)) {
+        clearSilenceTimers();
+        stopListening();
+        setAnswerText('');
+        finalTranscriptRef.current = '';
+        latestAnswerRef.current = '';
+        submitAnswer(combined, true);
+        return;
+      }
+
+      clearSilenceTimers();
       setAnswerText(combined);
       latestAnswerRef.current = combined;
 
@@ -384,16 +521,28 @@ export default function InterviewRoom() {
         hadSpeechRef.current = true;
       }
 
-      if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
-      silenceTimerRef.current = setTimeout(() => {
-        const snapshot = latestAnswerRef.current.trim();
-        if (isListeningRef.current && snapshot.length > 8) {
-          handleAutoSubmit(snapshot);
-        }
-      }, 8000);
-
       if (isUserSignoff(combined)) {
         handleAutoSubmit(combined);
+        return;
+      }
+
+      // 6-Second Silence Auto-Submit Countdown:
+      // If candidate pauses for 5 to 10 seconds (targeting 6s), auto-submit the response
+      if (isListeningRef.current && combined.trim().length >= 4) {
+        let secondsRemaining = 6;
+        setSilenceCountdown(secondsRemaining);
+        countdownIntervalRef.current = setInterval(() => {
+          secondsRemaining -= 1;
+          if (secondsRemaining <= 0) {
+            clearSilenceTimers();
+            const snapshot = latestAnswerRef.current.trim();
+            if (isListeningRef.current && snapshot.length >= 4) {
+              handleAutoSubmit(snapshot);
+            }
+          } else {
+            setSilenceCountdown(secondsRemaining);
+          }
+        }, 1000);
       }
     };
 
@@ -452,13 +601,17 @@ export default function InterviewRoom() {
           onEnd: () => {
             setAiIsSpeaking(false);
             setMouthOpenness(0.08);
+            setActiveViseme('viseme_sil');
             setSpokenWord('');
             setAvatarState('listening');
             resolve();
           },
-          onViseme: (openness, fragment) => {
+          onViseme: (openness, fragment, _shape, visemeId) => {
             setMouthOpenness(openness);
-            if (fragment.trim()) setSpokenWord(fragment.trim());
+            if (visemeId) {
+              setActiveViseme(mapVisemeIdToOculus(visemeId));
+            }
+            if (fragment && fragment.trim()) setSpokenWord(fragment.trim());
           },
         });
       });
@@ -480,17 +633,18 @@ export default function InterviewRoom() {
     answerStartRef.current = null;
     pauseCountRef.current = 0;
     hadSpeechRef.current = false;
+    clearSilenceTimers();
 
     try {
       recognitionRef.current.start();
     } catch {
       // Already started
     }
-  }, [isMicOn]);
+  }, [isMicOn, clearSilenceTimers]);
 
   const stopListening = useCallback(() => {
     isListeningRef.current = false;
-    if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+    clearSilenceTimers();
     if (recognitionRef.current) {
       try {
         recognitionRef.current.stop();
@@ -498,7 +652,7 @@ export default function InterviewRoom() {
         // Already stopped
       }
     }
-  }, []);
+  }, [clearSilenceTimers]);
 
   const handleJoinCall = useCallback(async () => {
     // 1. Request fullscreen
@@ -512,6 +666,13 @@ export default function InterviewRoom() {
         await (container as any).msRequestFullscreen();
       }
       setIsFullscreen(true);
+      if ('keyboard' in navigator && (navigator as any).keyboard?.lock) {
+        try {
+          await (navigator as any).keyboard.lock(['Escape']);
+        } catch (kErr) {
+          console.warn('Keyboard lock API not permitted:', kErr);
+        }
+      }
     } catch (err) {
       console.error('Failed to request fullscreen:', err);
     }
@@ -533,11 +694,15 @@ export default function InterviewRoom() {
           onEnd: () => {
             setAiIsSpeaking(false);
             setMouthOpenness(0.08);
+            setActiveViseme('viseme_sil');
             resolve();
           },
-          onViseme: (openness, fragment) => {
+          onViseme: (openness, fragment, _shape, visemeId) => {
             setMouthOpenness(openness);
-            if (fragment.trim()) setSpokenWord(fragment.trim());
+            if (visemeId) {
+              setActiveViseme(mapVisemeIdToOculus(visemeId));
+            }
+            if (fragment && fragment.trim()) setSpokenWord(fragment.trim());
           },
         });
       });
@@ -601,9 +766,133 @@ export default function InterviewRoom() {
   // ─── Submit Answer ────────────────────────────────────────
 
   const submitAnswer = useCallback(
-    async (answer: string) => {
+    async (answer: string, isExplicitSkip = false) => {
+      clearSilenceTimers();
       if (!currentQuestion || isProcessing || !answer.trim()) return;
 
+      // 1. Repeat Question Verbal Interceptor
+      if (isRepeatRequest(answer)) {
+        clearSilenceTimers();
+        stopListening();
+        setAnswerText('');
+        finalTranscriptRef.current = '';
+        latestAnswerRef.current = '';
+        setAvatarState('speaking');
+        if (currentQuestionRef.current) {
+          await aiSpeak(`Sure, let me repeat the question: ${currentQuestionRef.current.questionText}`);
+          startListening();
+        }
+        return;
+      }
+
+      // 2. Skip / "I don't know" Verbal Interceptor
+      const isSkip = isExplicitSkip || isSkipOrUnknownRequest(answer);
+
+      if (isSkip) {
+        clearSilenceTimers();
+        stopListening();
+        setAnswerText('');
+        finalTranscriptRef.current = '';
+        latestAnswerRef.current = '';
+        setIsProcessing(true);
+        setAvatarState('speaking');
+        setProcessingLabel('Transitioning to next topic…');
+
+        const empatheticPhrases = [
+          "That's completely fine, no worries at all. We all have areas we're still exploring. Let's move on to the next topic.",
+          "No problem at all. Honesty about what you've covered so far is a great engineering trait. Let's tackle the next question.",
+          "Understood, that is totally okay! Let's explore another area of your technical background.",
+        ];
+        const empatheticBridge = empatheticPhrases[Math.floor(Math.random() * empatheticPhrases.length)];
+
+        addTranscriptEntry('user', '[Candidate skipped: not familiar with this topic yet]');
+
+        try {
+          await apiClient.post(`/interview/session/${id}/answer`, {
+            questionId: currentQuestion.id,
+            answerText: '[Candidate skipped: not familiar with this topic yet]',
+            timeTaken: Math.max(3, Math.floor((Date.now() - (questionStartRef.current || Date.now())) / 1000)),
+            isSkip: true,
+          });
+
+          await aiSpeak(empatheticBridge);
+
+          setProcessingLabel('Ava is selecting the next question…');
+          const nextRes = await apiClient.get(`/interview/session/${id}/next`);
+
+          if (nextRes.data?.isComplete) {
+            setAvatarState('pleased');
+            await aiSpeak(
+              "That wraps up our interview. You've done well to make it through all the questions. Let me analyze your performance — I'll have your detailed report ready in just a moment."
+            );
+
+            setIsAnalyzing(true);
+            cleanupMediaStream();
+
+            if (document.fullscreenElement) {
+              try {
+                await document.exitFullscreen();
+                setIsFullscreen(false);
+              } catch (err) {
+                console.error('Failed to exit fullscreen on automatic complete:', err);
+              }
+            }
+
+            const confidenceMetrics = buildConfidenceMetrics();
+            const gaze = proctorDataRef.current.gazeScores;
+            const eyeContactScore = gaze.length
+              ? Math.round(gaze.reduce((a, b) => a + b, 0) / gaze.length)
+              : 70;
+            const tabBlurCount = proctorDataRef.current.tabBlurCount;
+            const presenceScore = Math.max(
+              0,
+              Math.min(100, 100 - tabBlurCount * 8 - (eyeContactScore < 50 ? 15 : 0)),
+            );
+
+            await apiClient.post(`/interview/session/${id}/complete`, {
+              confidenceMetrics: {
+                ...confidenceMetrics,
+                score: Math.round((confidenceMetrics.score + (videoMLMetrics?.confidenceScore ?? 88)) / 2),
+                videoConfidence: videoMLMetrics?.confidenceScore ?? 88,
+                composureLevel: videoMLMetrics?.composureLevel ?? 'Calm & Composed',
+                postureStatus: videoMLMetrics?.postureStatus ?? 'Optimal',
+              },
+              proctoring: {
+                eyeContactScore: Math.round((eyeContactScore + (videoMLMetrics?.eyeContactScore ?? 85)) / 2),
+                presenceScore,
+                tabBlurCount,
+                zeroRecordingActive: true,
+              },
+            });
+
+            setTimeout(() => {
+              navigate(`/interview/${id}/analysis`);
+            }, 4000);
+          } else {
+            const nextQ = nextRes.data?.question || nextRes.data;
+            setCurrentQuestion(nextQ);
+            setAnswerText('');
+            setIsProcessing(false);
+            setProcessingLabel('');
+
+            if (showCodeWorkspace) {
+              setCodeValue(getLanguageBoilerplate(codeLanguage));
+              setConsoleOutput('');
+            }
+
+            await aiSpeak(nextQ.questionText);
+            startListening();
+          }
+          return;
+        } catch (err) {
+          console.error('Failed to process skip:', err);
+          setIsProcessing(false);
+          startListening();
+          return;
+        }
+      }
+
+      // Normal answer flow
       const words = answer.trim().split(/\s+/).filter(Boolean).length;
       const startAt = answerStartRef.current || questionStartRef.current || Date.now();
       const durationMs = Math.max(1000, Date.now() - startAt);
@@ -636,7 +925,7 @@ export default function InterviewRoom() {
           timeTaken: Math.max(5, Math.floor((Date.now() - (questionStartRef.current || Date.now())) / 1000)),
         });
 
-        const evaluation = answerRes.data.evaluation;
+        const evaluation = answerRes.data?.evaluation;
 
         // If Ava requests a follow up and we are not already in follow-up mode,
         // intercept and ask for elaboration.
@@ -664,7 +953,7 @@ export default function InterviewRoom() {
         setProcessingLabel('Ava is choosing the right follow-up or next topic…');
         const nextRes = await apiClient.get(`/interview/session/${id}/next`);
 
-        if (nextRes.data.isComplete) {
+        if (nextRes.data?.isComplete) {
           // Complete the session
           setAvatarState('pleased');
           await aiSpeak(
@@ -695,11 +984,18 @@ export default function InterviewRoom() {
           );
 
           await apiClient.post(`/interview/session/${id}/complete`, {
-            confidenceMetrics,
+            confidenceMetrics: {
+              ...confidenceMetrics,
+              score: Math.round((confidenceMetrics.score + (videoMLMetrics?.confidenceScore ?? 88)) / 2),
+              videoConfidence: videoMLMetrics?.confidenceScore ?? 88,
+              composureLevel: videoMLMetrics?.composureLevel ?? 'Calm & Composed',
+              postureStatus: videoMLMetrics?.postureStatus ?? 'Optimal',
+            },
             proctoring: {
-              eyeContactScore,
+              eyeContactScore: Math.round((eyeContactScore + (videoMLMetrics?.eyeContactScore ?? 85)) / 2),
               presenceScore,
               tabBlurCount,
+              zeroRecordingActive: true,
             },
           });
           
@@ -708,7 +1004,7 @@ export default function InterviewRoom() {
           }, 4000);
         } else {
           // Ask next question
-          const nextQ = nextRes.data.question;
+          const nextQ = nextRes.data?.question || nextRes.data;
           setCurrentQuestion(nextQ);
           setAnswerText('');
           setIsProcessing(false);
@@ -756,6 +1052,11 @@ export default function InterviewRoom() {
       codeLanguage,
       getLanguageBoilerplate,
       cleanupMediaStream,
+      isRepeatRequest,
+      isSkipOrUnknownRequest,
+      clearSilenceTimers,
+      isFollowUpMode,
+      videoMLMetrics,
     ]
   );
 
@@ -948,8 +1249,13 @@ export default function InterviewRoom() {
         submittedAnswer += `\n\n[Submitted Code (${codeLanguage})]:\n\`\`\`${codeLanguage}\n${codeValue}\n\`\`\``;
       }
 
-      // Submit current answer if any
-      if (currentQuestion && answerText.trim()) {
+      // Submit current answer if any (ensure we don't save repeat or skip requests as answers)
+      if (
+        currentQuestion &&
+        answerText.trim() &&
+        !isRepeatRequest(answerText) &&
+        !isSkipOrUnknownRequest(answerText)
+      ) {
         await apiClient.post(`/interview/session/${id}/answer`, {
           questionId: currentQuestion.id,
           answerText: submittedAnswer,
@@ -970,11 +1276,18 @@ export default function InterviewRoom() {
       );
 
       await apiClient.post(`/interview/session/${id}/complete`, {
-        confidenceMetrics,
+        confidenceMetrics: {
+          ...confidenceMetrics,
+          score: Math.round((confidenceMetrics.score + (videoMLMetrics?.confidenceScore ?? 88)) / 2),
+          videoConfidence: videoMLMetrics?.confidenceScore ?? 88,
+          composureLevel: videoMLMetrics?.composureLevel ?? 'Calm & Composed',
+          postureStatus: videoMLMetrics?.postureStatus ?? 'Optimal',
+        },
         proctoring: {
-          eyeContactScore,
+          eyeContactScore: Math.round((eyeContactScore + (videoMLMetrics?.eyeContactScore ?? 85)) / 2),
           presenceScore,
           tabBlurCount,
+          zeroRecordingActive: true,
         },
       });
       
@@ -985,7 +1298,39 @@ export default function InterviewRoom() {
       console.error('Failed to end interview:', err);
       navigate(`/interview/${id}/analysis`);
     }
-  }, [id, currentQuestion, answerText, navigate, stopListening, buildConfidenceMetrics, cleanupMediaStream, showCodeWorkspace, codeValue, codeLanguage]);
+  }, [
+    id,
+    currentQuestion,
+    answerText,
+    navigate,
+    stopListening,
+    buildConfidenceMetrics,
+    cleanupMediaStream,
+    showCodeWorkspace,
+    codeValue,
+    codeLanguage,
+    isRepeatRequest,
+    isSkipOrUnknownRequest,
+    videoMLMetrics,
+  ]);
+
+  const handleRepeatQuestionCallback = useCallback(async () => {
+    if (currentQuestion) {
+      stopListening();
+      setAvatarState('speaking');
+      await aiSpeak(`Let me repeat the question: ${currentQuestion.questionText}`);
+      startListening();
+    }
+  }, [currentQuestion, aiSpeak, stopListening, startListening]);
+
+  const handleRequestClarificationCallback = useCallback(async () => {
+    if (currentQuestion) {
+      stopListening();
+      setAvatarState('speaking');
+      await aiSpeak(`To help clarify: Focus on your high-level approach first, state any key assumptions, and discuss the architectural tradeoffs.`);
+      startListening();
+    }
+  }, [currentQuestion, aiSpeak, stopListening, startListening]);
 
   // ─── Loading / Error Screen ───────────────────────────────
 
@@ -1437,7 +1782,7 @@ export default function InterviewRoom() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex h-[100dvh] flex-col bg-black overflow-hidden">
+    <div className="fixed inset-0 z-50 flex h-[100dvh] flex-col bg-[#EFFAFD] overflow-hidden">
       {/* RENDER THE MINIMAL 2-PANEL ORAL INTERVIEW ROOM MATCHING REFERENCE */}
       <NormalInterviewRoom
         mediaStream={mediaStream}
@@ -1445,12 +1790,25 @@ export default function InterviewRoom() {
         avatarState={avatarState}
         mouthOpenness={mouthOpenness}
         spokenWord={spokenWord}
+        activeVisemeShape={activeViseme}
         currentQuestionText={currentQuestion?.questionText || ''}
         candidateTranscription={answerText}
         onSubmitAnswer={submitAnswer}
         onEndInterview={handleEndInterview}
         isProcessing={isProcessing}
         processingLabel={processingLabel}
+        questionIndex={(currentQuestion?.orderIndex ?? 0) + 1}
+        totalQuestions={session?.questions?.length || 5}
+        questionDifficulty={currentQuestion?.difficulty || 'Medium'}
+        focusArea={session?.targetRole || 'Technical & STAR Drill'}
+        silenceCountdown={silenceCountdown}
+        isFullscreen={isFullscreen}
+        onReEnterFullscreen={toggleFullScreen}
+        onTranscriptionChange={(val) => {
+          setAnswerText(val);
+          latestAnswerRef.current = val;
+        }}
+        videoMLMetrics={videoMLMetrics}
       />
 
 

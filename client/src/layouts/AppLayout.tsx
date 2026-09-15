@@ -26,8 +26,15 @@ export default function AppLayout({ children }: AppLayoutProps) {
     path !== '/interview/new' &&
     path !== '/interview/coding/new';
 
-  // Public/Auth routes: / (landing page), /login, /register
-  const isPublicRoute = path === '/' || path === '/login' || path === '/register';
+  // Public/Auth routes: / (landing page), /login, /register, /about, /contact, /terms, /privacy
+  const isPublicRoute =
+    path === '/' ||
+    path === '/login' ||
+    path === '/register' ||
+    path === '/about' ||
+    path === '/contact' ||
+    path === '/terms' ||
+    path === '/privacy';
 
   // Dedicated Admin portal routes
   const isAdminRoute = path.startsWith('/admin');
@@ -46,12 +53,12 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   // Dashboard platform routes (dashboard, setup/new, history, analytics, settings)
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-slate-50 text-slate-900">
+    <div className="flex h-screen w-screen overflow-hidden bg-[#EFFAFD] text-[#11183D] transition-colors">
       
       {/* Skip to Main Content Accessibility Link */}
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-[#FF7A00] focus:text-white focus:font-semibold focus:rounded-xl focus:shadow-lg focus:outline-none"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-[#4A8BDF] focus:text-white focus:font-semibold focus:rounded-xl focus:shadow-lg focus:outline-none"
       >
         Skip to main content
       </a>
@@ -102,7 +109,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           </div>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF7A00]"
+            className="p-2 rounded-xl text-[#526078] hover:text-[#11183D] hover:bg-[#EFFAFD] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A8BDF]"
             aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
             aria-expanded={mobileMenuOpen}
           >
@@ -110,12 +117,12 @@ export default function AppLayout({ children }: AppLayoutProps) {
           </button>
         </header>
 
-        {/* Scrollable workspace content container */}
+        {/* Scrollable workspace content container with pale blue theme */}
         <div 
           id="workspace-viewport"
           role="region"
           aria-label="Workspace content view"
-          className="flex-1 h-full overflow-y-auto bg-slate-50 text-slate-900 relative focus:outline-none"
+          className="flex-1 h-full overflow-y-auto bg-[#EFFAFD] text-[#11183D] relative focus:outline-none transition-colors"
         >
           {children}
         </div>
