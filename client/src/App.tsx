@@ -37,6 +37,9 @@ import RoadmapBuilderPage from './pages/roadmap/RoadmapBuilderPage';
 import DiscussPage from './pages/discuss/DiscussPage';
 import DiscussDetail from './pages/discuss/DiscussDetail';
 import ProfilePage from './pages/profile/ProfilePage';
+import PlacementCommandCenterPage from './pages/placement/PlacementCommandCenterPage';
+import AddApplicationPage from './pages/placement/AddApplicationPage';
+import ApplicationDetailPage from './pages/placement/ApplicationDetailPage';
 
 // Layout shell
 import AppLayout from './layouts/AppLayout';
@@ -183,6 +186,46 @@ function App() {
                 }
               />
               <Route
+                path="/placement-crm"
+                element={
+                  <ProtectedRoute>
+                    <PlacementCommandCenterPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/placement-crm/add"
+                element={
+                  <ProtectedRoute>
+                    <AddApplicationPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/placement-crm/new"
+                element={
+                  <ProtectedRoute>
+                    <AddApplicationPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/placement-crm/application/:id"
+                element={
+                  <ProtectedRoute>
+                    <ApplicationDetailPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/placement-crm/app/:id"
+                element={
+                  <ProtectedRoute>
+                    <ApplicationDetailPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/roadmap"
                 element={
                   <ProtectedRoute>
@@ -293,20 +336,18 @@ function App() {
 
               {/* Secure Interview assessment pages */}
               <Route
-                path="/interview/:id/device-check"
+                path="/interview/new"
                 element={
                   <ProtectedRoute>
-                    <DeviceCheck />
+                    <SetupForm />
                   </ProtectedRoute>
                 }
               />
               <Route
-                path="/interview/:id"
+                path="/interview/setup"
                 element={
                   <ProtectedRoute>
-                    <ErrorBoundary fallbackTitle="Interview room error">
-                      <InterviewRoom />
-                    </ErrorBoundary>
+                    <SetupForm />
                   </ProtectedRoute>
                 }
               />
@@ -329,6 +370,14 @@ function App() {
                 }
               />
               <Route
+                path="/interview/:id/device-check"
+                element={
+                  <ProtectedRoute>
+                    <DeviceCheck />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/interview/:id/complete"
                 element={
                   <ProtectedRoute>
@@ -341,6 +390,16 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <AnalysisReport />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/interview/:id"
+                element={
+                  <ProtectedRoute>
+                    <ErrorBoundary fallbackTitle="Interview room error">
+                      <InterviewRoom />
+                    </ErrorBoundary>
                   </ProtectedRoute>
                 }
               />

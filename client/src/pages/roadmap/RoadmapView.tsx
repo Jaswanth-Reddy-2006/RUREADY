@@ -264,7 +264,7 @@ export default function RoadmapView() {
                   </span>
                 ) : (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold font-display bg-[#E8F5F0] text-[#168A62] border border-[#168A62]/30">
-                    Community Track by {roadmap.creatorName}
+                    Community Track by {roadmap.creatorName || 'Community Member'}
                   </span>
                 )}
 

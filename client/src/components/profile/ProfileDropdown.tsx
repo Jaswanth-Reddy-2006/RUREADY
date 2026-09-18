@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   LayoutDashboard,
@@ -27,6 +27,8 @@ interface ProfileDropdownProps {
 
 export default function ProfileDropdown({ isOpen, onClose, positionClass = 'right-0 mt-3' }: ProfileDropdownProps) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const isLanding = location.pathname === '/';
   const { user } = useAuthStore();
   const { profile, preferences, updatePreferences } = useProfileStore();
   const { logout, isLoggingOut } = useAuth();
@@ -113,15 +115,17 @@ export default function ProfileDropdown({ isOpen, onClose, positionClass = 'righ
         {/* 2. Action Menu Items: Dashboard, Profile, Settings, Notifications, Appearance, Sign Out */}
         <div className="space-y-1 pt-2 border-t border-[#DCE7F2] text-xs">
           
-          {/* Item 1: Dashboard */}
-          <Link
-            to="/dashboard"
-            onClick={onClose}
-            className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-[#EFFAFD] text-[#11183D] transition-colors"
-          >
-            <LayoutDashboard size={17} className="text-[#4A8BDF]" />
-            <span className="font-semibold text-xs">Dashboard</span>
-          </Link>
+          {/* Item 1: Dashboard (Only shown on landing page) */}
+          {isLanding && (
+            <Link
+              to="/dashboard"
+              onClick={onClose}
+              className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-[#EFFAFD] text-[#11183D] transition-colors"
+            >
+              <LayoutDashboard size={17} className="text-[#4A8BDF]" />
+              <span className="font-semibold text-xs">Dashboard</span>
+            </Link>
+          )}
 
           {/* Item 2: Profile */}
           <Link

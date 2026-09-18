@@ -56,11 +56,12 @@ export default function RoadmapCatalog() {
 
   // Check if roadmap was created/authored by the user
   const isUserCreated = (r: Roadmap) => {
+    if (!r) return false;
     return (
       r.creatorId === (user?.id || 'current-user') ||
       r.creatorUsername === 'you' ||
       r.creatorUsername === 'you_ai' ||
-      r.creatorName.toLowerCase().includes('you')
+      Boolean(r.creatorName && r.creatorName.toLowerCase().includes('you'))
     );
   };
 
@@ -98,6 +99,8 @@ export default function RoadmapCatalog() {
   const filteredRoadmaps = useMemo(() => {
     return roadmaps
       .filter((r) => {
+        if (!r) return false;
+
         // 1. Primary Tab Filtering
         if (activeTab === 'MY_ROADMAPS') {
           const userCreated = isUserCreated(r);
@@ -133,10 +136,10 @@ export default function RoadmapCatalog() {
         // 5. Search Query
         if (searchQuery.trim()) {
           const q = searchQuery.toLowerCase();
-          const matchTitle = r.title.toLowerCase().includes(q);
-          const matchDesc = r.description.toLowerCase().includes(q);
-          const matchTags = r.tags.some((t) => t.toLowerCase().includes(q));
-          const matchCreator = r.creatorName.toLowerCase().includes(q);
+          const matchTitle = (r.title || '').toLowerCase().includes(q);
+          const matchDesc = (r.description || '').toLowerCase().includes(q);
+          const matchTags = (r.tags || []).some((t) => (t || '').toLowerCase().includes(q));
+          const matchCreator = (r.creatorName || '').toLowerCase().includes(q);
           if (!matchTitle && !matchDesc && !matchTags && !matchCreator) return false;
         }
 

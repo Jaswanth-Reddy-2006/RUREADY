@@ -35,6 +35,7 @@ const NAV_LINKS = [
   { label: 'Benefits', href: '/#benefits' },
   { label: 'ATS Scanner', href: '/ats' },
   { label: 'Roadmaps', href: '/roadmap' },
+  { label: 'Placement CRM', href: '/placement-crm' },
   { label: 'Pricing', href: '/#pricing' },
   { label: 'About', href: '/about' },
   { label: 'Contact', href: '/contact' },

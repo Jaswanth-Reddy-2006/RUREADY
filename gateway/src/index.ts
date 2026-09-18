@@ -33,11 +33,12 @@ const PAYMENT_SERVICE_URL = process.env.PAYMENT_SERVICE_URL || 'http://localhost
 const ADMIN_SERVICE_URL = process.env.ADMIN_SERVICE_URL || 'http://localhost:4008';
 const RESUME_SERVICE_URL = process.env.RESUME_SERVICE_URL || 'http://localhost:3009';
 const ROADMAP_SERVICE_URL = process.env.ROADMAP_SERVICE_URL || 'http://localhost:3010';
+const PLACEMENT_SERVICE_URL = process.env.PLACEMENT_SERVICE_URL || 'http://localhost:3011';
 
 // Parse CORS origins from env
 const corsOrigins = process.env.CORS_ORIGIN
   ? process.env.CORS_ORIGIN.split(',').map((origin) => origin.trim())
-  : ['http://localhost:3000', 'http://localhost:5173', 'https://rureadyai.vercel.app'];
+  : ['http://localhost:3000', 'http://localhost:3011', 'http://localhost:5173', 'https://rureadyai.vercel.app'];
 
 // Security Headers
 app.use(
@@ -244,6 +245,20 @@ app.use(
     pathRewrite: (path: string) => {
       const clean = path.startsWith('/') ? path : `/${path}`;
       return `/api/discuss${clean === '/' ? '' : clean}`;
+    },
+    ws: true,
+  }),
+);
+
+// 8. Placement CRM Service
+app.use(
+  '/api/placement',
+  createProxyMiddleware({
+    target: PLACEMENT_SERVICE_URL,
+    changeOrigin: true,
+    pathRewrite: (path: string) => {
+      const clean = path.startsWith('/') ? path : `/${path}`;
+      return `/api/placement${clean === '/' ? '' : clean}`;
     },
     ws: true,
   }),

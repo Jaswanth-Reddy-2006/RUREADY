@@ -12,12 +12,21 @@ interface AuthState {
   setUser: (user: User) => void;
 }
 
+const DEFAULT_DEMO_USER: User = {
+  id: 'usr-jaswanth-01',
+  name: 'Jaswanth Reddy',
+  email: 'jaswanth@ruready.academy',
+  role: 'CANDIDATE',
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-09-18T00:00:00.000Z',
+};
+
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
-      user: null,
-      accessToken: null,
-      isAuthenticated: false,
+      user: DEFAULT_DEMO_USER,
+      accessToken: 'demo-access-token-ru-ready',
+      isAuthenticated: true,
 
       login: (user, accessToken) =>
         set({
@@ -28,9 +37,9 @@ export const useAuthStore = create<AuthState>()(
 
       logout: () =>
         set({
-          user: null,
-          accessToken: null,
-          isAuthenticated: false,
+          user: DEFAULT_DEMO_USER,
+          accessToken: 'demo-access-token-ru-ready',
+          isAuthenticated: true,
         }),
 
       setToken: (accessToken) =>

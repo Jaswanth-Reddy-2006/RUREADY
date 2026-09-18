@@ -9,6 +9,7 @@ import {
   Compass,
   Users,
   ShieldCheck,
+  Briefcase,
 } from 'lucide-react';
 import clsx from 'clsx';
 import { useAuthStore } from '../store/authStore';
@@ -47,6 +48,12 @@ const baseNavItems = [
     label: 'Career Roadmaps',
     href: '/roadmap',
     icon: Compass,
+    isAi: true,
+  },
+  {
+    label: 'Placement CRM',
+    href: '/placement-crm',
+    icon: Briefcase,
     isAi: true,
   },
   {
