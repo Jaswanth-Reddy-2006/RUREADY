@@ -258,7 +258,7 @@ export function createSpeechVisemeTimeline(text: string, wordsPerMinute: number 
     }
 
     const currentFrame = frames.find(
-      (f) => timeSec >= f.startTime && timeSec < f.startTime + f.duration
+      (f) => f && f.startTime !== undefined && timeSec >= f.startTime && timeSec < f.startTime + f.duration
     );
 
     if (!currentFrame) {

@@ -32,16 +32,38 @@ export function speakWithLipSync(
   window.speechSynthesis.cancel();
   if (lipSyncRaf) cancelAnimationFrame(lipSyncRaf);
 
-  const timeline = createSpeechVisemeTimeline(text);
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.rate = 0.92;
-  utterance.pitch = 1.02;
-  utterance.volume = 1;
+  // Clean raw markdown formatting (asterisks, hashtags, backticks, bullet points, links, etc.) for smooth speech flow
+  const cleanedText = text
+    .replace(/^#+\s+/gm, '')                 // Strip headers (# Header)
+    .replace(/\*\*(.*?)\*\*/g, '$1')         // Strip bold **text**
+    .replace(/\*(.*?)\*/g, '$1')             // Strip italic *text*
+    .replace(/__(.*?)__/g, '$1')             // Strip bold __text__
+    .replace(/_(.*?)_/g, '$1')               // Strip italic _text_
+    .replace(/`{1,3}(.*?)(`{1,3})?/g, '$1')   // Strip inline & block code backticks
+    .replace(/\[(.*?)\]\(.*?\)/g, '$1')       // Strip markdown links [label](url)
+    .replace(/^>\s?/gm, '')                  // Strip blockquotes
+    .replace(/^[\s*-]+(?=\w)/gm, '')         // Strip bullet points (- or *)
+    .replace(/[-_*]{3,}/g, '')               // Strip horizontal rules
+    .replace(/~{2}(.*?)(~{2})?/g, '$1')       // Strip strikethrough
+    .replace(/\s+/g, ' ')                    // Collapse extra whitespace
+    .trim();
+
+  const timeline = createSpeechVisemeTimeline(cleanedText);
+  const utterance = new SpeechSynthesisUtterance(cleanedText);
+  
+  // Smooth, warm, fresh corporate speech calibration
+  utterance.rate = 0.95;
+  utterance.pitch = 1.04;
+  utterance.volume = 1.0;
 
   const voices = window.speechSynthesis.getVoices();
+  // Prioritize modern Neural/Natural high-fidelity voices (Jenny, Aria, Samantha, Google)
   const preferredVoice =
-    voices.find((v) => v.lang.startsWith('en') && /female|samantha|zira|jenny|google/i.test(v.name)) ||
+    voices.find((v) => v.lang.startsWith('en') && /natural|neural|online/i.test(v.name) && /female|jenny|aria|ana|samantha|karen|victoria|google/i.test(v.name)) ||
+    voices.find((v) => v.lang.startsWith('en') && /natural|neural|online/i.test(v.name)) ||
+    voices.find((v) => v.lang.startsWith('en') && /female|samantha|jenny|aria|ana|google/i.test(v.name)) ||
     voices.find((v) => v.lang.startsWith('en'));
+
   if (preferredVoice) utterance.voice = preferredVoice;
 
   let speaking = false;
@@ -63,7 +85,7 @@ export function speakWithLipSync(
 
   utterance.onboundary = (event: SpeechSynthesisEvent) => {
     if (event.name !== 'word' || !event.charLength) return;
-    const fragment = text.slice(event.charIndex, event.charIndex + event.charLength);
+    const fragment = cleanedText.slice(event.charIndex, event.charIndex + event.charLength);
     const visemeId = charToViseme(fragment);
     const shape = VISEME_SHAPES[visemeId] || VISEME_SHAPES.REST;
     callbacks.onViseme?.(shape.jawOpen, fragment, shape, visemeId);

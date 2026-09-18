@@ -37,7 +37,7 @@ const ROADMAP_SERVICE_URL = process.env.ROADMAP_SERVICE_URL || 'http://localhost
 // Parse CORS origins from env
 const corsOrigins = process.env.CORS_ORIGIN
   ? process.env.CORS_ORIGIN.split(',').map((origin) => origin.trim())
-  : ['http://localhost:3000', 'http://localhost:5173'];
+  : ['http://localhost:3000', 'http://localhost:5173', 'https://rureadyai.vercel.app'];
 
 // Security Headers
 app.use(
@@ -51,7 +51,12 @@ app.use(
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || corsOrigins.includes(origin)) {
+      if (
+        !origin || 
+        corsOrigins.includes('*') || 
+        corsOrigins.includes(origin) || 
+        origin.endsWith('.vercel.app')
+      ) {
         callback(null, true);
       } else {
         callback(new Error(`Origin '${origin}' not allowed by CORS`));
@@ -210,6 +215,10 @@ app.use(
   createProxyMiddleware({
     target: RESUME_SERVICE_URL,
     changeOrigin: true,
+    pathRewrite: (path: string) => {
+      const clean = path.startsWith('/') ? path : `/${path}`;
+      return `/api/ats${clean === '/' ? '' : clean}`;
+    },
     ws: true,
   }),
 );
@@ -219,6 +228,10 @@ app.use(
   createProxyMiddleware({
     target: ROADMAP_SERVICE_URL,
     changeOrigin: true,
+    pathRewrite: (path: string) => {
+      const clean = path.startsWith('/') ? path : `/${path}`;
+      return `/api/roadmap${clean === '/' ? '' : clean}`;
+    },
     ws: true,
   }),
 );
@@ -228,6 +241,10 @@ app.use(
   createProxyMiddleware({
     target: ROADMAP_SERVICE_URL,
     changeOrigin: true,
+    pathRewrite: (path: string) => {
+      const clean = path.startsWith('/') ? path : `/${path}`;
+      return `/api/discuss${clean === '/' ? '' : clean}`;
+    },
     ws: true,
   }),
 );
@@ -272,7 +289,7 @@ app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
   });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log('');
   console.log('  ╔═══════════════════════════════════════════╗');
   console.log(`  ║       R U Ready? — API Gateway            ║`);

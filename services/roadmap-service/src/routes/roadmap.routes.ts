@@ -5,6 +5,7 @@ const router: Router = Router();
 
 router.get('/catalog', roadmapController.getCatalog);
 router.post('/manual', roadmapController.createManualRoadmap);
+router.get('/user', roadmapController.getUserRoadmaps);
 router.get('/user/:userId', roadmapController.getUserRoadmapsByCreator);
 router.get('/', roadmapController.getUserRoadmaps);
 router.post('/generate', roadmapController.generateRoadmap);

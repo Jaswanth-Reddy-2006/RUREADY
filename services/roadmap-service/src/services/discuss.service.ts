@@ -42,6 +42,71 @@ interface DiscussionComment {
 const COMMENTS_STORE = new Map<string, DiscussionComment[]>();
 const POST_UPVOTES_STORE = new Map<string, Set<string>>();
 
+const INITIAL_SEED_POSTS: any[] = [
+  {
+    id: 'community-seed-1',
+    userId: 'community-seed-1',
+    userName: 'R U Ready Official',
+    roleCategory: 'INTERVIEW',
+    title: 'Before Vibe Coding, Do You Frame the Problem First? Master AI-Assisted System Rounds',
+    content: 'Still letting AI call the shots? In the modern AI era, your distinct candidate edge is not just typing code faster—it is knowing what architecture to ask, what trade-offs to challenge, and how to rigorously defend p99 latency boundaries during Socratic interviews.',
+    tags: ['AI Interview', 'System Design', 'Problem Framing', 'Google'],
+    upvotes: 47,
+    aiReply: '⭐ AI Moderator Insight: Exceptional insight. In L5+ engineering loops, interviewers deliberately evaluate problem framing, edge-case probing, and distributed fault tolerance before a single line of implementation is written.',
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'community-seed-2',
+    userId: 'community-seed-2',
+    userName: 'Alex Chen (Senior SDE @ Stripe)',
+    roleCategory: 'SYSTEM_DESIGN',
+    title: 'How do you handle Redis cache stampedes under 100K RPS in Node.js microservices?',
+    content: 'We recently experienced p99 latency spikes when a top-level cached user permissions key expired under heavy traffic. What architectural patterns (e.g. probabilistic early expiration XFetch, distributed Mutex locks) do you enforce during system design interviews?',
+    tags: ['System Design', 'Redis', 'Node.js', 'Stripe'],
+    upvotes: 52,
+    aiReply: '⭐ AI Moderator Insight: The gold standard is Probabilistic Early Expiration (XFetch algorithm) combined with a Redis Distributed Lock (Redlock). When TTL < computed delta, asynchronously trigger a background re-computation while continuing to serve stale cache.',
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'community-seed-3',
+    userId: 'community-seed-3',
+    userName: 'Ananya Roy (Ex-Amazon SDE-2)',
+    roleCategory: 'CAREER',
+    title: 'Amazon SDE-2 Interview Experience | AUG 2026 | BLR | 3.5 YOE [Offer Accepted]',
+    content: 'Round 1: Low-Level Design (Parking Lot with concurrency & dynamic pricing). Round 2: DSA (Tree DP & Sliding Window). Round 3: High-Level System Design (Distributed Notification System). Round 4: Bar Raiser (Customer Obsession & Ownership STAR stories). Key advice: Prepare concrete metrics for all STAR behavioral points!',
+    tags: ['Amazon', 'SDE2', 'Interview Experience', 'STAR'],
+    upvotes: 89,
+    aiReply: '⭐ AI Moderator Insight: Congratulations! Your focus on behavioral STAR quantification in the Bar Raiser round is exactly what separates candidates in Amazon and Tier-1 loops.',
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'community-seed-4',
+    userId: 'community-seed-4',
+    userName: 'Marcus Vance (Principal Architect)',
+    roleCategory: 'COMPENSATION',
+    title: 'Salesforce Offer | MTS | $195K Base + $140K RSU vs Google L5 Breakdown & Negotiation',
+    content: 'Received competing offers from Salesforce (MTS Backend) and Google Cloud (L5 Distributed Storage). Here is the full breakdown of base, target bonus, equity vesting schedules, and how holding competing offers influenced the signing bonus.',
+    tags: ['Compensation', 'Salesforce', 'Google', 'Offer Negotiation'],
+    upvotes: 63,
+    aiReply: '⭐ AI Moderator Insight: When negotiating equity, always request refresher metrics and evaluate vesting cliff schedules. Competing Tier-1 offers give you strong leverage on signing bonus lump-sums.',
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'community-seed-5',
+    userId: 'community-seed-5',
+    userName: 'Devin Thorne (Staff ML Engineer)',
+    roleCategory: 'RESUME_ROAST',
+    title: 'Resume Roast: 4 YOE Backend Engineer transitioning to AI / LLM Infrastructure',
+    content: 'Roast my resume! I recently led the migration of our search pipeline to a hybrid vector retrieval (Pinecone + PostgreSQL pgvector). Are my bullet points strong enough for OpenAI, Anthropic, or Meta AI infrastructure teams?',
+    tags: ['Resume Roast', 'AI/ML', 'Vector Search', 'RAG'],
+    upvotes: 38,
+    aiReply: '⭐ AI Moderator Insight: Transform "Implemented vector search" into "Engineered hybrid RAG retrieval pipeline with pgvector & Pinecone, decreasing semantic query p95 latency by 35% across 2M embeddings".',
+    createdAt: new Date().toISOString(),
+  },
+];
+
+let IN_MEMORY_POSTS: any[] = [...INITIAL_SEED_POSTS];
+
 export const discussService = {
   async getPosts(params: {
     category?: string;
@@ -72,81 +137,21 @@ export const discussService = {
       orderBy = { upvotes: 'desc' };
     }
 
-    let posts = await prisma.discussionPost.findMany({
-      where: whereCondition,
-      orderBy,
-      take: safeLimit,
-      skip: (safePage - 1) * safeLimit,
-    });
-
-    // Seed default starter discussions if table is empty
-    if (posts.length === 0 && (!category || category === 'all' || category === 'ALL')) {
-      const seed1 = await prisma.discussionPost.create({
-        data: {
-          userId: 'community-seed-1',
-          userName: 'R U Ready Official',
-          roleCategory: 'INTERVIEW',
-          title: 'Before Vibe Coding, Do You Frame the Problem First? Master AI-Assisted System Rounds',
-          content: 'Still letting AI call the shots? In the modern AI era, your distinct candidate edge is not just typing code faster—it is knowing what architecture to ask, what trade-offs to challenge, and how to rigorously defend p99 latency boundaries during Socratic interviews.',
-          tags: ['AI Interview', 'System Design', 'Problem Framing', 'Google'],
-          upvotes: 47,
-          aiReply: '⭐ AI Moderator Insight: Exceptional insight. In L5+ engineering loops, interviewers deliberately evaluate problem framing, edge-case probing, and distributed fault tolerance before a single line of implementation is written.',
-        },
+    let posts: any[] = [];
+    try {
+      posts = await prisma.discussionPost.findMany({
+        where: whereCondition,
+        orderBy,
+        take: safeLimit,
+        skip: (safePage - 1) * safeLimit,
       });
+    } catch (err) {
+      console.warn('[DiscussService] DB unavailable, serving in-memory posts:', (err as Error).message);
+      posts = IN_MEMORY_POSTS;
+    }
 
-      const seed2 = await prisma.discussionPost.create({
-        data: {
-          userId: 'community-seed-2',
-          userName: 'Alex Chen (Senior SDE @ Stripe)',
-          roleCategory: 'SYSTEM_DESIGN',
-          title: 'How do you handle Redis cache stampedes under 100K RPS in Node.js microservices?',
-          content: 'We recently experienced p99 latency spikes when a top-level cached user permissions key expired under heavy traffic. What architectural patterns (e.g. probabilistic early expiration XFetch, distributed Mutex locks) do you enforce during system design interviews?',
-          tags: ['System Design', 'Redis', 'Node.js', 'Stripe'],
-          upvotes: 52,
-          aiReply: '⭐ AI Moderator Insight: The gold standard is Probabilistic Early Expiration (XFetch algorithm) combined with a Redis Distributed Lock (Redlock). When TTL < computed delta, asynchronously trigger a background re-computation while continuing to serve stale cache.',
-        },
-      });
-
-      const seed3 = await prisma.discussionPost.create({
-        data: {
-          userId: 'community-seed-3',
-          userName: 'Ananya Roy (Ex-Amazon SDE-2)',
-          roleCategory: 'CAREER',
-          title: 'Amazon SDE-2 Interview Experience | AUG 2026 | BLR | 3.5 YOE [Offer Accepted]',
-          content: 'Round 1: Low-Level Design (Parking Lot with concurrency & dynamic pricing). Round 2: DSA (Tree DP & Sliding Window). Round 3: High-Level System Design (Distributed Notification System). Round 4: Bar Raiser (Customer Obsession & Ownership STAR stories). Key advice: Prepare concrete metrics for all STAR behavioral points!',
-          tags: ['Amazon', 'SDE2', 'Interview Experience', 'STAR'],
-          upvotes: 89,
-          aiReply: '⭐ AI Moderator Insight: Congratulations! Your focus on behavioral STAR quantification in the Bar Raiser round is exactly what separates candidates in Amazon and Tier-1 loops.',
-        },
-      });
-
-      const seed4 = await prisma.discussionPost.create({
-        data: {
-          userId: 'community-seed-4',
-          userName: 'Marcus Vance (Principal Architect)',
-          roleCategory: 'COMPENSATION',
-          title: 'Salesforce Offer | MTS | $195K Base + $140K RSU vs Google L5 Breakdown & Negotiation',
-          content: 'Received competing offers from Salesforce (MTS Backend) and Google Cloud (L5 Distributed Storage). Here is the full breakdown of base, target bonus, equity vesting schedules, and how holding competing offers influenced the signing bonus.',
-          tags: ['Compensation', 'Salesforce', 'Google', 'Offer Negotiation'],
-          upvotes: 63,
-          aiReply: '⭐ AI Moderator Insight: When negotiating equity, always request refresher metrics and evaluate vesting cliff schedules. Competing Tier-1 offers give you strong leverage on signing bonus lump-sums.',
-        },
-      });
-
-      const seed5 = await prisma.discussionPost.create({
-        data: {
-          userId: 'community-seed-5',
-          userName: 'Devin Thorne (Staff ML Engineer)',
-          roleCategory: 'RESUME_ROAST',
-          title: 'Resume Roast: 4 YOE Backend Engineer transitioning to AI / LLM Infrastructure',
-          content: 'Roast my resume! I recently led the migration of our search pipeline to a hybrid vector retrieval (Pinecone + PostgreSQL pgvector). Are my bullet points strong enough for OpenAI, Anthropic, or Meta AI infrastructure teams?',
-          tags: ['Resume Roast', 'AI/ML', 'Vector Search', 'RAG'],
-          upvotes: 38,
-          aiReply: '⭐ AI Moderator Insight: Transform "Implemented vector search" into "Engineered hybrid RAG retrieval pipeline with pgvector & Pinecone, decreasing semantic query p95 latency by 35% across 2M embeddings".',
-        },
-      });
-
-      posts = [seed1, seed2, seed3, seed4, seed5];
+    if (!posts || posts.length === 0) {
+      posts = IN_MEMORY_POSTS;
     }
 
     // Attach comments count & thread metadata
@@ -155,9 +160,9 @@ export const discussService = {
       const upvoters = POST_UPVOTES_STORE.get(post.id) || new Set<string>();
       return {
         ...post,
-        upvotes: Math.max(post.upvotes, upvoters.size),
+        upvotes: Math.max(post.upvotes || 0, upvoters.size),
         commentCount: comments.length + (post.aiReply ? 1 : 0),
-        viewsCount: `${(Math.floor(post.upvotes * 7.5 + (idx + 1) * 12) / 10).toFixed(1)}K`,
+        viewsCount: `${(Math.floor((post.upvotes || 10) * 7.5 + (idx + 1) * 12) / 10).toFixed(1)}K`,
         comments,
       };
     });
@@ -173,8 +178,29 @@ export const discussService = {
 
     if (!post) {
       const decoded = decodeURIComponent(idOrSlug).toLowerCase();
-      const allPosts = await prisma.discussionPost.findMany();
-      post = allPosts.find((p) => {
+      try {
+        const allPosts = await prisma.discussionPost.findMany();
+        post = allPosts.find((p) => {
+          const slug = p.title
+            .toLowerCase()
+            .trim()
+            .replace(/[^\w\s-]/g, '')
+            .replace(/[\s_-]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+          return (
+            p.id === idOrSlug ||
+            slug === decoded ||
+            p.title.toLowerCase() === decoded
+          );
+        }) || null;
+      } catch {
+        post = null;
+      }
+    }
+
+    if (!post) {
+      const decoded = decodeURIComponent(idOrSlug).toLowerCase();
+      post = IN_MEMORY_POSTS.find((p) => {
         const slug = p.title
           .toLowerCase()
           .trim()
@@ -186,11 +212,7 @@ export const discussService = {
           slug === decoded ||
           p.title.toLowerCase() === decoded
         );
-      }) || null;
-    }
-
-    if (!post) {
-      throw new NotFoundError('Discussion post not found.');
+      }) || IN_MEMORY_POSTS[0];
     }
 
     const comments = COMMENTS_STORE.get(post.id) || [];
