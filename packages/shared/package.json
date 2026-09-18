@@ -2,9 +2,11 @@
   "name": "@ru-ready/shared",
   "version": "1.0.0",
   "private": true,
-  "main": "./src/types/index.ts",
-  "types": "./src/types/index.ts",
+  "type": "module",
+  "main": "./dist/types/index.js",
+  "types": "./dist/types/index.d.ts",
   "scripts": {
+    "build": "tsc",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

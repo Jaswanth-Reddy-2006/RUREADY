@@ -10,7 +10,7 @@
     "dev:roadmap": "pnpm --filter roadmap-service dev",
     "dev:resume": "pnpm --filter resume-service dev",
     "dev:client": "pnpm --filter client dev",
-    "build": "pnpm db:generate && pnpm --filter shared build && pnpm --filter gateway build && pnpm --filter \"./services/*\" build && pnpm --filter client build",
+    "build": "pnpm db:generate && pnpm --filter shared build && pnpm --filter gateway build && pnpm --filter \"./services/*\" build && node scripts/copy-prisma-generated.mjs && pnpm --filter client build",
     "build:gateway": "pnpm --filter gateway build",
     "build:client": "pnpm --filter client build",
     "db:generate": "pnpm -r db:generate",
