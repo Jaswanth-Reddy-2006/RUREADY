@@ -1,603 +1,544 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Sparkles, Clock, Code2, AlertTriangle, 
   ArrowLeft, Shield, Terminal, Check, ArrowRight,
   Cpu, Layers, CheckCircle2, ShieldCheck, Zap,
-  Filter, CheckSquare, XSquare, Info, BookOpen
+  Search, Plus, Play, Briefcase, GraduationCap
 } from 'lucide-react';
-import { z } from 'zod';
-import { useCodingInterviewStore } from '../../store/useCodingInterviewStore';
 import apiClient from '../../api/client';
-import toast from 'react-hot-toast';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
 import Badge from '../ui/Badge';
 
-const PATTERN_CATEGORIES: Record<string, { desc: string; topics: string[] }> = {
-  'Data Structures': {
-    desc: 'Core contiguous and node-based memory structures & lookup tables',
-    topics: [
-      'Arrays & Hashing',
-      'Two Pointers',
-      'Stack & Queues',
-      'Linked Lists',
-      'Trees & Binary Search Trees',
-      'Tries & Prefix Trees',
-      'Heaps & Priority Queues'
-    ]
-  },
-  'Algorithms & Search': {
-    desc: 'Traversal, optimization, greedy choices, and recursive search strategies',
-    topics: [
-      'Sliding Window',
-      'Binary Search',
-      'Breadth-First Search (BFS)',
-      'Depth-First Search (DFS)',
-      'Backtracking',
-      'Greedy Algorithms'
-    ]
-  },
-  'Advanced Paradigms': {
-    desc: 'Multi-state transformations, graphs, and combinatorial complexity',
-    topics: [
-      'Dynamic Programming (1D & 2D)',
-      'Graph Algorithms & Topological Sort',
-      'Union Find (Disjoint Set)',
-      'Bit Manipulation',
-      'Interval Scheduling'
-    ]
-  }
-};
-
-const LANGUAGES = [
-  { id: 'javascript', label: 'JavaScript', runtime: 'Node.js 20', ext: 'js', badge: 'V8 Engine' },
-  { id: 'typescript', label: 'TypeScript', runtime: 'TS 5.4 / Node', ext: 'ts', badge: 'Strict Types' },
-  { id: 'python', label: 'Python 3', runtime: 'CPython 3.12', ext: 'py', badge: 'Fast NumPy' },
-  { id: 'java', label: 'Java 17', runtime: 'OpenJDK 17', ext: 'java', badge: 'JVM HotSpot' },
-  { id: 'cpp', label: 'C++', runtime: 'GCC 13 (C++20)', ext: 'cpp', badge: 'Native GCC' },
-  { id: 'go', label: 'Go', runtime: 'Golang 1.22', ext: 'go', badge: 'Goroutines' }
+const POPULAR_ROLES = [
+  'Software Engineer',
+  'Full Stack Developer',
+  'Backend Developer',
+  'Frontend Developer',
+  'Data Engineer',
+  'AI / ML Engineer',
+  'DevOps Engineer',
+  'Product Engineer',
 ];
 
-const DIFFICULTY_METADATA = {
-  EASY: {
-    title: 'Easy Track',
-    tagline: 'Foundations & Linear Structures',
-    desc: 'Focuses on clean loops, array manipulation, hash map lookups, two-pointer bounds, and basic string parsing.',
-    icon: Code2,
-    badgeVariant: 'teal' as const,
-    complexityTarget: 'O(N) time • O(1) space',
-    typicalPatterns: ['Arrays & HashMaps', 'Two Pointers', 'Linear Traversal']
-  },
-  MEDIUM: {
-    title: 'Medium Track',
-    tagline: 'Standard Industry Interview Tier',
-    desc: 'Dynamic programming, sliding windows, graph BFS/DFS traversals, binary search trees, and heap intervals.',
-    icon: Sparkles,
-    badgeVariant: 'orange' as const,
-    complexityTarget: 'O(N log N) / O(N) time',
-    typicalPatterns: ['Sliding Window', 'Binary Search', 'Trees & Graphs', '1D/2D DP']
-  },
-  HARD: {
-    title: 'Hard Track',
-    tagline: 'Adversarial & High-Complexity Tier',
-    desc: 'Complex graph topologies, composite DP state compression, prefix tries, advanced segment trees, and adversarial edge-cases.',
-    icon: Terminal,
-    badgeVariant: 'red' as const,
-    complexityTarget: 'Optimal bounds & state compression',
-    typicalPatterns: ['Topological Sort', 'State-Space DP', 'Adversarial Edge Cases']
-  },
-};
+const POPULAR_COMPANIES = [
+  'Google',
+  'Microsoft',
+  'Amazon',
+  'TCS',
+  'Infosys',
+  'Deloitte',
+  'Accenture',
+  'Meta',
+  'Apple',
+  'Uber',
+  'Top Tech / Startup',
+];
 
-const codingSetupSchema = z.object({
-  difficulty: z.enum(['EASY', 'MEDIUM', 'HARD']),
-  problemCount: z.number().min(1).max(3),
-  durationMins: z.number().min(30).max(90),
-  selectedTopics: z.array(z.string()).min(1, 'Select at least one algorithmic pattern.'),
-});
+const CODING_PRACTICE_CHECKBOXES = [
+  { id: 'DSA', label: 'DSA / Problem Solving', isRecommended: true },
+  { id: 'SQL', label: 'SQL & Database Queries' },
+  { id: 'Debugging', label: 'Debugging & Code Review' },
+  { id: 'MachineCoding', label: 'Machine Coding / Low-Level Design' },
+  { id: 'Backend', label: 'Backend / API Development' },
+  { id: 'Frontend', label: 'Frontend Component Coding' },
+  { id: 'Competitive', label: 'Competitive Programming' },
+];
+
+const CODING_LANGUAGES = [
+  { id: 'cpp', label: 'C++', ext: 'cpp', badge: 'Native GCC' },
+  { id: 'java', label: 'Java 17', ext: 'java', badge: 'JVM' },
+  { id: 'python', label: 'Python 3', ext: 'py', badge: 'CPython 3.12' },
+  { id: 'javascript', label: 'JavaScript', ext: 'js', badge: 'Node.js 20' },
+  { id: 'typescript', label: 'TypeScript', ext: 'ts', badge: 'Strict Types' },
+  { id: 'go', label: 'Go (Golang)', ext: 'go', badge: 'Goroutines' },
+  { id: 'csharp', label: 'C#', ext: 'cs', badge: '.NET 8' },
+];
 
 export default function CodingSetupForm() {
   const navigate = useNavigate();
-  const [validationError, setValidationError] = useState<string | null>(null);
-  const [selectedLanguage, setSelectedLanguage] = useState('javascript');
-  const [activeCategoryTab, setActiveCategoryTab] = useState<string>('Data Structures');
 
-  const {
-    difficulty,
-    problemCount,
-    durationMins,
-    selectedTopics,
-    isSubmitting,
-    setDifficulty,
-    setProblemCount,
-    setDurationMins,
-    toggleTopic,
-    setSubmitting,
-    resetStore,
-  } = useCodingInterviewStore();
+  // Form State
+  const [targetRole, setTargetRole] = useState('Software Engineer');
+  const [customRoleInput, setCustomRoleInput] = useState('');
+  const [isCustomRole, setIsCustomRole] = useState(false);
 
-  const handleTopicToggle = (topic: string) => {
-    toggleTopic(topic);
-    setValidationError(null);
+  const [targetCompany, setTargetCompany] = useState('Google');
+  const [customCompanyInput, setCustomCompanyInput] = useState('');
+  const [isCustomCompany, setIsCustomCompany] = useState(false);
+
+  const [experienceLevel, setExperienceLevel] = useState('FRESHER');
+  const [jobDescription, setJobDescription] = useState('');
+  const [extractedSkills, setExtractedSkills] = useState<string[]>([]);
+
+  // Practice Selection & Language
+  const [selectedPractice, setSelectedPractice] = useState<string[]>(['DSA', 'Debugging']);
+  const [codingLanguage, setCodingLanguage] = useState<string>('python');
+  const [rememberLanguage, setRememberLanguage] = useState<boolean>(true);
+
+  // Duration & Realism
+  const [durationMins, setDurationMins] = useState(30);
+  const [simulationMode, setSimulationMode] = useState<'PRACTICE' | 'REALISTIC' | 'CHALLENGE'>('REALISTIC');
+
+  // Pre-Flight Review State
+  const [isGenerated, setIsGenerated] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [prepMessage, setPrepMessage] = useState('');
+
+  // Load saved language preference from localStorage on mount
+  useEffect(() => {
+    const savedLang = localStorage.getItem('ru_ready_preferred_language');
+    if (savedLang) {
+      setCodingLanguage(savedLang);
+    }
+  }, []);
+
+  // Save language preference when toggled
+  const handleLanguageChange = (langId: string) => {
+    setCodingLanguage(langId);
+    if (rememberLanguage) {
+      localStorage.setItem('ru_ready_preferred_language', langId);
+    }
   };
 
-  const handleSelectAllCategory = (category: string) => {
-    const topics = PATTERN_CATEGORIES[category]?.topics || [];
-    topics.forEach(t => {
-      if (!selectedTopics.includes(t)) {
-        toggleTopic(t);
-      }
-    });
-    setValidationError(null);
+  // Auto-extract topics from JD
+  useEffect(() => {
+    if (!jobDescription.trim()) return;
+    const lower = jobDescription.toLowerCase();
+    const detected = new Set<string>();
+    if (/dsa|algorithm|data structure/i.test(lower)) detected.add('DSA');
+    if (/sql|postgres|database/i.test(lower)) detected.add('SQL');
+    if (/backend|node|java|spring|python/i.test(lower)) detected.add('Backend');
+    if (/react|frontend|ui/i.test(lower)) detected.add('Frontend');
+    
+    if (detected.size > 0) {
+      setExtractedSkills(Array.from(detected));
+    }
+  }, [jobDescription]);
+
+  const togglePractice = (id: string) => {
+    if (selectedPractice.includes(id)) {
+      setSelectedPractice(selectedPractice.filter((item) => item !== id));
+    } else {
+      setSelectedPractice([...selectedPractice, id]);
+    }
   };
 
-  const handleClearCategory = (category: string) => {
-    const topics = PATTERN_CATEGORIES[category]?.topics || [];
-    topics.forEach(t => {
-      if (selectedTopics.includes(t)) {
-        toggleTopic(t);
-      }
-    });
+  const handleGeneratePlan = () => {
+    setIsGenerated(true);
+    setTimeout(() => {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }, 100);
   };
 
   const handleStartCodingInterview = async () => {
-    setValidationError(null);
-
-    const validationResult = codingSetupSchema.safeParse({
-      difficulty,
-      problemCount,
-      durationMins,
-      selectedTopics,
-    });
-
-    if (!validationResult.success) {
-      const errorMsg = validationResult.error.errors[0].message;
-      setValidationError(errorMsg);
-      toast.error(errorMsg);
-      return;
-    }
-
-    setSubmitting(true);
-    const setupToast = toast.loading('Initializing Socratic coding sandbox...');
-
+    setIsSubmitting(true);
+    setPrepMessage('Initializing observed IDE sandbox & compilation engine...');
     try {
-      const experienceLevel = 
-        difficulty === 'EASY' ? 'FRESHER' : 
-        difficulty === 'MEDIUM' ? 'MID' : 'SENIOR';
+      const finalRole = isCustomRole ? customRoleInput || 'Software Engineer' : targetRole;
+      const finalCompany = isCustomCompany ? customCompanyInput || 'Top Tech' : targetCompany;
+      const goalMeta = `[Mode: ${simulationMode}][Lang: ${codingLanguage}][Topics: ${selectedPractice.join(',')}]`;
 
-      const goalMeta = `[Mode: CODING][Problems: ${problemCount}][Difficulty: ${difficulty}][Language: ${selectedLanguage}][Topics: ${selectedTopics.join(',')}]`;
-
-      const response = await apiClient.post('/interview/session', {
+      const sessionResponse = await apiClient.post('/interview/session', {
         interviewType: 'CODING',
-        targetRole: 'Software Engineer (Coding Track)',
-        targetCompany: 'Technical Hiring Board',
+        targetRole: finalRole,
+        targetCompany: finalCompany,
         industry: 'Technology',
         experienceLevel,
-        focusAreas: selectedTopics,
+        focusAreas: selectedPractice,
         interviewGoal: goalMeta,
         durationMins,
-        mode: 'CODING',
       });
 
-      const sessionId = response.data.id;
+      const sessionId = sessionResponse.data.id;
+      setPrepMessage('Ava is preparing your live algorithmic challenge...');
       await apiClient.post(`/interview/session/${sessionId}/start`);
-
-      toast.success('Coding environment calibrated!', { id: setupToast });
-      resetStore();
-      navigate(`/interview/${sessionId}/device-check`);
-    } catch (err: any) {
-      console.error('Failed to initialize coding interview session:', err);
-      const errMessage = err.response?.data?.message || 'Failed to initialize coding environment.';
-      setValidationError(errMessage);
-      toast.error(errMessage, { id: setupToast });
-      setSubmitting(false);
+      navigate(`/interview/coding/${sessionId}`);
+    } catch (err) {
+      console.error('Failed to launch coding interview', err);
+      setIsSubmitting(false);
     }
   };
 
-  const minutesPerProblem = Math.round(durationMins / problemCount);
-  const activeTopicsInCurrentCategory = (PATTERN_CATEGORIES[activeCategoryTab]?.topics || []).filter(t => selectedTopics.includes(t)).length;
-  const totalTopicsInCurrentCategory = PATTERN_CATEGORIES[activeCategoryTab]?.topics.length || 0;
-
   return (
-    <div className="relative mx-auto max-w-5xl xl:max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-      
-      {/* Loading Overlay */}
-      {isSubmitting && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#11183D]/80 backdrop-blur-md">
-          <div className="mx-4 max-w-md w-full rounded-3xl border border-[#DCE7F2] bg-[#11183D] p-8 text-center shadow-2xl animate-in fade-in zoom-in duration-300">
-            <div className="mx-auto mb-6 h-12 w-12 animate-spin rounded-full border-4 border-[#4A8BDF] border-t-transparent" />
-            <h3 className="text-lg font-bold font-display text-white mb-2">
-              Preparing Monaco IDE & VM Sandbox
-            </h3>
-            <p className="text-xs text-[#DCE7F2] font-body">
-              Calibrating runtime compilers, test suites, and Socratic hints...
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* Navigation */}
-      <div className="mb-6 flex items-center justify-between">
-        <Link 
-          to="/dashboard"
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-[#526078] hover:text-[#11183D] transition-colors font-display"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Dashboard
-        </Link>
-        <span className="text-xs font-mono text-[#526078]">Step 1 of 2: Session Configuration</span>
-      </div>
-
-      {/* Header */}
-      <div className="mb-8 text-center max-w-2xl mx-auto space-y-2">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EFFAFD] border border-[#DCE7F2] text-[#4A8BDF] text-xs font-bold mb-1">
-          <Code2 size={14} />
-          <span>Interactive Coding Studio Setup</span>
-        </div>
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-[#11183D] font-display tracking-tight">
-          Configure Coding Track
-        </h1>
-        <p className="text-sm text-[#334155] font-body leading-relaxed">
-          Customize your algorithmic syllabus, preferred programming runtime, difficulty rigor, and live pacing constraints before entering the sandbox studio.
-        </p>
-      </div>
-
-      {/* Main Card */}
-      <Card padding="lg" className="shadow-sm border-[#DCE7F2] bg-white space-y-8 sm:space-y-10 p-6 sm:p-8 lg:p-10 rounded-3xl">
+    <div className="min-h-screen bg-slate-50 text-slate-900 py-10 px-4 sm:px-6 lg:px-8 font-sans">
+      <div className="max-w-3xl mx-auto space-y-8">
         
-        {/* Validation Alert */}
-        {validationError && (
-          <div className="flex items-start gap-3 rounded-2xl bg-[#FDF0F0] border border-[#D64545]/25 p-4 text-xs text-[#D64545] shadow-sm font-body animate-in fade-in">
-            <AlertTriangle size={16} className="shrink-0 mt-0.5" />
-            <div>
-              <span className="font-bold font-display block mb-0.5">Configuration Alert:</span>
-              <span>{validationError}</span>
-            </div>
+        {/* Header */}
+        <div className="text-center space-y-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold border border-blue-200">
+            <Code2 className="w-3.5 h-3.5" />
+            <span>Observed IDE & Algorithmic Assessment</span>
           </div>
-        )}
-
-        {/* 1. Difficulty Tiers */}
-        <div className="space-y-4">
-          <div className="border-b border-[#DCE7F2] pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-            <div>
-              <span className="text-xs font-bold text-[#4A8BDF] uppercase tracking-wider font-mono block mb-0.5">
-                Section 1 of 4
-              </span>
-              <h3 className="text-base font-bold font-display text-[#11183D]">
-                Difficulty & Algorithmic Rigor
-              </h3>
-            </div>
-            <span className="text-xs text-[#526078] font-body">
-              Determines test case complexity, time constraints, and Socratic hints
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
-            {(Object.keys(DIFFICULTY_METADATA) as Array<'EASY' | 'MEDIUM' | 'HARD'>).map((tier) => {
-              const meta = DIFFICULTY_METADATA[tier];
-              const isSelected = difficulty === tier;
-              const IconComponent = meta.icon;
-
-              return (
-                <button
-                  key={tier}
-                  type="button"
-                  onClick={() => {
-                    setDifficulty(tier);
-                    setValidationError(null);
-                  }}
-                  className={`text-left p-5 sm:p-6 rounded-2xl border transition-all flex flex-col justify-between min-h-[180px] cursor-pointer group relative overflow-hidden ${
-                    isSelected
-                      ? 'border-[#4A8BDF] bg-[#EFF7FD] ring-2 ring-[#4A8BDF]/30 shadow-md'
-                      : 'border-[#DCE7F2] bg-white hover:border-[#4A8BDF]/40 hover:bg-[#EFFAFD]/50'
-                  }`}
-                >
-                  <div>
-                    <div className="flex items-center justify-between w-full mb-3">
-                      <div className={`p-2.5 rounded-xl shrink-0 transition-colors ${isSelected ? 'bg-[#4A8BDF] text-white shadow-sm' : 'bg-[#EFFAFD] text-[#11183D] group-hover:bg-[#4A8BDF]/10'}`}>
-                        <IconComponent size={20} />
-                      </div>
-                      <Badge variant={meta.badgeVariant} size="xs">
-                        {tier}
-                      </Badge>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <h4 className="text-sm font-bold font-display text-[#11183D]">{meta.title}</h4>
-                      <p className="text-[11px] font-semibold text-[#4A8BDF] font-mono">{meta.tagline}</p>
-                      <p className="text-xs leading-relaxed text-[#334155] font-body pt-1">
-                        {meta.desc}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 pt-3 border-t border-[#DCE7F2]/60 space-y-1">
-                    <div className="flex items-center justify-between text-[10px] font-mono text-[#526078]">
-                      <span>Target:</span>
-                      <span className="font-bold text-[#11183D]">{meta.complexityTarget}</span>
-                    </div>
-                    <div className="flex flex-wrap gap-1 pt-1">
-                      {meta.typicalPatterns.map((pat, idx) => (
-                        <span key={idx} className="text-[9px] font-mono bg-white/80 border border-[#DCE7F2] px-1.5 py-0.5 rounded text-[#526078]">
-                          {pat}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+            Prepare for Coding Interview
+          </h1>
+          <p className="text-slate-600 text-sm max-w-lg mx-auto">
+            Tell us what you're preparing for. Ava will observe your approach, code compilation, and debugging process.
+          </p>
         </div>
 
-        {/* 2. Language Selection */}
-        <div className="space-y-4 pt-4 border-t border-[#DCE7F2]">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-            <div>
-              <span className="text-xs font-bold text-[#4A8BDF] uppercase tracking-wider font-mono block mb-0.5">
-                Section 2 of 4
-              </span>
-              <h3 className="text-base font-bold font-display text-[#11183D]">
-                Primary Programming Runtime
-              </h3>
-            </div>
-            <span className="text-xs text-[#526078] font-body">
-              Monaco editor syntax & sandboxed backend compiler
-            </span>
+        {/* ─── SINGLE PAGE FORM CONTAINER ─── */}
+        <Card className="p-6 sm:p-8 bg-white border-slate-200/80 shadow-xl rounded-3xl space-y-8">
+          
+          {/* SECTION 1: TARGET ROLE */}
+          <div className="space-y-3">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+              1. Target Role *
+            </label>
+            {!isCustomRole ? (
+              <select
+                value={targetRole}
+                onChange={(e) => {
+                  if (e.target.value === 'CUSTOM') {
+                    setIsCustomRole(true);
+                  } else {
+                    setTargetRole(e.target.value);
+                  }
+                }}
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500"
+              >
+                {POPULAR_ROLES.map((role) => (
+                  <option key={role} value={role}>
+                    {role}
+                  </option>
+                ))}
+                <option value="CUSTOM">+ Enter a custom role manually...</option>
+              </select>
+            ) : (
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={customRoleInput}
+                  onChange={(e) => setCustomRoleInput(e.target.value)}
+                  placeholder="e.g. Distributed Systems Engineer"
+                  className="flex-1 px-4 py-3 border border-blue-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500"
+                />
+                <button
+                  type="button"
+                  onClick={() => setIsCustomRole(false)}
+                  className="px-3 py-2 text-xs font-semibold text-slate-500 hover:text-slate-800"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3.5 sm:gap-4">
-            {LANGUAGES.map((lang) => {
-              const isSelected = selectedLanguage === lang.id;
-              return (
+          {/* SECTION 2: TARGET COMPANY */}
+          <div className="space-y-3 pt-4 border-t border-slate-100">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+              2. Target Company
+            </label>
+            {!isCustomCompany ? (
+              <select
+                value={targetCompany}
+                onChange={(e) => {
+                  if (e.target.value === 'CUSTOM') {
+                    setIsCustomCompany(true);
+                  } else {
+                    setTargetCompany(e.target.value);
+                  }
+                }}
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500"
+              >
+                {POPULAR_COMPANIES.map((company) => (
+                  <option key={company} value={company}>
+                    {company}
+                  </option>
+                ))}
+                <option value="CUSTOM">+ Enter company manually...</option>
+              </select>
+            ) : (
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={customCompanyInput}
+                  onChange={(e) => setCustomCompanyInput(e.target.value)}
+                  placeholder="e.g. Stripe, OpenAI, Startup"
+                  className="flex-1 px-4 py-3 border border-blue-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500"
+                />
                 <button
-                  key={lang.id}
                   type="button"
-                  onClick={() => setSelectedLanguage(lang.id)}
-                  className={`flex flex-col items-center justify-center p-4 rounded-2xl border transition-all cursor-pointer relative group ${
-                    isSelected
-                      ? 'border-[#4A8BDF] bg-[#EFF7FD] text-[#4A8BDF] font-bold shadow-sm ring-2 ring-[#4A8BDF]/30'
-                      : 'border-[#DCE7F2] bg-white text-[#334155] hover:border-[#4A8BDF]/40 hover:bg-[#EFFAFD]/50'
+                  onClick={() => setIsCustomCompany(false)}
+                  className="px-3 py-2 text-xs font-semibold text-slate-500 hover:text-slate-800"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* SECTION 3: EXPERIENCE LEVEL */}
+          <div className="space-y-3 pt-4 border-t border-slate-100">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+              3. Experience Level
+            </label>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              {[
+                { level: 'FRESHER', label: 'Fresher / Student' },
+                { level: 'MID', label: '0–2 Years' },
+                { level: 'MID_SENIOR', label: '2–5 Years' },
+                { level: 'SENIOR', label: '5+ Years' },
+              ].map((item) => (
+                <button
+                  key={item.label}
+                  type="button"
+                  onClick={() => setExperienceLevel(item.level)}
+                  className={`py-2.5 px-3 rounded-xl border text-xs font-bold transition-all ${
+                    experienceLevel === item.level
+                      ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                      : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
                   }`}
                 >
-                  {isSelected && (
-                    <div className="absolute top-2 right-2 text-[#4A8BDF]">
-                      <Check size={14} />
-                    </div>
-                  )}
-                  <span className="text-sm font-mono font-extrabold uppercase tracking-wide text-[#11183D]">{lang.ext}</span>
-                  <span className="text-xs font-display text-center font-bold text-[#11183D] mt-1">{lang.label}</span>
-                  <span className="text-[10px] font-mono text-[#526078] mt-0.5">{lang.runtime}</span>
+                  {item.label}
                 </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* 3. Algorithmic Patterns with Categorized Tabs */}
-        <div className="space-y-4 pt-4 border-t border-[#DCE7F2]">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div>
-              <span className="text-xs font-bold text-[#4A8BDF] uppercase tracking-wider font-mono block mb-0.5">
-                Section 3 of 4
-              </span>
-              <h3 className="text-base font-bold font-display text-[#11183D] flex items-center gap-2">
-                <span>Algorithmic Syllabus & Patterns</span>
-                <span className="text-[#D64545]">*</span>
-              </h3>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold font-mono px-3 py-1 rounded-full bg-[#EFF7FD] text-[#4A8BDF] border border-[#4A8BDF]/20">
-                {selectedTopics.length} Patterns Active
-              </span>
+              ))}
             </div>
           </div>
 
-          {/* Category Tabs & Quick Action Buttons */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#DCE7F2] pb-3">
-            <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
-              {Object.keys(PATTERN_CATEGORIES).map((cat) => {
-                const count = (PATTERN_CATEGORIES[cat]?.topics || []).filter(t => selectedTopics.includes(t)).length;
-                const isTabActive = activeCategoryTab === cat;
+          {/* SECTION 4: JOB DESCRIPTION (OPTIONAL) */}
+          <div className="space-y-3 pt-4 border-t border-slate-100">
+            <div className="flex justify-between items-center">
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                4. Job Description
+              </label>
+              <span className="text-xs text-slate-400 font-medium">Optional</span>
+            </div>
+            <textarea
+              rows={3}
+              value={jobDescription}
+              onChange={(e) => setJobDescription(e.target.value)}
+              placeholder="Paste job description here to extract target data structures and algorithms..."
+              className="w-full p-3.5 bg-slate-50 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-blue-500"
+            />
+            {extractedSkills.length > 0 && (
+              <div className="p-3 bg-blue-50/60 rounded-xl border border-blue-200 text-xs text-blue-900 flex items-center gap-2">
+                <Zap className="w-4 h-4 text-amber-500 shrink-0" />
+                <span>Extracted Coding Topics: <strong>{extractedSkills.join(', ')}</strong></span>
+              </div>
+            )}
+          </div>
 
+          {/* SECTION 5: WHAT WOULD YOU LIKE TO PRACTICE? */}
+          <div className="space-y-3 pt-4 border-t border-slate-100">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+              5. What would you like to practice?
+            </label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              {CODING_PRACTICE_CHECKBOXES.map((item) => {
+                const isChecked = selectedPractice.includes(item.id);
                 return (
-                  <button
-                    key={cat}
-                    type="button"
-                    onClick={() => setActiveCategoryTab(cat)}
-                    className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
-                      isTabActive
-                        ? 'bg-[#4A8BDF] text-white shadow-sm'
-                        : 'bg-[#EFFAFD] text-[#526078] hover:text-[#11183D] hover:bg-[#DCE7F2]'
+                  <div
+                    key={item.id}
+                    onClick={() => togglePractice(item.id)}
+                    className={`p-3 rounded-xl border cursor-pointer transition-all flex items-center justify-between text-xs ${
+                      isChecked
+                        ? 'border-blue-600 bg-blue-50/60 text-blue-900 font-bold'
+                        : 'border-slate-200 text-slate-700 hover:border-slate-300 bg-white'
                     }`}
                   >
-                    <span>{cat}</span>
-                    {count > 0 && (
-                      <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono font-bold ${
-                        isTabActive ? 'bg-white text-[#4A8BDF]' : 'bg-[#4A8BDF]/20 text-[#4A8BDF]'
-                      }`}>
-                        {count}
-                      </span>
+                    <div className="flex items-center gap-2">
+                      <div className={`w-4 h-4 rounded border flex items-center justify-center ${isChecked ? 'bg-blue-600 border-blue-600 text-white' : 'border-slate-300'}`}>
+                        {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
+                      </div>
+                      <span>{item.label}</span>
+                    </div>
+                    {item.isRecommended && (
+                      <span className="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-medium">Recommended</span>
                     )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* SECTION 6: CODING LANGUAGE SELECTION */}
+          <div className="space-y-3 pt-4 border-t border-slate-100">
+            <div className="flex justify-between items-center">
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                6. Choose Coding Language
+              </label>
+              <label className="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={rememberLanguage}
+                  onChange={(e) => setRememberLanguage(e.target.checked)}
+                  className="rounded text-blue-600"
+                />
+                <span>Remember my preference</span>
+              </label>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              {CODING_LANGUAGES.map((lang) => {
+                const isSelected = codingLanguage === lang.id;
+                return (
+                  <button
+                    key={lang.id}
+                    type="button"
+                    onClick={() => handleLanguageChange(lang.id)}
+                    className={`p-3 rounded-xl border text-left transition-all ${
+                      isSelected
+                        ? 'border-blue-600 bg-blue-50/60 text-blue-900 shadow-xs font-bold'
+                        : 'border-slate-200 text-slate-700 hover:border-slate-300 bg-white'
+                    }`}
+                  >
+                    <div className="text-xs font-bold">{lang.label}</div>
+                    <span className="text-[10px] text-slate-400 font-mono block mt-0.5">{lang.badge}</span>
                   </button>
                 );
               })}
             </div>
-
-            <div className="flex items-center gap-2 shrink-0">
-              <button
-                type="button"
-                onClick={() => handleSelectAllCategory(activeCategoryTab)}
-                className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#4A8BDF] hover:text-[#2459A8] transition-colors px-2 py-1 rounded-lg hover:bg-[#EFFAFD]"
-              >
-                <CheckSquare size={12} />
-                <span>Select All in Tab</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleClearCategory(activeCategoryTab)}
-                className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#526078] hover:text-[#D64545] transition-colors px-2 py-1 rounded-lg hover:bg-red-50"
-              >
-                <XSquare size={12} />
-                <span>Clear Tab</span>
-              </button>
-            </div>
           </div>
 
-          <p className="text-xs text-[#526078] font-body italic">
-            {PATTERN_CATEGORIES[activeCategoryTab]?.desc}
-          </p>
-
-          {/* Spacious Pattern Pill Matrix */}
-          <div className="flex flex-wrap gap-2.5 sm:gap-3 p-5 sm:p-6 rounded-2xl border border-[#DCE7F2] bg-[#EFFAFD]/40 min-h-[120px]">
-            {(PATTERN_CATEGORIES[activeCategoryTab]?.topics || []).map((topic) => {
-              const isSelected = selectedTopics.includes(topic);
-              return (
+          {/* SECTION 7: INTERVIEW DURATION */}
+          <div className="space-y-3 pt-4 border-t border-slate-100">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+              7. Interview Duration
+            </label>
+            <div className="grid grid-cols-5 gap-2">
+              {[15, 30, 45, 60, 90].map((mins) => (
                 <button
-                  key={topic}
+                  key={mins}
                   type="button"
-                  onClick={() => handleTopicToggle(topic)}
-                  className={`inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-xl border transition-all cursor-pointer ${
-                    isSelected
-                      ? 'bg-[#4A8BDF] text-white border-[#4A8BDF] shadow-sm scale-[1.02]'
-                      : 'bg-white text-[#334155] border-[#DCE7F2] hover:border-[#4A8BDF]/40 hover:text-[#4A8BDF] hover:bg-white'
+                  onClick={() => setDurationMins(mins)}
+                  className={`py-2.5 rounded-xl border text-xs font-bold transition-all ${
+                    durationMins === mins
+                      ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                      : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
                   }`}
                 >
-                  <div className={`h-4 w-4 rounded-md flex items-center justify-center text-[10px] ${isSelected ? 'bg-white text-[#4A8BDF]' : 'border border-[#DCE7F2]'}`}>
-                    {isSelected ? <Check size={10} strokeWidth={3} /> : null}
-                  </div>
-                  <span>{topic}</span>
+                  {mins} min
                 </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* 4. Bounds & Session Timers */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 pt-4 border-t border-[#DCE7F2]">
-          
-          <div className="space-y-3 p-5 rounded-2xl bg-[#EFFAFD]/30 border border-[#DCE7F2]">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-bold uppercase tracking-wider text-[#11183D] font-display">
-                Problem Count
-              </label>
-              <span className="text-xs font-bold bg-[#EFF7FD] text-[#4A8BDF] border border-[#4A8BDF]/20 px-3 py-0.5 rounded-full font-mono">
-                {problemCount} Problem{problemCount > 1 ? 's' : ''}
-              </span>
+              ))}
             </div>
-            <input
-              type="range"
-              min="1"
-              max="3"
-              step="1"
-              value={problemCount}
-              onChange={(e) => setProblemCount(parseInt(e.target.value, 10))}
-              className="w-full h-2 bg-[#DCE7F2] rounded-lg appearance-none cursor-pointer accent-[#4A8BDF] focus:outline-none"
-            />
-            <div className="flex justify-between text-[11px] text-[#526078] font-mono">
-              <span>1 Problem (Deep Dive)</span>
-              <span>2 Problems (Standard)</span>
-              <span>3 Problems (Speed Matrix)</span>
-            </div>
-            <p className="text-[11px] text-[#526078] font-body pt-1">
-              {problemCount === 1 && "In-depth algorithmic architecture, optimal edge-case handling, and rigorous complexity defense."}
-              {problemCount === 2 && "Balanced industry standard format covering one core structure and one optimization problem."}
-              {problemCount === 3 && "High-tempo competitive interview testing rapid implementation and pattern recognition."}
-            </p>
+            <span className="text-xs text-blue-600 font-semibold block mt-1">
+              30-minute observed coding session (Engine allocates problem depth)
+            </span>
           </div>
 
-          <div className="space-y-3 p-5 rounded-2xl bg-[#EFFAFD]/30 border border-[#DCE7F2]">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-bold uppercase tracking-wider text-[#11183D] font-display flex items-center gap-1.5">
-                <Clock size={14} className="text-[#4A8BDF]" />
-                <span>Session Duration</span>
-              </label>
-              <span className="text-xs font-bold bg-[#EFF7FD] text-[#4A8BDF] border border-[#4A8BDF]/20 px-3 py-0.5 rounded-full font-mono">
-                {durationMins} Min (≈ {minutesPerProblem}m / problem)
-              </span>
-            </div>
-            <input
-              type="range"
-              min="30"
-              max="90"
-              step="15"
-              value={durationMins}
-              onChange={(e) => setDurationMins(parseInt(e.target.value, 10))}
-              className="w-full h-2 bg-[#DCE7F2] rounded-lg appearance-none cursor-pointer accent-[#4A8BDF] focus:outline-none"
-            />
-            <div className="flex justify-between text-[11px] text-[#526078] font-mono">
-              <span>30 Min</span>
-              <span>45 Min</span>
-              <span>60 Min</span>
-              <span>75 Min</span>
-              <span>90 Min</span>
-            </div>
-
-            {/* Pacing Breakdown Gauge */}
-            <div className="pt-2 border-t border-[#DCE7F2]/60 flex items-center justify-between text-[11px] font-mono text-[#526078]">
-              <span>Clarification: 5m</span>
-              <span>Coding: {Math.max(10, minutesPerProblem - 10)}m</span>
-              <span>Defense & Hints: 5m</span>
+          {/* SECTION 8: REALISM MODE */}
+          <div className="space-y-3 pt-4 border-t border-slate-100">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+              8. Interview Realism Mode
+            </label>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {[
+                { id: 'PRACTICE', title: 'Practice Mode', desc: 'Progressive hints & guidance' },
+                { id: 'REALISTIC', title: 'Realistic Simulation', desc: 'Standard coding interview behavior' },
+                { id: 'CHALLENGE', title: 'Challenge Mode', desc: 'Deeper follow-ups & zero hints' },
+              ].map((m) => (
+                <div
+                  key={m.id}
+                  onClick={() => setSimulationMode(m.id as any)}
+                  className={`p-3.5 rounded-xl border cursor-pointer transition-all ${
+                    simulationMode === m.id
+                      ? 'border-blue-600 bg-blue-50/50 ring-2 ring-blue-400/20'
+                      : 'border-slate-200 hover:border-slate-300'
+                  }`}
+                >
+                  <div className="font-bold text-xs text-slate-900">{m.title}</div>
+                  <div className="text-[11px] text-slate-500 mt-0.5">{m.desc}</div>
+                </div>
+              ))}
             </div>
           </div>
 
-        </div>
-
-        {/* Summary Review & Launch Action Bar */}
-        <div className="pt-4 border-t border-[#DCE7F2] flex flex-col sm:flex-row items-center justify-between gap-4 p-5 sm:p-6 rounded-2xl bg-[#EFFAFD] border border-[#DCE7F2]">
-          <div className="space-y-1 text-left w-full sm:w-auto">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-bold text-[#11183D] font-display">Session Plan:</span>
-              <span className="text-xs font-mono font-bold text-[#4A8BDF] bg-white border border-[#DCE7F2] px-2 py-0.5 rounded-md">
-                {difficulty} TRACK
-              </span>
-              <span className="text-xs font-mono font-bold text-[#11183D] bg-white border border-[#DCE7F2] px-2 py-0.5 rounded-md">
-                {selectedLanguage.toUpperCase()}
-              </span>
-              <span className="text-xs font-mono font-bold text-[#168A62] bg-white border border-[#DCE7F2] px-2 py-0.5 rounded-md">
-                {problemCount} Qs • {durationMins}m
-              </span>
-            </div>
-            <p className="text-[11px] text-[#526078] font-body">
-              {selectedTopics.length} algorithmic pattern{selectedTopics.length !== 1 ? 's' : ''} loaded into Monaco sandbox
-            </p>
+          {/* GENERATE CTA */}
+          <div className="pt-6 border-t border-slate-100">
+            <Button
+              onClick={handleGeneratePlan}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-bold text-base shadow-lg transition-all flex items-center justify-center gap-2 active:scale-98"
+            >
+              <Sparkles className="w-5 h-5 fill-white" />
+              <span>Generate Coding Interview</span>
+            </Button>
           </div>
 
-          <Button
-            size="lg"
-            variant="royal"
-            onClick={handleStartCodingInterview}
-            disabled={isSubmitting || selectedTopics.length === 0}
-            iconRight={<ArrowRight size={16} />}
-            className="shadow-md shrink-0 w-full sm:w-auto"
+        </Card>
+
+        {/* ─── PRE-INTERVIEW REVIEW CARD ─── */}
+        {isGenerated && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="p-6 sm:p-8 bg-slate-900 text-white rounded-3xl space-y-6 shadow-2xl border border-slate-800"
           >
-            Launch Coding Studio →
-          </Button>
-        </div>
+            <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+              <div>
+                <span className="text-xs font-mono text-cyan-400 uppercase tracking-wider block">Coding Assessment Formulated</span>
+                <h2 className="text-2xl font-bold text-white mt-1">Ready to Code.</h2>
+              </div>
+              <Badge className="bg-blue-600 text-white text-xs px-3 py-1">Observed IDE Engine</Badge>
+            </div>
 
-      </Card>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+              <div>
+                <span className="text-slate-400 block">Target Role:</span>
+                <span className="font-bold text-white text-sm">{isCustomRole ? customRoleInput || 'Software Engineer' : targetRole}</span>
+              </div>
+              <div>
+                <span className="text-slate-400 block">Company:</span>
+                <span className="font-bold text-white text-sm">{isCustomCompany ? customCompanyInput || 'Top Tech' : targetCompany}</span>
+              </div>
+              <div>
+                <span className="text-slate-400 block">Language:</span>
+                <span className="font-bold text-cyan-300 text-sm uppercase">{codingLanguage}</span>
+              </div>
+              <div>
+                <span className="text-slate-400 block">Duration:</span>
+                <span className="font-bold text-white text-sm">{durationMins} Minutes</span>
+              </div>
+            </div>
 
-      {/* Security & Sandbox Info Note */}
-      <div className="mt-8 flex flex-col sm:flex-row justify-center items-center gap-3 text-xs text-[#7B8799] font-body text-center">
-        <div className="flex items-center gap-1.5">
-          <ShieldCheck size={15} className="text-[#168A62]" />
-          <span>Anti-Cheat Viewport Sync</span>
-        </div>
-        <span className="hidden sm:inline">•</span>
-        <div className="flex items-center gap-1.5">
-          <Cpu size={15} className="text-[#4A8BDF]" />
-          <span>Sandboxed Node.js/GCC VM Execution</span>
-        </div>
-        <span className="hidden sm:inline">•</span>
-        <div className="flex items-center gap-1.5">
-          <Sparkles size={15} className="text-[#A0006D]" />
-          <span>Ava Socratic AI Dialogue Engine</span>
-        </div>
+            <div className="space-y-2">
+              <span className="text-xs text-slate-400 font-semibold block">Topics & Focus Areas:</span>
+              <div className="flex flex-wrap gap-2">
+                {selectedPractice.map((item) => (
+                  <span key={item} className="px-3 py-1 bg-slate-800 text-cyan-300 rounded-lg text-xs font-medium border border-slate-700">
+                    ✓ {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="p-4 bg-slate-800/80 rounded-2xl border border-slate-700 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-blue-600 text-white font-bold flex items-center justify-center text-sm">
+                  AVA
+                </div>
+                <div>
+                  <h4 className="font-bold text-xs text-white">Ava — Observed Coding Interviewer</h4>
+                  <p className="text-[11px] text-slate-400">Live Code Stream • Socratic Feedback Active</p>
+                </div>
+              </div>
+              <span className="text-xs text-emerald-400 font-medium flex items-center gap-1">
+                <CheckCircle2 className="w-3.5 h-3.5" /> IDE & Compiler Ready
+              </span>
+            </div>
+
+            {isSubmitting && (
+              <div className="p-3 bg-blue-950 text-blue-300 rounded-xl text-xs flex items-center gap-2">
+                <Sparkles className="w-4 h-4 animate-spin text-blue-400" />
+                <span>{prepMessage}</span>
+              </div>
+            )}
+
+            <Button
+              onClick={handleStartCodingInterview}
+              disabled={isSubmitting}
+              className="w-full bg-blue-600 hover:bg-blue-500 text-white py-4 rounded-2xl font-bold text-base shadow-xl transition-all flex items-center justify-center gap-2 active:scale-98"
+            >
+              <Play className="w-5 h-5 fill-white" />
+              <span>Start Coding Interview →</span>
+            </Button>
+          </motion.div>
+        )}
+
       </div>
-
     </div>
   );
 }
-
-

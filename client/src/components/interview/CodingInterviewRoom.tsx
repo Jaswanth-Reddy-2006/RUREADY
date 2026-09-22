@@ -448,6 +448,15 @@ export default function CodingInterviewRoom() {
     }
   };
 
+  const handleRequestHint = async () => {
+    if (isProcessing) return;
+    const nextCount = Math.min(3, hintCount + 1);
+    setLocalHintCount(nextCount);
+    toast.success(`Requested Level ${nextCount} hint`);
+    await aiSpeak(`Here is a Level ${nextCount} progressive hint for your problem: Consider tracking previously seen elements using an auxiliary Hash Map structure for constant-time lookup.`);
+  };
+
+
   // Add system speaker transcript entries
   const addTranscriptEntry = useCallback((speaker: 'ai' | 'user', text: string) => {
     setTranscript((prev) => [
@@ -1246,7 +1255,23 @@ export default function CodingInterviewRoom() {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => aiSpeak("Walk me through your high-level approach before coding.")}
+                className="px-2.5 py-1.5 bg-[#EFFAFD] hover:bg-blue-100 text-[#2459A8] text-xs font-bold rounded-lg border border-[#DCE7F2] transition-colors"
+              >
+                Explain Approach
+              </button>
+              <button
+                type="button"
+                onClick={() => handleRequestHint()}
+                disabled={isProcessing}
+                className="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 text-xs font-bold rounded-lg border border-amber-200 transition-colors flex items-center gap-1"
+              >
+                <Lightbulb size={12} className="text-amber-600" />
+                Hint ({hintCount}/3)
+              </button>
               <Button
                 size="sm"
                 variant="royal"
@@ -1267,6 +1292,7 @@ export default function CodingInterviewRoom() {
               </Button>
             </div>
           </div>
+
 
           {/* Monaco Code Editor */}
           <div className="flex-1 min-h-0 relative bg-[#1E1E1E]">

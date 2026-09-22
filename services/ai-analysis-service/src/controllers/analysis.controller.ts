@@ -5,6 +5,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { analysisService } from '../services/analysis.service.js';
 import { aiService } from '../services/ai.service.js';
+import { EvaluatorService } from '../services/evaluator.service.js';
 
 export const analysisController = {
   async getSessionAnalysis(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -50,11 +51,19 @@ export const analysisController = {
 
   async evaluateAnswerInternal(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { questionText, questionType, answerText, session } = req.body;
-      const evalResult = await aiService.evaluateAnswer(questionText, questionType, answerText, session);
+      const { questionText, questionType, answerText, session, requiredConcepts, optionalConcepts } = req.body;
+      const evalResult = await EvaluatorService.evaluateAnswer({
+        questionText,
+        questionType,
+        answerText,
+        requiredConcepts,
+        optionalConcepts,
+        sessionContext: session,
+      });
       res.status(200).json(evalResult);
     } catch (error) {
       next(error);
     }
   },
 };
+

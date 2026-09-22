@@ -124,6 +124,11 @@ export async function readFileToPlainText(file: File): Promise<string> {
   });
 }
 
+export async function parseResumeFile(file: File): Promise<Partial<ResumeData>> {
+  const text = await readFileToPlainText(file);
+  return parseRawResumeToData(text);
+}
+
 /**
  * Intelligent pattern-matching parser that converts raw resume text into structured ResumeData
  */

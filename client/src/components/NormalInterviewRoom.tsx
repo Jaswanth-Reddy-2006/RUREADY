@@ -245,10 +245,9 @@ export default function NormalInterviewRoom({
             </div>
           </div>
 
-          {/* ─── CANDIDATE'S BOTTOM TRANSCRIPTION BOX ─── */}
-          {/* Live transcription appears here in real time as candidate speaks */}
-          <div className="bg-[#11183D] p-5 shrink-0 z-10 border-t border-[#1e295d]">
-            <div className="min-h-[72px] max-h-36 overflow-y-auto pr-1 flex flex-col justify-center">
+          {/* ─── CANDIDATE'S BOTTOM TRANSCRIPTION BOX & INTENT ACTIONS ─── */}
+          <div className="bg-[#11183D] p-5 shrink-0 z-10 border-t border-[#1e295d] space-y-3">
+            <div className="min-h-[56px] max-h-32 overflow-y-auto pr-1 flex flex-col justify-center">
               <span className="text-[10px] font-mono text-emerald-400 uppercase tracking-wider block mb-1">
                 Your Response
               </span>
@@ -262,6 +261,49 @@ export default function NormalInterviewRoom({
                 )}
               </p>
             </div>
+
+            {/* Quick Candidate Action Intent Buttons */}
+            <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-800">
+              <div className="flex flex-wrap items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => onSubmitAnswer("Can you repeat the question?")}
+                  className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium rounded-lg border border-slate-700 transition-colors"
+                >
+                  Repeat Question
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onSubmitAnswer("Can you rephrase or clarify the question?")}
+                  className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium rounded-lg border border-slate-700 transition-colors"
+                >
+                  Clarify Question
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onSubmitAnswer("Give me a second, I'm thinking.")}
+                  className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs font-medium rounded-lg border border-slate-700 transition-colors"
+                >
+                  I'm Thinking...
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onSubmitAnswer("I don't know this concept.")}
+                  className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-rose-300 text-xs font-medium rounded-lg border border-slate-700 transition-colors"
+                >
+                  I Don't Know
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleDirectSubmit}
+                disabled={isProcessing}
+                className="px-4 py-1.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-bold text-xs rounded-lg shadow-sm transition-all flex items-center gap-1.5"
+              >
+                {isProcessing ? 'Processing...' : 'Submit Answer'}
+              </button>
+            </div>
           </div>
 
         </div>
@@ -270,4 +312,5 @@ export default function NormalInterviewRoom({
     </div>
   );
 }
+
 

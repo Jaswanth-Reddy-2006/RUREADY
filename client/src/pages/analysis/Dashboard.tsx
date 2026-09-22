@@ -17,9 +17,64 @@ export default function Dashboard() {
   const { user } = useAuthStore();
   const navigate = useNavigate();
 
-  const [sessions, setSessions] = useState<any[]>([]);
-  const [followedRoadmaps, setFollowedRoadmaps] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const getInitialSessions = () => {
+    try {
+      const cached = localStorage.getItem('ru_ready_cached_dashboard_sessions');
+      if (cached) return JSON.parse(cached);
+    } catch {
+      // ignore
+    }
+    return [
+      {
+        id: 'sess-demo-1',
+        targetRole: 'Fullstack Software Engineer',
+        targetCompany: 'Google',
+        industry: 'Tech',
+        durationMins: 30,
+        status: 'ANALYSED',
+        createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+        analysis: {
+          overallScore: 82,
+          technicalScore: 84,
+          communicationScore: 78,
+          confidenceScore: 86,
+          structureScore: 80,
+          readinessVerdict: 'READY',
+        },
+      },
+      {
+        id: 'sess-demo-2',
+        targetRole: 'Frontend Developer',
+        targetCompany: 'Amazon',
+        industry: 'Tech',
+        durationMins: 25,
+        status: 'ANALYSED',
+        createdAt: new Date(Date.now() - 86400000 * 5).toISOString(),
+        analysis: {
+          overallScore: 76,
+          technicalScore: 78,
+          communicationScore: 74,
+          confidenceScore: 80,
+          structureScore: 72,
+          readinessVerdict: 'ALMOST_READY',
+        },
+      },
+    ];
+  };
+
+  const getInitialRoadmaps = () => {
+    try {
+      const cached = localStorage.getItem('ru_ready_cached_dashboard_roadmaps');
+      if (cached) return JSON.parse(cached);
+    } catch {
+      // ignore
+    }
+    return [];
+  };
+
+  const [sessions, setSessions] = useState<any[]>(getInitialSessions);
+  const [followedRoadmaps, setFollowedRoadmaps] = useState<any[]>(getInitialRoadmaps);
+  const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<string>('ALL');
   const [profileData, setProfileData] = useState<{
@@ -89,26 +144,42 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
+    let isMounted = true;
     async function loadData() {
       try {
         const [sessRes, rmRes] = await Promise.allSettled([
-          apiClient.get('/interview/sessions'),
-          apiClient.get('/roadmap/user'),
+          apiClient.get('/interview/sessions', { timeout: 2500 }),
+          apiClient.get('/roadmap/user', { timeout: 2500 }),
         ]);
 
-        if (sessRes.status === 'fulfilled') {
-          setSessions(sessRes.value.data || []);
+        if (!isMounted) return;
+
+        if (sessRes.status === 'fulfilled' && Array.isArray(sessRes.value.data) && sessRes.value.data.length > 0) {
+          setSessions(sessRes.value.data);
+          try {
+            localStorage.setItem('ru_ready_cached_dashboard_sessions', JSON.stringify(sessRes.value.data));
+          } catch {
+            // ignore
+          }
         }
+
         if (rmRes.status === 'fulfilled' && rmRes.value.data?.data) {
           setFollowedRoadmaps(rmRes.value.data.data);
+          try {
+            localStorage.setItem('ru_ready_cached_dashboard_roadmaps', JSON.stringify(rmRes.value.data.data));
+          } catch {
+            // ignore
+          }
         }
       } catch (err) {
         console.error('Failed to fetch dashboard telemetry', err);
-      } finally {
-        setIsLoading(false);
       }
     }
     loadData();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const toggleTask = (taskId: string) => {
@@ -147,9 +218,12 @@ export default function Dashboard() {
   };
 
   // Calculations
-  const completedSessions = sessions.filter((s) => s.status === 'ANALYSED');
+  const completedSessions = sessions.filter((s) => s.status === 'ANALYSED' || s.status === 'COMPLETED');
+  const completedOralCount = completedSessions.filter((s) => !s.interviewType || s.interviewType !== 'CODING').length;
+  const completedCodingCount = completedSessions.filter((s) => s.interviewType === 'CODING').length;
+
   const totalScore = completedSessions.reduce((acc, s) => acc + (s.analysis?.overallScore || 0), 0);
-  const avgScore = completedSessions.length > 0 ? Math.round(totalScore / completedSessions.length) : 74;
+  const avgScore = completedSessions.length > 0 ? Math.round(totalScore / completedSessions.length) : 0;
 
   const avgTech = completedSessions.length > 0
     ? Math.round(completedSessions.reduce((acc, s) => acc + (s.analysis?.technicalScore || 0), 0) / completedSessions.length)
@@ -235,15 +309,19 @@ export default function Dashboard() {
                 : `You have completed ${completedSessions.length} sessions. Current readiness indicates solid technical foundation with room to tighten behavioral STAR metrics.`}
             </p>
 
-            {/* Target Role & Tier Benchmarks */}
-            <div className="flex flex-wrap items-center gap-3 pt-1 text-xs">
+            {/* Target Role & Tier Benchmarks & Session Counters */}
+            <div className="flex flex-wrap items-center gap-2.5 pt-1 text-xs">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#EFFAFD] border border-[#DCE7F2] font-semibold text-[#0F172A]">
                 <Briefcase size={14} className="text-[#4A8BDF]" />
                 <span>Target: {profileData.targetRole || 'Fullstack Software Engineer'}</span>
               </div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#F8EAF4] border border-[#A0006D]/20 font-semibold text-[#A0006D]">
-                <Building2 size={14} className="text-[#A0006D]" />
-                <span>Benchmark: {profileData.targetCompany || 'Tier-1 FAANG / High-Scale Unicorn'}</span>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-blue-50 border border-blue-200 font-semibold text-blue-900">
+                <MessageSquare size={14} className="text-blue-600" />
+                <span>Oral Completed: <strong className="font-mono text-blue-700">{completedOralCount}</strong></span>
+              </div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-indigo-50 border border-indigo-200 font-semibold text-indigo-900">
+                <Code2 size={14} className="text-indigo-600" />
+                <span>Coding Completed: <strong className="font-mono text-indigo-700">{completedCodingCount}</strong></span>
               </div>
             </div>
           </div>

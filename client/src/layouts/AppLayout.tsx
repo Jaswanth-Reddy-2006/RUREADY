@@ -24,6 +24,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
     /^\/interview\/(coding\/)?[^/]+$/.test(path) && 
     path !== '/interview/setup' && 
     path !== '/interview/new' &&
+    path !== '/oral/new' &&
     path !== '/interview/coding/new';
 
   // Public/Auth routes: / (landing page), /login, /register, /about, /contact, /terms, /privacy

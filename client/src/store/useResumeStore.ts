@@ -24,9 +24,25 @@ export interface TemplateMetadata {
   samplePersona: ResumeData;
 }
 
+export interface ResumeVersion {
+  id: string;
+  name: string;
+  targetRole: string;
+  targetCompany: string;
+  targetJd?: string;
+  resumeData: ResumeData;
+  templateId: ResumeTemplateId;
+  atsScore: number | null;
+  atsAnalysis?: AtsScoreResult | null;
+  usedInApplicationsCount: number;
+  lastUpdated: string;
+}
+
 export interface ResumeStoreState {
-  // Master Resume Data (Saved across Profile & ATS Builder)
+  // Master Resume Data & Saved Versions
   masterResume: ResumeData;
+  resumeVersions: ResumeVersion[];
+  activityLogs: Array<{ id: string; type: string; title: string; details: string; timestamp: string }>;
 
   // Selected visual template
   activeTemplate: ResumeTemplateId;
@@ -43,6 +59,14 @@ export interface ResumeStoreState {
   updatePersonalInfo: (info: Partial<ResumeData['personalInfo']>) => void;
   updateSummary: (summary: string) => void;
   
+  // Resume Version Actions
+  createResumeVersion: (name: string, targetRole: string, targetCompany: string, targetJd?: string, customResumeData?: ResumeData) => string;
+  updateResumeVersion: (id: string, updates: Partial<ResumeVersion>) => void;
+  deleteResumeVersion: (id: string) => void;
+  duplicateResumeVersion: (id: string) => string;
+  saveAtsAnalysis: (versionId: string, result: AtsScoreResult) => void;
+  addActivityLog: (type: string, title: string, details: string) => void;
+
   // Experience CRUD
   addExperience: (exp: Omit<ResumeData['experience'][0], 'id'>) => void;
   updateExperience: (id: string, exp: Partial<ResumeData['experience'][0]>) => void;
@@ -381,10 +405,65 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
   }
 ];
 
+export const DEFAULT_RESUME_VERSIONS: ResumeVersion[] = [
+  {
+    id: 'ver-master',
+    name: 'Software Engineer Base Resume',
+    targetRole: 'Full Stack Engineer',
+    targetCompany: 'General Tech',
+    resumeData: DEFAULT_MASTER_RESUME,
+    templateId: 'modern-tech',
+    atsScore: 92,
+    usedInApplicationsCount: 3,
+    lastUpdated: new Date().toISOString(),
+  },
+  {
+    id: 'ver-amazon',
+    name: 'Amazon SDE Intern Version',
+    targetRole: 'Software Development Engineer',
+    targetCompany: 'Amazon',
+    targetJd: 'Responsibilities: Build high-throughput microservices using TypeScript, Node.js, and AWS.',
+    resumeData: DEFAULT_MASTER_RESUME,
+    templateId: 'faang-compact',
+    atsScore: 88,
+    usedInApplicationsCount: 2,
+    lastUpdated: new Date(Date.now() - 86400000).toISOString(),
+  },
+  {
+    id: 'ver-tcs',
+    name: 'Full Stack Developer — TCS',
+    targetRole: 'SDE / Full Stack',
+    targetCompany: 'TCS Digital',
+    targetJd: 'Requirements: React, TypeScript, Node.js, SQL, and Agile delivery.',
+    resumeData: DEFAULT_MASTER_RESUME,
+    templateId: 'harvard-classic',
+    atsScore: 82,
+    usedInApplicationsCount: 1,
+    lastUpdated: new Date(Date.now() - 172800000).toISOString(),
+  },
+];
+
 export const useResumeStore = create<ResumeStoreState>()(
   persist(
     (set, get) => ({
       masterResume: DEFAULT_MASTER_RESUME,
+      resumeVersions: DEFAULT_RESUME_VERSIONS,
+      activityLogs: [
+        {
+          id: 'log-1',
+          type: 'ANALYSIS',
+          title: 'Resume Analyzed for Amazon SDE',
+          details: 'Scored 88% ATS match against SDE requirements.',
+          timestamp: new Date().toISOString(),
+        },
+        {
+          id: 'log-2',
+          type: 'VERSION',
+          title: 'Created TCS Digital Resume Version',
+          details: 'Tailored summary and skills for TCS recruitment drive.',
+          timestamp: new Date(Date.now() - 86400000).toISOString(),
+        },
+      ],
       activeTemplate: 'modern-tech',
       isTailoringActive: false,
       targetJobTitle: 'Senior Full Stack Software Engineer',
@@ -403,6 +482,86 @@ Requirements:
 
       setTemplate: (templateId: ResumeTemplateId) => {
         set({ activeTemplate: templateId });
+      },
+
+      createResumeVersion: (name, targetRole, targetCompany, targetJd, customData) => {
+        const id = `ver_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+        const dataToUse = customData || JSON.parse(JSON.stringify(get().masterResume));
+        const newVersion: ResumeVersion = {
+          id,
+          name,
+          targetRole,
+          targetCompany,
+          targetJd,
+          resumeData: dataToUse,
+          templateId: get().activeTemplate,
+          atsScore: null,
+          usedInApplicationsCount: 0,
+          lastUpdated: new Date().toISOString(),
+        };
+
+        set((state) => ({
+          resumeVersions: [newVersion, ...state.resumeVersions],
+        }));
+
+        get().addActivityLog('VERSION', `Created ${name}`, `Targeted for ${targetRole} @ ${targetCompany}`);
+        return id;
+      },
+
+      updateResumeVersion: (id, updates) => {
+        set((state) => ({
+          resumeVersions: state.resumeVersions.map((v) =>
+            v.id === id ? { ...v, ...updates, lastUpdated: new Date().toISOString() } : v
+          ),
+        }));
+      },
+
+      deleteResumeVersion: (id) => {
+        set((state) => ({
+          resumeVersions: state.resumeVersions.filter((v) => v.id !== id),
+        }));
+      },
+
+      duplicateResumeVersion: (id) => {
+        const target = get().resumeVersions.find((v) => v.id === id);
+        if (!target) return id;
+        const newId = `ver_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+        const copy: ResumeVersion = {
+          ...JSON.parse(JSON.stringify(target)),
+          id: newId,
+          name: `${target.name} (Copy)`,
+          lastUpdated: new Date().toISOString(),
+          usedInApplicationsCount: 0,
+        };
+        set((state) => ({
+          resumeVersions: [copy, ...state.resumeVersions],
+        }));
+        get().addActivityLog('VERSION', `Duplicated ${target.name}`, 'Created copy version.');
+        return newId;
+      },
+
+      saveAtsAnalysis: (versionId, result) => {
+        set((state) => ({
+          resumeVersions: state.resumeVersions.map((v) =>
+            v.id === versionId ? { ...v, atsScore: result.totalScore, atsAnalysis: result, lastUpdated: new Date().toISOString() } : v
+          ),
+        }));
+        get().addActivityLog('ANALYSIS', `Ran ATS Analysis`, `Scored ${result.totalScore}% ATS Match.`);
+      },
+
+      addActivityLog: (type, title, details) => {
+        set((state) => ({
+          activityLogs: [
+            {
+              id: `log_${Date.now()}`,
+              type,
+              title,
+              details,
+              timestamp: new Date().toISOString(),
+            },
+            ...state.activityLogs,
+          ],
+        }));
       },
 
       updatePersonalInfo: (info) => {

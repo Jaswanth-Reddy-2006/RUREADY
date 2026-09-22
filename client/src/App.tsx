@@ -16,13 +16,31 @@ import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
 
 // Interview flow pages
+import OralCommandCenter from './pages/interview/OralCommandCenter';
+import CodingCommandCenter from './pages/interview/CodingCommandCenter';
 import SetupForm from './pages/interview/SetupForm';
 import DeviceCheck from './pages/interview/DeviceCheck';
 import InterviewRoom from './pages/interview/InterviewRoom';
 import Complete from './pages/interview/Complete';
 import AnalysisReport from './pages/interview/AnalysisReport';
+import InterviewReplay from './pages/interview/InterviewReplay';
 import CodingSetupForm from './components/interview/CodingSetupForm';
 import CodingInterviewRoom from './components/interview/CodingInterviewRoom';
+import OralHistoryPage from './pages/interview/OralHistoryPage';
+import CompanyWiseCatalogPage from './pages/interview/CompanyWiseCatalogPage';
+import CompanyTrackDetailPage from './pages/interview/CompanyTrackDetailPage';
+
+// Placement Preparation Engine pages
+import PreparationCommandCenter from './pages/prep/PreparationCommandCenter';
+import LearnLessonPage from './pages/prep/LearnLessonPage';
+import PracticeQuizPage from './pages/prep/PracticeQuizPage';
+import TestAssessmentPage from './pages/prep/TestAssessmentPage';
+import SubjectOverviewPage from './pages/prep/SubjectOverviewPage';
+import TopicDetailPage from './pages/prep/TopicDetailPage';
+import SkillMapPage from './pages/prep/SkillMapPage';
+import DailyPrepPage from './pages/prep/DailyPrepPage';
+
+
 
 // Analysis pages
 import Dashboard from './pages/analysis/Dashboard';
@@ -31,6 +49,11 @@ import AnalyticsPage from './pages/analysis/AnalyticsPage';
 import Settings from './pages/Settings';
 import AtsScanner from './pages/ats/AtsScanner';
 import AtsReport from './pages/ats/AtsReport';
+import ResumeDashboard from './pages/resume/ResumeDashboard';
+import ResumeBuilderPage from './pages/resume/ResumeBuilderPage';
+import AtsAnalyzerPage from './pages/resume/AtsAnalyzerPage';
+import ResumeVersionsPage from './pages/resume/ResumeVersionsPage';
+import ResumePreviewPage from './pages/resume/ResumePreviewPage';
 import RoadmapCatalog from './pages/roadmap/RoadmapCatalog';
 import RoadmapView from './pages/roadmap/RoadmapView';
 import RoadmapBuilderPage from './pages/roadmap/RoadmapBuilderPage';
@@ -78,6 +101,7 @@ function App() {
     /^\/interview\/(coding\/)?[^/]+$/.test(location.pathname) &&
     location.pathname !== '/interview/setup' &&
     location.pathname !== '/interview/new' &&
+    location.pathname !== '/oral/new' &&
     location.pathname !== '/interview/coding/new';
 
   return (
@@ -114,6 +138,110 @@ function App() {
                 }
               />
               <Route
+                path="/preparation"
+                element={
+                  <ProtectedRoute>
+                    <PreparationCommandCenter />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/preparation/subject/:subjectId"
+                element={
+                  <ProtectedRoute>
+                    <SubjectOverviewPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/preparation/topic/:topicId"
+                element={
+                  <ProtectedRoute>
+                    <TopicDetailPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/preparation/learn/:topicId"
+                element={
+                  <ProtectedRoute>
+                    <LearnLessonPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/preparation/practice/:topicId"
+                element={
+                  <ProtectedRoute>
+                    <PracticeQuizPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/preparation/test/:subjectId"
+                element={
+                  <ProtectedRoute>
+                    <TestAssessmentPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/preparation/assessment"
+                element={
+                  <ProtectedRoute>
+                    <TestAssessmentPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/preparation/skills"
+                element={
+                  <ProtectedRoute>
+                    <SkillMapPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/preparation/today"
+                element={
+                  <ProtectedRoute>
+                    <DailyPrepPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/oral"
+                element={
+                  <ProtectedRoute>
+                    <OralCommandCenter />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/coding"
+                element={
+                  <ProtectedRoute>
+                    <CodingCommandCenter />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/interview/coding"
+                element={
+                  <ProtectedRoute>
+                    <CodingCommandCenter />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/interview"
+                element={
+                  <ProtectedRoute>
+                    <OralCommandCenter />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/interview/new"
                 element={
                   <ProtectedRoute>
@@ -129,6 +257,71 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="/oral/new"
+                element={
+                  <ProtectedRoute>
+                    <SetupForm />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/oral/history"
+                element={
+                  <ProtectedRoute>
+                    <OralHistoryPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/interviews/company-wise"
+                element={
+                  <ProtectedRoute>
+                    <CompanyWiseCatalogPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/interview/company-wise"
+                element={
+                  <ProtectedRoute>
+                    <CompanyWiseCatalogPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/company-wise"
+                element={
+                  <ProtectedRoute>
+                    <CompanyWiseCatalogPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/interviews/company-wise/:companyId"
+                element={
+                  <ProtectedRoute>
+                    <CompanyTrackDetailPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/interview/company-wise/:companyId"
+                element={
+                  <ProtectedRoute>
+                    <CompanyTrackDetailPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/company-wise/:companyId"
+                element={
+                  <ProtectedRoute>
+                    <CompanyTrackDetailPage />
+                  </ProtectedRoute>
+                }
+              />
+
               <Route
                 path="/history"
                 element={
@@ -170,10 +363,58 @@ function App() {
                 }
               />
               <Route
+                path="/resume"
+                element={
+                  <ProtectedRoute>
+                    <ResumeDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/resume/builder"
+                element={
+                  <ProtectedRoute>
+                    <ResumeBuilderPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/resume/edit/:id"
+                element={
+                  <ProtectedRoute>
+                    <ResumeBuilderPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/resume/analyze"
+                element={
+                  <ProtectedRoute>
+                    <AtsAnalyzerPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/resume/versions"
+                element={
+                  <ProtectedRoute>
+                    <ResumeVersionsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/resume/preview/:id"
+                element={
+                  <ProtectedRoute>
+                    <ResumePreviewPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/ats"
                 element={
                   <ProtectedRoute>
-                    <AtsScanner />
+                    <AtsAnalyzerPage />
                   </ProtectedRoute>
                 }
               />
@@ -181,7 +422,7 @@ function App() {
                 path="/ats/report/:id"
                 element={
                   <ProtectedRoute>
-                    <AtsReport />
+                    <AtsAnalyzerPage />
                   </ProtectedRoute>
                 }
               />
@@ -390,6 +631,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <AnalysisReport />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/interview/:id/replay"
+                element={
+                  <ProtectedRoute>
+                    <InterviewReplay />
                   </ProtectedRoute>
                 }
               />

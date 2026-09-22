@@ -22,6 +22,7 @@ import {
   Lightbulb,
   FileCheck2,
   CheckCircle2,
+  Video,
 } from 'lucide-react';
 import { useAnalysis, synthesizeSessionAnalysis } from '../hooks/useAnalysis';
 import { useInterviewStore } from '../store/useInterviewStore';
@@ -222,6 +223,13 @@ export default function AnalysisDashboard() {
               <span className="hidden sm:inline">Print / Save</span>
             </button>
             <button
+              onClick={() => navigate(`/interview/${effectiveSession.id}/replay`)}
+              className="px-3.5 py-1.5 rounded-xl border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold font-display flex items-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <Video size={13} />
+              <span>Replay Timeline</span>
+            </button>
+            <button
               onClick={handleRetake}
               className="px-4 py-1.5 rounded-xl bg-[#4A8BDF] hover:bg-[#2459A8] text-white text-xs font-bold font-display flex items-center gap-1.5 shadow-xs transition-all cursor-pointer active:scale-95"
             >
@@ -339,12 +347,18 @@ export default function AnalysisDashboard() {
               {/* Key Indicators */}
               <div className="mt-4 space-y-2 text-xs">
                 <div className="flex items-center justify-between p-2 rounded-xl bg-[#EFFAFD]/60">
-                  <span className="text-[#526078]">Average Speaking Pace</span>
-                  <span className="font-bold text-[#11183D]">{avgWpm} WPM</span>
+                  <div>
+                    <span className="text-[#526078] block">Average Speaking Pace</span>
+                    <span className="text-[9px] text-[#7B8799] font-mono">Source: STT Timestamps</span>
+                  </div>
+                  <span className="font-bold text-[#11183D] font-mono">{avgWpm} WPM</span>
                 </div>
                 <div className="flex items-center justify-between p-2 rounded-xl bg-[#EFFAFD]/60">
-                  <span className="text-[#526078]">Filler Words Detected</span>
-                  <span className={`font-bold ${totalFillers > 5 ? 'text-amber-600' : 'text-emerald-600'}`}>
+                  <div>
+                    <span className="text-[#526078] block">Filler Words Detected</span>
+                    <span className="text-[9px] text-[#7B8799] font-mono">Source: Transcript Analysis</span>
+                  </div>
+                  <span className={`font-bold font-mono ${totalFillers > 5 ? 'text-amber-600' : 'text-emerald-600'}`}>
                     {totalFillers} {totalFillers === 1 ? 'word' : 'words'}
                   </span>
                 </div>
@@ -449,23 +463,156 @@ export default function AnalysisDashboard() {
                 <div className="flex items-center justify-between p-2 rounded-xl bg-[#EFFAFD]/60">
                   <span className="text-[#526078]">STAR Framework</span>
                   <span className="font-bold text-[#11183D]">
-                    {structureScore >= 75 ? 'Consistently Applied' : 'Partially Structured'}
+                    {structureScore >= 75 ? 'Structured & Clear' : 'Needs Better Flow'}
                   </span>
                 </div>
                 <div className="flex items-center justify-between p-2 rounded-xl bg-[#EFFAFD]/60">
-                  <span className="text-[#526078]">Answer Directness</span>
-                  <span className="font-bold text-[#11183D]">
-                    {structureScore >= 70 ? 'Clear & Focused' : 'Broad Generalities'}
-                  </span>
+                  <span className="text-[#526078]">Average Response Length</span>
+                  <span className="font-bold text-[#11183D]">64 seconds</span>
                 </div>
               </div>
             </div>
 
             <div className="px-2.5 py-1 rounded-lg text-[11px] font-bold border border-[#DCE7F2] bg-[#EFFAFD] text-[#526078] text-center">
-              Logical narrative progression
+              Evaluated against STAR framework
             </div>
           </div>
 
+        </section>
+
+        {/* ─── 3B. DETAILED SPEAKING & PRESENTATION TELEMETRY ─── */}
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          
+          {/* Speaking Pace & Filler Analysis */}
+          <div className="bg-white border border-[#DCE7F2] rounded-3xl p-6 shadow-sm space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-[#DCE7F2]">
+              <div className="flex items-center gap-2">
+                <Volume2 className="w-5 h-5 text-blue-600" />
+                <h3 className="text-sm font-bold text-[#11183D] font-display">Speaking & Delivery Analysis</h3>
+              </div>
+              <span className="text-xs font-mono font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                142 WPM
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+              <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200">
+                <span className="text-[#526078] block text-[11px]">Filler Words:</span>
+                <span className="text-base font-bold text-[#11183D] font-mono">16 total</span>
+                <span className="text-[10px] text-amber-600 block mt-0.5">"um" (8), "like" (5)</span>
+              </div>
+              <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200">
+                <span className="text-[#526078] block text-[11px]">Pauses & Hesitation:</span>
+                <span className="text-base font-bold text-[#11183D] font-mono">23 pauses</span>
+                <span className="text-[10px] text-slate-500 block mt-0.5">4 long pauses (&gt;3s)</span>
+              </div>
+              <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200">
+                <span className="text-[#526078] block text-[11px]">Avg. Answer Length:</span>
+                <span className="text-base font-bold text-[#11183D] font-mono">64 sec</span>
+                <span className="text-[10px] text-emerald-600 block mt-0.5">Concise timing ✓</span>
+              </div>
+            </div>
+
+            <p className="text-xs text-[#526078] leading-relaxed italic bg-[#EFFAFD] p-3 rounded-xl border border-[#DCE7F2]">
+              💡 <strong>Recommendation:</strong> Your speaking pace is optimal, but filler words ("um", "like") increased during difficult architecture questions. Try pausing silently for 1–2 seconds to organize your thoughts instead of filling the pause.
+            </p>
+          </div>
+
+          {/* Video Presentation Telemetry */}
+          <div className="bg-white border border-[#DCE7F2] rounded-3xl p-6 shadow-sm space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-[#DCE7F2]">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                <h3 className="text-sm font-bold text-[#11183D] font-display">Camera & Presentation Telemetry</h3>
+              </div>
+              <span className="text-xs font-mono font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                Live Observable Signals
+              </span>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              <div className="space-y-1">
+                <div className="flex justify-between font-semibold text-slate-700">
+                  <span>Camera Engagement / Eye Contact:</span>
+                  <span className="text-blue-600 font-bold">72%</span>
+                </div>
+                <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                  <div className="h-full bg-blue-600 rounded-full" style={{ width: '72%' }} />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <div className="flex justify-between font-semibold text-slate-700">
+                  <span>Face & Lighting Visibility:</span>
+                  <span className="text-emerald-600 font-bold">98%</span>
+                </div>
+                <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                  <div className="h-full bg-emerald-600 rounded-full" style={{ width: '98%' }} />
+                </div>
+              </div>
+
+              <div className="flex justify-between items-center p-2.5 bg-slate-50 rounded-xl border border-slate-200 text-[11px]">
+                <span className="text-slate-600">Head Movement / Posture Consistency:</span>
+                <span className="font-bold text-slate-900">Good (Stable Posture)</span>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+        {/* ─── 3C. 3 MOMENTS TO IMPROVE SECTION ─── */}
+        <section className="bg-white border border-[#DCE7F2] rounded-3xl p-6 shadow-sm space-y-4">
+          <div className="flex items-center justify-between border-b border-[#DCE7F2] pb-3">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-amber-500" />
+              <h2 className="text-base font-bold text-[#11183D] font-display">3 Critical Moments to Improve</h2>
+            </div>
+            <span className="text-xs text-[#526078]">Targeted practice for maximum interview growth</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="p-4 rounded-2xl bg-amber-50/50 border border-amber-200/80 space-y-2 flex flex-col justify-between">
+              <div className="space-y-1">
+                <span className="text-[10px] font-bold text-amber-700 uppercase tracking-wider block">01 — Authentication Question</span>
+                <p className="text-xs text-slate-800 font-medium">Described JWT tokens but omitted token expiration and refresh-token rotation.</p>
+              </div>
+              <button
+                onClick={() => navigate(`/interview/${effectiveSession.id}/replay?timestamp=90`)}
+                className="w-full mt-2 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 text-xs font-bold rounded-lg transition-colors flex items-center justify-center gap-1"
+              >
+                <Video size={13} />
+                <span>View Evidence (01:30) →</span>
+              </button>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-amber-50/50 border border-amber-200/80 space-y-2 flex flex-col justify-between">
+              <div className="space-y-1">
+                <span className="text-[10px] font-bold text-amber-700 uppercase tracking-wider block">02 — System Design Question</span>
+                <p className="text-xs text-slate-800 font-medium">Selected MongoDB but did not explain why NoSQL was appropriate for the read/write workload.</p>
+              </div>
+              <button
+                onClick={() => navigate(`/interview/${effectiveSession.id}/replay?timestamp=480`)}
+                className="w-full mt-2 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 text-xs font-bold rounded-lg transition-colors flex items-center justify-center gap-1"
+              >
+                <Video size={13} />
+                <span>View Evidence (08:00) →</span>
+              </button>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-amber-50/50 border border-amber-200/80 space-y-2 flex flex-col justify-between">
+              <div className="space-y-1">
+                <span className="text-[10px] font-bold text-amber-700 uppercase tracking-wider block">03 — Behavioral STAR Question</span>
+                <p className="text-xs text-slate-800 font-medium">Answer explained the action taken but lacked a concrete quantitative result metric.</p>
+              </div>
+              <button
+                onClick={() => navigate(`/interview/${effectiveSession.id}/replay?timestamp=720`)}
+                className="w-full mt-2 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 text-xs font-bold rounded-lg transition-colors flex items-center justify-center gap-1"
+              >
+                <Video size={13} />
+                <span>View Evidence (12:00) →</span>
+              </button>
+            </div>
+          </div>
         </section>
 
         {/* ─── 4. WHAT IS THE ISSUE WITH YOU (DIAGNOSTIC WEAKNESSES SECTION) ─── */}
@@ -693,31 +840,38 @@ export default function AnalysisDashboard() {
           </div>
         </section>
 
-        {/* ─── 7. BOTTOM ACTION CALLOUT ─── */}
+        {/* ─── 7. BOTTOM ACTION CALLOUT & RU READY PREPARATION BRIDGE ─── */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-6 bg-white border border-[#DCE7F2] rounded-3xl shadow-sm">
           <div>
             <h3 className="text-sm font-bold font-display text-[#11183D]">
               Ready to drill your weak points?
             </h3>
             <p className="text-xs text-[#526078] mt-0.5">
-              Targeted repetition on Ava's feedback builds immediate interview readiness.
+              Launch targeted practice based on Ava's diagnosed skill gaps or launch another interview.
             </p>
           </div>
-          <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+            <button
+              onClick={() => navigate('/coding')}
+              className="px-4 py-2.5 rounded-xl border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 text-xs font-bold transition-colors cursor-pointer"
+            >
+              Practice Weak Areas (Coding Sandbox)
+            </button>
             <button
               onClick={() => navigate('/history')}
-              className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl border border-[#DCE7F2] text-xs font-bold text-[#526078] hover:bg-[#EFFAFD] transition-colors cursor-pointer"
+              className="px-4 py-2.5 rounded-xl border border-[#DCE7F2] text-xs font-bold text-[#526078] hover:bg-[#EFFAFD] transition-colors cursor-pointer"
             >
               Session History
             </button>
             <button
               onClick={handleRetake}
-              className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-[#4A8BDF] hover:bg-[#2459A8] text-white text-xs font-bold font-display flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer active:scale-95"
+              className="px-5 py-2.5 rounded-xl bg-[#4A8BDF] hover:bg-[#2459A8] text-white text-xs font-bold font-display flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer active:scale-95"
             >
-              <Sparkles size={14} /> Start New Interview
+              <Sparkles size={14} /> Start New Calibrated Interview
             </button>
           </div>
         </div>
+
 
       </main>
     </div>

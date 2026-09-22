@@ -1,11 +1,67 @@
 import { prisma } from '../lib/prisma.js';
 import { NotFoundError } from '../lib/errors.js';
 import { v4 as uuidv4 } from 'uuid';
+import { QUESTION_BANK, PROJECT_DEEP_DIVE_STAGES } from '../data/question-bank.data.js';
+import { InterviewStateMachine } from './interview-fsm.js';
+import { StructuredEvaluation } from '@ru-ready/shared';
 
 const memorySessions = new Map<string, any>();
 const memoryQuestions = new Map<string, any[]>();
 const memoryChatHistory = new Map<string, any[]>();
 const memoryAnalysis = new Map<string, any>();
+
+
+export function classifyCandidateIntent(text: string): any {
+  if (!text || !text.trim()) return 'ANSWER';
+  const clean = text.toLowerCase().trim();
+
+  // 1. END INTERVIEW
+  if (/\b(end (the )?interview|stop (the )?interview|wrap up|finish session|i want to end)\b/i.test(clean)) {
+    return 'END_INTERVIEW';
+  }
+
+  // 2. TIME QUERY
+  if (/\b(how much time|time left|how many questions left|remaining time)\b/i.test(clean)) {
+    return 'TIME_QUERY';
+  }
+
+  // 3. REPEAT QUESTION
+  if (/\b(repeat|say (that|it) again|didn'?t hear|pardon|come again|what was the question)\b/i.test(clean)) {
+    return 'REPEAT_QUESTION';
+  }
+
+  // 4. DON_T_KNOW
+  if (/\b(don'?t know|not sure|no idea|haven'?t (used|worked)|never heard|unfamiliar|pass)\b/i.test(clean) && clean.length < 70) {
+    return 'DON_T_KNOW';
+  }
+
+  // 5. CLARIFICATION & CONFIRMATION
+  if (/\b(is this what you'?re asking|so you want me to|does this mean|are you asking|could you clarify)\b/i.test(clean)) {
+    return 'CLARIFICATION';
+  }
+
+  // 6. TECHNICAL QUESTION
+  if (/\b(what is the (max|maximum|input)|are duplicates allowed|is memory constrained)\b/i.test(clean)) {
+    return 'TECHNICAL_QUESTION';
+  }
+
+  // 7. CORRECTION
+  if (/\b(wait, actually|scratch that|let me fix|sorry, i meant)\b/i.test(clean)) {
+    return 'CORRECTION';
+  }
+
+  // 8. HESITATION
+  if (/^(umm+|uhh+|err+|let me think|give me a moment)\b/i.test(clean) && clean.length < 35) {
+    return 'HESITATION';
+  }
+
+  // 9. SKIP
+  if (/\b(skip|move on|next question|let'?s move to next)\b/i.test(clean)) {
+    return 'SKIP_QUESTION';
+  }
+
+  return 'ANSWER';
+}
 
 export const oralService = {
   async createSession(userId: string, data: any) {
@@ -137,11 +193,23 @@ export const oralService = {
 
     if (isSkip) {
       evaluationResult = {
+        intent: 'SKIP_QUESTION',
+        correctness: 0,
+        conceptCoverage: 0,
+        depth: 0,
+        clarity: 0.5,
+        relevance: 0,
+        confidence: 0,
+        coveredConcepts: [],
+        missingConcepts: [],
+        misconceptions: [],
+        quality: 'DON_T_KNOW',
         score: 0,
-        feedback: 'Candidate chose to pass on this question or requested another topic.',
-        strengths: [],
-        weaknesses: [],
-        betterAnswer: 'Candidate skipped this topic.',
+        feedback: 'Candidate skipped this question.',
+        recommendedAction: 'MOVE_ON',
+        spokenResponse: 'Understood. Let us move to the next question.',
+        emotion: 'encouraging',
+        gesture: 'nod',
         isSkip: true,
       };
     } else {
@@ -157,8 +225,10 @@ export const oralService = {
               questionType: currentQ.questionType,
               answerText,
               session,
+              requiredConcepts: currentQ.requiredConcepts || [],
+              optionalConcepts: currentQ.optionalConcepts || [],
             }),
-            signal: AbortSignal.timeout(6000),
+            signal: AbortSignal.timeout(10000),
           });
           if (evalResp.ok) {
             evaluationResult = await evalResp.json();
@@ -169,20 +239,51 @@ export const oralService = {
       }
     }
 
+    // Default fallback evaluation if service unavailable
+    if (!evaluationResult) {
+      evaluationResult = {
+        intent: 'ANSWER',
+        correctness: 0.75,
+        conceptCoverage: 0.70,
+        depth: 0.60,
+        clarity: 0.80,
+        relevance: 0.85,
+        confidence: 0.75,
+        coveredConcepts: [],
+        missingConcepts: [],
+        misconceptions: [],
+        quality: 'PARTIAL',
+        score: 75,
+        feedback: 'Solid answer, but deeper architectural trade-offs could be highlighted.',
+        recommendedAction: 'PROBE_DEPTH',
+        spokenResponse: "You are on the right track. Can you explain that in slightly more detail?",
+        emotion: 'curious',
+        gesture: 'nod',
+      };
+    }
+
+    const sessionObj = await this.getSession(sessionId, userId);
+    const context = {
+      sessionId,
+      currentState: sessionObj.engineState || 'ASKING',
+      currentQuestionIndex: sessionObj.questions ? sessionObj.questions.length : 1,
+      totalQuestionsPlanned: sessionObj.durationMins ? Math.round(sessionObj.durationMins / 4) : 5,
+      currentDifficulty: sessionObj.currentDifficulty || 'MEDIUM',
+      consecutiveStrongAnswers: sessionObj.consecutiveStrongAnswers || 0,
+      consecutiveWeakAnswers: sessionObj.consecutiveWeakAnswers || 0,
+      sessionMemory: sessionObj.questions || [],
+    };
+
+    const transitionResult = InterviewStateMachine.handleIntent(context, evaluationResult);
+
     try {
       const updateData: any = {
         answerText,
         answeredAt: new Date(),
         timeTakenSecs: timeTaken,
+        evalScore: evaluationResult.score,
+        evalFeedback: evaluationResult.feedback,
       };
-
-      if (evaluationResult) {
-        updateData.evalScore = evaluationResult.score;
-        updateData.evalFeedback = evaluationResult.feedback;
-        if (evaluationResult.strengths) updateData.evalStrengths = evaluationResult.strengths;
-        if (evaluationResult.weaknesses) updateData.evalWeaknesses = evaluationResult.weaknesses;
-        if (evaluationResult.betterAnswer) updateData.betterAnswer = evaluationResult.betterAnswer;
-      }
 
       const updatedQuestion = await prisma.oralQuestion.update({
         where: { id: questionId },
@@ -199,7 +300,8 @@ export const oralService = {
 
       return {
         ...updatedQuestion,
-        evaluation: evaluationResult || { score: 75, isSkip: Boolean(isSkip) },
+        evaluation: evaluationResult,
+        transition: transitionResult,
       };
     } catch (err) {
       console.warn('[OralService] DB submitAnswer fallback:', (err as Error).message);
@@ -213,27 +315,16 @@ export const oralService = {
       q.answerText = answerText;
       q.answeredAt = new Date();
       q.timeTakenSecs = timeTaken;
-      if (evaluationResult) {
-        (q as any).evalScore = evaluationResult.score;
-        (q as any).evalFeedback = evaluationResult.feedback;
-        (q as any).evalStrengths = evaluationResult.strengths;
-        (q as any).evalWeaknesses = evaluationResult.weaknesses;
-        (q as any).betterAnswer = evaluationResult.betterAnswer;
-      }
-
-      const history = memoryChatHistory.get(sessionId) || [];
-      history.push({
-        role: 'user',
-        content: isSkip ? `[Candidate skipped: "${answerText || 'Not familiar with this topic'}"]` : answerText,
-        timestamp: new Date(),
-      });
-      memoryChatHistory.set(sessionId, history);
+      (q as any).evalScore = evaluationResult.score;
+      (q as any).evalFeedback = evaluationResult.feedback;
 
       return {
         ...q,
-        evaluation: evaluationResult || { score: 75, isSkip: Boolean(isSkip) },
+        evaluation: evaluationResult,
+        transition: transitionResult,
       };
     }
+
   },
 
   async getSession(sessionId: string, userId: string) {
@@ -362,63 +453,77 @@ export const oralService = {
         console.warn('[OralService] AI Service generate-next-question offline/timed out, using adaptive fallback:', (fetchErr as Error).message);
       }
 
-      // Fallback domain matrix if AI Service is unreachable
+      // Fallback domain matrix & Question Bank matching if AI Service offline
+      let requiredConcepts: string[] = [];
+      let optionalConcepts: string[] = [];
+
       if (!promptText) {
-        const questionMatrix: Record<string, string[]> = {
-          frontend: [
-            `Walk me through how you optimize Web Vitals (LCP, CLS, INP) for a high-traffic ${role} application.`,
-            'How do you manage complex client-side state across deeply nested component hierarchies without triggering cascading re-renders?',
-            'Explain your strategy for client-side caching, service workers, and offline resilience in modern Web apps.',
-            'How do you defend against XSS, CSRF, and third-party script vulnerabilities in frontend architectures?',
-          ],
-          backend: [
-            `How do you design database indexing and partitioning strategies for a ${role} backend facing heavy write traffic?`,
-            'Walk me through your design for a resilient distributed locking mechanism across microservices.',
-            'How do you prevent data inconsistency and handle eventual consistency in event-driven architectures using Kafka or RabbitMQ?',
-            'Explain how you implement zero-downtime database schema migrations on a live production table with millions of rows.',
-          ],
-          fullstack: [
-            `Walk me through the end-to-end data pipeline from the browser event to the database transaction in a ${role} system.`,
-            'How do you balance server-side rendering (SSR) vs client-side hydration for dynamic data-heavy platforms?',
-            'Explain your approach to rate-limiting, API gateway management, and token authentication at scale.',
-            'How do you structure microservices or modular monoliths to maintain clean separation of concerns?',
-          ],
-          general: [
-            `Could you describe a challenging technical architecture problem you solved recently for ${role}?`,
-            `How do you handle performance optimization and architectural trade-offs when building scalable applications?`,
-            `Can you explain your approach to automated testing and ensuring code reliability in production?`,
-            `How do you handle cross-functional technical disagreements and conflicting system requirements?`,
-          ]
-        };
-
-        let category = 'general';
-        if (/front|react|vue|angular|js|ts|ui/i.test(roleLower)) category = 'frontend';
-        else if (/back|node|spring|java|python|go|golang|postgres|sql/i.test(roleLower)) category = 'backend';
-        else if (/full/i.test(roleLower)) category = 'fullstack';
-
-        const pool = questionMatrix[category] || questionMatrix.general;
-        const hash = (sessionId || 'seed').split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-        const selectedIdx = (hash + (nextOrder - 1) * 7) % pool.length;
-        promptText = pool[selectedIdx];
+        // Try picking matching question from QUESTION_BANK
+        const matchingBankItem = QUESTION_BANK[(nextOrder - 1) % QUESTION_BANK.length];
+        if (matchingBankItem) {
+          promptText = matchingBankItem.questionText;
+          qType = matchingBankItem.category;
+          difficulty = matchingBankItem.difficulty;
+          requiredConcepts = matchingBankItem.requiredConcepts;
+          optionalConcepts = matchingBankItem.optionalConcepts;
+        } else {
+          promptText = `Could you describe a challenging technical architecture problem you solved recently relative to ${role}?`;
+          requiredConcepts = ['technical problem statement', 'architecture choice', 'trade-offs', 'outcome'];
+        }
+      } else {
+        // Find matching required concepts if text aligns with question bank
+        const bankMatch = QUESTION_BANK.find(q => promptText.toLowerCase().includes(q.topic.toLowerCase()));
+        if (bankMatch) {
+          requiredConcepts = bankMatch.requiredConcepts;
+          optionalConcepts = bankMatch.optionalConcepts;
+        } else {
+          requiredConcepts = ['core concept', 'technical implementation', 'trade-offs'];
+        }
       }
 
-      const createdQ = await prisma.oralQuestion.create({
-        data: {
-          sessionId,
-          orderIndex: nextOrder,
-          questionText: promptText,
-          questionType: qType,
-          difficulty,
-          evalStrengths: [],
-          evalWeaknesses: [],
-        },
-      });
-
-      return {
-        isComplete: false,
-        question: createdQ,
-        ...createdQ,
+      const questionObj = {
+        id: `q_${uuidv4().slice(0, 8)}`,
+        sessionId,
+        orderIndex: nextOrder,
+        questionText: promptText,
+        questionType: qType,
+        difficulty,
+        requiredConcepts,
+        optionalConcepts,
+        evalStrengths: [],
+        evalWeaknesses: [],
       };
+
+      try {
+        const createdQ = await prisma.oralQuestion.create({
+          data: {
+            sessionId,
+            orderIndex: nextOrder,
+            questionText: promptText,
+            questionType: qType,
+            difficulty,
+            evalStrengths: [],
+            evalWeaknesses: [],
+          },
+        });
+        return {
+          isComplete: false,
+          question: { ...createdQ, requiredConcepts, optionalConcepts },
+          ...createdQ,
+          requiredConcepts,
+          optionalConcepts,
+        };
+      } catch {
+        const questions = memoryQuestions.get(sessionId) || [];
+        questions.push(questionObj);
+        memoryQuestions.set(sessionId, questions);
+        return {
+          isComplete: false,
+          question: questionObj,
+          ...questionObj,
+        };
+      }
+
     } catch (err) {
       console.warn('[OralService] DB getNextQuestion fallback:', (err as Error).message);
       const questions = memoryQuestions.get(sessionId) || [];
