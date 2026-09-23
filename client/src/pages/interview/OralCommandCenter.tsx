@@ -228,90 +228,121 @@ export default function OralCommandCenter() {
     <div className="min-h-screen bg-[#F4F7FC] text-slate-900 py-6 px-4 sm:px-6 lg:px-8 font-sans">
       <div className="max-w-7xl mx-auto space-y-6">
         
-        {/* ─── 1. PREMIUM HERO INTERVIEW CARD (SINGLE PRIMARY CTA) ─── */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-50/90 via-indigo-50/40 to-pink-50/60 border border-blue-100/80 shadow-xs p-6 md:p-8 flex flex-col md:flex-row items-stretch justify-between gap-6">
-          
-          {/* Left Info & Feature Chips */}
-          <div className="space-y-4 max-w-2xl z-10 flex flex-col justify-between">
-            <div className="space-y-2">
-              <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight font-display">
-                Oral Interview
-              </h1>
-              <p className="text-slate-600 text-xs sm:text-sm font-medium leading-relaxed">
-                Practice realistic technical and behavioral interviews tailored to your target role.
-              </p>
+        {/* ─── 1. PREMIUM HERO INTERVIEW CARD (EXACT MOCKUP MATCH) ─── */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#EEF5FF] via-[#F4EEFF] to-[#FDEEFF] border border-white/80 shadow-xs p-6 md:p-8">
+          <div className="relative z-10 flex flex-col lg:flex-row items-stretch justify-between gap-8">
+            
+            {/* Left Column: Top Badge, Heading, Subtitle & 4 Feature Chips */}
+            <div className="flex-1 flex flex-col justify-between space-y-6">
+              <div className="space-y-3">
+                {/* Top-Left Pink Pill Badge */}
+                <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-pink-100/90 text-pink-600 text-xs font-bold border border-pink-200/80 shadow-2xs">
+                  <Sparkles className="w-3.5 h-3.5 text-pink-500 fill-pink-500" />
+                  <span>AI-Powered Mock Interviews</span>
+                </div>
+
+                {/* Main Title & Description */}
+                <div className="space-y-2">
+                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#0B1536] tracking-tight font-display">
+                    Oral Interview
+                  </h1>
+                  <p className="text-slate-600 text-sm sm:text-base font-medium leading-relaxed max-w-xl">
+                    Practice realistic technical and behavioral interviews tailored to your target role.
+                  </p>
+                </div>
+              </div>
+
+              {/* 4 Feature Chips Row */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
+                <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/90 backdrop-blur-xs border border-white/80 shadow-2xs">
+                  <div className="w-9 h-9 rounded-full bg-blue-100/80 text-blue-600 flex items-center justify-center shrink-0">
+                    <MessageSquare className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="text-[12px] font-extrabold text-slate-900 block leading-tight">Real-time AI Interviewer</span>
+                    <span className="text-[10px] text-slate-500 block truncate">Natural conversation</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/90 backdrop-blur-xs border border-white/80 shadow-2xs">
+                  <div className="w-9 h-9 rounded-full bg-purple-100/80 text-purple-600 flex items-center justify-center shrink-0">
+                    <FileText className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="text-[12px] font-extrabold text-slate-900 block leading-tight">Role-specific Questions</span>
+                    <span className="text-[10px] text-slate-500 block truncate">Technical + Behavioral</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/90 backdrop-blur-xs border border-white/80 shadow-2xs">
+                  <div className="w-9 h-9 rounded-full bg-emerald-100/80 text-emerald-600 flex items-center justify-center shrink-0">
+                    <Lightbulb className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="text-[12px] font-extrabold text-slate-900 block leading-tight">Detailed Feedback</span>
+                    <span className="text-[10px] text-slate-500 block truncate">Improve with insights</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/90 backdrop-blur-xs border border-white/80 shadow-2xs">
+                  <div className="w-9 h-9 rounded-full bg-indigo-100/80 text-indigo-600 flex items-center justify-center shrink-0">
+                    <BarChart3 className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="text-[12px] font-extrabold text-slate-900 block leading-tight">Track Progress</span>
+                    <span className="text-[10px] text-slate-500 block truncate">See growth over time</span>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {/* 4 Feature Chips */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2">
-              <div className="flex items-center gap-2 p-2.5 rounded-xl bg-white/80 border border-slate-200/60 shadow-2xs">
-                <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
-                  <Bot className="w-4 h-4" />
+            {/* Right Column: Character Avatar, Annotation, Speech Bubble & CTA Button */}
+            <div className="relative flex flex-col items-center lg:items-end justify-between min-w-[320px]">
+              
+              {/* Upper Visual Area: Character + Annotations */}
+              <div className="relative w-full flex items-center justify-center lg:justify-end min-h-[170px]">
+                
+                {/* Handwritten Annotation Text */}
+                <div className="absolute left-0 sm:left-4 top-2 z-20 hidden sm:flex flex-col items-end rotate-[-6deg]">
+                  <span className="font-serif italic font-bold text-slate-700 text-base sm:text-lg drop-shadow-xs tracking-wide leading-tight">
+                    Your AI<br />Interviewer<br />is ready!
+                  </span>
+                  <svg className="w-7 h-7 text-slate-700 drop-shadow-xs mt-0.5 -mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M4 4c6 0 12 6 12 12m0 0l-4-2m4 2l-2-4" />
+                  </svg>
                 </div>
-                <div className="min-w-0">
-                  <span className="text-[11px] font-bold text-slate-900 block leading-none">Real-time AI</span>
-                  <span className="text-[9.5px] text-slate-500 truncate block">Natural conversation</span>
+
+                {/* 3D Character Avatar Image Container */}
+                <div className="relative z-10 w-44 h-44 sm:w-52 sm:h-52 lg:w-56 lg:h-56 overflow-hidden rounded-full border-4 border-white/80 shadow-xl bg-gradient-to-b from-indigo-200 via-purple-200 to-pink-200">
+                  <img
+                    src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80"
+                    alt="Your AI Interviewer"
+                    className="w-full h-full object-cover object-top filter brightness-[1.03]"
+                  />
+                </div>
+
+                {/* Speech Bubble */}
+                <div className="absolute right-0 sm:-right-2 top-2 sm:top-4 z-20 bg-white rounded-2xl px-4 py-2.5 shadow-lg border border-slate-100 flex items-center justify-center">
+                  <span className="text-blue-600 font-extrabold text-xs sm:text-sm whitespace-nowrap">
+                    Let's build a better you!
+                  </span>
+                  <div className="absolute -bottom-1.5 left-4 w-3 h-3 bg-white rotate-45 border-r border-b border-slate-100" />
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 p-2.5 rounded-xl bg-white/80 border border-slate-200/60 shadow-2xs">
-                <div className="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center shrink-0">
-                  <FileText className="w-4 h-4" />
-                </div>
-                <div className="min-w-0">
-                  <span className="text-[11px] font-bold text-slate-900 block leading-none">Role-specific</span>
-                  <span className="text-[9.5px] text-slate-500 truncate block">Technical + Behavioral</span>
-                </div>
+              {/* SINGLE PRIMARY CTA BUTTON ALIGNED LOWER-RIGHT */}
+              <div className="w-full flex justify-center lg:justify-end pt-4 z-20">
+                <Button
+                  onClick={() => navigate('/oral/new')}
+                  className="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 text-white font-extrabold text-sm sm:text-base px-8 py-3.5 rounded-full shadow-lg shadow-blue-500/25 border-2 border-white/50 flex items-center justify-center gap-2 transition-all active:scale-95"
+                >
+                  <span>{primaryCtaText}</span>
+                </Button>
               </div>
 
-              <div className="flex items-center gap-2 p-2.5 rounded-xl bg-white/80 border border-slate-200/60 shadow-2xs">
-                <div className="w-8 h-8 rounded-lg bg-teal-100 text-teal-600 flex items-center justify-center shrink-0">
-                  <ShieldCheck className="w-4 h-4" />
-                </div>
-                <div className="min-w-0">
-                  <span className="text-[11px] font-bold text-slate-900 block leading-none">Detailed Feedback</span>
-                  <span className="text-[9.5px] text-slate-500 truncate block">Improve with insights</span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 p-2.5 rounded-xl bg-white/80 border border-slate-200/60 shadow-2xs">
-                <div className="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0">
-                  <TrendingUp className="w-4 h-4" />
-                </div>
-                <div className="min-w-0">
-                  <span className="text-[11px] font-bold text-slate-900 block leading-none">Track Progress</span>
-                  <span className="text-[9.5px] text-slate-500 truncate block">See growth over time</span>
-                </div>
-              </div>
             </div>
+
           </div>
-
-          {/* Right Cinematic AI Interviewer Visual & Single Primary CTA */}
-          <div className="flex flex-col items-center md:items-end justify-between shrink-0 relative pt-2 md:pt-0 min-w-[280px]">
-            {/* Styled AI Interviewer Icon Badge */}
-            <div className="relative w-full flex items-center justify-center md:justify-end -mt-2">
-              <div className="relative w-36 h-36 sm:w-44 sm:h-44 rounded-full bg-gradient-to-br from-pink-500/15 via-purple-500/10 to-indigo-500/15 border-2 border-pink-200/80 flex items-center justify-center shadow-inner">
-                <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-gradient-to-br from-pink-600 via-pink-500 to-purple-600 text-white flex items-center justify-center shadow-lg border border-white/30">
-                  <Bot className="w-12 h-12 sm:w-14 sm:h-14 text-white drop-shadow-xs" />
-                </div>
-              </div>
-
-              {/* Floating Label */}
-              <div className="absolute top-1 right-2 bg-white/90 backdrop-blur-xs px-3 py-1.5 rounded-full border border-pink-200 shadow-xs z-20 flex items-center gap-1.5 text-xs font-bold text-slate-800">
-                <Sparkles className="w-3.5 h-3.5 text-pink-600" />
-                <span>Your AI Interviewer</span>
-              </div>
-            </div>
-
-            {/* SINGLE PRIMARY CTA BUTTON ALIGNED LOWER-RIGHT */}
-            <Button
-              onClick={() => navigate('/oral/new')}
-              className="mt-3 bg-pink-600 hover:bg-pink-700 text-white font-bold text-sm px-8 py-3.5 rounded-full shadow-md transition-all flex items-center justify-center gap-2 active:scale-95"
-            >
-              <span>{primaryCtaText}</span>
-            </Button>
-          </div>
-
         </div>
 
         {/* ─── 2. STATISTICS CARDS (FULLY DYNAMIC & ZERO-STATE AWARE) ─── */}
