@@ -233,21 +233,13 @@ export default function OralCommandCenter() {
           
           {/* Left Info & Feature Chips */}
           <div className="space-y-4 max-w-2xl z-10 flex flex-col justify-between">
-            <div className="space-y-3">
-              {/* Top Badge */}
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-100/80 text-pink-700 text-xs font-bold font-mono border border-pink-200/80 shadow-2xs">
-                <Sparkles className="w-3.5 h-3.5 text-pink-600" />
-                <span>AI-Powered Mock Interviews</span>
-              </div>
-
-              <div className="space-y-1">
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight font-display">
-                  Oral Interview
-                </h1>
-                <p className="text-slate-600 text-xs sm:text-sm font-medium leading-relaxed">
-                  Practice realistic technical and behavioral interviews tailored to your target role.
-                </p>
-              </div>
+            <div className="space-y-2">
+              <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight font-display">
+                Oral Interview
+              </h1>
+              <p className="text-slate-600 text-xs sm:text-sm font-medium leading-relaxed">
+                Practice realistic technical and behavioral interviews tailored to your target role.
+              </p>
             </div>
 
             {/* 4 Feature Chips */}
@@ -296,20 +288,16 @@ export default function OralCommandCenter() {
 
           {/* Right Cinematic AI Interviewer Visual & Single Primary CTA */}
           <div className="flex flex-col items-center md:items-end justify-between shrink-0 relative pt-2 md:pt-0 min-w-[280px]">
-            {/* Cinematic AI Avatar Image Container */}
-            <div className="relative w-full flex items-center justify-center md:justify-end -mt-4">
-              <div className="relative w-44 h-44 sm:w-52 sm:h-52 rounded-full overflow-hidden shadow-lg border-2 border-white/80">
-                {/* Soft Gradient Overlay Fade from Left */}
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-50/70 via-transparent to-transparent z-10 pointer-events-none" />
-                <img
-                  src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=450&q=80"
-                  alt="Your AI Interviewer"
-                  className="w-full h-full object-cover object-top filter brightness-[1.02]"
-                />
+            {/* Styled AI Interviewer Icon Badge */}
+            <div className="relative w-full flex items-center justify-center md:justify-end -mt-2">
+              <div className="relative w-36 h-36 sm:w-44 sm:h-44 rounded-full bg-gradient-to-br from-pink-500/15 via-purple-500/10 to-indigo-500/15 border-2 border-pink-200/80 flex items-center justify-center shadow-inner">
+                <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-gradient-to-br from-pink-600 via-pink-500 to-purple-600 text-white flex items-center justify-center shadow-lg border border-white/30">
+                  <Bot className="w-12 h-12 sm:w-14 sm:h-14 text-white drop-shadow-xs" />
+                </div>
               </div>
 
               {/* Floating Label */}
-              <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-xs px-3 py-1.5 rounded-full border border-pink-200 shadow-sm z-20 flex items-center gap-1.5 text-xs font-bold text-slate-800">
+              <div className="absolute top-1 right-2 bg-white/90 backdrop-blur-xs px-3 py-1.5 rounded-full border border-pink-200 shadow-xs z-20 flex items-center gap-1.5 text-xs font-bold text-slate-800">
                 <Sparkles className="w-3.5 h-3.5 text-pink-600" />
                 <span>Your AI Interviewer</span>
               </div>
@@ -318,7 +306,7 @@ export default function OralCommandCenter() {
             {/* SINGLE PRIMARY CTA BUTTON ALIGNED LOWER-RIGHT */}
             <Button
               onClick={() => navigate('/oral/new')}
-              className="mt-3 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold text-sm px-8 py-3.5 rounded-full shadow-md transition-all flex items-center justify-center gap-2 active:scale-95"
+              className="mt-3 bg-pink-600 hover:bg-pink-700 text-white font-bold text-sm px-8 py-3.5 rounded-full shadow-md transition-all flex items-center justify-center gap-2 active:scale-95"
             >
               <span>{primaryCtaText}</span>
             </Button>
