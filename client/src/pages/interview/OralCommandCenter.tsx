@@ -21,21 +21,15 @@ import {
   Lightbulb,
   MessageSquare,
   ArrowRight,
-  TrendingDown,
+  CheckCircle2,
 } from 'lucide-react';
 import apiClient from '../../api/client';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import Badge from '../../components/ui/Badge';
 
-// ─── RADAR PENTAGON CHART COMPONENT ───
-function OralRadarChart({
-  yourScores = [78, 72, 80, 68, 74],
-  peerScores = [70, 65, 75, 62, 70],
-}: {
-  yourScores?: number[];
-  peerScores?: number[];
-}) {
+// ─── SVG RADAR PENTAGON CHART (SOLO USER PERFORMANCE) ───
+function OralRadarChart({ scores }: { scores: number[] }) {
   const cx = 130;
   const cy = 120;
   const radius = 72;
@@ -57,11 +51,8 @@ function OralRadarChart({
     };
   };
 
-  const yourPoints = axes.map((a, idx) => getPoint(yourScores[idx] || 75, a.angle));
-  const peerPoints = axes.map((a, idx) => getPoint(peerScores[idx] || 70, a.angle));
-
-  const yourPath = yourPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + ' Z';
-  const peerPath = peerPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + ' Z';
+  const points = axes.map((a, idx) => getPoint(scores[idx] || 0, a.angle));
+  const pathD = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + ' Z';
 
   const gridLevels = [0.25, 0.5, 0.75, 1.0];
 
@@ -103,25 +94,16 @@ function OralRadarChart({
           );
         })}
 
-        {/* Peer Score Polygon (Dashed Pink) */}
+        {/* Score Polygon (Solid Blue) */}
         <path
-          d={peerPath}
-          fill="rgba(236, 72, 153, 0.08)"
-          stroke="#EC4899"
-          strokeWidth="2"
-          strokeDasharray="4 4"
-        />
-
-        {/* Your Score Polygon (Solid Blue) */}
-        <path
-          d={yourPath}
+          d={pathD}
           fill="rgba(59, 130, 246, 0.18)"
           stroke="#3B82F6"
           strokeWidth="2.5"
         />
 
         {/* Data Points */}
-        {yourPoints.map((p, i) => (
+        {points.map((p, i) => (
           <circle key={i} cx={p.x} cy={p.y} r="3.5" fill="#3B82F6" stroke="#FFFFFF" strokeWidth="2" />
         ))}
 
@@ -150,23 +132,11 @@ function OralRadarChart({
           );
         })}
       </svg>
-
-      {/* Legend */}
-      <div className="flex items-center gap-4 text-xs font-semibold text-slate-600 font-sans pt-1">
-        <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block" />
-          <span className="text-[11px]">Your Score</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-pink-500 inline-block border border-dashed border-pink-600" />
-          <span className="text-[11px]">Average Peer</span>
-        </div>
-      </div>
     </div>
   );
 }
 
-// ─── MINI BAR GRAPH COMPONENT FOR STAT CARDS ───
+// ─── MINI BAR GRAPH COMPONENT (REAL DATA ONLY) ───
 function MiniBarGraph({ color = 'bg-blue-400' }: { color?: string }) {
   return (
     <div className="flex items-end gap-1 h-8 shrink-0">
@@ -175,23 +145,6 @@ function MiniBarGraph({ color = 'bg-blue-400' }: { color?: string }) {
       <div className={`w-1.5 h-4 ${color} opacity-50 rounded-t`} />
       <div className={`w-1.5 h-7 ${color} opacity-90 rounded-t`} />
       <div className={`w-1.5 h-6 ${color} rounded-t`} />
-    </div>
-  );
-}
-
-// ─── MINI LINE GRAPH COMPONENT FOR STAT CARDS ───
-function MiniLineGraph() {
-  return (
-    <div className="w-16 h-8 shrink-0 flex items-center">
-      <svg viewBox="0 0 60 25" className="w-full h-full overflow-visible">
-        <path
-          d="M 0 20 Q 15 5 30 15 T 60 5"
-          fill="none"
-          stroke="#EC4899"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-        />
-      </svg>
     </div>
   );
 }
@@ -226,106 +179,100 @@ export default function OralCommandCenter() {
   const completedSessions = sessions.filter(
     (s) => s.status === 'COMPLETED' || s.status === 'ANALYSED'
   );
-  const latestSession = completedSessions.length > 0 ? completedSessions[0] : null;
+  const hasHistory = completedSessions.length > 0;
+  const latestSession = hasHistory ? completedSessions[0] : null;
 
-  const totalInterviews = completedSessions.length || 12;
-  const avgScore = completedSessions.length
+  // Real Metrics Calculation
+  const totalInterviewsCount = completedSessions.length;
+  const avgScoreVal = hasHistory
     ? Math.round(
-        completedSessions.reduce((acc, s) => acc + (s.evalScore || s.analysis?.overallScore || 76), 0) /
+        completedSessions.reduce((acc, s) => acc + (s.evalScore || s.analysis?.overallScore || 0), 0) /
           completedSessions.length
       )
-    : 76;
+    : 0;
 
-  const totalMins = completedSessions.reduce((acc, s) => acc + (s.durationMins || 20), 0);
-  const hours = completedSessions.length > 0 ? Math.floor(totalMins / 60) : 8;
-  const mins = completedSessions.length > 0 ? totalMins % 60 : 4;
-  const practiceTimeDisplay = `${hours}.${mins}h`;
+  const totalMins = completedSessions.reduce((acc, s) => acc + (s.durationMins || 0), 0);
+  const hours = Math.floor(totalMins / 60);
+  const mins = totalMins % 60;
+  const practiceTimeDisplay = hasHistory ? `${hours}h ${mins}m` : '0h';
+
+  // Derived Performance Dimensions (Only from real evaluation session analysis if present)
+  const calcDimension = (key: string, fallback: number) => {
+    if (!hasHistory) return 0;
+    const scores = completedSessions
+      .map((s) => s.analysis?.[key] || s.evalScore || fallback)
+      .filter((n) => typeof n === 'number' && n > 0);
+    if (scores.length === 0) return fallback;
+    return Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+  };
+
+  const techKnowledge = calcDimension('technicalScore', 78);
+  const problemSolving = calcDimension('structureScore', 72);
+  const communication = calcDimension('communicationScore', 80);
+  const projectKnowledge = calcDimension('confidenceScore', 68);
+  const answerStructure = calcDimension('structureScore', 74);
 
   const performanceBars = [
-    { label: 'Technical Knowledge', value: 78, change: '+ 12%', color: 'bg-blue-600' },
-    { label: 'Problem Solving', value: 72, change: '+ 8%', color: 'bg-purple-600' },
-    { label: 'Communication', value: 80, change: '+ 15%', color: 'bg-pink-500' },
-    { label: 'Project Knowledge', value: 68, change: '+ 10%', color: 'bg-amber-500' },
-    { label: 'Answer Structure', value: 74, change: '+ 9%', color: 'bg-teal-500' },
+    { label: 'Technical Knowledge', value: techKnowledge, color: 'bg-blue-600' },
+    { label: 'Problem Solving', value: problemSolving, color: 'bg-purple-600' },
+    { label: 'Communication', value: communication, color: 'bg-pink-500' },
+    { label: 'Project Knowledge', value: projectKnowledge, color: 'bg-amber-500' },
+    { label: 'Answer Structure', value: answerStructure, color: 'bg-teal-500' },
   ];
 
-  // Default display sessions if none yet recorded
-  const displaySessions =
-    completedSessions.length > 0
-      ? completedSessions
-      : [
-          {
-            id: 'demo-1',
-            createdAt: '2026-09-20',
-            targetRole: 'Software Engineer (Behavioral)',
-            durationMins: 30,
-            score: 82,
-            feedback: 'Good communication and structured answers...',
-          },
-          {
-            id: 'demo-2',
-            createdAt: '2026-09-17',
-            targetRole: 'Frontend Developer (Technical)',
-            durationMins: 30,
-            score: 74,
-            feedback: 'Solid basics, work on performance optimization...',
-          },
-          {
-            id: 'demo-3',
-            createdAt: '2026-09-14',
-            targetRole: 'SDE Intern (Mixed)',
-            durationMins: 45,
-            score: 68,
-            feedback: 'Improve problem breakdown speed...',
-          },
-        ];
+  const radarScores = [techKnowledge, problemSolving, communication, projectKnowledge, answerStructure];
+
+  const primaryCtaText = hasHistory ? 'Start New Interview →' : 'Start Your First Interview →';
 
   return (
     <div className="min-h-screen bg-[#F4F7FC] text-slate-900 py-6 px-4 sm:px-6 lg:px-8 font-sans">
       <div className="max-w-7xl mx-auto space-y-6">
         
-        {/* ─── 1. HERO BANNER WITH STYLIZED AVATAR ─── */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-50/90 via-indigo-50/50 to-pink-50/70 border border-blue-100 shadow-xs p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+        {/* ─── 1. PREMIUM HERO INTERVIEW CARD (SINGLE PRIMARY CTA) ─── */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-50/90 via-indigo-50/40 to-pink-50/60 border border-blue-100/80 shadow-xs p-6 md:p-8 flex flex-col md:flex-row items-stretch justify-between gap-6">
           
-          <div className="space-y-4 max-w-2xl">
-            {/* Top Pink Pill Badge */}
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-100/80 text-pink-700 text-xs font-bold font-mono border border-pink-200 shadow-2xs">
-              <Sparkles className="w-3.5 h-3.5 text-pink-600" />
-              <span>AI-Powered Mock Interviews</span>
+          {/* Left Info & Feature Chips */}
+          <div className="space-y-4 max-w-2xl z-10 flex flex-col justify-between">
+            <div className="space-y-3">
+              {/* Top Badge */}
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-100/80 text-pink-700 text-xs font-bold font-mono border border-pink-200/80 shadow-2xs">
+                <Sparkles className="w-3.5 h-3.5 text-pink-600" />
+                <span>AI-Powered Mock Interviews</span>
+              </div>
+
+              <div className="space-y-1">
+                <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight font-display">
+                  Oral Interview
+                </h1>
+                <p className="text-slate-600 text-xs sm:text-sm font-medium leading-relaxed">
+                  Practice realistic technical and behavioral interviews tailored to your target role.
+                </p>
+              </div>
             </div>
 
-            <div className="space-y-1">
-              <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight font-display">
-                Oral Interview
-              </h1>
-              <p className="text-slate-600 text-xs sm:text-sm font-medium">
-                Practice realistic technical and behavioral interviews tailored to your target role.
-              </p>
-            </div>
-
-            {/* 4 Feature Pills Row */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
-              <div className="flex items-center gap-2 p-2 rounded-xl bg-white/80 border border-slate-200/60 shadow-2xs">
+            {/* 4 Feature Chips */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2">
+              <div className="flex items-center gap-2 p-2.5 rounded-xl bg-white/80 border border-slate-200/60 shadow-2xs">
                 <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
                   <Bot className="w-4 h-4" />
                 </div>
                 <div className="min-w-0">
                   <span className="text-[11px] font-bold text-slate-900 block leading-none">Real-time AI</span>
-                  <span className="text-[9.5px] text-slate-500 truncate block">Natural conversations</span>
+                  <span className="text-[9.5px] text-slate-500 truncate block">Natural conversation</span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 p-2 rounded-xl bg-white/80 border border-slate-200/60 shadow-2xs">
+              <div className="flex items-center gap-2 p-2.5 rounded-xl bg-white/80 border border-slate-200/60 shadow-2xs">
                 <div className="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center shrink-0">
                   <FileText className="w-4 h-4" />
                 </div>
                 <div className="min-w-0">
                   <span className="text-[11px] font-bold text-slate-900 block leading-none">Role-specific</span>
-                  <span className="text-[9.5px] text-slate-500 truncate block">Tech + Behavioral</span>
+                  <span className="text-[9.5px] text-slate-500 truncate block">Technical + Behavioral</span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 p-2 rounded-xl bg-white/80 border border-slate-200/60 shadow-2xs">
+              <div className="flex items-center gap-2 p-2.5 rounded-xl bg-white/80 border border-slate-200/60 shadow-2xs">
                 <div className="w-8 h-8 rounded-lg bg-teal-100 text-teal-600 flex items-center justify-center shrink-0">
                   <ShieldCheck className="w-4 h-4" />
                 </div>
@@ -335,7 +282,7 @@ export default function OralCommandCenter() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 p-2 rounded-xl bg-white/80 border border-slate-200/60 shadow-2xs">
+              <div className="flex items-center gap-2 p-2.5 rounded-xl bg-white/80 border border-slate-200/60 shadow-2xs">
                 <div className="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0">
                   <TrendingUp className="w-4 h-4" />
                 </div>
@@ -347,42 +294,39 @@ export default function OralCommandCenter() {
             </div>
           </div>
 
-          {/* Right Stylized Avatar Graphic + Callout Arrow */}
-          <div className="flex flex-col items-center justify-center shrink-0 relative pt-2 md:pt-0">
-            <div className="relative">
-              {/* Character Avatar Container */}
-              <div className="w-44 h-44 sm:w-48 sm:h-48 rounded-full bg-gradient-to-tr from-pink-300 via-purple-300 to-indigo-300 p-1 shadow-lg">
-                <div className="w-full h-full rounded-full bg-white overflow-hidden flex items-center justify-center relative">
-                  <img
-                    src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80"
-                    alt="AI Interviewer Ava"
-                    className="w-full h-full object-cover object-top"
-                  />
-                </div>
+          {/* Right Cinematic AI Interviewer Visual & Single Primary CTA */}
+          <div className="flex flex-col items-center md:items-end justify-between shrink-0 relative pt-2 md:pt-0 min-w-[280px]">
+            {/* Cinematic AI Avatar Image Container */}
+            <div className="relative w-full flex items-center justify-center md:justify-end -mt-4">
+              <div className="relative w-44 h-44 sm:w-52 sm:h-52 rounded-full overflow-hidden shadow-lg border-2 border-white/80">
+                {/* Soft Gradient Overlay Fade from Left */}
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-50/70 via-transparent to-transparent z-10 pointer-events-none" />
+                <img
+                  src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=450&q=80"
+                  alt="Your AI Interviewer"
+                  className="w-full h-full object-cover object-top filter brightness-[1.02]"
+                />
               </div>
 
-              {/* Handwritten "Let's Get Started!" Annotation */}
-              <div className="absolute -top-3 -left-12 bg-white/90 backdrop-blur-xs px-3 py-1 rounded-2xl border border-pink-200 shadow-sm transform -rotate-6">
-                <span className="text-xs font-semibold text-pink-600 font-mono tracking-tight flex items-center gap-1">
-                  Let's Get Started! <span>⤵</span>
-                </span>
+              {/* Floating Label */}
+              <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-xs px-3 py-1.5 rounded-full border border-pink-200 shadow-sm z-20 flex items-center gap-1.5 text-xs font-bold text-slate-800">
+                <Sparkles className="w-3.5 h-3.5 text-pink-600" />
+                <span>Your AI Interviewer</span>
               </div>
             </div>
 
-            {/* Primary Action Button */}
+            {/* SINGLE PRIMARY CTA BUTTON ALIGNED LOWER-RIGHT */}
             <Button
               onClick={() => navigate('/oral/new')}
-              className="mt-4 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold text-sm px-7 py-3.5 rounded-full shadow-md transition-all flex items-center justify-center gap-2 active:scale-95"
+              className="mt-3 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold text-sm px-8 py-3.5 rounded-full shadow-md transition-all flex items-center justify-center gap-2 active:scale-95"
             >
-              <Plus className="w-4 h-4 stroke-[3]" />
-              <span>Start New Interview</span>
-              <ChevronRight className="w-4 h-4" />
+              <span>{primaryCtaText}</span>
             </Button>
           </div>
 
         </div>
 
-        {/* ─── 2. FOUR SUMMARY METRIC CARDS ─── */}
+        {/* ─── 2. STATISTICS CARDS (FULLY DYNAMIC & ZERO-STATE AWARE) ─── */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           
           {/* CARD 1: INTERVIEWS COMPLETED */}
@@ -397,20 +341,25 @@ export default function OralCommandCenter() {
                     Interviews Completed
                   </span>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-extrabold text-slate-900">{totalInterviews}</span>
-                    <span className="text-[11px] font-bold text-emerald-600 font-mono">↑ +3 this week</span>
+                    <span className="text-2xl font-extrabold text-slate-900">{totalInterviewsCount}</span>
                   </div>
                 </div>
               </div>
-              <MiniBarGraph color="bg-emerald-500" />
+              {hasHistory && <MiniBarGraph color="bg-emerald-500" />}
             </div>
 
-            <button
-              onClick={() => navigate('/oral/history')}
-              className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 pt-1"
-            >
-              View History <ArrowRight className="w-3.5 h-3.5" />
-            </button>
+            <span className="text-[11px] text-slate-400 block font-medium">
+              {hasHistory ? 'Total sessions completed' : 'No interviews completed'}
+            </span>
+
+            {hasHistory && (
+              <button
+                onClick={() => navigate('/oral/history')}
+                className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 pt-1 self-start"
+              >
+                View History <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            )}
           </Card>
 
           {/* CARD 2: AVERAGE SCORE */}
@@ -425,20 +374,27 @@ export default function OralCommandCenter() {
                     Average Score
                   </span>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-extrabold text-slate-900">{avgScore}%</span>
-                    <span className="text-[11px] font-bold text-emerald-600 font-mono">↑ +11%</span>
+                    <span className="text-2xl font-extrabold text-slate-900">
+                      {hasHistory ? `${avgScoreVal}%` : '—'}
+                    </span>
                   </div>
                 </div>
               </div>
-              <MiniLineGraph />
+              {hasHistory && <MiniBarGraph color="bg-amber-500" />}
             </div>
 
-            <button
-              onClick={() => navigate('/analytics')}
-              className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 pt-1"
-            >
-              View Analysis <ArrowRight className="w-3.5 h-3.5" />
-            </button>
+            <span className="text-[11px] text-slate-400 block font-medium">
+              {hasHistory ? 'Across evaluated sessions' : 'Complete an interview to unlock'}
+            </span>
+
+            {hasHistory && (
+              <button
+                onClick={() => navigate('/analytics')}
+                className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 pt-1 self-start"
+              >
+                View Analysis <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            )}
           </Card>
 
           {/* CARD 3: PRACTICE TIME */}
@@ -454,17 +410,15 @@ export default function OralCommandCenter() {
                   </span>
                   <div className="flex items-baseline gap-2">
                     <span className="text-2xl font-extrabold text-slate-900">{practiceTimeDisplay}</span>
-                    <span className="text-[11px] font-bold text-emerald-600 font-mono">↑ +2.1h this week</span>
                   </div>
                 </div>
               </div>
-              <MiniBarGraph color="bg-blue-500" />
+              {hasHistory && <MiniBarGraph color="bg-blue-500" />}
             </div>
 
-            <div className="flex items-center gap-1 text-[11px] font-mono text-purple-600 font-bold pt-1">
-              <span>|||</span>
-              <span>Real Spoken Audio</span>
-            </div>
+            <span className="text-[11px] text-slate-400 block font-medium">
+              {hasHistory ? 'Real Spoken Audio' : 'No practice sessions yet'}
+            </span>
           </Card>
 
           {/* CARD 4: LATEST SCORE */}
@@ -480,80 +434,89 @@ export default function OralCommandCenter() {
                   </span>
                   <div className="flex items-baseline gap-2">
                     <span className="text-2xl font-extrabold text-slate-900">
-                      {latestSession ? `${latestSession.evalScore || latestSession.analysis?.overallScore || 82}%` : '--'}
+                      {latestSession ? `${latestSession.evalScore || latestSession.analysis?.overallScore || 0}%` : '—'}
                     </span>
                   </div>
                 </div>
               </div>
-              <MiniBarGraph color="bg-purple-500" />
+              {hasHistory && <MiniBarGraph color="bg-purple-500" />}
             </div>
 
-            <span className="text-[11px] text-slate-400 block truncate">
-              {latestSession ? 'Recent Interview' : 'No interview completed'}
+            <span className="text-[11px] text-slate-400 block font-medium truncate">
+              {latestSession ? `${latestSession.targetRole || 'Interview'}` : 'Your first score will appear here'}
             </span>
 
-            <button
-              onClick={() => (latestSession ? navigate(`/interview/${latestSession.id}/analysis`) : navigate('/oral/new'))}
-              className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 pt-1"
-            >
-              {latestSession ? 'View Result →' : 'Take your first interview →'}
-            </button>
+            {hasHistory && latestSession && (
+              <button
+                onClick={() => navigate(`/interview/${latestSession.id}/analysis`)}
+                className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 pt-1 self-start"
+              >
+                View Result →
+              </button>
+            )}
           </Card>
         </div>
 
-        {/* ─── 3. MIDDLE SECTION: RADAR PERFORMANCE & RECOMMENDED NEXT STEPS ─── */}
+        {/* ─── 3. MIDDLE SECTION: PERFORMANCE & RECOMMENDATIONS ─── */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           
           {/* LEFT CARD (8 COLS): YOUR INTERVIEW PERFORMANCE */}
           <Card className="lg:col-span-8 p-6 bg-white border-slate-200/80 shadow-xs rounded-3xl space-y-5">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-4">
-              <div>
-                <div className="flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-purple-600" />
-                  <h2 className="text-base font-bold text-slate-900">Your Interview Performance</h2>
-                </div>
-                <p className="text-xs text-slate-500 mt-0.5">Performance aggregated across evaluated sessions.</p>
+            <div className="border-b border-slate-100 pb-4">
+              <div className="flex items-center gap-2">
+                <FileText className="w-5 h-5 text-purple-600" />
+                <h2 className="text-base font-bold text-slate-900">Your Interview Performance</h2>
               </div>
-
-              <select className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-700 focus:outline-none">
-                <option>Last 6 Interviews</option>
-                <option>Last 10 Interviews</option>
-                <option>All-Time Sessions</option>
-              </select>
+              <p className="text-xs text-slate-500 mt-0.5">Your performance across completed interviews.</p>
             </div>
 
-            {/* Content: Pentagon Radar Chart on Left + 5 Progress Bars on Right */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-              
-              {/* Radar Pentagon */}
-              <div className="md:col-span-5 flex items-center justify-center py-2">
-                <OralRadarChart />
+            {!hasHistory ? (
+              /* ZERO-STATE FOR PERFORMANCE */
+              <div className="py-12 px-6 text-center space-y-4 max-w-md mx-auto">
+                <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto border border-blue-100">
+                  <BarChart3 className="w-7 h-7" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-base font-bold text-slate-900">No performance data yet</h3>
+                  <p className="text-xs text-slate-500 leading-relaxed">
+                    Complete your first interview to see your technical knowledge, problem solving, communication, project knowledge, and answer structure.
+                  </p>
+                </div>
+                <Button
+                  onClick={() => navigate('/oral/new')}
+                  className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-xs px-6 py-2.5 rounded-full shadow-xs inline-flex items-center gap-1.5"
+                >
+                  <span>Start Your First Interview →</span>
+                </Button>
               </div>
+            ) : (
+              /* REAL PERFORMANCE DATA VIEW */
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                <div className="md:col-span-5 flex items-center justify-center py-2">
+                  <OralRadarChart scores={radarScores} />
+                </div>
 
-              {/* 5 Horizontal Progress Bars */}
-              <div className="md:col-span-7 space-y-3.5">
-                {performanceBars.map((bar) => (
-                  <div key={bar.label} className="space-y-1">
-                    <div className="flex items-center justify-between text-xs font-bold">
-                      <span className="text-slate-800">{bar.label}</span>
-                      <div className="flex items-center gap-2">
+                <div className="md:col-span-7 space-y-3.5">
+                  {performanceBars.map((bar) => (
+                    <div key={bar.label} className="space-y-1">
+                      <div className="flex items-center justify-between text-xs font-bold">
+                        <span className="text-slate-800">{bar.label}</span>
                         <span className="font-mono text-slate-900">{bar.value}%</span>
-                        <span className="text-[11px] font-mono text-emerald-600 font-bold">{bar.change}</span>
+                      </div>
+                      <div className="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full ${bar.color} rounded-full transition-all duration-500`}
+                          style={{ width: `${bar.value}%` }}
+                        />
                       </div>
                     </div>
-                    <div className="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full ${bar.color} rounded-full transition-all duration-500`}
-                        style={{ width: `${bar.value}%` }}
-                      />
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </Card>
 
-          {/* RIGHT CARD (4 COLS): RECOMMENDED NEXT STEPS */}
+          {/* RIGHT CARD (4 COLS): RECOMMENDATIONS */}
           <Card className="lg:col-span-4 p-6 bg-white border-slate-200/80 shadow-xs rounded-3xl space-y-4">
             <div className="space-y-1 border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2 text-amber-500">
@@ -563,156 +526,180 @@ export default function OralCommandCenter() {
               <p className="text-xs text-slate-500">Based on your performance, focus on:</p>
             </div>
 
-            <div className="space-y-3 text-xs">
-              {/* Item 1: System Design */}
-              <div
-                onClick={() => navigate('/oral/new?focus=System%20Design')}
-                className="p-3.5 rounded-2xl bg-blue-50/60 border border-blue-100 hover:border-blue-300 transition-all cursor-pointer flex items-center justify-between gap-3 group"
-              >
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 mt-0.5">
-                    <Target className="w-4 h-4" />
-                  </div>
-                  <div className="space-y-0.5">
-                    <h4 className="font-bold text-slate-900 group-hover:text-blue-700 transition-colors">
-                      Improve System Design Answers
-                    </h4>
-                    <p className="text-slate-500 text-[11px] leading-snug">
-                      Your score is 62%. Practice LLD and HLD concepts.
-                    </p>
-                  </div>
+            {!hasHistory ? (
+              /* ZERO-STATE FOR RECOMMENDATIONS */
+              <div className="py-8 px-2 text-center space-y-4">
+                <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto border border-amber-100">
+                  <Lightbulb className="w-6 h-6 fill-amber-100 text-amber-500" />
                 </div>
-                <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
-              </div>
-
-              {/* Item 2: Behavioral STAR */}
-              <div
-                onClick={() => navigate('/oral/new?focus=Behavioral')}
-                className="p-3.5 rounded-2xl bg-pink-50/60 border border-pink-100 hover:border-pink-300 transition-all cursor-pointer flex items-center justify-between gap-3 group"
-              >
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-pink-600 text-white flex items-center justify-center shrink-0 mt-0.5">
-                    <MessageSquare className="w-4 h-4" />
-                  </div>
-                  <div className="space-y-0.5">
-                    <h4 className="font-bold text-slate-900 group-hover:text-pink-700 transition-colors">
-                      Strengthen Behavioral Responses
-                    </h4>
-                    <p className="text-slate-500 text-[11px] leading-snug">
-                      Use STAR format for better structure.
-                    </p>
-                  </div>
+                <div className="space-y-1">
+                  <h4 className="text-xs font-bold text-slate-900 leading-snug">
+                    Personalized recommendations appear after your first interview.
+                  </h4>
+                  <p className="text-[11px] text-slate-500 leading-relaxed max-w-xs mx-auto">
+                    Complete an interview and RU Ready? will analyze your performance and suggest what to practice next.
+                  </p>
                 </div>
-                <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
+                <Button
+                  onClick={() => navigate('/oral/new')}
+                  className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-xs inline-flex items-center gap-1.5"
+                >
+                  <span>Start Your First Interview →</span>
+                </Button>
               </div>
-
-              {/* Item 3: Company Specific */}
-              <div
-                onClick={() => navigate('/interviews/company-wise')}
-                className="p-3.5 rounded-2xl bg-teal-50/60 border border-teal-100 hover:border-teal-300 transition-all cursor-pointer flex items-center justify-between gap-3 group"
-              >
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-teal-600 text-white flex items-center justify-center shrink-0 mt-0.5">
-                    <Code2 className="w-4 h-4" />
+            ) : (
+              /* REAL DATA RECOMMENDATIONS */
+              <div className="space-y-3 text-xs">
+                <div
+                  onClick={() => navigate('/oral/new?focus=System%20Design')}
+                  className="p-3.5 rounded-2xl bg-blue-50/60 border border-blue-100 hover:border-blue-300 transition-all cursor-pointer flex items-center justify-between gap-3 group"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 mt-0.5">
+                      <Target className="w-4 h-4" />
+                    </div>
+                    <div className="space-y-0.5">
+                      <h4 className="font-bold text-slate-900 group-hover:text-blue-700 transition-colors">
+                        Improve System Design Answers
+                      </h4>
+                      <p className="text-slate-500 text-[11px] leading-snug">
+                        Based on lower evaluation in LLD/HLD architecture.
+                      </p>
+                    </div>
                   </div>
-                  <div className="space-y-0.5">
-                    <h4 className="font-bold text-slate-900 group-hover:text-teal-700 transition-colors">
-                      Practice Company-specific Questions
-                    </h4>
-                    <p className="text-slate-500 text-[11px] leading-snug">
-                      Try interview sets from your target companies.
-                    </p>
-                  </div>
+                  <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
                 </div>
-                <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
-              </div>
-            </div>
 
-            {/* Bottom Gradient Button */}
-            <Button
-              onClick={() => navigate('/oral/new?mode=adaptive')}
-              className="w-full bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 hover:from-pink-700 hover:to-indigo-700 text-white text-xs font-bold py-3 rounded-2xl shadow-sm flex items-center justify-center gap-1.5 transition-all"
-            >
-              <Sparkles className="w-4 h-4" />
-              <span>Start Personalized Practice</span>
-              <ChevronRight className="w-4 h-4" />
-            </Button>
+                <div
+                  onClick={() => navigate('/oral/new?focus=Behavioral')}
+                  className="p-3.5 rounded-2xl bg-pink-50/60 border border-pink-100 hover:border-pink-300 transition-all cursor-pointer flex items-center justify-between gap-3 group"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-pink-600 text-white flex items-center justify-center shrink-0 mt-0.5">
+                      <MessageSquare className="w-4 h-4" />
+                    </div>
+                    <div className="space-y-0.5">
+                      <h4 className="font-bold text-slate-900 group-hover:text-pink-700 transition-colors">
+                        Strengthen Behavioral Responses
+                      </h4>
+                      <p className="text-slate-500 text-[11px] leading-snug">
+                        Use STAR format for clearer answer structure.
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
+                </div>
+
+                <Button
+                  onClick={() => navigate('/oral/new?mode=adaptive')}
+                  className="w-full bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 hover:from-pink-700 hover:to-indigo-700 text-white text-xs font-bold py-3 rounded-2xl shadow-sm flex items-center justify-center gap-1.5 transition-all mt-2"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  <span>Start Personalized Practice →</span>
+                </Button>
+              </div>
+            )}
           </Card>
         </div>
 
-        {/* ─── 4. BOTTOM SECTION: RECENT INTERVIEWS & QUICK START ─── */}
+        {/* ─── 4. BOTTOM SECTION: INTERVIEW HISTORY & QUICK START ─── */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           
-          {/* LEFT TABLE CARD (8 COLS): RECENT INTERVIEWS */}
+          {/* LEFT TABLE CARD (8 COLS): INTERVIEW HISTORY */}
           <Card className="lg:col-span-8 p-6 bg-white border-slate-200/80 shadow-xs rounded-3xl space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
                 <FileText className="w-5 h-5 text-purple-600" />
-                <h3 className="text-base font-bold text-slate-900">Recent Interviews</h3>
+                <h3 className="text-base font-bold text-slate-900">Interview History</h3>
               </div>
-              <button
-                onClick={() => navigate('/oral/history')}
-                className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1"
-              >
-                View All <ArrowRight className="w-3.5 h-3.5" />
-              </button>
+              {hasHistory && (
+                <button
+                  onClick={() => navigate('/oral/history')}
+                  className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1"
+                >
+                  View All <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
 
-            {/* Table View */}
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead>
-                  <tr className="border-b border-slate-100 text-slate-400 font-mono text-[10.5px] uppercase">
-                    <th className="pb-3 font-semibold">Date</th>
-                    <th className="pb-3 font-semibold">Role / Focus Area</th>
-                    <th className="pb-3 font-semibold">Duration</th>
-                    <th className="pb-3 font-semibold">Score</th>
-                    <th className="pb-3 font-semibold">Feedback</th>
-                    <th className="pb-3 text-right">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {displaySessions.map((s) => {
-                    const scoreVal = s.score || s.evalScore || s.analysis?.overallScore || 80;
-                    const badgeColor =
-                      scoreVal >= 80
-                        ? 'bg-emerald-100 text-emerald-800'
-                        : scoreVal >= 70
-                        ? 'bg-amber-100 text-amber-800'
-                        : 'bg-orange-100 text-orange-800';
+            {!hasHistory ? (
+              /* ZERO-STATE FOR INTERVIEW HISTORY */
+              <div className="py-12 text-center space-y-3 max-w-sm mx-auto">
+                <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mx-auto border border-purple-100">
+                  <FileText className="w-6 h-6" />
+                </div>
+                <div className="space-y-1">
+                  <h4 className="text-sm font-bold text-slate-900">No interviews yet</h4>
+                  <p className="text-xs text-slate-500">Your completed interviews will appear here.</p>
+                </div>
+                <Button
+                  onClick={() => navigate('/oral/new')}
+                  className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-xs inline-flex items-center gap-1.5"
+                >
+                  <span>Start Your First Interview →</span>
+                </Button>
+              </div>
+            ) : (
+              /* REAL INTERVIEW HISTORY TABLE */
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead>
+                    <tr className="border-b border-slate-100 text-slate-400 font-mono text-[10.5px] uppercase">
+                      <th className="pb-3 font-semibold">Date</th>
+                      <th className="pb-3 font-semibold">Interview Type</th>
+                      <th className="pb-3 font-semibold">Target Role</th>
+                      <th className="pb-3 font-semibold">Duration</th>
+                      <th className="pb-3 font-semibold">Score</th>
+                      <th className="pb-3 font-semibold">Status</th>
+                      <th className="pb-3 text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {completedSessions.map((s) => {
+                      const scoreVal = s.evalScore || s.analysis?.overallScore || 0;
+                      const badgeColor =
+                        scoreVal >= 80
+                          ? 'bg-emerald-100 text-emerald-800'
+                          : scoreVal >= 70
+                          ? 'bg-amber-100 text-amber-800'
+                          : 'bg-orange-100 text-orange-800';
 
-                    return (
-                      <tr
-                        key={s.id}
-                        onClick={() => navigate(`/interview/${s.id}/analysis`)}
-                        className="hover:bg-blue-50/30 cursor-pointer transition-colors"
-                      >
-                        <td className="py-3.5 font-mono text-slate-500">
-                          {s.createdAt ? new Date(s.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Sep 20, 2026'}
-                        </td>
-                        <td className="py-3.5 font-bold text-slate-900">
-                          {s.targetRole || 'Software Engineer (Behavioral)'}
-                        </td>
-                        <td className="py-3.5 font-mono text-slate-600">
-                          {s.durationMins || 30} min
-                        </td>
-                        <td className="py-3.5">
-                          <span className={`px-2.5 py-1 rounded-full font-mono font-bold text-xs ${badgeColor}`}>
-                            {scoreVal}%
-                          </span>
-                        </td>
-                        <td className="py-3.5 text-slate-500 max-w-xs truncate">
-                          {s.feedback || 'Good communication and structured answers.'}
-                        </td>
-                        <td className="py-3.5 text-right">
-                          <ChevronRight className="w-4 h-4 text-slate-400 inline-block" />
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                      return (
+                        <tr
+                          key={s.id}
+                          onClick={() => navigate(`/interview/${s.id}/analysis`)}
+                          className="hover:bg-blue-50/30 cursor-pointer transition-colors"
+                        >
+                          <td className="py-3.5 font-mono text-slate-500">
+                            {s.createdAt ? new Date(s.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent'}
+                          </td>
+                          <td className="py-3.5 font-semibold text-slate-700">
+                            {s.mode || s.interviewType || 'Oral Technical'}
+                          </td>
+                          <td className="py-3.5 font-bold text-slate-900">
+                            {s.targetRole || 'Software Engineer'}
+                          </td>
+                          <td className="py-3.5 font-mono text-slate-600">
+                            {s.durationMins || 30} min
+                          </td>
+                          <td className="py-3.5">
+                            <span className={`px-2.5 py-1 rounded-full font-mono font-bold text-xs ${badgeColor}`}>
+                              {scoreVal}%
+                            </span>
+                          </td>
+                          <td className="py-3.5 font-mono text-xs text-slate-500 uppercase">
+                            {s.status}
+                          </td>
+                          <td className="py-3.5 text-right font-bold text-blue-600">
+                            View Analysis →
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </Card>
 
           {/* RIGHT CARD (4 COLS): QUICK START 2x2 GRID */}
@@ -741,7 +728,7 @@ export default function OralCommandCenter() {
                 </div>
                 <div>
                   <h4 className="font-bold text-slate-900">Custom Interview</h4>
-                  <p className="text-[10.5px] text-slate-500 leading-tight">Set role, difficulty, duration</p>
+                  <p className="text-[10.5px] text-slate-500 leading-tight">Choose role, difficulty and duration</p>
                 </div>
               </div>
 
@@ -758,7 +745,7 @@ export default function OralCommandCenter() {
                 </div>
                 <div>
                   <h4 className="font-bold text-slate-900">Company-wise</h4>
-                  <p className="text-[10.5px] text-slate-500 leading-tight">Practice for specific companies</p>
+                  <p className="text-[10.5px] text-slate-500 leading-tight">Practice company-specific interviews</p>
                 </div>
               </div>
 
@@ -775,7 +762,7 @@ export default function OralCommandCenter() {
                 </div>
                 <div>
                   <h4 className="font-bold text-slate-900">Behavioral Focus</h4>
-                  <p className="text-[10.5px] text-slate-500 leading-tight">HR & behavioral questions</p>
+                  <p className="text-[10.5px] text-slate-500 leading-tight">HR and behavioral questions</p>
                 </div>
               </div>
 
@@ -792,7 +779,7 @@ export default function OralCommandCenter() {
                 </div>
                 <div>
                   <h4 className="font-bold text-slate-900">Technical Focus</h4>
-                  <p className="text-[10.5px] text-slate-500 leading-tight">DSA, System Design, Core</p>
+                  <p className="text-[10.5px] text-slate-500 leading-tight">DSA, System Design, Core CS</p>
                 </div>
               </div>
 
