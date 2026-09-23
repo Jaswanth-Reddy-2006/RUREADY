@@ -228,15 +228,27 @@ export default function OralCommandCenter() {
     <div className="min-h-screen bg-[#F4F7FC] text-slate-900 py-6 px-4 sm:px-6 lg:px-8 font-sans">
       <div className="max-w-7xl mx-auto space-y-6">
         
-        {/* ─── 1. PREMIUM HERO INTERVIEW CARD (EXACT MOCKUP MATCH) ─── */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#EEF5FF] via-[#F4EEFF] to-[#FDEEFF] border border-white/80 shadow-xs p-6 md:p-8">
+        {/* ─── 1. PREMIUM HERO INTERVIEW CARD (3D BACKGROUND BLEND & EXACT MOCKUP MATCH) ─── */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#EEF5FF] via-[#F4EEFF] to-[#FDEEFF] border border-white/80 shadow-xs p-6 md:p-8 min-h-[340px]">
+          
+          {/* Right-side 3D Image Container with Smooth Left-to-Right Fade */}
+          <div className="absolute inset-y-0 right-0 w-full lg:w-[58%] z-0 pointer-events-none overflow-hidden hidden sm:block">
+            {/* Left-to-Right Blending Gradient Mask */}
+            <div className="absolute inset-0 bg-gradient-to-r from-[#EEF5FF] via-[#EEF5FF]/90 via-30% to-transparent z-10" />
+            <img
+              src="/images/ai_interviewer_3d.jpg"
+              alt="3D AI Interviewer"
+              className="w-full h-full object-cover object-center filter brightness-[1.02] contrast-[1.02]"
+            />
+          </div>
+
           <div className="relative z-10 flex flex-col lg:flex-row items-stretch justify-between gap-8">
             
             {/* Left Column: Top Badge, Heading, Subtitle & 4 Feature Chips */}
-            <div className="flex-1 flex flex-col justify-between space-y-6">
+            <div className="flex-1 flex flex-col justify-between space-y-6 max-w-xl">
               <div className="space-y-3">
                 {/* Top-Left Pink Pill Badge */}
-                <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-pink-100/90 text-pink-600 text-xs font-bold border border-pink-200/80 shadow-2xs">
+                <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-pink-100/95 text-pink-600 text-xs font-bold border border-pink-200/80 shadow-2xs">
                   <Sparkles className="w-3.5 h-3.5 text-pink-500 fill-pink-500" />
                   <span>AI-Powered Mock Interviews</span>
                 </div>
@@ -246,7 +258,7 @@ export default function OralCommandCenter() {
                   <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#0B1536] tracking-tight font-display">
                     Oral Interview
                   </h1>
-                  <p className="text-slate-600 text-sm sm:text-base font-medium leading-relaxed max-w-xl">
+                  <p className="text-slate-600 text-sm sm:text-base font-medium leading-relaxed">
                     Practice realistic technical and behavioral interviews tailored to your target role.
                   </p>
                 </div>
@@ -254,7 +266,7 @@ export default function OralCommandCenter() {
 
               {/* 4 Feature Chips Row */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
-                <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/90 backdrop-blur-xs border border-white/80 shadow-2xs">
+                <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/95 backdrop-blur-xs border border-white/80 shadow-2xs">
                   <div className="w-9 h-9 rounded-full bg-blue-100/80 text-blue-600 flex items-center justify-center shrink-0">
                     <MessageSquare className="w-4 h-4" />
                   </div>
@@ -264,7 +276,7 @@ export default function OralCommandCenter() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/90 backdrop-blur-xs border border-white/80 shadow-2xs">
+                <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/95 backdrop-blur-xs border border-white/80 shadow-2xs">
                   <div className="w-9 h-9 rounded-full bg-purple-100/80 text-purple-600 flex items-center justify-center shrink-0">
                     <FileText className="w-4 h-4" />
                   </div>
@@ -274,7 +286,7 @@ export default function OralCommandCenter() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/90 backdrop-blur-xs border border-white/80 shadow-2xs">
+                <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/95 backdrop-blur-xs border border-white/80 shadow-2xs">
                   <div className="w-9 h-9 rounded-full bg-emerald-100/80 text-emerald-600 flex items-center justify-center shrink-0">
                     <Lightbulb className="w-4 h-4" />
                   </div>
@@ -284,7 +296,7 @@ export default function OralCommandCenter() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/90 backdrop-blur-xs border border-white/80 shadow-2xs">
+                <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/95 backdrop-blur-xs border border-white/80 shadow-2xs">
                   <div className="w-9 h-9 rounded-full bg-indigo-100/80 text-indigo-600 flex items-center justify-center shrink-0">
                     <BarChart3 className="w-4 h-4" />
                   </div>
@@ -296,37 +308,28 @@ export default function OralCommandCenter() {
               </div>
             </div>
 
-            {/* Right Column: Character Avatar, Annotation, Speech Bubble & CTA Button */}
-            <div className="relative flex flex-col items-center lg:items-end justify-between min-w-[320px]">
+            {/* Right Column: Handwritten Callout, Speech Bubble & CTA Button */}
+            <div className="relative flex flex-col items-center lg:items-end justify-between min-w-[300px] z-20 pt-4 lg:pt-0">
               
-              {/* Upper Visual Area: Character + Annotations */}
-              <div className="relative w-full flex items-center justify-center lg:justify-end min-h-[170px]">
+              {/* Upper Callout Annotations */}
+              <div className="relative w-full flex items-start justify-between lg:justify-end gap-3 min-h-[140px]">
                 
                 {/* Handwritten Annotation Text */}
-                <div className="absolute left-0 sm:left-4 top-2 z-20 hidden sm:flex flex-col items-end rotate-[-6deg]">
-                  <span className="font-serif italic font-bold text-slate-700 text-base sm:text-lg drop-shadow-xs tracking-wide leading-tight">
+                <div className="flex flex-col items-start lg:items-end rotate-[-6deg] pt-2">
+                  <span className="font-serif italic font-bold text-slate-800 text-lg sm:text-xl drop-shadow-xs tracking-wide leading-tight">
                     Your AI<br />Interviewer<br />is ready!
                   </span>
-                  <svg className="w-7 h-7 text-slate-700 drop-shadow-xs mt-0.5 -mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <svg className="w-7 h-7 text-slate-800 drop-shadow-xs mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M4 4c6 0 12 6 12 12m0 0l-4-2m4 2l-2-4" />
                   </svg>
                 </div>
 
-                {/* 3D Character Avatar Image Container */}
-                <div className="relative z-10 w-44 h-44 sm:w-52 sm:h-52 lg:w-56 lg:h-56 overflow-hidden rounded-full border-4 border-white/80 shadow-xl bg-gradient-to-b from-indigo-200 via-purple-200 to-pink-200">
-                  <img
-                    src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80"
-                    alt="Your AI Interviewer"
-                    className="w-full h-full object-cover object-top filter brightness-[1.03]"
-                  />
-                </div>
-
                 {/* Speech Bubble */}
-                <div className="absolute right-0 sm:-right-2 top-2 sm:top-4 z-20 bg-white rounded-2xl px-4 py-2.5 shadow-lg border border-slate-100 flex items-center justify-center">
+                <div className="bg-white/95 backdrop-blur-xs rounded-2xl px-4 py-2.5 shadow-xl border border-white/80 flex items-center justify-center relative">
                   <span className="text-blue-600 font-extrabold text-xs sm:text-sm whitespace-nowrap">
                     Let's build a better you!
                   </span>
-                  <div className="absolute -bottom-1.5 left-4 w-3 h-3 bg-white rotate-45 border-r border-b border-slate-100" />
+                  <div className="absolute -bottom-1.5 right-6 w-3 h-3 bg-white rotate-45 border-r border-b border-slate-100" />
                 </div>
               </div>
 
@@ -334,7 +337,7 @@ export default function OralCommandCenter() {
               <div className="w-full flex justify-center lg:justify-end pt-4 z-20">
                 <Button
                   onClick={() => navigate('/oral/new')}
-                  className="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 text-white font-extrabold text-sm sm:text-base px-8 py-3.5 rounded-full shadow-lg shadow-blue-500/25 border-2 border-white/50 flex items-center justify-center gap-2 transition-all active:scale-95"
+                  className="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 text-white font-extrabold text-sm sm:text-base px-8 py-3.5 rounded-full shadow-lg shadow-blue-500/25 border-2 border-white/60 flex items-center justify-center gap-2 transition-all active:scale-95"
                 >
                   <span>{primaryCtaText}</span>
                 </Button>
