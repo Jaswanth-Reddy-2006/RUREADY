@@ -38,8 +38,12 @@ export default function OralPreCheckPage() {
   const [camStatus, setCamStatus] = useState<'idle' | 'testing' | 'ready'>('idle');
   const [micStatus, setMicStatus] = useState<'idle' | 'testing' | 'ready'>('idle');
   const [audioStatus, setAudioStatus] = useState<'idle' | 'ready'>('idle');
+  const [audioVoicePlaying, setAudioVoicePlaying] = useState<boolean>(false);
+  const [audioVoiceHeard, setAudioVoiceHeard] = useState<boolean>(false);
   const [fullscreenStatus, setFullscreenStatus] = useState<'idle' | 'ready'>('idle');
   const [micVolume, setMicVolume] = useState<number>(0);
+  const [spokenTranscript, setSpokenTranscript] = useState<string>('');
+  const recognitionRef = useRef<any>(null);
   const [agreedToIntegrityRules, setAgreedToIntegrityRules] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [prepMessage, setPrepMessage] = useState<string>('');
@@ -78,7 +82,7 @@ export default function OralPreCheckPage() {
     };
   }, []);
 
-  // Cleanup active media streams on unmount
+  // Cleanup active media streams & speech synthesis on unmount
   useEffect(() => {
     return () => {
       if (mediaStreamRef.current) {
@@ -86,6 +90,16 @@ export default function OralPreCheckPage() {
       }
       if (audioStreamRef.current) {
         audioStreamRef.current.getTracks().forEach((t) => t.stop());
+      }
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.abort();
+        } catch {
+          // ignore
+        }
+      }
+      if (typeof window !== 'undefined' && window.speechSynthesis) {
+        window.speechSynthesis.cancel();
       }
     };
   }, []);
@@ -128,7 +142,9 @@ export default function OralPreCheckPage() {
   };
 
   const testMic = async () => {
+    if (micStatus === 'ready') return;
     setMicStatus('testing');
+    setSpokenTranscript('');
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       audioStreamRef.current = stream;
@@ -168,10 +184,64 @@ export default function OralPreCheckPage() {
         };
       }
 
-      setTimeout(() => {
-        setMicStatus('ready');
-        setMicVolume(85);
-      }, 1500);
+      const SpeechRecognition =
+        (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+      if (!SpeechRecognition) {
+        toast.error('Speech recognition not supported in this browser. Please use Chrome or Edge.');
+        return;
+      }
+
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.abort();
+        } catch {
+          // ignore
+        }
+      }
+
+      const rec = new SpeechRecognition();
+      rec.continuous = true;
+      rec.interimResults = true;
+      rec.lang = 'en-US';
+
+      rec.onresult = (event: any) => {
+        let transcript = '';
+        for (let i = 0; i < event.results.length; i++) {
+          transcript += event.results[i][0]?.transcript || '';
+        }
+        const clean = transcript.trim();
+        setSpokenTranscript(clean);
+
+        const lower = clean.toLowerCase();
+        // Check for required phrase matches
+        const matchesTarget =
+          lower.includes('ready to start') ||
+          lower.includes('start my mock') ||
+          lower.includes('ready to start my mock interview') ||
+          lower.includes('ready to take my mock interview') ||
+          lower.includes('ready to take the ai mock interview') ||
+          lower.includes('ready to start the mock interview');
+
+        if (matchesTarget) {
+          setMicStatus('ready');
+          toast.success('Microphone & speech phrase verified successfully!');
+          try {
+            rec.stop();
+          } catch {
+            // ignore
+          }
+        }
+      };
+
+      rec.onerror = (e: any) => {
+        if (e.error !== 'no-speech' && e.error !== 'aborted') {
+          console.warn('Speech recognition test error:', e);
+        }
+      };
+
+      rec.start();
+      recognitionRef.current = rec;
     } catch (e) {
       console.warn('Mic stream error:', e);
       toast.error('Unable to access microphone. Please check browser permissions.');
@@ -182,18 +252,58 @@ export default function OralPreCheckPage() {
 
   const testAudio = () => {
     try {
-      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.frequency.value = 520;
-      gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.4);
-      setAudioStatus('ready');
-    } catch {
-      setAudioStatus('ready');
+      if (typeof window !== 'undefined' && window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+      setAudioVoicePlaying(true);
+      const text =
+        "Hello! This is Ava, your AI interview coach. If you can hear my voice clearly, please click the confirmation button below.";
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
+
+      // Also play a test chime
+      try {
+        const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.value = 580;
+        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
+      } catch {
+        // ignore
+      }
+
+      utterance.onend = () => {
+        setAudioVoicePlaying(false);
+        setAudioVoiceHeard(true);
+      };
+      utterance.onerror = () => {
+        setAudioVoicePlaying(false);
+        setAudioVoiceHeard(true);
+      };
+
+      const voices = window.speechSynthesis.getVoices();
+      const preferredVoice = voices.find(
+        (v) =>
+          v.lang.startsWith('en') &&
+          (v.name.includes('Google') ||
+            v.name.includes('Natural') ||
+            v.name.includes('Samantha') ||
+            v.name.includes('Ava') ||
+            v.name.includes('Jenny'))
+      );
+      if (preferredVoice) utterance.voice = preferredVoice;
+
+      window.speechSynthesis.speak(utterance);
+      setAudioVoiceHeard(true);
+    } catch (err) {
+      console.warn('Audio test error:', err);
+      setAudioVoicePlaying(false);
+      setAudioVoiceHeard(true);
     }
   };
 
@@ -362,18 +472,18 @@ export default function OralPreCheckPage() {
                 </Badge>
               </div>
 
-              {/* Video Preview */}
+              {/* Video Preview with Mirroring */}
               <div className="w-full aspect-video bg-slate-950 rounded-xl overflow-hidden relative flex items-center justify-center border border-slate-800">
                 <video
                   ref={videoRef}
-                  className={`w-full h-full object-cover ${camStatus === 'ready' ? 'block' : 'hidden'}`}
+                  className={`w-full h-full object-cover transform scale-x-[-1] ${camStatus === 'ready' ? 'block' : 'hidden'}`}
                   muted
                   playsInline
                 />
                 {camStatus !== 'ready' && (
                   <div className="absolute inset-0 flex items-center justify-center p-4">
                     <span className="text-[11px] text-slate-400 text-center font-medium max-w-[260px] leading-relaxed">
-                      Allow camera access to display video stream & verify candidate presence
+                      Allow camera access to display mirrored video stream & verify candidate presence
                     </span>
                   </div>
                 )}
@@ -418,8 +528,15 @@ export default function OralPreCheckPage() {
                   Read Out Loud to Verify Mic:
                 </span>
                 <p className="text-xs italic text-purple-950 font-serif leading-relaxed font-semibold">
-                  "I am ready to take my RU READY AI mock interview."
+                  "I am ready to start my mock interview."
                 </p>
+
+                {spokenTranscript && (
+                  <div className="p-2 bg-white rounded-lg border border-purple-200 text-xs text-purple-900 font-mono">
+                    <span className="font-bold text-purple-700">Heard: </span>
+                    <span>"{spokenTranscript}"</span>
+                  </div>
+                )}
 
                 {/* Volume Level Indicator */}
                 <div className="space-y-1 pt-1">
@@ -444,7 +561,11 @@ export default function OralPreCheckPage() {
                     : 'bg-purple-600 hover:bg-purple-700 text-white shadow-xs'
                 }`}
               >
-                {micStatus === 'ready' ? '✓ Speech Verified' : micStatus === 'testing' ? 'Listening...' : 'Test Mic & Speak Phrase'}
+                {micStatus === 'ready'
+                  ? '✓ Speech Phrase Verified'
+                  : micStatus === 'testing'
+                  ? 'Listening for Phrase...'
+                  : '🎤 Start Mic & Speak Phrase'}
               </Button>
             </div>
 
@@ -471,16 +592,36 @@ export default function OralPreCheckPage() {
                   Audio Playback Check:
                 </span>
                 <p className="text-xs text-slate-700 leading-relaxed font-medium">
-                  Click the button below to play a test chime and ensure speaker clarity.
+                  Click "Play Voice" to hear Ava speak, then confirm audibility below.
                 </p>
               </div>
 
-              <Button
-                onClick={testAudio}
-                className="w-full text-xs py-3 rounded-xl font-bold cursor-pointer transition-all whitespace-nowrap flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
-              >
-                {audioStatus === 'ready' ? '✓ Audio Clear & Speaker Active' : '🔊 Play Test Sound'}
-              </Button>
+              <div className="space-y-2">
+                <Button
+                  onClick={testAudio}
+                  className="w-full text-xs py-2.5 rounded-xl font-bold cursor-pointer transition-all whitespace-nowrap flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-xs"
+                >
+                  {audioVoicePlaying ? '🔊 Ava is speaking...' : '🔊 Play Voice'}
+                </Button>
+
+                {audioVoiceHeard && audioStatus !== 'ready' && (
+                  <Button
+                    onClick={() => {
+                      setAudioStatus('ready');
+                      toast.success('Speaker verified successfully!');
+                    }}
+                    className="w-full text-xs py-2.5 rounded-xl font-bold cursor-pointer transition-all whitespace-nowrap flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
+                  >
+                    ✓ Yes, the voice is audible
+                  </Button>
+                )}
+
+                {audioStatus === 'ready' && (
+                  <div className="text-center text-xs font-bold text-emerald-700 py-1">
+                    ✓ Voice Verified & Clear
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Card 4: Full-Screen Mode Permission */}
