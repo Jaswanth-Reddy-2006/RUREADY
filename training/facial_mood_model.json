@@ -1,0 +1,100 @@
+{
+  "version": "2.0.0",
+  "modelName": "RennetusFacialMoodClassifier",
+  "description": "On-Device Real-Time Facial Expression, Tension & Mood Telemetry Classifier",
+  "datasetSource": "Hugging Face dair-ai/emotion & Face Expression Landmark Matrix",
+  "moodClasses": [
+    "Focused & Confident",
+    "Thoughtful & Analytical",
+    "Composed & Calm",
+    "Engaged & Receptive",
+    "Hesitant / Pensive",
+    "Restless / Anxious",
+    "Smiling & Enthusiastic"
+  ],
+  "featureNames": [
+    "lipCurvature",
+    "eyebrowTension",
+    "eyeOpennessRatio",
+    "fidgetMovementVelocity",
+    "headOrientationCentering",
+    "facialLuminanceVariance"
+  ],
+  "weights": [
+    [
+      -3.159022485952691,
+      -10.724095093674604,
+      1.8453431159838267,
+      -8.598062113003511,
+      3.995410440622921,
+      -0.6086448992657294
+    ],
+    [
+      -3.589896378058033,
+      14.882452822716742,
+      -3.6868083751556506,
+      -5.041067930752352,
+      -0.18591033040924196,
+      0.3193324644154383
+    ],
+    [
+      -9.553268741919004,
+      -22.404227431589426,
+      -9.010118609262129,
+      -18.963685098118304,
+      16.33848361089476,
+      -0.3291522526519565
+    ],
+    [
+      12.274212880901871,
+      -1.0378186163602536,
+      13.636491582761954,
+      -1.7970219208336011,
+      -1.7031570404229461,
+      -0.7829329754096166
+    ],
+    [
+      -15.754417460593222,
+      19.39234819845871,
+      -10.239857992575994,
+      7.63326489432399,
+      -6.304963806194459,
+      -0.025855781652820507
+    ],
+    [
+      -11.09236258540138,
+      19.141450443793847,
+      1.8418419836640298,
+      25.305722426470638,
+      -12.619463288170573,
+      1.940541682672492
+    ],
+    [
+      30.899286976188357,
+      -19.265036219045836,
+      5.621803060807259,
+      1.4550751308010925,
+      0.46777070310256574,
+      -0.4836376391793942
+    ]
+  ],
+  "biases": [
+    4.958219461534926,
+    3.431206353410458,
+    3.2333814164766186,
+    -4.090630953320369,
+    5.148398199123562,
+    -7.380803027128275,
+    -5.2997714500945525
+  ],
+  "confidenceMultiplier": 1.25,
+  "expressionMapping": {
+    "Focused & Confident": "Concentrated",
+    "Thoughtful & Analytical": "Concentrated",
+    "Composed & Calm": "Neutral / Attentive",
+    "Engaged & Receptive": "Neutral / Attentive",
+    "Hesitant / Pensive": "Concerned / Pensive",
+    "Restless / Anxious": "Concerned / Pensive",
+    "Smiling & Enthusiastic": "Smile / Receptive"
+  }
+}

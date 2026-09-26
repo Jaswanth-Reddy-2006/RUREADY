@@ -5,6 +5,7 @@
 import { prisma } from '../lib/prisma.js';
 import { NotFoundError } from '../lib/errors.js';
 import { Analysis, ExperienceLevel, ReadinessVerdict } from '@ru-ready/shared';
+import { hfModelEngine } from '../lib/hf-model-engine.js';
 
 function parseEvalMeta(feedback: string | null | undefined) {
   if (!feedback) return {};
@@ -218,37 +219,14 @@ export const analysisService = {
 
     const allAnswers = answeredQuestions
       .map((q) => q.answerText || '')
-      .join(' ')
-      .toLowerCase();
+      .join(' ');
 
-    let fillerCount = 0;
-    const fillerWords = ['like', 'umm', 'um', 'uhh', 'uh', 'err', 'basically', 'actually'];
-    fillerWords.forEach((word) => {
-      const regex = new RegExp(`\\b${word}\\b`, 'gi');
-      const matches = allAnswers.match(regex);
-      if (matches) fillerCount += matches.length;
-    });
-    const fillerDeduction = Math.min(30, (isNaN(fillerCount) ? 0 : fillerCount) * 2);
-    const safeFillerDeduction = isNaN(fillerDeduction) ? 0 : fillerDeduction;
+    const totalAnswerTime = answeredQuestions.reduce((sum, q) => sum + (q.timeTakenSecs || 30), 0);
+    const commAnalysis = hfModelEngine.analyzeCommunication(allAnswers, Math.max(15, totalAnswerTime));
 
-    let rawCommScore = 100 - safeWpmDeduction - safeFillerDeduction;
-
-    let totalStarCompliance = 0;
-    let countStarCompliance = 0;
-    answeredQuestions.forEach((q) => {
-      const meta = parseEvalMeta(q.evalFeedback);
-      if (meta.starCompliance != null) {
-        const complianceVal = Number(meta.starCompliance);
-        totalStarCompliance += isNaN(complianceVal) ? 0 : complianceVal;
-        countStarCompliance++;
-      }
-    });
-
-    let communicationScore = Math.max(0, Math.round(rawCommScore));
-    if (countStarCompliance > 0) {
-      const avgStarCompliance = totalStarCompliance / countStarCompliance;
-      const safeAvgStarCompliance = isNaN(avgStarCompliance) ? 0 : avgStarCompliance;
-      communicationScore = Math.max(0, Math.round(rawCommScore * 0.8 + safeAvgStarCompliance * 0.2));
+    let communicationScore = commAnalysis.clarityScore;
+    if (answeredQuestions.length === 0) {
+      communicationScore = 0;
     }
 
     const rawTabBlur = proctoring?.tabBlurCount;
@@ -278,43 +256,55 @@ export const analysisService = {
     );
 
     let strengths = answeredQuestions.flatMap((q) => q.evalStrengths || []);
+    strengths = Array.from(new Set(strengths)).filter(Boolean);
+    if (strengths.length === 0) {
+      if (technicalScore >= 70) {
+        strengths.push(`Solid technical command when addressing ${session.targetRole} concepts.`);
+      }
+      if (commAnalysis.clarityScore >= 70) {
+        strengths.push('Articulate verbal cadence with concise, intelligible terminology.');
+      }
+      if (confidenceScore >= 80) {
+        strengths.push('Maintained steady eye contact and stable environment proctoring.');
+      }
+      if (strengths.length === 0) {
+        strengths.push('Successfully completed all interview prompts within allocated duration.');
+      }
+    }
+
     let improvements = answeredQuestions.flatMap((q) => q.evalWeaknesses || []);
-
-    strengths = Array.from(new Set(strengths)).filter(Boolean).slice(0, 3);
-    while (strengths.length < 3) {
-      const defaults = [
-        'Demonstrated a robust understanding of production-grade architectural trade-offs.',
-        'Clearly explained microservices transaction paths and runtime event boundaries.',
-        'Highly articulate and structured response progression matching standard industry frameworks.',
-      ];
-      strengths.push(defaults[strengths.length]);
+    improvements = Array.from(new Set(improvements)).filter(Boolean);
+    if (improvements.length === 0) {
+      if (commAnalysis.fillerCount > 2) {
+        improvements.push(`Reduce verbal filler usage (${commAnalysis.fillerCount} instances detected in transcript: ${commAnalysis.detectedFillers.slice(0, 3).join(', ')}).`);
+      }
+      if (technicalScore < 75) {
+        improvements.push('Deepen architectural justification and Big-O trade-off explanations.');
+      }
+      if (tabBlurCount > 0) {
+        improvements.push(`Avoid window focus shifts (${tabBlurCount} tab/screen blur events recorded).`);
+      }
+      if (improvements.length === 0) {
+        improvements.push('Continue practicing higher difficulty edge case scenarios under timed pressure.');
+      }
     }
 
-    improvements = Array.from(new Set(improvements)).filter(Boolean).slice(0, 3);
-    while (improvements.length < 3) {
-      const defaults = [
-        'Struggled to defend database choices under high concurrent write loads.',
-        'Flipped focus context or exhibited lookups that flag potential out-of-bounds assistance.',
-        'Pacing fell slightly erratic or exhibited minor pauses during architectural justification.',
-      ];
-      improvements.push(defaults[improvements.length]);
-    }
-
-    const scoresMap = { technicalScore, communicationScore, confidenceScore };
-    const minDim = Object.keys(scoresMap).reduce((a, b) => (scoresMap[a as keyof typeof scoresMap] < scoresMap[b as keyof typeof scoresMap] ? a : b));
-
-    let readinessTips = [
+    const readinessTips = [
       {
-        tip: 'Enforce Systematic Justifications',
-        reason: 'Always defend technology decisions using concrete trade-offs (e.g. read latency vs. write consistency) rather than passive generalizations.',
+        tip: 'Deepen Technical Trade-Offs',
+        reason: `For ${session.targetRole} positions at ${session.targetCompany || 'top tech firms'}, substantiate architectural choices with latency, scalability, and memory implications.`,
       },
       {
-        tip: 'Maintain High Screen & Focus Presence',
-        reason: 'Deductions are heavily weighted on focus blurs. Retain locked viewport limits to guarantee high security verification scores.',
+        tip: 'Vocal Precision & Cadence',
+        reason: commAnalysis.fillerCount > 0
+          ? `Replace verbal fillers with silent 1-second pauses to project composure and authority.`
+          : 'Maintain your current steady 120-150 WPM cadence during high-pressure problem solving.',
       },
       {
-        tip: 'Calibrate Speech Delivery Bounds',
-        reason: 'Consistent, deliberate pace (110-160 WPM) improves listener engagement and semantic comprehension during system design rounds.',
+        tip: 'Proctoring & Focus Consistency',
+        reason: tabBlurCount > 0
+          ? `Eliminate context-switching (${tabBlurCount} blurs flagged) to maximize platform integrity.`
+          : 'Retain direct eye contact with the interviewer avatar to demonstrate engagement.',
       },
     ];
 
@@ -417,9 +407,28 @@ export const analysisService = {
 
     const answeredQuestions = session.questions.filter((q) => q.answerText);
 
-    const baseTechnical = answeredQuestions.length > 0
-      ? Math.round(answeredQuestions.reduce((sum, q) => sum + (Number(q.evalScore) || 0), 0) / answeredQuestions.length)
-      : 80;
+    // Extract submitted code and spoken responses
+    let submittedCode = '';
+    let spokenText = '';
+    answeredQuestions.forEach((q) => {
+      const text = q.answerText || '';
+      const codeMatch = text.match(/```(?:\w+)?\n([\s\S]*?)```/);
+      if (codeMatch) {
+        submittedCode += '\n' + codeMatch[1];
+      } else {
+        submittedCode += '\n' + text;
+      }
+      const defenseMatch = text.match(/\[Candidate Final Verbal Defense\]:\s*([\s\S]*)/i);
+      if (defenseMatch) {
+        spokenText += ' ' + defenseMatch[1];
+      }
+    });
+
+    // 1. Deep Code Quality & Complexity Analysis
+    const codeAnalysis = hfModelEngine.analyzeCodeQualityAndComplexity(
+      submittedCode,
+      session.selectedLanguage || 'javascript'
+    );
 
     let totalTestCases = 5;
     const rawTestCasesPassed = session.testCasesPassed;
@@ -453,71 +462,43 @@ export const analysisService = {
 
     let codeCorrectnessScore = 0;
     if (session.testCasesPassed == null) {
-      codeCorrectnessScore = isNaN(baseTechnical) ? 80 : baseTechnical;
+      codeCorrectnessScore = codeAnalysis.codeQualityScore;
       testCasesPassed = totalTestCases > 0 ? Math.round((codeCorrectnessScore / 100) * totalTestCases) : 0;
     } else {
       codeCorrectnessScore = totalTestCases > 0 ? Math.round((testCasesPassed / totalTestCases) * 100) : 0;
     }
     const safeCodeCorrectness = isNaN(codeCorrectnessScore) ? 0 : codeCorrectnessScore;
-
-    let totalAlgoEff = 0;
-    let countAlgoEff = 0;
-    answeredQuestions.forEach((q) => {
-      const meta = parseEvalMeta(q.evalFeedback);
-      if (meta.algorithmicEfficiency != null) {
-        const effVal = Number(meta.algorithmicEfficiency);
-        totalAlgoEff += isNaN(effVal) ? 0 : effVal;
-        countAlgoEff++;
-      }
-    });
-
-    let algorithmicEfficiencyScore = 50;
-    if (countAlgoEff > 0) {
-      const avgAlgo = totalAlgoEff / countAlgoEff;
-      algorithmicEfficiencyScore = isNaN(avgAlgo) ? 50 : Math.round(avgAlgo);
-    } else {
-      if (baseTechnical >= 80) algorithmicEfficiencyScore = 90;
-      else if (baseTechnical >= 60) algorithmicEfficiencyScore = 70;
-      else if (baseTechnical >= 40) algorithmicEfficiencyScore = 50;
-      else algorithmicEfficiencyScore = 30;
-    }
-    const safeAlgoEfficiency = isNaN(algorithmicEfficiencyScore) ? 0 : algorithmicEfficiencyScore;
+    const safeAlgoEfficiency = codeAnalysis.algorithmicEfficiencyScore;
 
     const rawHintCount = session.hintCount;
     const hintCount = (rawHintCount != null && !isNaN(Number(rawHintCount))) ? Number(rawHintCount) : 0;
     const cadenceScore = Math.max(0, 100 - hintCount * 15);
     const safeCadence = isNaN(cadenceScore) ? 0 : cadenceScore;
 
-    const rawEyeContact = proctoring?.eyeContactScore;
-    const eyeContactScore = (rawEyeContact != null && !isNaN(Number(rawEyeContact))) ? Number(rawEyeContact) : 80;
-    const rawTabBlur = proctoring?.tabBlurCount;
-    const tabBlurCount = (rawTabBlur != null && !isNaN(Number(rawTabBlur))) ? Number(rawTabBlur) : 0;
+    // 2. Multi-Modal Confidence & Proctoring Engine
+    const multiModalConf = await hfModelEngine.computeMultiModalConfidence(
+      spokenText || 'Coding solution implemented and validated.',
+      answeredQuestions.length * 45,
+      proctoring
+    );
 
-    const tabDeduction = tabBlurCount * 10;
-    let eyeContactDeduction = 0;
-    if (eyeContactScore < 80) {
-      eyeContactDeduction = Math.max(0, Math.round((80 - eyeContactScore) / 10) * 5);
-    }
-    const safeTabDeduction = isNaN(tabDeduction) ? 0 : tabDeduction;
-    const safeEyeContactDeduction = isNaN(eyeContactDeduction) ? 0 : eyeContactDeduction;
-
-    const platformIntegrityScore = Math.max(0, 100 - safeTabDeduction - safeEyeContactDeduction);
-    const confidenceScore = platformIntegrityScore;
+    const confidenceScore = multiModalConf.overallConfidence;
     const safeConfidence = isNaN(confidenceScore) ? 0 : confidenceScore;
-
+    const tabBlurCount = proctoring?.tabBlurCount ?? 0;
     const platformIntegrity = tabBlurCount > 4 ? 'COMPROMISED' : 'SECURED';
 
-    const rawWpm = confidenceMetrics?.signals?.avgWpm;
+    const rawWpm = confidenceMetrics?.signals?.avgWpm ?? multiModalConf.signals.wpm;
     const avgWpmVal = (rawWpm != null && !isNaN(Number(rawWpm))) ? Number(rawWpm) : 125;
     const communicationScore = Math.min(100, Math.max(0, 100 - Math.abs(125 - avgWpmVal) * 0.5));
     const safeComm = isNaN(communicationScore) ? 0 : communicationScore;
-    const structureScore = Math.max(0, Math.round(safeCodeCorrectness * 0.7 + safeComm * 0.3));
+    const structureScore = Math.max(0, Math.round(codeAnalysis.codeQualityScore * 0.6 + safeCodeCorrectness * 0.4));
 
     const overallScore = Math.round(
-      safeCodeCorrectness * 0.40 +
+      safeCodeCorrectness * 0.35 +
       safeAlgoEfficiency * 0.30 +
-      safeCadence * 0.15 +
-      safeConfidence * 0.15
+      structureScore * 0.15 +
+      safeCadence * 0.10 +
+      safeConfidence * 0.10
     );
 
     let readinessVerdict: 'NOT_READY' | 'ALMOST_READY' | 'READY' | 'STRONG' = 'READY';
@@ -538,37 +519,42 @@ export const analysisService = {
       communicationScore,
       confidenceScore,
       structureScore,
-      algorithmicEfficiencyScore,
+      safeAlgoEfficiency,
       hintCount,
-      platformIntegrityScore
+      confidenceScore
     );
 
-    const summary = `Coding Track assessment completed for ${session.targetRole}. Correctness score calibrated at ${codeCorrectnessScore}/100, algorithmic efficiency at ${algorithmicEfficiencyScore}/100, hint/cadence at ${cadenceScore}/100, and proctoring integrity at ${platformIntegrityScore}/100.\n\n[CORPORATE BENCHMARK] ${benchmark.feedback}`;
+    const summary = `Coding Track assessment completed for ${session.targetRole}. Correctness score calibrated at ${codeCorrectnessScore}/100 (${testCasesPassed}/${totalTestCases} test cases passed), algorithmic efficiency at ${safeAlgoEfficiency}/100 (Time: ${codeAnalysis.timeComplexity}, Space: ${codeAnalysis.spaceComplexity}), hint/cadence at ${cadenceScore}/100, and proctoring composure at ${confidenceScore}/100.\n\n[CORPORATE BENCHMARK] ${benchmark.feedback}`;
 
-    const strengths = [
-      'Successfully Refactored algorithm to correct Big-O bounds.',
-      'Demonstrated robust memory optimizations under large loops.',
-      'Calibrated boundary checks correctly to prevent out of bounds exceptions.'
-    ];
+    const strengths: string[] = [
+      ...codeAnalysis.strengths,
+      ...(testCasesPassed === totalTestCases && totalTestCases > 0 ? [`Passed 100% of test cases (${testCasesPassed}/${totalTestCases}) on first submission.`] : []),
+      ...(hintCount === 0 ? ['Completed problem independently with zero hint penalties.'] : [])
+    ].slice(0, 3);
 
-    const improvements = [
-      hintCount > 0 ? `Relied on ${hintCount} dynamic socratic hints inside the room.` : 'Could further speed up conceptual runtime explanations.',
-      tabBlurCount > 0 ? `Logged ${tabBlurCount} focus viewport breaks during active coding.` : 'Check for large integer overflow bounds inside inputs.',
-      'Further practice with dynamic pointer manipulation strategies.'
-    ];
+    const improvements: string[] = [
+      ...codeAnalysis.weaknesses,
+      ...(hintCount > 0 ? [`Relied on ${hintCount} dynamic socratic hint(s) during implementation.`] : []),
+      ...(testCasesPassed < totalTestCases ? [`Failed ${totalTestCases - testCasesPassed} edge test case(s); dry run boundary states.`] : []),
+      ...(tabBlurCount > 0 ? [`Logged ${tabBlurCount} focus viewport break(s) during active coding.`] : [])
+    ].slice(0, 3);
 
     const readinessTips = [
       {
+        tip: 'Time & Space Justification',
+        reason: `Target ${codeAnalysis.timeComplexity} runtime complexity with ${codeAnalysis.spaceComplexity} auxiliary space. Always explain asymptotic bounds before writing code.`
+      },
+      {
         tip: 'Minimize Hint Requests',
-        reason: 'Each dynamic hint deducts exactly 15 points. Build pointer index layouts prior to requesting room hints.'
+        reason: hintCount > 0
+          ? `Consuming ${hintCount} hints reduced your cadence score to ${cadenceScore}/100. Build pointer diagrams before requesting hints.`
+          : 'Great independent execution! Continue verifying extreme boundary conditions independently.'
       },
       {
-        tip: 'Secure Full Screen Focus',
-        reason: 'More than 4 tab window blurs flags status as COMPROMISED. Keep browser view focused during interrogations.'
-      },
-      {
-        tip: 'Optimize Code Quality Layout',
-        reason: 'Enforce proper helper abstraction and naming schemas in standard workspace code blocks.'
+        tip: 'Focus & Composure Integrity',
+        reason: tabBlurCount > 0
+          ? `Eliminate context-switching (${tabBlurCount} window blurs logged) to maintain platform integrity.`
+          : 'Optimal composure and screen presence maintained throughout the coding track.'
       }
     ];
 
@@ -576,11 +562,14 @@ export const analysisService = {
       platformIntegrity,
       tabBlurCount,
       hintCount,
-      avgWpm: confidenceMetrics?.signals?.avgWpm ?? 125,
+      avgWpm: avgWpmVal,
       codeCorrectnessScore,
-      algorithmicEfficiencyScore,
+      algorithmicEfficiencyScore: safeAlgoEfficiency,
+      timeComplexity: codeAnalysis.timeComplexity,
+      spaceComplexity: codeAnalysis.spaceComplexity,
+      detectedPatterns: codeAnalysis.detectedPatterns,
       cadenceScore,
-      platformIntegrityScore,
+      platformIntegrityScore: confidenceScore,
       testCasesPassed,
       totalTestCases,
       corporateBenchmark: benchmark
@@ -596,8 +585,8 @@ export const analysisService = {
         structureScore,
         confidenceMeterScore: confidenceMetrics?.score ?? null,
         confidenceSignals: confidenceSignals as any,
-        eyeContactScore,
-        presenceScore: platformIntegrityScore,
+        eyeContactScore: proctoring?.eyeContactScore ?? null,
+        presenceScore: confidenceScore,
         summary,
         strengths,
         improvements,
@@ -613,8 +602,8 @@ export const analysisService = {
         structureScore,
         confidenceMeterScore: confidenceMetrics?.score ?? null,
         confidenceSignals: confidenceSignals as any,
-        eyeContactScore,
-        presenceScore: platformIntegrityScore,
+        eyeContactScore: proctoring?.eyeContactScore ?? null,
+        presenceScore: confidenceScore,
         summary,
         strengths,
         improvements,

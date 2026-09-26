@@ -48,11 +48,11 @@ export default function Footer() {
           <div className="col-span-2">
             <div className="mb-4">
               <Link to="/">
-                <Logo size="sm" theme="light" />
+                <Logo size="sm" theme="light" showTagline />
               </Link>
             </div>
             <p className="text-xs text-[#526078] font-body max-w-xs leading-relaxed mb-6">
-              Realistic mock interviews with uninflated feedback. Build authentic technical confidence and get placed.
+              AI-powered mock interviews with uninflated feedback. Recognize your potential, Rebuild your confidence, and Rise to Tier-1 engineering bars.
             </p>
             <div className="flex items-center gap-2.5">
               {socialLinks.map((social) => (
@@ -125,10 +125,10 @@ export default function Footer() {
 
         <div className="border-t border-[#DCE7F2] py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-[#7B8799] font-body">
-            © {new Date().getFullYear()} R U Ready? All rights reserved.
+            © {new Date().getFullYear()} Rennetus. All rights reserved.
           </p>
           <p className="text-xs text-[#7B8799] font-body">
-            Professional AI Career Technology. Built with purpose.
+            Recognize • Rebuild • Rise — Professional AI Career Technology.
           </p>
         </div>
       </div>

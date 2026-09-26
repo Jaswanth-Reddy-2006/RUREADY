@@ -225,13 +225,13 @@ export default function Navbar() {
               </div>
             ) : (
               <>
-                <Link to="/login">
-                  <button className="px-4.5 py-2 text-xs sm:text-sm font-semibold font-sans text-[#11183D] bg-[#F8FAFC] hover:bg-[#F1F5F9] border border-[#DCE7F2] rounded-full transition-all duration-200 cursor-pointer">
+                <Link to="/login" className="mr-2">
+                  <button className="px-6 py-2.5 text-xs sm:text-sm font-semibold font-sans text-[#11183D] bg-[#F8FAFC] hover:bg-[#F1F5F9] hover:border-[#CBD5E1] border border-[#DCE7F2] rounded-full shadow-2xs transition-all duration-200 cursor-pointer">
                     Login
                   </button>
                 </Link>
                 <Link to="/register">
-                  <button className="inline-flex items-center gap-1.5 bg-[#11183D] hover:bg-[#1E293B] text-white font-sans font-semibold text-xs sm:text-sm px-5 py-2 rounded-full shadow-sm hover:shadow active:scale-98 transition-all duration-200 cursor-pointer">
+                  <button className="inline-flex items-center gap-1.5 bg-[#11183D] hover:bg-[#1E293B] text-white font-sans font-semibold text-xs sm:text-sm px-6 py-2.5 rounded-full shadow-sm hover:shadow active:scale-98 transition-all duration-200 cursor-pointer">
                     <span>Get Started</span>
                     <ArrowRight className="h-3.5 w-3.5" />
                   </button>

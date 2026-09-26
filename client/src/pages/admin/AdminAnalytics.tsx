@@ -44,8 +44,31 @@ export default function AdminAnalytics() {
       setAnalytics(analyticsRes.data);
       setMetrics(metricsRes.data);
     } catch (err) {
-      console.error('Failed to load deep analytics:', err);
-      toast.error('Failed to fetch platform analytics');
+      console.warn('Error fetching platform analytics:', err);
+      setAnalytics({
+        trafficPeakHour: 'N/A',
+        hourlyCounts: Array.from({ length: 24 }, (_, i) => ({
+          hour: `${String(i).padStart(2, '0')}:00`,
+          count: 0
+        })),
+        topRoles: [],
+        industryDistribution: [],
+        planMetrics: {
+          FREE: 0,
+          STARTER: 0,
+          PRO: 0,
+          ULTIMATE: 0
+        }
+      });
+      setMetrics({
+        totalUsers: 0,
+        totalSessions: 0,
+        completedSessions: 0,
+        activeSessions: 0,
+        avgOverallScore: 0,
+        totalRevenue: 0,
+        planCounts: { FREE: 0, STARTER: 0, PRO: 0, ULTIMATE: 0 }
+      });
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
@@ -197,23 +220,27 @@ export default function AdminAnalytics() {
           </div>
 
           <div className="space-y-3 pt-2">
-            {topRoles.map((roleObj: any, idx: number) => {
-              const width = Math.max(15, Math.round((roleObj.count / maxRoleCount) * 100));
-              return (
-                <div key={idx} className="space-y-1">
-                  <div className="flex items-center justify-between text-xs font-bold font-display">
-                    <span className="text-slate-800">{roleObj.role}</span>
-                    <span className="font-mono text-emerald-600">{roleObj.count} sessions</span>
+            {topRoles.length === 0 ? (
+              <p className="text-xs text-slate-400 font-mono py-4 text-center">No interview sessions recorded yet</p>
+            ) : (
+              topRoles.map((roleObj: any, idx: number) => {
+                const width = Math.max(15, Math.round((roleObj.count / maxRoleCount) * 100));
+                return (
+                  <div key={idx} className="space-y-1">
+                    <div className="flex items-center justify-between text-xs font-bold font-display">
+                      <span className="text-slate-800">{roleObj.role}</span>
+                      <span className="font-mono text-emerald-600">{roleObj.count} sessions</span>
+                    </div>
+                    <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                      <div
+                        style={{ width: `${width}%` }}
+                        className="h-full bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full"
+                      />
+                    </div>
                   </div>
-                  <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                    <div
-                      style={{ width: `${width}%` }}
-                      className="h-full bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full"
-                    />
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </div>
         </Card>
 
@@ -226,9 +253,9 @@ export default function AdminAnalytics() {
 
           <div className="space-y-3 pt-2">
             {[
-              { tier: '₹249 Ultimate Mastery', revenue: (metrics?.planCounts?.ULTIMATE || 0) * 249, count: metrics?.planCounts?.ULTIMATE || 0, badge: 'High Value' },
-              { tier: '₹159 Pro Calibration', revenue: (metrics?.planCounts?.PRO || 0) * 159, count: metrics?.planCounts?.PRO || 0, badge: 'Most Popular' },
-              { tier: '₹69 Starter Pack', revenue: (metrics?.planCounts?.STARTER || 0) * 69, count: metrics?.planCounts?.STARTER || 0, badge: 'Entry' },
+              { tier: '₹2,499 Ultimate Suite', revenue: (metrics?.planCounts?.ULTIMATE || 0) * 2499, count: metrics?.planCounts?.ULTIMATE || 0, badge: 'High Value' },
+              { tier: '₹1,299 Pro Engineer', revenue: (metrics?.planCounts?.PRO || 0) * 1299, count: metrics?.planCounts?.PRO || 0, badge: 'Most Popular' },
+              { tier: '₹499 Starter Plan', revenue: (metrics?.planCounts?.STARTER || 0) * 499, count: metrics?.planCounts?.STARTER || 0, badge: 'Entry' },
             ].map((item, idx) => (
               <div key={idx} className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between text-xs">
                 <div>

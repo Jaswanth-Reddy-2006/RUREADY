@@ -47,6 +47,11 @@ export class AvatarController {
     } else if (state === 'THINKING') {
       this.facial.setExpression('THINKING');
       this.facial.setViseme('viseme_sil');
+    } else if (state === 'REACTING') {
+      this.facial.setExpression('ENCOURAGING');
+      this.facial.setViseme('viseme_sil');
+    } else if (state === 'SPEAKING') {
+      this.facial.setExpression('SPEAKING');
     } else if (state === 'IDLE') {
       this.facial.setExpression('NEUTRAL');
       this.facial.setViseme('viseme_sil');
@@ -92,7 +97,7 @@ export class AvatarController {
     this.setState('LISTENING');
   }
 
-  public updateFrame(frame: number, externalViseme?: OculusViseme): AvatarFrameState {
+  public updateFrame(frameOrDelta: number, externalViseme?: OculusViseme): AvatarFrameState {
     const isSpeaking = this.voice.getIsSpeaking();
 
     let activeViseme: OculusViseme = 'viseme_sil';
@@ -107,7 +112,7 @@ export class AvatarController {
     this.facial.setViseme(activeViseme);
 
     const blendshapes = this.facial.update(0.24);
-    const eyeGaze = this.eye.update(frame, this.state);
+    const eyeGaze = this.eye.update(frameOrDelta, this.state);
 
     return {
       state: this.state,

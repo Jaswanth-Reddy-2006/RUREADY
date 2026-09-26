@@ -15,6 +15,10 @@ import {
   ChevronRight,
   Building2,
   Brain,
+  Swords,
+  Zap,
+  Network,
+  Sparkles,
 } from 'lucide-react';
 import clsx from 'clsx';
 import { useAuthStore } from '../store/authStore';
@@ -38,7 +42,12 @@ export default function SidebarNav() {
     location.pathname.startsWith('/coding') ||
     location.pathname.startsWith('/interview') ||
     location.pathname.startsWith('/interviews') ||
-    location.pathname.startsWith('/company-wise')
+    location.pathname.startsWith('/company-wise') ||
+    location.pathname.startsWith('/system-design')
+  );
+
+  const [challengesOpen, setChallengesOpen] = useState(
+    location.pathname.startsWith('/challenges')
   );
 
   const [learningPrepOpen, setLearningPrepOpen] = useState(
@@ -97,6 +106,8 @@ export default function SidebarNav() {
     location.pathname.startsWith('/interview') ||
     location.pathname.startsWith('/interviews') ||
     location.pathname.startsWith('/company-wise');
+
+  const isChallengesActive = location.pathname.startsWith('/challenges');
 
   const isLearningPrepActive =
     location.pathname.startsWith('/preparation') ||
@@ -167,6 +178,28 @@ export default function SidebarNav() {
 
             {interviewsOpen && (
               <div className="pl-4 space-y-1 border-l-2 border-slate-100 ml-4 py-1">
+                {/* Unified Interview Hub */}
+                <NavLink
+                  to="/interview"
+                  end
+                  className={({ isActive }) =>
+                    clsx(
+                      "flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all",
+                      isActive || location.pathname === '/interview' || location.pathname === '/interviews'
+                        ? "bg-[#EFFAFD] text-[#4A8BDF] font-extrabold"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                    )
+                  }
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Sparkles size={15} />
+                    <span>Interview Hub</span>
+                  </div>
+                  <span className="px-1.5 py-0.5 rounded text-[8px] font-bold bg-[#EFFAFD] text-[#4A8BDF] font-mono">
+                    ALL
+                  </span>
+                </NavLink>
+
                 {/* Oral Interview */}
                 <NavLink
                   to="/oral"
@@ -209,6 +242,27 @@ export default function SidebarNav() {
                   </span>
                 </NavLink>
 
+                {/* System Design Whiteboard */}
+                <NavLink
+                  to="/system-design"
+                  className={({ isActive }) =>
+                    clsx(
+                      "flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all",
+                      isActive || location.pathname.startsWith('/system-design')
+                        ? "bg-[#EFFAFD] text-[#4A8BDF] font-extrabold"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                    )
+                  }
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Network size={15} />
+                    <span>System Design</span>
+                  </div>
+                  <span className="px-1.5 py-0.5 rounded text-[8px] font-bold bg-purple-50 text-purple-700 border border-purple-200 font-mono">
+                    NEW
+                  </span>
+                </NavLink>
+
                 {/* Company-wise Interviews */}
                 <NavLink
                   to="/interviews/company-wise"
@@ -228,6 +282,108 @@ export default function SidebarNav() {
                   <span className="px-1.5 py-0.5 rounded text-[8px] font-bold bg-[#F8EAF4] text-[#A0006D] font-mono">
                     AI
                   </span>
+                </NavLink>
+
+                {/* Unified History & Scorecards */}
+                <NavLink
+                  to="/interview/history"
+                  className={({ isActive }) =>
+                    clsx(
+                      "flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all",
+                      isActive || location.pathname.startsWith('/interview/history')
+                        ? "bg-[#EFFAFD] text-[#4A8BDF] font-extrabold"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                    )
+                  }
+                >
+                  <div className="flex items-center gap-2.5">
+                    <FileText size={15} />
+                    <span>History & Reports</span>
+                  </div>
+                </NavLink>
+              </div>
+            )}
+          </div>
+
+          {/* ONLINE CHALLENGES DROPDOWN */}
+          <div className="space-y-1">
+            <button
+              type="button"
+              onClick={() => setChallengesOpen(!challengesOpen)}
+              className={clsx(
+                "w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-bold font-sans transition-all duration-200 group relative text-left",
+                isChallengesActive
+                  ? "bg-blue-50/60 text-[#11183D]"
+                  : "text-[#526078] hover:bg-[#F8FAFC] hover:text-[#11183D]"
+              )}
+            >
+              <div className="flex items-center gap-3">
+                <Swords size={17} className={isChallengesActive ? "text-[#4A8BDF]" : "text-[#526078] group-hover:text-[#11183D]"} />
+                <span>Online Challenges</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="px-1.5 py-0.5 rounded text-[8px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-200/60 font-mono animate-pulse">
+                  LIVE
+                </span>
+                {challengesOpen ? <ChevronDown size={14} className="text-slate-400" /> : <ChevronRight size={14} className="text-slate-400" />}
+              </div>
+            </button>
+
+            {challengesOpen && (
+              <div className="pl-4 space-y-1 border-l-2 border-slate-100 ml-4 py-1">
+                {/* Challenge Hub */}
+                <NavLink
+                  to="/challenges"
+                  end
+                  className={({ isActive }) =>
+                    clsx(
+                      "flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all",
+                      isActive
+                        ? "bg-[#EFFAFD] text-[#4A8BDF] font-extrabold"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                    )
+                  }
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Zap size={15} />
+                    <span>Arena Hub</span>
+                  </div>
+                </NavLink>
+
+                {/* Technical Quizzes */}
+                <NavLink
+                  to="/challenges/quizzes"
+                  className={({ isActive }) =>
+                    clsx(
+                      "flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all",
+                      isActive
+                        ? "bg-[#EFFAFD] text-[#4A8BDF] font-extrabold"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                    )
+                  }
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Brain size={15} />
+                    <span>Technical Quizzes</span>
+                  </div>
+                </NavLink>
+
+                {/* Elo Leaderboard */}
+                <NavLink
+                  to="/challenges/leaderboard"
+                  className={({ isActive }) =>
+                    clsx(
+                      "flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all",
+                      isActive
+                        ? "bg-[#EFFAFD] text-[#4A8BDF] font-extrabold"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                    )
+                  }
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Swords size={15} />
+                    <span>Elo Leaderboard</span>
+                  </div>
                 </NavLink>
               </div>
             )}
@@ -463,6 +619,7 @@ export default function SidebarNav() {
             <ProfileDropdown
               isOpen={profileDropdownOpen}
               onClose={() => setProfileDropdownOpen(false)}
+              positionClass="bottom-full left-2 mb-2 w-[calc(100%-16px)]"
             />
           )}
         </div>

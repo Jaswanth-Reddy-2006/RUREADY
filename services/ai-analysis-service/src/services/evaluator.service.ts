@@ -1,10 +1,7 @@
-// ═══════════════════════════════════════════════════════════════
-// RU READY Advanced Oral Interview Engine — Evaluator Service
-// ═══════════════════════════════════════════════════════════════
-
 import { StructuredEvaluation, CandidateIntent, NextAction } from '@ru-ready/shared';
 import { aiProviderManager } from '../lib/ai-provider-manager.js';
 import { MASTER_PROMPT_ENGINE_EVALUATOR } from '../prompts/master_prompt.js';
+import { hfModelEngine } from '../lib/hf-model-engine.js';
 
 export interface EvaluationInput {
   questionText: string;
@@ -109,12 +106,12 @@ ${input.answerText}
       }
     }
 
-    // Semantic Rule Fallback (if Ollama/LLM offline or mock mode)
-    return this.evaluateSemanticFallback(input);
+    // Hugging Face Semantic Intelligence & NLP Evaluation
+    return await this.evaluateSemanticFallback(input);
   }
 
   private static buildIntentFallback(intent: CandidateIntent, rawText: string): StructuredEvaluation {
-    const responses: Record<CandidateIntent, { spoken: string; action: NextAction }> = {
+    const responses: Partial<Record<CandidateIntent, { spoken: string; action: NextAction }>> = {
       REPEAT_QUESTION: {
         spoken: "Of course. Let me repeat the question for you clearly.",
         action: 'REPEAT',
@@ -149,7 +146,7 @@ ${input.answerText}
       },
     };
 
-    const target = responses[intent] || responses.ANSWER;
+    const target = responses[intent] || { spoken: "Let's proceed.", action: 'NEXT_QUESTION' as NextAction };
 
     return {
       intent,
@@ -172,26 +169,27 @@ ${input.answerText}
     };
   }
 
-  private static evaluateSemanticFallback(input: EvaluationInput): StructuredEvaluation {
-    const text = input.answerText.toLowerCase();
+  private static async evaluateSemanticFallback(input: EvaluationInput): Promise<StructuredEvaluation> {
     const required = input.requiredConcepts || [];
-    const words = text.split(/\s+/).filter(Boolean).length;
+    const optional = input.optionalConcepts || [];
 
-    const covered = required.filter(c => text.includes(c.toLowerCase()));
-    const missing = required.filter(c => !text.includes(c.toLowerCase()));
-
-    const coverageRatio = required.length ? covered.length / required.length : (words > 15 ? 0.8 : 0.4);
-    const score = Math.round(Math.min(100, Math.max(30, coverageRatio * 70 + (words > 20 ? 25 : 10))));
+    const hfEval = await hfModelEngine.evaluateAnswerComprehensively(
+      input.questionText,
+      input.questionType,
+      input.answerText,
+      required,
+      optional
+    );
 
     let quality: any = 'PARTIAL';
     let action: NextAction = 'PROBE_DEPTH';
     let spoken = "You're on the right track. Can you go one level deeper into the architectural details?";
 
-    if (coverageRatio >= 0.85 || score >= 85) {
+    if (hfEval.score >= 85) {
       quality = 'STRONG';
       action = 'NEXT_QUESTION';
       spoken = "Good explanation. You covered the key technical concepts well.";
-    } else if (coverageRatio < 0.4 && words < 12) {
+    } else if (hfEval.score < 40) {
       quality = 'MISSING_DEPTH';
       action = 'SIMPLER_QUESTION';
       spoken = "That's a basic start. Let's break down the underlying concept further.";
@@ -199,18 +197,18 @@ ${input.answerText}
 
     return {
       intent: 'ANSWER',
-      correctness: coverageRatio,
-      conceptCoverage: coverageRatio,
-      depth: Math.min(1.0, words / 40),
-      clarity: 0.8,
-      relevance: 0.85,
-      confidence: words > 15 ? 0.8 : 0.5,
-      coveredConcepts: covered,
-      missingConcepts: missing,
+      correctness: Math.round((hfEval.score / 100) * 100) / 100,
+      conceptCoverage: Math.round((hfEval.conceptCoverage / 100) * 100) / 100,
+      depth: Math.round((hfEval.technicalDepth / 100) * 100) / 100,
+      clarity: Math.round((hfEval.communication.clarityScore / 100) * 100) / 100,
+      relevance: Math.round((Math.max(40, hfEval.conceptCoverage) / 100) * 100) / 100,
+      confidence: Math.round((hfEval.communication.fluencyScore / 100) * 100) / 100,
+      coveredConcepts: hfEval.coveredConcepts,
+      missingConcepts: hfEval.missingConcepts,
       misconceptions: [],
       quality,
-      score,
-      feedback: `Identified ${covered.length}/${required.length || 1} core concepts in response.`,
+      score: hfEval.score,
+      feedback: hfEval.feedback,
       recommendedAction: action,
       spokenResponse: spoken,
       emotion: quality === 'STRONG' ? 'thoughtful' : 'curious',

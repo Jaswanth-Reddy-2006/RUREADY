@@ -18,8 +18,9 @@ import { useAuthStore } from '../../store/authStore';
 import { useInterviewStore } from '../../store/useInterviewStore';
 import { speakWithLipSync, loadSpeechVoices } from '../../lib/speech';
 import { OculusViseme, mapVisemeIdToOculus } from '../../components/interview/visemeMapper';
-import { Maximize2, Minimize2, Mic, MicOff, Video, VideoOff, Play, Shield, BookOpen, Wrench, Sparkles, FileText, Clock, AlertCircle, CheckCircle2, PhoneOff, Code2, Terminal } from 'lucide-react';
+import { Maximize2, Minimize2, Mic, MicOff, Video, VideoOff, Play, Shield, ShieldAlert, BookOpen, Wrench, Sparkles, FileText, Clock, AlertCircle, CheckCircle2, PhoneOff, Code2, Terminal } from 'lucide-react';
 import NormalInterviewRoom from '../../components/NormalInterviewRoom';
+import toast from 'react-hot-toast';
 
 
 // ─── Types ─────────────────────────────────────────────────────
@@ -65,6 +66,10 @@ export default function InterviewRoom() {
   const [loadingMessage, setLoadingMessage] = useState('Connecting to your interview room...');
   const [loadError, setLoadError] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const isProcessingRef = useRef(false);
+  useEffect(() => {
+    isProcessingRef.current = isProcessing;
+  }, [isProcessing]);
 
   // Media state (enabled by default)
   const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
@@ -73,7 +78,13 @@ export default function InterviewRoom() {
 
   // Follow-up/Elaboration state
   const [isFollowUpMode, setIsFollowUpMode] = useState(false);
+  const isFollowUpModeRef = useRef(false);
+  useEffect(() => {
+    isFollowUpModeRef.current = isFollowUpMode;
+  }, [isFollowUpMode]);
   const lastAnswerTextRef = useRef('');
+
+  const submitAnswerRef = useRef<(answer: string, isExplicitSkip?: boolean) => Promise<void>>(async () => {});
 
   // Coding IDE states
   const [showCodeWorkspace, setShowCodeWorkspace] = useState(false);
@@ -179,24 +190,11 @@ export default function InterviewRoom() {
   const [isInterviewStarted, setIsInterviewStarted] = useState(false);
   const [transcript, setTranscript] = useState<TranscriptEntry[]>([]);
   const [showTranscript, setShowTranscript] = useState(true);
-  const [isLobbyOpen, setIsLobbyOpen] = useState(true);
-  const [verifyingSystem, setVerifyingSystem] = useState(true);
-  const [backgroundVerified, setBackgroundVerified] = useState(false);
-
-  useEffect(() => {
-    if (isLobbyOpen) {
-      setVerifyingSystem(true);
-      setBackgroundVerified(false);
-      const timer = setTimeout(() => {
-        setVerifyingSystem(false);
-        setBackgroundVerified(true);
-      }, 1500);
-      return () => clearTimeout(timer);
-    }
-  }, [isLobbyOpen]);
 
   // Fullscreen state & Escape key locking
-  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(() => 
+    typeof document !== 'undefined' ? Boolean(document.fullscreenElement) : true
+  );
 
   const toggleFullScreen = useCallback(async () => {
     if (!document.fullscreenElement) {
@@ -227,29 +225,59 @@ export default function InterviewRoom() {
     }
   }, []);
 
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
-    };
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
+  // Disqualification and Cheating Enforcement State
+  const [isDisqualified, setIsDisqualified] = useState(false);
+  const [disqualificationReason, setDisqualificationReason] = useState('');
+  const hasDisqualifiedRef = useRef(false);
 
-    // Guard against Escape key breaking stage layout
-    const handleGlobalKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        e.stopPropagation();
+  const stopListening = useCallback(() => {
+    isListeningRef.current = false;
+    clearSilenceTimers();
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch {
+        // Already stopped
       }
-    };
-    window.addEventListener('keydown', handleGlobalKeyDown, true);
+    }
+  }, [clearSilenceTimers]);
 
-    return () => {
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
-      window.removeEventListener('keydown', handleGlobalKeyDown, true);
-      if (document.fullscreenElement) {
-        document.exitFullscreen().catch(err => console.error('Exit fullscreen failed on unmount:', err));
-      }
-    };
-  }, []);
+  // Disqualification & Real-Time Integrity Enforcer
+  const handleDisqualifyAndAutoSubmit = useCallback(async (reason: string) => {
+    if (hasDisqualifiedRef.current || !id) return;
+    hasDisqualifiedRef.current = true;
+    setIsDisqualified(true);
+    setDisqualificationReason(reason);
+    stopListening();
+    if (mediaStream) {
+      mediaStream.getTracks().forEach((track) => track.stop());
+    }
+    window.speechSynthesis.cancel();
+
+    try {
+      await apiClient.post(`/interview/session/${id}/complete`, {
+        isDisqualified: true,
+        cheatingDetected: true,
+        disqualificationReason: reason,
+        confidenceMetrics: {
+          score: 0,
+          signals: { avgWpm: 0, avgPauseCount: 0, avgAnswerLength: 0 },
+          videoConfidence: 0,
+          composureLevel: 'Restless',
+          postureStatus: 'Off-Center',
+        },
+        proctoring: {
+          eyeContactScore: 0,
+          presenceScore: 0,
+          tabBlurCount: 99,
+          zeroRecordingActive: true,
+          flag: 'DISQUALIFIED_CHEATING_DETECTED',
+        },
+      });
+    } catch (err) {
+      console.error('Failed to log disqualification completion:', err);
+    }
+  }, [id, stopListening, mediaStream]);
 
   const chatScrollRef = useRef<HTMLDivElement>(null);
 
@@ -351,6 +379,70 @@ export default function InterviewRoom() {
     return skipPhrases.some((phrase) => normalized === phrase || normalized.includes(phrase));
   }, []);
 
+  // Verbal Clarification / Question Detector
+  const isClarificationOrQuestion = useCallback((text: string) => {
+    const normalized = text.toLowerCase().replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!normalized) return false;
+    const clarificationPhrases = [
+      "is this what you are asking",
+      "are you asking",
+      "could you clarify",
+      "can you clarify",
+      "should i focus on",
+      "can i assume",
+      "would you like high level",
+      "do you mean",
+      "are we allowed to",
+      "is this frontend or backend",
+      "is memory constrained",
+    ];
+    return clarificationPhrases.some((phrase) => normalized.includes(phrase));
+  }, []);
+
+  // Verbal Hesitation / Thinking Request Detector
+  const isHesitationRequest = useCallback((text: string) => {
+    const normalized = text.toLowerCase().replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!normalized) return false;
+    const hesitationPhrases = [
+      "give me a second",
+      "give me a moment",
+      "let me think",
+      "just a second",
+      "one second please",
+      "one moment please",
+      "let me collect my thoughts",
+    ];
+    return hesitationPhrases.some((phrase) => normalized.startsWith(phrase) || normalized === phrase);
+  }, []);
+
+  // Speech-to-Text Technical Terminology Normalizer
+  const normalizeTechnicalSpeech = useCallback((text: string) => {
+    let cleaned = text;
+    const replacements: Array<[RegExp, string]> = [
+      [/\bsequel\b/gi, 'SQL'],
+      [/\bpost grass\b/gi, 'PostgreSQL'],
+      [/\bpostgres\b/gi, 'PostgreSQL'],
+      [/\bmongo\b/gi, 'MongoDB'],
+      [/\bnode js\b/gi, 'Node.js'],
+      [/\breact js\b/gi, 'React'],
+      [/\bnext js\b/gi, 'Next.js'],
+      [/\bg rpc\b/gi, 'gRPC'],
+      [/\brest api\b/gi, 'REST API'],
+      [/\bweb socket\b/gi, 'WebSocket'],
+      [/\bweb sockets\b/gi, 'WebSockets'],
+      [/\bk 8s\b/gi, 'K8s'],
+      [/\bcube neties\b/gi, 'Kubernetes'],
+      [/\bci cd\b/gi, 'CI/CD'],
+      [/\bstar method\b/gi, 'STAR method'],
+      [/\bcap theorem\b/gi, 'CAP theorem'],
+      [/\bacid properties\b/gi, 'ACID properties'],
+    ];
+    for (const [regex, replacement] of replacements) {
+      cleaned = cleaned.replace(regex, replacement);
+    }
+    return cleaned;
+  }, []);
+
   const answerMetricsRef = useRef<Array<{ wordCount: number; durationMs: number; pauseCount: number }>>([]);
   const answerStartRef = useRef<number | null>(null);
   const questionStartRef = useRef<number | null>(null);
@@ -376,6 +468,23 @@ export default function InterviewRoom() {
   const videoMLMetrics = useVideoAnalysisML(mediaStream, isCameraOn, (m) => {
     handleGazeSample(m.eyeContactScore);
   });
+
+  // Multiple Faces / Cheating Real-Time Enforcer
+  const multipleFacesStreakRef = useRef(0);
+  useEffect(() => {
+    if (!isInterviewStarted || isAnalyzing || hasDisqualifiedRef.current) return;
+
+    if (videoMLMetrics && (videoMLMetrics.faceCount > 1 || videoMLMetrics.multipleFacesDetected)) {
+      multipleFacesStreakRef.current += 1;
+      if (multipleFacesStreakRef.current >= 2) {
+        handleDisqualifyAndAutoSubmit(
+          "Cheating Detected: Multiple individuals detected in webcam stream during live interview."
+        );
+      }
+    } else {
+      multipleFacesStreakRef.current = 0;
+    }
+  }, [videoMLMetrics, isInterviewStarted, isAnalyzing, handleDisqualifyAndAutoSubmit]);
 
   // ─── Media Setup ───────────────────────────────────────────
 
@@ -481,7 +590,8 @@ export default function InterviewRoom() {
           interimText += chunk;
         }
       }
-      const combined = `${finalTranscriptRef.current}${interimText}`.replace(/\s+/g, ' ').trim();
+      const rawCombined = `${finalTranscriptRef.current}${interimText}`.replace(/\s+/g, ' ').trim();
+      const combined = normalizeTechnicalSpeech(rawCombined);
       
       if (isRepeatRequest(combined)) {
         clearSilenceTimers();
@@ -500,13 +610,20 @@ export default function InterviewRoom() {
         return;
       }
 
+      if (isHesitationRequest(combined)) {
+        clearSilenceTimers();
+        setAvatarState('listening');
+        // Give candidate room to think without cutting them off
+        return;
+      }
+
       if (isSkipOrUnknownRequest(combined)) {
         clearSilenceTimers();
         stopListening();
         setAnswerText('');
         finalTranscriptRef.current = '';
         latestAnswerRef.current = '';
-        submitAnswer(combined, true);
+        submitAnswerRef.current(combined, true);
         return;
       }
 
@@ -522,27 +639,39 @@ export default function InterviewRoom() {
       }
 
       if (isUserSignoff(combined)) {
-        handleAutoSubmit(combined);
+        clearSilenceTimers();
+        stopListening();
+        submitAnswerRef.current(combined);
         return;
       }
 
-      // 6-Second Silence Auto-Submit Countdown:
-      // If candidate pauses for 5 to 10 seconds (targeting 6s), auto-submit the response
-      if (isListeningRef.current && combined.trim().length >= 4) {
-        let secondsRemaining = 6;
-        setSilenceCountdown(secondsRemaining);
+      // Smart Silence Auto-Submit (3.5s natural conversational pause):
+      // When candidate finishes their thought and pauses for 3.5 seconds, auto-submit smoothly
+      if (isListeningRef.current && combined.trim().length >= 3) {
+        setSilenceCountdown(3);
+        let remainingSeconds = 3;
+
         countdownIntervalRef.current = setInterval(() => {
-          secondsRemaining -= 1;
-          if (secondsRemaining <= 0) {
-            clearSilenceTimers();
-            const snapshot = latestAnswerRef.current.trim();
-            if (isListeningRef.current && snapshot.length >= 4) {
-              handleAutoSubmit(snapshot);
-            }
+          remainingSeconds -= 1;
+          if (remainingSeconds > 0) {
+            setSilenceCountdown(remainingSeconds);
           } else {
-            setSilenceCountdown(secondsRemaining);
+            if (countdownIntervalRef.current) {
+              clearInterval(countdownIntervalRef.current);
+              countdownIntervalRef.current = null;
+            }
+            setSilenceCountdown(null);
           }
         }, 1000);
+
+        silenceTimerRef.current = setTimeout(() => {
+          const snapshot = latestAnswerRef.current.trim();
+          if (isListeningRef.current && snapshot.length >= 3 && !isProcessingRef.current) {
+            clearSilenceTimers();
+            stopListening();
+            submitAnswerRef.current(snapshot);
+          }
+        }, 3500);
       }
     };
 
@@ -622,11 +751,14 @@ export default function InterviewRoom() {
   // ─── Start Listening (User's Turn) ───────────────────────
 
   const startListening = useCallback(() => {
-    if (!recognitionRef.current || !isMicOn) return;
+    if (!recognitionRef.current || !isMicOn) {
+      return;
+    }
 
     setAvatarState('listening');
     setAnswerText('');
     finalTranscriptRef.current = '';
+    latestAnswerRef.current = '';
     isListeningRef.current = true;
     lastSpeechRef.current = Date.now();
     questionStartRef.current = Date.now();
@@ -642,30 +774,63 @@ export default function InterviewRoom() {
     }
   }, [isMicOn, clearSilenceTimers]);
 
-  const stopListening = useCallback(() => {
-    isListeningRef.current = false;
-    clearSilenceTimers();
-    if (recognitionRef.current) {
-      try {
-        recognitionRef.current.stop();
-      } catch {
-        // Already stopped
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      const inFullscreen = !!document.fullscreenElement;
+      setIsFullscreen(inFullscreen);
+      if (!inFullscreen && isInterviewStarted && !isAnalyzing && !hasDisqualifiedRef.current) {
+        handleDisqualifyAndAutoSubmit("Full-screen mode exited during the interview. Full-screen is strictly required.");
       }
-    }
-  }, [clearSilenceTimers]);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+
+    // Visibility change: desktop swipe, tab switch, minimize
+    const handleVisibilityChange = () => {
+      if (document.hidden && isInterviewStarted && !isAnalyzing && !hasDisqualifiedRef.current) {
+        handleDisqualifyAndAutoSubmit("Virtual desktop switch, tab switch, or window minimized during exam.");
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Window Blur: candidate focus moved outside browser / secondary app clicked
+    const handleWindowBlur = () => {
+      if (isInterviewStarted && !isAnalyzing && !hasDisqualifiedRef.current) {
+        handleDisqualifyAndAutoSubmit("Window focus lost: candidate shifted desktops or clicked external application.");
+      }
+    };
+    window.addEventListener('blur', handleWindowBlur);
+
+    // Guard against Escape key breaking stage layout
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown, true);
+
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('blur', handleWindowBlur);
+      window.removeEventListener('keydown', handleGlobalKeyDown, true);
+    };
+  }, [isInterviewStarted, isAnalyzing, handleDisqualifyAndAutoSubmit]);
 
   const handleJoinCall = useCallback(async () => {
-    // 1. Request fullscreen
+    // 1. Request fullscreen gracefully
     try {
       const container = document.documentElement;
-      if (container.requestFullscreen) {
-        await container.requestFullscreen();
-      } else if ((container as any).webkitRequestFullscreen) { /* Safari */
-        await (container as any).webkitRequestFullscreen();
-      } else if ((container as any).msRequestFullscreen) { /* IE11 */
-        await (container as any).msRequestFullscreen();
+      if (!document.fullscreenElement) {
+        if (container.requestFullscreen) {
+          await container.requestFullscreen();
+        } else if ((container as any).webkitRequestFullscreen) { /* Safari */
+          await (container as any).webkitRequestFullscreen();
+        } else if ((container as any).msRequestFullscreen) { /* IE11 */
+          await (container as any).msRequestFullscreen();
+        }
       }
-      setIsFullscreen(true);
+      setIsFullscreen(!!document.fullscreenElement);
       if ('keyboard' in navigator && (navigator as any).keyboard?.lock) {
         try {
           await (navigator as any).keyboard.lock(['Escape']);
@@ -674,16 +839,18 @@ export default function InterviewRoom() {
         }
       }
     } catch (err) {
-      console.error('Failed to request fullscreen:', err);
+      console.warn('Fullscreen request deferred until user interaction:', err);
     }
 
     // 2. Transition states
-    setIsLobbyOpen(false);
     setIsInterviewStarted(true);
 
-    // 3. Trigger Ava's greeting
+    // 3. Trigger Ava's greeting or resume prompt
     if (session && currentQuestion) {
-      const greeting = `Welcome! I'm Ava, your AI interview coach today. We'll be going through a mock interview for the ${session.targetRole} role. I'll ask you a series of questions, and you can respond naturally by speaking. Let's begin.`;
+      const isResuming = session.status === 'IN_PROGRESS' && session.questions && session.questions.some((q: any) => q.answerText);
+      const greeting = isResuming
+        ? `Welcome back! Resuming your interview session for the ${session.targetRole || 'target'} role. Let's continue.`
+        : `Welcome! I'm Ava, your AI interview coach today. We'll be going through a mock interview for the ${session.targetRole || 'target'} role. I'll ask you a series of questions, and you can respond naturally by speaking. Let's begin.`;
       
       addTranscriptEntry('ai', greeting);
       setAvatarState('speaking');
@@ -707,7 +874,7 @@ export default function InterviewRoom() {
         });
       });
 
-      // Now ask first question
+      // Now ask question
       await aiSpeak(currentQuestion.questionText);
       startListening();
     }
@@ -768,7 +935,8 @@ export default function InterviewRoom() {
   const submitAnswer = useCallback(
     async (answer: string, isExplicitSkip = false) => {
       clearSilenceTimers();
-      if (!currentQuestion || isProcessing || !answer.trim()) return;
+      const activeQ = currentQuestionRef.current || currentQuestion;
+      if (!activeQ || isProcessingRef.current || !answer.trim()) return;
 
       // 1. Repeat Question Verbal Interceptor
       if (isRepeatRequest(answer)) {
@@ -809,7 +977,7 @@ export default function InterviewRoom() {
 
         try {
           await apiClient.post(`/interview/session/${id}/answer`, {
-            questionId: currentQuestion.id,
+            questionId: activeQ.id,
             answerText: '[Candidate skipped: not familiar with this topic yet]',
             timeTaken: Math.max(3, Math.floor((Date.now() - (questionStartRef.current || Date.now())) / 1000)),
             isSkip: true,
@@ -920,7 +1088,7 @@ export default function InterviewRoom() {
 
       try {
         const answerRes = await apiClient.post(`/interview/session/${id}/answer`, {
-          questionId: currentQuestion.id,
+          questionId: activeQ.id,
           answerText: submittedAnswer,
           timeTaken: Math.max(5, Math.floor((Date.now() - (questionStartRef.current || Date.now())) / 1000)),
         });
@@ -935,8 +1103,7 @@ export default function InterviewRoom() {
           setIsProcessing(false);
           setProcessingLabel('');
           setAnswerText('');
-
-          const followUpBridge = `Thanks. I need a bit more detail — ${evaluation.followUpReason || 'please elaborate'}.`;
+          const followUpBridge = evaluation.followUpReason || evaluation.spokenResponse || "Could you go into a bit more detail about that?";
           await aiSpeak(followUpBridge);
           startListening();
           return;
@@ -1015,12 +1182,35 @@ export default function InterviewRoom() {
             setConsoleOutput('');
           }
 
-          const bridge =
-            evaluation?.isSkip
-              ? "That's okay, let's move on to the next topic. "
-              : evaluation?.score != null && evaluation.score >= 78
-                ? 'Good answer. Let me move to the next topic. '
-                : '';
+          let bridge = '';
+          if (evaluation?.isSkip) {
+            const skipBridges = [
+              "That's completely fine, no worries at all. Let's move on to our next area. ",
+              "Understood, perfectly okay! Let's explore another aspect of your technical experience. ",
+              "No problem at all. Honesty is valued in engineering. Let's tackle the next question. ",
+            ];
+            bridge = skipBridges[Math.floor(Math.random() * skipBridges.length)];
+          } else if (evaluation?.score != null && evaluation.score >= 78) {
+            const strongBridges = [
+              "Great explanation. That aligns well with standard production architectures. ",
+              "Solid breakdown of the trade-offs and approach. Building on that, ",
+              "Nice breakdown. I like how you structured that solution. Moving to our next topic, ",
+            ];
+            bridge = strongBridges[Math.floor(Math.random() * strongBridges.length)];
+          } else if (evaluation?.score != null && evaluation.score >= 50) {
+            const moderateBridges = [
+              "Understood. Thanks for sharing your thought process on that. ",
+              "Got it. That covers the primary mechanics. Let's explore the next question. ",
+              "Interesting perspective. Let's see how you approach this next problem. ",
+            ];
+            bridge = moderateBridges[Math.floor(Math.random() * moderateBridges.length)];
+          } else if (evaluation?.score != null) {
+            const learningBridges = [
+              "Thanks for walking through that. Let's transition to our next question. ",
+              "Understood. Let's explore another area of your engineering background. ",
+            ];
+            bridge = learningBridges[Math.floor(Math.random() * learningBridges.length)];
+          }
 
           if (bridge) await aiSpeak(bridge);
           await aiSpeak(nextQ.questionText);
@@ -1060,14 +1250,18 @@ export default function InterviewRoom() {
     ]
   );
 
+  useEffect(() => {
+    submitAnswerRef.current = submitAnswer;
+  }, [submitAnswer]);
+
   // Auto-submit handler (called by silence detection)
   const handleAutoSubmit = useCallback(
     (text: string) => {
       if (text.trim().length > 3) {
-        submitAnswer(text);
+        submitAnswerRef.current(text);
       }
     },
-    [submitAnswer]
+    []
   );
 
   // ─── Load Session & Start Interview ───────────────────────
@@ -1176,11 +1370,12 @@ export default function InterviewRoom() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  // ─── Auto-join from DeviceCheck Bypass ─────────────────────────
-  const { antiCheatStatus } = useInterviewStore();
+  // ─── Auto-start Live Interview Session ─────────────────────────
+  const hasAutoStartedRef = useRef(false);
 
   useEffect(() => {
-    if (antiCheatStatus === 'SECURED' && !isLoading && isLobbyOpen && session && currentQuestion) {
+    if (!isLoading && session && currentQuestion && !hasAutoStartedRef.current) {
+      hasAutoStartedRef.current = true;
       if (mediaStream) {
         mediaStream.getAudioTracks().forEach((track) => {
           track.enabled = true;
@@ -1193,7 +1388,7 @@ export default function InterviewRoom() {
       setIsCameraOn(true);
       handleJoinCall();
     }
-  }, [antiCheatStatus, isLoading, isLobbyOpen, session, currentQuestion, handleJoinCall, mediaStream]);
+  }, [isLoading, session, currentQuestion, handleJoinCall, mediaStream]);
 
   // ─── Controls ─────────────────────────────────────────────
 
@@ -1426,270 +1621,49 @@ export default function InterviewRoom() {
     );
   }
 
-  if (isLobbyOpen) {
-    const parseGoalText = (goalText: string | undefined | null) => {
-      if (!goalText) return { timer: 20, difficulty: 'MEDIUM', skills: [], tools: [], subjects: [] };
-      const timerMatch = goalText.match(/\[Timer:\s*([^\]]+)\]/);
-      const diffMatch = goalText.match(/\[Difficulty:\s*([^\]]+)\]/);
-      const skillsMatch = goalText.match(/\[Skills:\s*([^\]]*)\]/);
-      const toolsMatch = goalText.match(/\[Tools:\s*([^\]]*)\]/);
-      const subjectsMatch = goalText.match(/\[Subjects:\s*([^\]]*)\]/);
 
-      return {
-        timer: timerMatch ? parseInt(timerMatch[1]) : 20,
-        difficulty: diffMatch ? diffMatch[1] : 'MEDIUM',
-        skills: skillsMatch && skillsMatch[1] ? skillsMatch[1].split(',').map(s => s.trim()).filter(Boolean) : [],
-        tools: toolsMatch && toolsMatch[1] ? toolsMatch[1].split(',').map(s => s.trim()).filter(Boolean) : [],
-        subjects: subjectsMatch && subjectsMatch[1] ? subjectsMatch[1].split(',').map(s => s.trim()).filter(Boolean) : []
-      };
-    };
 
-    const meta = parseGoalText(session?.interviewGoal);
-    const canJoin = isMicOn && isCameraOn && !verifyingSystem && backgroundVerified;
-
+  if (isDisqualified) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#EFFAFD] text-[#11183D] p-4 sm:p-8 overflow-y-auto">
-        {/* Ambient background glows */}
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute top-1/4 left-1/4 h-[400px] w-[400px] rounded-full bg-[#4A8BDF]/10 blur-[130px]" />
-          <div className="absolute bottom-1/4 right-1/4 h-[350px] w-[350px] rounded-full bg-[#A0006D]/10 blur-[120px]" />
-        </div>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950 text-white p-6 overflow-hidden">
+        <div className="max-w-lg w-full bg-slate-900 border border-rose-500/50 rounded-3xl p-8 shadow-2xl space-y-6 text-center">
+          <div className="h-20 w-20 mx-auto rounded-3xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-500 animate-pulse">
+            <ShieldAlert size={40} />
+          </div>
+          <div>
+            <span className="text-[10px] font-mono uppercase tracking-widest text-rose-400 font-bold bg-rose-950/60 border border-rose-800/60 px-3 py-1 rounded-full">
+              Integrity Violation Detected
+            </span>
+            <h1 className="text-2xl font-black font-display text-white mt-3">
+              Interview Terminated & Submitted
+            </h1>
+            <p className="text-xs text-slate-300 mt-2.5 leading-relaxed font-body">
+              {disqualificationReason || "A virtual desktop switch, tab switch, or full-screen exit was detected during your live proctored session. Your exam has been automatically terminated and submitted as a cheating violation."}
+            </p>
+          </div>
 
-        <div className="relative z-10 max-w-5xl w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center py-6">
-          
-          {/* LEFT: Video stream preview */}
-          <div className="lg:col-span-7 flex flex-col items-center space-y-6 w-full">
-            <h2 className="text-xl font-bold font-display text-[#11183D] self-start px-2 flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-[#4A8BDF] animate-pulse" />
-              Webcam & Mic Preview
-            </h2>
-            
-            <div className="w-full aspect-video rounded-3xl overflow-hidden border border-[#DCE7F2] shadow-sm relative bg-white flex items-center justify-center">
-              <UserCamera
-                stream={mediaStream}
-                isMicActive={isMicOn}
-                isCameraOn={isCameraOn}
-                className="w-full h-full object-cover"
-                userName="Live Preview"
-              />
+          <div className="p-4 rounded-2xl bg-rose-950/40 border border-rose-800/40 text-left text-xs space-y-2 text-rose-200">
+            <div className="flex items-center justify-between font-mono text-[11px]">
+              <span>Status:</span>
+              <span className="font-bold text-rose-400">DISQUALIFIED</span>
+            </div>
+            <div className="flex items-center justify-between font-mono text-[11px]">
+              <span>Integrity Score:</span>
+              <span className="font-bold text-rose-400">0 / 100</span>
+            </div>
+            <div className="flex items-center justify-between font-mono text-[11px]">
+              <span>Record:</span>
+              <span className="font-bold text-rose-400">Flagged in Audit Log</span>
             </div>
           </div>
 
-          {/* RIGHT: Interview Profile Summary */}
-          <div className="lg:col-span-5 flex flex-col space-y-6 w-full">
-            <div className="rounded-3xl border border-[#DCE7F2] bg-white p-6 sm:p-8 shadow-sm space-y-6 relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#4A8BDF] to-[#A0006D]" />
-              
-              <div className="space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#A0006D] font-display">
-                  Live Lobby
-                </span>
-                <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-[#11183D] font-display">
-                  Ready to Join?
-                </h1>
-                <p className="text-xs text-[#526078] font-body">
-                  Confirm your interview parameters and check your devices before starting.
-                </p>
-              </div>
-
-              {/* Specs Stack */}
-              <div className="space-y-3.5 pt-2">
-                
-                {/* Target Role */}
-                <div className="flex items-center justify-between rounded-xl bg-[#EFFAFD] border border-[#DCE7F2] px-4 py-3">
-                  <span className="text-xs font-semibold text-[#526078]">Target Role</span>
-                  <span className="text-xs font-bold text-[#4A8BDF] bg-[#EFF7FD] border border-[#4A8BDF]/25 px-2.5 py-1 rounded-lg">
-                    {session?.targetRole}
-                  </span>
-                </div>
-
-                {/* Experience Level & Difficulty */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="flex flex-col justify-center rounded-xl bg-[#EFFAFD] border border-[#DCE7F2] px-4 py-2.5">
-                    <span className="text-[10px] text-[#7B8799]">Experience</span>
-                    <span className="text-xs font-bold text-[#11183D] mt-0.5">{session?.experienceLevel}</span>
-                  </div>
-                  <div className="flex flex-col justify-center rounded-xl bg-[#EFFAFD] border border-[#DCE7F2] px-4 py-2.5">
-                    <span className="text-[10px] text-[#7B8799]">Difficulty</span>
-                    <span className="text-xs font-bold text-[#4A8BDF] mt-0.5">{meta.difficulty}</span>
-                  </div>
-                </div>
-
-                {/* Duration / Question Count */}
-                <div className="flex items-center justify-between rounded-xl bg-[#EFFAFD] border border-[#DCE7F2] px-4 py-3">
-                  <div className="flex items-center gap-2">
-                    <Clock size={14} className="text-[#4A8BDF]" />
-                    <span className="text-xs font-semibold text-[#526078]">Duration</span>
-                  </div>
-                  <span className="text-xs font-bold text-[#11183D]">
-                    {meta.timer} Mins ({meta.timer === 10 ? '3' : meta.timer === 20 ? '5' : '8'} questions)
-                  </span>
-                </div>
-
-                {/* Resume Status */}
-                {session?.resumeId && (
-                  <div className="flex items-center gap-2.5 rounded-xl bg-[#E8F5F0] border border-[#168A62]/20 px-4 py-3 text-[#168A62]">
-                    <FileText size={16} />
-                    <span className="text-xs font-semibold">Resume context integrated</span>
-                  </div>
-                )}
-
-                {/* Custom Subjects if present */}
-                {meta.subjects.length > 0 && (
-                  <div className="space-y-1.5">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#7B8799]">Core Subjects</span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {meta.subjects.map((sub, i) => (
-                        <span key={i} className="text-[10px] font-semibold text-[#11183D] bg-[#EFFAFD] border border-[#DCE7F2] px-2.5 py-1 rounded-lg">
-                          {sub}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Custom Skills if present */}
-                {meta.skills.length > 0 && (
-                  <div className="space-y-1.5">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#7B8799]">Skills & Tech Stack</span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {meta.skills.map((skill, i) => (
-                        <span key={i} className="text-[10px] font-semibold text-[#11183D] bg-[#EFFAFD] border border-[#DCE7F2] px-2.5 py-1 rounded-lg">
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Custom Tools if present */}
-                {meta.tools.length > 0 && (
-                  <div className="space-y-1.5">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#7B8799]">Custom Tools</span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {meta.tools.map((tool, i) => (
-                        <span key={i} className="text-[10px] font-semibold text-[#11183D] bg-[#EFFAFD] border border-[#DCE7F2] px-2.5 py-1 rounded-lg">
-                          {tool}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-              </div>
-
-              {/* Action Buttons */}
-              <div className="space-y-3 pt-2">
-                <button
-                  type="button"
-                  disabled={!canJoin}
-                  onClick={handleJoinCall}
-                  className={`w-full flex items-center justify-center gap-2.5 rounded-2xl px-6 py-4 text-sm font-bold tracking-wide transition-all shadow-md font-display ${
-                    canJoin
-                      ? 'bg-[#4A8BDF] hover:bg-[#2459A8] text-white active:scale-[0.98] shadow-[#4A8BDF]/25 cursor-pointer'
-                      : 'bg-[#EFFAFD] border border-[#DCE7F2] text-[#7B8799] cursor-not-allowed'
-                  }`}
-                >
-                  <Play size={16} fill={canJoin ? "currentColor" : "none"} className={canJoin ? "text-white" : "text-[#7B8799]"} />
-                  Join Call & Go Fullscreen
-                </button>
-
-                {/* Pre-Interview Requirements Checklist Widget */}
-                <div className="mt-4 rounded-2xl border border-[#DCE7F2] bg-[#EFFAFD]/60 p-4 space-y-3">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#7B8799] block mb-1">
-                    Pre-Interview Requirements
-                  </span>
-
-                  {/* 1. Camera check */}
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-[#526078] flex items-center gap-2">
-                      <Video size={14} className={isCameraOn ? "text-[#168A62]" : "text-[#7B8799]"} />
-                      Webcam Status
-                    </span>
-                    <span className={`font-bold flex items-center gap-1 ${isCameraOn ? "text-[#168A62]" : "text-[#D64545] animate-pulse"}`}>
-                      {isCameraOn ? (
-                        <>
-                          <CheckCircle2 size={12} /> Active
-                        </>
-                      ) : (
-                        <>
-                          <AlertCircle size={12} /> Inactive
-                        </>
-                      )}
-                    </span>
-                  </div>
-
-                  {/* 2. Mic check */}
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-[#526078] flex items-center gap-2">
-                      <Mic size={14} className={isMicOn ? "text-[#168A62]" : "text-[#7B8799]"} />
-                      Microphone Status
-                    </span>
-                    <span className={`font-bold flex items-center gap-1 ${isMicOn ? "text-[#168A62]" : "text-[#D64545] animate-pulse"}`}>
-                      {isMicOn ? (
-                        <>
-                          <CheckCircle2 size={12} /> Active
-                        </>
-                      ) : (
-                        <>
-                          <AlertCircle size={12} /> Inactive
-                        </>
-                      )}
-                    </span>
-                  </div>
-
-                  {/* 3. System security check */}
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-[#526078] flex items-center gap-2">
-                      <Shield size={14} className={backgroundVerified ? "text-[#168A62]" : "text-[#4A8BDF]"} />
-                      Proctoring Scan (Third-Party Apps)
-                    </span>
-                    <span className={`font-bold flex items-center gap-1 ${
-                      verifyingSystem 
-                        ? "text-[#4A8BDF] animate-pulse" 
-                        : backgroundVerified 
-                          ? "text-[#168A62]" 
-                          : "text-[#D64545]"
-                    }`}>
-                      {verifyingSystem ? (
-                        <span className="flex items-center gap-1.5">
-                          <motion.span
-                            animate={{ rotate: 360 }}
-                            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                            className="inline-block h-3 w-3 rounded-full border-2 border-transparent border-t-[#4A8BDF]"
-                          />
-                          Scanning...
-                        </span>
-                      ) : backgroundVerified ? (
-                        <>
-                          <CheckCircle2 size={12} /> Clean System Pass
-                        </>
-                      ) : (
-                        <>
-                          <AlertCircle size={12} /> Failed Scan
-                        </>
-                      )}
-                    </span>
-                  </div>
-
-                  {!canJoin && (
-                    <p className="text-[10px] text-[#D99020] font-medium leading-relaxed pt-2 border-t border-[#DCE7F2] flex items-start gap-1.5">
-                      <AlertCircle size={12} className="shrink-0 mt-0.5" />
-                      {!isCameraOn || !isMicOn
-                        ? "Please turn on both camera and microphone from the preview panel controls on the left."
-                        : "Waiting for system integrity verification..."}
-                    </p>
-                  )}
-                </div>
-
-                <p className="text-[9px] text-center text-[#7B8799] font-body leading-relaxed mt-2">
-                  Recommended for absolute focus. Fullscreen mode prevents accidental exits during the live feedback tracking session.
-                </p>
-              </div>
-
-            </div>
-          </div>
-
+          <button
+            type="button"
+            onClick={() => navigate(`/interview/${id}/analysis`)}
+            className="w-full py-3.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-2xl transition-all shadow-lg cursor-pointer flex items-center justify-center gap-2 font-display"
+          >
+            <span>View Integrity Report →</span>
+          </button>
         </div>
       </div>
     );

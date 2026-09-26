@@ -60,10 +60,15 @@ export default function AdminUsers() {
 
     try {
       const res = await apiClient.get('/admin/users');
-      setUsers(res.data.users || []);
+      if (res.data) {
+        const list = Array.isArray(res.data) ? res.data : (res.data.users || []);
+        setUsers(list);
+      } else {
+        setUsers([]);
+      }
     } catch (err) {
-      console.error('Failed to load candidate directory:', err);
-      toast.error('Failed to fetch candidate directory');
+      console.warn('Error fetching candidate directory:', err);
+      setUsers([]);
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
@@ -323,9 +328,9 @@ export default function AdminUsers() {
                           }`}
                         >
                           <option value="FREE">Free</option>
-                          <option value="STARTER">₹69 Starter</option>
-                          <option value="PRO">₹159 Pro</option>
-                          <option value="ULTIMATE">₹249 Ultimate</option>
+                          <option value="STARTER">₹499 Starter</option>
+                          <option value="PRO">₹1,299 Pro</option>
+                          <option value="ULTIMATE">₹2,499 Ultimate</option>
                         </select>
                       </td>
                       <td className="py-3.5 px-4">

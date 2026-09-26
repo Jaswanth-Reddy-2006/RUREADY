@@ -1,0 +1,67 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model SystemDesignProblem {
+  id                        String   @id @default(cuid())
+  slug                      String   @unique
+  title                     String
+  difficulty                String   @default("MEDIUM") // EASY, MEDIUM, HARD
+  category                  String   @default("DISTRIBUTED_SYSTEMS") // WEB_SCALE, REAL_TIME, STORAGE, HIGH_THROUGHPUT, INFRASTRUCTURE
+  summary                   String
+  description               String
+  functionalRequirements    String[] @default([])
+  nonFunctionalRequirements String[] @default([])
+  trafficDefaults           Json     @default("{}")
+  suggestedComponents       String[] @default([])
+  starterGraph              Json     @default("{\"nodes\":[],\"edges\":[]}")
+  referenceArchitecture     Json     @default("{\"nodes\":[],\"edges\":[],\"explanation\":\"\"}")
+  rubricTemplate            Json     @default("{}")
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+
+  sessions                  SystemDesignSession[]
+
+  @@map("system_design_problems")
+}
+
+model SystemDesignSession {
+  id              String   @id @default(cuid())
+  userId          String
+  userName        String?
+  problemId       String
+  problem         SystemDesignProblem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  title           String
+  stage           Int      @default(1) // 1: Requirements, 2: Capacity, 3: High-Level Design, 4: Deep Dive, 5: Scalability & Failures, 6: Trade-offs
+  status          String   @default("IN_PROGRESS") // IN_PROGRESS, COMPLETED, ABANDONED
+  durationSeconds Int      @default(0)
+  
+  // Whiteboard Canvas State
+  graphData       Json     @default("{\"nodes\":[],\"edges\":[]}")
+  
+  // Capacity Engine State
+  capacityInputs  Json     @default("{}")
+  capacityOutputs Json     @default("{}")
+  
+  // Architecture Diagnostic / Validator State
+  validationState Json     @default("{\"score\":100,\"issues\":[],\"spoFs\":[],\"bottlenecks\":[]}")
+  
+  // Socratic Interviewer State
+  transcript      Json     @default("[]") // Array of { id, role: 'ai' | 'candidate', content, timestamp, stage }
+  
+  // Evaluation & Scorecard
+  score           Int?     // 0 - 100 overall score
+  evaluation      Json?    // 11-dimension scoring, strengths, gaps, recommended fixes
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId, status])
+  @@map("system_design_sessions")
+}

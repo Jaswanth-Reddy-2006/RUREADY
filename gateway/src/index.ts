@@ -34,6 +34,8 @@ const ADMIN_SERVICE_URL = process.env.ADMIN_SERVICE_URL || 'http://localhost:400
 const RESUME_SERVICE_URL = process.env.RESUME_SERVICE_URL || 'http://localhost:3009';
 const ROADMAP_SERVICE_URL = process.env.ROADMAP_SERVICE_URL || 'http://localhost:3010';
 const PLACEMENT_SERVICE_URL = process.env.PLACEMENT_SERVICE_URL || 'http://localhost:3011';
+const CHALLENGE_SERVICE_URL = process.env.CHALLENGE_SERVICE_URL || 'http://localhost:4012';
+const SYSTEM_DESIGN_SERVICE_URL = process.env.SYSTEM_DESIGN_SERVICE_URL || 'http://localhost:4013';
 
 // Parse CORS origins from env
 const corsOrigins = process.env.CORS_ORIGIN
@@ -269,6 +271,35 @@ app.use(
   '/api/admin',
   createProxyMiddleware({
     target: ADMIN_SERVICE_URL,
+    changeOrigin: true,
+    ws: true,
+  }),
+);
+
+// 9. Challenge & Multiplayer Service (HTTP + WebSockets)
+app.use(
+  '/api/challenges',
+  createProxyMiddleware({
+    target: CHALLENGE_SERVICE_URL,
+    changeOrigin: true,
+    ws: true,
+  }),
+);
+
+app.use(
+  '/socket.io',
+  createProxyMiddleware({
+    target: CHALLENGE_SERVICE_URL,
+    changeOrigin: true,
+    ws: true,
+  }),
+);
+
+// 10. System Design Whiteboard Arena Microservice
+app.use(
+  '/api/system-design',
+  createProxyMiddleware({
+    target: SYSTEM_DESIGN_SERVICE_URL,
     changeOrigin: true,
     ws: true,
   }),

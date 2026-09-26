@@ -20,6 +20,7 @@ export default function AdminRoute({ children }: AdminRouteProps) {
 
   const isUserAdmin =
     (user as any).role === 'ADMIN' ||
+    user.email?.toLowerCase() === 'admin@rennetus.ai' ||
     user.email?.toLowerCase() === 'admin@ruready.ai' ||
     user.email?.toLowerCase().startsWith('admin@');
 

@@ -17,13 +17,14 @@ export function useAuth() {
       toast.success(`Welcome back, ${data.user.name}!`);
       const isUserAdmin =
         (data.user as any).role === 'ADMIN' ||
+        data.user.email?.toLowerCase() === 'admin@rennetus.ai' ||
         data.user.email?.toLowerCase() === 'admin@ruready.ai' ||
         data.user.email?.toLowerCase().startsWith('admin@');
       navigate(isUserAdmin ? '/admin' : '/dashboard');
     },
     onError: (error: AxiosError<ApiError>) => {
       const message =
-        error.response?.data?.message || 'Login failed. Please try again.';
+        error.response?.data?.message || 'Invalid email or password. Please try again.';
       toast.error(message);
     },
   });
@@ -32,10 +33,10 @@ export function useAuth() {
     mutationFn: (data: RegisterRequest) => authApi.register(data),
     onSuccess: (data) => {
       login(data.user, data.accessToken);
-      toast.success(`Welcome to RU READY, ${data.user.name}!`);
+      toast.success(`Welcome to Rennetus, ${data.user.name}!`);
       const isUserAdmin =
         (data.user as any).role === 'ADMIN' ||
-        data.user.email?.toLowerCase() === 'admin@ruready.ai' ||
+        data.user.email?.toLowerCase() === 'admin@rennetus.ai' ||
         data.user.email?.toLowerCase().startsWith('admin@');
       navigate(isUserAdmin ? '/admin' : '/dashboard');
     },
@@ -50,13 +51,18 @@ export function useAuth() {
     mutationFn: () => authApi.logout(),
     onSuccess: () => {
       clearAuth();
+      localStorage.removeItem('rennetus-auth');
+      localStorage.removeItem('ru-ready-auth');
       toast.success('Logged out successfully.');
-      navigate('/');
+      navigate('/login');
     },
     onError: () => {
       // Force logout even if API call fails
       clearAuth();
-      navigate('/');
+      localStorage.removeItem('rennetus-auth');
+      localStorage.removeItem('ru-ready-auth');
+      toast.success('Logged out successfully.');
+      navigate('/login');
     },
   });
 

@@ -45,10 +45,10 @@ export default function AdminSessionDetail() {
     setIsLoading(true);
     try {
       const res = await apiClient.get(`/admin/sessions/${id}`);
-      setSession(res.data.session);
+      setSession(res.data?.session || null);
     } catch (err) {
-      console.error('Failed to load session details:', err);
-      toast.error('Session not found or error loading telemetry');
+      console.warn('Error fetching session detail:', err);
+      setSession(null);
     } finally {
       setIsLoading(false);
     }

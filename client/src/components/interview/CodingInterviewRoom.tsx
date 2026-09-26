@@ -6,7 +6,7 @@ import {
   Sparkles, Play, Clock, Code2, Lightbulb, Mic, MicOff, Video, VideoOff, 
   Terminal, Shield, ArrowLeft, ChevronRight, CheckCircle2, AlertCircle, 
   X, ChevronDown, ChevronUp, AlertTriangle, Send,
-  MessageSquare, Layers, Check, Volume2, Cpu, Eye, ShieldCheck
+  MessageSquare, Layers, Check, Volume2, Cpu, Eye, ShieldCheck, ShieldAlert
 } from 'lucide-react';
 import apiClient from '../../api/client';
 import { codingApi, type CodeEvaluationResponse, type IdealSolutionResponse } from '../../api/coding';
@@ -19,6 +19,7 @@ import InterviewTimer from './InterviewTimer';
 import { speakWithLipSync, loadSpeechVoices } from '../../lib/speech';
 import { useFaceTelemetry } from '../../hooks/useFaceTelemetry';
 import { useCandidateAnalysis } from '../../hooks/useCandidateAnalysis';
+import ExitConfirmationModal from './ExitConfirmationModal';
 import Button from '../ui/Button';
 import Badge from '../ui/Badge';
 
@@ -300,8 +301,6 @@ export default function CodingInterviewRoom() {
 
   // Interview History
   const [transcript, setTranscript] = useState<TranscriptEntry[]>([]);
-  const [isLobbyOpen, setIsLobbyOpen] = useState(true);
-  const [verifyingSystem, setVerifyingSystem] = useState(true);
 
   // Proctoring telemetry logs
   const proctorDataRef = useRef({
@@ -330,28 +329,82 @@ export default function CodingInterviewRoom() {
     }
   }, [eyeGazeScore, isCameraOn, mediaStream]);
 
-  // Browser anti-cheat blocks
-  useEffect(() => {
-    const handleBlur = () => {
-      proctorDataRef.current.tabBlurCount++;
-      toast.error('SECURITY ALERT: Tab deviation detected. Please keep focus on your coding workspace.', {
-        duration: 4000
+  // Disqualification and Cheating Enforcement
+  const [isDisqualified, setIsDisqualified] = useState(false);
+  const [disqualificationReason, setDisqualificationReason] = useState('');
+  const hasDisqualifiedRef = useRef(false);
+  const [showExitModal, setShowExitModal] = useState(false);
+
+  const handleDisqualifyAndAutoSubmit = useCallback(async (reason: string) => {
+    if (hasDisqualifiedRef.current || !id) return;
+    hasDisqualifiedRef.current = true;
+    setIsDisqualified(true);
+    setDisqualificationReason(reason);
+    if (mediaStream) {
+      mediaStream.getTracks().forEach((t) => t.stop());
+    }
+    window.speechSynthesis.cancel();
+
+    try {
+      await apiClient.post(`/interview/session/${id}/complete`, {
+        isDisqualified: true,
+        cheatingDetected: true,
+        disqualificationReason: reason,
+        confidenceMetrics: {
+          score: 0,
+          signals: { avgWpm: 0, avgPauseCount: 0, avgAnswerLength: 0 }
+        },
+        proctoring: {
+          eyeContactScore: 0,
+          presenceScore: 0,
+          tabBlurCount: 99,
+          flag: 'DISQUALIFIED_CHEATING_DETECTED'
+        }
       });
+    } catch (err) {
+      console.error('Failed to log coding disqualification:', err);
+    }
+  }, [id, mediaStream]);
+
+  // Browser anti-cheat blocks & desktop switch detection
+  useEffect(() => {
+    if (!currentProblem || isLoading || hasDisqualifiedRef.current) return;
+
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement && !hasDisqualifiedRef.current) {
+        handleDisqualifyAndAutoSubmit("Full-screen mode exited or candidate gestured to desktop.");
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden && !hasDisqualifiedRef.current) {
+        handleDisqualifyAndAutoSubmit("Virtual desktop switch, tab switch, or window minimized during exam.");
+      }
+    };
+
+    const handleBlur = () => {
+      if (!hasDisqualifiedRef.current) {
+        handleDisqualifyAndAutoSubmit("Window focus lost: candidate shifted desktops or clicked external application.");
+      }
     };
 
     const blockBackNavigation = () => {
       window.history.pushState(null, '', window.location.href);
     };
 
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('blur', handleBlur);
     window.history.pushState(null, '', window.location.href);
     window.addEventListener('popstate', blockBackNavigation);
 
     return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('blur', handleBlur);
       window.removeEventListener('popstate', blockBackNavigation);
     };
-  }, []);
+  }, [currentProblem, isLoading, handleDisqualifyAndAutoSubmit]);
 
   // Algorithmic approach analyzer (Brute Force vs Optimal vs Binary Search)
   const analyzeApproach = (code: string) => {
@@ -682,29 +735,29 @@ export default function CodingInterviewRoom() {
           mediaStream.getTracks().forEach((t) => t.stop());
         }
 
-        const confidenceMetrics = {
-          score: 88,
-          signals: {
-            avgWpm: 130,
-            avgPauseCount: 1.2,
-            avgAnswerLength: 95
-          }
-        };
-
         const gaze = proctorDataRef.current.gazeScores;
         const eyeContactScore = gaze.length
           ? Math.round(gaze.reduce((a, b) => a + b, 0) / gaze.length)
           : 85;
         const tabBlurCount = proctorDataRef.current.tabBlurCount;
-        const presenceScore = Math.max(0, Math.min(100, 100 - tabBlurCount * 10));
+        const presenceScore = Math.max(0, Math.min(100, 100 - tabBlurCount * 15));
+
+        const confidenceMetrics = {
+          score: candidateMetrics.speakingConfidence || 85,
+          signals: {
+            avgWpm: candidateMetrics.speechRateWpm || 125,
+            avgPauseCount: candidateMetrics.fidgetIndex || 0,
+            avgAnswerLength: candidateMetrics.expressionBreakdown?.focused ?? 50,
+          },
+        };
 
         await apiClient.post(`/interview/session/${id}/complete`, {
           confidenceMetrics,
           proctoring: {
             eyeContactScore,
             presenceScore,
-            tabBlurCount
-          }
+            tabBlurCount,
+          },
         });
 
         toast.success('Coding Assessment Completed!');
@@ -728,6 +781,19 @@ export default function CodingInterviewRoom() {
       startListening();
     }
   }, [id, currentQuestion, isProcessing, codeValue, codeLanguage, aiSpeak, startListening, stopListening, navigate, mediaStream]);
+
+  const handleSaveAndExit = useCallback(() => {
+    if (currentProblem && id) {
+      localStorage.setItem(`coding_session_code_${id}_${currentProblem.id}`, codeValue);
+    }
+    stopListening();
+    if (mediaStream) {
+      mediaStream.getTracks().forEach((track) => {
+        try { track.stop(); } catch {}
+      });
+    }
+    navigate('/interview');
+  }, [currentProblem, id, codeValue, stopListening, mediaStream, navigate]);
 
   // Speech Recognition lifecycle setup
   useEffect(() => {
@@ -920,8 +986,10 @@ export default function CodingInterviewRoom() {
     toast.success(`Switched to ${newLang.toUpperCase()}`);
   };
 
-  // Join full screen from Lobby
-  const handleJoinCall = async () => {
+  // Auto-start coding interview session
+  const hasAutoStartedRef = useRef(false);
+
+  const handleJoinCall = useCallback(async () => {
     try {
       const container = document.documentElement;
       if (container.requestFullscreen) {
@@ -929,14 +997,64 @@ export default function CodingInterviewRoom() {
       }
     } catch {}
 
-    setIsLobbyOpen(false);
-
     if (currentProblem) {
-      const intro = `Welcome to the live technical coding assessment. I am Ava. I will evaluate your algorithmic reasoning and code structuring. Take your time to review "${currentProblem.title}" on the left, discuss your thoughts with me, and run test cases when you are ready. Let's begin!`;
+      const intro = `Welcome to your technical coding assessment. I am Alex, your interviewer today. I'll be reviewing your algorithmic reasoning, problem-solving approach, and code implementation. Take your time to review "${currentProblem.title}" on the left, speak your thoughts out loud, and run test cases when you are ready. Let's begin!`;
       await aiSpeak(intro);
-      startListening();
     }
-  };
+  }, [currentProblem, aiSpeak]);
+
+  useEffect(() => {
+    if (!isLoading && currentProblem && !hasAutoStartedRef.current) {
+      hasAutoStartedRef.current = true;
+      handleJoinCall();
+    }
+  }, [isLoading, currentProblem, handleJoinCall]);
+
+  if (isDisqualified) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950 text-white p-6 overflow-hidden">
+        <div className="max-w-lg w-full bg-slate-900 border border-rose-500/50 rounded-3xl p-8 shadow-2xl space-y-6 text-center">
+          <div className="h-20 w-20 mx-auto rounded-3xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-500 animate-pulse">
+            <ShieldAlert size={40} />
+          </div>
+          <div>
+            <span className="text-[10px] font-mono uppercase tracking-widest text-rose-400 font-bold bg-rose-950/60 border border-rose-800/60 px-3 py-1 rounded-full">
+              Integrity Violation Detected
+            </span>
+            <h1 className="text-2xl font-black font-display text-white mt-3">
+              Coding Exam Terminated & Submitted
+            </h1>
+            <p className="text-xs text-slate-300 mt-2.5 leading-relaxed font-body">
+              {disqualificationReason || "A virtual desktop switch, tab switch, or full-screen exit was detected during your live coding assessment. Your exam has been automatically terminated and submitted as a cheating violation."}
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-rose-950/40 border border-rose-800/40 text-left text-xs space-y-2 text-rose-200">
+            <div className="flex items-center justify-between font-mono text-[11px]">
+              <span>Status:</span>
+              <span className="font-bold text-rose-400">DISQUALIFIED</span>
+            </div>
+            <div className="flex items-center justify-between font-mono text-[11px]">
+              <span>Integrity Score:</span>
+              <span className="font-bold text-rose-400">0 / 100</span>
+            </div>
+            <div className="flex items-center justify-between font-mono text-[11px]">
+              <span>Violation:</span>
+              <span className="font-bold text-rose-400">Recorded in Proctoring Log</span>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => navigate(`/interview/${id}/analysis`)}
+            className="w-full py-3.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-2xl transition-all shadow-lg cursor-pointer flex items-center justify-center gap-2 font-display"
+          >
+            <span>View Integrity Report →</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (loadError) {
     return (
@@ -969,105 +1087,7 @@ export default function CodingInterviewRoom() {
     );
   }
 
-  // Pre-interview Lobby View
-  if (isLobbyOpen) {
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#11183D] text-white p-4 sm:p-6 lg:p-8 font-body select-none overflow-y-auto">
-        <div className="max-w-5xl w-full grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center py-6">
-          
-          {/* Camera Telemetry Feed */}
-          <div className="lg:col-span-7 flex flex-col space-y-4 w-full">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-xs font-bold text-[#DCE7F2] font-display">
-                <span className="h-2 w-2 rounded-full bg-[#168A62] animate-pulse" />
-                <span>HARDWARE & PROCTORING FEED</span>
-              </div>
-              <span className="text-[10px] font-mono text-[#4A8BDF] bg-[#4A8BDF]/20 px-2.5 py-0.5 rounded-full border border-[#4A8BDF]/40">
-                1280x720 HD Active
-              </span>
-            </div>
 
-            <div className="w-full aspect-video rounded-3xl overflow-hidden border border-white/10 bg-slate-900 flex items-center justify-center shadow-2xl relative">
-              <UserCamera
-                stream={mediaStream}
-                isMicActive={isMicOn}
-                isCameraOn={isCameraOn}
-                className="w-full h-full object-cover scale-x-[-1]"
-                userName="Identity Preview Feed"
-              />
-              <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between bg-black/60 backdrop-blur-md px-3 py-2 rounded-2xl text-[11px] font-mono text-[#DCE7F2]">
-                <div className="flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-[#168A62]" />
-                  <span>Microphone: Calibrated</span>
-                </div>
-                <span>Gaze Lock: 98%</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Session Info & Enter CTA */}
-          <div className="lg:col-span-5 flex flex-col space-y-6 w-full">
-            <div className="rounded-3xl border border-white/15 bg-white/[0.06] backdrop-blur-xl p-6 sm:p-8 shadow-2xl relative overflow-hidden space-y-6">
-              <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#4A8BDF] via-[#A0006D] to-[#4A8BDF]" />
-              
-              <div>
-                <span className="text-[11px] font-bold uppercase text-[#4A8BDF] tracking-wider font-mono">
-                  Socratic Algorithm Assessment
-                </span>
-                <h1 className="text-2xl sm:text-3xl font-extrabold font-display text-white tracking-tight mt-1">
-                  Ready to solve?
-                </h1>
-                <p className="text-xs text-[#DCE7F2] mt-1.5 leading-relaxed">
-                  Monaco compiler sandbox running under anti-cheat isolation layers is fully calibrated.
-                </p>
-              </div>
-
-              <div className="space-y-3 pt-1">
-                <div className="flex items-center justify-between rounded-2xl bg-white/[0.05] border border-white/10 p-3.5">
-                  <span className="text-xs font-semibold text-slate-300">Target Role</span>
-                  <span className="text-xs font-bold text-white bg-[#4A8BDF]/20 border border-[#4A8BDF]/40 px-3 py-1 rounded-lg">
-                    {session?.targetRole || 'Software Engineer'}
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-white/[0.05] border border-white/10 rounded-2xl p-3.5 flex flex-col justify-center">
-                    <span className="text-[10px] text-slate-400 uppercase font-bold">Difficulty Rigor</span>
-                    <span className="text-xs font-bold text-white mt-1 capitalize">{currentQuestion?.difficulty || 'Medium'} Track</span>
-                  </div>
-                  <div className="bg-white/[0.05] border border-white/10 rounded-2xl p-3.5 flex flex-col justify-center">
-                    <span className="text-[10px] text-slate-400 uppercase font-bold">Interviewer</span>
-                    <span className="text-xs font-bold text-[#F8EAF4] mt-1 flex items-center gap-1">
-                      <Sparkles size={11} className="text-[#A0006D]" /> Ava Socratic AI
-                    </span>
-                  </div>
-                </div>
-
-                <div className="p-3.5 rounded-2xl bg-[#168A62]/10 border border-[#168A62]/30 flex items-center gap-2 text-xs text-emerald-300 font-mono">
-                  <ShieldCheck size={16} className="shrink-0 text-[#168A62]" />
-                  <span>Sandbox compiler & test runner active</span>
-                </div>
-              </div>
-
-              <div className="pt-2">
-                <Button
-                  onClick={handleJoinCall}
-                  size="lg"
-                  variant="royal"
-                  fullWidth
-                  iconRight={<ChevronRight size={16} />}
-                  className="shadow-xl"
-                >
-                  Enter Live Coding Studio →
-                </Button>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div 
@@ -1137,7 +1157,15 @@ export default function CodingInterviewRoom() {
             </button>
           </div>
           <div className="flex items-center gap-2">
-            <InterviewTimer isRunning={!isLobbyOpen} />
+            <InterviewTimer isRunning={true} />
+            <button
+              type="button"
+              onClick={() => setShowExitModal(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-rose-600 border border-[#DCE7F2] text-xs font-bold font-sans transition-colors cursor-pointer"
+            >
+              <ArrowLeft size={14} />
+              <span>Exit</span>
+            </button>
           </div>
         </div>
       </header>
@@ -1145,47 +1173,44 @@ export default function CodingInterviewRoom() {
       {/* Main Studio 2-Pane Split */}
       <main className="flex-1 flex overflow-hidden min-h-0 bg-[#EFFAFD]">
         
-        {/* LEFT PANE (42vw): Problem Statement & Ava AI + Candidate Video Dock */}
+        {/* LEFT PANE (42vw): Alex Technical Interviewer Avatar + Problem Statement */}
         <section className="w-[42vw] h-full flex flex-col border-r border-[#DCE7F2] bg-white min-w-[380px] overflow-hidden">
           
-          {/* Main Problem Statement Body */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-2.5">
-            <div className="space-y-2.5 animate-in fade-in">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold font-mono px-2 py-0.5 rounded-md bg-[#EFFAFD] text-[#2459A8] border border-[#DCE7F2]">
-                  Q{currentProblemIndex + 1}
-                </span>
-                <span className="text-xs font-bold text-[#11183D] font-display">
-                  {currentProblem?.title || 'Problem Statement'}
-                </span>
+          {/* Top Section: Technical Interviewer Avatar (Alex in front of laptop) */}
+          <div className="p-3.5 bg-slate-950 border-b border-[#DCE7F2] shrink-0 space-y-2.5">
+            <div className="relative h-44 w-full rounded-2xl overflow-hidden border border-slate-800 bg-slate-900 shadow-md">
+              <img
+                src="/images/interviewer_alex_laptop.jpg"
+                alt="Alex - Senior Technical Interviewer"
+                className="w-full h-full object-cover object-top"
+              />
+              
+              {/* Subtle Ambient Gradient Overlays */}
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-r from-slate-950/40 via-transparent to-slate-950/40 pointer-events-none" />
+
+              {/* Status Badge & Equalizer */}
+              <div className="absolute top-2.5 left-2.5 flex items-center gap-2 bg-slate-900/90 backdrop-blur-md px-2.5 py-1 rounded-full border border-slate-700/80 text-[10px] font-mono text-emerald-400 font-semibold shadow-sm">
+                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>{aiIsSpeaking ? 'Alex Speaking' : isProcessing || isRunningCode ? 'Evaluating Code...' : 'Alex • Listening'}</span>
+                {aiIsSpeaking && (
+                  <span className="flex items-end gap-0.5 h-3 ml-0.5">
+                    <span className="w-0.5 bg-emerald-400 rounded-full animate-[bounce_0.6s_infinite_100ms] h-2" />
+                    <span className="w-0.5 bg-emerald-400 rounded-full animate-[bounce_0.6s_infinite_200ms] h-3" />
+                    <span className="w-0.5 bg-emerald-400 rounded-full animate-[bounce_0.6s_infinite_300ms] h-1.5" />
+                    <span className="w-0.5 bg-emerald-400 rounded-full animate-[bounce_0.6s_infinite_150ms] h-2.5" />
+                  </span>
+                )}
               </div>
 
-              <div className="p-3.5 rounded-xl bg-[#EFFAFD]/50 border border-[#DCE7F2] text-xs leading-relaxed text-[#11183D] font-body">
-                <div className="whitespace-pre-wrap font-sans text-xs text-[#334155] leading-relaxed">
-                  {currentProblem?.description || 'Given an array of integers, return the indices of two numbers that add up to target.'}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom Dock: Ava AI Avatar & Candidate Video Feed Side-by-Side + Live Ava Captions */}
-          <div className="border-t border-[#DCE7F2] bg-[#0A0E1A] p-3 flex flex-col gap-2.5 shrink-0 shadow-inner">
-            {/* Side-by-side Video Feeds */}
-            <div className="grid grid-cols-2 gap-2.5">
-              {/* Ava AI Video Feed */}
-              <div className="h-28 rounded-xl bg-gradient-to-b from-[#0e172e] to-[#04060c] border border-white/20 overflow-hidden relative shadow-md flex items-center justify-center">
-                <AIAvatar
-                  state={avatarState}
-                  isSpeaking={aiIsSpeaking}
-                  mouthOpenness={mouthOpenness}
-                  activeVisemeShape={activeViseme}
-                  currentWord={spokenWord}
-                  className="h-full w-full object-cover"
-                />
+              {/* Proctoring Status Pill */}
+              <div className="absolute top-2.5 right-2.5 flex items-center gap-1.5 bg-slate-900/90 backdrop-blur-md px-2 py-1 rounded-full border border-slate-700/80 text-[10px] font-mono text-slate-300 shadow-sm">
+                <ShieldCheck size={12} className="text-emerald-400" />
+                <span>Proctor Active</span>
               </div>
 
-              {/* Candidate Webcam Feed */}
-              <div className="h-28 rounded-xl border border-white/20 overflow-hidden relative shadow-md bg-slate-950 flex items-center justify-center">
+              {/* Candidate Picture-in-Picture Webcam */}
+              <div className="absolute bottom-2.5 right-2.5 w-28 h-20 rounded-xl overflow-hidden border border-white/20 shadow-2xl bg-slate-950">
                 {isCameraOn && mediaStream ? (
                   <video
                     ref={(ref) => {
@@ -1199,36 +1224,70 @@ export default function CodingInterviewRoom() {
                     className="w-full h-full object-cover scale-x-[-1]"
                   />
                 ) : (
-                  <div className="flex flex-col items-center justify-center text-slate-500 p-2 text-center">
-                    <VideoOff size={20} className="mb-1 text-slate-600" />
-                    <span className="text-[10px] font-mono">Camera Paused</span>
+                  <div className="w-full h-full flex flex-col items-center justify-center text-slate-500 bg-slate-900">
+                    <VideoOff size={14} className="mb-0.5 text-slate-600" />
+                    <span className="text-[8px] font-mono">Camera Off</span>
                   </div>
                 )}
+                <div className="absolute bottom-1 left-1 bg-slate-900/90 backdrop-blur px-1 py-0.5 rounded text-[8px] font-mono text-slate-200">
+                  Candidate
+                </div>
+              </div>
+
+              {/* Interviewer Persona Info */}
+              <div className="absolute bottom-2.5 left-2.5 flex flex-col">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs font-bold text-white font-display drop-shadow">
+                    Alex Mitchell
+                  </span>
+                  <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#4A8BDF] text-white font-mono uppercase">
+                    Tech Lead
+                  </span>
+                </div>
+                <span className="text-[10px] text-slate-300 font-mono drop-shadow">
+                  Algorithms & Code Evaluator
+                </span>
               </div>
             </div>
 
-            {/* Live Captions of Ava */}
-            <div className="rounded-xl bg-slate-900/95 border border-white/10 p-2.5 shadow-sm">
+            {/* Live Synchronized Subtitles */}
+            <div className="rounded-xl bg-slate-900/95 border border-slate-800 p-2.5 shadow-sm">
               <div className="flex items-center justify-between gap-2 mb-1">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-[#A0006D] font-mono">
-                    Ava AI Interviewer
-                  </span>
-                  {aiIsSpeaking && (
-                    <span className="flex items-center gap-0.5">
-                      <span className="h-1 w-0.5 rounded-full bg-[#A0006D] animate-bounce" />
-                      <span className="h-2 w-0.5 rounded-full bg-[#A0006D] animate-bounce delay-75" />
-                      <span className="h-1 w-0.5 rounded-full bg-[#A0006D] animate-bounce delay-150" />
-                    </span>
-                  )}
-                </div>
+                <span className="text-[9px] font-bold uppercase tracking-wider text-[#4A8BDF] font-mono flex items-center gap-1">
+                  <Volume2 size={10} /> Live Audio Transcript
+                </span>
                 {activeCaption?.speaker === 'user' && (
-                  <span className="text-[9px] text-sky-400 font-mono">You speaking...</span>
+                  <span className="text-[9px] text-emerald-400 font-mono">Candidate speaking...</span>
                 )}
               </div>
-              <p className="text-xs text-white leading-relaxed font-sans line-clamp-2">
-                {activeCaption?.text || 'I am analyzing your solution. Feel free to explain your thoughts or run test cases.'}
+              <p className="text-xs text-slate-200 leading-relaxed font-sans line-clamp-2">
+                {activeCaption?.text || 'Welcome to your technical assessment. Read through the problem below, explain your initial thoughts, and write your solution.'}
               </p>
+            </div>
+          </div>
+
+          {/* Main Problem Statement Body */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-3">
+            <div className="space-y-3 animate-in fade-in">
+              <div className="flex items-center justify-between gap-2 border-b border-[#DCE7F2] pb-2.5">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold font-mono px-2 py-0.5 rounded-md bg-[#EFFAFD] text-[#2459A8] border border-[#DCE7F2]">
+                    Q{currentProblemIndex + 1}
+                  </span>
+                  <h2 className="text-sm font-bold text-[#11183D] font-display">
+                    {currentProblem?.title || 'Problem Statement'}
+                  </h2>
+                </div>
+                <Badge variant={currentProblem?.difficulty === 'EASY' ? 'success' : currentProblem?.difficulty === 'HARD' ? 'error' : 'warning'} size="xs">
+                  {currentProblem?.difficulty || 'MEDIUM'}
+                </Badge>
+              </div>
+
+              <div className="p-4 rounded-xl bg-[#EFFAFD]/60 border border-[#DCE7F2] text-xs leading-relaxed text-[#11183D] font-body shadow-xs">
+                <div className="whitespace-pre-wrap font-sans text-xs text-[#334155] leading-relaxed">
+                  {currentProblem?.description || 'Given an array of integers, return the indices of two numbers that add up to target.'}
+                </div>
+              </div>
             </div>
           </div>
 
@@ -1466,6 +1525,15 @@ export default function CodingInterviewRoom() {
         </section>
 
       </main>
+
+      {/* Exit & Session Preservation Modal */}
+      <ExitConfirmationModal
+        isOpen={showExitModal}
+        onClose={() => setShowExitModal(false)}
+        onSaveAndExit={handleSaveAndExit}
+        onEndAndSubmit={submitSolution}
+        interviewType="CODING"
+      />
     </div>
   );
 }

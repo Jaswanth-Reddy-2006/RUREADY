@@ -48,12 +48,35 @@ export default function AdminOverview() {
         apiClient.get('/admin/logs'),
       ]);
 
-      setMetrics(metricsRes.data);
-      setAnalytics(analyticsRes.data);
-      setRecentLogs((logsRes.data.logs || []).slice(0, 5));
+      if (metricsRes.data) setMetrics(metricsRes.data);
+      if (analyticsRes.data) setAnalytics(analyticsRes.data);
+      if (logsRes.data) {
+        const logList = Array.isArray(logsRes.data) ? logsRes.data : (logsRes.data.logs || []);
+        if (logList.length > 0) setRecentLogs(logList);
+      }
     } catch (err) {
-      console.error('Failed to load overview telemetry:', err);
-      toast.error('Failed to load admin metrics');
+      console.warn('API fallback active for admin overview:', err);
+      setMetrics({
+        totalUsers: 0,
+        totalSessions: 0,
+        completedSessions: 0,
+        activeSessions: 0,
+        avgOverallScore: 0,
+        totalRevenue: 0,
+        planCounts: { FREE: 0, STARTER: 0, PRO: 0, ULTIMATE: 0 },
+        modeCounts: { ORAL: 0, CODING: 0 },
+        interviews7Days: 0,
+        interviews30Days: 0
+      });
+      setAnalytics({
+        trafficPeakHour: 'N/A',
+        hourlyCounts: Array.from({ length: 24 }, (_, i) => ({
+          hour: `${String(i).padStart(2, '0')}:00`,
+          count: 0
+        })),
+        topRoles: []
+      });
+      setRecentLogs([]);
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
@@ -160,9 +183,9 @@ export default function AdminOverview() {
           </div>
           <div className="flex items-center gap-2 mt-2">
             <p className="text-2xl font-black text-slate-900 font-display">
-              {metrics?.onlineUsers || 1}
+              {metrics?.onlineUsers || 0}
             </p>
-            <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-ping" />
+            {metrics?.onlineUsers > 0 && <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-ping" />}
           </div>
           <p className="text-[10px] text-slate-400 font-mono mt-1">Active within 20m</p>
         </Card>
@@ -214,9 +237,9 @@ export default function AdminOverview() {
             </div>
           </div>
           <p className="text-2xl font-black text-slate-900 font-display mt-2">
-            ₹{metrics?.totalRevenue || 0}
+            ₹{metrics?.totalRevenue ? Number(metrics.totalRevenue).toLocaleString('en-IN') : 0}
           </p>
-          <p className="text-[10px] text-amber-600 font-semibold font-mono mt-1">Paid Tiers (₹69-₹249)</p>
+          <p className="text-[10px] text-amber-600 font-semibold font-mono mt-1">Paid Tiers (₹499-₹2,499)</p>
         </Card>
 
         {/* 6. Platform Average Score */}
@@ -230,7 +253,7 @@ export default function AdminOverview() {
             </div>
           </div>
           <p className="text-2xl font-black text-slate-900 font-display mt-2">
-            {metrics?.avgScore || 78}<span className="text-xs text-slate-400 font-normal">/100</span>
+            {metrics?.avgScore ? `${metrics.avgScore}` : '0'}<span className="text-xs text-slate-400 font-normal">/100</span>
           </p>
           <p className="text-[10px] text-orange-600 font-semibold font-mono mt-1">STAR Calibrated</p>
         </Card>
@@ -305,9 +328,9 @@ export default function AdminOverview() {
             <div className="space-y-3.5 pt-4">
               {[
                 { plan: 'Free Tier', count: metrics?.planCounts?.FREE || 0, price: '₹0', color: 'bg-slate-400', badge: 'Free' },
-                { plan: 'Starter Pack', count: metrics?.planCounts?.STARTER || 0, price: '₹69', color: 'bg-amber-500', badge: '₹69' },
-                { plan: 'Pro Calibration', count: metrics?.planCounts?.PRO || 0, price: '₹159', color: 'bg-blue-500', badge: '₹159' },
-                { plan: 'Ultimate Mastery', count: metrics?.planCounts?.ULTIMATE || 0, price: '₹249', color: 'bg-purple-600', badge: '₹249' },
+                { plan: 'Starter Plan', count: metrics?.planCounts?.STARTER || 0, price: '₹499', color: 'bg-amber-500', badge: '₹499' },
+                { plan: 'Pro Engineer', count: metrics?.planCounts?.PRO || 0, price: '₹1,299', color: 'bg-blue-500', badge: '₹1,299' },
+                { plan: 'Ultimate Suite', count: metrics?.planCounts?.ULTIMATE || 0, price: '₹2,499', color: 'bg-purple-600', badge: '₹2,499' },
               ].map((p, idx) => (
                 <div key={idx} className="p-3 rounded-2xl bg-slate-50 border border-slate-200/70 space-y-1.5">
                   <div className="flex items-center justify-between text-xs font-bold font-display">
@@ -348,7 +371,7 @@ export default function AdminOverview() {
               <p className="text-xs text-slate-500">Hourly candidate activity and interview requests</p>
             </div>
             <span className="text-[11px] font-mono font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-xl border border-emerald-200">
-              Peak: {analytics?.trafficPeakHour || '18:00 - 19:00 IST'}
+              Peak: {analytics?.trafficPeakHour || 'N/A'}
             </span>
           </div>
 

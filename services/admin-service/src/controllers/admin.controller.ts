@@ -89,4 +89,103 @@ export const adminController = {
       next(err);
     }
   },
+
+  // ─── System Controls & Cache Management ───
+  async getSystemControls(_req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const controls = await adminService.getSystemControls();
+      res.status(200).json(controls);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async toggleMaintenance(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { enabled, message } = req.body;
+      const updated = await adminService.toggleMaintenance(Boolean(enabled), message);
+      res.status(200).json(updated);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async updateLlmEngines(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { activeEngine, fallbackEngine, temperature, maxTokens } = req.body;
+      const updated = await adminService.updateLlmEngines(activeEngine, fallbackEngine, temperature, maxTokens);
+      res.status(200).json(updated);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async flushCache(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { target } = req.body;
+      const result = await adminService.flushCache(target || 'ALL');
+      res.status(200).json(result);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async restartService(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const serviceName = req.params.serviceName as string;
+      const result = await adminService.restartMicroservice(serviceName);
+      res.status(200).json(result);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  // ─── Broadcasts & In-App Announcements ───
+  async getBroadcasts(_req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const broadcasts = await adminService.getBroadcasts();
+      res.status(200).json(broadcasts);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async createBroadcast(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const created = await adminService.createBroadcast(req.body);
+      res.status(201).json(created);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async toggleBroadcast(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const id = req.params.id as string;
+      const updated = await adminService.toggleBroadcast(id);
+      res.status(200).json(updated);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async deleteBroadcast(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const id = req.params.id as string;
+      const result = await adminService.deleteBroadcast(id);
+      res.status(200).json(result);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  // ─── Live Anti-Cheat & Integrity Hub ───
+  async getIntegrityMetrics(_req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const metrics = await adminService.getIntegrityMetrics();
+      res.status(200).json(metrics);
+    } catch (err) {
+      next(err);
+    }
+  },
 };

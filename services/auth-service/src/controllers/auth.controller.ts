@@ -135,7 +135,10 @@ export async function login(req: Request, res: Response, next: NextFunction): Pr
   try {
     const { email, password } = req.body as z.infer<typeof loginSchema>;
 
-    const isEmailAdmin = email.toLowerCase() === 'admin@ruready.ai' || email.toLowerCase().startsWith('admin@');
+    const isEmailAdmin =
+      email.toLowerCase() === 'admin@rennetus.ai' ||
+      email.toLowerCase() === 'admin@ruready.ai' ||
+      email.toLowerCase().startsWith('admin@');
 
     let user = await prisma.user.findUnique({
       where: { email },
@@ -146,7 +149,7 @@ export async function login(req: Request, res: Response, next: NextFunction): Pr
       user = await prisma.user.create({
         data: {
           email,
-          name: 'System Administrator',
+          name: 'Rennetus Administrator',
           passwordHash,
         },
       });
@@ -173,7 +176,10 @@ export async function login(req: Request, res: Response, next: NextFunction): Pr
 
     res.cookie(REFRESH_COOKIE_NAME, refreshToken, REFRESH_COOKIE_OPTIONS);
 
-    const isUserAdmin = user.email.toLowerCase() === 'admin@ruready.ai' || user.email.toLowerCase().startsWith('admin@');
+    const isUserAdmin =
+      user.email.toLowerCase() === 'admin@rennetus.ai' ||
+      user.email.toLowerCase() === 'admin@ruready.ai' ||
+      user.email.toLowerCase().startsWith('admin@');
 
     res.status(200).json({
       user: {

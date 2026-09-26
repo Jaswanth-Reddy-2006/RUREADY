@@ -15,5 +15,7 @@ import '../services/payment-service/dist/index.js';
 import '../services/admin-service/dist/index.js';
 import '../services/resume-service/dist/index.js';
 import '../services/roadmap-service/dist/index.js';
+import '../services/challenge-service/dist/index.js';
+import '../services/system-design-service/dist/index.js';
 
 console.log('🚀 All R U Ready backend microservices & API Gateway running in a single process.');

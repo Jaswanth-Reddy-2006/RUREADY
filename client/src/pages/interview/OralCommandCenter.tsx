@@ -222,114 +222,100 @@ export default function OralCommandCenter() {
 
   const radarScores = [techKnowledge, problemSolving, communication, projectKnowledge, answerStructure];
 
-  const primaryCtaText = hasHistory ? 'Start New Interview →' : 'Start Your First Interview →';
+  const primaryCtaText = hasHistory ? 'Start Your Interview →' : 'Start Your First Interview →';
 
   return (
     <div className="min-h-screen bg-[#F4F7FC] text-slate-900 py-6 px-4 sm:px-6 lg:px-8 font-sans">
       <div className="max-w-7xl mx-auto space-y-6">
         
-        {/* ─── 1. PREMIUM HERO INTERVIEW CARD (FULL CARD 3D BACKGROUND + HIGH CONTRAST TEXT) ─── */}
-        <div className="relative overflow-hidden rounded-3xl bg-[#F0F5FD] border border-blue-100/90 shadow-sm min-h-[340px] md:min-h-[320px]">
+        {/* ─── 1. PREMIUM HERO INTERVIEW CARD ─── */}
+        <div className="relative overflow-hidden rounded-3xl bg-[#EEF5FF] border border-blue-100/90 shadow-sm min-h-[340px] md:min-h-[320px]">
           
-          {/* Full-width 3D Background Image spanning from Left to Right */}
+          {/* 3D Background Image - Shifted slightly more to the Right side */}
           <div className="absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden">
             <img
               src="/images/ai_interviewer_3d.jpg"
               alt="3D AI Interviewer"
-              className="w-full h-full object-cover object-right sm:object-right-top filter brightness-[1.03] contrast-[1.02]"
+              className="w-full h-full object-cover object-[92%_top] filter brightness-[1.05] contrast-[1.05]"
             />
-            {/* Soft Light Overlay Gradient (Ensures perfect text contrast on left while opening up on right) */}
-            <div className="absolute inset-0 bg-gradient-to-r from-[#F0F5FD] via-[#F0F5FD]/90 via-40% to-transparent/20 z-10" />
+            {/* Gradient Overlay strictly on Left Half to protect text contrast */}
+            <div className="absolute inset-y-0 left-0 w-full sm:w-[65%] lg:w-[55%] bg-gradient-to-r from-[#EEF5FF] via-[#EEF5FF]/92 to-transparent z-10" />
           </div>
 
           <div className="relative z-20 p-6 md:p-8 flex flex-col lg:flex-row items-stretch justify-between gap-8 h-full">
             
-            {/* Left Column: Top Badge, Heading, Subtitle & 4 Feature Chips */}
+            {/* Left Column: Heading, Subtitle & Compact Feature Chips */}
             <div className="flex-1 flex flex-col justify-between space-y-6 max-w-xl">
               <div className="space-y-3">
-                {/* Top-Left Pink Pill Badge */}
-                <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-pink-100 text-pink-700 text-xs font-bold border border-pink-200/90 shadow-2xs">
-                  <Sparkles className="w-3.5 h-3.5 text-pink-600 fill-pink-600" />
-                  <span>AI-Powered Mock Interviews</span>
-                </div>
-
-                {/* Main Title & Description (HIGH CONTRAST DARK TEXT) */}
+                {/* Main Title & Description (DARK SLATE GRAY SUBTITLE) */}
                 <div className="space-y-2">
-                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-950 tracking-tight font-display drop-shadow-2xs">
+                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-950 tracking-tight font-display">
                     Oral Interview
                   </h1>
-                  <p className="text-slate-800 text-sm sm:text-base font-semibold leading-relaxed drop-shadow-2xs max-w-md">
+                  <p className="text-slate-600 font-medium text-sm sm:text-base leading-relaxed max-w-lg" style={{ color: '#475569' }}>
                     Practice realistic technical and behavioral interviews tailored to your target role.
                   </p>
                 </div>
               </div>
 
-              {/* 4 Feature Chips Row (DARK HIGH-CONTRAST TEXT) */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
-                <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/95 backdrop-blur-md border border-white/90 shadow-xs">
-                  <div className="w-9 h-9 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
-                    <MessageSquare className="w-4.5 h-4.5" />
+              {/* 4 Compact Feature Chips Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-w-lg pt-2">
+                <div className="flex items-center gap-2.5 p-2.5 px-3 rounded-2xl bg-white/95 backdrop-blur-md border border-white/90 shadow-xs">
+                  <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
+                    <MessageSquare className="w-4 h-4" />
                   </div>
-                  <div className="min-w-0">
-                    <span className="text-[12px] font-black text-slate-950 block leading-tight">Real-time AI Interviewer</span>
-                    <span className="text-[10px] font-semibold text-slate-700 block truncate">Natural conversation</span>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/95 backdrop-blur-md border border-white/90 shadow-xs">
-                  <div className="w-9 h-9 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center shrink-0">
-                    <FileText className="w-4.5 h-4.5" />
-                  </div>
-                  <div className="min-w-0">
-                    <span className="text-[12px] font-black text-slate-950 block leading-tight">Role-specific Questions</span>
-                    <span className="text-[10px] font-semibold text-slate-700 block truncate">Technical + Behavioral</span>
+                  <div className="min-w-0 flex-1">
+                    <span className="text-xs font-extrabold text-slate-900 block leading-tight">Real-time AI Interviewer</span>
+                    <span className="text-[10px] font-medium text-slate-600 block leading-tight">Natural conversation</span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/95 backdrop-blur-md border border-white/90 shadow-xs">
-                  <div className="w-9 h-9 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
-                    <Lightbulb className="w-4.5 h-4.5" />
+                <div className="flex items-center gap-2.5 p-2.5 px-3 rounded-2xl bg-white/95 backdrop-blur-md border border-white/90 shadow-xs">
+                  <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center shrink-0">
+                    <FileText className="w-4 h-4" />
                   </div>
-                  <div className="min-w-0">
-                    <span className="text-[12px] font-black text-slate-950 block leading-tight">Detailed Feedback</span>
-                    <span className="text-[10px] font-semibold text-slate-700 block truncate">Improve with insights</span>
+                  <div className="min-w-0 flex-1">
+                    <span className="text-xs font-extrabold text-slate-900 block leading-tight">Role-specific Questions</span>
+                    <span className="text-[10px] font-medium text-slate-600 block leading-tight">Technical + Behavioral</span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/95 backdrop-blur-md border border-white/90 shadow-xs">
-                  <div className="w-9 h-9 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0">
-                    <BarChart3 className="w-4.5 h-4.5" />
+                <div className="flex items-center gap-2.5 p-2.5 px-3 rounded-2xl bg-white/95 backdrop-blur-md border border-white/90 shadow-xs">
+                  <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                    <Lightbulb className="w-4 h-4" />
                   </div>
-                  <div className="min-w-0">
-                    <span className="text-[12px] font-black text-slate-950 block leading-tight">Track Progress</span>
-                    <span className="text-[10px] font-semibold text-slate-700 block truncate">See growth over time</span>
+                  <div className="min-w-0 flex-1">
+                    <span className="text-xs font-extrabold text-slate-900 block leading-tight">Detailed Feedback</span>
+                    <span className="text-[10px] font-medium text-slate-600 block leading-tight">Improve with insights</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2.5 p-2.5 px-3 rounded-2xl bg-white/95 backdrop-blur-md border border-white/90 shadow-xs">
+                  <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0">
+                    <BarChart3 className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <span className="text-xs font-extrabold text-slate-900 block leading-tight">Track Progress</span>
+                    <span className="text-[10px] font-medium text-slate-600 block leading-tight">See growth over time</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Right Column: Handwritten Callout, Speech Bubble & CTA Button */}
-            <div className="relative flex flex-col items-center lg:items-end justify-between min-w-[280px] z-20 pt-4 lg:pt-0">
+            {/* Right Column: Handwritten Callout with Arrow Pointing directly to AI Face + CTA Button */}
+            <div className="relative flex flex-col items-center lg:items-end justify-between min-w-[240px] lg:min-w-[280px] z-20 pt-4 lg:pt-0">
               
-              {/* Upper Callout Annotations */}
-              <div className="relative w-full flex items-start justify-between lg:justify-end gap-3 min-h-[140px]">
-                
-                {/* Handwritten Annotation Text - HIGH CONTRAST DARK TEXT */}
-                <div className="flex flex-col items-start lg:items-end rotate-[-6deg] pt-2">
-                  <span className="font-serif italic font-black text-slate-900 text-lg sm:text-xl drop-shadow-[0_1px_2px_rgba(255,255,255,0.9)] tracking-wide leading-tight">
+              {/* Upper Callout Annotation Pointing directly to 3D Model Face */}
+              <div className="relative w-full flex items-center justify-center lg:justify-end pt-2 min-h-[120px]">
+                {/* Handwritten Callout Text with Arrow Pointing Right directly to Character Face */}
+                <div className="flex flex-col items-end rotate-[-4deg] z-30 mr-4 sm:mr-8 lg:mr-10">
+                  <span className="font-serif italic font-black text-slate-950 text-lg sm:text-xl drop-shadow-[0_2px_4px_rgba(255,255,255,1)] tracking-wide leading-tight text-right">
                     Your AI<br />Interviewer<br />is ready!
                   </span>
-                  <svg className="w-7 h-7 text-slate-900 drop-shadow-[0_1px_2px_rgba(255,255,255,0.9)] mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M4 4c6 0 12 6 12 12m0 0l-4-2m4 2l-2-4" />
+                  {/* Curved Arrow pointing right and down directly towards character face */}
+                  <svg className="w-10 h-10 text-slate-950 drop-shadow-[0_2px_4px_rgba(255,255,255,1)] mt-1 -mr-2" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M 4 4 Q 20 2 24 18 M 24 18 L 17 14 M 24 18 L 21 11" />
                   </svg>
-                </div>
-
-                {/* Speech Bubble */}
-                <div className="bg-white rounded-2xl px-4 py-2.5 shadow-xl border border-slate-200/80 flex items-center justify-center relative">
-                  <span className="text-blue-700 font-extrabold text-xs sm:text-sm whitespace-nowrap">
-                    Let's build a better you!
-                  </span>
-                  <div className="absolute -bottom-1.5 right-6 w-3 h-3 bg-white rotate-45 border-r border-b border-slate-200/80" />
                 </div>
               </div>
 
@@ -337,7 +323,7 @@ export default function OralCommandCenter() {
               <div className="w-full flex justify-center lg:justify-end pt-4 z-20">
                 <Button
                   onClick={() => navigate('/oral/new')}
-                  className="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 text-white font-extrabold text-sm sm:text-base px-8 py-3.5 rounded-full shadow-lg shadow-blue-500/25 border-2 border-white/60 flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer"
+                  className="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 text-white font-extrabold text-sm sm:text-base px-8 py-3.5 rounded-full shadow-lg shadow-blue-500/30 border-2 border-white/60 flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer"
                 >
                   <span>{primaryCtaText}</span>
                 </Button>

@@ -1,0 +1,266 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ChallengeRoom {
+  id              String   @id @default(cuid())
+  roomCode        String   @unique
+  title           String
+  type            String   @default("BATTLE_1V1") // BATTLE_1V1, CONTEST, QUIZ
+  visibility      String   @default("PUBLIC") // PUBLIC, PRIVATE
+  difficulty      String   @default("MEDIUM") // EASY, MEDIUM, HARD, MIXED
+  topic           String   @default("DSA")
+  language        String   @default("all")
+  maxParticipants Int      @default(2)
+  durationMinutes Int      @default(30)
+  status          String   @default("WAITING") // WAITING, ACTIVE, FINISHED, CANCELLED
+  createdBy       String
+  hostName        String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  participants ChallengeParticipant[]
+  matches      MatchSession[]
+
+  @@index([roomCode, status])
+  @@map("challenge_rooms")
+}
+
+model ChallengeParticipant {
+  id         String        @id @default(cuid())
+  roomId     String
+  room       ChallengeRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  userId     String
+  userName   String
+  userAvatar String?
+  userRating Int           @default(1200)
+  isHost     Boolean       @default(false)
+  isReady    Boolean       @default(false)
+  status     String        @default("JOINED") // JOINED, READY, PLAYING, LEFT, DISCONNECTED
+  joinedAt   DateTime      @default(now())
+  leftAt     DateTime?
+
+  @@unique([roomId, userId])
+  @@map("challenge_participants")
+}
+
+model MatchSession {
+  id              String         @id @default(cuid())
+  roomId          String?
+  room            ChallengeRoom? @relation(fields: [roomId], references: [id], onDelete: SetNull)
+  matchType       String         @default("1V1_RANKED") // 1V1_RANKED, 1V1_CASUAL, CONTEST, TOURNAMENT
+  difficulty      String         @default("MEDIUM")
+  status          String         @default("MATCHMAKING") // MATCHMAKING, READY_CHECK, COUNTDOWN, IN_PROGRESS, COMPLETED, CANCELLED
+  startedAt       DateTime?
+  endedAt         DateTime?
+  durationSeconds Int            @default(1800)
+  winnerId        String?
+  resultSummary   String?
+  problemId       String?
+  createdAt       DateTime       @default(now())
+
+  participants MatchParticipant[]
+  submissions  ChallengeSubmission[]
+
+  @@index([status, matchType])
+  @@map("match_sessions")
+}
+
+model MatchParticipant {
+  id             String       @id @default(cuid())
+  matchId        String
+  match          MatchSession @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  userId         String
+  userName       String
+  userAvatar     String?
+  score          Int          @default(0)
+  problemsSolved Int          @default(0)
+  passedTests    Int          @default(0)
+  totalTests     Int          @default(5)
+  ratingBefore   Int          @default(1200)
+  ratingAfter    Int          @default(1200)
+  xpEarned       Int          @default(0)
+  status         String       @default("IN_PROGRESS") // IN_PROGRESS, FINISHED, FORFEIT, DISCONNECTED
+  submittedAt    DateTime?
+
+  @@unique([matchId, userId])
+  @@map("match_participants")
+}
+
+model ChallengeProblem {
+  id            String   @id @default(cuid())
+  title         String
+  slug          String   @unique
+  difficulty    String   @default("MEDIUM") // EASY, MEDIUM, HARD
+  description   String
+  examples      Json     @default("[]")
+  constraints   String[] @default([])
+  topicTags     String[] @default([])
+  timeLimitMs   Int      @default(2000)
+  memoryLimitMb Int      @default(256)
+  starterCodes  Json     @default("{}")
+  testCases     Json     @default("[]") // Sample & hidden test cases with input and expected output
+  idealSolution String?
+  createdAt     DateTime @default(now())
+
+  @@index([difficulty])
+  @@map("challenge_problems")
+}
+
+model ChallengeSubmission {
+  id              String       @id @default(cuid())
+  matchId         String
+  match           MatchSession @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  userId          String
+  problemId       String
+  language        String
+  sourceCode      String
+  status          String       @default("ACCEPTED") // ACCEPTED, WRONG_ANSWER, TIME_LIMIT, RUNTIME_ERROR, COMPILE_ERROR
+  executionTimeMs Int          @default(0)
+  passedTestCases Int          @default(0)
+  totalTestCases  Int          @default(5)
+  score           Int          @default(0)
+  stdout          String?
+  errorDetails    String?
+  submittedAt     DateTime     @default(now())
+
+  @@index([matchId, userId])
+  @@map("challenge_submissions")
+}
+
+model QuizTemplate {
+  id              String   @id @default(cuid())
+  title           String
+  category        String // DSA, OS, DBMS, NETWORKS, OOP, APTITUDE, SYSTEM_DESIGN
+  difficulty      String   @default("MEDIUM")
+  timePerQuestion Int      @default(20)
+  totalQuestions  Int      @default(10)
+  createdAt       DateTime @default(now())
+
+  questions QuizQuestion[]
+  sessions  QuizSession[]
+
+  @@map("quiz_templates")
+}
+
+model QuizQuestion {
+  id           String       @id @default(cuid())
+  quizId       String
+  quiz         QuizTemplate @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  question     String
+  options      String[]
+  correctIndex Int // Hidden server-side until reveal
+  explanation  String
+  topic        String
+  difficulty   String       @default("MEDIUM")
+
+  @@index([quizId])
+  @@map("quiz_questions")
+}
+
+model QuizSession {
+  id              String       @id @default(cuid())
+  quizId          String
+  quiz            QuizTemplate @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  roomCode        String?      @unique
+  status          String       @default("WAITING") // WAITING, IN_PROGRESS, COMPLETED
+  currentQuestion Int          @default(0)
+  startedAt       DateTime?
+  endedAt         DateTime?
+  durationSeconds Int          @default(300)
+  createdAt       DateTime     @default(now())
+
+  answers QuizAnswer[]
+
+  @@map("quiz_sessions")
+}
+
+model QuizAnswer {
+  id             String      @id @default(cuid())
+  sessionId      String
+  session        QuizSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  questionId     String
+  userId         String
+  userName       String
+  selectedIndex  Int
+  isCorrect      Boolean     @default(false)
+  responseTimeMs Int         @default(0)
+  pointsAwarded  Int         @default(0)
+  submittedAt    DateTime    @default(now())
+
+  @@unique([sessionId, questionId, userId])
+  @@map("quiz_answers")
+}
+
+model Friendship {
+  id          String   @id @default(cuid())
+  requesterId String
+  recipientId String
+  status      String   @default("ACCEPTED") // PENDING, ACCEPTED, DECLINED, BLOCKED
+  createdAt   DateTime @default(now())
+
+  @@unique([requesterId, recipientId])
+  @@map("friendships")
+}
+
+model StudyGroup {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  createdBy   String
+  createdAt   DateTime @default(now())
+
+  members GroupMember[]
+
+  @@map("study_groups")
+}
+
+model GroupMember {
+  id       String     @id @default(cuid())
+  groupId  String
+  group    StudyGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  userId   String
+  userName String
+  role     String     @default("MEMBER") // ADMIN, MEMBER
+  joinedAt DateTime   @default(now())
+
+  @@unique([groupId, userId])
+  @@map("group_members")
+}
+
+model ChallengeRating {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  userName      String
+  userAvatar    String?
+  rating        Int      @default(1200)
+  tier          String   @default("GOLD") // BRONZE, SILVER, GOLD, PLATINUM, DIAMOND, GRANDMASTER
+  battlesTotal  Int      @default(0)
+  battlesWon    Int      @default(0)
+  winRate       Float    @default(0.0)
+  currentStreak Int      @default(0)
+  longestStreak Int      @default(0)
+  totalXP       Int      @default(0)
+  updatedAt     DateTime @updatedAt
+
+  @@index([rating])
+  @@map("challenge_ratings")
+}
+
+model ChallengeReward {
+  id         String   @id @default(cuid())
+  userId     String
+  matchId    String?
+  rewardType String // WIN_1V1, PARTICIPATION_1V1, CONTEST_TOP3, QUIZ_PERFECT, STREAK_BONUS
+  amountXP   Int      @default(0)
+  awardedAt  DateTime @default(now())
+
+  @@unique([userId, matchId, rewardType])
+  @@map("challenge_rewards")
+}

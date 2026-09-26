@@ -4,32 +4,78 @@ import { ReadinessVerdict, type InterviewSession, type Analysis, type Question }
 
 export function synthesizeSessionAnalysis(session: any): Analysis {
   const questions: Question[] = session.questions || [];
+  const answeredQuestions = questions.filter((q) => q.answerText && q.answerText.trim().length > 0);
   
-  // Calculate calibrated scores based on answers and question performance
-  let technicalScore = 88;
-  let communicationScore = 85;
-  let structureScore = 84;
-  let confidenceScore = 90;
-
-  if (questions.length > 0) {
-    const scoredQuestions = questions.filter((q) => typeof q.evalScore === 'number');
+  // 1. Dynamic Technical Score
+  let technicalScore = 0;
+  if (answeredQuestions.length > 0) {
+    const scoredQuestions = answeredQuestions.filter((q) => typeof q.evalScore === 'number');
     if (scoredQuestions.length > 0) {
-      const avgQScore = Math.round(
+      technicalScore = Math.round(
         scoredQuestions.reduce((acc, q) => acc + (q.evalScore || 0), 0) / scoredQuestions.length
       );
-      technicalScore = Math.max(70, Math.min(95, avgQScore));
+    } else {
+      technicalScore = 70;
     }
   }
 
-  const overallScore = Math.round(
-    technicalScore * 0.4 + communicationScore * 0.25 + structureScore * 0.2 + confidenceScore * 0.15
-  );
+  // 2. Dynamic Communication Score & Speech Metrics
+  const allAnswers = answeredQuestions.map((q) => q.answerText || '').join(' ');
+  const words = allAnswers.split(/\s+/).filter(Boolean);
+  const totalWords = words.length;
 
-  const role = session.targetRole || 'Fullstack Software Engineer';
+  let fillerCount = 0;
+  const fillers = ['um', 'umm', 'uh', 'uhh', 'like', 'basically', 'actually', 'literally'];
+  for (const f of fillers) {
+    const regex = new RegExp(`\\b${f}\\b`, 'gi');
+    const matches = allAnswers.match(regex);
+    if (matches) fillerCount += matches.length;
+  }
+
+  const fillerPenalty = Math.min(35, fillerCount * 3);
+  const avgWordsPerQ = answeredQuestions.length > 0 ? totalWords / answeredQuestions.length : 0;
+  const lengthScore = Math.min(100, Math.max(0, avgWordsPerQ * 1.5));
+  const communicationScore = answeredQuestions.length > 0
+    ? Math.max(10, Math.min(100, Math.round(lengthScore * 0.6 + (100 - fillerPenalty) * 0.4)))
+    : 0;
+
+  // 3. Proctoring & Confidence
+  const eyeContactScore = session.proctoring?.eyeContactScore ?? (session.isDisqualified ? 0 : 85);
+  const tabBlurCount = session.proctoring?.tabBlurCount ?? 0;
+  const confidenceScore = session.isDisqualified ? 0 : Math.max(0, Math.min(100, 100 - tabBlurCount * 15 - (eyeContactScore < 75 ? 15 : 0)));
+
+  const structureScore = Math.max(0, Math.min(100, Math.round(technicalScore * 0.55 + communicationScore * 0.3 + confidenceScore * 0.15)));
+  const overallScore = Math.max(0, Math.min(100, Math.round(technicalScore * 0.40 + communicationScore * 0.30 + confidenceScore * 0.30)));
+
+  const role = session.targetRole || 'Software Engineer';
+  const company = session.targetCompany || 'Technology Firms';
+
+  // 4. Dynamic Strengths & Weaknesses from real answers
+  let strengths: string[] = answeredQuestions.flatMap((q) => q.evalStrengths || []);
+  let improvements: string[] = answeredQuestions.flatMap((q) => q.evalWeaknesses || []);
+
+  strengths = Array.from(new Set(strengths)).filter(Boolean);
+  improvements = Array.from(new Set(improvements)).filter(Boolean);
+
+  if (strengths.length === 0) {
+    if (technicalScore >= 70) strengths.push(`Demonstrated solid engineering foundation for ${role}.`);
+    if (communicationScore >= 70) strengths.push('Articulate verbal explanation and clear cadence.');
+    if (confidenceScore >= 80) strengths.push('Strong environment composure and eye focus.');
+    if (strengths.length === 0 && answeredQuestions.length > 0) strengths.push('Successfully submitted responses to interview questions.');
+  }
+
+  if (improvements.length === 0) {
+    if (fillerCount > 2) improvements.push(`Reduce filler word frequency (${fillerCount} fillers observed).`);
+    if (technicalScore < 70) improvements.push('Expand technical depth and discuss architectural trade-offs.');
+    if (tabBlurCount > 0) improvements.push(`Eliminate window switching (${tabBlurCount} tab blur events detected).`);
+    if (improvements.length === 0) improvements.push('Practice structuring answers with the STAR method for greater clarity.');
+  }
+
+  const readinessVerdict = overallScore >= 80 ? ReadinessVerdict.READY : overallScore >= 60 ? ReadinessVerdict.ALMOST_READY : ReadinessVerdict.NOT_READY;
 
   return {
-    id: `an_${session.id || 'sess_default'}`,
-    sessionId: session.id || 'sess_default',
+    id: `an_${session.id || 'sess_active'}`,
+    sessionId: session.id || 'sess_active',
     overallScore,
     communicationScore,
     technicalScore,
@@ -37,38 +83,30 @@ export function synthesizeSessionAnalysis(session: any): Analysis {
     structureScore,
     confidenceMeterScore: confidenceScore,
     confidenceSignals: {
-      avgWpm: 134,
-      avgPauseCount: 2,
-      avgAnswerLength: 88,
+      avgWpm: Math.round(totalWords / Math.max(1, (answeredQuestions.length * 1.5))),
+      avgPauseCount: fillerCount,
+      avgAnswerLength: Math.round(avgWordsPerQ),
     },
-    eyeContactScore: 88,
-    presenceScore: 92,
-    summary: `Candidate demonstrated solid algorithmic proficiency for the ${role} position. Approach explanations were clear, modular, and grounded in Big-O time and space trade-offs with strong boundary case awareness.`,
-    strengths: [
-      'Proactively evaluated time and space complexity prior to implementation',
-      'Clean modular design with intuitive identifier naming and edge case bounds',
-      'Effective verbal communication and articulate problem-solving walkthroughs',
-    ],
-    improvements: [
-      'State input constraint limits explicitly before initiating code execution',
-      'Minimize mid-sentence filler words during complexity justification',
-      'Walk through edge cases (null inputs, single elements) systematically out loud',
-    ],
+    eyeContactScore,
+    presenceScore: confidenceScore,
+    summary: `Candidate completed interview evaluation for ${role} at ${company}. Technical proficiency scored at ${technicalScore}/100, verbal clarity at ${communicationScore}/100, and proctoring composure at ${confidenceScore}/100.`,
+    strengths: strengths.slice(0, 3),
+    improvements: improvements.slice(0, 3),
     actionableTips: [
       {
-        tip: 'State Target Big-O Upfront',
-        reason: 'Always communicate your expected asymptotic runtime bounds in the first 60 seconds before typing code.',
+        tip: 'Architectural Trade-Offs',
+        reason: `Substantiate your technical choices with explicit memory, latency, and scalability trade-offs for ${role} rounds.`,
       },
       {
-        tip: 'Boundary Case Dry Run',
-        reason: 'Manually trace two extreme edge cases (e.g. empty inputs or duplicates) with sample variable states.',
+        tip: 'Speech Cadence Control',
+        reason: fillerCount > 0 ? 'Replace verbal filler tokens with silent micro-pauses.' : 'Maintain your current steady conversational pace.',
       },
       {
-        tip: 'Eliminate Verbal Fillers',
-        reason: 'Use silent micro-pauses instead of "um" or "like" to formulate clear, authoritative statements.',
+        tip: 'Proctoring & Focus Consistency',
+        reason: tabBlurCount > 0 ? 'Ensure full screen focus is maintained throughout the exam.' : 'Retain direct eye contact with the interviewer.',
       },
     ],
-    readinessVerdict: overallScore >= 80 ? ReadinessVerdict.READY : overallScore >= 65 ? ReadinessVerdict.ALMOST_READY : ReadinessVerdict.NOT_READY,
+    readinessVerdict,
     createdAt: new Date().toISOString(),
   };
 }
@@ -83,7 +121,7 @@ export function useAnalysis(sessionId?: string) {
         const response = await apiClient.get(`/interview/session/${sessionId}`);
         sessionData = response.data;
       } catch (err) {
-        console.warn('[useAnalysis] Primary session fetch fallback triggered:', err);
+        console.warn('[useAnalysis] Primary session fetch error:', err);
       }
 
       // Check secondary analytics endpoint if analysis is absent
@@ -98,69 +136,13 @@ export function useAnalysis(sessionId?: string) {
         }
       }
 
-      // Ensure sessionData has fallback structure if backend returned empty
       if (!sessionData) {
-        sessionData = {
-          id: sessionId || 'sess_default',
-          userId: 'demo-user-123',
-          interviewType: 'TECHNICAL',
-          targetRole: 'Fullstack Engineer',
-          targetCompany: 'Top Tech Companies',
-          industry: 'Technology',
-          experienceLevel: 'MID',
-          durationMins: 20,
-          status: 'COMPLETED',
-          createdAt: new Date().toISOString(),
-          questions: [
-            {
-              id: 'q_default_1',
-              orderIndex: 1,
-              questionText: 'Two Sum: Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.',
-              questionType: 'TECHNICAL',
-              difficulty: 'MEDIUM',
-              answerText: 'Employed an auxiliary hash map storing complement values with O(N) linear time and O(N) space complexity.',
-              evalScore: 88,
-              evalFeedback: 'Optimal single-pass hash map implementation. Well-reasoned time/space complexity analysis.',
-              evalStrengths: [
-                'Instant identification of single-pass hash lookup',
-                'Comprehensive complexity justification',
-                'Handled duplicate keys properly',
-              ],
-              evalWeaknesses: [
-                'Could verbally discuss 64-bit integer overflow edge cases',
-              ],
-              betterAnswer: 'Single-pass hash table with complement mapping: target - nums[i].',
-            },
-          ],
-        };
+        throw new Error('Interview session could not be found.');
       }
 
-      // Guarantee analysis is attached immediately
+      // Guarantee analysis is synthesized dynamically from real data if missing
       if (!sessionData.analysis) {
         sessionData.analysis = synthesizeSessionAnalysis(sessionData);
-      }
-
-      // Ensure questions array is populated
-      if (!sessionData.questions || sessionData.questions.length === 0) {
-        sessionData.questions = [
-          {
-            id: 'q_default_1',
-            orderIndex: 1,
-            questionText: 'Coding Problem: Implement an optimal solution with comprehensive boundary case coverage.',
-            questionType: 'TECHNICAL',
-            difficulty: 'MEDIUM',
-            answerText: 'Implemented algorithmic solution and validated against hidden test suites.',
-            evalScore: 86,
-            evalFeedback: 'Passed sandboxed verification and satisfied time/space complexity standards.',
-            evalStrengths: [
-              'Clean algorithmic reasoning',
-              'Consistent code readability',
-            ],
-            evalWeaknesses: [
-              'Explicitly verify upper bound constraints',
-            ],
-          },
-        ];
       }
 
       return sessionData as InterviewSession;

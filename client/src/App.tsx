@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { Agentation } from 'agentation';
 import { useProfileStore } from './store/useProfileStore';
@@ -16,9 +16,13 @@ import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
 
 // Interview flow pages
+import UnifiedInterviewHub from './pages/interview/UnifiedInterviewHub';
+import InterviewHistoryPage from './pages/interview/InterviewHistoryPage';
 import OralCommandCenter from './pages/interview/OralCommandCenter';
 import CodingCommandCenter from './pages/interview/CodingCommandCenter';
 import SetupForm from './pages/interview/SetupForm';
+import OralReviewPage from './pages/interview/OralReviewPage';
+import OralPreCheckPage from './pages/interview/OralPreCheckPage';
 import DeviceCheck from './pages/interview/DeviceCheck';
 import InterviewRoom from './pages/interview/InterviewRoom';
 import Complete from './pages/interview/Complete';
@@ -40,7 +44,17 @@ import TopicDetailPage from './pages/prep/TopicDetailPage';
 import SkillMapPage from './pages/prep/SkillMapPage';
 import DailyPrepPage from './pages/prep/DailyPrepPage';
 
+// Online Challenges & Multiplayer Arena pages
+import OnlineChallengesHub from './pages/challenges/OnlineChallengesHub';
+import BattleArena1v1 from './pages/challenges/BattleArena1v1';
+import MultiplayerContestRoom from './pages/challenges/MultiplayerContestRoom';
+import MultiplayerQuizArena from './pages/challenges/MultiplayerQuizArena';
+import ChallengesLeaderboardPage from './pages/challenges/ChallengesLeaderboardPage';
 
+// System Design Studio pages
+import SystemDesignHub from './pages/system-design/SystemDesignHub';
+import SystemDesignStudio from './pages/system-design/SystemDesignStudio';
+import SystemDesignHistory from './pages/system-design/SystemDesignHistory';
 
 // Analysis pages
 import Dashboard from './pages/analysis/Dashboard';
@@ -69,10 +83,16 @@ import AppLayout from './layouts/AppLayout';
 import AdminRoute from './components/auth/AdminRoute';
 import AdminLayout from './layouts/AdminLayout';
 import AdminOverview from './pages/admin/AdminOverview';
+import AdminModels from './pages/admin/AdminModels';
+import AdminRevenue from './pages/admin/AdminRevenue';
+import AdminQuestions from './pages/admin/AdminQuestions';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminLogs from './pages/admin/AdminLogs';
 import AdminAnalytics from './pages/admin/AdminAnalytics';
 import AdminSessionDetail from './pages/admin/AdminSessionDetail';
+import AdminSystemControls from './pages/admin/AdminSystemControls';
+import AdminBroadcasts from './pages/admin/AdminBroadcasts';
+import AdminIntegrity from './pages/admin/AdminIntegrity';
 
 /** The global marketing header/footer should only render on public marketing pages. */
 function shouldShowHeaderFooter(pathname: string): boolean {
@@ -98,11 +118,22 @@ function App() {
 
   const showHeaderFooter = shouldShowHeaderFooter(location.pathname);
   const isLiveInterviewRoom =
-    /^\/interview\/(coding\/)?[^/]+$/.test(location.pathname) &&
+    (/^\/interview\/(coding\/)?[^/]+$/.test(location.pathname) || /^\/oral\/room\/[^/]+$/.test(location.pathname)) &&
     location.pathname !== '/interview/setup' &&
     location.pathname !== '/interview/new' &&
+    location.pathname !== '/interview/review' &&
+    location.pathname !== '/interview/precheck' &&
+    location.pathname !== '/interview/history' &&
+    location.pathname !== '/interview/coding' &&
+    location.pathname !== '/interview/coding/new' &&
     location.pathname !== '/oral/new' &&
-    location.pathname !== '/interview/coding/new';
+    location.pathname !== '/oral/setup' &&
+    location.pathname !== '/oral/review' &&
+    location.pathname !== '/oral/precheck' &&
+    location.pathname !== '/oral/history' &&
+    location.pathname !== '/oral/device-check' &&
+    !location.pathname.includes('/analytics') &&
+    !location.pathname.includes('/results');
 
   return (
     <AppLayout>
@@ -210,6 +241,38 @@ function App() {
                 }
               />
               <Route
+                path="/interview"
+                element={
+                  <ProtectedRoute>
+                    <UnifiedInterviewHub />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/interviews"
+                element={
+                  <ProtectedRoute>
+                    <UnifiedInterviewHub />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/interview/history"
+                element={
+                  <ProtectedRoute>
+                    <InterviewHistoryPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/interviews/history"
+                element={
+                  <ProtectedRoute>
+                    <InterviewHistoryPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/oral"
                 element={
                   <ProtectedRoute>
@@ -226,18 +289,26 @@ function App() {
                 }
               />
               <Route
-                path="/interview/coding"
+                path="/coding/new"
                 element={
                   <ProtectedRoute>
-                    <CodingCommandCenter />
+                    <CodingSetupForm />
                   </ProtectedRoute>
                 }
               />
               <Route
-                path="/interview"
+                path="/coding/history"
                 element={
                   <ProtectedRoute>
-                    <OralCommandCenter />
+                    <InterviewHistoryPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/interview/coding"
+                element={
+                  <ProtectedRoute>
+                    <CodingCommandCenter />
                   </ProtectedRoute>
                 }
               />
@@ -258,6 +329,22 @@ function App() {
                 }
               />
               <Route
+                path="/interview/review"
+                element={
+                  <ProtectedRoute>
+                    <OralReviewPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/interview/precheck"
+                element={
+                  <ProtectedRoute>
+                    <OralPreCheckPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/oral/new"
                 element={
                   <ProtectedRoute>
@@ -266,10 +353,42 @@ function App() {
                 }
               />
               <Route
+                path="/oral/setup"
+                element={
+                  <ProtectedRoute>
+                    <SetupForm />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/oral/review"
+                element={
+                  <ProtectedRoute>
+                    <OralReviewPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/oral/precheck"
+                element={
+                  <ProtectedRoute>
+                    <OralPreCheckPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/oral/device-check"
+                element={
+                  <ProtectedRoute>
+                    <OralPreCheckPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/oral/history"
                 element={
                   <ProtectedRoute>
-                    <OralHistoryPage />
+                    <InterviewHistoryPage />
                   </ProtectedRoute>
                 }
               />
@@ -302,6 +421,82 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <CompanyTrackDetailPage />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Online Challenges & Multiplayer Competition Routes */}
+              <Route
+                path="/challenges"
+                element={
+                  <ProtectedRoute>
+                    <OnlineChallengesHub />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/challenges/quizzes"
+                element={
+                  <ProtectedRoute>
+                    <MultiplayerQuizArena />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/challenges/quiz/:sessionId"
+                element={
+                  <ProtectedRoute>
+                    <MultiplayerQuizArena />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/challenges/room/:roomId"
+                element={
+                  <ProtectedRoute>
+                    <MultiplayerContestRoom />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/challenges/leaderboard"
+                element={
+                  <ProtectedRoute>
+                    <ChallengesLeaderboardPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/challenges/match/:matchId"
+                element={
+                  <ProtectedRoute>
+                    <BattleArena1v1 />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* System Design Whiteboard Studio Routes */}
+              <Route
+                path="/system-design"
+                element={
+                  <ProtectedRoute>
+                    <SystemDesignHub />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/system-design/studio/:sessionId"
+                element={
+                  <ProtectedRoute>
+                    <SystemDesignStudio />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/system-design/history"
+                element={
+                  <ProtectedRoute>
+                    <SystemDesignHistory />
                   </ProtectedRoute>
                 }
               />
@@ -535,6 +730,30 @@ function App() {
                 }
               />
               <Route
+                path="/admin/models"
+                element={
+                  <AdminRoute>
+                    <AdminLayout>
+                      <AdminModels />
+                    </AdminLayout>
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/revenue"
+                element={
+                  <AdminRoute>
+                    <AdminLayout>
+                      <AdminRevenue />
+                    </AdminLayout>
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/questions"
+                element={<Navigate to="/admin" replace />}
+              />
+              <Route
                 path="/admin/users"
                 element={
                   <AdminRoute>
@@ -560,6 +779,36 @@ function App() {
                   <AdminRoute>
                     <AdminLayout>
                       <AdminSessionDetail />
+                    </AdminLayout>
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/integrity"
+                element={
+                  <AdminRoute>
+                    <AdminLayout>
+                      <AdminIntegrity />
+                    </AdminLayout>
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/broadcasts"
+                element={
+                  <AdminRoute>
+                    <AdminLayout>
+                      <AdminBroadcasts />
+                    </AdminLayout>
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/system-controls"
+                element={
+                  <AdminRoute>
+                    <AdminLayout>
+                      <AdminSystemControls />
                     </AdminLayout>
                   </AdminRoute>
                 }
@@ -644,6 +893,16 @@ function App() {
               />
               <Route
                 path="/interview/:id"
+                element={
+                  <ProtectedRoute>
+                    <ErrorBoundary fallbackTitle="Interview room error">
+                      <InterviewRoom />
+                    </ErrorBoundary>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/interview/:id/room"
                 element={
                   <ProtectedRoute>
                     <ErrorBoundary fallbackTitle="Interview room error">

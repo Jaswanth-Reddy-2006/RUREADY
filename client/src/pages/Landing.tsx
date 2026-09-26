@@ -259,7 +259,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         q: 'Can I generate a customized interview based on my resume?',
-        a: 'Absolutely. R U Ready? synthesizes the tech stack, libraries, and experience claims on your resume to generate targeted Socratic questions specifically testing what you listed.',
+        a: 'Absolutely. Rennetus synthesizes the tech stack, libraries, and experience claims on your resume to generate targeted Socratic questions specifically testing what you listed.',
       },
       {
         q: 'How does the job description keyword comparison work?',
@@ -274,7 +274,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
     colorTheme: 'blue',
     items: [
       {
-        q: 'Does R U Ready? record or store my webcam video?',
+        q: 'Does Rennetus record or store my webcam video?',
         a: 'Absolutely not. We maintain a strict Zero Video Recording guarantee. No video files or streams are ever saved to disk or transmitted to our servers. All visual telemetry (face centering, posture stability, and eye gaze tracking) is computed in real-time, on-device in memory, and immediately discarded.',
       },
       {
@@ -298,7 +298,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
     colorTheme: 'violet',
     items: [
       {
-        q: 'What is the R U Ready? Readiness Score?',
+        q: 'What is the Rennetus Readiness Score?',
         a: 'The Readiness Score is a calibrated 0-100 composite index calculated across technical correctness, algorithmic efficiency, STAR communication depth, eye contact confidence, and speech pacing. It gives you an uninflated assessment of whether you meet Tier-1 tech standards.',
       },
       {
@@ -430,10 +430,10 @@ export default function Landing() {
       className="min-h-screen bg-[#EFFAFD] text-[#0F172A] overflow-hidden selection:bg-[#4A8BDF]/20 selection:text-[#2459A8] font-sans"
     >
       <Helmet>
-        <title>R U Ready? — Check Your Standards & Upgrade Yourself to Get Placed</title>
+        <title>Rennetus — Recognize • Rebuild • Rise | AI Interview Platform</title>
         <meta
           name="description"
-          content="Calibrated AI Mock Interviews, ATS Resume Alignment, Live In-Browser Coding Sandbox, and Custom Tech Career Roadmaps."
+          content="Rennetus — Calibrated AI Mock Interviews, ATS Resume Alignment, Live In-Browser Coding Sandbox, and Custom Tech Career Roadmaps."
         />
       </Helmet>
 
@@ -759,7 +759,7 @@ export default function Landing() {
           
           <div className="text-center max-w-3xl mx-auto space-y-4">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#0F172A] tracking-tight">
-              What You Gain With R U Ready?
+              What You Gain With Rennetus
             </h2>
             <p className="text-base sm:text-lg text-black font-medium leading-relaxed">
               From your first diagnostic session to clearing strict Tier-1 hiring loops — here is what happens when you prepare with calibrated intelligence.
@@ -1147,7 +1147,7 @@ export default function Landing() {
               Ready to Check Your Standards & Get Placed?
             </h2>
             <p className="text-pink-100 text-sm sm:text-base font-medium leading-relaxed max-w-xl mx-auto">
-              Join thousands of candidates using R U Ready? for ATS alignment, live coding benchmarks, and multi-agent mock interviews.
+              Join thousands of candidates using Rennetus for ATS alignment, live coding benchmarks, and multi-agent mock interviews.
             </p>
 
             <div className="pt-2 flex flex-wrap items-center justify-center gap-4">

@@ -147,14 +147,66 @@ ${rawTranscript}
 
     if (previousQA.length > 0) {
       const last = previousQA[previousQA.length - 1];
-      if (last.answerText && last.answerText.length > 10) {
-        const words = last.answerText.split(' ');
-        const keyTerm = words.find(w => w.length > 5 && !['because', 'through', 'building', 'project'].includes(w.toLowerCase())) || 'that approach';
+      const answer = (last.answerText || '').toLowerCase();
+
+      if (answer.includes('full-stack') || answer.includes('full stack') || answer.includes('fullstack')) {
         return {
-          questionText: `Follow-up: In your previous response, you highlighted using ${keyTerm}. How did you handle edge-case failure modes or performance trade-offs with that architecture?`,
+          questionText: "Okay, you mentioned you work as a full-stack developer. What is the specific tech stack, frameworks, and architecture you use across your frontend and backend projects?",
           questionType: QuestionType.TECHNICAL,
           difficulty: Difficulty.MEDIUM,
-          rationale: 'Deep-dive Socratic challenge on candidate spoken answer',
+          rationale: 'Drill down into candidate stated full-stack background',
+          isFollowUp: true,
+        };
+      }
+
+      if (answer.includes('react') || answer.includes('frontend') || answer.includes('vue') || answer.includes('angular') || answer.includes('next.js') || answer.includes('nextjs')) {
+        return {
+          questionText: "Understood, nice to hear about your frontend focus. How do you approach state management, performance optimization, and API communication in your web applications?",
+          questionType: QuestionType.TECHNICAL,
+          difficulty: Difficulty.MEDIUM,
+          rationale: 'Frontend architecture exploration',
+          isFollowUp: true,
+        };
+      }
+
+      if (answer.includes('node') || answer.includes('backend') || answer.includes('python') || answer.includes('django') || answer.includes('fastapi') || answer.includes('java') || answer.includes('spring') || answer.includes('express') || answer.includes('golang') || answer.includes('go')) {
+        return {
+          questionText: "Got it. When building your backend services and APIs, how do you handle database transactions, caching strategies, and error handling for production scale?",
+          questionType: QuestionType.TECHNICAL,
+          difficulty: Difficulty.MEDIUM,
+          rationale: 'Backend architecture exploration',
+          isFollowUp: true,
+        };
+      }
+
+      if (answer.includes('database') || answer.includes('sql') || answer.includes('postgres') || answer.includes('mongo') || answer.includes('redis')) {
+        return {
+          questionText: "Interesting data layer choice. How do you design indexing strategies and handle data consistency or concurrency in those databases?",
+          questionType: QuestionType.TECHNICAL,
+          difficulty: Difficulty.MEDIUM,
+          rationale: 'Database design exploration',
+          isFollowUp: true,
+        };
+      }
+
+      if (answer.includes('student') || answer.includes('fresher') || answer.includes('college') || answer.includes('university') || answer.includes('graduate')) {
+        return {
+          questionText: "Great to know about your academic background. What is the most challenging technical project or algorithm you built during your studies, and what was your individual contribution?",
+          questionType: QuestionType.BEHAVIOURAL,
+          difficulty: Difficulty.MEDIUM,
+          rationale: 'Academic and hands-on project exploration',
+          isFollowUp: true,
+        };
+      }
+
+      if (last.answerText && last.answerText.length > 8) {
+        const words = last.answerText.split(/\s+/).filter(w => w.length > 4 && !['because', 'through', 'building', 'project', 'worked', 'really', 'myself', 'about'].includes(w.toLowerCase()));
+        const topic = words[0] || 'your previous experience';
+        return {
+          questionText: `That's interesting regarding ${topic}. Could you walk me through the key architectural trade-offs and decisions you made when implementing that?`,
+          questionType: QuestionType.TECHNICAL,
+          difficulty: Difficulty.MEDIUM,
+          rationale: 'Socratic follow-up on candidate spoken answer',
           isFollowUp: true,
         };
       }

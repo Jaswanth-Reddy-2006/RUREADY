@@ -1,11 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import AIAvatar, { type AvatarState } from './interview/AIAvatar';
 import { type OculusViseme } from './interview/visemeMapper';
 import { type VideoAnalysisMetrics } from '../hooks/useVideoAnalysisML';
-import { 
-  Volume2, Shield, Clock, Edit3, Maximize2
-} from 'lucide-react';
-import Badge from './ui/Badge';
+import { Maximize2, Mic, ShieldAlert, Sparkles } from 'lucide-react';
 
 interface NormalInterviewRoomProps {
   mediaStream: MediaStream | null;
@@ -15,7 +12,7 @@ interface NormalInterviewRoomProps {
   spokenWord: string;
   activeVisemeShape?: OculusViseme;
   currentQuestionText: string;
-  candidateTranscription: string;
+  candidateTranscription?: string;
   onSubmitAnswer: (answer: string) => void;
   onEndInterview: () => void;
   isProcessing: boolean;
@@ -39,41 +36,16 @@ export default function NormalInterviewRoom({
   spokenWord,
   activeVisemeShape,
   currentQuestionText,
-  candidateTranscription,
-  onSubmitAnswer,
   onEndInterview,
   isProcessing,
   processingLabel,
-  questionIndex = 1,
-  totalQuestions = 5,
-  questionDifficulty = 'Medium',
-  focusArea = 'System & STAR Competency',
-  silenceCountdown = null,
+  candidateTranscription,
   isFullscreen = true,
   onReEnterFullscreen,
-  onTranscriptionChange,
+  silenceCountdown,
   videoMLMetrics,
 }: NormalInterviewRoomProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isEditingTranscript, setIsEditingTranscript] = useState(false);
-  const [manualText, setManualText] = useState('');
-  const [elapsedSeconds, setElapsedSeconds] = useState(0);
-
-  // Synchronize manual text with live transcription when not actively typing
-  useEffect(() => {
-    if (!isEditingTranscript) {
-      setManualText(candidateTranscription);
-    }
-  }, [candidateTranscription, isEditingTranscript]);
-
-  // Question elapsed timer
-  useEffect(() => {
-    setElapsedSeconds(0);
-    const interval = setInterval(() => {
-      setElapsedSeconds((prev) => prev + 1);
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [currentQuestionText]);
 
   // Bind candidate media stream (strictly locked on)
   useEffect(() => {
@@ -85,45 +57,34 @@ export default function NormalInterviewRoom({
     }
   }, [mediaStream]);
 
-  const formatPacingTime = (secs: number) => {
-    const mins = Math.floor(secs / 60);
-    const remainingSecs = secs % 60;
-    return `${mins}:${remainingSecs < 10 ? '0' : ''}${remainingSecs}`;
-  };
-
-  const handleInsertStructureTag = (tag: string) => {
-    const prefix = `[${tag}]: `;
-    const updated = manualText ? `${manualText}\n${prefix}` : prefix;
-    setManualText(updated);
-    setIsEditingTranscript(true);
-    if (onTranscriptionChange) {
-      onTranscriptionChange(updated);
-    }
-  };
-
-  const handleDirectSubmit = () => {
-    const finalAnswer = isEditingTranscript ? manualText : (candidateTranscription || manualText);
-    if (!finalAnswer.trim() || isProcessing) return;
-    onSubmitAnswer(finalAnswer);
-    setIsEditingTranscript(false);
-    setManualText('');
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-      e.preventDefault();
-      handleDirectSubmit();
-    }
-  };
-
-  const activeAnswer = isEditingTranscript ? manualText : candidateTranscription;
-
   return (
-    <div 
-      className="fixed inset-0 z-50 flex flex-col bg-[#EFFAFD] text-[#11183D] font-sans select-none overflow-hidden"
-      onKeyDown={handleKeyDown}
-    >
+    <div className="fixed inset-0 z-50 flex flex-col bg-[#EFFAFD] text-[#11183D] font-sans select-none overflow-hidden">
       
+      {/* ─── 0. STRICT FULL-SCREEN LOCKDOWN OVERLAY (If Exited) ─── */}
+      {!isFullscreen && (
+        <div className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-slate-950/95 backdrop-blur-xl p-6 text-white text-center select-none animate-fadeIn">
+          <div className="max-w-md w-full bg-slate-900 border border-amber-500/40 rounded-3xl p-8 shadow-2xl space-y-6">
+            <div className="h-16 w-16 mx-auto rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+              <ShieldAlert size={32} />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold font-display text-white">Full-Screen Security Lockdown</h2>
+              <p className="text-xs text-slate-400 mt-2 leading-relaxed font-body">
+                For complete proctoring integrity, this interview must remain in full-screen mode at all times. Tab switches, multi-window events, and external processes are monitored.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={onReEnterFullscreen}
+              className="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-2xl transition-all shadow-lg cursor-pointer flex items-center justify-center gap-2 font-display"
+            >
+              <Maximize2 size={16} />
+              <span>Return to Full-Screen Mode</span>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* ─── 1. TOP MINIMAL BRAND & EXIT BAR ─── */}
       <header className="px-6 py-3 shrink-0 border-b border-[#DCE7F2] bg-white shadow-xs z-20 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
@@ -135,14 +96,50 @@ export default function NormalInterviewRoom({
           </span>
         </div>
 
-        {/* Discreet End Call */}
-        <button
-          type="button"
-          onClick={onEndInterview}
-          className="bg-[#D64545] hover:bg-[#D64545]/90 text-white px-4 py-1.5 rounded-full font-bold text-xs shadow-xs transition-all cursor-pointer active:scale-95 font-display"
-        >
-          End Call
-        </button>
+        {/* Right Controls: AI State Pill + End Call */}
+        <div className="flex items-center gap-3">
+          {/* Live AI State Pill */}
+          {aiIsSpeaking ? (
+            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-50 border border-sky-200 text-sky-700 text-xs font-bold font-mono shadow-xs animate-pulse">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
+              </span>
+              <span>Ava Speaking...</span>
+            </div>
+          ) : isProcessing ? (
+            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-50 border border-purple-200 text-purple-700 text-xs font-bold font-mono shadow-xs">
+              <div className="h-2.5 w-2.5 rounded-full border-2 border-purple-600 border-t-transparent animate-spin" />
+              <span>Thinking & Processing...</span>
+            </div>
+          ) : avatarState === 'listening' ? (
+            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold font-mono shadow-xs">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              <span>
+                {(silenceCountdown ?? 0) > 0
+                  ? `Listening (Submitting in ${silenceCountdown}s)...`
+                  : 'Listening to you...'}
+              </span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-slate-600 text-xs font-bold font-mono shadow-xs">
+              <span className="h-2 w-2 rounded-full bg-slate-400" />
+              <span>Ready</span>
+            </div>
+          )}
+
+          {/* Discreet End Call */}
+          <button
+            type="button"
+            onClick={onEndInterview}
+            className="bg-[#D64545] hover:bg-[#D64545]/90 text-white px-4 py-1.5 rounded-full font-bold text-xs shadow-xs transition-all cursor-pointer active:scale-95 font-display"
+          >
+            End Call
+          </button>
+        </div>
       </header>
 
       {/* ─── 2. MAIN 2-PANEL EQUAL STAGE ─── */}
@@ -155,6 +152,14 @@ export default function NormalInterviewRoom({
           <div className="relative flex-1 min-h-[260px] w-full flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#0e172e] via-[#090e1c] to-[#04060c]">
             <AIAvatar
               state={avatarState}
+              expression={
+                aiIsSpeaking ? 'SPEAKING' :
+                isProcessing ? 'THINKING' :
+                avatarState === 'listening' ? 'INTERESTED' :
+                avatarState === 'pleased' ? 'ENCOURAGING' :
+                avatarState === 'concerned' ? 'CONCERNED' :
+                'NEUTRAL'
+              }
               isSpeaking={aiIsSpeaking}
               mouthOpenness={mouthOpenness}
               activeVisemeShape={activeVisemeShape}
@@ -167,20 +172,9 @@ export default function NormalInterviewRoom({
             <div className="absolute top-4 left-4 z-10 px-3 py-1 rounded-full bg-[#11183D]/80 backdrop-blur-md border border-white/10 text-white text-xs font-bold font-display shadow-md">
               Ava
             </div>
-
-            {/* Processing Indicator */}
-            {isProcessing && (
-              <div className="absolute inset-0 bg-[#070b14]/70 backdrop-blur-xs flex items-center justify-center z-20">
-                <div className="bg-[#11183D] border border-white/20 px-5 py-2.5 rounded-full text-xs text-white font-mono flex items-center gap-2.5 shadow-xl">
-                  <div className="h-3.5 w-3.5 border-2 border-[#4A8BDF] border-t-transparent animate-spin rounded-full" />
-                  <span>{processingLabel || 'Ava is evaluating response...'}</span>
-                </div>
-              </div>
-            )}
           </div>
 
           {/* ─── AVA'S BOTTOM CAPTION BOX ─── */}
-          {/* Speaks question, then displays 'Come on, you can start your question' */}
           <div className="bg-[#11183D] p-5 shrink-0 z-10">
             <div className="min-h-[72px] max-h-36 overflow-y-auto pr-1 flex flex-col justify-center">
               {aiIsSpeaking ? (
@@ -195,7 +189,7 @@ export default function NormalInterviewRoom({
               ) : (
                 <div className="space-y-1">
                   <p className="text-sm sm:text-base font-bold text-[#38bdf8] font-display tracking-tight">
-                    Come on, you can start your question
+                    Ava is listening — please respond whenever you're ready
                   </p>
                   <p className="text-xs sm:text-sm text-slate-300 font-normal leading-relaxed font-body line-clamp-2">
                     {currentQuestionText}
@@ -208,9 +202,9 @@ export default function NormalInterviewRoom({
         </div>
 
         {/* ─── RIGHT: CANDIDATE STAGE ─── */}
-        <div className="w-full h-full flex flex-col bg-white border border-[#DCE7F2] rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm justify-between">
+        <div className="w-full h-full flex flex-col bg-white border border-[#DCE7F2] rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm">
           
-          {/* Candidate Webcam Feed Area */}
+          {/* Candidate Webcam Feed Area (Clean, full height) */}
           <div className="relative flex-1 bg-[#11183D] min-h-[260px] flex items-center justify-center overflow-hidden">
             {mediaStream ? (
               <video
@@ -232,78 +226,20 @@ export default function NormalInterviewRoom({
               You
             </div>
 
-            {/* Live On-Device ML Telemetry Indicator (Zero Video Recording) */}
-            <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
-              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-[#11183D]/85 backdrop-blur-md border border-emerald-500/30 text-white text-xs font-medium font-body shadow-md">
-                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-[10px] text-emerald-300 font-mono tracking-wider">LIVE ML</span>
-                <span className="text-white/30">•</span>
-                <span className="text-[11px] text-slate-200">Confidence {videoMLMetrics?.confidenceScore ?? 88}%</span>
-                <span className="text-white/30">•</span>
-                <span className="text-[11px] text-[#7dd3fc]">{videoMLMetrics?.composureLevel ?? 'Calm & Composed'}</span>
+            {/* Multiple People Integrity Warning */}
+            {(videoMLMetrics?.multipleFacesDetected || (videoMLMetrics?.faceCount && videoMLMetrics.faceCount > 1)) && (
+              <div className="absolute top-4 right-4 z-20 px-3.5 py-1.5 rounded-full bg-red-600/95 backdrop-blur-md border border-red-400 text-white text-xs font-bold font-display shadow-xl flex items-center gap-1.5 animate-bounce">
+                <span>⚠️ Multiple People Detected</span>
               </div>
-            </div>
-          </div>
+            )}
 
-          {/* ─── CANDIDATE'S BOTTOM TRANSCRIPTION BOX & INTENT ACTIONS ─── */}
-          <div className="bg-[#11183D] p-5 shrink-0 z-10 border-t border-[#1e295d] space-y-3">
-            <div className="min-h-[56px] max-h-32 overflow-y-auto pr-1 flex flex-col justify-center">
-              <span className="text-[10px] font-mono text-emerald-400 uppercase tracking-wider block mb-1">
-                Your Response
-              </span>
-              <p className="text-sm sm:text-base text-white font-medium leading-relaxed font-body">
-                {activeAnswer.trim() ? (
-                  activeAnswer
-                ) : (
-                  <span className="text-slate-400 italic">
-                    Speak your answer aloud into your microphone...
-                  </span>
-                )}
-              </p>
-            </div>
-
-            {/* Quick Candidate Action Intent Buttons */}
-            <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-800">
-              <div className="flex flex-wrap items-center gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => onSubmitAnswer("Can you repeat the question?")}
-                  className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium rounded-lg border border-slate-700 transition-colors"
-                >
-                  Repeat Question
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onSubmitAnswer("Can you rephrase or clarify the question?")}
-                  className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium rounded-lg border border-slate-700 transition-colors"
-                >
-                  Clarify Question
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onSubmitAnswer("Give me a second, I'm thinking.")}
-                  className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs font-medium rounded-lg border border-slate-700 transition-colors"
-                >
-                  I'm Thinking...
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onSubmitAnswer("I don't know this concept.")}
-                  className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-rose-300 text-xs font-medium rounded-lg border border-slate-700 transition-colors"
-                >
-                  I Don't Know
-                </button>
+            {/* Pause / Auto-submit Countdown Badge */}
+            {(silenceCountdown ?? 0) > 0 && !videoMLMetrics?.multipleFacesDetected && (
+              <div className="absolute top-4 right-4 z-10 px-3.5 py-1.5 rounded-full bg-amber-500/95 backdrop-blur-md border border-amber-300 text-white text-xs font-bold font-mono shadow-lg flex items-center gap-2 animate-pulse">
+                <div className="h-2 w-2 rounded-full bg-white" />
+                <span>Submitting in {silenceCountdown}s (speak to continue)</span>
               </div>
-
-              <button
-                type="button"
-                onClick={handleDirectSubmit}
-                disabled={isProcessing}
-                className="px-4 py-1.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-bold text-xs rounded-lg shadow-sm transition-all flex items-center gap-1.5"
-              >
-                {isProcessing ? 'Processing...' : 'Submit Answer'}
-              </button>
-            </div>
+            )}
           </div>
 
         </div>

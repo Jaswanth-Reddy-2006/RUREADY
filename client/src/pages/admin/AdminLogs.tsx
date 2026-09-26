@@ -107,8 +107,8 @@ export default function AdminLogs() {
       const res = await apiClient.get('/admin/health-matrix');
       setHealthMatrix(res.data || []);
     } catch (err) {
-      console.error('Failed to load microservices health matrix:', err);
-      toast.error('Failed to fetch microservices status');
+      console.warn('Error fetching microservices health matrix:', err);
+      setHealthMatrix([]);
     } finally {
       setHealthLoading(false);
     }
@@ -120,8 +120,8 @@ export default function AdminLogs() {
       const res = await apiClient.get('/admin/system-logs');
       setSystemLogs(res.data || []);
     } catch (err) {
-      console.error('Failed to load system background logs:', err);
-      toast.error('Failed to fetch system logs');
+      console.warn('Error fetching system logs:', err);
+      setSystemLogs([]);
     } finally {
       setSysLogsLoading(false);
     }
@@ -131,10 +131,10 @@ export default function AdminLogs() {
     if (!silent) setSessionLogsLoading(true);
     try {
       const res = await apiClient.get('/admin/logs');
-      setLogs(res.data.logs || []);
+      setLogs(res.data?.logs || []);
     } catch (err) {
-      console.error('Failed to load candidate session logs:', err);
-      toast.error('Failed to fetch session audit logs');
+      console.warn('Error fetching candidate session logs:', err);
+      setLogs([]);
     } finally {
       setSessionLogsLoading(false);
     }

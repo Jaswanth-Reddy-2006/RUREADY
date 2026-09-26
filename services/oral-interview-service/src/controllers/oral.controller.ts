@@ -85,7 +85,7 @@ export const oralController = {
     try {
       const userId = (req as any).user?.userId || (req.headers['x-user-id'] as string) || 'demo-user-123';
       const sessionId = req.params.id as string;
-      const session = await oralService.completeSession(sessionId, userId);
+      const session = await oralService.completeSession(sessionId, userId, req.body);
       res.status(200).json(session);
     } catch (err) {
       next(err);

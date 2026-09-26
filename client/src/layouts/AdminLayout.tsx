@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════
 // R U Ready? — Bespoke Executive Admin Layout
-// Theme: Emerald Green (#10B981) + Deep Navy (#0F172A) + Solar Orange (#FF7A00)
+// Theme: Unified Light Executive Platform Theme (Matches User App Layout)
 // ═══════════════════════════════════════════════════════════════
 
 import React, { useState, useEffect } from 'react';
@@ -10,17 +10,19 @@ import {
   Users,
   Layers,
   TrendingUp,
-  ArrowRight,
   LogOut,
   Menu,
   X,
-  Zap,
+  Sparkles,
+  IndianRupee,
+  Sliders,
+  Megaphone,
+  ShieldCheck,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import clsx from 'clsx';
 import { useAuthStore } from '@/store/authStore';
 import { useAuth } from '@/hooks/useAuth';
-import apiClient from '@/api/client';
 import Logo from '@/components/ui/Logo';
 
 interface AdminLayoutProps {
@@ -35,19 +37,44 @@ const adminNavItems = [
     icon: LayoutDashboard,
   },
   {
+    label: 'AI Models & Voices',
+    href: '/admin/models',
+    icon: Sparkles,
+  },
+  {
     label: 'Candidate Directory',
     href: '/admin/users',
     icon: Users,
   },
   {
-    label: 'Session Logs',
-    href: '/admin/logs',
-    icon: Layers,
+    label: 'Revenue & Plans',
+    href: '/admin/revenue',
+    icon: IndianRupee,
+  },
+  {
+    label: 'Anti-Cheat Integrity',
+    href: '/admin/integrity',
+    icon: ShieldCheck,
+  },
+  {
+    label: 'Broadcasts & Banners',
+    href: '/admin/broadcasts',
+    icon: Megaphone,
+  },
+  {
+    label: 'System Controls & LLM',
+    href: '/admin/system-controls',
+    icon: Sliders,
   },
   {
     label: 'Traffic & Business',
     href: '/admin/analytics',
     icon: TrendingUp,
+  },
+  {
+    label: 'Microservices & Logs',
+    href: '/admin/logs',
+    icon: Layers,
   },
 ];
 
@@ -57,32 +84,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [onlineCount, setOnlineCount] = useState<number>(3);
 
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
-
-  // Periodic lightweight ping for live metrics
-  useEffect(() => {
-    let isMounted = true;
-    async function fetchStatus() {
-      try {
-        const res = await apiClient.get('/admin/metrics');
-        if (isMounted && res.data && res.data.onlineUsers) {
-          setOnlineCount(res.data.onlineUsers);
-        }
-      } catch {
-        // silent
-      }
-    }
-    fetchStatus();
-    const interval = setInterval(fetchStatus, 30000);
-    return () => {
-      isMounted = false;
-      clearInterval(interval);
-    };
-  }, []);
 
   const handleLogout = async () => {
     await logout();
@@ -92,26 +97,20 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-[#EFFAFD] font-body text-[#11183D] selection:bg-[#4A8BDF]/20 selection:text-[#2459A8]">
       
-      {/* ─── Desktop Dedicated Admin Sidebar ─── */}
-      <aside className="hidden lg:flex w-64 xl:w-72 h-full bg-[#11183D] text-white flex-col justify-between border-r border-[#2459A8]/30 shrink-0 select-none shadow-2xl relative z-30">
+      {/* ─── Desktop Dedicated Admin Sidebar (Unified Light Platform Theme) ─── */}
+      <aside className="hidden lg:flex w-64 bg-white text-[#11183D] flex-col justify-between border-r border-[#DCE7F2] shrink-0 select-none z-30 shadow-xs">
         
-        {/* Top Branding */}
-        <div className="p-6 space-y-6">
-          <Link to="/admin" className="block focus:outline-none">
-            <Logo size="md" theme="dark" />
-          </Link>
-
-          {/* Live Online Indicator */}
-          <div className="p-3 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between">
-            <span className="text-[11px] font-medium text-slate-300">Live Active</span>
-            <div className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-[#168A62] animate-pulse" />
-              <span className="text-xs font-bold font-mono text-[#168A62]">{onlineCount} Online</span>
-            </div>
+        {/* Top Branding & Navigation */}
+        <div className="flex flex-col flex-1 overflow-y-auto">
+          {/* Brand Header */}
+          <div className="h-16 flex items-center px-6 border-b border-[#DCE7F2] shrink-0">
+            <Link to="/admin" className="block focus:outline-none">
+              <Logo size="md" theme="light" />
+            </Link>
           </div>
 
           {/* Nav Links */}
-          <nav className="space-y-1.5 pt-1">
+          <nav className="p-3 space-y-1.5 flex-1" aria-label="Admin Navigation Menu">
             {adminNavItems.map((item) => {
               const Icon = item.icon;
               const isActive = item.exact
@@ -125,59 +124,47 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   end={item.exact}
                   className={({ isActive }) =>
                     clsx(
-                      'flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all group',
+                      'flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold font-sans transition-all duration-200 group relative',
                       isActive
-                        ? 'bg-[#4A8BDF] text-white shadow-md shadow-[#4A8BDF]/20 font-bold'
-                        : 'text-slate-300 hover:text-white hover:bg-white/10'
+                        ? 'bg-[#EFFAFD] text-[#11183D] shadow-xs'
+                        : 'text-[#526078] hover:bg-[#F8FAFC] hover:text-[#11183D]'
                     )
                   }
                 >
-                  <div className="flex items-center gap-3">
-                    <Icon size={16} className={clsx(isActive ? 'text-white' : 'text-slate-400 group-hover:text-[#4A8BDF]')} />
-                    <span>{item.label}</span>
-                  </div>
+                  <Icon
+                    size={17}
+                    className={clsx(
+                      isActive ? 'text-[#4A8BDF]' : 'text-[#526078] group-hover:text-[#11183D]'
+                    )}
+                  />
+                  <span className="flex-1 truncate">{item.label}</span>
                 </NavLink>
               );
             })}
           </nav>
         </div>
 
-        {/* Bottom Switch to Candidate View & Admin Profile */}
-        <div className="p-5 border-t border-white/10 bg-black/20 space-y-3">
-          
-          {/* Quick Switcher Button */}
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 hover:border-[#4A8BDF]/60 text-xs text-slate-300 hover:text-white transition-all cursor-pointer group shadow-sm"
-          >
-            <div className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-[#A0006D]" />
-              <span className="font-semibold">Candidate View</span>
-            </div>
-            <ArrowRight size={13} className="text-slate-400 group-hover:text-[#4A8BDF] group-hover:translate-x-0.5 transition-transform" />
-          </button>
-
-          {/* Admin User Info */}
-          <div className="flex items-center justify-between pt-1">
+        {/* Bottom Admin Profile & Logout */}
+        <div className="p-4 border-t border-[#DCE7F2] bg-[#F8FAFC] shrink-0">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5 overflow-hidden">
-              <div className="h-8 w-8 rounded-xl bg-[#4A8BDF]/20 border border-[#4A8BDF]/30 text-[#4A8BDF] font-bold font-display flex items-center justify-center text-xs shrink-0">
+              <div className="h-8 w-8 rounded-xl bg-[#2459A8] text-white font-bold flex items-center justify-center text-xs shrink-0 shadow-xs">
                 {user?.name?.charAt(0) || 'A'}
               </div>
               <div className="overflow-hidden">
-                <p className="text-xs font-bold text-white truncate">{user?.name || 'Admin User'}</p>
-                <p className="text-[10px] text-slate-400 font-mono truncate">{user?.email || 'admin@ruready.ai'}</p>
+                <p className="text-xs font-bold text-[#11183D] truncate">{user?.name || 'Admin User'}</p>
+                <p className="text-[10px] text-[#526078] font-mono truncate">{user?.email || 'admin@ruready.ai'}</p>
               </div>
             </div>
 
             <button
               onClick={handleLogout}
               title="Log out"
-              className="p-2 rounded-lg text-slate-400 hover:text-[#D64545] hover:bg-white/10 transition-colors cursor-pointer shrink-0"
+              className="p-1.5 rounded-xl text-[#526078] hover:text-[#E11D48] hover:bg-[#EFFAFD] transition-colors cursor-pointer shrink-0"
             >
-              <LogOut size={15} />
+              <LogOut size={16} />
             </button>
           </div>
-
         </div>
 
       </aside>
@@ -186,14 +173,14 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#EFFAFD]">
         
         {/* Mobile Header Bar */}
-        <header className="lg:hidden h-14 bg-[#11183D] text-white px-4 flex items-center justify-between border-b border-white/10 shrink-0 z-20">
+        <header className="lg:hidden h-14 bg-white text-[#11183D] px-4 flex items-center justify-between border-b border-[#DCE7F2] shrink-0 z-20">
           <Link to="/admin">
-            <Logo size="sm" theme="dark" />
+            <Logo size="sm" theme="light" />
           </Link>
 
           <button
             onClick={() => setMobileMenuOpen(prev => !prev)}
-            className="p-2 rounded-lg bg-white/10 text-slate-300 hover:text-white"
+            className="p-2 rounded-xl text-[#526078] hover:text-[#11183D] hover:bg-[#EFFAFD]"
           >
             {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
           </button>
@@ -206,7 +193,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="lg:hidden bg-[#0F172A] border-b border-slate-800 p-4 space-y-2 z-30 shadow-xl"
+              className="lg:hidden bg-white border-b border-[#DCE7F2] p-4 space-y-2 z-30 shadow-xl"
             >
               {adminNavItems.map((item) => {
                 const Icon = item.icon;
@@ -220,27 +207,20 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                     to={item.href}
                     end={item.exact}
                     className={clsx(
-                      'flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold',
-                      isActive ? 'bg-emerald-500 text-white font-bold' : 'text-slate-300 hover:bg-slate-800'
+                      'flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold',
+                      isActive ? 'bg-[#EFFAFD] text-[#11183D]' : 'text-[#526078] hover:bg-[#F8FAFC]'
                     )}
                   >
-                    <Icon size={16} />
+                    <Icon size={17} className={isActive ? 'text-[#4A8BDF]' : 'text-[#526078]'} />
                     <span>{item.label}</span>
                   </NavLink>
                 );
               })}
 
-              <div className="pt-2 border-t border-slate-800 flex items-center justify-between">
-                <button
-                  onClick={() => navigate('/dashboard')}
-                  className="text-xs font-semibold text-[#FF7A00] flex items-center gap-1.5"
-                >
-                  <span>Candidate View</span>
-                  <ArrowRight size={13} />
-                </button>
+              <div className="pt-2 border-t border-[#DCE7F2] flex items-center justify-end">
                 <button
                   onClick={handleLogout}
-                  className="text-xs text-rose-400 font-semibold"
+                  className="text-xs text-rose-600 font-semibold"
                 >
                   Log out
                 </button>

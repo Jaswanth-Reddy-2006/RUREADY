@@ -16,47 +16,47 @@ export function classifyCandidateIntent(text: string): any {
   const clean = text.toLowerCase().trim();
 
   // 1. END INTERVIEW
-  if (/\b(end (the )?interview|stop (the )?interview|wrap up|finish session|i want to end)\b/i.test(clean)) {
+  if (/\b(end (the )?(interview|call|meet|session)|stop (the )?(interview|session)|wrap up|finish (the )?session|i want to end|let'?s end)\b/i.test(clean)) {
     return 'END_INTERVIEW';
   }
 
-  // 2. TIME QUERY
-  if (/\b(how much time|time left|how many questions left|remaining time)\b/i.test(clean)) {
+  // 2. TIME & PROGRESS QUERY
+  if (/\b(how much time|time left|how many questions (left|remaining)|remaining time|what'?s the time|how am i doing on time)\b/i.test(clean)) {
     return 'TIME_QUERY';
   }
 
   // 3. REPEAT QUESTION
-  if (/\b(repeat|say (that|it) again|didn'?t hear|pardon|come again|what was the question)\b/i.test(clean)) {
+  if (/\b(repeat|say (that|it) again|didn'?t (hear|catch)|pardon|come again|what was the question|one more time|could you repeat|can you please repeat)\b/i.test(clean)) {
     return 'REPEAT_QUESTION';
   }
 
-  // 4. DON_T_KNOW
-  if (/\b(don'?t know|not sure|no idea|haven'?t (used|worked)|never heard|unfamiliar|pass)\b/i.test(clean) && clean.length < 70) {
+  // 4. DON_T_KNOW & UNFAMILIAR
+  if (/\b(don'?t know|not sure|no idea|haven'?t (used|worked with|touched)|never heard|unfamiliar with|not familiar|pass on this|don'?t have experience with)\b/i.test(clean) && clean.length < 90) {
     return 'DON_T_KNOW';
   }
 
-  // 5. CLARIFICATION & CONFIRMATION
-  if (/\b(is this what you'?re asking|so you want me to|does this mean|are you asking|could you clarify)\b/i.test(clean)) {
+  // 5. CLARIFICATION & SCOPE CONFIRMATION
+  if (/\b(is this what you'?re asking|so you want me to|does this mean|are you asking (about|if)|could you clarify|should i focus on|can i assume|are you looking for|would you prefer|high level or deep dive)\b/i.test(clean)) {
     return 'CLARIFICATION';
   }
 
-  // 6. TECHNICAL QUESTION
-  if (/\b(what is the (max|maximum|input)|are duplicates allowed|is memory constrained)\b/i.test(clean)) {
+  // 6. TECHNICAL CONSTRAINT QUESTION
+  if (/\b(what is the (max|maximum|input|scale|throughput|latency)|are duplicates allowed|is memory constrained|can (we|i) use (a )?(library|cache|framework)|single region or multi region|is this distributed)\b/i.test(clean)) {
     return 'TECHNICAL_QUESTION';
   }
 
-  // 7. CORRECTION
-  if (/\b(wait, actually|scratch that|let me fix|sorry, i meant)\b/i.test(clean)) {
+  // 7. CORRECTION & REPHRASING
+  if (/\b(wait,? actually|scratch that|let me fix|sorry,? i meant|to correct myself|let me rephrase|what i actually meant)\b/i.test(clean)) {
     return 'CORRECTION';
   }
 
-  // 8. HESITATION
-  if (/^(umm+|uhh+|err+|let me think|give me a moment)\b/i.test(clean) && clean.length < 35) {
+  // 8. HESITATION / THINKING TIME
+  if (/^(umm+|uhh+|err+|let me think|give me a (moment|second)|just a second|one moment please|let me collect my thoughts)\b/i.test(clean) && clean.length < 50) {
     return 'HESITATION';
   }
 
   // 9. SKIP
-  if (/\b(skip|move on|next question|let'?s move to next)\b/i.test(clean)) {
+  if (/\b(skip|move on|next question|next topic|let'?s move (to |on to )?next)\b/i.test(clean) && clean.length < 60) {
     return 'SKIP_QUESTION';
   }
 
@@ -444,7 +444,9 @@ export const oralService = {
         if (resp.ok) {
           const aiData = (await resp.json()) as any;
           if (aiData?.questionText?.trim()) {
-            promptText = aiData.questionText.trim();
+            promptText = aiData.questionText.trim()
+              .replace(/^(Follow-up|Follow up|Question\s*\d+|Next question|Follow-up Question)\s*:\s*/i, '')
+              .trim();
             if (aiData.questionType) qType = aiData.questionType;
             if (aiData.difficulty) difficulty = aiData.difficulty;
           }
@@ -453,25 +455,68 @@ export const oralService = {
         console.warn('[OralService] AI Service generate-next-question offline/timed out, using adaptive fallback:', (fetchErr as Error).message);
       }
 
-      // Fallback domain matrix & Question Bank matching if AI Service offline
+      // Cohesive 5-Stage Adaptive Question Strategy (Domain & Stated Stack Aware)
       let requiredConcepts: string[] = [];
       let optionalConcepts: string[] = [];
 
       if (!promptText) {
-        // Try picking matching question from QUESTION_BANK
-        const matchingBankItem = QUESTION_BANK[(nextOrder - 1) % QUESTION_BANK.length];
-        if (matchingBankItem) {
-          promptText = matchingBankItem.questionText;
-          qType = matchingBankItem.category;
-          difficulty = matchingBankItem.difficulty;
-          requiredConcepts = matchingBankItem.requiredConcepts;
-          optionalConcepts = matchingBankItem.optionalConcepts;
+        const allSpokenSoFar = previousQA.map((p: any) => (p.answerText || '').toLowerCase()).join(' ');
+        const roleLower = (session.targetRole || 'Software Engineer').toLowerCase();
+
+        if (nextOrder === 1) {
+          promptText = `Tell me about yourself, your recent engineering experience, and what technical stack you work with day-to-day as a ${session.targetRole || 'Software Engineer'}.`;
+          qType = 'BEHAVIOURAL';
+          difficulty = 'EASY';
+          requiredConcepts = ['background overview', 'current technical stack', 'notable project or impact'];
+        } else if (nextOrder === 2) {
+          // Stage 2: Deep dive into the candidate's exact stated stack
+          if (allSpokenSoFar.includes('react') || allSpokenSoFar.includes('frontend') || roleLower.includes('front')) {
+            promptText = `You mentioned working with frontend technologies. How do you manage complex client state, prevent unnecessary component re-renders, and ensure optimal Core Web Vitals in production?`;
+            requiredConcepts = ['state management', 'render optimization', 'Core Web Vitals (LCP, INP, CLS)', 'component architecture'];
+          } else if (allSpokenSoFar.includes('node') || allSpokenSoFar.includes('backend') || allSpokenSoFar.includes('express') || roleLower.includes('back')) {
+            promptText = `You mentioned working on backend services. How do you design your REST or GraphQL APIs, structure database connections, and handle asynchronous error propagation at scale?`;
+            requiredConcepts = ['API design', 'database connection pooling', 'error handling middleware', 'asynchronous event loop'];
+          } else if (allSpokenSoFar.includes('python') || allSpokenSoFar.includes('django') || allSpokenSoFar.includes('fastapi') || allSpokenSoFar.includes('ai') || allSpokenSoFar.includes('ml')) {
+            promptText = `Given your experience with Python and data/backend services, how do you handle asynchronous I/O, background task queues with Celery or Redis, and API performance optimization?`;
+            requiredConcepts = ['asyncio / asynchronous I/O', 'background worker queues', 'caching with Redis', 'data validation'];
+          } else if (allSpokenSoFar.includes('java') || allSpokenSoFar.includes('spring')) {
+            promptText = `In your Spring Boot / Java services, how do you manage dependency injection, thread pool executor tuning, and transactional boundary isolation across microservices?`;
+            requiredConcepts = ['Spring IoC / Dependency Injection', 'Thread pool sizing', 'Transaction management (@Transactional)', 'Microservice boundaries'];
+          } else {
+            promptText = `In the primary tech stack you use as a ${session.targetRole || 'Software Engineer'}, walk me through the end-to-end architecture of a significant feature or service you developed.`;
+            requiredConcepts = ['architecture layout', 'data flow', 'component interaction', 'trade-offs made'];
+          }
+          qType = 'TECHNICAL';
+          difficulty = 'MEDIUM';
+        } else if (nextOrder === 3) {
+          // Stage 3: System Architecture & Data/Trade-off Layer
+          if (allSpokenSoFar.includes('postgres') || allSpokenSoFar.includes('sql') || allSpokenSoFar.includes('database') || allSpokenSoFar.includes('mongo') || roleLower.includes('full') || roleLower.includes('back')) {
+            promptText = `When scaling your database layer under high concurrent traffic, how do you evaluate indexing strategies, connection pooling, and choosing between SQL vs NoSQL or caching with Redis?`;
+            requiredConcepts = ['indexing (B-Tree)', 'read vs write trade-offs', 'caching invalidation strategy', 'concurrency control'];
+          } else if (roleLower.includes('front')) {
+            promptText = `How do you architect large-scale client-side applications for offline resilience, service worker caching, and secure token storage without exposing vulnerable XSS surfaces?`;
+            requiredConcepts = ['service workers / caching strategies', 'token security (HttpOnly vs memory)', 'XSS / CSRF mitigation', 'bundle splitting'];
+          } else {
+            promptText = `How do you approach scalability bottlenecks in your system, specifically regarding load balancing, caching layers, and handling asynchronous task processing?`;
+            requiredConcepts = ['load balancing algorithms', 'caching layers', 'message queuing', 'system bottlenecks'];
+          }
+          qType = 'SYSTEM_DESIGN';
+          difficulty = 'MEDIUM';
+        } else if (nextOrder === 4) {
+          // Stage 4: Real-World Troubleshooting / Production Outage / Optimization
+          promptText = `Can you describe a complex production bug, memory leak, or performance latency bottleneck you investigated in your applications? How did you isolate root cause and verify the fix?`;
+          qType = 'TECHNICAL';
+          difficulty = 'HARD';
+          requiredConcepts = ['root cause analysis', 'profiling & telemetry tools', 'mitigation strategy', 'long-term regression prevention'];
         } else {
-          promptText = `Could you describe a challenging technical architecture problem you solved recently relative to ${role}?`;
-          requiredConcepts = ['technical problem statement', 'architecture choice', 'trade-offs', 'outcome'];
+          // Stage 5: Behavioral & Engineering Leadership
+          promptText = `Tell me about a time you faced a sharp technical disagreement with a teammate regarding system architecture or library choice. How did you evaluate trade-offs and reach alignment?`;
+          qType = 'BEHAVIOURAL';
+          difficulty = 'MEDIUM';
+          requiredConcepts = ['conflict resolution', 'objective technical trade-offs', 'team alignment', 'positive outcome'];
         }
       } else {
-        // Find matching required concepts if text aligns with question bank
+        // Find matching required concepts if text aligns with question bank or defaults
         const bankMatch = QUESTION_BANK.find(q => promptText.toLowerCase().includes(q.topic.toLowerCase()));
         if (bankMatch) {
           requiredConcepts = bankMatch.requiredConcepts;
@@ -534,24 +579,45 @@ export const oralService = {
 
       const memSession = memorySessions.get(sessionId) || {};
       const role = memSession.targetRole || 'Software Engineer';
+      const roleLower = role.toLowerCase();
+      const allSpokenSoFar = questions.map((p: any) => (p.answerText || '').toLowerCase()).join(' ');
 
-      const questionPrompts = [
-        `Could you describe a challenging technical problem you solved recently in a ${role} project?`,
-        `How do you handle performance optimization and trade-offs when building scalable ${role} applications?`,
-        `Can you explain your approach to testing and ensuring code reliability in production?`,
-        `How do you handle cross-functional collaboration and conflicting technical requirements?`,
-      ];
+      let promptText = '';
+      let qType = 'TECHNICAL';
+      let difficulty = 'MEDIUM';
 
-      const hash = (sessionId || 'seed').split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-      const selectedIdx = (hash + (nextOrder - 1) * 7) % questionPrompts.length;
+      if (nextOrder === 1) {
+        promptText = `Tell me about yourself, your recent engineering experience, and what technical stack you work with day-to-day as a ${role}.`;
+        qType = 'BEHAVIOURAL';
+        difficulty = 'EASY';
+      } else if (nextOrder === 2) {
+        if (allSpokenSoFar.includes('react') || allSpokenSoFar.includes('frontend') || roleLower.includes('front')) {
+          promptText = `You mentioned working with frontend technologies. How do you manage complex client state, prevent unnecessary component re-renders, and ensure optimal Core Web Vitals in production?`;
+        } else if (allSpokenSoFar.includes('node') || allSpokenSoFar.includes('backend') || allSpokenSoFar.includes('express') || roleLower.includes('back')) {
+          promptText = `You mentioned working on backend services. How do you design your REST or GraphQL APIs, structure database connections, and handle asynchronous error propagation at scale?`;
+        } else if (allSpokenSoFar.includes('python') || allSpokenSoFar.includes('django') || allSpokenSoFar.includes('fastapi')) {
+          promptText = `Given your experience with Python, how do you handle asynchronous I/O, background worker queues with Celery or Redis, and API performance optimization?`;
+        } else {
+          promptText = `In the primary tech stack you use as a ${role}, walk me through the end-to-end architecture of a significant feature or service you developed.`;
+        }
+      } else if (nextOrder === 3) {
+        promptText = `When scaling your system under high concurrent traffic, how do you evaluate indexing strategies, database connection pooling, and caching with Redis?`;
+        qType = 'SYSTEM_DESIGN';
+      } else if (nextOrder === 4) {
+        promptText = `Can you describe a complex production bug, memory leak, or performance latency bottleneck you investigated in your applications? How did you isolate root cause and verify the fix?`;
+        difficulty = 'HARD';
+      } else {
+        promptText = `Tell me about a time you faced a sharp technical disagreement with a teammate regarding system architecture or library choice. How did you evaluate trade-offs and reach alignment?`;
+        qType = 'BEHAVIOURAL';
+      }
 
       const newQ = {
         id: `q_${uuidv4().slice(0, 8)}`,
         sessionId,
         orderIndex: nextOrder,
-        questionText: questionPrompts[selectedIdx],
-        questionType: 'TECHNICAL',
-        difficulty: 'MEDIUM',
+        questionText: promptText,
+        questionType: qType,
+        difficulty,
         evalStrengths: [],
         evalWeaknesses: [],
       };
@@ -566,42 +632,131 @@ export const oralService = {
     }
   },
 
-  async completeSession(sessionId: string, userId: string) {
-    const analysis = {
+  async completeSession(sessionId: string, userId: string, payload?: any) {
+    const session = await this.getSession(sessionId, userId);
+    const questions: any[] = session.questions || [];
+    const answered = questions.filter((q: any) => q.answerText && q.answerText.trim());
+
+    // 1. Technical score from answered questions
+    let technicalScore = 0;
+    if (answered.length > 0) {
+      const totalScore = answered.reduce((acc: number, q: any) => acc + (typeof q.evalScore === 'number' ? q.evalScore : 70), 0);
+      technicalScore = Math.round(totalScore / answered.length);
+    }
+
+    // 2. Communication score from real words and pace
+    const allAnswers = answered.map((q: any) => q.answerText).join(' ');
+    const words = allAnswers.split(/\s+/).filter(Boolean);
+    const totalWords = words.length;
+
+    let fillerCount = 0;
+    const fillers = ['um', 'umm', 'uh', 'uhh', 'like', 'basically', 'actually', 'literally'];
+    for (const f of fillers) {
+      const regex = new RegExp(`\\b${f}\\b`, 'gi');
+      const matches = allAnswers.match(regex);
+      if (matches) fillerCount += matches.length;
+    }
+
+    const fillerPenalty = Math.min(30, fillerCount * 3);
+    const lengthScore = Math.min(100, Math.max(30, (totalWords / (answered.length || 1)) * 1.5));
+    const communicationScore = answered.length > 0
+      ? Math.max(20, Math.min(100, Math.round(lengthScore * 0.7 + (100 - fillerPenalty) * 0.3)))
+      : 0;
+
+    // 3. Confidence & Proctoring
+    const tabBlurCount = payload?.proctoring?.tabBlurCount ?? 0;
+    const eyeContactScore = payload?.proctoring?.eyeContactScore ?? (payload?.isDisqualified ? 0 : 85);
+    const confidenceScore = payload?.isDisqualified ? 0 : Math.max(0, Math.min(100, 100 - tabBlurCount * 15 - (eyeContactScore < 75 ? 15 : 0)));
+
+    const structureScore = Math.max(0, Math.min(100, Math.round(technicalScore * 0.55 + communicationScore * 0.3 + confidenceScore * 0.15)));
+    const overallScore = Math.max(0, Math.min(100, Math.round(technicalScore * 0.40 + communicationScore * 0.30 + confidenceScore * 0.30)));
+
+    // 4. Dynamic Strengths & Improvements
+    const strengths: string[] = [];
+    const improvements: string[] = [];
+
+    answered.forEach((q: any) => {
+      if (q.evalStrengths && Array.isArray(q.evalStrengths)) {
+        strengths.push(...q.evalStrengths);
+      }
+      if (q.evalWeaknesses && Array.isArray(q.evalWeaknesses)) {
+        improvements.push(...q.evalWeaknesses);
+      }
+    });
+
+    if (strengths.length === 0) {
+      if (technicalScore >= 70) strengths.push(`Demonstrated solid competence in ${session.targetRole || 'engineering'} topics.`);
+      if (communicationScore >= 70) strengths.push('Clear conversational pace and articulation.');
+      if (strengths.length === 0) strengths.push('Completed the interview session.');
+    }
+
+    if (improvements.length === 0) {
+      if (fillerCount > 2) improvements.push(`Reduce verbal fillers (${fillerCount} detected).`);
+      if (technicalScore < 70) improvements.push('Expand technical depth and discuss architectural trade-offs.');
+      if (tabBlurCount > 0) improvements.push(`Avoid window switching (${tabBlurCount} tab blur events).`);
+      if (improvements.length === 0) improvements.push('Practice structuring responses using the STAR method.');
+    }
+
+    const readinessVerdict = overallScore >= 80 ? 'READY' : overallScore >= 60 ? 'ALMOST_READY' : 'NOT_READY';
+
+    let analysis: any = {
       id: `an_${sessionId}`,
       sessionId,
-      overallScore: 88,
-      communicationScore: 85,
-      technicalScore: 89,
-      confidenceScore: 90,
-      structureScore: 86,
-      confidenceMeterScore: 89,
+      overallScore,
+      communicationScore,
+      technicalScore,
+      confidenceScore,
+      structureScore,
+      confidenceMeterScore: confidenceScore,
       confidenceSignals: {
-        avgWpm: 132,
-        avgPauseCount: 2,
-        avgAnswerLength: 85,
+        avgWpm: Math.round(totalWords / Math.max(1, (answered.length * 1.5))),
+        avgPauseCount: fillerCount,
+        avgAnswerLength: Math.round(totalWords / (answered.length || 1)),
       },
-      eyeContactScore: 88,
-      presenceScore: 92,
-      summary: 'Candidate demonstrated strong problem-solving skills, articulate code structuring, and clear communication throughout the interview.',
-      strengths: [
-        'Rapid algorithmic intuition and proactive time/space complexity evaluation',
-        'Clean, modular code structure with idiomatic syntax',
-        'Clear, structured verbal walkthrough while reasoning through constraints',
-      ],
-      improvements: [
-        'Formally write down input bounds before starting code implementation',
-        'Minimize hesitation pauses during complexity justification',
-        'Test extreme boundary cases out loud before submitting',
-      ],
+      eyeContactScore,
+      presenceScore: confidenceScore,
+      summary: `Candidate completed interview for ${session.targetRole || 'Software Engineer'}. Technical score: ${technicalScore}/100. Communication score: ${communicationScore}/100. Proctoring & confidence: ${confidenceScore}/100.`,
+      strengths: Array.from(new Set(strengths)).slice(0, 3),
+      improvements: Array.from(new Set(improvements)).slice(0, 3),
       actionableTips: [
-        { tip: 'State Target Big-O Upfront', reason: 'Communicate asymptotic targets in the first minute of your response.' },
-        { tip: 'Boundary Case Dry Run', reason: 'Test empty collections and duplicate inputs step-by-step.' },
-        { tip: 'Micro-pause Pacing', reason: 'Replace filler words with silent pauses to maintain authoritative presence.' },
+        { tip: 'Substantiate Trade-offs', reason: `For ${session.targetRole || 'target'} roles, discuss scalability and system limits.` },
+        { tip: 'Fluent Delivery', reason: fillerCount > 0 ? 'Replace filler words with deliberate pauses.' : 'Maintain your clear speaking rhythm.' },
+        { tip: 'Screen Presence', reason: 'Keep visual focus locked on the interviewer to maximize proctoring scores.' },
       ],
-      readinessVerdict: 'READY',
+      readinessVerdict,
       createdAt: new Date().toISOString(),
     };
+
+    // Try calling AI Analysis service RPC for full neural compilation
+    const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:4003';
+    try {
+      const resp = await fetch(`${aiServiceUrl}/internal/evaluate-session`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId,
+          confidenceMetrics: {
+            score: confidenceScore,
+            signals: analysis.confidenceSignals,
+          },
+          proctoring: {
+            eyeContactScore,
+            presenceScore: confidenceScore,
+            tabBlurCount,
+          },
+        }),
+        signal: AbortSignal.timeout(6000),
+      });
+      if (resp.ok) {
+        const aiAnalysis = await resp.json();
+        if (aiAnalysis && aiAnalysis.overallScore !== undefined) {
+          analysis = aiAnalysis;
+        }
+      }
+    } catch (e) {
+      console.warn('[OralService] ai-analysis-service evaluate-session RPC skipped/fallback:', (e as Error).message);
+    }
+
     memoryAnalysis.set(sessionId, analysis);
 
     try {
