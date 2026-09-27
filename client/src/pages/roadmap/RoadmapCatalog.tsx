@@ -5,17 +5,25 @@ import {
   Compass, ShieldCheck, Sparkles, Plus, Search, Filter,
   Users, Layers, Award, Clock, ArrowRight, BookOpen,
   Code2, CheckCircle2, Bookmark, Check, RefreshCw, GraduationCap,
-  Heart, SlidersHorizontal, X
+  Heart, SlidersHorizontal, X, BarChart2, Zap
 } from 'lucide-react';
 import { useRoadmapStore, Roadmap } from '../../store/useRoadmapStore';
 import { useAuthStore } from '../../store/authStore';
 import RoadmapCard from '../../components/roadmap/RoadmapCard';
 import RoadmapPreviewModal from '../../components/roadmap/RoadmapPreviewModal';
+import ActiveRoadmapBanner from '../../components/roadmap/ActiveRoadmapBanner';
+import MyRoadmapView from '../../components/roadmap/MyRoadmapView';
+import SkillProfileSection from '../../components/roadmap/SkillProfileSection';
+import VerifiedExpertBadge from '../../components/roadmap/VerifiedExpertBadge';
+import AiRoadmapBuilderModal from '../../components/roadmap/AiRoadmapBuilderModal';
+import AiPersonalizationModal from '../../components/roadmap/AiPersonalizationModal';
+import SprintExperienceModal from '../../components/roadmap/SprintExperienceModal';
+import SprintReviewModal from '../../components/roadmap/SprintReviewModal';
+import ManualRoadmapBuilder from '../../components/roadmap/ManualRoadmapBuilder';
 import Button from '../../components/ui/Button';
 import toast from 'react-hot-toast';
 
-type MainTabType = 'MY_ROADMAPS' | 'LIKED' | 'EXPLORE';
-type MySubTab = 'ALL' | 'CREATED' | 'CLAIMED';
+type MainTabType = 'OVERVIEW' | 'MY_ROADMAP' | 'SKILL_PROFILE' | 'VERIFIED_EXPERTS';
 type ExploreSubTab = 'ALL' | 'OFFICIAL' | 'COMMUNITY' | 'AI';
 
 export default function RoadmapCatalog() {
@@ -25,17 +33,21 @@ export default function RoadmapCatalog() {
     roadmaps, 
     enrolledRoadmapIds, 
     likedRoadmapIds,
-    enrollRoadmap, 
+    activeRoadmapId,
     claimRoadmap,
     syncWithBackend 
   } = useRoadmapStore();
 
-  // Primary Navigation Tab (1. My Roadmaps, 2. Liked, 3. Explore)
-  const [activeTab, setActiveTab] = useState<MainTabType>('MY_ROADMAPS');
-  
-  // Sub-tabs
-  const [mySubTab, setMySubTab] = useState<MySubTab>('ALL');
+  // Primary Navigation Tab (Overview/Discover, My Roadmap, Skill Profile, Verified Experts)
+  const [activeTab, setActiveTab] = useState<MainTabType>('OVERVIEW');
   const [exploreSubTab, setExploreSubTab] = useState<ExploreSubTab>('ALL');
+
+  // Modal Control States
+  const [isAiBuilderOpen, setIsAiBuilderOpen] = useState(false);
+  const [isPersonalizeOpen, setIsPersonalizeOpen] = useState(false);
+  const [isManualBuilderOpen, setIsManualBuilderOpen] = useState(false);
+  const [isSprintModalOpen, setIsSprintModalOpen] = useState(false);
+  const [isSprintReviewOpen, setIsSprintReviewOpen] = useState(false);
 
   // Search & Filters state
   const [searchQuery, setSearchQuery] = useState('');
@@ -43,8 +55,6 @@ export default function RoadmapCatalog() {
   const [selectedTier, setSelectedTier] = useState<string>('ALL');
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('ALL');
   const [sortBy, setSortBy] = useState<'POPULAR' | 'VOTES' | 'NEWEST' | 'STEPS'>('POPULAR');
-  
-  // Filter drawer toggle for Explore
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
 
   // Preview Modal State
@@ -54,38 +64,21 @@ export default function RoadmapCatalog() {
     syncWithBackend();
   }, [syncWithBackend]);
 
-  // Check if roadmap was created/authored by the user
-  const isUserCreated = (r: Roadmap) => {
-    if (!r) return false;
-    return (
-      r.creatorId === (user?.id || 'current-user') ||
-      r.creatorUsername === 'you' ||
-      r.creatorUsername === 'you_ai' ||
-      Boolean(r.creatorName && r.creatorName.toLowerCase().includes('you'))
-    );
-  };
+  // Find currently active user roadmap object
+  const activeRoadmap = useMemo(() => {
+    if (activeRoadmapId) {
+      return roadmaps.find((r) => r.id === activeRoadmapId) || roadmaps[0];
+    }
+    if (enrolledRoadmapIds.length > 0) {
+      return roadmaps.find((r) => r.id === enrolledRoadmapIds[0]) || roadmaps[0];
+    }
+    return roadmaps[0];
+  }, [roadmaps, activeRoadmapId, enrolledRoadmapIds]);
 
   // Check if roadmap is enrolled/claimed by the user
   const isUserClaimed = (r: Roadmap) => {
     return enrolledRoadmapIds.includes(r.id);
   };
-
-  // Tab counts
-  const myRoadmapsTotal = useMemo(() => {
-    return roadmaps.filter((r) => isUserCreated(r) || isUserClaimed(r)).length;
-  }, [roadmaps, enrolledRoadmapIds, user]);
-
-  const likedRoadmapsTotal = useMemo(() => {
-    return roadmaps.filter((r) => likedRoadmapIds.includes(r.id)).length;
-  }, [roadmaps, likedRoadmapIds]);
-
-  const myCreatedTotal = useMemo(() => {
-    return roadmaps.filter((r) => isUserCreated(r)).length;
-  }, [roadmaps, user]);
-
-  const myClaimedTotal = useMemo(() => {
-    return roadmaps.filter((r) => isUserClaimed(r) && !isUserCreated(r)).length;
-  }, [roadmaps, enrolledRoadmapIds, user]);
 
   const activeFiltersCount = useMemo(() => {
     let count = 0;
@@ -95,45 +88,33 @@ export default function RoadmapCatalog() {
     return count;
   }, [selectedCategory, selectedTier, selectedDifficulty]);
 
-  // Filtered & Sorted Roadmaps
+  // Filtered & Sorted Roadmaps for Overview / Marketplace
   const filteredRoadmaps = useMemo(() => {
     return roadmaps
       .filter((r) => {
         if (!r) return false;
 
-        // 1. Primary Tab Filtering
-        if (activeTab === 'MY_ROADMAPS') {
-          const userCreated = isUserCreated(r);
-          const userClaimed = isUserClaimed(r);
+        // Sub-tab filter
+        if (exploreSubTab === 'OFFICIAL' && !r.isOfficial) return false;
+        if (exploreSubTab === 'COMMUNITY' && (r.isOfficial || r.isAiGenerated)) return false;
+        if (exploreSubTab === 'AI' && !r.isAiGenerated) return false;
 
-          if (!userCreated && !userClaimed) return false;
-
-          if (mySubTab === 'CREATED' && !userCreated) return false;
-          if (mySubTab === 'CLAIMED' && (!userClaimed || userCreated)) return false;
-        } else if (activeTab === 'LIKED') {
-          if (!likedRoadmapIds.includes(r.id)) return false;
-        } else if (activeTab === 'EXPLORE') {
-          if (exploreSubTab === 'OFFICIAL' && !r.isOfficial) return false;
-          if (exploreSubTab === 'COMMUNITY' && (r.isOfficial || r.isAiGenerated)) return false;
-          if (exploreSubTab === 'AI' && !r.isAiGenerated) return false;
-        }
-
-        // 2. Category Filter
+        // Category Filter
         if (selectedCategory !== 'ALL' && r.category !== selectedCategory && r.rolePath !== selectedCategory) {
           return false;
         }
 
-        // 3. Tier Filter
+        // Tier Filter
         if (selectedTier !== 'ALL' && r.targetCompanyTier !== selectedTier) {
           return false;
         }
 
-        // 4. Difficulty Filter
+        // Difficulty Filter
         if (selectedDifficulty !== 'ALL' && r.difficulty !== selectedDifficulty) {
           return false;
         }
 
-        // 5. Search Query
+        // Search Query
         if (searchQuery.trim()) {
           const q = searchQuery.toLowerCase();
           const matchTitle = (r.title || '').toLowerCase().includes(q);
@@ -153,17 +134,12 @@ export default function RoadmapCatalog() {
       });
   }, [
     roadmaps, 
-    activeTab, 
-    mySubTab, 
     exploreSubTab, 
     selectedCategory, 
     selectedTier, 
     selectedDifficulty, 
     searchQuery, 
-    sortBy, 
-    enrolledRoadmapIds, 
-    likedRoadmapIds, 
-    user
+    sortBy
   ]);
 
   const handleOpenPreview = (roadmap: Roadmap) => {
@@ -181,11 +157,6 @@ export default function RoadmapCatalog() {
     toast.success(`Claimed! "${roadmap.title}" added to My Roadmaps.`);
   };
 
-  const handleCloneToBuilder = (roadmap: Roadmap) => {
-    setPreviewRoadmap(null);
-    navigate(`/roadmap/builder?clone=${roadmap.id}&mode=manual`);
-  };
-
   const handleResetFilters = () => {
     setSearchQuery('');
     setSelectedCategory('ALL');
@@ -198,10 +169,9 @@ export default function RoadmapCatalog() {
       <div className="max-w-7xl mx-auto space-y-8">
 
         {/* ══════════════════════════════════════════════════════════ */}
-        {/* HERO MARKETPLACE BANNER & CREATION CTAS                     */}
+        {/* HERO ROADMAPS MARKETPLACE BANNER                           */}
         {/* ══════════════════════════════════════════════════════════ */}
         <div className="relative rounded-3xl bg-gradient-to-br from-[#2459A8] via-[#4A8BDF] to-[#A0006D] p-8 sm:p-10 text-white shadow-xl overflow-hidden">
-          {/* Subtle Ambient Background Shapes */}
           <div className="absolute top-0 right-0 -mt-10 -mr-10 w-80 h-80 bg-white/10 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute bottom-0 left-1/3 -mb-12 w-64 h-64 bg-[#A0006D]/20 rounded-full blur-2xl pointer-events-none" />
 
@@ -209,18 +179,17 @@ export default function RoadmapCatalog() {
             <div className="space-y-3 max-w-2xl">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md text-xs font-bold font-display uppercase tracking-wider text-white border border-white/20">
                 <Compass size={14} />
-                <span>Industry Verified Career Roadmaps</span>
+                <span>CAREER ROADMAPS</span>
               </div>
 
               <h1 className="text-3xl sm:text-4xl font-black font-display tracking-tight text-white leading-tight">
-                Career Roadmap Marketplace
+                Find your path. Build your skills. Reach your goal.
               </h1>
 
               <p className="text-sm text-white/90 leading-relaxed font-normal">
                 Explore company-vetted blueprints with <strong>'What should I do?'</strong>, <strong>'What is the source?'</strong>, and <strong>'What is the exact thing?'</strong>. Or architect your own custom sequential roadmap manually and with AI.
               </p>
 
-              {/* Quick Stat Highlights */}
               <div className="flex flex-wrap items-center gap-5 pt-2 text-xs font-medium text-white/80">
                 <div className="flex items-center gap-1.5">
                   <ShieldCheck size={16} className="text-[#EFFAFD]" />
@@ -242,124 +211,86 @@ export default function RoadmapCatalog() {
               <Button
                 variant="eggplant"
                 size="md"
-                onClick={() => navigate('/roadmap/builder?mode=ai')}
+                onClick={() => setIsAiBuilderOpen(true)}
                 className="shadow-lg text-xs font-display justify-center py-3 px-5 border border-white/20 bg-[#A0006D] hover:bg-[#850059] text-white"
                 icon={<Sparkles size={15} />}
               >
-                AI Student Diagnostic
+                AI Career Planner
               </Button>
 
               <Button
                 variant="secondary"
                 size="md"
-                onClick={() => navigate('/roadmap/builder?mode=manual')}
+                onClick={() => setIsManualBuilderOpen(true)}
                 className="shadow-md text-xs font-display justify-center py-3 px-5 bg-white text-[#11183D] hover:bg-[#EFFAFD] border-0"
                 icon={<Plus size={15} className="text-[#4A8BDF]" />}
               >
-                Create Roadmap Manually
-              </Button>
-
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => navigate('/roadmap/builder?mode=blueprints')}
-                className="text-xs font-display justify-center py-2 px-4 bg-white/20 hover:bg-white/30 text-white border border-white/30"
-                icon={<Layers size={14} />}
-              >
-                Fork Student Blueprints
+                Create Roadmap
               </Button>
             </div>
           </div>
         </div>
 
-        {/* Student Mentorship & 3-Pillar Mission Callout */}
-        <div className="p-5 sm:p-6 bg-white border border-[#DCE7F2] rounded-3xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-start gap-3.5">
-            <div className="p-2.5 rounded-2xl bg-[#EFFAFD] text-[#2459A8] shrink-0">
-              <GraduationCap size={22} />
-            </div>
-            <div className="space-y-1">
-              <h3 className="text-sm font-bold font-display text-[#11183D]">
-                How RU Ready Helps Real Students Break Out of Tutorial Hell
-              </h3>
-              <p className="text-xs text-[#526078] max-w-3xl leading-relaxed">
-                Generic roadmaps drown students in 50-hour video playlists without clear deliverables. Every RU Ready milestone enforces the 3 Pillars: <strong>'What should I do?'</strong> (Action steps & pitfalls), <strong>'What is the source?'</strong> (Verified documentation), and <strong>'What is the exact thing?'</strong> (Sandbox drill & automated tests).
-              </p>
-            </div>
+        {/* ══════════════════════════════════════════════════════════ */}
+        {/* PRIMARY ARCHITECTURE TABS                                  */}
+        {/* ══════════════════════════════════════════════════════════ */}
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#DCE7F2] pb-4">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <button
+              onClick={() => setActiveTab('OVERVIEW')}
+              className={`px-4 py-2.5 rounded-2xl text-xs font-bold font-display transition-all cursor-pointer flex items-center gap-2 ${
+                activeTab === 'OVERVIEW'
+                  ? 'bg-[#2459A8] text-white shadow-md'
+                  : 'bg-white text-[#526078] border border-[#DCE7F2] hover:text-[#11183D]'
+              }`}
+            >
+              <Compass size={14} />
+              <span>Overview & Discover</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('MY_ROADMAP')}
+              className={`px-4 py-2.5 rounded-2xl text-xs font-bold font-display transition-all cursor-pointer flex items-center gap-2 ${
+                activeTab === 'MY_ROADMAP'
+                  ? 'bg-[#A0006D] text-white shadow-md'
+                  : 'bg-white text-[#526078] border border-[#DCE7F2] hover:text-[#11183D]'
+              }`}
+            >
+              <Bookmark size={14} />
+              <span>My Active Roadmap</span>
+              {enrolledRoadmapIds.length > 0 && (
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-white/20 text-white">
+                  {enrolledRoadmapIds.length}
+                </span>
+              )}
+            </button>
+
+            <button
+              onClick={() => setActiveTab('SKILL_PROFILE')}
+              className={`px-4 py-2.5 rounded-2xl text-xs font-bold font-display transition-all cursor-pointer flex items-center gap-2 ${
+                activeTab === 'SKILL_PROFILE'
+                  ? 'bg-[#168A62] text-white shadow-md'
+                  : 'bg-white text-[#526078] border border-[#DCE7F2] hover:text-[#11183D]'
+              }`}
+            >
+              <BarChart2 size={14} />
+              <span>Skill Intelligence</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('VERIFIED_EXPERTS')}
+              className={`px-4 py-2.5 rounded-2xl text-xs font-bold font-display transition-all cursor-pointer flex items-center gap-2 ${
+                activeTab === 'VERIFIED_EXPERTS'
+                  ? 'bg-[#B45309] text-white shadow-md'
+                  : 'bg-white text-[#526078] border border-[#DCE7F2] hover:text-[#11183D]'
+              }`}
+            >
+              <ShieldCheck size={14} />
+              <span>Verified Experts</span>
+            </button>
           </div>
 
-          <Button
-            variant="royal"
-            size="sm"
-            onClick={() => navigate('/roadmap/builder?mode=blueprints')}
-            iconRight={<ArrowRight size={13} />}
-            className="shrink-0 text-xs font-bold"
-          >
-            Explore Placement Blueprints
-          </Button>
-        </div>
-
-        {/* ══════════════════════════════════════════════════════════ */}
-        {/* ══════════════════════════════════════════════════════════ */}
-        {/* PRIMARY VIEW NAVIGATION: MY ROADMAPS, LIKED, EXPLORE       */}
-        {/* ══════════════════════════════════════════════════════════ */}
-        <div className="space-y-4">
-          
-          {/* Main Tabs (Order: 1. My Roadmaps, 2. Liked, 3. Explore) */}
-          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#DCE7F2] pb-4">
-            <div className="flex flex-wrap items-center gap-2.5">
-              
-              {/* Tab 1: My Roadmaps */}
-              <button
-                onClick={() => setActiveTab('MY_ROADMAPS')}
-                className={`px-4 py-2.5 rounded-2xl text-xs font-bold font-display transition-all cursor-pointer flex items-center gap-2 ${
-                  activeTab === 'MY_ROADMAPS'
-                    ? 'bg-[#2459A8] text-white shadow-md'
-                    : 'bg-white text-[#526078] border border-[#DCE7F2] hover:text-[#11183D]'
-                }`}
-              >
-                <Bookmark size={14} className={activeTab === 'MY_ROADMAPS' ? 'text-white' : 'text-[#4A8BDF]'} />
-                <span>My Roadmaps</span>
-                <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono ${activeTab === 'MY_ROADMAPS' ? 'bg-white/20 text-white' : 'bg-[#EFFAFD] text-[#526078]'}`}>
-                  {myRoadmapsTotal}
-                </span>
-              </button>
-
-              {/* Tab 2: Liked Roadmaps */}
-              <button
-                onClick={() => setActiveTab('LIKED')}
-                className={`px-4 py-2.5 rounded-2xl text-xs font-bold font-display transition-all cursor-pointer flex items-center gap-2 ${
-                  activeTab === 'LIKED'
-                    ? 'bg-[#A0006D] text-white shadow-md'
-                    : 'bg-white text-[#526078] border border-[#DCE7F2] hover:text-[#11183D]'
-                }`}
-              >
-                <Heart size={14} className={activeTab === 'LIKED' ? 'text-white fill-white' : 'text-[#A0006D]'} />
-                <span>Liked Roadmaps</span>
-                <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono ${activeTab === 'LIKED' ? 'bg-white/20 text-white' : 'bg-[#F8EAF4] text-[#A0006D]'}`}>
-                  {likedRoadmapsTotal}
-                </span>
-              </button>
-
-              {/* Tab 3: Explore Roadmaps */}
-              <button
-                onClick={() => setActiveTab('EXPLORE')}
-                className={`px-4 py-2.5 rounded-2xl text-xs font-bold font-display transition-all cursor-pointer flex items-center gap-2 ${
-                  activeTab === 'EXPLORE'
-                    ? 'bg-[#168A62] text-white shadow-md'
-                    : 'bg-white text-[#526078] border border-[#DCE7F2] hover:text-[#11183D]'
-                }`}
-              >
-                <Compass size={14} className={activeTab === 'EXPLORE' ? 'text-white' : 'text-[#168A62]'} />
-                <span>Explore Roadmaps</span>
-                <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono ${activeTab === 'EXPLORE' ? 'bg-white/20 text-white' : 'bg-[#EFFAFD] text-[#526078]'}`}>
-                  {roadmaps.length}
-                </span>
-              </button>
-
-            </div>
-
-            {/* Sort Selector */}
+          {activeTab === 'OVERVIEW' && (
             <div className="flex items-center gap-2">
               <span className="text-xs text-[#526078] font-medium hidden sm:inline">Sort:</span>
               <select
@@ -373,99 +304,34 @@ export default function RoadmapCatalog() {
                 <option value="STEPS">Most Comprehensive (Steps)</option>
               </select>
             </div>
-          </div>
-
-          {/* ══════════════════════════════════════════════════════════ */}
-          {/* TAB-SPECIFIC SUB-BARS & SEARCH / FILTER TOGGLES            */}
-          {/* ══════════════════════════════════════════════════════════ */}
-          
-          {/* SUB-BAR FOR: MY ROADMAPS */}
-          {activeTab === 'MY_ROADMAPS' && (
-            <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-white border border-[#DCE7F2] rounded-2xl shadow-2xs">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold font-display text-[#526078] mr-1 hidden sm:inline">View:</span>
-                {[
-                  { id: 'ALL', label: 'All My Roadmaps', count: myRoadmapsTotal },
-                  { id: 'CREATED', label: 'Created by Me', count: myCreatedTotal },
-                  { id: 'CLAIMED', label: 'Claimed Blueprints', count: myClaimedTotal },
-                ].map((pill) => (
-                  <button
-                    key={pill.id}
-                    onClick={() => setMySubTab(pill.id as MySubTab)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold font-display transition-all cursor-pointer flex items-center gap-1.5 ${
-                      mySubTab === pill.id
-                        ? 'bg-[#EFFAFD] text-[#2459A8] border border-[#4A8BDF]/40'
-                        : 'text-[#526078] hover:text-[#11183D] hover:bg-[#EFFAFD]/50'
-                    }`}
-                  >
-                    <span>{pill.label}</span>
-                    <span className="font-mono text-[10px] opacity-75">({pill.count})</span>
-                  </button>
-                ))}
-              </div>
-
-              {/* Quick Search inside My Roadmaps */}
-              <div className="relative min-w-[240px]">
-                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#7B8799]" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Filter my roadmaps..."
-                  className="w-full pl-8 pr-3 py-1.5 bg-[#EFFAFD]/50 border border-[#DCE7F2] rounded-xl text-xs text-[#11183D] placeholder-[#7B8799] focus:outline-none focus:border-[#4A8BDF]"
-                />
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery('')}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-[#7B8799] hover:text-[#11183D]"
-                  >
-                    <X size={12} />
-                  </button>
-                )}
-              </div>
-            </div>
           )}
+        </div>
 
-          {/* SUB-BAR FOR: LIKED ROADMAPS */}
-          {activeTab === 'LIKED' && (
-            <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-white border border-[#DCE7F2] rounded-2xl shadow-2xs">
-              <div className="flex items-center gap-2 text-xs font-bold font-display text-[#526078]">
-                <Heart size={14} className="text-[#A0006D] fill-[#A0006D]" />
-                <span>Curriculums and blueprints you voted for ({likedRoadmapsTotal})</span>
-              </div>
+        {/* ══════════════════════════════════════════════════════════ */}
+        {/* TAB 1: OVERVIEW & DISCOVER MARKETPLACE                     */}
+        {/* ══════════════════════════════════════════════════════════ */}
+        {activeTab === 'OVERVIEW' && (
+          <div className="space-y-8">
+            {/* Active User Roadmap Section BEFORE Marketplace */}
+            {activeRoadmap && (
+              <ActiveRoadmapBanner
+                roadmap={activeRoadmap}
+                onContinueSprint={() => setIsSprintModalOpen(true)}
+                onViewRoadmap={() => {
+                  setActiveTab('MY_ROADMAP');
+                }}
+              />
+            )}
 
-              <div className="relative min-w-[240px]">
-                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#7B8799]" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search liked roadmaps..."
-                  className="w-full pl-8 pr-3 py-1.5 bg-[#EFFAFD]/50 border border-[#DCE7F2] rounded-xl text-xs text-[#11183D] placeholder-[#7B8799] focus:outline-none focus:border-[#4A8BDF]"
-                />
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery('')}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-[#7B8799] hover:text-[#11183D]"
-                  >
-                    <X size={12} />
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* SUB-BAR FOR: EXPLORE ROADMAPS (WITH SEARCH & FILTER BUTTON) */}
-          {activeTab === 'EXPLORE' && (
+            {/* Discover & Search Controls */}
             <div className="space-y-3">
               <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 p-3 bg-white border border-[#DCE7F2] rounded-2xl shadow-2xs">
-                
-                {/* Explore Sub-categories */}
+                {/* Sub category pills */}
                 <div className="flex flex-wrap items-center gap-2">
                   {[
-                    { id: 'ALL', label: 'All Tracks' },
-                    { id: 'OFFICIAL', label: 'Official Blueprints' },
-                    { id: 'COMMUNITY', label: 'Community' },
+                    { id: 'ALL', label: 'All Categories' },
+                    { id: 'OFFICIAL', label: 'Verified Blueprints' },
+                    { id: 'COMMUNITY', label: 'Community Tracks' },
                     { id: 'AI', label: 'AI Synthesized' },
                   ].map((pill) => (
                     <button
@@ -473,7 +339,7 @@ export default function RoadmapCatalog() {
                       onClick={() => setExploreSubTab(pill.id as ExploreSubTab)}
                       className={`px-3 py-1.5 rounded-xl text-xs font-bold font-display transition-all cursor-pointer ${
                         exploreSubTab === pill.id
-                          ? 'bg-[#E8F5F0] text-[#168A62] border border-[#168A62]/40 shadow-xs'
+                          ? 'bg-[#EFFAFD] text-[#2459A8] border border-[#4A8BDF]/40 shadow-xs'
                           : 'text-[#526078] hover:text-[#11183D] hover:bg-[#EFFAFD]/50'
                       }`}
                     >
@@ -482,16 +348,15 @@ export default function RoadmapCatalog() {
                   ))}
                 </div>
 
-                {/* Search and Filter Button for Explore */}
+                {/* Search Input */}
                 <div className="flex items-center gap-2 flex-1 md:max-w-md justify-end">
-                  {/* Search Input */}
                   <div className="relative flex-1">
                     <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#7B8799]" />
                     <input
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Search by role, skills (React, Kafka), tier..."
+                      placeholder="Search role, company, skill or career goal..."
                       className="w-full pl-9 pr-7 py-2 bg-[#EFFAFD]/60 border border-[#DCE7F2] rounded-xl text-xs text-[#11183D] placeholder-[#7B8799] focus:outline-none focus:border-[#4A8BDF]"
                     />
                     {searchQuery && (
@@ -504,7 +369,6 @@ export default function RoadmapCatalog() {
                     )}
                   </div>
 
-                  {/* Filter Toggle Button */}
                   <Button
                     variant={isFilterDrawerOpen || activeFiltersCount > 0 ? 'royal' : 'secondary'}
                     size="sm"
@@ -522,7 +386,7 @@ export default function RoadmapCatalog() {
                 </div>
               </div>
 
-              {/* Expandable Filter Drawer */}
+              {/* Filter Drawer */}
               <AnimatePresence>
                 {isFilterDrawerOpen && (
                   <motion.div
@@ -535,74 +399,61 @@ export default function RoadmapCatalog() {
                     <div className="flex items-center justify-between border-b border-[#DCE7F2] pb-3">
                       <div className="flex items-center gap-2 text-xs font-bold font-display text-[#11183D]">
                         <SlidersHorizontal size={14} className="text-[#4A8BDF]" />
-                        <span>Filter Explore Blueprints</span>
-                        {activeFiltersCount > 0 && (
-                          <span className="text-[11px] font-normal text-[#526078]">
-                            ({activeFiltersCount} active filter{activeFiltersCount > 1 ? 's' : ''})
-                          </span>
-                        )}
+                        <span>Category & Discipline Filters</span>
                       </div>
-
                       {activeFiltersCount > 0 && (
                         <button
                           onClick={handleResetFilters}
                           className="text-xs font-bold text-[#A0006D] hover:underline cursor-pointer flex items-center gap-1"
                         >
                           <X size={12} />
-                          <span>Reset All Filters</span>
+                          <span>Reset All</span>
                         </button>
                       )}
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
-                      {/* Category Filter */}
                       <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-[#526078] block">Category / Discipline</label>
+                        <label className="text-xs font-bold text-[#526078] block">Role / Discipline</label>
                         <select
                           value={selectedCategory}
                           onChange={(e) => setSelectedCategory(e.target.value)}
-                          className="w-full bg-[#EFFAFD]/50 border border-[#DCE7F2] rounded-xl px-3 py-2 text-xs text-[#11183D] font-medium focus:outline-none"
+                          className="w-full bg-[#EFFAFD]/50 border border-[#DCE7F2] rounded-xl px-3 py-2 text-xs text-[#11183D] font-medium"
                         >
-                          <option value="ALL">All Categories & Roles</option>
-                          <option value="FULLSTACK">Fullstack Web Engineering</option>
-                          <option value="AIML">AI / ML & LLM Engineering</option>
-                          <option value="DEVOPS">DevOps, Cloud & SRE</option>
-                          <option value="SYSTEM_DESIGN">High-Frequency Distributed Systems</option>
-                          <option value="DATA">Data Lakehouse & Streaming</option>
-                          <option value="FRONTEND">Frontend Architecture & Next.js</option>
+                          <option value="ALL">All Disciplines</option>
+                          <option value="FULLSTACK">Full Stack Software Engineer</option>
+                          <option value="AIML">AI / ML Engineer</option>
+                          <option value="DEVOPS">DevOps & Cloud Systems</option>
+                          <option value="SYSTEM_DESIGN">System Design & Concurrency</option>
                         </select>
                       </div>
 
-                      {/* Hiring Tier Filter */}
                       <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-[#526078] block">Hiring Tier Benchmark</label>
+                        <label className="text-xs font-bold text-[#526078] block">Target Company Tier</label>
                         <select
                           value={selectedTier}
                           onChange={(e) => setSelectedTier(e.target.value)}
-                          className="w-full bg-[#EFFAFD]/50 border border-[#DCE7F2] rounded-xl px-3 py-2 text-xs text-[#11183D] font-medium focus:outline-none"
+                          className="w-full bg-[#EFFAFD]/50 border border-[#DCE7F2] rounded-xl px-3 py-2 text-xs text-[#11183D] font-medium"
                         >
-                          <option value="ALL">All Hiring Tiers</option>
-                          <option value="FAANG">FAANG / Top Tech Tier</option>
-                          <option value="Tier-1 FinTech">Tier-1 FinTech / High-Frequency</option>
+                          <option value="ALL">All Company Tiers</option>
+                          <option value="FAANG">Amazon / FAANG Tier</option>
+                          <option value="Tier-1 FinTech">Tier-1 FinTech</option>
                           <option value="Unicorn">High-Growth Unicorn</option>
-                          <option value="High-Growth Startup">Early-Stage Startup</option>
-                          <option value="Enterprise">Global Enterprise</option>
                         </select>
                       </div>
 
-                      {/* Difficulty Filter */}
                       <div className="space-y-1.5">
                         <label className="text-xs font-bold text-[#526078] block">Difficulty Level</label>
                         <select
                           value={selectedDifficulty}
                           onChange={(e) => setSelectedDifficulty(e.target.value)}
-                          className="w-full bg-[#EFFAFD]/50 border border-[#DCE7F2] rounded-xl px-3 py-2 text-xs text-[#11183D] font-medium focus:outline-none"
+                          className="w-full bg-[#EFFAFD]/50 border border-[#DCE7F2] rounded-xl px-3 py-2 text-xs text-[#11183D] font-medium"
                         >
                           <option value="ALL">All Difficulties</option>
-                          <option value="Beginner">Beginner Foundation</option>
-                          <option value="Intermediate">Intermediate Production</option>
-                          <option value="Advanced">Advanced Engineering</option>
-                          <option value="Staff">Staff / Principal Tier</option>
+                          <option value="Beginner">Beginner</option>
+                          <option value="Intermediate">Intermediate</option>
+                          <option value="Advanced">Advanced</option>
+                          <option value="Staff">Staff / Principal</option>
                         </select>
                       </div>
                     </div>
@@ -610,142 +461,145 @@ export default function RoadmapCatalog() {
                 )}
               </AnimatePresence>
             </div>
-          )}
 
-        </div>
-
-        {/* ══════════════════════════════════════════════════════════ */}
-        {/* ROADMAP GRID (SHOP LIST / MY LIST)                          */}
-        {/* ══════════════════════════════════════════════════════════ */}
-        {filteredRoadmaps.length === 0 ? (
-          <div className="bg-white rounded-3xl border border-[#DCE7F2] p-12 text-center space-y-5 shadow-xs">
-            {activeTab === 'MY_ROADMAPS' ? (
-              <>
-                <div className="w-16 h-16 rounded-3xl bg-[#EFFAFD] text-[#2459A8] flex items-center justify-center mx-auto shadow-xs">
-                  <Bookmark size={32} />
-                </div>
-                <div className="space-y-1.5">
-                  <h3 className="text-lg font-bold font-display text-[#11183D]">
-                    {mySubTab === 'CREATED' 
-                      ? 'No roadmaps authored yet'
-                      : mySubTab === 'CLAIMED'
-                      ? 'No claimed blueprints yet'
-                      : 'You haven\'t created or claimed any roadmaps yet'}
-                  </h3>
-                  <p className="text-xs text-[#526078] max-w-md mx-auto leading-relaxed">
-                    Personalize your engineering journey by creating a roadmap tailored to your semester with AI, architecting one manually, or claiming ready-made placement blueprints from the Explore catalog.
-                  </p>
-                </div>
-                <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-                  <Button
-                    variant="eggplant"
-                    size="sm"
-                    onClick={() => navigate('/roadmap/builder?mode=ai')}
-                    icon={<Sparkles size={14} />}
-                  >
-                    AI Student Diagnostic
-                  </Button>
-                  <Button
-                    variant="royal"
-                    size="sm"
-                    onClick={() => navigate('/roadmap/builder?mode=manual')}
-                    icon={<Plus size={14} />}
-                  >
-                    Create Manually
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => setActiveTab('EXPLORE')}
-                    icon={<Compass size={14} />}
-                  >
-                    Explore & Claim Blueprints
-                  </Button>
-                </div>
-              </>
-            ) : activeTab === 'LIKED' ? (
-              <>
-                <div className="w-16 h-16 rounded-3xl bg-[#F8EAF4] text-[#A0006D] flex items-center justify-center mx-auto shadow-xs">
-                  <Heart size={32} className="fill-[#A0006D]" />
-                </div>
-                <div className="space-y-1.5">
-                  <h3 className="text-lg font-bold font-display text-[#11183D]">
-                    No liked roadmaps yet
-                  </h3>
-                  <p className="text-xs text-[#526078] max-w-md mx-auto leading-relaxed">
-                    Click the heart icon on any roadmap card while browsing to bookmark top curriculums into your liked collection.
-                  </p>
-                </div>
-                <div className="pt-2">
-                  <Button
-                    variant="royal"
-                    size="sm"
-                    onClick={() => setActiveTab('EXPLORE')}
-                    icon={<Compass size={14} />}
-                  >
-                    Explore Roadmaps to Upvote
-                  </Button>
-                </div>
-              </>
-            ) : (
-              <>
-                <Compass size={40} className="text-[#4A8BDF] mx-auto opacity-70" />
-                <div className="space-y-1">
-                  <h3 className="text-base font-bold font-display text-[#11183D]">
-                    No roadmaps match your explore filters
-                  </h3>
-                  <p className="text-xs text-[#526078] max-w-md mx-auto">
-                    Try clearing your search query or reset your filters to view all available curriculums.
-                  </p>
-                </div>
-                <div className="flex items-center justify-center gap-3 pt-2">
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={handleResetFilters}
-                  >
-                    Reset Filters
-                  </Button>
-                  <Button
-                    variant="royal"
-                    size="sm"
-                    onClick={() => navigate('/roadmap/builder?mode=manual')}
-                    icon={<Plus size={14} />}
-                  >
-                    Create Custom Roadmap
-                  </Button>
-                </div>
-              </>
-            )}
+            {/* Roadmap Cards Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredRoadmaps.map((roadmap) => (
+                <RoadmapCard
+                  key={roadmap.id}
+                  roadmap={roadmap}
+                  isEnrolled={isUserClaimed(roadmap)}
+                  onPreview={handleOpenPreview}
+                  onEnrollOrStart={handleEnrollAndStart}
+                  onClaim={handleClaimDirectly}
+                />
+              ))}
+            </div>
           </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredRoadmaps.map((roadmap) => (
-              <RoadmapCard
-                key={roadmap.id}
-                roadmap={roadmap}
-                isEnrolled={enrolledRoadmapIds.includes(roadmap.id)}
-                onPreview={handleOpenPreview}
-                onEnrollOrStart={handleEnrollAndStart}
-                onClaim={handleClaimDirectly}
+        )}
+
+        {/* ══════════════════════════════════════════════════════════ */}
+        {/* TAB 2: MY ROADMAP EXPERIENCE VIEW                          */}
+        {/* ══════════════════════════════════════════════════════════ */}
+        {activeTab === 'MY_ROADMAP' && activeRoadmap && (
+          <MyRoadmapView
+            roadmap={activeRoadmap}
+            onOpenSprintModal={() => setIsSprintModalOpen(true)}
+            onSelectNode={(nodeId) => navigate(`/roadmap/${activeRoadmap.id}?node=${nodeId}`)}
+          />
+        )}
+
+        {/* ══════════════════════════════════════════════════════════ */}
+        {/* TAB 3: SKILL INTELLIGENCE SECTION                         */}
+        {/* ══════════════════════════════════════════════════════════ */}
+        {activeTab === 'SKILL_PROFILE' && <SkillProfileSection />}
+
+        {/* ══════════════════════════════════════════════════════════ */}
+        {/* TAB 4: VERIFIED EXPERT ROADMAPS UI SYSTEM                  */}
+        {/* ══════════════════════════════════════════════════════════ */}
+        {activeTab === 'VERIFIED_EXPERTS' && (
+          <div className="space-y-6">
+            <div className="bg-white rounded-3xl border border-[#DCE7F2] p-6 md:p-8 shadow-xs space-y-2">
+              <h2 className="text-xl md:text-2xl font-bold font-display text-[#11183D] flex items-center gap-2">
+                <ShieldCheck className="w-6 h-6 text-[#4A8BDF]" />
+                Verified Expert Curated Roadmaps
+              </h2>
+              <p className="text-xs md:text-sm text-[#526078]">
+                Curriculums authored and verified by senior software engineers, staff architects, and hiring managers across FAANG and top tech tiers.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <VerifiedExpertBadge
+                type="RENNETUS_VERIFIED"
+                expertName="RU Ready Curriculum Board"
+                expertRole="Principal Architect Committee"
+                companyName="Rennetus Academy"
+                experienceYears="10+ years"
+                learnersCount={3420}
+                showCard
               />
-            ))}
+
+              <VerifiedExpertBadge
+                type="COMPANY_VERIFIED"
+                expertName="Senior Software Engineer"
+                expertRole="Backend & Distributed Systems"
+                companyName="Amazon"
+                experienceYears="5+ years"
+                learnersCount={8420}
+                showCard
+              />
+
+              <VerifiedExpertBadge
+                type="INDUSTRY_VERIFIED"
+                expertName="Maya Patel"
+                expertRole="Staff Frontend Engineer"
+                companyName="Stripe"
+                experienceYears="7+ years"
+                learnersCount={1240}
+                showCard
+              />
+            </div>
           </div>
         )}
 
       </div>
 
       {/* ══════════════════════════════════════════════════════════ */}
-      {/* INTERACTIVE MODALS                                         */}
+      {/* INTERACTIVE MODALS & WIZARDS                               */}
       {/* ══════════════════════════════════════════════════════════ */}
       
-      {/* 1. Preview Modal */}
       <RoadmapPreviewModal
         roadmap={previewRoadmap}
         isOpen={!!previewRoadmap}
         onClose={() => setPreviewRoadmap(null)}
         onEnrollAndStart={handleEnrollAndStart}
-        onCloneToBuilder={handleCloneToBuilder}
+        onCloneToBuilder={(r) => navigate(`/roadmap/builder?clone=${r.id}`)}
+      />
+
+      <AiRoadmapBuilderModal
+        isOpen={isAiBuilderOpen}
+        onClose={() => setIsAiBuilderOpen(false)}
+        onSuccess={(newMap) => {
+          setIsAiBuilderOpen(false);
+          setActiveTab('MY_ROADMAP');
+        }}
+        onOpenPersonalize={() => {
+          setIsAiBuilderOpen(false);
+          setIsPersonalizeOpen(true);
+        }}
+      />
+
+      <AiPersonalizationModal
+        isOpen={isPersonalizeOpen}
+        onClose={() => setIsPersonalizeOpen(false)}
+      />
+
+      <SprintExperienceModal
+        isOpen={isSprintModalOpen}
+        onClose={() => setIsSprintModalOpen(false)}
+        onCompleteSprint={() => {
+          setIsSprintModalOpen(false);
+          setIsSprintReviewOpen(true);
+        }}
+      />
+
+      <SprintReviewModal
+        isOpen={isSprintReviewOpen}
+        onClose={() => setIsSprintReviewOpen(false)}
+        onStartNextSprint={() => {
+          setIsSprintReviewOpen(false);
+          toast.success('Sprint 08 started!');
+        }}
+      />
+
+      <ManualRoadmapBuilder
+        isOpen={isManualBuilderOpen}
+        onClose={() => setIsManualBuilderOpen(false)}
+        onSuccess={(newMap) => {
+          setIsManualBuilderOpen(false);
+          setActiveTab('MY_ROADMAP');
+        }}
       />
 
     </div>

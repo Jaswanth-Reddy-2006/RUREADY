@@ -13,3 +13,11 @@ export class NotFoundError extends Error {
     this.name = 'NotFoundError';
   }
 }
+
+export class UnauthorizedError extends Error {
+  statusCode = 401;
+  constructor(message = 'Authentication is required') {
+    super(message);
+    this.name = 'UnauthorizedError';
+  }
+}

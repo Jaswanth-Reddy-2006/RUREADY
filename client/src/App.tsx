@@ -931,9 +931,9 @@ function App() {
           </AnimatePresence>
         </main>
         {showHeaderFooter && <Footer />}
-        {import.meta.env.DEV && (
+        {import.meta.env.DEV && import.meta.env.VITE_ENABLE_AGENTATION === 'true' && (
           <Agentation
-            endpoint="http://localhost:4747"
+            endpoint={import.meta.env.VITE_AGENTATION_ENDPOINT || 'http://localhost:4747'}
             onSessionCreated={(sessionId) => {
               console.log('Agentation session started:', sessionId);
             }}

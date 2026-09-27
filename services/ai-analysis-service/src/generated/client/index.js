@@ -225,7 +225,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\Jaswanth Reddy\\OneDrive\\Desktop\\Projects\\RU_Ready\\services\\ai-analysis-service\\src\\generated\\client",
+      "value": "C:\\Rennetus\\RUREADY\\services\\ai-analysis-service\\src\\generated\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -239,7 +239,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\Jaswanth Reddy\\OneDrive\\Desktop\\Projects\\RU_Ready\\services\\ai-analysis-service\\src\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Rennetus\\RUREADY\\services\\ai-analysis-service\\src\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
