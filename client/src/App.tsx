@@ -71,6 +71,8 @@ import ResumePreviewPage from './pages/resume/ResumePreviewPage';
 import RoadmapCatalog from './pages/roadmap/RoadmapCatalog';
 import RoadmapView from './pages/roadmap/RoadmapView';
 import RoadmapBuilderPage from './pages/roadmap/RoadmapBuilderPage';
+import { ManualRoadmapBuilderContainer } from './components/roadmap/builder/ManualRoadmapBuilderContainer';
+import AIPlannerPage from './pages/roadmap/AIPlannerPage';
 import DiscussPage from './pages/discuss/DiscussPage';
 import DiscussDetail from './pages/discuss/DiscussDetail';
 import ProfilePage from './pages/profile/ProfilePage';
@@ -665,7 +667,31 @@ function App() {
                 path="/roadmap"
                 element={
                   <ProtectedRoute>
-                    <RoadmapCatalog />
+                    <RoadmapCatalog defaultPageTab="TODAY" />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/roadmap/today"
+                element={
+                  <ProtectedRoute>
+                    <RoadmapCatalog defaultPageTab="TODAY" />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/roadmap/catalog"
+                element={
+                  <ProtectedRoute>
+                    <RoadmapCatalog defaultPageTab="ROADMAP" />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/roadmap/ai-planner"
+                element={
+                  <ProtectedRoute>
+                    <AIPlannerPage />
                   </ProtectedRoute>
                 }
               />
@@ -673,7 +699,7 @@ function App() {
                 path="/roadmap/builder"
                 element={
                   <ProtectedRoute>
-                    <RoadmapBuilderPage />
+                    <ManualRoadmapBuilderContainer />
                   </ProtectedRoute>
                 }
               />
@@ -681,7 +707,7 @@ function App() {
                 path="/roadmap/create"
                 element={
                   <ProtectedRoute>
-                    <RoadmapBuilderPage />
+                    <ManualRoadmapBuilderContainer />
                   </ProtectedRoute>
                 }
               />

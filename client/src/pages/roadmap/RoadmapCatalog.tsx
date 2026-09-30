@@ -5,7 +5,7 @@ import {
   Compass, ShieldCheck, Sparkles, Plus, Search, Filter,
   Users, Layers, Award, Clock, ArrowRight, BookOpen,
   Code2, CheckCircle2, Bookmark, Check, RefreshCw, GraduationCap,
-  Heart, SlidersHorizontal, X, BarChart2, Zap
+  Heart, SlidersHorizontal, X, BarChart2, Zap, Laptop, Cloud, Shield
 } from 'lucide-react';
 import { useRoadmapStore, Roadmap } from '../../store/useRoadmapStore';
 import { useAuthStore } from '../../store/authStore';
@@ -20,13 +20,18 @@ import AiPersonalizationModal from '../../components/roadmap/AiPersonalizationMo
 import SprintExperienceModal from '../../components/roadmap/SprintExperienceModal';
 import SprintReviewModal from '../../components/roadmap/SprintReviewModal';
 import ManualRoadmapBuilder from '../../components/roadmap/ManualRoadmapBuilder';
+import TodayView from '../../components/roadmap/TodayView';
 import Button from '../../components/ui/Button';
 import toast from 'react-hot-toast';
 
 type MainTabType = 'OVERVIEW' | 'MY_ROADMAP' | 'SKILL_PROFILE' | 'VERIFIED_EXPERTS';
 type ExploreSubTab = 'ALL' | 'OFFICIAL' | 'COMMUNITY' | 'AI';
 
-export default function RoadmapCatalog() {
+interface RoadmapCatalogProps {
+  defaultPageTab?: 'TODAY' | 'ROADMAP';
+}
+
+export default function RoadmapCatalog({ defaultPageTab = 'TODAY' }: RoadmapCatalogProps) {
   const navigate = useNavigate();
   const { user } = useAuthStore();
   const { 
@@ -37,6 +42,9 @@ export default function RoadmapCatalog() {
     claimRoadmap,
     syncWithBackend 
   } = useRoadmapStore();
+
+  // Top level Roadmap section Page (1. Today | 2. Roadmap)
+  const [pageTab, setPageTab] = useState<'TODAY' | 'ROADMAP'>(defaultPageTab);
 
   // Primary Navigation Tab (Overview/Discover, My Roadmap, Skill Profile, Verified Experts)
   const [activeTab, setActiveTab] = useState<MainTabType>('OVERVIEW');
@@ -169,9 +177,52 @@ export default function RoadmapCatalog() {
       <div className="max-w-7xl mx-auto space-y-8">
 
         {/* ══════════════════════════════════════════════════════════ */}
-        {/* HERO ROADMAPS MARKETPLACE BANNER                           */}
+        {/* 2 MAIN PAGES NAVIGATION: 1. TODAY  |  2. ROADMAP           */}
         {/* ══════════════════════════════════════════════════════════ */}
-        <div className="relative rounded-3xl bg-gradient-to-br from-[#2459A8] via-[#4A8BDF] to-[#A0006D] p-8 sm:p-10 text-white shadow-xl overflow-hidden">
+        <div className="flex items-center justify-between gap-4 border-b border-[#DCE7F2] pb-4">
+          <div className="flex items-center gap-3 bg-white/90 backdrop-blur-md p-1.5 rounded-2xl border border-[#DCE7F2] shadow-2xs">
+            <button
+              onClick={() => setPageTab('TODAY')}
+              className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold font-display transition-all cursor-pointer flex items-center gap-2 ${
+                pageTab === 'TODAY'
+                  ? 'bg-gradient-to-r from-[#2459A8] to-[#4A8BDF] text-white shadow-md'
+                  : 'text-[#526078] hover:text-[#11183D] hover:bg-slate-50'
+              }`}
+            >
+              <Sparkles size={16} />
+              <span>Today</span>
+            </button>
+
+            <button
+              onClick={() => setPageTab('ROADMAP')}
+              className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold font-display transition-all cursor-pointer flex items-center gap-2 ${
+                pageTab === 'ROADMAP'
+                  ? 'bg-gradient-to-r from-[#2459A8] to-[#4A8BDF] text-white shadow-md'
+                  : 'text-[#526078] hover:text-[#11183D] hover:bg-slate-50'
+              }`}
+            >
+              <Compass size={16} />
+              <span>Roadmap</span>
+            </button>
+          </div>
+        </div>
+
+        {/* PAGE 1: TODAY VIEW */}
+        {pageTab === 'TODAY' && (
+          <TodayView
+            onSelectRoadmapTab={() => setPageTab('ROADMAP')}
+            onSelectCategory={(category) => {
+              setSelectedCategory(category);
+              setPageTab('ROADMAP');
+            }}
+          />
+        )}
+
+        {/* PAGE 2: ROADMAP VIEW (EVERYTHING CURRENTLY IN ROADMAP) */}
+        {pageTab === 'ROADMAP' && (
+          <div className="space-y-8">
+            {/* HERO ROADMAPS MARKETPLACE BANNER */}
+            <div className="relative rounded-3xl bg-gradient-to-br from-[#2459A8] via-[#4A8BDF] to-[#A0006D] p-8 sm:p-10 text-white shadow-xl overflow-hidden">
           <div className="absolute top-0 right-0 -mt-10 -mr-10 w-80 h-80 bg-white/10 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute bottom-0 left-1/3 -mb-12 w-64 h-64 bg-[#A0006D]/20 rounded-full blur-2xl pointer-events-none" />
 
@@ -211,7 +262,7 @@ export default function RoadmapCatalog() {
               <Button
                 variant="eggplant"
                 size="md"
-                onClick={() => setIsAiBuilderOpen(true)}
+                onClick={() => navigate('/roadmap/ai-planner')}
                 className="shadow-lg text-xs font-display justify-center py-3 px-5 border border-white/20 bg-[#A0006D] hover:bg-[#850059] text-white"
                 icon={<Sparkles size={15} />}
               >
@@ -323,13 +374,76 @@ export default function RoadmapCatalog() {
               />
             )}
 
+            {/* 3-Pillar Methodology Callout Banner */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-white/90 border border-[#DCE7F2] p-5 rounded-3xl shadow-2xs">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-xl bg-blue-50 text-[#2459A8] flex items-center justify-center shrink-0 font-black text-xs border border-blue-100">
+                  1
+                </div>
+                <div>
+                  <h4 className="text-xs font-extrabold font-display text-[#11183D]">What should I do?</h4>
+                  <p className="text-[11px] text-[#526078] leading-tight mt-0.5">Step-by-step action plan & core mental models for every milestone.</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-xl bg-purple-50 text-[#A0006D] flex items-center justify-center shrink-0 font-black text-xs border border-purple-100">
+                  2
+                </div>
+                <div>
+                  <h4 className="text-xs font-extrabold font-display text-[#11183D]">What is the source?</h4>
+                  <p className="text-[11px] text-[#526078] leading-tight mt-0.5">Official docs, papers, books & production GitHub repositories.</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-xl bg-emerald-50 text-[#168A62] flex items-center justify-center shrink-0 font-black text-xs border border-emerald-100">
+                  3
+                </div>
+                <div>
+                  <h4 className="text-xs font-extrabold font-display text-[#11183D]">What is the exact thing?</h4>
+                  <p className="text-[11px] text-[#526078] leading-tight mt-0.5">Specific drill project, starter code & verification checklist.</p>
+                </div>
+              </div>
+            </div>
+
             {/* Discover & Search Controls */}
             <div className="space-y-3">
+              
+              {/* Discipline Quick Chips Bar */}
+              <div className="flex flex-wrap items-center gap-2">
+                {[
+                  { id: 'ALL', label: 'All Disciplines', icon: Compass },
+                  { id: 'FULLSTACK', label: 'Full Stack Dev', icon: Laptop },
+                  { id: 'AIML', label: 'AI & Machine Learning', icon: BarChart2 },
+                  { id: 'DEVOPS', label: 'Cloud & DevOps', icon: Cloud },
+                  { id: 'SYSTEM_DESIGN', label: 'System Design', icon: Layers },
+                  { id: 'CYBERSECURITY', label: 'Cybersecurity', icon: Shield },
+                ].map((chip) => {
+                  const IconComponent = chip.icon;
+                  const isSelected = selectedCategory === chip.id;
+                  return (
+                    <button
+                      key={chip.id}
+                      onClick={() => setSelectedCategory(chip.id)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold font-display transition-all cursor-pointer flex items-center gap-1.5 ${
+                        isSelected
+                          ? 'bg-[#2459A8] text-white shadow-xs'
+                          : 'bg-white text-[#526078] border border-[#DCE7F2] hover:text-[#11183D] hover:bg-[#EFFAFD]/50'
+                      }`}
+                    >
+                      <IconComponent size={13} />
+                      <span>{chip.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
               <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 p-3 bg-white border border-[#DCE7F2] rounded-2xl shadow-2xs">
                 {/* Sub category pills */}
                 <div className="flex flex-wrap items-center gap-2">
                   {[
-                    { id: 'ALL', label: 'All Categories' },
+                    { id: 'ALL', label: 'All Track Types' },
                     { id: 'OFFICIAL', label: 'Verified Blueprints' },
                     { id: 'COMMUNITY', label: 'Community Tracks' },
                     { id: 'AI', label: 'AI Synthesized' },
@@ -462,6 +576,36 @@ export default function RoadmapCatalog() {
               </AnimatePresence>
             </div>
 
+            {/* Empty State Fallback when zero results */}
+            {filteredRoadmaps.length === 0 && (
+              <div className="bg-white rounded-3xl border border-[#DCE7F2] p-10 text-center space-y-4 max-w-lg mx-auto shadow-xs">
+                <div className="w-16 h-16 rounded-2xl bg-blue-50 text-[#2459A8] flex items-center justify-center mx-auto border border-blue-100">
+                  <Search size={28} />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-lg font-bold font-display text-[#11183D]">No matching roadmaps found</h3>
+                  <p className="text-xs text-[#526078]">
+                    No roadmaps match your filter criteria or search query "{searchQuery}". Try resetting filters or generate a custom roadmap.
+                  </p>
+                </div>
+                <div className="flex items-center justify-center gap-3 pt-2">
+                  <button
+                    onClick={handleResetFilters}
+                    className="px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 font-display transition-colors"
+                  >
+                    Reset Filters
+                  </button>
+                  <button
+                    onClick={() => navigate('/roadmap/ai-planner')}
+                    className="px-4 py-2 rounded-xl text-xs font-bold bg-[#A0006D] hover:bg-[#850059] text-white font-display flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer"
+                  >
+                    <Sparkles size={14} />
+                    <span>Synthesize with AI</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Roadmap Cards Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredRoadmaps.map((roadmap) => (
@@ -542,6 +686,8 @@ export default function RoadmapCatalog() {
             </div>
           </div>
         )}
+      </div>
+    )}
 
       </div>
 
