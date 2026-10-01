@@ -60,7 +60,7 @@ export default function ProfilePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isOwnProfile = !username || username === profile.username || username === user?.name?.toLowerCase().replace(/\s+/g, '_');
-  const userInitial = (profile.name || user?.name || 'Jaswanth Reddy').charAt(0).toUpperCase() || 'J';
+  const userInitial = (user?.name || profile.name || 'User').charAt(0).toUpperCase() || 'U';
 
   const handleOpenFollowers = () => {
     setFollowModalTab('followers');

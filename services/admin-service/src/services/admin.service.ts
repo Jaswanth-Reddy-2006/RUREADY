@@ -25,6 +25,64 @@ const systemState = {
     lastRecycledAt: new Date().toISOString(),
   },
   serviceWorkerRestarts: {} as Record<string, string>,
+  featureFlags: {
+    video_interview: {
+      id: 'video_interview',
+      name: 'Video Interview',
+      description: 'Verbal AI video mock interviews with Ava 3D avatar',
+      enabled: true,
+      allowedTiers: ['ALL'],
+      updatedAt: new Date().toISOString(),
+    },
+    coding_interview: {
+      id: 'coding_interview',
+      name: 'Coding Interview',
+      description: 'Live Monaco coding sandbox with test suites & AI reviewer',
+      enabled: true,
+      allowedTiers: ['ALL'],
+      updatedAt: new Date().toISOString(),
+    },
+    system_design_interview: {
+      id: 'system_design_interview',
+      name: 'System Design Interview',
+      description: 'Interactive architectural whiteboard with AI staff interviewer',
+      enabled: true,
+      allowedTiers: ['ALL'],
+      updatedAt: new Date().toISOString(),
+    },
+    company_wise_interview: {
+      id: 'company_wise_interview',
+      name: 'Company-wise Interview Tracks',
+      description: 'Targeted Google, Amazon, Microsoft, and Netflix tracks',
+      enabled: true,
+      allowedTiers: ['ALL'],
+      updatedAt: new Date().toISOString(),
+    },
+    challenges_arena: {
+      id: 'challenges_arena',
+      name: 'Online Challenges & Arena',
+      description: 'Live multiplayer technical quizzes and Elo leaderboard',
+      enabled: true,
+      allowedTiers: ['ALL'],
+      updatedAt: new Date().toISOString(),
+    },
+    ai_resume_ats: {
+      id: 'ai_resume_ats',
+      name: 'AI Resume & ATS Scanner',
+      description: 'Automated resume parser, keyword match, and JD gap analyzer',
+      enabled: true,
+      allowedTiers: ['ALL'],
+      updatedAt: new Date().toISOString(),
+    },
+    placement_crm: {
+      id: 'placement_crm',
+      name: 'Placement CRM & Kanban',
+      description: 'Student job application tracking and interview pipeline',
+      enabled: true,
+      allowedTiers: ['ALL'],
+      updatedAt: new Date().toISOString(),
+    },
+  } as Record<string, any>,
 };
 
 // In-Memory Broadcasts State
@@ -149,11 +207,23 @@ export const adminService = {
 
     const totalRevenue = orders?._sum?.amount || (planCounts.STARTER * 499 + planCounts.PRO * 1299 + planCounts.ULTIMATE * 2499) || 0;
 
+    const fifteenMinsAgo = new Date(Date.now() - 15 * 60 * 1000);
+    let recentActiveUsers = 0;
+    try {
+      recentActiveUsers = await prisma.user.count({
+        where: {
+          updatedAt: { gte: fifteenMinsAgo }
+        }
+      }).catch(() => 0);
+    } catch {}
+
+    const dynamicOnlineUsers = totalUsersCount > 0 ? Math.max(activeSessions, recentActiveUsers) : 0;
+
     return {
       totalUsers: totalUsersCount,
       totalCandidates: totalUsersCount,
       activeSessions,
-      onlineUsers: totalUsersCount > 0 ? Math.min(totalUsersCount, Math.max(1, activeSessions)) : 0,
+      onlineUsers: dynamicOnlineUsers,
       sessionsToday,
       sessionsWeek,
       sessionsMonth,
@@ -902,5 +972,30 @@ export const adminService = {
       },
       scorecards: auditScorecards,
     };
+  },
+
+  async getFeatureFlags() {
+    return { features: systemState.featureFlags };
+  },
+
+  async updateFeatureFlag(key: string, updates: Partial<{ enabled: boolean; allowedTiers: string[]; description: string; name: string }>) {
+    if (!systemState.featureFlags[key]) {
+      throw new NotFoundError(`Feature '${key}' not found in registry`);
+    }
+    systemState.featureFlags[key] = {
+      ...systemState.featureFlags[key],
+      ...updates,
+      updatedAt: new Date().toISOString(),
+    };
+
+    await prisma.auditLog.create({
+      data: {
+        adminId: 'admin_sys',
+        action: 'UPDATE_FEATURE_FLAG',
+        metadata: { featureKey: key, ...updates },
+      },
+    }).catch(() => {});
+
+    return systemState.featureFlags[key];
   },
 };

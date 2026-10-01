@@ -47,7 +47,7 @@ export default function OralReviewPage() {
           <div className="flex items-center gap-3">
             <button
               type="button"
-              onClick={() => navigate('/oral/setup')}
+              onClick={() => navigate('/video/setup')}
               className="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-300 transition-all cursor-pointer shadow-2xs"
               title="Back to Configuration"
             >
@@ -55,7 +55,7 @@ export default function OralReviewPage() {
             </button>
             <div>
               <h1 className="text-xl font-black text-slate-900 flex items-center gap-2">
-                <span>Oral Mock Interview Setup</span>
+                <span>Video Mock Interview Setup</span>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 font-mono">
                   AI
                 </span>
@@ -70,7 +70,7 @@ export default function OralReviewPage() {
           <div className="flex items-center gap-2 self-start sm:self-center">
             <button
               type="button"
-              onClick={() => navigate('/oral/setup')}
+              onClick={() => navigate('/video/setup')}
               className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition-colors cursor-pointer"
             >
               <span className="h-2 w-2 rounded-full bg-emerald-500" />
@@ -82,7 +82,7 @@ export default function OralReviewPage() {
             </div>
             <button
               type="button"
-              onClick={() => navigate('/oral/precheck')}
+              onClick={() => navigate('/video/precheck')}
               className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-500 border border-slate-200 hover:bg-slate-200 transition-colors cursor-pointer"
             >
               <span className="h-2 w-2 rounded-full bg-slate-400" />
@@ -166,7 +166,7 @@ export default function OralReviewPage() {
           {/* BUTTON ACTIONS */}
           <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
             <Button
-              onClick={() => navigate('/oral/setup')}
+              onClick={() => navigate('/video/setup')}
               className="w-full sm:w-auto bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 px-6 py-3 rounded-2xl font-bold text-xs sm:text-sm shadow-2xs cursor-pointer flex items-center justify-center gap-2"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -174,7 +174,7 @@ export default function OralReviewPage() {
             </Button>
 
             <Button
-              onClick={() => navigate('/oral/precheck')}
+              onClick={() => navigate('/video/precheck')}
               className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-8 py-3.5 rounded-2xl font-bold text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <span>Next Step</span>

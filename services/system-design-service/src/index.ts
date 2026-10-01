@@ -53,6 +53,8 @@ app.get('/api/system-design/health', (_req: Request, res: Response) => {
 
 // Routes
 app.use('/api/system-design', systemDesignRoutes);
+app.use('/system-design', systemDesignRoutes);
+app.use('/', systemDesignRoutes);
 
 // Global Error Handler
 app.use((err: any, _req: Request, res: Response, _next: any) => {

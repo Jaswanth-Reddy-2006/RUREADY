@@ -394,7 +394,7 @@ export default function ApplicationDetailPage() {
                 </div>
 
                 <button
-                  onClick={() => navigate('/interview/coding/new')}
+                  onClick={() => navigate('/coding/new')}
                   className="w-full py-2.5 px-4 bg-[#2459A8] hover:bg-[#1a4380] text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
                 >
                   <span>Start Preparation</span>
@@ -508,7 +508,7 @@ export default function ApplicationDetailPage() {
                 </div>
 
                 <button
-                  onClick={() => navigate('/interview/coding/new')}
+                  onClick={() => navigate('/coding/new')}
                   className="w-full py-2.5 px-4 bg-[#2459A8] hover:bg-[#1a4380] text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs mt-2"
                 >
                   <span>Start Next Task</span>
@@ -597,7 +597,7 @@ export default function ApplicationDetailPage() {
                   </div>
 
                   <button
-                    onClick={() => navigate('/interview/coding/new')}
+                    onClick={() => navigate('/coding/new')}
                     className="px-3.5 py-1.5 rounded-xl bg-[#EFFAFD] text-[#2459A8] border border-[#DCE7F2] hover:bg-[#DCE7F2] text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
                   >
                     <Sparkles size={14} />
@@ -643,7 +643,7 @@ export default function ApplicationDetailPage() {
 
                   <div className="space-y-2">
                     {[
-                      { label: 'Start OA Preparation', route: '/interview/coding/new', color: 'text-rose-600 bg-rose-50 border-rose-200' },
+                      { label: 'Start OA Preparation', route: '/coding/new', color: 'text-rose-600 bg-rose-50 border-rose-200' },
                       { label: 'Take a Mock Test', route: '/interview/new', color: 'text-indigo-600 bg-indigo-50 border-indigo-200' },
                       { label: 'View Interview Questions', route: '/discuss', color: 'text-amber-600 bg-amber-50 border-amber-200' },
                       { label: 'Read Company Insights', route: '/placement-crm', color: 'text-emerald-600 bg-emerald-50 border-emerald-200' },

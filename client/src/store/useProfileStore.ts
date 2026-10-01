@@ -333,117 +333,86 @@ interface ProfileStoreState {
   updateProfile: (partial: Partial<UserProfileData>) => void;
   updatePreferences: (partial: Partial<ProfilePreferences>) => void;
   recordActivity: (type: 'CODING' | 'ORAL' | 'ROADMAP' | 'ATS', title: string, score: string) => void;
+  syncWithAuthUser: (user: any) => void;
 }
+
+const getInitialAuthUser = () => {
+  try {
+    const raw = localStorage.getItem('rennetus-auth');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed?.state?.user) {
+        return parsed.state.user;
+      }
+    }
+  } catch {}
+  return null;
+};
+
+const initialUser = getInitialAuthUser();
 
 export const useProfileStore = create<ProfileStoreState>()(
   persist(
     (set, get) => ({
       profile: {
-        name: 'Jaswanth Reddy',
-        username: 'Jaswanth_Reddy_2006',
-        email: 'jaswanthreddy2006@gmail.com',
-        phoneNumber: '+91 98765 43210',
-        points: 1250,
+        name: initialUser?.name || 'Candidate',
+        username: initialUser?.name
+          ? initialUser.name.toLowerCase().replace(/\s+/g, '_')
+          : (initialUser?.email ? initialUser.email.split('@')[0] : 'candidate'),
+        email: initialUser?.email || '',
+        phoneNumber: '',
+        points: 0,
         twoFactorEnabled: false,
-        headline: 'Aspiring Full Stack Engineer & Distributed Systems Enthusiast',
-        bio: 'Passionate software engineer building high-performance systems and preparing for Tier-1 engineering roles. Practicing daily algorithmic problem solving, Socratic STAR interview defenses, and system architecture.',
+        headline: 'Aspiring Software Engineer',
+        bio: 'Passionate software engineer building high-performance systems and preparing for engineering roles.',
         targetRole: 'Full Stack Software Engineer',
-        seniority: 'MID',
-        targetCompany: 'Google / Meta / Stripe',
-        location: 'Hyderabad, India',
-        education: 'B.Tech in Computer Science & Engineering',
-        githubUrl: 'https://github.com/Jaswanth-Reddy-2006',
-        linkedinUrl: 'https://linkedin.com/in/jaswanthreddy',
-        portfolioUrl: 'https://jaswanthreddy.dev',
-        avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-        currentStreak: 14,
-        maxStreak: 32,
-        totalActiveDays: 148,
-        globalRankPercentile: 4.2,
+        seniority: 'FRESHER',
+        targetCompany: '',
+        location: '',
+        education: '',
+        githubUrl: '',
+        linkedinUrl: '',
+        portfolioUrl: '',
+        avatarUrl: initialUser?.avatarUrl || '',
+        currentStreak: 0,
+        maxStreak: 0,
+        totalActiveDays: 0,
+        globalRankPercentile: 100,
         privacySettings: {
           publicProfile: true,
           showActivity: true,
           showLeaderboard: true,
         },
         codingStats: {
-          totalSolved: 146,
+          totalSolved: 0,
           totalAvailable: 320,
-          easySolved: 58,
+          easySolved: 0,
           easyTotal: 90,
-          mediumSolved: 74,
+          mediumSolved: 0,
           mediumTotal: 160,
-          hardSolved: 14,
+          hardSolved: 0,
           hardTotal: 70,
-          acceptanceRate: 78.4,
-          beatsPercentage: 91.6
+          acceptanceRate: 0,
+          beatsPercentage: 0
         },
         oralStats: {
-          interviewsCompleted: 24,
-          avgScore: 89,
-          starCompliance: 94,
-          vocalConfidence: 91,
-          averagePacingWpm: 136,
-          eyeContactScore: 95
+          interviewsCompleted: 0,
+          avgScore: 0,
+          starCompliance: 0,
+          vocalConfidence: 0,
+          averagePacingWpm: 0,
+          eyeContactScore: 0
         },
         skills: [
-          { name: 'Data Structures & Algorithms', level: 'Master', count: 146 },
-          { name: 'System Design & Distributed Systems', level: 'Advanced', count: 28 },
-          { name: 'Dynamic Programming', level: 'Advanced', count: 34 },
-          { name: 'Behavioral & STAR Communication', level: 'Master', count: 24 },
-          { name: 'React & TypeScript Architecture', level: 'Master', count: 62 },
-          { name: 'Node.js & Go Microservices', level: 'Advanced', count: 45 }
+          { name: 'Data Structures & Algorithms', level: 'Intermediate', count: 0 },
+          { name: 'System Design & Distributed Systems', level: 'Intermediate', count: 0 },
+          { name: 'Dynamic Programming', level: 'Intermediate', count: 0 },
+          { name: 'Behavioral & STAR Communication', level: 'Intermediate', count: 0 },
+          { name: 'React & TypeScript Architecture', level: 'Intermediate', count: 0 },
+          { name: 'Node.js & Backend Services', level: 'Intermediate', count: 0 }
         ],
         badges: DEFAULT_BADGES,
-        recentSubmissions: [
-          {
-            id: 'sub-1',
-            type: 'CODING',
-            title: 'LRU Cache Implementation (O(1) Get & Put)',
-            timestamp: '2 hours ago',
-            scoreOrResult: 'All 24/24 Test Cases Passed (4ms, Beats 94%)',
-            languageOrTopic: 'TypeScript',
-            difficulty: 'HARD',
-            status: 'OPTIMAL'
-          },
-          {
-            id: 'sub-2',
-            type: 'ORAL',
-            title: 'Technical Conflict & Architecture Tradeoffs',
-            timestamp: 'Yesterday',
-            scoreOrResult: 'Score: 92/100 • STAR Method 96%',
-            languageOrTopic: 'System Design Track',
-            difficulty: 'MEDIUM',
-            status: 'OPTIMAL'
-          },
-          {
-            id: 'sub-3',
-            type: 'CODING',
-            title: 'Coin Change II (2D Knapsack State Compression)',
-            timestamp: '2 days ago',
-            scoreOrResult: 'Optimal O(N*W) Space Compression',
-            languageOrTopic: 'Python 3',
-            difficulty: 'MEDIUM',
-            status: 'PASSED'
-          },
-          {
-            id: 'sub-4',
-            type: 'ROADMAP',
-            title: 'Distributed Message Queues & Kafka Partitioning',
-            timestamp: '3 days ago',
-            scoreOrResult: 'Step 4 of 6 Completed',
-            languageOrTopic: 'Backend Roadmap',
-            status: 'PASSED'
-          },
-          {
-            id: 'sub-5',
-            type: 'ATS',
-            title: 'Senior Backend Engineer ATS Resume Scan',
-            timestamp: '5 days ago',
-            scoreOrResult: 'Match Score: 94/100 (Tier 1)',
-            languageOrTopic: 'Fintech Industry',
-            status: 'OPTIMAL'
-          }
-        ]
+        recentSubmissions: []
       },
       followers: DEFAULT_FOLLOWERS,
       following: DEFAULT_FOLLOWING,
@@ -563,14 +532,114 @@ export const useProfileStore = create<ProfileStoreState>()(
             }
           };
         });
+      },
+
+      syncWithAuthUser: (user) => {
+        if (!user) {
+          set({
+            profile: {
+              name: 'Candidate',
+              username: 'candidate',
+              email: '',
+              phoneNumber: '',
+              points: 0,
+              twoFactorEnabled: false,
+              headline: 'Aspiring Software Engineer',
+              bio: '',
+              targetRole: 'Full Stack Software Engineer',
+              seniority: 'FRESHER',
+              targetCompany: '',
+              location: '',
+              education: '',
+              githubUrl: '',
+              linkedinUrl: '',
+              portfolioUrl: '',
+              avatarUrl: '',
+              currentStreak: 0,
+              maxStreak: 0,
+              totalActiveDays: 0,
+              globalRankPercentile: 100,
+              privacySettings: {
+                publicProfile: true,
+                showActivity: true,
+                showLeaderboard: true,
+              },
+              codingStats: {
+                totalSolved: 0,
+                totalAvailable: 320,
+                easySolved: 0,
+                easyTotal: 90,
+                mediumSolved: 0,
+                mediumTotal: 160,
+                hardSolved: 0,
+                hardTotal: 70,
+                acceptanceRate: 0,
+                beatsPercentage: 0
+              },
+              oralStats: {
+                interviewsCompleted: 0,
+                avgScore: 0,
+                starCompliance: 0,
+                vocalConfidence: 0,
+                averagePacingWpm: 0,
+                eyeContactScore: 0
+              },
+              skills: [
+                { name: 'Data Structures & Algorithms', level: 'Intermediate', count: 0 },
+                { name: 'System Design & Distributed Systems', level: 'Intermediate', count: 0 },
+                { name: 'Dynamic Programming', level: 'Intermediate', count: 0 },
+                { name: 'Behavioral & STAR Communication', level: 'Intermediate', count: 0 },
+                { name: 'React & TypeScript Architecture', level: 'Intermediate', count: 0 },
+                { name: 'Node.js & Backend Services', level: 'Intermediate', count: 0 }
+              ],
+              badges: DEFAULT_BADGES,
+              recentSubmissions: []
+            }
+          });
+          return;
+        }
+
+        set((state) => ({
+          profile: {
+            ...state.profile,
+            name: user.name || state.profile.name,
+            email: user.email || state.profile.email,
+            username: user.name
+              ? user.name.toLowerCase().replace(/\s+/g, '_')
+              : (user.email ? user.email.split('@')[0] : state.profile.username),
+            avatarUrl: user.avatarUrl || state.profile.avatarUrl,
+          }
+        }));
       }
     }),
     {
       name: 'ru-ready-profile-store',
       storage: createJSONStorage(() => localStorage),
       onRehydrateStorage: () => (state) => {
-        if (state?.preferences) {
-          state.preferences.themeMode = 'light';
+        if (state) {
+          const authUser = getInitialAuthUser();
+          if (authUser) {
+            state.profile.name = authUser.name || state.profile.name;
+            state.profile.email = authUser.email || state.profile.email;
+            state.profile.username = authUser.name
+              ? authUser.name.toLowerCase().replace(/\s+/g, '_')
+              : (authUser.email ? authUser.email.split('@')[0] : state.profile.username);
+            if (authUser.avatarUrl) {
+              state.profile.avatarUrl = authUser.avatarUrl;
+            }
+          } else if (
+            state.profile.email === 'jaswanthreddy2006@gmail.com' ||
+            state.profile.name === 'Jaswanth Reddy' ||
+            state.profile.username === 'Jaswanth_Reddy_2006'
+          ) {
+            state.profile.name = 'Candidate';
+            state.profile.username = 'candidate';
+            state.profile.email = '';
+            state.profile.githubUrl = '';
+            state.profile.linkedinUrl = '';
+            state.profile.portfolioUrl = '';
+            state.profile.phoneNumber = '';
+          }
         }
       }
     }

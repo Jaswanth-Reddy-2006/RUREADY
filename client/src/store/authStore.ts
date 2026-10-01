@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { User } from '@ru-ready/shared';
+import { useProfileStore } from './useProfileStore';
 
 interface AuthState {
   user: User | null;
@@ -19,25 +20,37 @@ export const useAuthStore = create<AuthState>()(
       accessToken: null,
       isAuthenticated: false,
 
-      login: (user, accessToken) =>
+      login: (user, accessToken) => {
+        try {
+          useProfileStore.getState().syncWithAuthUser(user);
+        } catch {}
         set({
           user,
           accessToken,
           isAuthenticated: true,
-        }),
+        });
+      },
 
-      logout: () =>
+      logout: () => {
+        try {
+          useProfileStore.getState().syncWithAuthUser(null);
+        } catch {}
         set({
           user: null,
           accessToken: null,
           isAuthenticated: false,
-        }),
+        });
+      },
 
       setToken: (accessToken) =>
         set({ accessToken, isAuthenticated: Boolean(accessToken) }),
 
-      setUser: (user) =>
-        set({ user, isAuthenticated: Boolean(user) }),
+      setUser: (user) => {
+        try {
+          useProfileStore.getState().syncWithAuthUser(user);
+        } catch {}
+        set({ user, isAuthenticated: Boolean(user) });
+      },
     }),
     {
       name: 'rennetus-auth',

@@ -36,7 +36,7 @@ export default function AdminAvatarPlayground() {
   const [persona, setPersona] = useState<AvatarPersona>('AVA');
   const [avatarState, setAvatarState] = useState<AvatarState>('idle');
   const [expression, setExpression] = useState<FacialExpression>('NEUTRAL');
-  const [selectedVoice, setSelectedVoice] = useState<KokoroVoice>('en_us_ava_warm');
+  const [selectedVoice, setSelectedVoice] = useState<KokoroVoice>('hf_ava_neural');
 
   const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
   const [mouthOpenness, setMouthOpenness] = useState<number>(0.05);

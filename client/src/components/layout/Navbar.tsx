@@ -144,8 +144,8 @@ export default function Navbar() {
           className={clsx(
             'pointer-events-auto max-w-5xl mx-auto rounded-full transition-all duration-300 px-5 sm:px-7 py-2 flex items-center justify-between border shadow-lg',
             scrolled || !isLanding
-              ? 'bg-white/95 backdrop-blur-xl border-[#DCE7F2] shadow-[#11183D]/5'
-              : 'bg-white/90 backdrop-blur-md border-[#DCE7F2]/80 shadow-[#11183D]/5',
+              ? 'bg-white/95 dark:bg-[#11183D]/95 backdrop-blur-xl border-[#DCE7F2] dark:border-[#1E293B] shadow-[#11183D]/5 dark:shadow-black/20'
+              : 'bg-white/90 dark:bg-[#11183D]/90 backdrop-blur-md border-[#DCE7F2]/80 dark:border-[#1E293B]/80 shadow-[#11183D]/5 dark:shadow-black/20',
           )}
         >
           {/* Left: Brand Logo */}
@@ -170,12 +170,12 @@ export default function Navbar() {
                       key={link.label}
                       type="button"
                       onClick={() => setFeaturesMenuOpen((prev) => !prev)}
-                      className="flex items-center gap-1 text-sm font-semibold text-[#526078] hover:text-[#11183D] transition-colors duration-200 font-sans cursor-pointer"
+                      className="flex items-center gap-1 text-sm font-semibold text-[#526078] dark:text-[#94A3B8] hover:text-[#11183D] dark:hover:text-white transition-colors duration-200 font-sans cursor-pointer"
                     >
                       <span>{link.label}</span>
                       <ChevronDown
                         className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                          featuresMenuOpen ? 'rotate-180 text-[#4A8BDF]' : 'text-[#7E8B9B]'
+                          featuresMenuOpen ? 'rotate-180 text-[#4A8BDF]' : 'text-[#7E8B9B] dark:text-[#64748B]'
                         }`}
                       />
                     </button>
@@ -183,7 +183,7 @@ export default function Navbar() {
                     <a
                       key={link.label}
                       href={link.href}
-                      className="text-sm font-semibold text-[#526078] hover:text-[#11183D] transition-colors duration-200 font-sans"
+                      className="text-sm font-semibold text-[#526078] dark:text-[#94A3B8] hover:text-[#11183D] dark:hover:text-white transition-colors duration-200 font-sans"
                     >
                       {link.label}
                     </a>
@@ -191,7 +191,7 @@ export default function Navbar() {
                     <Link
                       key={link.label}
                       to={link.href}
-                      className="text-sm font-semibold text-[#526078] hover:text-[#11183D] transition-colors duration-200 font-sans"
+                      className="text-sm font-semibold text-[#526078] dark:text-[#94A3B8] hover:text-[#11183D] dark:hover:text-white transition-colors duration-200 font-sans"
                     >
                       {link.label}
                     </Link>
@@ -205,14 +205,14 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-3">
             {isAuthenticated ? (
               <div className="relative">
-                {/* Profile Avatar Icon with Initial J */}
+                {/* Profile Avatar Icon */}
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="flex items-center gap-2 p-0.5 rounded-full hover:ring-2 hover:ring-[#4A8BDF]/40 transition-all duration-200 bg-white border border-[#DCE7F2] shadow-xs cursor-pointer"
+                  className="flex items-center gap-2 p-0.5 rounded-full hover:ring-2 hover:ring-[#4A8BDF]/40 transition-all duration-200 bg-white dark:bg-[#11183D] border border-[#DCE7F2] dark:border-[#1E293B] shadow-xs cursor-pointer"
                   aria-label="User Profile Menu"
                 >
                   <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-[#2459A8] to-[#4A8BDF] flex items-center justify-center text-white font-bold text-xs font-sans shadow-sm border border-white/20">
-                    {(profile.name || user?.name || 'Jaswanth Reddy').charAt(0).toUpperCase() || 'J'}
+                    {(user?.name || profile.name || 'User').charAt(0).toUpperCase() || 'U'}
                   </div>
                 </button>
 
@@ -226,12 +226,12 @@ export default function Navbar() {
             ) : (
               <>
                 <Link to="/login" className="mr-2">
-                  <button className="px-6 py-2.5 text-xs sm:text-sm font-semibold font-sans text-[#11183D] bg-[#F8FAFC] hover:bg-[#F1F5F9] hover:border-[#CBD5E1] border border-[#DCE7F2] rounded-full shadow-2xs transition-all duration-200 cursor-pointer">
+                  <button className="px-6 py-2.5 text-xs sm:text-sm font-semibold font-sans text-[#11183D] dark:text-white bg-[#F8FAFC] dark:bg-[#1E293B] hover:bg-[#F1F5F9] dark:hover:bg-[#2C374A] hover:border-[#CBD5E1] dark:hover:border-[#475569] border border-[#DCE7F2] dark:border-[#334155] rounded-full shadow-2xs transition-all duration-200 cursor-pointer">
                     Login
                   </button>
                 </Link>
                 <Link to="/register">
-                  <button className="inline-flex items-center gap-1.5 bg-[#11183D] hover:bg-[#1E293B] text-white font-sans font-semibold text-xs sm:text-sm px-6 py-2.5 rounded-full shadow-sm hover:shadow active:scale-98 transition-all duration-200 cursor-pointer">
+                  <button className="inline-flex items-center gap-1.5 bg-[#11183D] dark:bg-[#4A8BDF] hover:bg-[#1E293B] dark:hover:bg-[#2459A8] text-white font-sans font-semibold text-xs sm:text-sm px-6 py-2.5 rounded-full shadow-sm hover:shadow active:scale-98 transition-all duration-200 cursor-pointer">
                     <span>Get Started</span>
                     <ArrowRight className="h-3.5 w-3.5" />
                   </button>
@@ -243,13 +243,13 @@ export default function Navbar() {
           {/* Mobile: Hamburger Button */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden p-2 rounded-full hover:bg-[#EFFAFD] transition-colors text-[#11183D]"
+            className="md:hidden p-2 rounded-full hover:bg-[#EFFAFD] dark:hover:bg-white/[0.05] transition-colors text-[#11183D] dark:text-white"
             aria-label="Toggle menu"
           >
             {mobileOpen ? (
-              <X className="h-5 w-5 text-[#11183D]" />
+              <X className="h-5 w-5 text-[#11183D] dark:text-white" />
             ) : (
-              <Menu className="h-5 w-5 text-[#11183D]" />
+              <Menu className="h-5 w-5 text-[#11183D] dark:text-white" />
             )}
           </button>
         </nav>

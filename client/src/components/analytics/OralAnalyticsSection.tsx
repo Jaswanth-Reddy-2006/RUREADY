@@ -37,7 +37,7 @@ export default function OralAnalyticsSection({ oralBreakdown }: OralAnalyticsSec
             {oralBreakdown.totalSessions} Oral Session{oralBreakdown.totalSessions === 1 ? '' : 's'}
           </span>
           <button
-            onClick={() => navigate('/oral')}
+            onClick={() => navigate('/video')}
             className="text-xs font-bold text-[#2459A8] hover:underline flex items-center gap-1 cursor-pointer"
           >
             <span>Launch Oral Hub</span>

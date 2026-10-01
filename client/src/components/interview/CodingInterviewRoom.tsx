@@ -125,10 +125,12 @@ func main() {
 };
 
 const FALLBACK_PROBLEMS = [
+  // ─── 1. DSA: Two Sum (Arrays & Two Pointers) ───
   {
     id: 'two-sum',
     title: 'Two Sum',
     difficulty: 'EASY',
+    category: 'DSA',
     description: `Given an array of integers \`nums\` and an integer \`target\`, return indices of the two numbers such that they add up to \`target\`.
 
 You may assume that each input would have **exactly one solution**, and you may not use the same element twice. You can return the answer in any order.
@@ -158,82 +160,126 @@ Output: [0,1]
 • \`-10^9 <= target <= 10^9\`
 • Only one valid answer exists.`,
     starterCode: {
-      javascript: `/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number[]}\n */\nfunction twoSum(nums, target) {\n  // Write your optimal solution here\n  return [0, 1];\n}`,
-      typescript: `function twoSum(nums: number[], target: number): number[] {\n  // Write your optimal solution here\n  return [0, 1];\n}`,
-      python: `def twoSum(nums: list[int], target: int) -> list[int]:\n    # Write your optimal solution here\n    return [0, 1]`,
-      java: `class Solution {\n    public int[] twoSum(int[] nums, int target) {\n        // Write your optimal solution here\n        return new int[]{0, 1};\n    }\n}`,
-      cpp: `#include <vector>\n\nclass Solution {\npublic:\n    std::vector<int> twoSum(std::vector<int>& nums, int target) {\n        return {0, 1};\n    }\n};`,
-      go: `package main\n\nfunc twoSum(nums []int, target int) []int {\n    return []int{0, 1}\n}`
+      javascript: `/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number[]}\n */\nfunction twoSum(nums, target) {\n  const map = new Map();\n  for (let i = 0; i < nums.length; i++) {\n    const complement = target - nums[i];\n    if (map.has(complement)) {\n      return [map.get(complement), i];\n    }\n    map.set(nums[i], i);\n  }\n  return [];\n}`,
+      typescript: `function twoSum(nums: number[], target: number): number[] {\n  const map = new Map<number, number>();\n  for (let i = 0; i < nums.length; i++) {\n    const complement = target - nums[i];\n    if (map.has(complement)) {\n      return [map.get(complement)!, i];\n    }\n    map.set(nums[i], i);\n  }\n  return [];\n}`,
+      python: `def twoSum(nums: list[int], target: int) -> list[int]:\n    seen = {}\n    for i, num in enumerate(nums):\n        complement = target - num\n        if complement in seen:\n            return [seen[complement], i]\n        seen[num] = i\n    return []`,
+      java: `import java.util.*;\n\nclass Solution {\n    public int[] twoSum(int[] nums, int target) {\n        Map<Integer, Integer> map = new HashMap<>();\n        for (int i = 0; i < nums.length; i++) {\n            int complement = target - nums[i];\n            if (map.containsKey(complement)) {\n                return new int[]{map.get(complement), i};\n            }\n            map.put(nums[i], i);\n        }\n        return new int[]{};\n    }\n}`,
+      cpp: `#include <vector>\n#include <unordered_map>\n\nclass Solution {\npublic:\n    std::vector<int> twoSum(std::vector<int>& nums, int target) {\n        std::unordered_map<int, int> map;\n        for (int i = 0; i < nums.size(); i++) {\n            int comp = target - nums[i];\n            if (map.find(comp) != map.end()) {\n                return {map[comp], i};\n            }\n            map[nums[i]] = i;\n        }\n        return {};\n    }\n};`,
+      go: `package main\n\nfunc twoSum(nums []int, target int) []int {\n    seen := make(map[int]int)\n    for i, num := range nums {\n        comp := target - num\n        if idx, ok := seen[comp]; ok {\n            return []int{idx, i}\n        }\n        seen[num] = i\n    }\n    return []int{}\n}`
     }
   },
+
+  // ─── 2. MACHINE CODING / LLD: In-Memory Key-Value Store with TTL ───
   {
-    id: 'valid-palindrome',
-    title: 'Valid Palindrome',
-    difficulty: 'EASY',
-    description: `A phrase is a **palindrome** if, after converting all uppercase letters into lowercase letters and removing all non-alphanumeric characters, it reads the same forward and backward. Alphanumeric characters include letters and numbers.
+    id: 'in-memory-kv-store',
+    title: 'In-Memory Key-Value Store with TTL',
+    difficulty: 'MEDIUM',
+    category: 'MachineCoding',
+    description: `Design and implement an in-memory key-value data store that supports \`set\`, \`get\`, \`delete\`, and expiration (\`TTL\` in milliseconds).
 
-Given a string \`s\`, return \`true\` if it is a **palindrome**, or \`false\` otherwise.
+### Requirements:
+1. \`set(key: string, value: any, ttlMs?: number): void\` — Stores the key-value pair. If \`ttlMs\` is provided, the key automatically expires after \`ttlMs\` milliseconds.
+2. \`get(key: string): any\` — Returns the value if exists and not expired, else returns \`null\` or \`undefined\`.
+3. \`del(key: string): boolean\` — Deletes the key and returns \`true\` if it existed.
+4. \`size(): number\` — Returns the number of active, non-expired keys.
 
-### Example 1:
-\`\`\`text
-Input: s = "A man, a plan, a canal: Panama"
-Output: true
-Explanation: "amanaplanacanalpanama" is a palindrome.
-\`\`\`
-
-### Example 2:
-\`\`\`text
-Input: s = "race a car"
-Output: false
-Explanation: "raceacar" is not a palindrome.
+### Example:
+\`\`\`javascript
+const store = new KeyValueStore();
+store.set("user:1", { name: "Alice" }, 1000); // expires in 1s
+store.get("user:1"); // => { name: "Alice" }
+// after 1.5s:
+store.get("user:1"); // => null
 \`\`\`
 
 ### Constraints:
-• \`1 <= s.length <= 2 * 10^5\`
-• \`s\` consists only of printable ASCII characters.`,
+• Operations must run in average **O(1)** time complexity.
+• Expired keys should be lazily evicted on access or periodically purged without blocking reads.`,
     starterCode: {
-      javascript: `/**\n * @param {string} s\n * @return {boolean}\n */\nfunction isPalindrome(s) {\n  // Write your optimal solution here\n  return true;\n}`,
-      typescript: `function isPalindrome(s: string): boolean {\n  // Write your optimal solution here\n  return true;\n}`,
-      python: `def isPalindrome(s: str) -> bool:\n    # Write your optimal solution here\n    return True`,
-      java: `class Solution {\n    public boolean isPalindrome(String s) {\n        return true;\n    }\n}`,
-      cpp: `#include <string>\n\nclass Solution {\npublic:\n    bool isPalindrome(std::string s) {\n        return true;\n    }\n};`,
-      go: `package main\n\nfunc isPalindrome(s string) bool {\n    return true\n}`
+      javascript: `class KeyValueStore {\n  constructor() {\n    this.store = new Map();\n  }\n\n  set(key, value, ttlMs) {\n    const expiresAt = ttlMs ? Date.now() + ttlMs : null;\n    this.store.set(key, { value, expiresAt });\n  }\n\n  get(key) {\n    const item = this.store.get(key);\n    if (!item) return null;\n    if (item.expiresAt && Date.now() > item.expiresAt) {\n      this.store.delete(key);\n      return null;\n    }\n    return item.value;\n  }\n\n  del(key) {\n    return this.store.delete(key);\n  }\n\n  size() {\n    let count = 0;\n    const now = Date.now();\n    for (const [key, item] of this.store.entries()) {\n      if (!item.expiresAt || now <= item.expiresAt) {\n        count++;\n      }\n    }\n    return count;\n  }\n}`,
+      typescript: `interface StoreItem<T> {\n  value: T;\n  expiresAt: number | null;\n}\n\nclass KeyValueStore<T = any> {\n  private store = new Map<string, StoreItem<T>>();\n\n  set(key: string, value: T, ttlMs?: number): void {\n    const expiresAt = ttlMs ? Date.now() + ttlMs : null;\n    this.store.set(key, { value, expiresAt });\n  }\n\n  get(key: string): T | null {\n    const item = this.store.get(key);\n    if (!item) return null;\n    if (item.expiresAt && Date.now() > item.expiresAt) {\n      this.store.delete(key);\n      return null;\n    }\n    return item.value;\n  }\n\n  del(key: string): boolean {\n    return this.store.delete(key);\n  }\n\n  size(): number {\n    const now = Date.now();\n    let count = 0;\n    for (const [, item] of this.store.entries()) {\n      if (!item.expiresAt || now <= item.expiresAt) count++;\n    }\n    return count;\n  }\n}`,
+      python: `import time\n\nclass KeyValueStore:\n    def __init__(self):\n        self.store = {}\n\n    def set(self, key: str, value: any, ttl_ms: int = None):\n        expires_at = (time.time() * 1000 + ttl_ms) if ttl_ms else None\n        self.store[key] = (value, expires_at)\n\n    def get(self, key: str):\n        if key not in self.store:\n            return None\n        val, expires_at = self.store[key]\n        if expires_at and (time.time() * 1000 > expires_at):\n            del self.store[key]\n            return None\n        return val\n\n    def delete(self, key: str) -> bool:\n        if key in self.store:\n            del self.store[key]\n            return True\n        return False\n\n    def size(self) -> int:\n        now = time.time() * 1000\n        return sum(1 for _, (_, exp) in self.store.items() if not exp or now <= exp)`,
+      java: `import java.util.concurrent.*;\nimport java.util.*;\n\npublic class KeyValueStore {\n    private static class Entry {\n        Object value;\n        Long expiresAt;\n        Entry(Object v, Long exp) { this.value = v; this.expiresAt = exp; }\n    }\n    private final Map<String, Entry> store = new ConcurrentHashMap<>();\n\n    public void set(String key, Object value, Long ttlMs) {\n        Long expiresAt = ttlMs != null ? System.currentTimeMillis() + ttlMs : null;\n        store.put(key, new Entry(value, expiresAt));\n    }\n\n    public Object get(String key) {\n        Entry entry = store.get(key);\n        if (entry == null) return null;\n        if (entry.expiresAt != null && System.currentTimeMillis() > entry.expiresAt) {\n            store.remove(key);\n            return null;\n        }\n        return entry.value;\n    }\n}`,
+      cpp: `#include <unordered_map>\n#include <chrono>\n#include <string>\n\nclass KeyValueStore {\n    struct Entry {\n        std::string value;\n        long long expiresAt;\n    };\n    std::unordered_map<std::string, Entry> store;\npublic:\n    void set(const std::string& key, const std::string& val, long long ttlMs = 0) {\n        long long exp = ttlMs > 0 ? getCurrentTimeMs() + ttlMs : 0;\n        store[key] = {val, exp};\n    }\n    long long getCurrentTimeMs() {\n        return std::chrono::duration_cast<std::chrono::milliseconds>(\n            std::chrono::system_clock::now().time_since_epoch()).count();\n    }\n};`,
+      go: `package main\n\nimport "time"\n\ntype StoreItem struct {\n    Value     interface{}\n    ExpiresAt int64\n}\n\ntype KeyValueStore struct {\n    store map[string]StoreItem\n}\n\nfunc NewKVStore() *KeyValueStore {\n    return &KeyValueStore{store: make(map[string]StoreItem)}\n}`
     }
   },
+
+  // ─── 3. MACHINE CODING / LLD: Token Bucket Rate Limiter ───
   {
-    id: 'best-time-to-buy-and-sell-stock',
-    title: 'Best Time to Buy and Sell Stock',
-    difficulty: 'EASY',
-    description: `You are given an array \`prices\` where \`prices[i]\` is the price of a given stock on the \`i\`th day.
+    id: 'token-bucket-rate-limiter',
+    title: 'Token Bucket Rate Limiter',
+    difficulty: 'MEDIUM',
+    category: 'MachineCoding',
+    description: `Design and implement an API Rate Limiter using the **Token Bucket Algorithm**.
 
-You want to maximize your profit by choosing a single day to buy one stock and choosing a different day in the future to sell that stock.
-
-Return the maximum profit you can achieve from this transaction. If you cannot achieve any profit, return 0.
-
-### Example 1:
-\`\`\`text
-Input: prices = [7,1,5,3,6,4]
-Output: 5
-Explanation: Buy on day 2 (price = 1) and sell on day 5 (price = 6), profit = 6-1 = 5.
-\`\`\`
-
-### Example 2:
-\`\`\`text
-Input: prices = [7,6,4,3,1]
-Output: 0
-Explanation: In this case, no transactions are done and the max profit = 0.
-\`\`\`
+### Requirements:
+1. \`capacity\`: Maximum tokens the bucket can hold.
+2. \`refillRate\`: Number of tokens added to the bucket per second.
+3. \`allowRequest(tokens: number = 1): boolean\` — Checks if enough tokens are available. If yes, consumes tokens and returns \`true\`. Otherwise, returns \`false\` without consuming tokens.
 
 ### Constraints:
-• \`1 <= prices.length <= 10^5\`
-• \`0 <= prices[i] <= 10^4\``,
+• Handle fractional refill smoothly based on elapsed timestamps without spinning background timers.
+• Ensure atomic or thread-safe state operations in multi-threaded environments.`,
     starterCode: {
-      javascript: `/**\n * @param {number[]} prices\n * @return {number}\n */\nfunction maxProfit(prices) {\n  // Write your optimal solution here\n  return 0;\n}`,
-      typescript: `function maxProfit(prices: number[]): number {\n  // Write your optimal solution here\n  return 0;\n}`,
-      python: `def maxProfit(prices: list[int]) -> int:\n    # Write your optimal solution here\n    return 0`,
-      java: `class Solution {\n    public int maxProfit(int[] prices) {\n        return 0;\n    }\n}`,
-      cpp: `#include <vector>\n\nclass Solution {\npublic:\n    int maxProfit(std::vector<int>& prices) {\n        return 0;\n    }\n};`,
-      go: `package main\n\nfunc maxProfit(prices []int) int {\n    return 0\n}`
+      javascript: `class TokenBucketRateLimiter {\n  constructor(capacity, refillRatePerSec) {\n    this.capacity = capacity;\n    this.refillRate = refillRatePerSec;\n    this.tokens = capacity;\n    this.lastRefill = Date.now();\n  }\n\n  allowRequest(tokens = 1) {\n    this.refill();\n    if (this.tokens >= tokens) {\n      this.tokens -= tokens;\n      return true;\n    }\n    return false;\n  }\n\n  refill() {\n    const now = Date.now();\n    const elapsedSec = (now - this.lastRefill) / 1000;\n    this.tokens = Math.min(this.capacity, this.tokens + elapsedSec * this.refillRate);\n    this.lastRefill = now;\n  }\n}`,
+      typescript: `class TokenBucketRateLimiter {\n  private tokens: number;\n  private lastRefill: number;\n\n  constructor(private capacity: number, private refillRatePerSec: number) {\n    this.tokens = capacity;\n    this.lastRefill = Date.now();\n  }\n\n  allowRequest(tokens: number = 1): boolean {\n    this.refill();\n    if (this.tokens >= tokens) {\n      this.tokens -= tokens;\n      return true;\n    }\n    return false;\n  }\n\n  private refill(): void {\n    const now = Date.now();\n    const elapsedSec = (now - this.lastRefill) / 1000;\n    this.tokens = Math.min(this.capacity, this.tokens + elapsedSec * this.refillRatePerSec);\n    this.lastRefill = now;\n  }\n}`,
+      python: `import time\n\nclass TokenBucketRateLimiter:\n    def __init__(self, capacity: int, refill_rate_per_sec: float):\n        self.capacity = capacity\n        self.refill_rate = refill_rate_per_sec\n        self.tokens = float(capacity)\n        self.last_refill = time.time()\n\n    def allow_request(self, tokens: int = 1) -> bool:\n        self._refill()\n        if self.tokens >= tokens:\n            self.tokens -= tokens\n            return True\n        return False\n\n    def _refill(self):\n        now = time.time()\n        elapsed = now - self.last_refill\n        self.tokens = min(float(self.capacity), self.tokens + elapsed * self.refill_rate)\n        self.last_refill = now`,
+      java: `public class TokenBucketRateLimiter {\n    private final long capacity;\n    private final double refillRatePerSec;\n    private double tokens;\n    private long lastRefill;\n\n    public TokenBucketRateLimiter(long capacity, double refillRatePerSec) {\n        this.capacity = capacity;\n        this.refillRatePerSec = refillRatePerSec;\n        this.tokens = capacity;\n        this.lastRefill = System.currentTimeMillis();\n    }\n\n    public synchronized boolean allowRequest(int tokensNeeded) {\n        refill();\n        if (tokens >= tokensNeeded) {\n            tokens -= tokensNeeded;\n            return true;\n        }\n        return false;\n    }\n\n    private void refill() {\n        long now = System.currentTimeMillis();\n        double elapsedSec = (now - lastRefill) / 1000.0;\n        tokens = Math.min(capacity, tokens + elapsedSec * refillRatePerSec);\n        lastRefill = now;\n    }\n}`,
+      cpp: `#include <chrono>\n#include <algorithm>\n\nclass TokenBucketRateLimiter {\n    double capacity;\n    double refillRate;\n    double tokens;\n    std::chrono::time_point<std::chrono::steady_clock> lastRefill;\npublic:\n    TokenBucketRateLimiter(double cap, double rate) : capacity(cap), refillRate(rate), tokens(cap), lastRefill(std::chrono::steady_clock::now()) {}\n};`,
+      go: `package main\n\nimport "time"\n\ntype TokenBucketRateLimiter struct {\n    capacity   float64\n    refillRate float64\n    tokens     float64\n    lastRefill time.Time\n}`
+    }
+  },
+
+  // ─── 4. FRONTEND JS: Concurrent Async Task Queue ───
+  {
+    id: 'async-task-queue',
+    title: 'Concurrent Async Task Queue with Retries',
+    difficulty: 'MEDIUM',
+    category: 'Frontend',
+    description: `Implement a Promise-based Async Task Queue that executes tasks with a maximum concurrency limit and automatic retries on failure.
+
+### Requirements:
+1. \`constructor(concurrency: number, maxRetries: number = 2)\`
+2. \`enqueue(taskFn: () => Promise<any>): Promise<any>\` — Returns a Promise that resolves when \`taskFn\` completes or rejects if all retries fail.
+3. At most \`concurrency\` tasks may execute in parallel.
+
+### Example:
+\`\`\`javascript
+const queue = new AsyncTaskQueue(2, 3);
+const res = await queue.enqueue(() => fetch('/api/data'));
+\`\`\``,
+    starterCode: {
+      javascript: `class AsyncTaskQueue {\n  constructor(concurrency = 2, maxRetries = 2) {\n    this.concurrency = concurrency;\n    this.maxRetries = maxRetries;\n    this.running = 0;\n    this.queue = [];\n  }\n\n  enqueue(taskFn) {\n    return new Promise((resolve, reject) => {\n      this.queue.push({ taskFn, retries: 0, resolve, reject });\n      this.processNext();\n    });\n  }\n\n  async processNext() {\n    if (this.running >= this.concurrency || this.queue.length === 0) return;\n    this.running++;\n    const item = this.queue.shift();\n\n    try {\n      const result = await item.taskFn();\n      item.resolve(result);\n    } catch (err) {\n      if (item.retries < this.maxRetries) {\n        item.retries++;\n        this.queue.unshift(item);\n      } else {\n        item.reject(err);\n      }\n    } finally {\n      this.running--;\n      this.processNext();\n    }\n  }\n}`,
+      typescript: `type TaskFn<T> = () => Promise<T>;\n\nclass AsyncTaskQueue {\n  private running = 0;\n  private queue: Array<{ taskFn: TaskFn<any>; retries: number; resolve: (val: any) => void; reject: (err: any) => void }> = [];\n\n  constructor(private concurrency: number = 2, private maxRetries: number = 2) {}\n\n  enqueue<T>(taskFn: TaskFn<T>): Promise<T> {\n    return new Promise<T>((resolve, reject) => {\n      this.queue.push({ taskFn, retries: 0, resolve, reject });\n      this.processNext();\n    });\n  }\n\n  private async processNext(): Promise<void> {\n    if (this.running >= this.concurrency || this.queue.length === 0) return;\n    this.running++;\n    const item = this.queue.shift()!;\n    try {\n      const res = await item.taskFn();\n      item.resolve(res);\n    } catch (err) {\n      if (item.retries < this.maxRetries) {\n        item.retries++;\n        this.queue.unshift(item);\n      } else {\n        item.reject(err);\n      }\n    } finally {\n      this.running--;\n      this.processNext();\n    }\n  }\n}`,
+      python: `import asyncio\n\nclass AsyncTaskQueue:\n    def __init__(self, concurrency: int = 2, max_retries: int = 2):\n        self.semaphore = asyncio.Semaphore(concurrency)\n        self.max_retries = max_retries\n\n    async def enqueue(self, task_fn):\n        async with self.semaphore:\n            for attempt in range(self.max_retries + 1):\n                try:\n                    return await task_fn()\n                except Exception as e:\n                    if attempt == self.max_retries:\n                        raise e`,
+      java: `import java.util.concurrent.*;\n\npublic class AsyncTaskQueue {\n    private final ExecutorService executor;\n    public AsyncTaskQueue(int concurrency) {\n        this.executor = Executors.newFixedThreadPool(concurrency);\n    }\n}`,
+      cpp: `#include <thread>\n#include <future>\n#include <queue>\n\nclass AsyncTaskQueue {\n    // Thread Pool / Task Queue implementation\n};`,
+      go: `package main\n\ntype AsyncTaskQueue struct {\n    sem chan struct{}\n}\n\nfunc NewTaskQueue(concurrency int) *AsyncTaskQueue {\n    return &AsyncTaskQueue{sem: make(chan struct{}, concurrency)}\n}`
+    }
+  },
+
+  // ─── 5. BACKEND & DISTRIBUTED: Thread-safe LRU Cache ───
+  {
+    id: 'lru-cache',
+    title: 'LRU Cache (Least Recently Used)',
+    difficulty: 'MEDIUM',
+    category: 'Backend',
+    description: `Design a data structure that follows the constraints of a **Least Recently Used (LRU) Cache**.
+
+### Requirements:
+1. \`LRUCache(int capacity)\` Initialize the LRU cache with positive size \`capacity\`.
+2. \`int get(int key)\` Return the value of the \`key\` if the key exists, otherwise return \`-1\`.
+3. \`void put(int key, int value)\` Update the value of the \`key\` if the \`key\` exists. Otherwise, add the \`key-value\` pair to the cache. If the number of keys exceeds the \`capacity\` from this operation, **evict the least recently used key**.
+
+The functions \`get\` and \`put\` must each run in **O(1)** average time complexity.`,
+    starterCode: {
+      javascript: `class LRUCache {\n  /**\n   * @param {number} capacity\n   */\n  constructor(capacity) {\n    this.capacity = capacity;\n    this.cache = new Map();\n  }\n\n  /**\n   * @param {number} key\n   * @return {number}\n   */\n  get(key) {\n    if (!this.cache.has(key)) return -1;\n    const val = this.cache.get(key);\n    this.cache.delete(key);\n    this.cache.set(key, val);\n    return val;\n  }\n\n  /**\n   * @param {number} key\n   * @param {number} value\n   * @return {void}\n   */\n  put(key, value) {\n    if (this.cache.has(key)) {\n      this.cache.delete(key);\n    } else if (this.cache.size >= this.capacity) {\n      const oldestKey = this.cache.keys().next().value;\n      this.cache.delete(oldestKey);\n    }\n    this.cache.set(key, value);\n  }\n}`,
+      typescript: `class LRUCache {\n  private cache = new Map<number, number>();\n  constructor(private capacity: number) {}\n\n  get(key: number): number {\n    if (!this.cache.has(key)) return -1;\n    const val = this.cache.get(key)!;\n    this.cache.delete(key);\n    this.cache.set(key, val);\n    return val;\n  }\n\n  put(key: number, value: number): void {\n    if (this.cache.has(key)) {\n      this.cache.delete(key);\n    } else if (this.cache.size >= this.capacity) {\n      const oldestKey = this.cache.keys().next().value!;\n      this.cache.delete(oldestKey);\n    }\n    this.cache.set(key, value);\n  }\n}`,
+      python: `from collections import OrderedDict\n\nclass LRUCache:\n    def __init__(self, capacity: int):\n        self.capacity = capacity\n        self.cache = OrderedDict()\n\n    def get(self, key: int) -> int:\n        if key not in self.cache:\n            return -1\n        self.cache.move_to_end(key)\n        return self.cache[key]\n\n    def put(self, key: int, value: int) -> None:\n        if key in self.cache:\n            self.cache.move_to_end(key)\n        self.cache[key] = value\n        if len(self.cache) > self.capacity:\n            self.cache.popitem(last=False)`,
+      java: `import java.util.LinkedHashMap;\nimport java.util.Map;\n\nclass LRUCache {\n    private final int capacity;\n    private final LinkedHashMap<Integer, Integer> map;\n\n    public LRUCache(int capacity) {\n        this.capacity = capacity;\n        this.map = new LinkedHashMap<Integer, Integer>(capacity, 0.75f, true) {\n            @Override\n            protected boolean removeEldestEntry(Map.Entry<Integer, Integer> eldest) {\n                return size() > LRUCache.this.capacity;\n            }\n        };\n    }\n\n    public int get(int key) {\n        return map.getOrDefault(key, -1);\n    }\n\n    public void put(int key, int value) {\n        map.put(key, value);\n    }\n}`,
+      cpp: `#include <unordered_map>\n#include <list>\n\nclass LRUCache {\n    int cap;\n    std::list<std::pair<int, int>> l;\n    std::unordered_map<int, std::list<std::pair<int, int>>::iterator> m;\npublic:\n    LRUCache(int capacity) : cap(capacity) {}\n    int get(int key) {\n        if (m.find(key) == m.end()) return -1;\n        l.splice(l.begin(), l, m[key]);\n        return m[key]->second;\n    }\n    void put(int key, int value) {\n        if (m.find(key) != m.end()) {\n            l.splice(l.begin(), l, m[key]);\n            m[key]->second = value;\n            return;\n        }\n        if (l.size() == cap) {\n            m.erase(l.back().first);\n            l.pop_back();\n        }\n        l.emplace_front(key, value);\n        m[key] = l.begin();\n    }\n};`,
+      go: `package main\n\ntype LRUCache struct {\n    capacity int\n}`
     }
   }
 ];
@@ -792,7 +838,7 @@ export default function CodingInterviewRoom() {
         try { track.stop(); } catch {}
       });
     }
-    navigate('/interview');
+    navigate('/coding');
   }, [currentProblem, id, codeValue, stopListening, mediaStream, navigate]);
 
   // Speech Recognition lifecycle setup

@@ -236,7 +236,7 @@ export function computeGamificationData(
       target: 1,
       isCompleted: todayOralDone >= 1,
       actionText: todayOralDone >= 1 ? 'Completed' : 'Start Interview',
-      actionHref: '/oral/new',
+      actionHref: '/video/new',
       iconName: 'MessageSquare',
     },
     {
@@ -262,7 +262,7 @@ export function computeGamificationData(
       target: 1,
       isCompleted: todayBehavioralDone >= 1,
       actionText: todayBehavioralDone >= 1 ? 'Completed' : 'Practice Now',
-      actionHref: '/oral/new?focus=Behavioral',
+      actionHref: '/video/new?focus=Behavioral',
       iconName: 'Users',
     },
   ];
@@ -348,7 +348,7 @@ export function computeGamificationData(
       levelLabel: oralSessions.filter((s) => s.focusAreas?.some((f: string) => f.toLowerCase().includes('behavioral'))).length === 0 ? 'Not Started' : 'Level 1 — STAR Practice',
       isStarted: oralSessions.filter((s) => s.focusAreas?.some((f: string) => f.toLowerCase().includes('behavioral'))).length > 0,
       actionText: 'Continue Practice',
-      actionHref: '/oral/new?focus=Behavioral',
+      actionHref: '/video/new?focus=Behavioral',
       iconName: 'Users',
     },
     {
@@ -361,7 +361,7 @@ export function computeGamificationData(
       levelLabel: totalOralCompleted === 0 ? 'Not Started' : totalOralCompleted < 5 ? 'Level 1 — Articulation' : 'Level 2 — Confident',
       isStarted: totalOralCompleted > 0,
       actionText: 'Continue Practice',
-      actionHref: '/oral',
+      actionHref: '/video',
       iconName: 'Volume2',
     },
     {

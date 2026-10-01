@@ -55,7 +55,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   // Dashboard platform routes (dashboard, setup/new, history, analytics, settings)
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[#EFFAFD] text-[#11183D] transition-colors">
+    <div className="flex h-screen w-screen overflow-hidden bg-[#EFFAFD] dark:bg-[#080C1D] text-[#11183D] dark:text-[#F8FAFC] transition-colors">
       
       {/* Skip to Main Content Accessibility Link */}
       <a
@@ -103,15 +103,15 @@ export default function AppLayout({ children }: AppLayoutProps) {
       </AnimatePresence>
 
       {/* Workspace Main Area */}
-      <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0">
+      <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0 bg-[#EFFAFD] dark:bg-[#080C1D]">
         {/* Mobile top bar with hamburger */}
-        <header className="md:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-[#DCE7F2] text-[#11183D] shrink-0">
+        <header className="md:hidden flex items-center justify-between px-4 py-3 bg-white dark:bg-[#11183D] border-b border-[#DCE7F2] dark:border-[#1E293B] text-[#11183D] dark:text-white shrink-0">
           <div className="flex items-center gap-2">
             <Logo size="sm" theme="light" />
           </div>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 rounded-xl text-[#526078] hover:text-[#11183D] hover:bg-[#EFFAFD] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A8BDF]"
+            className="p-2 rounded-xl text-[#526078] dark:text-[#94A3B8] hover:text-[#11183D] dark:hover:text-white hover:bg-[#EFFAFD] dark:hover:bg-white/[0.05] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A8BDF]"
             aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
             aria-expanded={mobileMenuOpen}
           >
@@ -119,12 +119,12 @@ export default function AppLayout({ children }: AppLayoutProps) {
           </button>
         </header>
 
-        {/* Scrollable workspace content container with pale blue theme */}
+        {/* Scrollable workspace content container */}
         <div 
           id="workspace-viewport"
           role="region"
           aria-label="Workspace content view"
-          className="flex-1 h-full overflow-y-auto bg-[#EFFAFD] text-[#11183D] relative focus:outline-none transition-colors"
+          className="flex-1 h-full overflow-y-auto bg-[#EFFAFD] dark:bg-[#080C1D] text-[#11183D] dark:text-[#F8FAFC] relative focus:outline-none transition-colors"
         >
           {children}
         </div>

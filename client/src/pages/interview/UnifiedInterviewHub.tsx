@@ -199,7 +199,7 @@ export default function UnifiedInterviewHub() {
 
             <div>
               <h2 className="text-xl font-bold text-slate-900 group-hover:text-[#4A8BDF] transition-colors font-sans">
-                Oral Interview
+                Video Interview
               </h2>
               <p className="text-xs text-slate-500 leading-relaxed mt-1 font-sans">
                 Practice real-world verbal interviews with an interactive 3D AI interviewer that listens, analyzes confidence, assesses domain knowledge, and delivers structured follow-up questions.
@@ -232,7 +232,7 @@ export default function UnifiedInterviewHub() {
               onClick={() => navigate('/oral')}
               className="text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors"
             >
-              Oral Hub & Catalog
+              Video Hub & Catalog
             </button>
 
             <button
@@ -240,7 +240,7 @@ export default function UnifiedInterviewHub() {
               onClick={() => navigate('/oral/new')}
               className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#2459A8] to-[#4A8BDF] hover:from-[#1D4A8C] hover:to-[#3B77C4] text-white rounded-2xl text-xs font-bold font-sans shadow-sm transition-all"
             >
-              <span>Start Oral Interview</span>
+              <span>Start Video Interview</span>
               <ArrowRight size={14} />
             </button>
           </div>

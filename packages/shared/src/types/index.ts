@@ -160,6 +160,7 @@ export interface Question {
   questionText: string;
   questionType: QuestionType;
   difficulty: Difficulty;
+  category?: string;
   answerText?: string;
   answeredAt?: string;
   timeTakenSecs?: number;
@@ -168,6 +169,13 @@ export interface Question {
   evalStrengths: string[];
   evalWeaknesses: string[];
   betterAnswer?: string;
+  whatWentWell?: string[];
+  whatCouldBeImproved?: string[];
+  suggestedAnswerStructure?: string[];
+  followUpQuestionText?: string;
+  followUpAnswerText?: string;
+  followUpScore?: number;
+  isSkip?: boolean;
 }
 
 export interface SubmitAnswerRequest {
@@ -184,6 +192,53 @@ export interface ActionableTip {
   resource?: string;
 }
 
+export interface StageBreakdownItem {
+  stageNumber: number;
+  stageName: string;
+  questionCount: number;
+  durationMins: number;
+  score: number;
+  description?: string;
+}
+
+export interface PerformanceTimelineItem {
+  questionIndex: number;
+  questionLabel: string;
+  score: number;
+  rating: 'Strong' | 'Good' | 'Needs Improvement' | 'Weak';
+  category?: string;
+  durationSecs?: number;
+  questionText?: string;
+}
+
+export interface InterviewSummaryMeta {
+  totalQuestionsAsked: number;
+  questionsAnswered: number;
+  questionsSkipped: number;
+  averageAnswerLengthMinutes: number;
+  longestAnswerMinutes: number;
+  shortestAnswerMinutes: number;
+  followUpQuestionsCount: number;
+  topicsCovered: string[];
+}
+
+export interface PersonalizedRecommendation {
+  priority: number;
+  title: string;
+  weakness: string;
+  action: string;
+  expectedOutcome: string;
+  practiceResource?: string;
+}
+
+export interface PracticeResourceItem {
+  title: string;
+  subtitle: string;
+  category: string;
+  link: string;
+  iconType?: string;
+}
+
 export interface Analysis {
   id: string;
   sessionId: string;
@@ -192,11 +247,19 @@ export interface Analysis {
   technicalScore: number;
   confidenceScore: number;
   structureScore: number;
+  problemSolvingScore?: number;
+  depthScore?: number;
+  relevanceScore?: number;
+  industryReadinessScore?: number;
+  categoryScores?: Record<string, number>;
   confidenceMeterScore?: number;
   confidenceSignals?: {
     avgWpm: number;
     avgPauseCount: number;
     avgAnswerLength: number;
+    corporateBenchmark?: any;
+    timeComplexity?: string;
+    spaceComplexity?: string;
   };
   eyeContactScore?: number;
   presenceScore?: number;
@@ -205,6 +268,11 @@ export interface Analysis {
   improvements: string[];
   actionableTips: ActionableTip[];
   readinessVerdict: ReadinessVerdict;
+  stageBreakdown?: StageBreakdownItem[];
+  performanceTimeline?: PerformanceTimelineItem[];
+  interviewSummary?: InterviewSummaryMeta;
+  recommendations?: PersonalizedRecommendation[];
+  practiceResources?: PracticeResourceItem[];
   createdAt: string;
 }
 

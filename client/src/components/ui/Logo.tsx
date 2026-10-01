@@ -38,7 +38,7 @@ const sizeConfig = {
 export default function Logo({ size = 'md', theme = 'light', showTagline = false, className }: LogoProps) {
   const s = sizeConfig[size] || sizeConfig.md;
   const isDark = theme === 'dark';
-  const textColor = isDark ? 'text-white' : 'text-[#0F172A]';
+  const textColor = isDark ? 'text-white' : 'text-[#0F172A] dark:text-white';
 
   return (
     <div className={clsx('flex items-center gap-2.5 select-none leading-none group', className)}>

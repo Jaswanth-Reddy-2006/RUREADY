@@ -24,7 +24,7 @@ export default function RoadmapCertificateModal({
 
   if (!isOpen) return null;
 
-  const candidateName = user?.name || 'Jaswanth Reddy';
+  const candidateName = user?.name || 'Candidate';
   const verificationHash = `RU-${roadmap.id.slice(0, 8).toUpperCase()}-${Date.now().toString(36).toUpperCase()}`;
   const currentDate = new Date().toLocaleDateString('en-US', {
     month: 'long',

@@ -126,14 +126,29 @@ export interface QuizSession {
 }
 
 export interface LeaderboardEntry {
+  rank: number;
   userId: string;
   userName: string;
+  userAvatar?: string;
   rating: number;
+  rankTier: string;
   wins: number;
   losses: number;
   matchesPlayed: number;
   winRate: number;
-  rankTier: string;
+  currentStreak?: number;
+  seasonPoints?: number;
+  rankDelta?: number;
+}
+
+export interface LeaderboardPayload {
+  timeframe: 'weekly' | 'monthly' | 'all_time';
+  tier: string;
+  seasonLabel: string;
+  seasonEndsAt: number;
+  timeRemainingMs: number;
+  totalChallengers: number;
+  entries: LeaderboardEntry[];
 }
 
 export const challengesApi = {
@@ -213,9 +228,9 @@ export const challengesApi = {
     return res.data;
   },
 
-  async getLeaderboard(limit = 20) {
+  async getLeaderboard(timeframe: 'weekly' | 'monthly' | 'all_time' = 'weekly', tier = 'ALL', limit = 50): Promise<{ success: boolean; data: LeaderboardPayload }> {
     const res = await apiClient.get('/challenges/leaderboard', {
-      params: { limit },
+      params: { timeframe, tier, limit },
     });
     return res.data;
   },

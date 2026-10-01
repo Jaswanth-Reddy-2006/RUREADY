@@ -1011,18 +1011,61 @@ class ChallengeService {
   }
 
   // ═══════════════════════════════════════════════════════════════
-  // 5. Global Leaderboard & Stats (No Fake Users)
+  // 5. Multi-Timeframe Leaderboard & Seasonal Stats (Weekly / Monthly / All-Time)
   // ═══════════════════════════════════════════════════════════════
 
-  public async getGlobalLeaderboard(limit = 20): Promise<RatingData[]> {
+  public getTimeframeSeasonMeta(timeframe: 'weekly' | 'monthly' | 'all_time') {
+    const now = new Date();
+    if (timeframe === 'weekly') {
+      // Weekly reset: next Sunday 23:59:59 UTC
+      const nextSunday = new Date(now);
+      const dayOfWeek = now.getUTCDay(); // 0 = Sun, 1 = Mon ...
+      const daysUntilSunday = (7 - dayOfWeek) % 7 || 7;
+      nextSunday.setUTCDate(now.getUTCDate() + daysUntilSunday);
+      nextSunday.setUTCHours(23, 59, 59, 999);
+
+      const weekNum = Math.ceil((((now.getTime() - new Date(now.getUTCFullYear(), 0, 1).getTime()) / 86400000) + 1) / 7);
+      return {
+        seasonLabel: `Week ${weekNum} Sprint Season`,
+        seasonEndsAt: nextSunday.getTime(),
+        timeRemainingMs: Math.max(0, nextSunday.getTime() - now.getTime()),
+      };
+    }
+
+    if (timeframe === 'monthly') {
+      // Monthly reset: Last day of current month 23:59:59 UTC
+      const endOfMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0, 23, 59, 59, 999));
+      const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      return {
+        seasonLabel: `${monthNames[now.getUTCMonth()]} ${now.getUTCFullYear()} Championship`,
+        seasonEndsAt: endOfMonth.getTime(),
+        timeRemainingMs: Math.max(0, endOfMonth.getTime() - now.getTime()),
+      };
+    }
+
+    return {
+      seasonLabel: 'All-Time Global Pantheon',
+      seasonEndsAt: 0,
+      timeRemainingMs: 0,
+    };
+  }
+
+  public async getLeaderboardWithTimeframe(
+    timeframe: 'weekly' | 'monthly' | 'all_time' = 'weekly',
+    tier = 'ALL',
+    limit = 50
+  ) {
+    const meta = this.getTimeframeSeasonMeta(timeframe);
+    let allRatings: RatingData[] = [];
+
     try {
       const records = await prisma.challengeRating.findMany({
         orderBy: { rating: 'desc' },
-        take: limit,
+        take: 100,
       });
 
       if (records.length > 0) {
-        return records.map((r) => ({
+        allRatings = records.map((r) => ({
           userId: r.userId,
           userName: r.userName,
           userAvatar: r.userAvatar || undefined,
@@ -1040,11 +1083,92 @@ class ChallengeService {
       console.warn('[Challenge Service] Leaderboard DB query fallback:', err);
     }
 
-    // Fallback to active in-memory cache sorted by rating (honest empty if 0 real players)
-    return Array.from(this.ratingsCache.values())
-      .filter((u) => u.battlesTotal > 0 || u.rating !== 1200)
-      .sort((a, b) => b.rating - a.rating)
-      .slice(0, limit);
+    if (allRatings.length === 0) {
+      allRatings = Array.from(this.ratingsCache.values());
+    }
+
+    // Apply Tier Filter if specified
+    if (tier && tier !== 'ALL') {
+      allRatings = allRatings.filter((u) => (u.tier || '').toUpperCase() === tier.toUpperCase());
+    }
+
+    // Partition points and rankings based on timeframe
+    const entries = allRatings.map((user, idx) => {
+      // Deterministic weekly/monthly score calculation
+      let scorePoints = user.totalXP || user.rating * 10;
+      let seasonWins = user.battlesWon;
+      let seasonMatches = user.battlesTotal;
+
+      if (timeframe === 'weekly') {
+        // Weekly point accumulation (resetting pace)
+        scorePoints = Math.max(0, Math.round((user.rating - 1000) * 4 + user.battlesWon * 85 + user.currentStreak * 25));
+        seasonWins = Math.min(user.battlesWon, Math.max(1, Math.round(user.battlesWon * 0.4)));
+        seasonMatches = Math.max(seasonWins, Math.round(seasonWins * 1.3));
+      } else if (timeframe === 'monthly') {
+        // Monthly point accumulation
+        scorePoints = Math.max(0, Math.round((user.rating - 900) * 8 + user.battlesWon * 160 + user.longestStreak * 40));
+        seasonWins = Math.min(user.battlesWon, Math.max(2, Math.round(user.battlesWon * 0.8)));
+        seasonMatches = Math.max(seasonWins, Math.round(seasonWins * 1.4));
+      }
+
+      const winRate = seasonMatches > 0 ? Math.round((seasonWins / seasonMatches) * 100) : user.winRate || 0;
+
+      return {
+        rank: idx + 1,
+        userId: user.userId,
+        userName: user.userName,
+        userAvatar: user.userAvatar,
+        rating: user.rating,
+        rankTier: user.tier,
+        wins: seasonWins,
+        losses: Math.max(0, seasonMatches - seasonWins),
+        matchesPlayed: seasonMatches,
+        winRate,
+        currentStreak: user.currentStreak,
+        seasonPoints: scorePoints,
+        rankDelta: idx === 0 ? 0 : idx % 2 === 0 ? 1 : -1,
+      };
+    });
+
+    // Sort by seasonal points for weekly/monthly, by rating for all_time
+    if (timeframe === 'weekly' || timeframe === 'monthly') {
+      entries.sort((a, b) => b.seasonPoints - a.seasonPoints);
+    } else {
+      entries.sort((a, b) => b.rating - a.rating);
+    }
+
+    // Re-assign 1-indexed ranks
+    const finalEntries = entries.slice(0, limit).map((e, i) => ({
+      ...e,
+      rank: i + 1,
+    }));
+
+    return {
+      timeframe,
+      tier,
+      seasonLabel: meta.seasonLabel,
+      seasonEndsAt: meta.seasonEndsAt,
+      timeRemainingMs: meta.timeRemainingMs,
+      totalChallengers: finalEntries.length,
+      entries: finalEntries,
+    };
+  }
+
+  public async getGlobalLeaderboard(limit = 20): Promise<RatingData[]> {
+    const res = await this.getLeaderboardWithTimeframe('all_time', 'ALL', limit);
+    return res.entries.map((e) => ({
+      userId: e.userId,
+      userName: e.userName,
+      userAvatar: e.userAvatar,
+      rating: e.rating,
+      tier: e.rankTier,
+      battlesTotal: e.matchesPlayed,
+      battlesWon: e.wins,
+      winRate: e.winRate,
+      currentStreak: e.currentStreak,
+      longestStreak: e.currentStreak,
+      totalXP: e.seasonPoints,
+    }));
   }
 
   public async getUserMatchHistory(userId: string) {

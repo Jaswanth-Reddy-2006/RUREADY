@@ -32,4 +32,8 @@ router.delete('/broadcasts/:id', adminController.deleteBroadcast);
 // Feature 3: Live Anti-Cheat & Integrity Hub
 router.get('/integrity', adminController.getIntegrityMetrics);
 
+// Feature 4: Feature Flags & Authorization Engine
+router.get('/features', adminController.getFeatureFlags);
+router.patch('/features/:key', adminController.updateFeatureFlag);
+
 export default router;

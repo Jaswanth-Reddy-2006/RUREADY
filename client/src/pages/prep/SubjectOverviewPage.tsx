@@ -396,7 +396,7 @@ export default function SubjectOverviewPage() {
                   <p className="text-xs text-slate-500">Master class diagrams, SOLID design principles, and design patterns.</p>
                 </div>
                 <Button
-                  onClick={() => navigate('/oral/new?role=Software%20Engineer&focus=System%20Design%20LLD')}
+                  onClick={() => navigate('/video/new?role=Software%20Engineer&focus=System%20Design%20LLD')}
                   className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-xs shrink-0"
                 >
                   Practice LLD Oral Interview →
@@ -453,7 +453,7 @@ export default function SubjectOverviewPage() {
 
                           <div className="pt-2">
                             <Button
-                              onClick={() => navigate(`/oral/new?role=Software%20Engineer&focus=${encodeURIComponent(lld.title)}`)}
+                              onClick={() => navigate(`/video/new?role=Software%20Engineer&focus=${encodeURIComponent(lld.title)}`)}
                               className="w-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold py-2.5 rounded-xl shadow-xs"
                             >
                               Practice {lld.title} in Oral Interview Loop →
@@ -479,7 +479,7 @@ export default function SubjectOverviewPage() {
                   <p className="text-xs text-slate-500">Distributed systems, caching strategies, database sharding, and scalability.</p>
                 </div>
                 <Button
-                  onClick={() => navigate('/oral/new?role=Senior%20Software%20Engineer&focus=System%20Design%20HLD')}
+                  onClick={() => navigate('/video/new?role=Senior%20Software%20Engineer&focus=System%20Design%20HLD')}
                   className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-xs shrink-0"
                 >
                   Practice System Design Interview →

@@ -334,7 +334,7 @@ export function aggregateCareerAnalytics(
           reason: 'Build your initial baseline for communication and technical explanation.',
           estimatedTime: '20 min',
           actionLabel: 'Start Oral Interview',
-          actionUrl: '/oral'
+          actionUrl: '/video'
         },
         {
           id: 'act-2',
@@ -592,7 +592,7 @@ export function aggregateCareerAnalytics(
       reason: 'Retest your technical accuracy and answer structure under pressure.',
       estimatedTime: '25 min',
       actionLabel: 'Start Oral Interview',
-      actionUrl: '/oral'
+      actionUrl: '/video'
     }
   ];
 

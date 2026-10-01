@@ -282,6 +282,10 @@ app.use(
   createProxyMiddleware({
     target: CHALLENGE_SERVICE_URL,
     changeOrigin: true,
+    pathRewrite: (path: string) => {
+      const clean = path.startsWith('/') ? path : `/${path}`;
+      return `/api/challenges${clean === '/' ? '' : clean}`;
+    },
     ws: true,
   }),
 );
@@ -301,6 +305,10 @@ app.use(
   createProxyMiddleware({
     target: SYSTEM_DESIGN_SERVICE_URL,
     changeOrigin: true,
+    pathRewrite: (path: string) => {
+      const clean = path.startsWith('/') ? path : `/${path}`;
+      return `/api/system-design${clean === '/' ? '' : clean}`;
+    },
     ws: true,
   }),
 );

@@ -62,26 +62,26 @@ export default function OralHistoryPage() {
         
         {/* Back Link */}
         <button
-          onClick={() => navigate('/oral')}
+          onClick={() => navigate('/video')}
           className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-900 transition-colors"
         >
           <ChevronLeft className="w-4 h-4" />
-          <span>Back to Oral Command Center</span>
+          <span>Back to Video Command Center</span>
         </button>
 
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 md:p-8 rounded-3xl border border-slate-200/80 shadow-xs">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-              Oral Interview History
+              Video Interview History
             </h1>
             <p className="text-slate-500 text-xs sm:text-sm mt-0.5">
-              Review transcripts, speech telemetry, and STAR evaluation reports from past oral sessions.
+              Review transcripts, speech telemetry, and STAR evaluation reports from past video sessions.
             </p>
           </div>
 
           <Button
-            onClick={() => navigate('/oral/new')}
+            onClick={() => navigate('/video/new')}
             className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-2xl font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 shrink-0"
           >
             <span>+ Start New Interview</span>
@@ -127,7 +127,7 @@ export default function OralHistoryPage() {
               <FileText className="w-8 h-8 text-slate-300 mx-auto" />
               <p className="text-sm font-bold text-slate-700">No matching interview sessions found.</p>
               <Button
-                onClick={() => navigate('/oral/new')}
+                onClick={() => navigate('/video/new')}
                 className="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold"
               >
                 Start Your First Interview
@@ -138,7 +138,7 @@ export default function OralHistoryPage() {
               {filteredSessions.map((s) => (
                 <div
                   key={s.id}
-                  onClick={() => navigate(`/interview/${s.id}/analysis`)}
+                  onClick={() => navigate(`/video/${s.id}/analysis`)}
                   className="p-5 rounded-2xl border border-slate-200 hover:border-blue-300 hover:bg-blue-50/20 transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                 >
                   <div className="flex items-center gap-4">

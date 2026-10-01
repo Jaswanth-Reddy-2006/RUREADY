@@ -59,7 +59,7 @@ export default function AdminBroadcasts() {
   const [category, setCategory] = useState<BroadcastItem['category']>('PLACEMENT_DRIVE');
   const [targetAudience, setTargetAudience] = useState<BroadcastItem['targetAudience']>('ALL');
   const [bannerType, setBannerType] = useState<BroadcastItem['bannerType']>('TOP_BANNER');
-  const [actionUrl, setActionUrl] = useState('/oral/new');
+  const [actionUrl, setActionUrl] = useState('/video/new');
   const [actionText, setActionText] = useState('Launch Practice');
   const [expiresInDays, setExpiresInDays] = useState(7);
 

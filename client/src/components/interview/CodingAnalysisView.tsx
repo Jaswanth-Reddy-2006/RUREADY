@@ -216,7 +216,7 @@ function solveOptimal(nums, target) {
               <span className="hidden sm:inline">Print / Save PDF</span>
             </button>
             <button
-              onClick={() => navigate('/interview/coding/new')}
+              onClick={() => navigate('/coding/new')}
               className="px-4 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold font-display flex items-center gap-1.5 shadow-xs transition-all cursor-pointer active:scale-95"
             >
               <Sparkles size={13} />
