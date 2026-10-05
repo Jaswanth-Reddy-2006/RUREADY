@@ -6,6 +6,8 @@ import {
 } from 'lucide-react';
 import { Roadmap, RoadmapNode, useRoadmapStore } from '../../store/useRoadmapStore';
 import { useAuthStore } from '../../store/authStore';
+import { roadmapApi } from '../../api/roadmap';
+import type { RoadmapGenerationInput } from '@ru-ready/shared';
 import Button from '../ui/Button';
 import toast from 'react-hot-toast';
 
@@ -17,14 +19,17 @@ interface AiDiagnosticFormProps {
 const COMMON_SKILLS = [
   'JavaScript', 'TypeScript', 'Python', 'Go', 'Java', 'C++',
   'React', 'Node.js', 'Express', 'Next.js', 'SQL', 'PostgreSQL',
-  'MongoDB', 'Redis', 'Docker', 'Git', 'Linux'
+  'MongoDB', 'Redis', 'Docker', 'Git', 'Linux',
+  'Pandas', 'NumPy', 'Statistics', 'Machine Learning', 'Deep Learning',
+  'Excel', 'Power BI', 'Tableau'
 ];
 
 const BLINDSPOTS = [
   'System Design & Distributed Scaling',
   'Database Indexing & Query Optimization',
   'Concurrency, Race Conditions & Thread Pools',
-  'Oral Socratic Defense & Explaining Trade-offs',
+  'Statistics & Experimental Hypothesis Testing',
+  'Machine Learning Model Evaluation & Drift',
   'Low-Level Memory Allocation & Garbage Collection',
   'Production CI/CD, Observability & Dockerizing'
 ];
@@ -39,7 +44,8 @@ export default function AiDiagnosticForm({ onGenerate, onCancel }: AiDiagnosticF
   const [studentPersona, setStudentPersona] = useState('3rd / 4th Year Placement Crunch');
   const [timelineWeeks, setTimelineWeeks] = useState(12);
   const [weeklyHours, setWeeklyHours] = useState(15);
-  const [targetRole, setTargetRole] = useState('FULLSTACK');
+  const [targetRole, setTargetRole] = useState('Full Stack Developer');
+  const [customRoleInput, setCustomRoleInput] = useState('');
   const [targetCompanyTier, setTargetCompanyTier] = useState<Roadmap['targetCompanyTier']>('FAANG');
   const [knownSkills, setKnownSkills] = useState<string[]>(['JavaScript', 'React', 'Git']);
   const [selectedBlindspots, setSelectedBlindspots] = useState<string[]>([
@@ -60,189 +66,70 @@ export default function AiDiagnosticForm({ onGenerate, onCancel }: AiDiagnosticF
     );
   };
 
-  const handleSynthesize = () => {
+  const handleSynthesize = async () => {
+    const finalRole = (customRoleInput.trim() || targetRole || 'Full Stack Developer').trim();
     setIsSynthesizing(true);
-    setSynthesisProgress(10);
+    setSynthesisProgress(15);
 
     const progressInterval = setInterval(() => {
-      setSynthesisProgress((prev) => {
-        if (prev >= 95) {
-          clearInterval(progressInterval);
-          return 95;
-        }
-        return prev + 18;
-      });
-    }, 400);
+      setSynthesisProgress((prev) => (prev >= 90 ? 90 : prev + 15));
+    }, 450);
 
-    setTimeout(() => {
+    try {
+      const payload: RoadmapGenerationInput = {
+        targetRole: finalRole,
+        targetCompanyTier: targetCompanyTier || 'FAANG',
+        timelineWeeks: Number(timelineWeeks) || 12,
+        hoursPerDay: Math.max(0.5, Math.round(((Number(weeklyHours) || 15) / 5) * 10) / 10),
+        daysPerWeek: 5,
+        knownSkills,
+        identifiedBlindspots: selectedBlindspots,
+        pedagogicalPriority,
+      };
+
+      const result = await roadmapApi.generateRoadmap(payload);
       clearInterval(progressInterval);
       setSynthesisProgress(100);
 
-      // Generate bespoke calibrated roadmap
-      const generatedNodes: RoadmapNode[] = [
-        {
-          id: `ai-node-1-${Date.now()}`,
-          title: `Foundations of High-Throughput ${targetRole === 'BACKEND' ? 'Distributed Backend Systems' : 'Full Stack Architecture'}`,
-          subHeader: 'Phase 1 • Core Runtime Mechanics & Architectural Invariants',
-          category: 'Architecture',
-          orderIndex: 1,
-          status: 'IN_PROGRESS',
-          score: 0,
-          estimatedHours: Math.round(weeklyHours * 1.5),
-          whatShouldIDo: {
-            summary: `Establish rock-solid mastery of asynchronous task queuing, runtime memory lifecycle, and clean interface contracts targeting ${targetCompanyTier} engineering bars.`,
-            actionSteps: [
-              'Audit memory leaks, detached heap objects, and event listener lifecycle under high concurrency.',
-              'Implement a custom asynchronous task scheduler handling request batching without starvation.',
-              'Construct strict domain invariants using TypeScript and runtime schema validation.'
-            ],
-            mentalModels: [
-              'Fail-Fast Invariant: Reject invalid data at the external API boundary before it contaminates database state.',
-              'Non-Blocking Event Loops: Never execute CPU-heavy synchronous computation on the primary request loop.'
-            ]
-          },
-          whatIsTheSource: [
-            {
-              id: `ai-src-1-${Date.now()}`,
-              title: 'Official Architectural Specification & Concurrency Mechanics',
-              url: 'https://developer.mozilla.org',
-              type: 'DOCS',
-              description: 'Exhaustive reference for event loop phases, memory layout, and microtask scheduling.'
-            }
-          ],
-          whatIsTheExactThing: {
-            title: 'Asynchronous Concurrency Limiter & Batching Engine Drill',
-            description: `Construct an executable TypeScript concurrency queue that caps active connections at N and verifies deterministic order under 1,000 simulated async tasks.`,
-            deliverable: 'Tested TypeScript module passing automated load and timeout tests.',
-            starterCode: `// Calibrated Phase 1 Drill\nexport class TaskScheduler {\n  private activeCount = 0;\n  constructor(private readonly maxConcurrent: number) {}\n  async submit<T>(task: () => Promise<T>): Promise<T> {\n    // TODO: Implement concurrency control\n    throw new Error("Implement scheduler");\n  }\n}`,
-            verificationChecklist: [
-              'Never exceeds active concurrency limits under heavy burst load',
-              'Handles promise rejections cleanly without dropping remaining queue tasks'
-            ]
-          },
-          microQuestions: [
-            {
-              id: `ai-mq-1-${Date.now()}`,
-              questionText: 'How would you prevent task queue starvation when a flood of high-priority microtasks arrives simultaneously?',
-              focus: 'Event Loop Prioritization',
-              suggestedAnswer: 'By interleaving microtask execution with yields to setImmediate or setTimeout(0) to allow macrotasks, I/O polling, and timer callbacks to execute before the thread starves.'
-            }
-          ]
-        },
-        {
-          id: `ai-node-2-${Date.now()}`,
-          title: 'Relational Schema Design, Compound B-Trees & Transaction Isolation',
-          subHeader: 'Phase 2 • Production Data Persistence for High Scale',
-          category: 'Database',
-          orderIndex: 2,
-          status: 'LOCKED',
-          score: 0,
-          estimatedHours: Math.round(weeklyHours * 2),
-          whatShouldIDo: {
-            summary: 'Move beyond basic ORMs to master database indexing, EXPLAIN query plans, optimistic locking, and row-level synchronization under multi-client writes.',
-            actionSteps: [
-              'Design a multi-tenant PostgreSQL schema with composite indexing on high-cardinality filters.',
-              'Benchmark query execution plans using EXPLAIN ANALYZE on datasets over 500,000 rows.',
-              'Implement transactional balance updates using SELECT FOR UPDATE avoiding race conditions.'
-            ],
-            mentalModels: [
-              'Leftmost Index Prefix Rule: Compound indexes must be queried using the leading column to enable binary B-Tree traversal.',
-              'Isolation Level Overhead: Serializable isolation guarantees strict consistency but dramatically increases transaction abort rates under high write contention.'
-            ]
-          },
-          whatIsTheSource: [
-            {
-              id: `ai-src-2-${Date.now()}`,
-              title: 'Use The Index, Luke! Database Performance Guide',
-              url: 'https://use-the-index-luke.com',
-              type: 'DOCS',
-              description: 'World-renowned guide to indexing mechanics, range queries, and indexing pitfalls.'
-            }
-          ],
-          whatIsTheExactThing: {
-            title: 'High-Concurrency Atomic Ledger & Index Optimizer Drill',
-            description: 'Construct a PostgreSQL schema and transactional transfer service that handles 50 concurrent balance debits with 0 negative balance violations.',
-            deliverable: 'Complete migration script, seed data, and passing concurrency unit test.',
-            starterCode: `// Phase 2 Drill: Atomic Database Ledger\nexport async function atomicDebit(dbPool: any, accountId: string, amount: number) {\n  // TODO: Run transactional balance check and deduction with SELECT FOR UPDATE\n}`,
-            verificationChecklist: [
-              'Prevents double-spending race conditions with row-level locks',
-              'Query plans verify Index Scan rather than full table sequential scan'
-            ]
-          },
-          microQuestions: [
-            {
-              id: `ai-mq-2-${Date.now()}`,
-              questionText: 'Explain the difference between Read Committed and Repeatable Read isolation levels. When does a non-repeatable read occur?',
-              focus: 'ACID Transaction Isolation',
-              suggestedAnswer: 'Read Committed guarantees a transaction will only see committed data, but re-reading the same row can yield different values if another transaction committed changes in between. Repeatable Read ensures snapshot isolation where subsequent reads always return identical data.'
-            }
-          ]
-        },
-        {
-          id: `ai-node-3-${Date.now()}`,
-          title: 'Distributed Caching, Invalidation Daemons & Resilient System Design',
-          subHeader: 'Phase 3 • Safeguarding the Persistence Layer & Passing System Design Rounds',
-          category: 'Distributed Systems',
-          orderIndex: 3,
-          status: 'LOCKED',
-          score: 0,
-          estimatedHours: Math.round(weeklyHours * 2.2),
-          whatShouldIDo: {
-            summary: `Design high-throughput caching topologies using Redis, eliminate Cache Stampedes with distributed mutexes, and defend architectural trade-offs in ${targetCompanyTier} loops.`,
-            actionSteps: [
-              'Build a Cache-Aside wrapper in TypeScript with probabilistic early expiration (XFetch).',
-              'Construct a sliding-window rate limiter using Redis sorted sets (ZSET).',
-              'Defend SQL vs NoSQL, Polling vs WebSockets, and Monolith vs Microservices trade-offs.'
-            ],
-            mentalModels: [
-              'Cache Invalidation as Hard Invariant: Stale data must either be strictly bounded by short TTLs or invalidated synchronously on writes.',
-              'CAP Theorem Trade-offs: In partitioned networks, you must choose between availability (returning possibly stale data) or consistency (returning error until synced).'
-            ]
-          },
-          whatIsTheSource: [
-            {
-              id: `ai-src-3-${Date.now()}`,
-              title: 'System Design Primer & Distributed Caching Topologies',
-              url: 'https://github.com/donnemartin/system-design-primer',
-              type: 'REPO',
-              description: 'Curated industry standard for scaling web apps to millions of concurrent users.'
-            }
-          ],
-          whatIsTheExactThing: {
-            title: 'Distributed Sliding-Window Rate Limiter & Mutex Drill',
-            description: 'Construct a resilient Redis sliding-window middleware handling 10,000 requests without boundary burst leaks.',
-            deliverable: 'Express/Fastify middleware with passing automated concurrency test harness.',
-            starterCode: `// Phase 3 Drill: Redis Sliding Window Rate Limiter\nexport function createRateLimiter(redisClient: any, limit: number, windowSecs: number) {\n  return async (clientIp: string) => {\n    // TODO: ZREMRANGEBYSCORE, ZADD, ZCARD in MULTI\n  };\n}`,
-            verificationChecklist: [
-              'Smooth traffic shaping across 60-second window boundaries',
-              'Sub-3ms execution overhead per request using pipelined Redis commands'
-            ]
-          },
-          microQuestions: [
-            {
-              id: `ai-mq-3-${Date.now()}`,
-              questionText: 'How do you prevent a Cache Stampede when a million users query a hot resource whose cache entry just expired?',
-              focus: 'Cache Stampede Mitigation',
-              suggestedAnswer: 'By implementing distributed locks (mutex) where only the first request is permitted to recompute the expensive database query while other concurrent requests wait or receive slightly stale cached data via probabilistic early refresh.'
-            }
-          ]
-        }
-      ];
+      const generatedNodes: RoadmapNode[] = (result.roadmap.phases || []).flatMap((p, pIdx) =>
+        (p.nodes || []).map((n, nIdx) => ({
+          id: n.id || `node-${pIdx + 1}-${nIdx + 1}`,
+          title: n.title,
+          subHeader: n.subHeader || `${p.title} • ${n.category}`,
+          category: n.category,
+          orderIndex: n.orderIndex,
+          status: (n.status as any) || (pIdx === 0 && nIdx === 0 ? 'IN_PROGRESS' : 'LOCKED'),
+          score: n.score || 0,
+          estimatedHours: n.estimatedHours || 15,
+          whatShouldIDo: n.whatShouldIDo,
+          whatIsTheSource: n.whatIsTheSource as any,
+          whatIsTheExactThing: n.whatIsTheExactThing as any,
+          microQuestions: n.microQuestions || [],
+        }))
+      );
 
       const newRoadmap: Roadmap = {
-        id: `rm-ai-${Date.now()}`,
-        title: `${targetRole.charAt(0) + targetRole.slice(1).toLowerCase()} Engineer Blueprint (${targetCompanyTier} Track)`,
-        rolePath: targetRole,
-        category: (targetRole === 'FRONTEND' ? 'FRONTEND' : targetRole === 'BACKEND' ? 'SYSTEM_DESIGN' : 'FULLSTACK') as any,
-        targetCompanyTier,
-        difficulty: 'Intermediate',
-        estimatedWeeks: timelineWeeks,
-        description: `Bespoke, ${timelineWeeks}-week curriculum tailored for ${studentPersona}. Designed for ${weeklyHours} hours/week to eliminate tutorial hell and conquer ${targetCompanyTier} technical interviews by building verified production drills.`,
+        id: result.roadmap.id || `rm-ai-${Date.now()}`,
+        title: result.roadmap.title || `${finalRole} Personalized Roadmap`,
+        rolePath: result.roadmap.rolePath || finalRole,
+        category: (finalRole.toUpperCase().includes('FRONTEND')
+          ? 'FRONTEND'
+          : finalRole.toUpperCase().includes('BACKEND')
+          ? 'SYSTEM_DESIGN'
+          : finalRole.toUpperCase().includes('DATA')
+          ? 'DATA'
+          : finalRole.toUpperCase().includes('ML') || finalRole.toUpperCase().includes('AI')
+          ? 'AIML'
+          : 'FULLSTACK') as any,
+        targetCompanyTier: result.roadmap.targetCompanyTier || targetCompanyTier,
+        difficulty: (result.roadmap.difficulty as any) || 'Intermediate',
+        estimatedWeeks: result.roadmap.estimatedWeeks || timelineWeeks,
+        description: result.roadmap.description || `Personalized ${timelineWeeks}-week curriculum tailored for ${studentPersona}.`,
         isOfficial: false,
         isPublic: true,
         isAiGenerated: true,
-        overallReadiness: 0,
-        tags: [targetRole, targetCompanyTier, `${weeklyHours}h/wk`, 'AI-Calibrated', ...knownSkills.slice(0, 3)],
+        overallReadiness: result.roadmap.overallReadiness || result.skillGapAnalysis?.overallReadinessBaseline || 0,
+        tags: [finalRole, targetCompanyTier, `${weeklyHours}h/wk`, 'AI-Calibrated', ...knownSkills.slice(0, 3)],
         creatorId: user?.id || 'current-user',
         creatorName: user?.name || 'You (AI Co-Architected)',
         creatorUsername: 'you_ai',
@@ -250,13 +137,18 @@ export default function AiDiagnosticForm({ onGenerate, onCancel }: AiDiagnosticF
         upvotes: 0,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        nodesData: generatedNodes
+        nodesData: generatedNodes,
       };
 
       setIsSynthesizing(false);
-      toast.success('Bespoke student roadmap synthesized!');
+      toast.success('Bespoke student roadmap synthesized by AI Engine!');
       onGenerate(newRoadmap);
-    }, 2200);
+    } catch (err: any) {
+      clearInterval(progressInterval);
+      setIsSynthesizing(false);
+      const msg = err.response?.data?.message || err.message || 'Failed to synthesize roadmap. Please try again.';
+      toast.error(msg);
+    }
   };
 
   return (
@@ -431,6 +323,20 @@ export default function AiDiagnosticForm({ onGenerate, onCancel }: AiDiagnosticF
                     </button>
                   ))}
                 </div>
+
+                <div className="mt-3">
+                  <label className="text-[11px] font-semibold text-[#526078] block mb-1">
+                    Or specify custom target role:
+                  </label>
+                  <input
+                    type="text"
+                    id="custom-role-input"
+                    value={customRoleInput}
+                    onChange={(e) => setCustomRoleInput(e.target.value)}
+                    placeholder="e.g. Data Scientist, Data Analyst, Machine Learning Engineer..."
+                    className="w-full px-3.5 py-2 rounded-xl border border-[#DCE7F2] text-xs text-[#11183D] placeholder-[#94A3B8] focus:border-[#2459A8] focus:outline-none"
+                  />
+                </div>
               </div>
 
               <div className="space-y-2 pt-2 border-t border-[#DCE7F2]">
@@ -492,6 +398,39 @@ export default function AiDiagnosticForm({ onGenerate, onCancel }: AiDiagnosticF
                       </button>
                     );
                   })}
+                </div>
+
+                <div className="mt-3 flex gap-2">
+                  <input
+                    type="text"
+                    id="custom-skill-input"
+                    placeholder="Add skill with proficiency (e.g. Python: Advanced, Statistics: Beginner)..."
+                    className="flex-1 px-3 py-1.5 rounded-xl border border-[#DCE7F2] text-xs text-[#11183D] placeholder-[#94A3B8] focus:border-[#2459A8] focus:outline-none"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const val = (e.currentTarget.value || '').trim();
+                        if (val && !knownSkills.includes(val)) {
+                          setKnownSkills([...knownSkills, val]);
+                          e.currentTarget.value = '';
+                        }
+                      }
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => {
+                      const inp = document.getElementById('custom-skill-input') as HTMLInputElement;
+                      if (inp && inp.value.trim() && !knownSkills.includes(inp.value.trim())) {
+                        setKnownSkills([...knownSkills, inp.value.trim()]);
+                        inp.value = '';
+                      }
+                    }}
+                  >
+                    Add
+                  </Button>
                 </div>
               </div>
 

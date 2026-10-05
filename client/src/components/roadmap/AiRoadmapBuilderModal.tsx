@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   X, Sparkles, Check, ArrowRight, ArrowLeft, Target,
-  Clock, DollarSign, BookOpen, Layers, CheckCircle2, ShieldCheck, Zap
+  Clock, DollarSign, BookOpen, Layers, CheckCircle2, ShieldCheck, Zap,
+  FileText, RefreshCw, AlertCircle, Trash2, Plus
 } from 'lucide-react';
 import { useRoadmapStore, Roadmap } from '../../store/useRoadmapStore';
 import Button from '../ui/Button';
@@ -22,7 +23,13 @@ export default function AiRoadmapBuilderModal({
   onSuccess,
   onOpenPersonalize,
 }: AiRoadmapBuilderModalProps) {
-  const { createAiRoadmap } = useRoadmapStore();
+  const { 
+    createAiRoadmap, 
+    fetchResumePrefill, 
+    isResumePrefillLoading, 
+    resumePrefill 
+  } = useRoadmapStore();
+
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedResult, setGeneratedResult] = useState<Roadmap | null>(null);
@@ -38,7 +45,63 @@ export default function AiRoadmapBuilderModal({
   const [budgetOption, setBudgetOption] = useState('Free only');
   const [learningStyle, setLearningStyle] = useState('Project-Heavy & Practical');
 
+  // Stage 8.1 Resume Bridge state
+  const [isResumePrefilled, setIsResumePrefilled] = useState(false);
+  const [resumeSkills, setResumeSkills] = useState<string[]>([]);
+  const [resumeBlindspots, setResumeBlindspots] = useState<string[]>([]);
+  const [newSkillInput, setNewSkillInput] = useState('');
+
   if (!isOpen) return null;
+
+  const handleUseResume = async () => {
+    try {
+      const prefill = await fetchResumePrefill();
+      if (prefill && (prefill.knownSkills.length > 0 || prefill.suggestedTargetRole)) {
+        if (prefill.suggestedTargetRole) {
+          setTargetRole(prefill.suggestedTargetRole);
+        }
+        if (prefill.knownSkills.length > 0) {
+          setResumeSkills(prefill.knownSkills);
+          setCurrentSkills(prefill.knownSkills.join(', '));
+        }
+        if (prefill.identifiedBlindspots && prefill.identifiedBlindspots.length > 0) {
+          setResumeBlindspots(prefill.identifiedBlindspots);
+        }
+        if (prefill.suggestedLevel) {
+          if (prefill.suggestedLevel === 'BEGINNER') setExperienceLevel('Beginner (Student / Entry)');
+          else if (prefill.suggestedLevel === 'ADVANCED' || prefill.suggestedLevel === 'STAFF') setExperienceLevel('Advanced (3+ yrs)');
+          else setExperienceLevel('Intermediate (1-2 yrs)');
+        }
+        if (prefill.suggestedCompanyTier) {
+          setTargetCompany(prefill.suggestedCompanyTier);
+        }
+        setIsResumePrefilled(true);
+        setCurrentStep(2); // Jump directly to review background
+        toast.success(`Resume loaded! ${prefill.normalizedSkillCount} skills detected from ${prefill.fileName || 'your profile'}.`);
+      } else {
+        toast.error('No uploaded resume found. You can upload one in Resume Studio or enter your details manually.');
+      }
+    } catch {
+      toast.error('Could not connect to resume service. You can still enter skills manually.');
+    }
+  };
+
+  const handleRemoveSkill = (skillToRemove: string) => {
+    const updated = resumeSkills.filter((s) => s !== skillToRemove);
+    setResumeSkills(updated);
+    setCurrentSkills(updated.join(', '));
+  };
+
+  const handleAddSkill = () => {
+    if (!newSkillInput.trim()) return;
+    const clean = newSkillInput.trim();
+    if (!resumeSkills.includes(clean)) {
+      const updated = [...resumeSkills, clean];
+      setResumeSkills(updated);
+      setCurrentSkills(updated.join(', '));
+    }
+    setNewSkillInput('');
+  };
 
   const goalOptions = [
     'Become a Software Engineer',
@@ -76,13 +139,21 @@ export default function AiRoadmapBuilderModal({
     toast('AI Synthesis Engine generating personalized roadmap...', { icon: '🤖' });
 
     try {
+      const skillsList = isResumePrefilled && resumeSkills.length > 0
+        ? resumeSkills
+        : currentSkills.split(',').map((s) => s.trim()).filter(Boolean);
+
+      const focusGaps = resumeBlindspots.length > 0
+        ? `Target blindspots to reinforce: ${resumeBlindspots.slice(0, 5).join(', ')}. Target Company: ${targetCompany} with ${budgetOption} resources.`
+        : `Focus on ${targetCompany} interview requirements with ${budgetOption} resources.`;
+
       const newMap = await createAiRoadmap({
         rolePath: targetRole || 'Full Stack',
         targetTier: (targetCompany.includes('Amazon') || targetCompany.includes('Google') ? 'FAANG' : 'Unicorn') as any,
         difficulty: experienceLevel.includes('Intermediate') ? 'Intermediate' : 'Advanced',
         timelineWeeks: timeCommitment.includes('3+') ? 14 : 24,
-        techStack: currentSkills.split(',').map((s) => s.trim()).filter(Boolean),
-        focusGaps: `Focus on ${targetCompany} interview requirements with ${budgetOption} resources.`,
+        techStack: skillsList,
+        focusGaps,
       });
 
       setGeneratedResult(newMap);
@@ -141,6 +212,33 @@ export default function AiRoadmapBuilderModal({
             {/* Step 1: Goal */}
             {currentStep === 1 && (
               <div className="space-y-4">
+                {/* Resume Fast-Track Banner */}
+                <div className="bg-gradient-to-r from-[#F8EAF4] via-white to-[#EFFAFD] p-4 rounded-2xl border border-[#A0006D]/30 flex flex-wrap items-center justify-between gap-3 shadow-xs">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-[#A0006D]/10 text-[#A0006D]">
+                      <FileText size={20} />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold font-display text-[#11183D]">
+                        Have an uploaded resume?
+                      </p>
+                      <p className="text-[11px] text-[#526078]">
+                        Auto-populate your target role, verified skills, and gaps instantly.
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="eggplant"
+                    size="sm"
+                    onClick={handleUseResume}
+                    disabled={isResumePrefillLoading}
+                    className="text-xs font-display flex items-center gap-1.5 shadow-xs"
+                    icon={isResumePrefillLoading ? <RefreshCw size={14} className="animate-spin" /> : <Sparkles size={14} />}
+                  >
+                    {isResumePrefillLoading ? 'Loading Resume...' : 'Use My Resume'}
+                  </Button>
+                </div>
+
                 <h3 className="text-base font-bold font-display text-[#11183D]">
                   What is your primary career goal?
                 </h3>
@@ -175,9 +273,118 @@ export default function AiRoadmapBuilderModal({
             {/* Step 2: Background */}
             {currentStep === 2 && (
               <div className="space-y-4">
-                <h3 className="text-base font-bold font-display text-[#11183D]">
-                  Target Role, Company & Current Background
-                </h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-base font-bold font-display text-[#11183D]">
+                    Target Role, Company & Current Background
+                  </h3>
+                  {!isResumePrefilled && (
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={handleUseResume}
+                      disabled={isResumePrefillLoading}
+                      className="text-xs font-display border-[#DCE7F2] flex items-center gap-1"
+                      icon={isResumePrefillLoading ? <RefreshCw size={12} className="animate-spin" /> : <FileText size={12} />}
+                    >
+                      Use Resume
+                    </Button>
+                  )}
+                </div>
+
+                {/* Resume-Derived Preview & Interactive Chips */}
+                {isResumePrefilled && (
+                  <div className="bg-[#EFFAFD] p-3.5 rounded-2xl border border-[#4A8BDF]/40 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-xs font-bold font-display text-[#2459A8]">
+                        <Sparkles size={14} className="text-[#4A8BDF]" />
+                        <span>✨ Auto-populated from Resume ({resumePrefill?.fileName || 'Parsed Resume'})</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsResumePrefilled(false);
+                          setResumeSkills([]);
+                          setResumeBlindspots([]);
+                        }}
+                        className="text-[11px] font-bold text-[#7B8799] hover:text-[#11183D] underline cursor-pointer"
+                      >
+                        Reset to manual
+                      </button>
+                    </div>
+                    
+                    {/* Skill Chips with remove buttons */}
+                    {resumeSkills.length > 0 && (
+                      <div className="space-y-1.5 pt-1">
+                        <label className="text-[11px] font-bold text-[#526078] block">
+                          Detected Known Skills ({resumeSkills.length}) — Click &times; to remove:
+                        </label>
+                        <div className="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto p-1 bg-white rounded-xl border border-[#DCE7F2]">
+                          {resumeSkills.map((skill) => (
+                            <span
+                              key={skill}
+                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-[#EFFAFD] text-[#2459A8] border border-[#4A8BDF]/30"
+                            >
+                              <span>{skill}</span>
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveSkill(skill)}
+                                className="text-[#7B8799] hover:text-red-500 transition-colors cursor-pointer"
+                                title="Remove skill"
+                              >
+                                <X size={12} />
+                              </button>
+                            </span>
+                          ))}
+                        </div>
+
+                        {/* Quick add skill */}
+                        <div className="flex items-center gap-2 pt-1">
+                          <input
+                            type="text"
+                            value={newSkillInput}
+                            onChange={(e) => setNewSkillInput(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                handleAddSkill();
+                              }
+                            }}
+                            placeholder="Add another skill (e.g. Docker, Redis)..."
+                            className="flex-1 saas-input p-2 text-xs"
+                          />
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={handleAddSkill}
+                            className="text-xs"
+                            icon={<Plus size={14} />}
+                          >
+                            Add
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Detected Gaps if present from ATS analysis */}
+                    {resumeBlindspots.length > 0 && (
+                      <div className="pt-2 border-t border-[#4A8BDF]/20">
+                        <label className="text-[11px] font-bold text-[#A0006D] block mb-1">
+                          🎯 Target Gaps Detected from ATS Audit ({resumeBlindspots.length}):
+                        </label>
+                        <div className="flex flex-wrap gap-1.5">
+                          {resumeBlindspots.map((gap) => (
+                            <span
+                              key={gap}
+                              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#F8EAF4] text-[#A0006D] border border-[#A0006D]/30"
+                            >
+                              {gap}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Input
@@ -197,7 +404,12 @@ export default function AiRoadmapBuilderModal({
                 <Input
                   label="Current Skills (comma separated)"
                   value={currentSkills}
-                  onChange={(e) => setCurrentSkills(e.target.value)}
+                  onChange={(e) => {
+                    setCurrentSkills(e.target.value);
+                    if (isResumePrefilled) {
+                      setResumeSkills(e.target.value.split(',').map((s) => s.trim()).filter(Boolean));
+                    }
+                  }}
                   placeholder="e.g. Java, Python, SQL, Git"
                 />
 

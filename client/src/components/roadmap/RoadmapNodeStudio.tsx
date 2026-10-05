@@ -37,7 +37,10 @@ export default function RoadmapNodeStudio({
     nodeCode, 
     saveNodeCode,
     nodeSubmissions,
-    recordNodeSubmission
+    recordNodeSubmission,
+    evaluatePracticalDrill,
+    activeUserRoadmap,
+    userRoadmaps,
   } = useRoadmapStore();
 
   const [activeLeftTab, setActiveLeftTab] = useState<'whatToDo' | 'sources' | 'hints' | 'notes'>('whatToDo');
@@ -133,40 +136,56 @@ export default function RoadmapNodeStudio({
     saveNodeCode(roadmap.id, node.id, updated);
   };
 
-  // Run Test Suite simulation
-  const handleRunTests = () => {
+  // Run Sandboxed Test Suite via Server-Authoritative Evaluation
+  const handleRunTests = async () => {
     setIsRunningTests(true);
-    setTimeout(() => {
-      setIsRunningTests(false);
-      const isPass = currentCode.trim().length > 30;
-      const res = {
-        ran: true,
-        passed: isPass,
-        tests: [
-          { name: 'Invariant & State Mutation Boundary', passed: true, durationMs: 5 },
-          { name: 'Concurrent Rate / Throughput Simulation', passed: isPass, durationMs: 9 },
-          { name: 'Memory Allocation & Clean Destruction', passed: true, durationMs: 3 },
-        ],
-        executionTimeMs: 17,
-        memoryMb: 26.4,
-        stdout: isPass
-          ? `✓ Test Suite Complete. All 3 assertions passed without memory leaks.`
-          : `✗ Test Assertion Failed: Expected concurrent safety guard was not triggered. Check your state synchronization.`,
-      };
-      setTestResults(res);
-
-      recordNodeSubmission(roadmap.id, node.id, {
-        passedTests: isPass,
-        score: isPass ? 95 : 40,
-        executionTimeMs: 17,
+    try {
+      const userRoadmap = activeUserRoadmap || userRoadmaps[roadmap.id];
+      const res = await evaluatePracticalDrill({
+        roadmapId: roadmap.id,
+        nodeId: node.id,
+        userRoadmapId: userRoadmap?.id,
+        code: currentCode,
+        language: codeLanguage,
       });
 
-      if (isPass) {
-        toast.success('Test Suite Passed! All benchmarks cleared.');
+      setIsRunningTests(false);
+
+      if (res.data) {
+        const d = res.data;
+        const testList = d.testResults.map((t) => ({
+          name: t.name || t.description || `Assertion #${t.testCaseIndex}`,
+          passed: t.passed,
+          durationMs: t.executionTimeMs || 4,
+        }));
+
+        setTestResults({
+          ran: true,
+          passed: d.passed,
+          tests: testList.length > 0 ? testList : [{ name: 'Practical Drill Execution', passed: d.passed, durationMs: d.runtimeMs }],
+          executionTimeMs: d.runtimeMs || 15,
+          memoryMb: 24.5,
+          stdout: d.stdout || (d.passed ? `✓ All ${d.passedCount}/${d.totalCount} tests passed!` : d.errorDetails || 'Test suite failed.'),
+        });
+
+        recordNodeSubmission(roadmap.id, node.id, {
+          passedTests: d.passed,
+          score: d.score,
+          executionTimeMs: d.runtimeMs,
+        });
+
+        if (d.passed) {
+          toast.success(`Test Suite Passed (${d.passedCount}/${d.totalCount})! ${d.evidenceRecorded ? 'Skill evidence recorded.' : ''}`);
+        } else {
+          toast.error(d.errorDetails || `Test Suite Failed (${d.passedCount}/${d.totalCount} passed).`);
+        }
       } else {
-        toast.error('Test Suite Failed. Review assertion errors.');
+        toast.error(res.error || 'Failed to run test suite.');
       }
-    }, 1200);
+    } catch (err: any) {
+      setIsRunningTests(false);
+      toast.error(err?.message || 'Execution error');
+    }
   };
 
   // Speech to text toggle

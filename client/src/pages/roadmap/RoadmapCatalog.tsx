@@ -47,6 +47,7 @@ export default function RoadmapCatalog() {
   const [isPersonalizeOpen, setIsPersonalizeOpen] = useState(false);
   const [isManualBuilderOpen, setIsManualBuilderOpen] = useState(false);
   const [isSprintModalOpen, setIsSprintModalOpen] = useState(false);
+  const [selectedSprintTaskId, setSelectedSprintTaskId] = useState<string | null>(null);
   const [isSprintReviewOpen, setIsSprintReviewOpen] = useState(false);
 
   // Search & Filters state
@@ -484,7 +485,10 @@ export default function RoadmapCatalog() {
         {activeTab === 'MY_ROADMAP' && activeRoadmap && (
           <MyRoadmapView
             roadmap={activeRoadmap}
-            onOpenSprintModal={() => setIsSprintModalOpen(true)}
+            onOpenSprintModal={(taskId?: string) => {
+              setSelectedSprintTaskId(taskId || null);
+              setIsSprintModalOpen(true);
+            }}
             onSelectNode={(nodeId) => navigate(`/roadmap/${activeRoadmap.id}?node=${nodeId}`)}
           />
         )}
@@ -577,9 +581,14 @@ export default function RoadmapCatalog() {
 
       <SprintExperienceModal
         isOpen={isSprintModalOpen}
-        onClose={() => setIsSprintModalOpen(false)}
+        initialTaskId={selectedSprintTaskId}
+        onClose={() => {
+          setIsSprintModalOpen(false);
+          setSelectedSprintTaskId(null);
+        }}
         onCompleteSprint={() => {
           setIsSprintModalOpen(false);
+          setSelectedSprintTaskId(null);
           setIsSprintReviewOpen(true);
         }}
       />
@@ -589,7 +598,7 @@ export default function RoadmapCatalog() {
         onClose={() => setIsSprintReviewOpen(false)}
         onStartNextSprint={() => {
           setIsSprintReviewOpen(false);
-          toast.success('Sprint 08 started!');
+          setIsSprintModalOpen(true);
         }}
       />
 

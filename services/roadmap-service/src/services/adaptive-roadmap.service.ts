@@ -8,6 +8,9 @@ import {
   sprintPerformanceSchema,
   taskProgressSchema,
 } from '../domain/roadmap.domain.js';
+import { sprintTelemetryService } from './sprint-telemetry.service.js';
+import { skillReadinessService } from './skill-readiness.service.js';
+import { deriveRoadmapLearningHistory } from '@ru-ready/shared';
 import { z } from 'zod';
 
 const structuredRoadmapSchema = z.object({
@@ -34,6 +37,7 @@ const structuredRoadmapSchema = z.object({
     category: z.string().trim().min(2).max(80),
     estimatedMinutes: z.number().int().min(15).max(10_000).default(60),
     requiresEvidence: z.boolean().default(false),
+    requiresAssessment: z.boolean().default(false),
     targetProficiency: z.number().int().min(0).max(100).optional(),
     skills: z.array(z.object({
       name: z.string().trim().min(2).max(100),
@@ -71,6 +75,18 @@ function getPlannedTaskCount(hoursPerDay: number, daysPerWeek: number, durationD
   return Math.max(1, Math.min(4, Math.floor(availableMinutes / 90)));
 }
 
+const taskInclude = {
+  roadmapNode: {
+    include: {
+      skills: {
+        include: {
+          skill: true,
+        },
+      },
+    },
+  },
+};
+
 export const adaptiveRoadmapService = {
   async createStructuredRoadmap(userId: string, input: unknown) {
     const payload = structuredRoadmapSchema.parse(input);
@@ -102,6 +118,7 @@ export const adaptiveRoadmapService = {
               orderIndex: index + 1,
               estimatedMinutes: node.estimatedMinutes,
               requiresEvidence: node.requiresEvidence,
+              requiresAssessment: node.requiresAssessment,
               targetProficiency: node.targetProficiency,
             })),
           },
@@ -170,7 +187,7 @@ export const adaptiveRoadmapService = {
           where: { status: { in: ['ACTIVE', 'UPCOMING'] } },
           orderBy: { sprintNumber: 'asc' },
           take: 1,
-          include: { tasks: { orderBy: { orderIndex: 'asc' } } },
+          include: { tasks: { orderBy: { orderIndex: 'asc' }, include: taskInclude } },
         },
       },
       orderBy: { updatedAt: 'desc' },
@@ -184,7 +201,7 @@ export const adaptiveRoadmapService = {
         sourceRoadmap: { include: { goal: true } },
         sprints: {
           orderBy: { sprintNumber: 'asc' },
-          include: { tasks: { orderBy: { orderIndex: 'asc' } }, performance: true },
+          include: { tasks: { orderBy: { orderIndex: 'asc' }, include: taskInclude }, performance: true },
         },
         adaptations: { orderBy: { createdAt: 'desc' } },
         skillEvidence: { include: { skill: true }, orderBy: { assessedAt: 'desc' } },
@@ -194,18 +211,64 @@ export const adaptiveRoadmapService = {
     return instance;
   },
 
+  async getRoadmapLearningHistory(userId: string, userRoadmapId: string) {
+    const instance = await prisma.userRoadmap.findFirst({
+      where: { id: userRoadmapId, userId },
+      include: {
+        sourceRoadmap: { include: { goal: true } },
+        sprints: {
+          orderBy: { sprintNumber: 'asc' },
+          include: {
+            tasks: { orderBy: { orderIndex: 'asc' }, include: taskInclude },
+            performance: true,
+          },
+        },
+        adaptations: { orderBy: { createdAt: 'desc' } },
+        skillEvidence: { include: { skill: true }, orderBy: { assessedAt: 'desc' } },
+        assessmentAttempts: {
+          include: { assessment: true, skill: true },
+          orderBy: { completedAt: 'desc' },
+        },
+      },
+    });
+    if (!instance) throw new NotFoundError('Your roadmap was not found');
+    return deriveRoadmapLearningHistory(instance);
+  },
+
   async updateSprintTask(userId: string, sprintId: string, taskId: string, input: unknown) {
     const payload = taskProgressSchema.parse(input);
     const task = await prisma.roadmapSprintTask.findFirst({
       where: { id: taskId, sprintId, sprint: { userRoadmap: { userId } } },
-      include: { sprint: { select: { userRoadmapId: true } } },
+      include: {
+        sprint: { select: { userRoadmapId: true } },
+        roadmapNode: { include: { skills: true } },
+      },
     });
     if (!task) throw new NotFoundError('Sprint task not found');
 
-    if (payload.status === 'COMPLETED' && task.requiresEvidence) {
-      const evidenceCount = await prisma.skillEvidence.count({ where: { userRoadmapId: task.sprint.userRoadmapId } });
-      if (evidenceCount === 0) {
-        throw new BadRequestError('This task requires evidence before it can be completed');
+    if (payload.status === 'COMPLETED') {
+      if (task.requiresAssessment) {
+        const passedAttemptCount = await prisma.microAssessmentAttempt.count({
+          where: {
+            userId,
+            passed: true,
+            OR: [
+              { sprintTaskId: task.id },
+              ...(task.roadmapNodeId ? [{ assessment: { roadmapNodeId: task.roadmapNodeId } }] : []),
+              ...(task.roadmapNode?.skills?.[0]?.skillId ? [{ skillId: task.roadmapNode.skills[0].skillId }] : []),
+            ],
+          },
+        });
+        if (passedAttemptCount === 0) {
+          throw new BadRequestError('This task requires passing the associated micro-assessment (score >= 70%) before it can be completed');
+        }
+      }
+
+      if (task.requiresEvidence) {
+        const evidenceCount = await prisma.skillEvidence.count({ where: { userRoadmapId: task.sprint.userRoadmapId } });
+        if (evidenceCount === 0) {
+          throw new BadRequestError('This task requires evidence before it can be completed');
+        }
       }
     }
 
@@ -215,6 +278,7 @@ export const adaptiveRoadmapService = {
         status: payload.status,
         completedAt: payload.status === 'COMPLETED' ? new Date() : null,
       },
+      include: taskInclude,
     });
   },
 
@@ -243,15 +307,75 @@ export const adaptiveRoadmapService = {
     const performanceInput = sprintPerformanceSchema.parse(input);
     const sprint = await prisma.roadmapSprint.findFirst({
       where: { id: sprintId, userRoadmap: { userId } },
-      include: { tasks: { orderBy: { orderIndex: 'asc' } }, userRoadmap: true },
+      include: { tasks: { orderBy: { orderIndex: 'asc' }, include: taskInclude }, userRoadmap: true },
     });
     if (!sprint) throw new NotFoundError('Sprint not found');
     if (sprint.status === 'COMPLETED') throw new BadRequestError('Sprint is already completed');
 
+    // Milestone / Required assessment gating check
+    const incompleteRequiredTasks = sprint.tasks.filter(
+      (task) => task.requiresAssessment && task.status !== 'COMPLETED' && task.status !== 'SKIPPED'
+    );
+    if (incompleteRequiredTasks.length > 0) {
+      throw new BadRequestError('Sprint contains required assessments that must be passed before completion');
+    }
+    // Compute server-authoritative unified sprint telemetry
+    let telemetry = null;
+    try {
+      telemetry = await sprintTelemetryService.calculateSprintTelemetry(userId, sprint);
+    } catch {
+      // In-memory / mock test fallback
+    }
+
     const relevantTasks = sprint.tasks.filter((task) => task.status !== 'SKIPPED');
     const completedTasks = relevantTasks.filter((task) => task.status === 'COMPLETED');
-    const taskCompletion = relevantTasks.length === 0 ? 100 : Math.round((completedTasks.length / relevantTasks.length) * 100);
-    const recommendation = determineSprintAdaptation({ taskCompletion, ...performanceInput });
+    const taskCompletion = telemetry?.taskCompletionRate ?? (relevantTasks.length === 0 ? 100 : Math.round((completedTasks.length / relevantTasks.length) * 100));
+
+    // Derive assessment score and practical score from unified telemetry or explicit inputs
+    let effectiveAssessmentScore = performanceInput.assessmentScore;
+    if (effectiveAssessmentScore === undefined || effectiveAssessmentScore === null) {
+      if (telemetry?.assessmentScore !== undefined && telemetry?.assessmentScore !== null) {
+        effectiveAssessmentScore = telemetry.assessmentScore;
+      } else {
+        const sprintAttempts = await prisma.microAssessmentAttempt.findMany({
+          where: {
+            userId,
+            OR: [
+              { sprintId: sprint.id },
+              { sprintTaskId: { in: sprint.tasks.map((t) => t.id) } },
+            ],
+          },
+        });
+        if (sprintAttempts.length > 0) {
+          effectiveAssessmentScore = Math.round(
+            sprintAttempts.reduce((sum, att) => sum + att.score, 0) / sprintAttempts.length
+          );
+        }
+      }
+    }
+
+    let effectivePracticalScore = performanceInput.practicalScore;
+    if (effectivePracticalScore === undefined || effectivePracticalScore === null) {
+      if (telemetry?.practicalScore !== undefined && telemetry?.practicalScore !== null) {
+        effectivePracticalScore = telemetry.practicalScore;
+      }
+    }
+
+    let effectiveCodingScore = performanceInput.codingScore;
+    if (effectiveCodingScore === undefined || effectiveCodingScore === null) {
+      if (effectivePracticalScore !== undefined && effectivePracticalScore !== null) {
+        effectiveCodingScore = effectivePracticalScore;
+      }
+    }
+
+    const resolvedPerformance = {
+      ...performanceInput,
+      assessmentScore: effectiveAssessmentScore,
+      practicalScore: effectivePracticalScore,
+      codingScore: effectiveCodingScore,
+    };
+
+    const recommendation = determineSprintAdaptation({ taskCompletion, ...resolvedPerformance });
 
     await prisma.$transaction([
       prisma.roadmapSprint.update({
@@ -260,37 +384,37 @@ export const adaptiveRoadmapService = {
       }),
       prisma.sprintPerformance.upsert({
         where: { sprintId: sprint.id },
-        create: { sprintId: sprint.id, taskCompletion, decision: recommendation.decision, ...performanceInput },
-        update: { taskCompletion, decision: recommendation.decision, ...performanceInput },
+        create: { sprintId: sprint.id, taskCompletion, decision: recommendation.decision, ...resolvedPerformance },
+        update: { taskCompletion, decision: recommendation.decision, ...resolvedPerformance },
       }),
     ]);
 
     let nextSprint = null;
-    if (recommendation.action) {
-      const personalization = personalizationSchema.parse(sprint.userRoadmap.personalization);
-      const source = await prisma.careerRoadmap.findUnique({
-        where: { id: sprint.userRoadmap.sourceRoadmapId },
-        include: { nodes: { orderBy: { orderIndex: 'asc' } } },
-      });
-      if (source) {
-        nextSprint = await this.createNextSprint(
-          sprint.userRoadmapId,
-          source,
-          personalization,
-          sprint.sprintNumber + 1,
-          new Date(sprint.endDate.getTime() + 86_400_000),
-          recommendation.action,
-          sprint.tasks.filter((task) => task.status !== 'COMPLETED'),
-        );
-      }
+    const personalization = personalizationSchema.parse(sprint.userRoadmap.personalization);
+    const source = await prisma.careerRoadmap.findUnique({
+      where: { id: sprint.userRoadmap.sourceRoadmapId },
+      include: { nodes: { orderBy: { orderIndex: 'asc' } } },
+    });
+    if (source) {
+      nextSprint = await this.createNextSprint(
+        sprint.userRoadmapId,
+        source,
+        personalization,
+        sprint.sprintNumber + 1,
+        new Date(sprint.endDate.getTime() + 86_400_000),
+        recommendation.action || undefined,
+        sprint.tasks.filter((task) => task.status !== 'COMPLETED'),
+      );
+    }
 
+    if (recommendation.action) {
       await prisma.roadmapAdaptation.create({
         data: {
           userRoadmapId: sprint.userRoadmapId,
           sprintId: sprint.id,
           action: recommendation.action,
           reason: recommendation.reason,
-          evidence: { taskCompletion, ...performanceInput },
+          evidence: { taskCompletion, ...resolvedPerformance },
           previousState: { sprintNumber: sprint.sprintNumber, objective: sprint.objective },
           newState: nextSprint ? { nextSprintId: nextSprint.id, objective: nextSprint.objective } : { nextSprintPending: true },
         },
@@ -298,23 +422,36 @@ export const adaptiveRoadmapService = {
     }
 
     return {
-      sprint: await prisma.roadmapSprint.findUnique({ include: { tasks: true, performance: true }, where: { id: sprint.id } }),
+      sprint: await prisma.roadmapSprint.findUnique({
+        include: { tasks: { orderBy: { orderIndex: 'asc' }, include: taskInclude }, performance: true },
+        where: { id: sprint.id },
+      }),
       recommendation,
       nextSprint,
+      ...(telemetry ? { telemetry } : {}),
     };
+  },
+
+  async getSprintTelemetry(userId: string, sprintId: string) {
+    return sprintTelemetryService.calculateSprintTelemetry(userId, sprintId);
+  },
+
+  async getRoadmapReadiness(userId: string, userRoadmapId: string) {
+    return skillReadinessService.calculateRoadmapReadiness(userId, userRoadmapId);
   },
 
   async createNextSprint(
     userRoadmapId: string,
-    source: { nodesData: unknown; nodes: Array<{ id: string; title: string; description: string | null; orderIndex: number; estimatedMinutes: number; requiresEvidence: boolean }>; },
+    source: { nodesData: unknown; nodes: Array<{ id: string; title: string; description: string | null; orderIndex: number; estimatedMinutes: number; requiresEvidence: boolean; requiresAssessment?: boolean }>; },
     personalization: z.infer<typeof personalizationSchema>,
     sprintNumber: number,
     startDate: Date,
     action?: 'ACCELERATE_TASK' | 'INSERT_REINFORCEMENT' | 'EXTEND_SPRINT' | 'REDUCE_WORKLOAD' | 'INCREASE_PRACTICE',
-    carryForward: Array<{ title: string; description: string | null; estimatedMinutes: number; requiresEvidence: boolean }> = [],
+    carryForward: Array<{ title: string; description: string | null; estimatedMinutes: number; requiresEvidence: boolean; requiresAssessment?: boolean; roadmapNodeId?: string | null }> = [],
   ) {
     const existing = await prisma.roadmapSprint.findUnique({
       where: { userRoadmapId_sprintNumber: { userRoadmapId, sprintNumber } },
+      include: { tasks: { orderBy: { orderIndex: 'asc' }, include: taskInclude } },
     });
     if (existing) return existing;
 
@@ -329,6 +466,7 @@ export const adaptiveRoadmapService = {
           orderIndex: node.orderIndex,
           estimatedMinutes: node.estimatedMinutes,
           requiresEvidence: node.requiresEvidence,
+          requiresAssessment: node.requiresAssessment ?? false,
         }))
       : getLegacyNodes(source.nodesData).map((node, index) => ({
           roadmapNodeId: null,
@@ -337,13 +475,14 @@ export const adaptiveRoadmapService = {
           orderIndex: node.orderIndex || index + 1,
           estimatedMinutes: Math.max(30, Math.round((node.estimatedHours || 1) * 60)),
           requiresEvidence: Boolean(node.requiresEvidence),
+          requiresAssessment: false,
         }));
     const offset = Math.max(0, (sprintNumber - 1) * taskCount);
     const upcoming = sourceNodes.slice(action === 'ACCELERATE_TASK' ? offset + 1 : offset, offset + taskCount + 1);
-    const carried = carryForward.slice(0, taskCount).map((task, index) => ({ ...task, roadmapNodeId: null, orderIndex: index + 1 }));
+    const carried = carryForward.slice(0, taskCount).map((task, index) => ({ ...task, roadmapNodeId: task.roadmapNodeId || null, requiresAssessment: task.requiresAssessment ?? false, orderIndex: index + 1 }));
     const selectedTasks = action === 'EXTEND_SPRINT' && carried.length > 0 ? carried : upcoming;
     const reinforcement = action === 'INSERT_REINFORCEMENT'
-      ? [{ roadmapNodeId: null, title: `Reinforcement practice for ${personalization.targetRole}`, description: 'Use an assessment or practical task to demonstrate the weakest sprint skill before advancing.', orderIndex: 0, estimatedMinutes: 90, requiresEvidence: true }]
+      ? [{ roadmapNodeId: null, title: `Reinforcement practice for ${personalization.targetRole}`, description: 'Use an assessment or practical task to demonstrate the weakest sprint skill before advancing.', orderIndex: 0, estimatedMinutes: 90, requiresEvidence: true, requiresAssessment: true }]
       : [];
     const tasks = [...reinforcement, ...selectedTasks].slice(0, 4);
     const objective = action === 'INSERT_REINFORCEMENT'
@@ -358,7 +497,7 @@ export const adaptiveRoadmapService = {
         endDate: window.endDate,
         objective,
         expectedMinutes: tasks.reduce((total, task) => total + task.estimatedMinutes, 0),
-        status: sprintNumber === 1 ? 'ACTIVE' : 'UPCOMING',
+        status: 'ACTIVE',
         tasks: {
           create: tasks.map((task, index) => ({
             roadmapNodeId: task.roadmapNodeId,
@@ -367,10 +506,11 @@ export const adaptiveRoadmapService = {
             orderIndex: index + 1,
             estimatedMinutes: task.estimatedMinutes,
             requiresEvidence: task.requiresEvidence,
+            requiresAssessment: task.requiresAssessment ?? false,
           })),
         },
       },
-      include: { tasks: { orderBy: { orderIndex: 'asc' } } },
+      include: { tasks: { orderBy: { orderIndex: 'asc' }, include: taskInclude } },
     });
   },
 };

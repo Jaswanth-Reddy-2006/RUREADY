@@ -11,6 +11,13 @@ export interface AIProviderConfig {
   isAvailable?: boolean;
 }
 
+export interface ChatCompletionOptions {
+  responseFormatJson?: boolean;
+  temperature?: number;
+  maxTokens?: number;
+  timeoutMs?: number;
+}
+
 const DEFAULT_CONFIGS: Record<AIProviderType, { baseUrl: string; model: string; requiresKey: boolean }> = {
   ollama: {
     baseUrl: process.env.AI_OLLAMA_BASE_URL || 'http://127.0.0.1:11434/v1',
@@ -39,24 +46,26 @@ const DEFAULT_CONFIGS: Record<AIProviderType, { baseUrl: string; model: string; 
   },
 };
 
-class AIProviderManager {
+export class AIProviderManager {
   private config: AIProviderConfig;
 
-  constructor() {
-    const envProvider = (process.env.AI_PROVIDER?.toLowerCase() as AIProviderType) || 'mock';
+  constructor(customConfig?: Partial<AIProviderConfig>) {
+    const envProvider = (process.env.AI_PROVIDER?.toLowerCase() as AIProviderType) ||
+      (process.env.AI_API_BASE_URL ? 'custom' : (process.env.AI_API_KEY && process.env.AI_API_KEY.length > 20 ? 'openai' : 'mock'));
     const initialProvider: AIProviderType = ['ollama', 'openai', 'gemini', 'custom', 'mock'].includes(envProvider)
       ? envProvider
-      : (process.env.AI_API_KEY && process.env.AI_API_KEY.length > 20 ? 'openai' : 'mock');
+      : 'mock';
 
     const providerDefaults = DEFAULT_CONFIGS[initialProvider] || DEFAULT_CONFIGS.mock;
 
     this.config = {
-      provider: initialProvider,
-      baseUrl: process.env.AI_API_BASE_URL || providerDefaults.baseUrl,
-      apiKey: process.env.AI_API_KEY || 'ollama-local-key',
-      model: process.env.AI_MODEL || providerDefaults.model,
-      temperature: 0.7,
-      timeoutMs: 30000,
+      provider: customConfig?.provider || initialProvider,
+      baseUrl: customConfig?.baseUrl || process.env.AI_API_BASE_URL || providerDefaults.baseUrl,
+      apiKey: customConfig?.apiKey || process.env.AI_API_KEY || 'ollama-local-key',
+      model: customConfig?.model || process.env.AI_MODEL || providerDefaults.model,
+      temperature: customConfig?.temperature ?? 0.7,
+      maxTokens: customConfig?.maxTokens,
+      timeoutMs: customConfig?.timeoutMs ?? 30000,
     };
   }
 
@@ -64,18 +73,49 @@ class AIProviderManager {
     return { ...this.config };
   }
 
-  public async callChatCompletion(systemPrompt: string, userPrompt: string, timeoutMsOverride?: number): Promise<string> {
+  public setConfig(updated: Partial<AIProviderConfig>): void {
+    this.config = { ...this.config, ...updated };
+  }
+
+  public async callChatCompletion(
+    systemPrompt: string,
+    userPrompt: string,
+    optionsOrTimeout?: number | ChatCompletionOptions
+  ): Promise<string> {
     if (this.config.provider === 'mock') {
       throw new Error('AI_PROVIDER is mock. Use mock generator logic.');
     }
 
-    const timeout = timeoutMsOverride || this.config.timeoutMs;
+    const options: ChatCompletionOptions =
+      typeof optionsOrTimeout === 'number'
+        ? { timeoutMs: optionsOrTimeout }
+        : optionsOrTimeout || {};
+
+    const timeout = options.timeoutMs || this.config.timeoutMs;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    const temperature = options.temperature !== undefined ? options.temperature : this.config.temperature;
+    const maxTokens = options.maxTokens !== undefined ? options.maxTokens : this.config.maxTokens;
+    const responseFormatJson = options.responseFormatJson ?? false;
 
     try {
       const base = this.config.baseUrl.replace(/\/+$/g, '');
       const url = base.endsWith('/chat/completions') ? base : `${base}/chat/completions`;
+
+      const requestPayload: Record<string, any> = {
+        model: this.config.model,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+        temperature,
+        ...(maxTokens ? { max_tokens: maxTokens } : {}),
+      };
+
+      if (responseFormatJson && ['openai', 'gemini', 'custom'].includes(this.config.provider)) {
+        requestPayload.response_format = { type: 'json_object' };
+      }
 
       const response = await fetch(url, {
         method: 'POST',
@@ -83,15 +123,7 @@ class AIProviderManager {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${this.config.apiKey}`,
         },
-        body: JSON.stringify({
-          model: this.config.model,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: userPrompt },
-          ],
-          temperature: this.config.temperature,
-          ...(this.config.maxTokens ? { max_tokens: this.config.maxTokens } : {}),
-        }),
+        body: JSON.stringify(requestPayload),
         signal: controller.signal,
       });
 
@@ -99,7 +131,9 @@ class AIProviderManager {
 
       if (!response.ok) {
         const errText = await response.text();
-        throw new Error(`AI Provider HTTP ${response.status}: ${errText.slice(0, 200)}`);
+        const error = new Error(`AI Provider HTTP ${response.status}: ${errText.slice(0, 300)}`);
+        (error as any).status = response.status;
+        throw error;
       }
 
       const data = (await response.json()) as any;

@@ -342,87 +342,150 @@ function buildDefaultRoadmap(
   return obj;
 }
 
+import { roadmapGeneratorEngine } from '../engine/roadmap-generator.engine.js';
+import { RoadmapGenerationInput } from '@ru-ready/shared';
+import { TrustedBackendContext } from '../mappers/roadmap.mapper.js';
+
+export const GenerateRoadmapRequestSchema = z
+  .object({
+    targetRole: z.string().trim().min(2).max(120).optional(),
+    rolePath: z.string().trim().min(2).max(120).optional(),
+    targetCompany: z.string().trim().max(120).optional(),
+    targetCompanyTier: z
+      .enum(['FAANG', 'Unicorn', 'Tier-1 FinTech', 'High-Growth Startup', 'Enterprise'])
+      .optional()
+      .default('FAANG'),
+    targetOutcome: z.string().trim().max(300).optional(),
+    currentLevel: z
+      .enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED', 'STAFF', 'FRESHER', 'MID', 'SENIOR'])
+      .optional()
+      .default('INTERMEDIATE'),
+    timelineWeeks: z.number().int().min(1).max(104).optional().default(12),
+    hoursPerDay: z.number().min(0.5).max(16).optional().default(2),
+    daysPerWeek: z.number().int().min(1).max(7).optional().default(5),
+    sprintDurationDays: z.union([z.literal(7), z.literal(10)]).optional().default(7),
+    knownSkills: z.array(z.string().trim().max(80)).max(30).optional().default([]),
+    identifiedBlindspots: z.array(z.string().trim().max(80)).max(20).optional().default([]),
+    focusAreas: z.array(z.string().trim().max(80)).max(20).optional().default([]),
+    preferredTechnologies: z.array(z.string().trim().max(80)).max(20).optional().default([]),
+    customTechStack: z.record(z.any()).optional(),
+    pedagogicalPriority: z.enum(['PLACEMENT', 'PROJECTS', 'PRINCIPLES']).optional(),
+    userEvidence: z.union([z.array(z.any()), z.record(z.any())]).optional(),
+    freeOnly: z.boolean().optional().default(false),
+    budgetCents: z.number().int().min(0).max(10_000_000).optional(),
+    currency: z.string().trim().length(3).optional().default('INR'),
+  })
+  .refine((data) => Boolean(data.targetRole || data.rolePath), {
+    message: 'Either targetRole or rolePath must be provided',
+  });
+
 export const roadmapService = {
   async generateRoadmap(
     userId: string,
-    rolePath: string = 'FULLSTACK',
-    targetCompanyTier: string = 'FAANG',
-    customTechStack?: Record<string, string>
+    rolePathOrPayload: string | Record<string, any> = 'FULLSTACK',
+    targetCompanyTierOrMetadata?: string | { creatorName?: string; creatorUsername?: string; creatorAvatar?: string; creatorRole?: string },
+    customTechStack?: Record<string, any>
   ) {
-    const validated = GenerateRoadmapSchema.parse({
-      rolePath: rolePath.toUpperCase(),
-      targetCompanyTier,
-      customTechStack,
-    });
+    let payload: any = {};
+    let creatorMetadata: any = {};
 
-    const template = PRE_BUILT_ROADMAPS[validated.rolePath] || PRE_BUILT_ROADMAPS.FULLSTACK;
-
-    let initialNodes: RoadmapNode[] = template.nodes.map((n, idx) => ({
-      ...n,
-      status: idx === 0 ? 'IN_PROGRESS' : 'LOCKED',
-      score: idx === 0 ? 35 : 0,
-    }));
-
-    if (validated.customTechStack && Object.keys(validated.customTechStack).length > 0) {
-      initialNodes = initialNodes.map((node) => {
-        let title = node.title;
-        let concepts = [...node.concepts];
-        const stack = validated.customTechStack!;
-
-        if (stack.frontend && node.category.includes('Frontend')) {
-          title = `${stack.frontend} Component Architecture & State`;
-          concepts[0] = `Mastering ${stack.frontend} reactivity lifecycle and performance profiling.`;
-        }
-        if (stack.backend && node.category.includes('Backend')) {
-          title = `${stack.backend} Asynchronous Microservices`;
-          concepts[0] = `Optimizing ${stack.backend} runtime concurrency and connection pooling.`;
-        }
-        if (stack.database && node.category.includes('Database')) {
-          title = `${stack.database} Query Indexing & Data Models`;
-          concepts[0] = `High-throughput indexing structures and query execution in ${stack.database}.`;
-        }
-        if (stack.cloud && (node.category.includes('System') || node.category.includes('Containers'))) {
-          title = `${stack.cloud} Infrastructure & Distributed Reliability`;
-          concepts[0] = `Deploying fault-tolerant microservices on ${stack.cloud}.`;
-        }
-
-        return {
-          ...node,
-          title,
-          concepts,
-        };
-      });
+    if (typeof rolePathOrPayload === 'object' && rolePathOrPayload !== null) {
+      payload = rolePathOrPayload;
+      if (typeof targetCompanyTierOrMetadata === 'object') {
+        creatorMetadata = targetCompanyTierOrMetadata;
+      }
+    } else {
+      payload = {
+        rolePath: rolePathOrPayload,
+        targetCompanyTier: typeof targetCompanyTierOrMetadata === 'string' ? targetCompanyTierOrMetadata : 'FAANG',
+        customTechStack,
+      };
     }
 
-    const memoryObj: any = {
+    let validated: z.infer<typeof GenerateRoadmapRequestSchema>;
+    try {
+      validated = GenerateRoadmapRequestSchema.parse(payload);
+    } catch (err: any) {
+      if (err instanceof z.ZodError) {
+        const msg = err.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join(', ');
+        throw new BadRequestError(`Invalid generation request: ${msg}`);
+      }
+      throw err;
+    }
+    const targetRole = validated.targetRole || validated.rolePath || 'FULLSTACK';
+
+    const preferredTechnologies = [...validated.preferredTechnologies];
+    if (validated.customTechStack && typeof validated.customTechStack === 'object') {
+      for (const val of Object.values(validated.customTechStack)) {
+        if (typeof val === 'string' && val.trim() && !preferredTechnologies.includes(val.trim())) {
+          preferredTechnologies.push(val.trim());
+        }
+      }
+    }
+
+    const generationInput: RoadmapGenerationInput = {
+      targetRole,
+      targetCompany: validated.targetCompany,
+      targetCompanyTier: validated.targetCompanyTier as any,
+      targetOutcome: validated.targetOutcome,
+      currentLevel: validated.currentLevel as any,
+      timelineWeeks: validated.timelineWeeks,
+      hoursPerDay: validated.hoursPerDay,
+      daysPerWeek: validated.daysPerWeek,
+      sprintDurationDays: validated.sprintDurationDays,
+      knownSkills: validated.knownSkills,
+      identifiedBlindspots: validated.identifiedBlindspots,
+      focusAreas: validated.focusAreas,
+      preferredTechnologies,
+      pedagogicalPriority: validated.pedagogicalPriority,
+      userEvidence: validated.userEvidence,
+      freeOnly: validated.freeOnly,
+      budgetCents: validated.budgetCents,
+      currency: validated.currency,
+    };
+
+    const backendContext: TrustedBackendContext = {
       id: `rdmp_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
       userId,
-      rolePath: validated.rolePath,
-      targetCompanyTier: validated.targetCompanyTier,
-      overallReadiness: 25,
-      nodesData: initialNodes as any,
-      customTechStack: validated.customTechStack || null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      isOfficial: false,
+      isPublic: true,
+      isAiGenerated: true,
+      creatorId: userId,
+      creatorName: creatorMetadata?.creatorName || 'Candidate',
+      creatorUsername: creatorMetadata?.creatorUsername || 'candidate',
+      creatorAvatar: creatorMetadata?.creatorAvatar,
+      creatorRole: creatorMetadata?.creatorRole || `Aspiring ${targetRole}`,
     };
-    memoryRoadmaps.set(memoryObj.id, memoryObj);
 
     try {
-      const roadmap = await prisma.careerRoadmap.create({
-        data: {
-          userId,
-          rolePath: validated.rolePath,
-          targetCompanyTier: validated.targetCompanyTier,
-          overallReadiness: 25,
-          nodesData: initialNodes as any,
-          customTechStack: validated.customTechStack as any,
+      const result = await roadmapGeneratorEngine.generateRoadmap(generationInput, backendContext);
+      memoryRoadmaps.set(result.roadmap.id, result.roadmap);
+      return result;
+    } catch (err: any) {
+      if (err instanceof BadRequestError) {
+        throw err;
+      }
+      console.warn('[RoadmapService] Engine generation failed, falling back to legacy memory template:', err.message);
+      const fallbackObj = buildDefaultRoadmap(userId, targetRole, validated.targetCompanyTier, backendContext.id);
+      return {
+        roadmap: fallbackObj,
+        skillGapAnalysis: {
+          targetRole,
+          totalRequiredSkills: fallbackObj.nodesData.length,
+          masteredSkillsCount: 0,
+          unmetSkillsCount: fallbackObj.nodesData.length,
+          overallReadinessBaseline: 25,
+          skillGaps: [],
         },
-      });
-      memoryRoadmaps.set(roadmap.id, roadmap);
-      return roadmap;
-    } catch (err) {
-      console.warn('[RoadmapService] Database unavailable, using in-memory store:', (err as Error).message);
-      return memoryObj as any;
+        generationMetadata: {
+          modelUsed: 'legacy-template',
+          totalPhases: 1,
+          totalMilestones: fallbackObj.nodesData.length,
+          estimatedTotalHours: 40,
+          generatedAt: new Date().toISOString(),
+        },
+        generationSource: 'FALLBACK' as const,
+      };
     }
   },
 
@@ -436,7 +499,7 @@ export const roadmapService = {
 
       if (roadmaps.length === 0) {
         const defaultMap = await this.generateRoadmap(userId, 'FULLSTACK', 'FAANG');
-        roadmaps = [defaultMap];
+        return [defaultMap.roadmap || defaultMap];
       }
 
       return roadmaps;

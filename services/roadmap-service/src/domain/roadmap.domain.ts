@@ -34,6 +34,63 @@ export const selfReportedEvidenceSchema = z.object({
   notes: z.string().trim().max(1_000).optional(),
 });
 
+export const submitAssessmentSchema = z.object({
+  assessmentId: z.string().trim().min(1),
+  userRoadmapId: z.string().trim().optional(),
+  sprintId: z.string().trim().optional(),
+  sprintTaskId: z.string().trim().optional(),
+  skillId: z.string().trim().optional(),
+  answers: z.array(z.object({
+    questionId: z.string().trim().min(1),
+    selectedOptionIndex: z.number().int().min(0).max(10),
+  })).min(1, 'At least one answer must be submitted'),
+});
+
+export interface AssessmentQuestionData {
+  id: string;
+  questionText: string;
+  options: string[];
+  correctOptionIndex: number;
+  explanation?: string | null;
+}
+
+export function evaluateAssessmentAnswers(
+  questions: AssessmentQuestionData[],
+  submittedAnswers: Array<{
+    questionId: string;
+    selectedOptionIndex: number;
+  }>
+) {
+  const answerMap = new Map(submittedAnswers.map((a) => [a.questionId, a.selectedOptionIndex]));
+  let correctCount = 0;
+
+  const questionResults = questions.map((q) => {
+    const selected = answerMap.get(q.id);
+    const isCorrect = selected !== undefined && selected === q.correctOptionIndex;
+    if (isCorrect) correctCount++;
+    return {
+      questionId: q.id,
+      questionText: q.questionText,
+      selectedOptionIndex: selected ?? -1,
+      correctOptionIndex: q.correctOptionIndex,
+      isCorrect,
+      explanation: q.explanation ?? null,
+    };
+  });
+
+  const totalQuestions = questions.length;
+  const score = totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
+  const passed = score >= 70;
+
+  return {
+    totalQuestions,
+    correctAnswers: correctCount,
+    score,
+    passed,
+    questionResults,
+  };
+}
+
 export type SprintMetrics = {
   taskCompletion: number;
   assessmentScore?: number | null;
@@ -43,6 +100,7 @@ export type SprintMetrics = {
   consistencyScore?: number | null;
 };
 
+
 export type AdaptationRecommendation = {
   decision: 'CONTINUE' | 'ACCELERATE' | 'EXTEND' | 'REMEDIATE';
   action: 'ACCELERATE_TASK' | 'INSERT_REINFORCEMENT' | 'EXTEND_SPRINT' | 'REDUCE_WORKLOAD' | 'INCREASE_PRACTICE' | null;
@@ -51,6 +109,28 @@ export type AdaptationRecommendation = {
 
 function scoreBelow(value: number | null | undefined, threshold: number): boolean {
   return value !== null && value !== undefined && value < threshold;
+}
+
+export function getAssessmentAdaptationSignal(score: number): AdaptationRecommendation {
+  if (score < 55) {
+    return {
+      decision: 'REMEDIATE',
+      action: 'INSERT_REINFORCEMENT',
+      reason: 'Demonstrated assessment performance is below the proficiency threshold (< 55%). Targeted reinforcement will be scheduled.',
+    };
+  }
+  if (score >= 85) {
+    return {
+      decision: 'ACCELERATE',
+      action: 'ACCELERATE_TASK',
+      reason: 'Demonstrated assessment performance exceeds target proficiency (>= 85%). Eligible for accelerated milestone progression.',
+    };
+  }
+  return {
+    decision: 'CONTINUE',
+    action: null,
+    reason: 'Demonstrated assessment performance satisfies current milestone criteria (>= 55%). Progression continues as planned.',
+  };
 }
 
 export function determineSprintAdaptation(metrics: SprintMetrics): AdaptationRecommendation {
@@ -101,3 +181,30 @@ export function getSprintWindow(startDate: Date, durationDays: 7 | 10): { startD
   end.setUTCHours(23, 59, 59, 999);
   return { startDate: start, endDate: end };
 }
+
+export {
+  deriveDailyLearningPlan,
+  resolveResumeTask,
+  getSafeSessionDuration,
+  createInitialTaskSession,
+  startTaskSession,
+  pauseTaskSession,
+  resumeTaskSession,
+  resetTaskSession,
+  tickTaskSession,
+  formatTimerSeconds,
+  deriveDailyLearningActivity,
+  toUtcDateKey,
+  shiftUtcDateKey,
+} from '@ru-ready/shared';
+export type {
+  DailyLearningPlanDTO,
+  DailyTaskScheduleItemDTO,
+  TaskSessionState,
+  TaskSessionSnapshot,
+  DailyLearningActivityDTO,
+} from '@ru-ready/shared';
+
+
+
+
