@@ -17,6 +17,7 @@ import ResumeFillDetailsModal from '../../components/resume/ResumeFillDetailsMod
 import RoadmapPreviewModal from '../../components/roadmap/RoadmapPreviewModal';
 import StreakCalendar from '../../components/profile/StreakCalendar';
 import PracticeStatsBreakdown from '../../components/profile/PracticeStatsBreakdown';
+import RoadmapProfileSummaryCard from '../../components/profile/RoadmapProfileSummaryCard';
 import FollowModal from '../../components/profile/FollowModal';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
@@ -414,6 +415,9 @@ export default function ProfilePage() {
           </div>
         )}
       </Card>
+
+      {/* 3.8 Verified Career Roadmap & Proof of Work (Stage 7.4) */}
+      <RoadmapProfileSummaryCard isOwnProfile={isOwnProfile} />
 
       {/* 4. Authored & Enrolled Career Roadmaps Showcase */}
       {(() => {

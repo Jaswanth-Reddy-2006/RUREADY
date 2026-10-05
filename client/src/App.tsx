@@ -15,6 +15,7 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
+import PublicVerificationPage from './pages/PublicVerificationPage';
 
 // Interview flow pages
 import UnifiedInterviewHub from './pages/interview/UnifiedInterviewHub';
@@ -195,7 +196,7 @@ function App() {
         >
           <AnimatePresence mode="wait">
             <Routes location={location} key={location.pathname}>
-              {/* Marketing and authentication routes */}
+              {/* Marketing, authentication, and public verification routes */}
               <Route path="/" element={<Landing />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
@@ -203,6 +204,7 @@ function App() {
               <Route path="/contact" element={<Contact />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />
+              <Route path="/verify/:verificationId" element={<PublicVerificationPage />} />
 
               {/* Workspace Dashboard & Navigation links */}
               <Route
@@ -1124,9 +1126,9 @@ function App() {
           </AnimatePresence>
         </main>
         {showHeaderFooter && <Footer />}
-        {import.meta.env.DEV && (
+        {import.meta.env.DEV && import.meta.env.VITE_ENABLE_AGENTATION === 'true' && (
           <Agentation
-            endpoint="http://localhost:4747"
+            endpoint={import.meta.env.VITE_AGENTATION_ENDPOINT || 'http://localhost:4747'}
             onSessionCreated={(sessionId) => {
               console.log('Agentation session started:', sessionId);
             }}

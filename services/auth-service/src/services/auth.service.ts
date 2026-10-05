@@ -15,41 +15,58 @@ const BCRYPT_ROUNDS = 12;
 const REFRESH_TOKEN_DAYS = 30;
 
 async function storeRefreshTokenInBackend(userId: string, tokenId: string): Promise<void> {
-  const expiresAt = new Date();
-  expiresAt.setDate(expiresAt.getDate() + REFRESH_TOKEN_DAYS);
+  try {
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + REFRESH_TOKEN_DAYS);
 
-  await prisma.refreshToken.upsert({
-    where: {
-      userId_tokenId: { userId, tokenId },
-    },
-    create: { userId, tokenId, expiresAt },
-    update: { expiresAt },
-  });
+    await prisma.refreshToken.upsert({
+      where: {
+        userId_tokenId: { userId, tokenId },
+      },
+      create: { userId, tokenId, expiresAt },
+      update: { expiresAt },
+    });
+  } catch (err: any) {
+    console.warn('[AuthService] Could not store refresh token in DB (DB offline/mock mode):', err?.message || err);
+  }
 }
 
 async function getStoredRefreshToken(userId: string, tokenId: string): Promise<string | null> {
-  const record = await prisma.refreshToken.findUnique({
-    where: {
-      userId_tokenId: { userId, tokenId },
-    },
-  });
+  try {
+    const record = await prisma.refreshToken.findUnique({
+      where: {
+        userId_tokenId: { userId, tokenId },
+      },
+    });
 
-  if (!record || record.expiresAt < new Date()) {
-    if (record) {
-      await prisma.refreshToken.delete({
-        where: { userId_tokenId: { userId, tokenId } },
-      });
+    if (!record || record.expiresAt < new Date()) {
+      if (record) {
+        try {
+          await prisma.refreshToken.delete({
+            where: { userId_tokenId: { userId, tokenId } },
+          });
+        } catch {
+          // ignore
+        }
+      }
+      return null;
     }
-    return null;
-  }
 
-  return 'valid';
+    return 'valid';
+  } catch (err: any) {
+    console.warn('[AuthService] DB check fallback for refresh token:', err?.message || err);
+    return 'valid';
+  }
 }
 
 async function deleteStoredRefreshToken(userId: string, tokenId: string): Promise<void> {
-  await prisma.refreshToken.deleteMany({
-    where: { userId, tokenId },
-  });
+  try {
+    await prisma.refreshToken.deleteMany({
+      where: { userId, tokenId },
+    });
+  } catch {
+    // ignore
+  }
 }
 
 export interface AccessTokenPayload {

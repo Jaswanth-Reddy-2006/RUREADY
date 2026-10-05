@@ -129,8 +129,162 @@ exports.Prisma.CareerRoadmapScalarFieldEnum = {
   overallReadiness: 'overallReadiness',
   nodesData: 'nodesData',
   customTechStack: 'customTechStack',
+  title: 'title',
+  description: 'description',
+  visibility: 'visibility',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.RoadmapGoalScalarFieldEnum = {
+  id: 'id',
+  roadmapId: 'roadmapId',
+  targetRole: 'targetRole',
+  outcome: 'outcome',
+  targetCompany: 'targetCompany',
+  targetIndustry: 'targetIndustry',
+  deadline: 'deadline',
+  difficulty: 'difficulty',
+  estimatedWeeks: 'estimatedWeeks',
+  freeOnly: 'freeOnly',
+  budgetCents: 'budgetCents',
+  currency: 'currency',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SkillScalarFieldEnum = {
+  id: 'id',
+  slug: 'slug',
+  name: 'name',
+  category: 'category',
+  description: 'description',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SkillRelationshipScalarFieldEnum = {
+  id: 'id',
+  fromSkillId: 'fromSkillId',
+  toSkillId: 'toSkillId',
+  type: 'type',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.RoadmapPhaseScalarFieldEnum = {
+  id: 'id',
+  roadmapId: 'roadmapId',
+  title: 'title',
+  description: 'description',
+  orderIndex: 'orderIndex',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.RoadmapNodeScalarFieldEnum = {
+  id: 'id',
+  roadmapId: 'roadmapId',
+  phaseId: 'phaseId',
+  legacyNodeId: 'legacyNodeId',
+  title: 'title',
+  description: 'description',
+  category: 'category',
+  orderIndex: 'orderIndex',
+  estimatedMinutes: 'estimatedMinutes',
+  requiresEvidence: 'requiresEvidence',
+  targetProficiency: 'targetProficiency',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.RoadmapNodeSkillScalarFieldEnum = {
+  nodeId: 'nodeId',
+  skillId: 'skillId',
+  targetProficiency: 'targetProficiency'
+};
+
+exports.Prisma.RoadmapNodeDependencyScalarFieldEnum = {
+  nodeId: 'nodeId',
+  prerequisiteNodeId: 'prerequisiteNodeId'
+};
+
+exports.Prisma.UserRoadmapScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  sourceRoadmapId: 'sourceRoadmapId',
+  status: 'status',
+  personalization: 'personalization',
+  planSnapshot: 'planSnapshot',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.RoadmapSprintScalarFieldEnum = {
+  id: 'id',
+  userRoadmapId: 'userRoadmapId',
+  sprintNumber: 'sprintNumber',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  objective: 'objective',
+  expectedMinutes: 'expectedMinutes',
+  status: 'status',
+  decision: 'decision',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.RoadmapSprintTaskScalarFieldEnum = {
+  id: 'id',
+  sprintId: 'sprintId',
+  roadmapNodeId: 'roadmapNodeId',
+  title: 'title',
+  description: 'description',
+  orderIndex: 'orderIndex',
+  estimatedMinutes: 'estimatedMinutes',
+  requiresEvidence: 'requiresEvidence',
+  status: 'status',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SprintPerformanceScalarFieldEnum = {
+  id: 'id',
+  sprintId: 'sprintId',
+  taskCompletion: 'taskCompletion',
+  assessmentScore: 'assessmentScore',
+  practicalScore: 'practicalScore',
+  codingScore: 'codingScore',
+  interviewScore: 'interviewScore',
+  consistencyScore: 'consistencyScore',
+  notes: 'notes',
+  decision: 'decision',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.SkillEvidenceScalarFieldEnum = {
+  id: 'id',
+  userRoadmapId: 'userRoadmapId',
+  skillId: 'skillId',
+  source: 'source',
+  estimatedProficiency: 'estimatedProficiency',
+  demonstratedScore: 'demonstratedScore',
+  confidence: 'confidence',
+  externalReference: 'externalReference',
+  metadata: 'metadata',
+  assessedAt: 'assessedAt'
+};
+
+exports.Prisma.RoadmapAdaptationScalarFieldEnum = {
+  id: 'id',
+  userRoadmapId: 'userRoadmapId',
+  sprintId: 'sprintId',
+  action: 'action',
+  reason: 'reason',
+  evidence: 'evidence',
+  previousState: 'previousState',
+  newState: 'newState',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.DiscussionPostScalarFieldEnum = {
@@ -175,10 +329,86 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
+exports.RoadmapVisibility = exports.$Enums.RoadmapVisibility = {
+  PUBLIC: 'PUBLIC',
+  PRIVATE: 'PRIVATE',
+  UNLISTED: 'UNLISTED'
+};
 
+exports.RoadmapDifficulty = exports.$Enums.RoadmapDifficulty = {
+  BEGINNER: 'BEGINNER',
+  INTERMEDIATE: 'INTERMEDIATE',
+  ADVANCED: 'ADVANCED'
+};
+
+exports.SkillRelationType = exports.$Enums.SkillRelationType = {
+  PREREQUISITE: 'PREREQUISITE',
+  DEPENDENCY: 'DEPENDENCY',
+  RELATED: 'RELATED'
+};
+
+exports.UserRoadmapStatus = exports.$Enums.UserRoadmapStatus = {
+  ACTIVE: 'ACTIVE',
+  PAUSED: 'PAUSED',
+  COMPLETED: 'COMPLETED',
+  ARCHIVED: 'ARCHIVED'
+};
+
+exports.SprintStatus = exports.$Enums.SprintStatus = {
+  UPCOMING: 'UPCOMING',
+  ACTIVE: 'ACTIVE',
+  COMPLETED: 'COMPLETED',
+  EXTENDED: 'EXTENDED',
+  SKIPPED: 'SKIPPED',
+  CANCELLED: 'CANCELLED'
+};
+
+exports.SprintDecision = exports.$Enums.SprintDecision = {
+  CONTINUE: 'CONTINUE',
+  ACCELERATE: 'ACCELERATE',
+  EXTEND: 'EXTEND',
+  REMEDIATE: 'REMEDIATE'
+};
+
+exports.SprintTaskStatus = exports.$Enums.SprintTaskStatus = {
+  TODO: 'TODO',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+  SKIPPED: 'SKIPPED'
+};
+
+exports.SkillEvidenceSource = exports.$Enums.SkillEvidenceSource = {
+  SELF_REPORTED: 'SELF_REPORTED',
+  ASSESSMENT: 'ASSESSMENT',
+  CODING_INTERVIEW: 'CODING_INTERVIEW',
+  ORAL_INTERVIEW: 'ORAL_INTERVIEW',
+  PROJECT: 'PROJECT',
+  ROADMAP_SPRINT: 'ROADMAP_SPRINT'
+};
+
+exports.RoadmapAdaptationAction = exports.$Enums.RoadmapAdaptationAction = {
+  ACCELERATE_TASK: 'ACCELERATE_TASK',
+  INSERT_REINFORCEMENT: 'INSERT_REINFORCEMENT',
+  EXTEND_SPRINT: 'EXTEND_SPRINT',
+  REDUCE_WORKLOAD: 'REDUCE_WORKLOAD',
+  INCREASE_PRACTICE: 'INCREASE_PRACTICE'
+};
 
 exports.Prisma.ModelName = {
   CareerRoadmap: 'CareerRoadmap',
+  RoadmapGoal: 'RoadmapGoal',
+  Skill: 'Skill',
+  SkillRelationship: 'SkillRelationship',
+  RoadmapPhase: 'RoadmapPhase',
+  RoadmapNode: 'RoadmapNode',
+  RoadmapNodeSkill: 'RoadmapNodeSkill',
+  RoadmapNodeDependency: 'RoadmapNodeDependency',
+  UserRoadmap: 'UserRoadmap',
+  RoadmapSprint: 'RoadmapSprint',
+  RoadmapSprintTask: 'RoadmapSprintTask',
+  SprintPerformance: 'SprintPerformance',
+  SkillEvidence: 'SkillEvidence',
+  RoadmapAdaptation: 'RoadmapAdaptation',
   DiscussionPost: 'DiscussionPost'
 };
 

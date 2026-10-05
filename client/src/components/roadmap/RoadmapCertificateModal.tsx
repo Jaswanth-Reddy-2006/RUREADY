@@ -4,7 +4,7 @@ import {
   X, Award, ShieldCheck, Share2, Download, 
   CheckCircle2, Sparkles, Building2
 } from 'lucide-react';
-import { Roadmap } from '../../store/useRoadmapStore';
+import { Roadmap, useRoadmapStore } from '../../store/useRoadmapStore';
 import { useAuthStore } from '../../store/authStore';
 import Button from '../ui/Button';
 import toast from 'react-hot-toast';
@@ -21,11 +21,25 @@ export default function RoadmapCertificateModal({
   onClose,
 }: RoadmapCertificateModalProps) {
   const { user } = useAuthStore();
+  const { activeUserRoadmap, userRoadmaps, fetchVerifiedProfile } = useRoadmapStore();
+  const [serverVerificationId, setServerVerificationId] = React.useState<string | null>(null);
+
+  const activeUr = activeUserRoadmap || userRoadmaps[roadmap.id] || null;
+
+  React.useEffect(() => {
+    if (isOpen && activeUr?.id) {
+      fetchVerifiedProfile(activeUr.id).then((profile) => {
+        if (profile?.verificationId) {
+          setServerVerificationId(profile.verificationId);
+        }
+      });
+    }
+  }, [isOpen, activeUr?.id, fetchVerifiedProfile]);
 
   if (!isOpen) return null;
 
-  const candidateName = user?.name || 'Candidate';
-  const verificationHash = `RU-${roadmap.id.slice(0, 8).toUpperCase()}-${Date.now().toString(36).toUpperCase()}`;
+  const candidateName = user?.name || 'Verified Candidate';
+  const verificationHash = serverVerificationId || `VRF-${roadmap.id.slice(0, 8).toUpperCase()}-${Date.now().toString(36).toUpperCase()}`;
   const currentDate = new Date().toLocaleDateString('en-US', {
     month: 'long',
     day: 'numeric',

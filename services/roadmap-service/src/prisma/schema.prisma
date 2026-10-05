@@ -26,12 +26,386 @@ model CareerRoadmap {
   isOfficial        Boolean  @default(false)
   nodesData         Json
   customTechStack   Json?
+  title             String?
+  description       String?  @db.Text
+  visibility        RoadmapVisibility @default(PUBLIC)
+  goal              RoadmapGoal?
+  phases            RoadmapPhase[]
+  nodes             RoadmapNode[]
+  followers         UserRoadmap[] @relation("SourceRoadmap")
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
+<<<<<<< HEAD
+  @@index([userId, createdAt])
+  @@index([rolePath, visibility, updatedAt])
+=======
   @@index([userId])
   @@index([rolePath])
+>>>>>>> origin/main
   @@map("career_roadmaps")
+}
+
+enum RoadmapVisibility {
+  PUBLIC
+  PRIVATE
+  UNLISTED
+}
+
+enum RoadmapDifficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum SkillRelationType {
+  PREREQUISITE
+  DEPENDENCY
+  RELATED
+}
+
+enum UserRoadmapStatus {
+  ACTIVE
+  PAUSED
+  COMPLETED
+  ARCHIVED
+}
+
+enum SprintStatus {
+  UPCOMING
+  ACTIVE
+  COMPLETED
+  EXTENDED
+  SKIPPED
+  CANCELLED
+}
+
+enum SprintTaskStatus {
+  TODO
+  IN_PROGRESS
+  COMPLETED
+  SKIPPED
+}
+
+enum SprintDecision {
+  CONTINUE
+  ACCELERATE
+  EXTEND
+  REMEDIATE
+}
+
+enum SkillEvidenceSource {
+  SELF_REPORTED
+  ASSESSMENT
+  CODING_INTERVIEW
+  ORAL_INTERVIEW
+  PROJECT
+  ROADMAP_SPRINT
+}
+
+enum RoadmapAdaptationAction {
+  ACCELERATE_TASK
+  INSERT_REINFORCEMENT
+  EXTEND_SPRINT
+  REDUCE_WORKLOAD
+  INCREASE_PRACTICE
+}
+
+model RoadmapGoal {
+  id              String            @id @default(cuid())
+  roadmapId       String            @unique
+  targetRole      String
+  outcome         String
+  targetCompany   String?
+  targetIndustry  String?
+  deadline        DateTime?
+  difficulty      RoadmapDifficulty @default(INTERMEDIATE)
+  estimatedWeeks  Int?
+  freeOnly        Boolean           @default(false)
+  budgetCents     Int?
+  currency        String            @default("INR")
+  roadmap         CareerRoadmap     @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@index([targetRole, updatedAt])
+  @@index([targetCompany])
+  @@map("roadmap_goals")
+}
+
+model Skill {
+  id                 String                    @id @default(cuid())
+  slug               String                    @unique
+  name               String
+  category           String
+  description        String?                   @db.Text
+  nodeLinks          RoadmapNodeSkill[]
+  evidence           SkillEvidence[]
+  assessments        MicroAssessment[]
+  assessmentAttempts MicroAssessmentAttempt[]
+  outgoingLinks      SkillRelationship[]       @relation("SkillRelationshipFrom")
+  incomingLinks      SkillRelationship[]       @relation("SkillRelationshipTo")
+  createdAt          DateTime                  @default(now())
+  updatedAt          DateTime                  @updatedAt
+
+  @@index([category, name])
+  @@map("skills")
+}
+
+model SkillRelationship {
+  id          String            @id @default(cuid())
+  fromSkillId String
+  toSkillId   String
+  type        SkillRelationType
+  fromSkill   Skill             @relation("SkillRelationshipFrom", fields: [fromSkillId], references: [id], onDelete: Cascade)
+  toSkill     Skill             @relation("SkillRelationshipTo", fields: [toSkillId], references: [id], onDelete: Cascade)
+  createdAt   DateTime          @default(now())
+
+  @@unique([fromSkillId, toSkillId, type])
+  @@index([toSkillId, type])
+  @@map("skill_relationships")
+}
+
+model RoadmapPhase {
+  id          String          @id @default(cuid())
+  roadmapId   String
+  title       String
+  description String?         @db.Text
+  orderIndex  Int
+  roadmap     CareerRoadmap   @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  nodes       RoadmapNode[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@unique([roadmapId, orderIndex])
+  @@map("roadmap_phases")
+}
+
+model RoadmapNode {
+  id                String                  @id @default(cuid())
+  roadmapId         String
+  phaseId           String?
+  legacyNodeId      String?
+  title             String
+  description       String?                 @db.Text
+  category          String
+  orderIndex        Int
+  estimatedMinutes  Int                     @default(60)
+  requiresEvidence  Boolean                 @default(false)
+  requiresAssessment Boolean                @default(false)
+  targetProficiency Int?
+  roadmap           CareerRoadmap           @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  phase             RoadmapPhase?           @relation(fields: [phaseId], references: [id], onDelete: SetNull)
+  skills            RoadmapNodeSkill[]
+  assessments       MicroAssessment[]
+  prerequisites     RoadmapNodeDependency[] @relation("DependentRoadmapNode")
+  unlocks           RoadmapNodeDependency[] @relation("PrerequisiteRoadmapNode")
+  sprintTasks       RoadmapSprintTask[]
+  createdAt         DateTime                @default(now())
+  updatedAt         DateTime                @updatedAt
+
+  @@unique([roadmapId, orderIndex])
+  @@index([roadmapId, phaseId])
+  @@map("roadmap_nodes")
+}
+
+model RoadmapNodeSkill {
+  nodeId            String
+  skillId           String
+  targetProficiency Int?
+  node              RoadmapNode @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+  skill             Skill       @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@id([nodeId, skillId])
+  @@index([skillId])
+  @@map("roadmap_node_skills")
+}
+
+model RoadmapNodeDependency {
+  nodeId             String
+  prerequisiteNodeId String
+  node               RoadmapNode @relation("DependentRoadmapNode", fields: [nodeId], references: [id], onDelete: Cascade)
+  prerequisiteNode   RoadmapNode @relation("PrerequisiteRoadmapNode", fields: [prerequisiteNodeId], references: [id], onDelete: Cascade)
+
+  @@id([nodeId, prerequisiteNodeId])
+  @@map("roadmap_node_dependencies")
+}
+
+model UserRoadmap {
+  id                 String                   @id @default(cuid())
+  userId             String
+  sourceRoadmapId    String
+  status             UserRoadmapStatus        @default(ACTIVE)
+  personalization    Json
+  planSnapshot       Json?
+  sourceRoadmap      CareerRoadmap            @relation("SourceRoadmap", fields: [sourceRoadmapId], references: [id], onDelete: Restrict)
+  sprints            RoadmapSprint[]
+  skillEvidence      SkillEvidence[]
+  assessmentAttempts MicroAssessmentAttempt[]
+  adaptations        RoadmapAdaptation[]
+  createdAt          DateTime                 @default(now())
+  updatedAt          DateTime                 @updatedAt
+
+  @@unique([userId, sourceRoadmapId])
+  @@index([userId, status, updatedAt])
+  @@map("user_roadmaps")
+}
+
+model RoadmapSprint {
+  id                 String                   @id @default(cuid())
+  userRoadmapId      String
+  sprintNumber       Int
+  startDate          DateTime
+  endDate            DateTime
+  objective          String
+  expectedMinutes    Int                      @default(0)
+  status             SprintStatus             @default(UPCOMING)
+  decision           SprintDecision?
+  userRoadmap        UserRoadmap              @relation(fields: [userRoadmapId], references: [id], onDelete: Cascade)
+  tasks              RoadmapSprintTask[]
+  performance        SprintPerformance?
+  assessmentAttempts MicroAssessmentAttempt[]
+  adaptations        RoadmapAdaptation[]
+  createdAt          DateTime                 @default(now())
+  updatedAt          DateTime                 @updatedAt
+
+  @@unique([userRoadmapId, sprintNumber])
+  @@index([userRoadmapId, status, startDate])
+  @@map("roadmap_sprints")
+}
+
+model RoadmapSprintTask {
+  id                 String                   @id @default(cuid())
+  sprintId           String
+  roadmapNodeId      String?
+  title              String
+  description        String?                  @db.Text
+  orderIndex         Int
+  estimatedMinutes   Int                      @default(60)
+  requiresEvidence   Boolean                  @default(false)
+  requiresAssessment Boolean                  @default(false)
+  status             SprintTaskStatus         @default(TODO)
+  completedAt        DateTime?
+  sprint             RoadmapSprint            @relation(fields: [sprintId], references: [id], onDelete: Cascade)
+  roadmapNode        RoadmapNode?             @relation(fields: [roadmapNodeId], references: [id], onDelete: SetNull)
+  assessmentAttempts MicroAssessmentAttempt[]
+  createdAt          DateTime                 @default(now())
+  updatedAt          DateTime                 @updatedAt
+
+  @@unique([sprintId, orderIndex])
+  @@index([roadmapNodeId])
+  @@map("roadmap_sprint_tasks")
+}
+
+model SprintPerformance {
+  id               String         @id @default(cuid())
+  sprintId         String         @unique
+  taskCompletion   Int
+  assessmentScore  Int?
+  practicalScore   Int?
+  codingScore      Int?
+  interviewScore   Int?
+  consistencyScore Int?
+  notes            String?        @db.Text
+  decision         SprintDecision
+  sprint           RoadmapSprint  @relation(fields: [sprintId], references: [id], onDelete: Cascade)
+  createdAt        DateTime       @default(now())
+
+  @@map("sprint_performances")
+}
+
+model SkillEvidence {
+  id                   String              @id @default(cuid())
+  userRoadmapId        String
+  skillId              String
+  source               SkillEvidenceSource
+  estimatedProficiency Int?
+  demonstratedScore    Int?
+  confidence           Int                 @default(20)
+  externalReference    String?
+  metadata             Json?
+  assessedAt           DateTime            @default(now())
+  userRoadmap          UserRoadmap         @relation(fields: [userRoadmapId], references: [id], onDelete: Cascade)
+  skill                Skill               @relation(fields: [skillId], references: [id], onDelete: Restrict)
+
+  @@index([userRoadmapId, skillId, assessedAt])
+  @@map("skill_evidence")
+}
+
+model MicroAssessment {
+  id            String                    @id @default(cuid())
+  title         String
+  description   String?                   @db.Text
+  roadmapNodeId String?
+  skillId       String?
+  roadmapNode   RoadmapNode?              @relation(fields: [roadmapNodeId], references: [id], onDelete: SetNull)
+  skill         Skill?                    @relation(fields: [skillId], references: [id], onDelete: SetNull)
+  questions     MicroAssessmentQuestion[]
+  attempts      MicroAssessmentAttempt[]
+  createdAt     DateTime                  @default(now())
+  updatedAt     DateTime                  @updatedAt
+
+  @@index([roadmapNodeId])
+  @@index([skillId])
+  @@map("micro_assessments")
+}
+
+model MicroAssessmentQuestion {
+  id                 String          @id @default(cuid())
+  assessmentId       String
+  assessment         MicroAssessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  questionText       String          @db.Text
+  options            String[]
+  correctOptionIndex Int
+  explanation        String?         @db.Text
+  orderIndex         Int             @default(0)
+  createdAt          DateTime        @default(now())
+
+  @@index([assessmentId, orderIndex])
+  @@map("micro_assessment_questions")
+}
+
+model MicroAssessmentAttempt {
+  id             String             @id @default(cuid())
+  assessmentId   String
+  assessment     MicroAssessment    @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  userId         String
+  userRoadmapId  String?
+  userRoadmap    UserRoadmap?       @relation(fields: [userRoadmapId], references: [id], onDelete: SetNull)
+  sprintId       String?
+  sprint         RoadmapSprint?     @relation(fields: [sprintId], references: [id], onDelete: SetNull)
+  sprintTaskId   String?
+  sprintTask     RoadmapSprintTask? @relation(fields: [sprintTaskId], references: [id], onDelete: SetNull)
+  skillId        String?
+  skill          Skill?             @relation(fields: [skillId], references: [id], onDelete: SetNull)
+  totalQuestions Int
+  correctAnswers Int
+  score          Int
+  passed         Boolean            @default(false)
+  answers        Json
+  completedAt    DateTime           @default(now())
+  createdAt      DateTime           @default(now())
+
+  @@index([userId, assessmentId])
+  @@index([userRoadmapId, skillId])
+  @@map("micro_assessment_attempts")
+}
+
+model RoadmapAdaptation {
+  id            String                  @id @default(cuid())
+  userRoadmapId String
+  sprintId      String?
+  action        RoadmapAdaptationAction
+  reason        String                  @db.Text
+  evidence      Json
+  previousState Json?
+  newState      Json?
+  userRoadmap   UserRoadmap             @relation(fields: [userRoadmapId], references: [id], onDelete: Cascade)
+  sprint        RoadmapSprint?          @relation(fields: [sprintId], references: [id], onDelete: SetNull)
+  createdAt     DateTime                @default(now())
+
+  @@index([userRoadmapId, createdAt])
+  @@map("roadmap_adaptations")
 }
 
 model DiscussionPost {

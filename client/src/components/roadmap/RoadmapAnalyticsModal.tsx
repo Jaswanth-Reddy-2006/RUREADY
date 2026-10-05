@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   X, Award, Zap, TrendingUp, Clock, Target, 
-  CheckCircle2, ShieldCheck, BarChart3, ArrowRight
+  CheckCircle2, ShieldCheck, BarChart3, ArrowRight, AlertCircle, Download, Share2, FileCode2
 } from 'lucide-react';
-import { Roadmap } from '../../store/useRoadmapStore';
+import { Roadmap, useRoadmapStore } from '../../store/useRoadmapStore';
+import { RoadmapReadinessAnalyticsDTO, VerifiedCareerProfileDTO } from '@ru-ready/shared';
 import Button from '../ui/Button';
+import toast from 'react-hot-toast';
 
 interface RoadmapAnalyticsModalProps {
   roadmap: Roadmap;
@@ -18,22 +20,62 @@ export default function RoadmapAnalyticsModal({
   isOpen,
   onClose,
 }: RoadmapAnalyticsModalProps) {
+  const { activeUserRoadmap, userRoadmaps, fetchRoadmapReadiness, fetchVerifiedProfile, exportVerifiedProfile } = useRoadmapStore();
+  const [serverAnalytics, setServerAnalytics] = useState<RoadmapReadinessAnalyticsDTO | null>(null);
+  const [verifiedProfile, setVerifiedProfile] = useState<VerifiedCareerProfileDTO | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
+
+  const activeUr = activeUserRoadmap || userRoadmaps[roadmap.id] || null;
+
+  useEffect(() => {
+    if (isOpen && activeUr?.id) {
+      fetchRoadmapReadiness(activeUr.id).then((data) => {
+        if (data) setServerAnalytics(data);
+      });
+      fetchVerifiedProfile(activeUr.id).then((profile) => {
+        if (profile) setVerifiedProfile(profile);
+      });
+    }
+  }, [isOpen, activeUr?.id, fetchRoadmapReadiness, fetchVerifiedProfile]);
+
   if (!isOpen) return null;
 
-  const total = roadmap.nodesData.length;
-  const mastered = roadmap.nodesData.filter((n) => n.status === 'MASTERED').length;
-  const inProgress = roadmap.nodesData.filter((n) => n.status === 'IN_PROGRESS').length;
-  const currentReadiness = total > 0 ? Math.round((mastered / total) * 100) : 0;
+  const total = serverAnalytics?.totalRequiredSkills || roadmap.nodesData.length;
+  const mastered = serverAnalytics?.masteredSkillsCount ?? roadmap.nodesData.filter((n) => n.status === 'MASTERED').length;
+  const inProgress = serverAnalytics?.inProgressSkillsCount ?? roadmap.nodesData.filter((n) => n.status === 'IN_PROGRESS').length;
+  const currentReadiness = serverAnalytics?.overallReadiness ?? (total > 0 ? Math.round((mastered / total) * 100) : (roadmap.overallReadiness || 0));
 
   // Domain competencies calibrated to track
-  const domains = [
-    { name: 'System Design & Scalability', score: Math.min(100, currentReadiness + 15), benchmark: 85 },
-    { name: 'Concurrency & Asynchronous I/O', score: Math.min(100, currentReadiness + 5), benchmark: 80 },
-    { name: 'Database Indexing & Persistence', score: Math.min(100, currentReadiness + 20), benchmark: 90 },
-    { name: 'Socratic Architectural Defense', score: Math.min(100, currentReadiness + 10), benchmark: 75 },
-  ];
+  const domains = serverAnalytics?.domains && serverAnalytics.domains.length > 0
+    ? serverAnalytics.domains
+    : [
+        { name: 'System Design & Scalability', score: Math.min(100, currentReadiness + 15), benchmark: 85 },
+        { name: 'Concurrency & Asynchronous I/O', score: Math.min(100, currentReadiness + 5), benchmark: 80 },
+        { name: 'Database Indexing & Persistence', score: Math.min(100, currentReadiness + 20), benchmark: 90 },
+        { name: 'Socratic Architectural Defense', score: Math.min(100, currentReadiness + 10), benchmark: 75 },
+      ];
 
-  const estimatedWeeksLeft = Math.max(1, Math.round(((total - mastered) / (total || 1)) * (roadmap.estimatedWeeks || 8)));
+  const estimatedWeeksLeft = serverAnalytics?.estimatedWeeksRemaining ?? Math.max(1, Math.round(((total - mastered) / (total || 1)) * (roadmap.estimatedWeeks || 8)));
+
+  const handleExportProfile = async () => {
+    if (!activeUr?.id) return;
+    setIsExporting(true);
+    try {
+      await exportVerifiedProfile(activeUr.id);
+      toast.success('Verified career readiness profile exported!');
+    } catch {
+      toast.error('Failed to export verified profile');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleCopyVerification = () => {
+    if (verifiedProfile?.verificationId && navigator.clipboard) {
+      navigator.clipboard.writeText(`${window.location.origin}/verify/${verifiedProfile.verificationId}`);
+      toast.success('Verification ID copied to clipboard!');
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -85,6 +127,61 @@ export default function RoadmapAnalyticsModal({
                 <strong className="text-2xl font-black font-display text-[#168A62]">~{estimatedWeeksLeft} wks left</strong>
               </div>
             </div>
+
+            {/* Stage 5.7: Verified Career Profile Section */}
+            {verifiedProfile && (
+              <div className="p-5 rounded-2xl bg-[#EFFAFD]/60 border border-[#DCE7F2] space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <ShieldCheck size={18} className="text-[#2459A8]" />
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#11183D] font-display">
+                      Verified Career Profile
+                    </h4>
+                  </div>
+                  <span className="text-[10px] font-mono text-[#526078] bg-white px-2 py-0.5 rounded border border-[#DCE7F2]">
+                    {verifiedProfile.verificationId}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs">
+                  <div className="p-2.5 bg-white rounded-xl border border-[#DCE7F2]">
+                    <span className="block text-[10px] text-[#526078]">Mastered</span>
+                    <strong className="text-[#2459A8] font-bold">{verifiedProfile.masteredSkills.length} skills</strong>
+                  </div>
+                  <div className="p-2.5 bg-white rounded-xl border border-[#DCE7F2]">
+                    <span className="block text-[10px] text-[#526078]">Demonstrated</span>
+                    <strong className="text-[#168A62] font-bold">{verifiedProfile.demonstratedSkills.length} skills</strong>
+                  </div>
+                  <div className="p-2.5 bg-white rounded-xl border border-[#DCE7F2]">
+                    <span className="block text-[10px] text-[#526078]">Verified Evidence</span>
+                    <strong className="text-[#A0006D] font-bold">{verifiedProfile.verifiedEvidenceCount} records</strong>
+                  </div>
+                  <div className="p-2.5 bg-white rounded-xl border border-[#DCE7F2]">
+                    <span className="block text-[10px] text-[#526078]">Completed Sprints</span>
+                    <strong className="text-[#11183D] font-bold">{verifiedProfile.completedSprintCount} / {verifiedProfile.totalSprintCount}</strong>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between gap-3 pt-2">
+                  <button
+                    onClick={handleCopyVerification}
+                    className="text-xs text-[#2459A8] hover:underline flex items-center gap-1 font-medium cursor-pointer"
+                  >
+                    <Share2 size={12} />
+                    Copy Verification ID
+                  </button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={handleExportProfile}
+                    isLoading={isExporting}
+                    icon={<Download size={13} />}
+                  >
+                    Export Profile JSON
+                  </Button>
+                </div>
+              </div>
+            )}
 
             {/* Competency Domains */}
             <div className="space-y-3">
@@ -139,3 +236,4 @@ export default function RoadmapAnalyticsModal({
     </AnimatePresence>
   );
 }
+

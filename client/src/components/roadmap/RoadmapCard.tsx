@@ -27,8 +27,12 @@ export default function RoadmapCard({
   const { likedRoadmapIds, toggleUpvoteRoadmap, claimRoadmap } = useRoadmapStore();
   const isLiked = likedRoadmapIds?.includes(roadmap.id);
 
-  const completedNodesCount = roadmap.nodesData.filter((n) => n.status === 'MASTERED').length;
-  const totalNodesCount = roadmap.nodesData.length;
+  const creatorName = roadmap.creatorName || 'RU Ready Author';
+  const creatorUsername = roadmap.creatorUsername || 'ru_ready';
+  const nodes = roadmap.nodesData || [];
+
+  const completedNodesCount = nodes.filter((n) => n && n.status === 'MASTERED').length;
+  const totalNodesCount = nodes.length;
   const calculatedReadiness = totalNodesCount > 0 
     ? Math.round((completedNodesCount / totalNodesCount) * 100) 
     : 0;
@@ -49,7 +53,7 @@ export default function RoadmapCard({
       onClaim(roadmap);
     } else {
       claimRoadmap(roadmap.id);
-      toast.success(`Claimed! "${roadmap.title}" added to My Roadmaps.`);
+      toast.success(`Claimed! "${roadmap.title || 'Roadmap'}" added to My Roadmaps.`);
     }
   };
 
@@ -82,7 +86,7 @@ export default function RoadmapCard({
           )}
 
           <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold font-mono uppercase bg-[#EFFAFD] text-[#526078] border border-[#DCE7F2]">
-            {roadmap.targetCompanyTier}
+            {roadmap.targetCompanyTier || 'FAANG'}
           </span>
 
           {isEnrolled && (
@@ -112,10 +116,10 @@ export default function RoadmapCard({
       {/* Main Title & Description */}
       <div className="space-y-2 flex-1">
         <h3 className="text-lg font-bold font-display text-[#11183D] leading-snug group-hover:text-[#2459A8] transition-colors">
-          {roadmap.title}
+          {roadmap.title || 'Untitled Roadmap'}
         </h3>
         <p className="text-xs text-[#526078] line-clamp-2 leading-relaxed">
-          {roadmap.description}
+          {roadmap.description || 'Custom sequential roadmap curriculum.'}
         </p>
       </div>
 
@@ -124,24 +128,24 @@ export default function RoadmapCard({
         {roadmap.creatorAvatar ? (
           <img
             src={roadmap.creatorAvatar}
-            alt={roadmap.creatorName}
+            alt={creatorName}
             className="w-7 h-7 rounded-full object-cover border border-[#DCE7F2]"
           />
         ) : (
           <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-[#2459A8] to-[#4A8BDF] flex items-center justify-center text-white text-[11px] font-bold font-display">
-            {roadmap.creatorName.charAt(0)}
+            {creatorName.charAt(0)}
           </div>
         )}
         <div className="min-w-0 flex-1">
           <p className="text-xs font-bold font-display text-[#11183D] truncate">
-            {roadmap.creatorName}
+            {creatorName}
           </p>
           <p className="text-[10px] text-[#7B8799] truncate">
-            {roadmap.creatorRole || `@${roadmap.creatorUsername}`}
+            {roadmap.creatorRole || `@${creatorUsername}`}
           </p>
         </div>
         <span className="text-[11px] font-semibold text-[#526078] shrink-0 bg-[#EFFAFD] px-2.5 py-1 rounded-xl">
-          {roadmap.difficulty}
+          {roadmap.difficulty || 'Intermediate'}
         </span>
       </div>
 
@@ -151,21 +155,21 @@ export default function RoadmapCard({
           <span className="block text-[10px] font-semibold text-[#7B8799] uppercase">Milestones</span>
           <span className="text-xs font-bold font-display text-[#11183D] flex items-center justify-center gap-1">
             <Layers size={12} className="text-[#4A8BDF]" />
-            {roadmap.nodesData.length} Steps
+            {totalNodesCount} Steps
           </span>
         </div>
         <div>
           <span className="block text-[10px] font-semibold text-[#7B8799] uppercase">Duration</span>
           <span className="text-xs font-bold font-display text-[#11183D] flex items-center justify-center gap-1">
             <Clock size={12} className="text-[#A0006D]" />
-            ~{roadmap.estimatedWeeks} Wks
+            ~{roadmap.estimatedWeeks || 8} Wks
           </span>
         </div>
         <div>
           <span className="block text-[10px] font-semibold text-[#7B8799] uppercase">Claimed</span>
           <span className="text-xs font-bold font-display text-[#11183D] flex items-center justify-center gap-1">
             <Bookmark size={12} className="text-[#168A62]" />
-            {roadmap.enrolledCount}
+            {roadmap.enrolledCount || 0}
           </span>
         </div>
       </div>
