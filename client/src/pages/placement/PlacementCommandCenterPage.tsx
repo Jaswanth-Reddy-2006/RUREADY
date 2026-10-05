@@ -9,6 +9,7 @@ import {
   Target, Zap, AlertCircle
 } from 'lucide-react';
 import { usePlacementStore, JobApplication, ApplicationStage } from '../../store/usePlacementStore';
+import { useAuthStore } from '../../store/authStore';
 import PlacementKanban from '../../components/placement/PlacementKanban';
 import PlacementCalendar from '../../components/placement/PlacementCalendar';
 import PlacementTableView from '../../components/placement/PlacementTableView';
@@ -21,6 +22,7 @@ type TimeRangeType = 'THIS_MONTH' | 'THIS_WEEK' | 'CUSTOM';
 
 export default function PlacementCommandCenterPage() {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
   const { 
     applications, 
     activeView, 
@@ -133,7 +135,7 @@ export default function PlacementCommandCenterPage() {
                     <span>Placement Command Center</span>
                   </div>
                   <h1 className="text-2xl sm:text-3xl font-black font-display text-[#11183D] tracking-tight">
-                    Good evening, Jaswanth! 👋
+                    Welcome back, {user?.name?.split(' ')[0] || 'Candidate'}! 👋
                   </h1>
                   <p className="text-xs sm:text-sm text-[#526078] font-medium">
                     Track campus drives, monitor hiring risk factors, analyze JD skill gaps, and auto-prep for interviews.
@@ -440,7 +442,7 @@ export default function PlacementCommandCenterPage() {
                 {/* Action Buttons */}
                 <div className="flex items-center gap-2 pt-3 border-t border-[#DCE7F2]">
                   <button
-                    onClick={() => navigate('/interview/coding/new')}
+                    onClick={() => navigate('/coding/new')}
                     className="flex-1 py-2.5 bg-[#2459A8] hover:bg-[#1d4787] text-white rounded-xl text-xs font-bold font-display flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer"
                   >
                     <span>Start Preparation</span>

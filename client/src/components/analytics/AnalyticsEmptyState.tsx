@@ -37,7 +37,7 @@ export default function AnalyticsEmptyState() {
       {/* Primary CTAs */}
       <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto">
         <button
-          onClick={() => navigate('/oral')}
+          onClick={() => navigate('/video')}
           className="w-full sm:w-auto px-6 py-3.5 bg-[#2459A8] hover:bg-[#1d4787] text-white rounded-2xl text-xs font-bold font-display flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
         >
           <Video size={16} />

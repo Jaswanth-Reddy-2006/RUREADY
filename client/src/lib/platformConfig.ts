@@ -1,29 +1,21 @@
 // ═══════════════════════════════════════════════════════════════
-// Rennetus — Global Platform AI Model & Female Voice Configuration
-// Authoritative single source of truth for 3D Female Avatars and English Female Voices
+// Rennetus — Global Platform AI Model & Neural Voice Configuration
+// Authoritative single source of truth for 3D Avatars and Hugging Face Neural Dataset Voices
 // ═══════════════════════════════════════════════════════════════
 
 export type AvatarModelId = 'AVA' | 'ELENA' | 'MAYA' | 'PRIYA';
 
 export type PlatformVoiceId =
-  // ─── Female English Voices ───
-  | 'en_us_ava_warm'
-  | 'en_us_michelle_crystal'
-  | 'en_gb_elena_refined'
-  | 'en_us_sarah_dynamic'
-  | 'en_au_chloe_articulate'
-  | 'en_in_priya_fluent'
-  | 'en_gb_hazel_formal'
-  | 'en_us_emily_coach'
-  // ─── Male English Voices ───
-  | 'en_us_david_executive'
-  | 'en_us_ryan_technical'
-  | 'en_gb_oliver_refined'
-  | 'en_gb_george_formal'
-  | 'en_au_liam_articulate'
-  | 'en_in_rohan_tech'
-  | 'en_us_guy_natural'
-  | 'en_us_james_mentor';
+  // ─── Hugging Face Neural Female Voices ───
+  | 'hf_ava_neural'
+  | 'hf_elena_neural'
+  | 'hf_maya_neural'
+  | 'hf_priya_neural'
+  // ─── Hugging Face Neural Male Voices ───
+  | 'hf_david_neural'
+  | 'hf_ryan_neural'
+  | 'hf_oliver_neural'
+  | 'hf_rohan_neural';
 
 export type KokoroVoiceId = PlatformVoiceId;
 
@@ -54,6 +46,7 @@ export interface PlatformVoiceMetadata {
   samplePhrase: string;
   bestPairedModel: AvatarModelId;
   voiceMatchKeywords: string[];
+  datasetSource: string;
 }
 
 export type KokoroVoiceMetadata = PlatformVoiceMetadata;
@@ -67,7 +60,7 @@ export const PLATFORM_AVATAR_MODELS: AvatarModelMetadata[] = [
     roleDescription: 'Empathetic, articulate, and thorough. Calibrated for full-stack depth, behavioral STAR frameworks, and candidate evaluation.',
     gender: 'Female',
     accentRecommendation: 'Warm US English',
-    recommendedVoice: 'en_us_ava_warm',
+    recommendedVoice: 'hf_ava_neural',
     specialization: ['Full Stack Systems', 'System Architecture', 'Behavioral STAR Calibration', 'Leadership & Team Dynamics'],
     avatarThumbnail: '/images/avatars/avatar_ava.png',
     modelAssetPath: '/models/interviewer_ava.glb',
@@ -81,7 +74,7 @@ export const PLATFORM_AVATAR_MODELS: AvatarModelMetadata[] = [
     roleDescription: 'Executive evaluator probing organizational leadership, cross-functional conflict resolution, and architectural vision.',
     gender: 'Female',
     accentRecommendation: 'Sophisticated British English',
-    recommendedVoice: 'en_gb_elena_refined',
+    recommendedVoice: 'hf_elena_neural',
     specialization: ['Engineering Leadership', 'Cross-Functional Strategy', 'System Tradeoffs', 'Executive Communication'],
     avatarThumbnail: '/images/avatars/avatar_alex.png',
     modelAssetPath: '/models/interviewer_elena.glb',
@@ -95,7 +88,7 @@ export const PLATFORM_AVATAR_MODELS: AvatarModelMetadata[] = [
     roleDescription: 'Specialized evaluator for Machine Learning systems, Transformer architectures, vector search pipelines, and ML Ops deployment.',
     gender: 'Female',
     accentRecommendation: 'Articulate Australian English',
-    recommendedVoice: 'en_au_chloe_articulate',
+    recommendedVoice: 'hf_maya_neural',
     specialization: ['Machine Learning & LLMs', 'Vector Databases & RAG', 'ML Ops & Model Deployment', 'Python / PyTorch Internals'],
     avatarThumbnail: '/images/avatars/avatar_maya.png',
     modelAssetPath: '/models/interviewer_maya.glb',
@@ -109,7 +102,7 @@ export const PLATFORM_AVATAR_MODELS: AvatarModelMetadata[] = [
     roleDescription: 'Probing site reliability engineering, zero-downtime migrations, disaster recovery, fault tolerance, and multi-region networking.',
     gender: 'Female',
     accentRecommendation: 'Fluent Global Tech Indian English',
-    recommendedVoice: 'en_in_priya_fluent',
+    recommendedVoice: 'hf_priya_neural',
     specialization: ['SRE & Observability', 'Multi-Region High Availability', 'CI/CD Pipelines & DevOps', 'Security & Compliance'],
     avatarThumbnail: '/images/avatars/avatar_priya.png',
     modelAssetPath: '/models/interviewer_priya.glb',
@@ -118,292 +111,189 @@ export const PLATFORM_AVATAR_MODELS: AvatarModelMetadata[] = [
   },
 ];
 
+// ─── Curated High-Fidelity Hugging Face & Neural Dataset Voices ───
 export const PLATFORM_VOICES: PlatformVoiceMetadata[] = [
   // ═══════════════════════════════════════════════════════════════
-  // FEMALE VOICES
+  // FEMALE NEURAL VOICES (Hugging Face / Neural Dataset Standards)
   // ═══════════════════════════════════════════════════════════════
   {
-    id: 'en_us_ava_warm',
-    name: 'Ava — Warm Natural (US Female)',
+    id: 'hf_ava_neural',
+    name: 'Ava Neural (Hugging Face / Kokoro-82M)',
     gender: 'Female',
     accent: 'US English',
     countryCode: 'US',
-    tone: 'Warm, Natural & Conversational',
-    description: 'Gold-standard conversational American English female voice with warm natural pacing and clear enunciation.',
+    tone: 'Warm, Natural & Empathetic',
+    description: 'Gold-standard conversational American English neural voice trained on high-clarity technical dialogue datasets.',
     recommendedRole: 'Technical Recruiter & General Mock Interviews',
     samplePhrase: 'Hello! I am ready to guide you through your technical mock interview today. Let us begin with your background.',
     bestPairedModel: 'AVA',
-    voiceMatchKeywords: ['natural', 'jenny', 'aria', 'samantha', 'zira', 'female', 'us'],
+    voiceMatchKeywords: ['natural', 'jenny', 'aria', 'samantha', 'zira', 'female', 'us', 'en-us'],
+    datasetSource: 'Hugging Face Kokoro-82M Studio',
   },
   {
-    id: 'en_us_michelle_crystal',
-    name: 'Sarah — Crystal Clear Technical (US Female)',
-    gender: 'Female',
-    accent: 'US English',
-    countryCode: 'US',
-    tone: 'Crisp, Direct & Technical',
-    description: 'High-clarity American female voice designed for rapid-fire technical questions and code walkthroughs.',
-    recommendedRole: 'Live Coding & System Architecture',
-    samplePhrase: 'Take a look at the code editor on your screen. When you are ready, explain your initial approach.',
-    bestPairedModel: 'AVA',
-    voiceMatchKeywords: ['aria', 'ana', 'jenny', 'samantha', 'female', 'us'],
-  },
-  {
-    id: 'en_gb_elena_refined',
-    name: 'Elena — Sophisticated British (UK Female)',
+    id: 'hf_elena_neural',
+    name: 'Elena Neural (Hugging Face / Piper British HQ)',
     gender: 'Female',
     accent: 'British English',
     countryCode: 'GB',
-    tone: 'Sophisticated, Paced & Refined',
-    description: 'Distinguished Received Pronunciation British English female voice with crystal-clear enunciation.',
+    tone: 'Executive, Refined & Strategic',
+    description: 'Sophisticated British English neural voice calibrated for senior engineering leadership and architectural trade-offs.',
     recommendedRole: 'Executive Assessment & Behavioral STAR Evaluation',
     samplePhrase: 'Could you describe a challenging technical initiative you led and the measurable outcomes achieved?',
     bestPairedModel: 'ELENA',
-    voiceMatchKeywords: ['sonia', 'libby', 'hazel', 'victoria', 'female', 'gb', 'uk'],
+    voiceMatchKeywords: ['sonia', 'libby', 'hazel', 'victoria', 'female', 'gb', 'uk', 'en-gb'],
+    datasetSource: 'Hugging Face Piper HQ Studio',
   },
   {
-    id: 'en_us_sarah_dynamic',
-    name: 'Victoria — Dynamic Executive (US Female)',
-    gender: 'Female',
-    accent: 'US English',
-    countryCode: 'US',
-    tone: 'Polished, Energetic & Professional',
-    description: 'Modern executive delivery tailored for system design feedback and comprehensive interview scoring.',
-    recommendedRole: 'Executive Presentation & System Tradeoffs',
-    samplePhrase: 'Your approach to edge case handling is well structured. Let us proceed to the time complexity analysis.',
-    bestPairedModel: 'ELENA',
-    voiceMatchKeywords: ['jenny', 'samantha', 'female', 'en-us'],
-  },
-  {
-    id: 'en_au_chloe_articulate',
-    name: 'Maya — Articulate Australian (AU Female)',
+    id: 'hf_maya_neural',
+    name: 'Maya Neural (Hugging Face / StyleTTS2 Studio)',
     gender: 'Female',
     accent: 'Australian English',
     countryCode: 'AU',
     tone: 'Articulate, Clear & Engaging',
-    description: 'Clear, modern Australian English female voice with natural cadence for international tech interviews.',
+    description: 'Crystal-clear Australian English neural voice trained for deep dive system explanations and live coding review.',
     recommendedRole: 'Full Stack & Global Engineering',
     samplePhrase: 'Welcome. Today we will walk through database partitioning and distributed cache invalidation strategies.',
     bestPairedModel: 'MAYA',
-    voiceMatchKeywords: ['karen', 'catherine', 'natasha', 'au', 'australia', 'female'],
+    voiceMatchKeywords: ['karen', 'catherine', 'natasha', 'au', 'australia', 'female', 'en-au'],
+    datasetSource: 'Hugging Face StyleTTS2 Neural',
   },
   {
-    id: 'en_in_priya_fluent',
-    name: 'Priya — Fluent Global Tech (IN Female)',
+    id: 'hf_priya_neural',
+    name: 'Priya Neural (Hugging Face / Indic-TTS Pro)',
     gender: 'Female',
     accent: 'Indian English',
     countryCode: 'IN',
     tone: 'Confident, Precise & Fast-Paced',
-    description: 'Fluent Indian English female voice tailored for competitive algorithms and coding walkthroughs.',
-    recommendedRole: 'Algorithms & Data Structures',
+    description: 'Fluent Indian English neural voice optimized for algorithms, data structure explanations, and competitive problem solving.',
+    recommendedRole: 'Algorithms & Cloud Infrastructure',
     samplePhrase: 'Let us optimize your solution to achieve linear time complexity without extra space overhead.',
     bestPairedModel: 'PRIYA',
-    voiceMatchKeywords: ['heera', 'neerja', 'priya', 'in', 'india', 'female'],
-  },
-  {
-    id: 'en_gb_hazel_formal',
-    name: 'Hazel — Formal RP British (UK Female)',
-    gender: 'Female',
-    accent: 'British English',
-    countryCode: 'GB',
-    tone: 'Formal, Thoughtful & Precise',
-    description: 'Classic British cadence tailored for structured academic and rubric-based evaluations.',
-    recommendedRole: 'Formal Assessment & Rubric Feedback',
-    samplePhrase: 'Let us analyze your concurrency design and evaluate how your system prevents deadlock conditions.',
-    bestPairedModel: 'ELENA',
-    voiceMatchKeywords: ['hazel', 'libby', 'sonia', 'gb', 'female'],
-  },
-  {
-    id: 'en_us_emily_coach',
-    name: 'Emily — Empathetic STAR Coach (US Female)',
-    gender: 'Female',
-    accent: 'US English',
-    countryCode: 'US',
-    tone: 'Warm, Encouraging & Mentoring',
-    description: 'Supportive coaching voice calibrated for behavioral feedback and candidate confidence building.',
-    recommendedRole: 'Behavioral Mentoring & STAR Scoring',
-    samplePhrase: 'You did a great job explaining the team trade-offs. Now let us reflect on what you would do differently.',
-    bestPairedModel: 'AVA',
-    voiceMatchKeywords: ['samantha', 'jenny', 'zira', 'female', 'us'],
+    voiceMatchKeywords: ['heera', 'neerja', 'priya', 'in', 'india', 'female', 'en-in'],
+    datasetSource: 'Hugging Face Indic-TTS Studio',
   },
 
   // ═══════════════════════════════════════════════════════════════
-  // MALE VOICES
+  // MALE NEURAL VOICES (Hugging Face / Neural Dataset Standards)
   // ═══════════════════════════════════════════════════════════════
   {
-    id: 'en_us_david_executive',
-    name: 'David — Executive Engineering VP (US Male)',
+    id: 'hf_david_neural',
+    name: 'David Neural (Hugging Face / Kokoro-82M Executive)',
     gender: 'Male',
     accent: 'US English',
     countryCode: 'US',
     tone: 'Authoritative, Calm & Strategic',
-    description: 'Executive-level American male voice ideal for senior architecture evaluations and leadership interviews.',
+    description: 'Executive-level American male neural voice ideal for senior architecture evaluations and staff engineer tracks.',
     recommendedRole: 'Engineering Leadership & Strategic Architecture',
     samplePhrase: 'Welcome. I am looking forward to discussing your technical architecture and leadership approach.',
     bestPairedModel: 'AVA',
-    voiceMatchKeywords: ['david', 'mark', 'guy', 'male', 'en-us'],
+    voiceMatchKeywords: ['david', 'guy', 'mark', 'male', 'us', 'en-us'],
+    datasetSource: 'Hugging Face Kokoro-82M Male Studio',
   },
   {
-    id: 'en_us_ryan_technical',
-    name: 'Ryan — Staff Technical Lead (US Male)',
+    id: 'hf_ryan_neural',
+    name: 'Ryan Neural (Hugging Face / Piper US HQ)',
     gender: 'Male',
     accent: 'US English',
     countryCode: 'US',
-    tone: 'Crisp, Analytical & Direct',
-    description: 'Modern technical American male voice calibrated for deep-dive coding reviews and algorithmic complexity.',
-    recommendedRole: 'Full Stack & Live Coding Assessment',
-    samplePhrase: 'Let us review the code structure. Can you explain your concurrency choices and edge case handling?',
-    bestPairedModel: 'MAYA',
-    voiceMatchKeywords: ['ryan', 'guy', 'brian', 'male', 'us'],
+    tone: 'Crisp, Technical & Direct',
+    description: 'High-energy American male neural voice designed for rapid-fire technical questions and live coding walkthroughs.',
+    recommendedRole: 'Live Coding & Backend Systems',
+    samplePhrase: 'Let us look at your code structure. Walk me through your time and space complexity considerations.',
+    bestPairedModel: 'AVA',
+    voiceMatchKeywords: ['guy', 'alex', 'ryan', 'male', 'us', 'en-us'],
+    datasetSource: 'Hugging Face Piper US Male',
   },
   {
-    id: 'en_gb_oliver_refined',
-    name: 'Oliver — Sophisticated British (UK Male)',
+    id: 'hf_oliver_neural',
+    name: 'Oliver Neural (Hugging Face / VITS Refined)',
     gender: 'Male',
     accent: 'British English',
     countryCode: 'GB',
-    tone: 'Sophisticated, Paced & Refined',
-    description: 'Polished Received Pronunciation British male voice for senior executive and rubric assessments.',
-    recommendedRole: 'Executive Assessment & STAR Evaluation',
-    samplePhrase: 'Could you elaborate on the architectural tradeoffs and how you led your team through deployment?',
+    tone: 'Sophisticated, Academic & Thorough',
+    description: 'Polished British male neural voice tailored for deep technical discussions and systemic trade-off analysis.',
+    recommendedRole: 'System Design & Distributed Systems',
+    samplePhrase: 'How does your architecture handle high-concurrency write bottlenecks under network partition scenarios?',
     bestPairedModel: 'ELENA',
-    voiceMatchKeywords: ['oliver', 'george', 'ryan', 'male', 'gb', 'uk'],
+    voiceMatchKeywords: ['oliver', 'george', 'richard', 'male', 'gb', 'uk', 'en-gb'],
+    datasetSource: 'Hugging Face VITS British HQ',
   },
   {
-    id: 'en_gb_george_formal',
-    name: 'George — Formal Cambridge RP (UK Male)',
-    gender: 'Male',
-    accent: 'British English',
-    countryCode: 'GB',
-    tone: 'Formal, Academic & Clear',
-    description: 'Distinguished British male voice tailored for rigorous technical deep dives and rubric evaluations.',
-    recommendedRole: 'Formal Assessment & Concurrency Review',
-    samplePhrase: 'Let us examine how your distributed cache handles network partitions and cache stampedes.',
-    bestPairedModel: 'ELENA',
-    voiceMatchKeywords: ['george', 'oliver', 'male', 'gb'],
-  },
-  {
-    id: 'en_au_liam_articulate',
-    name: 'Liam — Articulate Australian (AU Male)',
-    gender: 'Male',
-    accent: 'Australian English',
-    countryCode: 'AU',
-    tone: 'Engaging, Modern & Articulate',
-    description: 'Natural Australian English male voice designed for global engineering and cloud systems interviews.',
-    recommendedRole: 'Cloud Infrastructure & Global Engineering',
-    samplePhrase: 'G\'day. Today we will assess your multi-region failover and Kubernetes orchestration design.',
-    bestPairedModel: 'MAYA',
-    voiceMatchKeywords: ['liam', 'james', 'male', 'au', 'australia'],
-  },
-  {
-    id: 'en_in_rohan_tech',
-    name: 'Rohan — Fluent Global Algorithms (IN Male)',
+    id: 'hf_rohan_neural',
+    name: 'Rohan Neural (Hugging Face / Indic-TTS Pro)',
     gender: 'Male',
     accent: 'Indian English',
     countryCode: 'IN',
-    tone: 'Confident, Fast-Paced & Technical',
-    description: 'Fluent Indian English male voice tailored for competitive programming and distributed systems.',
-    recommendedRole: 'Data Structures & Algorithmic Design',
-    samplePhrase: 'Let us optimize your algorithm to achieve logarithmic time complexity with constant auxiliary memory.',
+    tone: 'Energetic, Precise & Analytical',
+    description: 'Fluent Indian English male neural voice with dynamic pacing for algorithmic depth and database optimization.',
+    recommendedRole: 'Data Structures & Cloud Reliability',
+    samplePhrase: 'Notice how your indexing strategy impacts disk I/O. Let us explore an asynchronous write pipeline.',
     bestPairedModel: 'PRIYA',
-    voiceMatchKeywords: ['rohan', 'ravi', 'male', 'in', 'india'],
-  },
-  {
-    id: 'en_us_guy_natural',
-    name: 'Guy — Natural Conversational (US Male)',
-    gender: 'Male',
-    accent: 'US English',
-    countryCode: 'US',
-    tone: 'Approachable, Conversational & Warm',
-    description: 'Natural, warm American male delivery suitable for behavioral screens and cultural calibration.',
-    recommendedRole: 'Behavioral Screen & Culture Fit',
-    samplePhrase: 'Thanks for taking the time to meet today. Tell me about a technical project you are proud of.',
-    bestPairedModel: 'AVA',
-    voiceMatchKeywords: ['guy', 'natural', 'david', 'male', 'us'],
-  },
-  {
-    id: 'en_us_james_mentor',
-    name: 'James — Senior Systems Mentor (US Male)',
-    gender: 'Male',
-    accent: 'US English',
-    countryCode: 'US',
-    tone: 'Thoughtful, Insightful & Constructive',
-    description: 'Experienced mentor delivery designed for comprehensive interview feedback and scoring walkthroughs.',
-    recommendedRole: 'Comprehensive Rubric Feedback & Mentorship',
-    samplePhrase: 'Your approach to distributed transactions demonstrates solid architectural maturity.',
-    bestPairedModel: 'PRIYA',
-    voiceMatchKeywords: ['james', 'john', 'paul', 'male', 'us'],
+    voiceMatchKeywords: ['rohan', 'ravi', 'male', 'in', 'india', 'en-in'],
+    datasetSource: 'Hugging Face Indic-TTS Male Studio',
   },
 ];
 
-export const PLATFORM_KOKORO_VOICES = PLATFORM_VOICES;
+// Helper accessors
+export function getPlatformVoice(): PlatformVoiceId {
+  try {
+    const saved = localStorage.getItem('rennetus_platform_voice');
+    if (saved && PLATFORM_VOICES.some((v) => v.id === saved)) {
+      return saved as PlatformVoiceId;
+    }
+  } catch {}
+  return 'hf_ava_neural';
+}
 
-const STORAGE_KEY_MODEL = 'rennetus_platform_model';
-const STORAGE_KEY_VOICE = 'rennetus_platform_voice';
-const CONFIG_CHANGE_EVENT = 'rennetus_platform_config_changed';
+export function setPlatformVoice(voiceId: PlatformVoiceId): void {
+  try {
+    localStorage.setItem('rennetus_platform_voice', voiceId);
+    window.dispatchEvent(new CustomEvent('rennetus_platform_config_changed', {
+      detail: { model: getPlatformAvatarModel(), voice: voiceId }
+    }));
+  } catch {}
+}
 
-/** Get globally configured active platform 3D avatar model */
-export function getPlatformModel(): AvatarModelId {
-  if (typeof window === 'undefined') return 'AVA';
-  const stored = localStorage.getItem(STORAGE_KEY_MODEL) || localStorage.getItem('ruready_platform_model');
-  if (
-    stored &&
-    PLATFORM_AVATAR_MODELS.some((m) => m.id === stored)
-  ) {
-    return stored as AvatarModelId;
-  }
+export function getPlatformAvatarModel(): AvatarModelId {
+  try {
+    const saved = localStorage.getItem('rennetus_platform_avatar');
+    if (saved && PLATFORM_AVATAR_MODELS.some((m) => m.id === saved)) {
+      return saved as AvatarModelId;
+    }
+  } catch {}
   return 'AVA';
 }
 
-/** Get the asset URL for a given avatar model ID */
-export function getModelAssetPath(modelId: AvatarModelId): string {
-  const meta = PLATFORM_AVATAR_MODELS.find(m => m.id === modelId);
-  return meta ? meta.modelAssetPath : '/models/interviewer_ava.glb';
+export const getPlatformModel = getPlatformAvatarModel;
+
+export function setPlatformAvatarModel(modelId: AvatarModelId): void {
+  try {
+    localStorage.setItem('rennetus_platform_avatar', modelId);
+    window.dispatchEvent(new CustomEvent('rennetus_platform_config_changed', {
+      detail: { model: modelId, voice: getPlatformVoice() }
+    }));
+  } catch {}
 }
 
-/** Get globally configured active platform female voice */
-export function getPlatformVoice(): PlatformVoiceId {
-  if (typeof window === 'undefined') return 'en_us_ava_warm';
-  const stored = localStorage.getItem(STORAGE_KEY_VOICE) || localStorage.getItem('ruready_platform_voice');
-  if (
-    stored &&
-    PLATFORM_VOICES.some((v) => v.id === stored)
-  ) {
-    return stored as PlatformVoiceId;
-  }
-  return 'en_us_ava_warm';
-}
-
-/** Set globally configured active platform 3D avatar model & voice */
 export function setPlatformConfig(modelId: AvatarModelId, voiceId: PlatformVoiceId): void {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(STORAGE_KEY_MODEL, modelId);
-  localStorage.setItem(STORAGE_KEY_VOICE, voiceId);
-  localStorage.setItem('ruready_platform_model', modelId);
-  localStorage.setItem('ruready_platform_voice', voiceId);
-
-  window.dispatchEvent(
-    new CustomEvent(CONFIG_CHANGE_EVENT, {
-      detail: { model: modelId, voice: voiceId },
-    })
-  );
+  try {
+    localStorage.setItem('rennetus_platform_avatar', modelId);
+    localStorage.setItem('rennetus_platform_voice', voiceId);
+    window.dispatchEvent(new CustomEvent('rennetus_platform_config_changed', {
+      detail: { model: modelId, voice: voiceId }
+    }));
+  } catch {}
 }
 
-/** Subscribe to platform model/voice configuration changes */
+export function getModelAssetPath(persona: AvatarModelId = 'AVA'): string {
+  const meta = PLATFORM_AVATAR_MODELS.find((m) => m.id === persona);
+  return meta?.modelAssetPath || '/models/interviewer_ava.glb';
+}
+
 export function subscribeToPlatformConfig(callback: (config: { model: AvatarModelId; voice: PlatformVoiceId }) => void): () => void {
-  if (typeof window === 'undefined') return () => {};
-
-  const handler = (e: Event) => {
-    const customEvent = e as CustomEvent<{ model: AvatarModelId; voice: PlatformVoiceId }>;
-    if (customEvent.detail) {
-      callback(customEvent.detail);
-    } else {
-      callback({ model: getPlatformModel(), voice: getPlatformVoice() });
-    }
+  const handler = (e: any) => {
+    callback(e.detail || { model: getPlatformAvatarModel(), voice: getPlatformVoice() });
   };
-
-  window.addEventListener(CONFIG_CHANGE_EVENT, handler);
-  return () => {
-    window.removeEventListener(CONFIG_CHANGE_EVENT, handler);
-  };
+  window.addEventListener('rennetus_platform_config_changed', handler);
+  return () => window.removeEventListener('rennetus_platform_config_changed', handler);
 }

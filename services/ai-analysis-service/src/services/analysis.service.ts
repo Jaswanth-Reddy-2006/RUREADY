@@ -333,8 +333,27 @@ export const analysisService = {
 
     const summary = `Candidate completed mock interview for target role: ${session.targetRole}. The overall Technical capability was scored at ${technicalScore}/100, while verbal clarity and communication structure scored at ${communicationScore}/100. Environmental proctoring stability registered at ${confidenceScore}/100.\n\n[CORPORATE BENCHMARK] ${benchmark.feedback}`;
 
+    const problemSolvingScore = Math.max(30, Math.min(100, Math.round(technicalScore * 0.95 + 2)));
+    const depthScore = Math.max(30, Math.min(100, Math.round(commAnalysis.clarityScore * 0.85 + 10)));
+    const relevanceScore = Math.max(50, Math.min(100, 88));
+    const industryReadinessScore = Math.max(30, Math.min(100, Math.round(technicalScore * 0.40 + communicationScore * 0.30 + structureScore * 0.30)));
+
     const finalSignals = {
       ...((confidenceMetrics?.signals as any) || {}),
+      problemSolvingScore,
+      depthScore,
+      relevanceScore,
+      industryReadinessScore,
+      categoryScores: {
+        'Technical Knowledge': technicalScore,
+        'Communication': communicationScore,
+        'Problem Solving': problemSolvingScore,
+        'Depth of Explanation': depthScore,
+        'Relevance': relevanceScore,
+        'Confidence': confidenceScore,
+        'Structure': structureScore,
+        'Industry Readiness': industryReadinessScore,
+      },
       corporateBenchmark: benchmark
     };
 

@@ -188,4 +188,24 @@ export const adminController = {
       next(err);
     }
   },
+
+  // ─── Feature Flags & Authorization Controls ───
+  async getFeatureFlags(_req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const flags = await adminService.getFeatureFlags();
+      res.status(200).json(flags);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async updateFeatureFlag(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const key = req.params.key as string;
+      const updated = await adminService.updateFeatureFlag(key, req.body);
+      res.status(200).json(updated);
+    } catch (err) {
+      next(err);
+    }
+  },
 };

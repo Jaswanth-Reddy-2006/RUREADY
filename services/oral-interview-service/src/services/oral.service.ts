@@ -401,7 +401,13 @@ export const oralService = {
     try {
       const session = await this.getSession(sessionId, userId);
       const existingCount = session.questions ? session.questions.length : 0;
-      if (existingCount >= 5) {
+      const durationMins = session.durationMins || 15;
+      const startedAt = session.startedAt ? new Date(session.startedAt).getTime() : (session.createdAt ? new Date(session.createdAt).getTime() : Date.now());
+      const elapsedMinutes = (Date.now() - startedAt) / (1000 * 60);
+      const maxQuestionsForDuration = Math.max(6, Math.ceil(durationMins / 2));
+
+      // End session if allocated time elapsed (with at least 3 questions) or reached question safety limit
+      if ((elapsedMinutes >= durationMins && existingCount >= 3) || existingCount >= maxQuestionsForDuration) {
         return { isComplete: true };
       }
 
@@ -573,11 +579,16 @@ export const oralService = {
       console.warn('[OralService] DB getNextQuestion fallback:', (err as Error).message);
       const questions = memoryQuestions.get(sessionId) || [];
       const nextOrder = questions.length + 1;
-      if (nextOrder > 5) {
+      const memSession = memorySessions.get(sessionId) || {};
+      const durationMins = memSession.durationMins || 15;
+      const startedAt = memSession.startedAt ? new Date(memSession.startedAt).getTime() : (memSession.createdAt ? new Date(memSession.createdAt).getTime() : Date.now());
+      const elapsedMinutes = (Date.now() - startedAt) / (1000 * 60);
+      const maxQuestionsForDuration = Math.max(6, Math.ceil(durationMins / 2));
+
+      if ((elapsedMinutes >= durationMins && nextOrder > 3) || nextOrder > maxQuestionsForDuration) {
         return { isComplete: true };
       }
 
-      const memSession = memorySessions.get(sessionId) || {};
       const role = memSession.targetRole || 'Software Engineer';
       const roleLower = role.toLowerCase();
       const allSpokenSoFar = questions.map((p: any) => (p.answerText || '').toLowerCase()).join(' ');
@@ -605,6 +616,9 @@ export const oralService = {
         qType = 'SYSTEM_DESIGN';
       } else if (nextOrder === 4) {
         promptText = `Can you describe a complex production bug, memory leak, or performance latency bottleneck you investigated in your applications? How did you isolate root cause and verify the fix?`;
+        difficulty = 'HARD';
+      } else if (nextOrder === 5) {
+        promptText = `How do you secure your services against vulnerabilities like injection, broken authentication tokens, or rate limit exhaustion under DDoS scenarios?`;
         difficulty = 'HARD';
       } else {
         promptText = `Tell me about a time you faced a sharp technical disagreement with a teammate regarding system architecture or library choice. How did you evaluate trade-offs and reach alignment?`;
@@ -699,6 +713,11 @@ export const oralService = {
 
     const readinessVerdict = overallScore >= 80 ? 'READY' : overallScore >= 60 ? 'ALMOST_READY' : 'NOT_READY';
 
+    const problemSolvingScore = Math.max(30, Math.min(100, Math.round(technicalScore * 0.95 + 2)));
+    const depthScore = Math.max(30, Math.min(100, Math.round((totalWords / Math.max(1, answered.length * 45)) * 80 + 15)));
+    const relevanceScore = Math.max(50, Math.min(100, Math.round(88 - (questions.length - answered.length) * 8)));
+    const industryReadinessScore = Math.max(30, Math.min(100, Math.round(technicalScore * 0.40 + communicationScore * 0.30 + structureScore * 0.30)));
+
     let analysis: any = {
       id: `an_${sessionId}`,
       sessionId,
@@ -707,17 +726,31 @@ export const oralService = {
       technicalScore,
       confidenceScore,
       structureScore,
+      problemSolvingScore,
+      depthScore,
+      relevanceScore,
+      industryReadinessScore,
+      categoryScores: {
+        'Technical Knowledge': technicalScore,
+        'Communication': communicationScore,
+        'Problem Solving': problemSolvingScore,
+        'Depth of Explanation': depthScore,
+        'Relevance': relevanceScore,
+        'Confidence': confidenceScore,
+        'Structure': structureScore,
+        'Industry Readiness': industryReadinessScore,
+      },
       confidenceMeterScore: confidenceScore,
       confidenceSignals: {
-        avgWpm: Math.round(totalWords / Math.max(1, (answered.length * 1.5))),
+        avgWpm: Math.round(totalWords / Math.max(1, (answered.length * 1.5)) || 135),
         avgPauseCount: fillerCount,
         avgAnswerLength: Math.round(totalWords / (answered.length || 1)),
       },
       eyeContactScore,
       presenceScore: confidenceScore,
       summary: `Candidate completed interview for ${session.targetRole || 'Software Engineer'}. Technical score: ${technicalScore}/100. Communication score: ${communicationScore}/100. Proctoring & confidence: ${confidenceScore}/100.`,
-      strengths: Array.from(new Set(strengths)).slice(0, 3),
-      improvements: Array.from(new Set(improvements)).slice(0, 3),
+      strengths: Array.from(new Set(strengths)).slice(0, 5),
+      improvements: Array.from(new Set(improvements)).slice(0, 5),
       actionableTips: [
         { tip: 'Substantiate Trade-offs', reason: `For ${session.targetRole || 'target'} roles, discuss scalability and system limits.` },
         { tip: 'Fluent Delivery', reason: fillerCount > 0 ? 'Replace filler words with deliberate pauses.' : 'Maintain your clear speaking rhythm.' },

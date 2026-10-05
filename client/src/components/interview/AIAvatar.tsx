@@ -53,7 +53,7 @@ const AIAvatar: React.FC<AIAvatarProps> = ({
       setActivePersona(persona);
     } else {
       setActivePersona(getPlatformModel());
-      return subscribeToPlatformConfig(({ model }) => {
+      return subscribeToPlatformConfig(({ model }: { model: any }) => {
         setActivePersona(model);
       });
     }

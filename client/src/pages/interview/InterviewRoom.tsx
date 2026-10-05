@@ -163,7 +163,7 @@ export default function InterviewRoom() {
   const recognitionRef = useRef<any>(null);
   const isListeningRef = useRef(false);
   const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const countdownIntervalRef = useRef<any>(null);
   const [silenceCountdown, setSilenceCountdown] = useState<number | null>(null);
   const lastSpeechRef = useRef<number>(Date.now());
   const latestAnswerRef = useRef('');
@@ -175,6 +175,7 @@ export default function InterviewRoom() {
       silenceTimerRef.current = null;
     }
     if (countdownIntervalRef.current) {
+      clearTimeout(countdownIntervalRef.current);
       clearInterval(countdownIntervalRef.current);
       countdownIntervalRef.current = null;
     }
@@ -645,24 +646,27 @@ export default function InterviewRoom() {
         return;
       }
 
-      // Smart Silence Auto-Submit (3.5s natural conversational pause):
-      // When candidate finishes their thought and pauses for 3.5 seconds, auto-submit smoothly
+      // Smart Silence Auto-Submit (5.0s natural conversational pause):
+      // When candidate finishes their thought and pauses for 5.0 seconds, auto-submit smoothly.
+      // Reset countdown while candidate is actively speaking.
+      // Only show countdown during the final 3 seconds of continuous silence.
       if (isListeningRef.current && combined.trim().length >= 3) {
-        setSilenceCountdown(3);
+        setSilenceCountdown(null);
         let remainingSeconds = 3;
 
-        countdownIntervalRef.current = setInterval(() => {
-          remainingSeconds -= 1;
-          if (remainingSeconds > 0) {
-            setSilenceCountdown(remainingSeconds);
-          } else {
-            if (countdownIntervalRef.current) {
-              clearInterval(countdownIntervalRef.current);
-              countdownIntervalRef.current = null;
+        countdownIntervalRef.current = setTimeout(() => {
+          setSilenceCountdown(3);
+          const intervalId = setInterval(() => {
+            remainingSeconds -= 1;
+            if (remainingSeconds > 0) {
+              setSilenceCountdown(remainingSeconds);
+            } else {
+              clearInterval(intervalId);
+              setSilenceCountdown(null);
             }
-            setSilenceCountdown(null);
-          }
-        }, 1000);
+          }, 1000);
+          countdownIntervalRef.current = intervalId as any;
+        }, 2000) as any;
 
         silenceTimerRef.current = setTimeout(() => {
           const snapshot = latestAnswerRef.current.trim();
@@ -671,7 +675,7 @@ export default function InterviewRoom() {
             stopListening();
             submitAnswerRef.current(snapshot);
           }
-        }, 3500);
+        }, 5000);
       }
     };
 

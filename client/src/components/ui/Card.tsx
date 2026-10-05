@@ -25,22 +25,22 @@ export interface CardProps extends HTMLAttributes<HTMLDivElement> {
 const variantStyles: Record<CardVariant, string> = {
   // Official SaaS White Content Surface
   default:
-    'bg-white text-[#11183D] border border-[#DCE7F2] shadow-sm',
+    'bg-white dark:bg-[#11183D] text-[#11183D] dark:text-[#F1F5F9] border border-[#DCE7F2] dark:border-[#1E293B] shadow-sm',
   // Official Signature AI Card
   ai:
-    'bg-[#F8EAF4] text-[#11183D] border border-[#A0006D]/25 shadow-sm',
+    'bg-[#F8EAF4] dark:bg-[#240E26] text-[#11183D] dark:text-[#F1F5F9] border border-[#A0006D]/25 dark:border-[#A0006D]/40 shadow-sm',
   glass:
-    'bg-white text-[#11183D] border border-[#DCE7F2] shadow-sm',
+    'bg-white/90 dark:bg-[#11183D]/90 backdrop-blur-md text-[#11183D] dark:text-[#F1F5F9] border border-[#DCE7F2] dark:border-[#1E293B] shadow-sm',
   obsidian:
-    'bg-white text-[#11183D] border border-[#DCE7F2] shadow-sm',
+    'bg-[#0B0F28] text-[#F1F5F9] border border-[#1E293B] shadow-sm',
   elevated:
-    'bg-white text-[#11183D] border border-[#DCE7F2] shadow-md hover:border-[#4A8BDF]',
+    'bg-white dark:bg-[#11183D] text-[#11183D] dark:text-[#F1F5F9] border border-[#DCE7F2] dark:border-[#1E293B] shadow-md hover:border-[#4A8BDF]',
   dark:
-    'bg-white text-[#11183D] border border-[#DCE7F2] shadow-sm',
+    'bg-[#0B0F28] text-[#F1F5F9] border border-[#1E293B] shadow-sm',
   soft:
-    'bg-[#EFF7FD] text-[#11183D] border border-[#DCE7F2]',
+    'bg-[#EFF7FD] dark:bg-[#152046] text-[#11183D] dark:text-[#F1F5F9] border border-[#DCE7F2] dark:border-[#1E293B]',
   outline:
-    'bg-transparent text-[#11183D] border border-[#DCE7F2]',
+    'bg-transparent text-[#11183D] dark:text-[#F1F5F9] border border-[#DCE7F2] dark:border-[#1E293B]',
 };
 
 const paddingStyles: Record<CardPadding, string> = {

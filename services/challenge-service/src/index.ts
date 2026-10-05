@@ -37,8 +37,10 @@ app.get('/health', (_req, res) => {
   });
 });
 
-// Mount Routes
+// Mount Routes (supporting direct access, reverse proxying, and prefix rewriting)
 app.use('/api/challenges', challengeRoutes);
+app.use('/challenges', challengeRoutes);
+app.use('/', challengeRoutes);
 
 // Setup Socket.IO
 const io = setupSocketServer(server);

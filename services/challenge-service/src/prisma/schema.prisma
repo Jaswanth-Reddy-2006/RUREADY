@@ -235,21 +235,31 @@ model GroupMember {
 }
 
 model ChallengeRating {
-  id           String   @id @default(cuid())
-  userId       String   @unique
-  userName     String
-  userAvatar   String?
-  rating       Int      @default(1200)
-  tier         String   @default("GOLD") // BRONZE, SILVER, GOLD, PLATINUM, DIAMOND, GRANDMASTER
-  battlesTotal Int      @default(0)
-  battlesWon   Int      @default(0)
-  winRate      Float    @default(0.0)
-  currentStreak Int     @default(0)
-  longestStreak Int     @default(0)
-  totalXP      Int      @default(0)
-  updatedAt    DateTime @updatedAt
+  id             String    @id @default(cuid())
+  userId         String    @unique
+  userName       String
+  userAvatar     String?
+  rating         Int       @default(1200)
+  tier           String    @default("GOLD") // BRONZE, SILVER, GOLD, PLATINUM, DIAMOND, GRANDMASTER
+  battlesTotal   Int       @default(0)
+  battlesWon     Int       @default(0)
+  winRate        Float     @default(0.0)
+  currentStreak  Int       @default(0)
+  longestStreak  Int       @default(0)
+  totalXP        Int       @default(0)
+  weeklyPoints   Int       @default(0)
+  monthlyPoints  Int       @default(0)
+  weeklyMatches  Int       @default(0)
+  weeklyWins     Int       @default(0)
+  monthlyMatches Int       @default(0)
+  monthlyWins    Int       @default(0)
+  seasonResetAt  DateTime?
+  updatedAt      DateTime  @updatedAt
 
   @@index([rating])
+  @@index([weeklyPoints])
+  @@index([monthlyPoints])
+  @@index([tier, weeklyPoints])
   @@map("challenge_ratings")
 }
 

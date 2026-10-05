@@ -1,13 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   Sparkles,
   Briefcase,
   Play,
   Clock,
-  Code2,
-  Terminal,
   Target,
   Plus,
   Zap,
@@ -19,99 +17,73 @@ import {
   ArrowRight,
   Search,
   Check,
-  AlertTriangle,
-  Lock,
   Maximize,
-  VolumeX,
   Layers,
   Database,
   Cpu,
   CheckCircle2,
-  UserCheck,
+  Network,
+  Globe,
+  HardDrive,
+  Radio,
 } from 'lucide-react';
 import apiClient from '../../api/client';
-import Button from '../ui/Button';
-import Card from '../ui/Card';
-import Badge from '../ui/Badge';
-import toast from 'react-hot-toast';
+import Button from '../../components/ui/Button';
+import Card from '../../components/ui/Card';
+import { systemDesignApi } from '../../api/systemDesign';
+import { useSystemDesignStore } from '../../store/useSystemDesignStore';
 
 const POPULAR_ROLES = [
   'Software Engineer',
-  'Full Stack Developer',
-  'Backend Developer',
-  'Frontend Developer',
-  'AI / ML Engineer',
-  'Data Engineer',
-  'DevOps / SRE',
-  'Mobile Developer',
-  'Systems Software Engineer',
-  'Cloud Software Engineer',
-  'QA / Automation Engineer',
+  'Senior Software Engineer (SDE-2)',
+  'Staff Systems Architect',
+  'Backend Architect',
+  'Full Stack Engineer',
+  'Distributed Systems Lead',
+  'Cloud Infrastructure Architect',
+  'Data Platform Engineer',
 ];
 
-const CODING_PRACTICE_TRACKS = [
+const ARCHITECTURE_DOMAINS = [
   {
-    id: 'DSA',
-    title: 'Data Structures & Algorithms (DSA)',
-    desc: 'Arrays, Two Pointers, Trees, Graphs, Dynamic Programming & Asymptotic Complexity.',
-    icon: Code2,
-    badge: 'Popular',
+    id: 'STORAGE',
+    title: 'Distributed Storage & Caching',
+    desc: 'Consistent Hashing, LRU Eviction, Replication, Partitioning & CAP Theorem.',
+    icon: HardDrive,
+    badge: 'Core Infra',
   },
   {
-    id: 'MachineCoding',
-    title: 'Machine Coding & Low-Level Design (LLD)',
-    desc: 'Clean Architecture, In-Memory Caching, Rate Limiters, Event Emitters & Object-Oriented Systems.',
-    icon: Layers,
-    badge: 'FAANG / Tier-1',
+    id: 'REAL_TIME',
+    title: 'Real-time & Streaming Systems',
+    desc: 'WebSockets, Pub/Sub Event Queues, Message Brokers, Live Notification Pipelines.',
+    icon: Radio,
+    badge: 'High Throughput',
   },
   {
-    id: 'SQL',
-    title: 'SQL & Database Query Internals',
-    desc: 'Complex Multi-Table JOINs, Window Functions, Indexing Strategy & Schema Optimizations.',
+    id: 'FINTECH',
+    title: 'Financial & Transactional Systems',
+    desc: 'Idempotency Keys, 2-Phase Commit, Distributed Locking, ACID Guarantees.',
     icon: Database,
-    badge: 'Data & Backend',
+    badge: 'Mission Critical',
   },
   {
-    id: 'Frontend',
-    title: 'Frontend Architecture & JavaScript',
-    desc: 'Async Concurrent Task Queues, Deep Cloning, Custom Hooks, DOM Engines & Event Loop.',
-    icon: Cpu,
-    badge: 'UI & Systems',
-  },
-  {
-    id: 'Backend',
-    title: 'Backend & Distributed Primitives',
-    desc: 'Thread-Safe LRU Cache, Consistent Hashing Ring, Concurrency Locks & Circuit Breakers.',
-    icon: Terminal,
-    badge: 'High Scale',
+    id: 'WEB_SCALE',
+    title: 'High-Scale Web Services',
+    desc: 'URL Shortener, Rate Limiters, Global CDN, Geo-DNS & Load Balancing.',
+    icon: Globe,
+    badge: 'FAANG Standard',
   },
 ];
 
-const PREDEFINED_ALGORITHMS = [
-  'Two Pointers',
-  'Sliding Window',
-  'Dynamic Programming',
-  'Binary Trees & BST',
-  'Graphs & BFS/DFS',
-  'Binary Search',
-  'Heaps & Priority Queues',
-  'Trie / Prefix Trees',
-  'In-Memory Key-Value Store',
-  'Token Bucket Rate Limiting',
-  'Async Task Queue',
-  'Consistent Hashing',
-  'SQL Window Functions',
-  'Indexing & Query Optimization',
-];
-
-export default function CodingSetupForm() {
+export default function SystemDesignSetupForm() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { createAndLoadSession } = useSystemDesignStore();
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  const initialFocus = searchParams.get('focus') || 'DSA';
-  const initialRole = searchParams.get('role') || 'Software Engineer';
+  const initialRole = searchParams.get('role') || 'Senior Software Engineer (SDE-2)';
+  const initialDomain = searchParams.get('domain') || 'STORAGE';
 
   // Wizard Step: 1 = Prepare, 2 = Check (Review), 3 = Allow (Device Check), 4 = Hello / Launch
   const [wizardStep, setWizardStep] = useState<number>(1);
@@ -119,16 +91,13 @@ export default function CodingSetupForm() {
   // Form State
   const [targetRole, setTargetRole] = useState<string>(initialRole);
   const [roleSearch, setRoleSearch] = useState<string>('');
-  const [selectedTrack, setSelectedTrack] = useState<string>(initialFocus);
-  const [selectedAlgorithms, setSelectedAlgorithms] = useState<string[]>([]);
-  const [customAlgoInput, setCustomAlgoInput] = useState<string>('');
-  const [durationMins, setDurationMins] = useState<number>(30);
+  const [selectedDomain, setSelectedDomain] = useState<string>(initialDomain);
+  const [durationMins, setDurationMins] = useState<number>(45);
   const [simulationMode, setSimulationMode] = useState<'PRACTICE' | 'REALISTIC' | 'CHALLENGE'>('REALISTIC');
 
   // Loading & session state
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [createdSessionId, setCreatedSessionId] = useState<string | null>(null);
-  const [prepMessage, setPrepMessage] = useState<string>('');
 
   // Device Check States (Step 3)
   const [cameraStatus, setCameraStatus] = useState<'IDLE' | 'TESTING' | 'PASS' | 'FAIL'>('IDLE');
@@ -139,24 +108,9 @@ export default function CodingSetupForm() {
   const [micVolume, setMicVolume] = useState<number>(0);
   const [isPlayingAudioTest, setIsPlayingAudioTest] = useState<boolean>(false);
 
-  // Filtered Roles
   const filteredRoles = POPULAR_ROLES.filter((r) =>
     r.toLowerCase().includes(roleSearch.toLowerCase())
   );
-
-  const toggleAlgorithm = (algo: string) => {
-    setSelectedAlgorithms((prev) =>
-      prev.includes(algo) ? prev.filter((a) => a !== algo) : [...prev, algo]
-    );
-  };
-
-  const handleAddCustomAlgo = () => {
-    const trimmed = customAlgoInput.trim();
-    if (trimmed && !selectedAlgorithms.includes(trimmed)) {
-      setSelectedAlgorithms((prev) => [...prev, trimmed]);
-      setCustomAlgoInput('');
-    }
-  };
 
   // Hardware Initialization for Step 3
   useEffect(() => {
@@ -189,7 +143,6 @@ export default function CodingSetupForm() {
           videoRef.current.srcObject = stream;
         }
 
-        // Setup Audio Analyser
         const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
         if (AudioContextClass) {
           audioContext = new AudioContextClass();
@@ -229,7 +182,6 @@ export default function CodingSetupForm() {
     };
   }, [wizardStep]);
 
-  // Audio Playback Tone Test
   const handleTestAudioPlayback = () => {
     setIsPlayingAudioTest(true);
     try {
@@ -258,7 +210,6 @@ export default function CodingSetupForm() {
     }
   };
 
-  // Fullscreen Request
   const handleRequestFullscreen = async () => {
     try {
       if (!document.fullscreenElement) {
@@ -270,28 +221,17 @@ export default function CodingSetupForm() {
     }
   };
 
-  // Create Session and Proceed to Launch
   const handleProceedToLaunch = async () => {
     setIsSubmitting(true);
-    setPrepMessage('Configuring your IDE sandbox and loading problem set...');
-
     try {
-      const response = await apiClient.post('/interview/coding/session', {
-        targetRole,
-        track: selectedTrack,
-        focusAreas: selectedAlgorithms.length > 0 ? selectedAlgorithms : [selectedTrack],
-        durationMins,
-        simulationMode,
-        difficulty: simulationMode === 'CHALLENGE' ? 'HARD' : 'MEDIUM',
-      });
-
-      const newSession = response.data?.session || response.data;
-      const sessionId = newSession?.id || `coding-${Date.now()}`;
+      const probs = await systemDesignApi.getProblems();
+      const targetProb = probs.find((p) => p.category === selectedDomain) || probs[0] || { id: 'tinyurl' };
+      const sessionId = await createAndLoadSession(targetProb.id);
       setCreatedSessionId(sessionId);
       setWizardStep(4);
     } catch (err) {
-      console.warn('Backend session creation fallback:', err);
-      const fallbackId = `coding-${Date.now()}`;
+      console.warn('System design session launch fallback:', err);
+      const fallbackId = `sd-${Date.now()}`;
       setCreatedSessionId(fallbackId);
       setWizardStep(4);
     } finally {
@@ -299,13 +239,12 @@ export default function CodingSetupForm() {
     }
   };
 
-  // Final Start Coding Room
-  const handleStartRoom = () => {
-    const targetId = createdSessionId || `coding-${Date.now()}`;
-    navigate(`/coding/${targetId}`);
+  const handleStartStudio = () => {
+    const targetId = createdSessionId || `sd-${Date.now()}`;
+    navigate(`/system-design/studio/${targetId}`);
   };
 
-  const selectedTrackObj = CODING_PRACTICE_TRACKS.find((t) => t.id === selectedTrack) || CODING_PRACTICE_TRACKS[0];
+  const selectedDomainObj = ARCHITECTURE_DOMAINS.find((d) => d.id === selectedDomain) || ARCHITECTURE_DOMAINS[0];
 
   return (
     <div className="min-h-screen bg-[#F4F7FC] text-slate-900 py-8 px-4 sm:px-6 lg:px-8 font-sans">
@@ -318,7 +257,7 @@ export default function CodingSetupForm() {
               if (wizardStep > 1) {
                 setWizardStep(wizardStep - 1);
               } else {
-                navigate('/coding');
+                navigate('/system-design');
               }
             }}
             className="flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
@@ -327,7 +266,7 @@ export default function CodingSetupForm() {
             <span>{wizardStep === 1 ? 'Back to Command Center' : 'Previous Step'}</span>
           </button>
 
-          {/* Stepper Progress Indicator */}
+          {/* Stepper Progress */}
           <div className="flex items-center gap-3">
             {[
               { num: 1, label: 'Prepare' },
@@ -365,52 +304,49 @@ export default function CodingSetupForm() {
           </div>
         </div>
 
-        {/* ─── STEP 1: CONFIGURE INTERVIEW (PREPARE) ─── */}
+        {/* ─── STEP 1: CONFIGURE (PREPARE) ─── */}
         {wizardStep === 1 && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             className="space-y-6"
           >
-            {/* Header Card */}
             <div className="bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-8 shadow-xs space-y-2">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold">
                 <Sparkles size={13} />
-                <span>AI Coding Assessment Setup</span>
+                <span>AI System Design Studio Setup</span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-black text-slate-950 tracking-tight font-display">
-                Customize Your Coding Session
+                Customize Your System Design Round
               </h1>
               <p className="text-xs sm:text-sm text-slate-500 font-medium">
-                Choose your target engineering role and practice track. You can write your solution in JavaScript, TypeScript, Python, Java, C++, or Go inside the room.
+                Choose your target engineering seniority and architecture domain to initialize the interactive whiteboard canvas.
               </p>
             </div>
 
-            {/* 1. Target Role Selector */}
+            {/* 1. Target Seniority / Role */}
             <Card className="p-6 bg-white border-slate-200/80 shadow-xs rounded-3xl space-y-4">
               <div className="space-y-1 border-b border-slate-100 pb-3">
                 <div className="flex items-center gap-2 text-slate-900 font-bold text-sm">
                   <Briefcase size={16} className="text-blue-600" />
-                  <span>1. Target Engineering Role</span>
+                  <span>1. Target Engineering Role & Level</span>
                 </div>
                 <p className="text-xs text-slate-500">
-                  Select the role you are targeting to tailor the complexity and discussion.
+                  Select your seniority level to adjust Socratic depth, SPOF detection, and rubric scoring.
                 </p>
               </div>
 
-              {/* Search Bar */}
               <div className="relative">
                 <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
                   type="text"
-                  placeholder="Search role (e.g. Frontend, Backend, AI/ML, Full Stack)..."
+                  placeholder="Search role / seniority..."
                   value={roleSearch}
                   onChange={(e) => setRoleSearch(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-hidden focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
+                  className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-hidden focus:border-blue-500"
                 />
               </div>
 
-              {/* Role Badges Grid */}
               <div className="flex flex-wrap gap-2">
                 {filteredRoles.map((role) => {
                   const isSelected = targetRole === role;
@@ -432,27 +368,27 @@ export default function CodingSetupForm() {
               </div>
             </Card>
 
-            {/* 2. Practice Domain / Track */}
+            {/* 2. Architecture Domain */}
             <Card className="p-6 bg-white border-slate-200/80 shadow-xs rounded-3xl space-y-4">
               <div className="space-y-1 border-b border-slate-100 pb-3">
                 <div className="flex items-center gap-2 text-slate-900 font-bold text-sm">
-                  <Code2 size={16} className="text-purple-600" />
-                  <span>2. Practice Track & Problem Domain</span>
+                  <Network size={16} className="text-purple-600" />
+                  <span>2. Architecture Domain</span>
                 </div>
                 <p className="text-xs text-slate-500">
-                  What would you like to practice in this session?
+                  Select the system architecture domain you want to design and defend.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-                {CODING_PRACTICE_TRACKS.map((track) => {
-                  const Icon = track.icon;
-                  const isSelected = selectedTrack === track.id;
+                {ARCHITECTURE_DOMAINS.map((domain) => {
+                  const Icon = domain.icon;
+                  const isSelected = selectedDomain === domain.id;
 
                   return (
                     <div
-                      key={track.id}
-                      onClick={() => setSelectedTrack(track.id)}
+                      key={domain.id}
+                      onClick={() => setSelectedDomain(domain.id)}
                       className={`p-4 rounded-2xl border transition-all cursor-pointer space-y-2 relative ${
                         isSelected
                           ? 'bg-blue-50/60 border-blue-600 ring-2 ring-blue-500/20 shadow-xs'
@@ -468,12 +404,12 @@ export default function CodingSetupForm() {
                         <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                           isSelected ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'
                         }`}>
-                          {track.badge}
+                          {domain.badge}
                         </span>
                       </div>
                       <div>
-                        <h4 className="text-xs font-bold text-slate-900">{track.title}</h4>
-                        <p className="text-[11px] text-slate-500 leading-snug mt-0.5">{track.desc}</p>
+                        <h4 className="text-xs font-bold text-slate-900">{domain.title}</h4>
+                        <p className="text-[11px] text-slate-500 leading-snug mt-0.5">{domain.desc}</p>
                       </div>
                     </div>
                   );
@@ -481,73 +417,19 @@ export default function CodingSetupForm() {
               </div>
             </Card>
 
-            {/* 3. Optional Algorithm & Specific Focus */}
-            <Card className="p-6 bg-white border-slate-200/80 shadow-xs rounded-3xl space-y-4">
-              <div className="space-y-1 border-b border-slate-100 pb-3">
-                <div className="flex items-center gap-2 text-slate-900 font-bold text-sm">
-                  <Target size={16} className="text-amber-600" />
-                  <span>3. Specific Topics / Algorithms (Optional)</span>
-                </div>
-                <p className="text-xs text-slate-500">
-                  Select specific algorithms or topics you want Ava to emphasize during the session.
-                </p>
-              </div>
-
-              <div className="flex flex-wrap gap-2">
-                {PREDEFINED_ALGORITHMS.map((algo) => {
-                  const isSelected = selectedAlgorithms.includes(algo);
-                  return (
-                    <button
-                      key={algo}
-                      type="button"
-                      onClick={() => toggleAlgorithm(algo)}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
-                        isSelected
-                          ? 'bg-amber-600 text-white border-amber-600 shadow-xs'
-                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
-                      }`}
-                    >
-                      {isSelected ? `✓ ${algo}` : algo}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Custom Algorithm Input */}
-              <div className="flex items-center gap-2 pt-1">
-                <input
-                  type="text"
-                  placeholder="Add custom topic (e.g. Radix Sort, Segment Tree, Redux Thunk)..."
-                  value={customAlgoInput}
-                  onChange={(e) => setCustomAlgoInput(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddCustomAlgo())}
-                  className="flex-1 px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-hidden focus:border-blue-500"
-                />
-                <Button
-                  type="button"
-                  onClick={handleAddCustomAlgo}
-                  className="bg-slate-900 hover:bg-slate-800 text-white text-xs px-4 py-2 rounded-xl font-bold"
-                >
-                  <Plus size={14} className="mr-1" /> Add
-                </Button>
-              </div>
-            </Card>
-
-            {/* 4. Duration & Simulation Strictness Mode */}
+            {/* 3. Duration & Strictness */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              
-              {/* Duration Card */}
               <Card className="p-6 bg-white border-slate-200/80 shadow-xs rounded-3xl space-y-4">
                 <div className="space-y-1 border-b border-slate-100 pb-3">
                   <div className="flex items-center gap-2 text-slate-900 font-bold text-sm">
                     <Clock size={16} className="text-blue-600" />
-                    <span>4. Session Duration</span>
+                    <span>3. Session Duration</span>
                   </div>
-                  <p className="text-xs text-slate-500">Set total interview time limit.</p>
+                  <p className="text-xs text-slate-500">Design whiteboard time limit.</p>
                 </div>
 
-                <div className="grid grid-cols-4 gap-2">
-                  {[15, 30, 45, 60].map((mins) => (
+                <div className="grid grid-cols-3 gap-2">
+                  {[30, 45, 60].map((mins) => (
                     <button
                       key={mins}
                       type="button"
@@ -564,21 +446,20 @@ export default function CodingSetupForm() {
                 </div>
               </Card>
 
-              {/* Simulation Mode Card */}
               <Card className="p-6 bg-white border-slate-200/80 shadow-xs rounded-3xl space-y-4">
                 <div className="space-y-1 border-b border-slate-100 pb-3">
                   <div className="flex items-center gap-2 text-slate-900 font-bold text-sm">
                     <ShieldCheck size={16} className="text-emerald-600" />
-                    <span>5. Simulation Strictness</span>
+                    <span>4. Simulation Strictness</span>
                   </div>
-                  <p className="text-xs text-slate-500">AI hint allowance and time behavior.</p>
+                  <p className="text-xs text-slate-500">AI probing frequency & hint mode.</p>
                 </div>
 
                 <div className="grid grid-cols-3 gap-2">
                   {[
-                    { id: 'PRACTICE', label: 'Learning', sub: 'Hints allowed' },
-                    { id: 'REALISTIC', label: 'Realistic', sub: 'FAANG level' },
-                    { id: 'CHALLENGE', label: 'Hardcore', sub: 'Strict & timed' },
+                    { id: 'PRACTICE', label: 'Learning', sub: 'Hints enabled' },
+                    { id: 'REALISTIC', label: 'Realistic', sub: 'FAANG strict' },
+                    { id: 'CHALLENGE', label: 'Hardcore', sub: 'Staff level' },
                   ].map((mode) => (
                     <button
                       key={mode.id}
@@ -600,10 +481,8 @@ export default function CodingSetupForm() {
                   ))}
                 </div>
               </Card>
-
             </div>
 
-            {/* Bottom Proceed Button */}
             <div className="flex justify-end pt-2">
               <Button
                 onClick={() => setWizardStep(2)}
@@ -616,7 +495,7 @@ export default function CodingSetupForm() {
           </motion.div>
         )}
 
-        {/* ─── STEP 2: REVIEW & CONFIRM PLAN ─── */}
+        {/* ─── STEP 2: REVIEW ─── */}
         {wizardStep === 2 && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -626,62 +505,40 @@ export default function CodingSetupForm() {
             <div className="bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-8 shadow-xs space-y-2">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold">
                 <CheckCircle2 size={13} />
-                <span>Session Summary</span>
+                <span>Architecture Blueprint</span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-black text-slate-950 tracking-tight font-display">
-                Review Your Assessment Blueprint
+                Review Your System Design Plan
               </h1>
               <p className="text-xs sm:text-sm text-slate-500 font-medium">
-                Verify your chosen focus area, duration, and proctoring rules before checking hardware.
+                Verify your chosen architecture domain and duration before device check.
               </p>
             </div>
 
             <Card className="p-6 bg-white border-slate-200/80 shadow-xs rounded-3xl space-y-6 divide-y divide-slate-100">
-              
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pb-2">
                 <div className="space-y-1">
-                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Target Role</span>
+                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Target Seniority</span>
                   <p className="text-base font-black text-slate-900">{targetRole}</p>
                 </div>
 
                 <div className="space-y-1">
-                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Practice Track</span>
-                  <p className="text-base font-black text-slate-900">{selectedTrackObj.title}</p>
+                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Architecture Domain</span>
+                  <p className="text-base font-black text-slate-900">{selectedDomainObj.title}</p>
                 </div>
 
                 <div className="space-y-1">
-                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Session Duration</span>
+                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Whiteboard Duration</span>
                   <p className="text-base font-black text-slate-900">{durationMins} Minutes Timed</p>
                 </div>
 
                 <div className="space-y-1">
                   <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Simulation Strictness</span>
                   <p className="text-base font-black text-slate-900">
-                    {simulationMode === 'PRACTICE' ? 'Learning Mode (Hints Allowed)' : simulationMode === 'REALISTIC' ? 'Realistic FAANG Standard' : 'Hardcore Timed Challenge'}
+                    {simulationMode === 'PRACTICE' ? 'Learning Mode (Hints Allowed)' : simulationMode === 'REALISTIC' ? 'Realistic FAANG Standard' : 'Hardcore Staff Level'}
                   </p>
                 </div>
               </div>
-
-              {selectedAlgorithms.length > 0 && (
-                <div className="pt-4 space-y-2">
-                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Specific Topics Selected</span>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedAlgorithms.map((algo) => (
-                      <span key={algo} className="px-3 py-1 rounded-xl bg-blue-50 text-blue-700 text-xs font-bold border border-blue-100">
-                        {algo}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div className="pt-4 space-y-2">
-                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">IDE Language Selection</span>
-                <p className="text-xs text-slate-600">
-                  You can freely choose and switch your programming language (Python, JavaScript, TypeScript, Java, C++, Go) directly inside the Monaco editor during the session.
-                </p>
-              </div>
-
             </Card>
 
             <div className="flex items-center justify-between pt-2">
@@ -704,7 +561,7 @@ export default function CodingSetupForm() {
           </motion.div>
         )}
 
-        {/* ─── STEP 3: PRE-FLIGHT HARDWARE & PROCTORING CHECK (ALLOW) ─── */}
+        {/* ─── STEP 3: DEVICE CHECK ─── */}
         {wizardStep === 3 && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -714,19 +571,17 @@ export default function CodingSetupForm() {
             <div className="bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-8 shadow-xs space-y-2">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold">
                 <ShieldCheck size={13} />
-                <span>Device & System Verification</span>
+                <span>Device Verification</span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-black text-slate-950 tracking-tight font-display">
                 Pre-Flight Hardware Check
               </h1>
               <p className="text-xs sm:text-sm text-slate-500 font-medium">
-                Verify your webcam, microphone, audio output, and browser fullscreen mode for an uninterrupted assessment.
+                Verify your camera, microphone, and audio to interact with your Socratic AI Architect.
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-              
-              {/* Webcam Feed (6 Cols) */}
               <Card className="md:col-span-6 p-5 bg-white border-slate-200/80 shadow-xs rounded-3xl space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-xs font-bold text-slate-900">
@@ -734,9 +589,9 @@ export default function CodingSetupForm() {
                     <span>Live Video Feed</span>
                   </div>
                   <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                    cameraStatus === 'PASS' ? 'bg-emerald-100 text-emerald-800' : cameraStatus === 'FAIL' ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800'
+                    cameraStatus === 'PASS' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'
                   }`}>
-                    {cameraStatus === 'PASS' ? 'Camera Connected' : cameraStatus === 'FAIL' ? 'Permission Denied' : 'Checking...'}
+                    {cameraStatus === 'PASS' ? 'Camera Connected' : 'Checking...'}
                   </span>
                 </div>
 
@@ -748,15 +603,8 @@ export default function CodingSetupForm() {
                     muted
                     className="w-full h-full object-cover scale-x-[-1]"
                   />
-                  {cameraStatus !== 'PASS' && (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/90 text-white p-4 text-center space-y-2">
-                      <Camera size={24} className="text-slate-400" />
-                      <p className="text-xs text-slate-300">Grant camera access in browser</p>
-                    </div>
-                  )}
                 </div>
 
-                {/* Mic Audio Level */}
                 <div className="space-y-1.5 pt-1">
                   <div className="flex items-center justify-between text-xs font-bold">
                     <span className="text-slate-700 flex items-center gap-1.5">
@@ -774,10 +622,7 @@ export default function CodingSetupForm() {
                 </div>
               </Card>
 
-              {/* Speaker & Fullscreen Check (6 Cols) */}
               <div className="md:col-span-6 space-y-4">
-                
-                {/* Speaker Test Card */}
                 <Card className="p-5 bg-white border-slate-200/80 shadow-xs rounded-3xl space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-xs font-bold text-slate-900">
@@ -792,7 +637,7 @@ export default function CodingSetupForm() {
                   </div>
 
                   <p className="text-xs text-slate-500 leading-relaxed">
-                    Test your audio output to ensure you can hear Ava's Socratic questions and code feedback clearly.
+                    Test your audio output to ensure you can hear the AI Architect's questions.
                   </p>
 
                   <Button
@@ -806,12 +651,11 @@ export default function CodingSetupForm() {
                   </Button>
                 </Card>
 
-                {/* Fullscreen Mode Card */}
                 <Card className="p-5 bg-white border-slate-200/80 shadow-xs rounded-3xl space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-xs font-bold text-slate-900">
                       <Maximize size={16} className="text-indigo-600" />
-                      <span>Fullscreen Proctoring Mode</span>
+                      <span>Fullscreen Whiteboard Canvas</span>
                     </div>
                     <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                       fullscreenStatus === 'PASS' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'
@@ -819,10 +663,6 @@ export default function CodingSetupForm() {
                       {fullscreenStatus === 'PASS' ? 'Fullscreen Ready' : 'Optional'}
                     </span>
                   </div>
-
-                  <p className="text-xs text-slate-500 leading-relaxed">
-                    Lock the Monaco IDE in full screen to minimize distractions and maximize code editor workspace.
-                  </p>
 
                   <Button
                     type="button"
@@ -833,7 +673,6 @@ export default function CodingSetupForm() {
                     <span>Enable Fullscreen Mode</span>
                   </Button>
                 </Card>
-
               </div>
             </div>
 
@@ -851,14 +690,14 @@ export default function CodingSetupForm() {
                 disabled={isSubmitting}
                 className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold text-sm px-8 py-3.5 rounded-full shadow-md shadow-emerald-500/20 inline-flex items-center gap-2 cursor-pointer disabled:opacity-50"
               >
-                <span>{isSubmitting ? prepMessage || 'Initializing...' : 'Proceed to Launch Room'}</span>
+                <span>{isSubmitting ? 'Booting Studio Canvas...' : 'Proceed to Launch Canvas'}</span>
                 <ArrowRight size={16} />
               </Button>
             </div>
           </motion.div>
         )}
 
-        {/* ─── STEP 4: AI WELCOME & ROOM LAUNCH (HELLO) ─── */}
+        {/* ─── STEP 4: LAUNCH (HELLO) ─── */}
         {wizardStep === 4 && (
           <motion.div
             initial={{ opacity: 0, scale: 0.98 }}
@@ -867,12 +706,11 @@ export default function CodingSetupForm() {
           >
             <div className="bg-white border border-slate-200/80 rounded-3xl p-8 shadow-xs text-center space-y-6 max-w-2xl mx-auto">
               
-              {/* 3D Interviewer Avatar Preview Badge */}
               <div className="relative w-28 h-28 mx-auto rounded-3xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-600 p-1 shadow-lg shadow-blue-500/25">
                 <div className="w-full h-full rounded-[22px] overflow-hidden bg-slate-950 flex items-center justify-center">
                   <img
-                    src="/images/coding_hero_3d.jpg"
-                    alt="AI Interviewer"
+                    src="/images/male_interviewer_3d.jpg"
+                    alt="AI Architect"
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -883,20 +721,20 @@ export default function CodingSetupForm() {
 
               <div className="space-y-2">
                 <h2 className="text-2xl sm:text-3xl font-black text-slate-950 font-display tracking-tight">
-                  Your AI Interviewer is Ready!
+                  Your AI Architect is Ready!
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-600 max-w-md mx-auto leading-relaxed">
-                  Ava will introduce the problem, observe your coding approach, analyze edge cases, and provide progressive hints if requested.
+                  Design your architecture graph on the canvas, calculate capacity, and defend your design decisions.
                 </p>
               </div>
 
               <div className="bg-blue-50/70 border border-blue-100 rounded-2xl p-4 text-left max-w-md mx-auto space-y-2 text-xs">
                 <div className="flex items-center justify-between text-slate-700 font-bold">
-                  <span>Track:</span>
-                  <span className="text-blue-700">{selectedTrackObj.title}</span>
+                  <span>Domain:</span>
+                  <span className="text-blue-700">{selectedDomainObj.title}</span>
                 </div>
                 <div className="flex items-center justify-between text-slate-700 font-bold">
-                  <span>Role:</span>
+                  <span>Level:</span>
                   <span className="text-slate-900">{targetRole}</span>
                 </div>
                 <div className="flex items-center justify-between text-slate-700 font-bold">
@@ -907,11 +745,11 @@ export default function CodingSetupForm() {
 
               <div className="pt-2">
                 <Button
-                  onClick={handleStartRoom}
+                  onClick={handleStartStudio}
                   className="w-full max-w-md mx-auto bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-extrabold text-base py-4 rounded-2xl shadow-xl shadow-blue-500/30 flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-98"
                 >
                   <Play size={18} fill="currentColor" />
-                  <span>Enter Live Coding Room</span>
+                  <span>Enter System Design Studio</span>
                 </Button>
               </div>
 

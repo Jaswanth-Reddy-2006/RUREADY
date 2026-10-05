@@ -610,7 +610,7 @@ export default function Dashboard() {
               </div>
               <button
                 type="button"
-                onClick={() => navigate('/oral/new')}
+                onClick={() => navigate('/video/new')}
                 className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition-all inline-flex items-center gap-1.5 cursor-pointer"
               >
                 <span>Start First Assessment</span>
@@ -680,7 +680,7 @@ export default function Dashboard() {
               </div>
               <button
                 type="button"
-                onClick={() => navigate('/oral/new')}
+                onClick={() => navigate('/video/new')}
                 className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition-all inline-flex items-center gap-1.5 cursor-pointer"
               >
                 <span>Start Your First Interview</span>
@@ -877,7 +877,7 @@ export default function Dashboard() {
                 desc: 'Live observed Monaco coding challenges & oral AI assessments.',
                 status: completedSessions.length > 0 ? 'In Progress' : 'Up Next',
                 progress: Math.min(100, completedSessions.length * 25),
-                href: '/oral/new',
+                href: '/video/new',
                 actionText: 'Mock Interview',
               },
               {
@@ -966,7 +966,7 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
             <button
               type="button"
-              onClick={() => navigate('/oral/new')}
+              onClick={() => navigate('/video/new')}
               className="p-3.5 rounded-2xl bg-blue-50/60 hover:bg-blue-100/70 border border-blue-200 text-left transition-all flex items-center gap-3 cursor-pointer group"
             >
               <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-xs">

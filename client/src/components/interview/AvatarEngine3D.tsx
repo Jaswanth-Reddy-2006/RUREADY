@@ -343,9 +343,9 @@ export default function AvatarEngine3D({
         if (dict['viseme_aa'] !== undefined) {
           for (const v of oculusVisemeList) {
             if (dict[v] !== undefined) {
-              const maxIntensity = (v === 'viseme_aa' || v === 'viseme_O' || v === 'viseme_E') ? 0.36 : 0.28;
+              const maxIntensity = (v === 'viseme_aa' || v === 'viseme_O' || v === 'viseme_E') ? 0.25 : 0.18;
               const target = frameState.viseme === v ? maxIntensity : 0.0;
-              const lerpFactor = target > inf[dict[v]] ? 0.38 : 0.22;
+              const lerpFactor = target > inf[dict[v]] ? 0.34 : 0.18;
               inf[dict[v]] = THREE.MathUtils.lerp(inf[dict[v]], target, lerpFactor);
             }
           }
@@ -362,14 +362,14 @@ export default function AvatarEngine3D({
         let gazeX = eyeGaze.lookX * 0.35;
         let gazeY = eyeGaze.lookY * 0.35;
         if (currentState === 'THINKING') {
-          gazeX = 0.12;
-          gazeY = 0.10;
+          gazeX = 0.10;
+          gazeY = 0.08;
         }
 
-        if (dict['eyeLookInLeft'] !== undefined) inf[dict['eyeLookInLeft']] = Math.min(0.20, Math.max(0, gazeX));
-        if (dict['eyeLookOutRight'] !== undefined) inf[dict['eyeLookOutRight']] = Math.min(0.20, Math.max(0, gazeX));
-        if (dict['eyeLookUpLeft'] !== undefined) inf[dict['eyeLookUpLeft']] = Math.min(0.18, Math.max(0, gazeY));
-        if (dict['eyeLookUpRight'] !== undefined) inf[dict['eyeLookUpRight']] = Math.min(0.18, Math.max(0, gazeY));
+        if (dict['eyeLookInLeft'] !== undefined) inf[dict['eyeLookInLeft']] = Math.min(0.18, Math.max(0, gazeX));
+        if (dict['eyeLookOutRight'] !== undefined) inf[dict['eyeLookOutRight']] = Math.min(0.18, Math.max(0, gazeX));
+        if (dict['eyeLookUpLeft'] !== undefined) inf[dict['eyeLookUpLeft']] = Math.min(0.15, Math.max(0, gazeY));
+        if (dict['eyeLookUpRight'] !== undefined) inf[dict['eyeLookUpRight']] = Math.min(0.15, Math.max(0, gazeY));
 
         // 2. ARKit Blendshapes & Situational Expressions Driver
         const isMouthShape = (name: string) => /^(jawOpen|mouthFunnel|mouthPucker|mouthStretch|mouthLowerDown|mouthUpperUp|mouthPress|mouthRoll|mouthDimple|mouthClose)/.test(name);
@@ -379,35 +379,35 @@ export default function AvatarEngine3D({
           if (dict[bsName] !== undefined && typeof bsVal === 'number') {
             let targetVal = bsVal;
             
-            // If model does not have native Oculus visemes, inject ARKit viseme weights
+            // If model does not have native Oculus visemes, inject calibrated ARKit viseme weights
             if (dict['viseme_aa'] === undefined && activeVisemeARKit[bsName] !== undefined) {
               targetVal = Math.max(targetVal, activeVisemeARKit[bsName]);
             }
 
             // Situational enhancements
             if (currentState === 'LISTENING') {
-              if (bsName === 'mouthSmileLeft' || bsName === 'mouthSmileRight') targetVal = Math.max(targetVal, 0.14);
-              if (bsName === 'browInnerUp') targetVal = Math.max(targetVal, 0.10);
+              if (bsName === 'mouthSmileLeft' || bsName === 'mouthSmileRight') targetVal = Math.max(targetVal, 0.10);
+              if (bsName === 'browInnerUp') targetVal = Math.max(targetVal, 0.08);
             } else if (currentState === 'THINKING') {
-              if (bsName === 'browDownLeft' || bsName === 'browDownRight') targetVal = Math.max(targetVal, 0.08);
+              if (bsName === 'browDownLeft' || bsName === 'browDownRight') targetVal = Math.max(targetVal, 0.06);
               if (bsName === 'mouthSmileLeft' || bsName === 'mouthSmileRight') targetVal = Math.min(targetVal, 0.04);
             } else if (currentState === 'REACTING') {
-              if (bsName === 'mouthSmileLeft' || bsName === 'mouthSmileRight') targetVal = Math.max(targetVal, 0.20);
-              if (bsName === 'browInnerUp') targetVal = Math.max(targetVal, 0.12);
+              if (bsName === 'mouthSmileLeft' || bsName === 'mouthSmileRight') targetVal = Math.max(targetVal, 0.16);
+              if (bsName === 'browInnerUp') targetVal = Math.max(targetVal, 0.10);
             } else if (currentState === 'IDLE') {
               if (bsName === 'mouthSmileLeft' || bsName === 'mouthSmileRight') targetVal = Math.max(targetVal, 0.06);
             }
 
-            const maxLimit = isMouthShape(bsName) ? 0.40 : 0.25;
+            const maxLimit = isMouthShape(bsName) ? 0.28 : 0.20;
             const clamped = Math.min(maxLimit, Math.max(0, targetVal));
-            const lerpSpeed = isMouthShape(bsName) ? 0.32 : 0.18;
+            const lerpSpeed = isMouthShape(bsName) ? 0.30 : 0.16;
             inf[dict[bsName]] = THREE.MathUtils.lerp(inf[dict[bsName]], clamped, lerpSpeed);
           }
         }
 
-        // Idle gentle jaw breathing when silent
+        // Idle gentle breathing when silent
         if (dict['jawOpen'] !== undefined && frameState.viseme === 'viseme_sil') {
-          inf[dict['jawOpen']] = THREE.MathUtils.lerp(inf[dict['jawOpen']], Math.sin(breathPhase * 0.9) * 0.012, 0.1);
+          inf[dict['jawOpen']] = THREE.MathUtils.lerp(inf[dict['jawOpen']], Math.sin(breathPhase * 0.8) * 0.008, 0.08);
         }
       }
 

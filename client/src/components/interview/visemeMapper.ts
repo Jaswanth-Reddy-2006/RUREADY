@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════════
 // R U Ready? — Oculus Visemes & ARKit Blendshapes Mapping Engine
+// Calibrated for natural, human-like speech kinematics (Wav2Lip / Audio2Face)
 // ═══════════════════════════════════════════════════════════════
 
 export type OculusViseme =
@@ -67,8 +68,8 @@ export const DEFAULT_ARKIT_BLENDSHAPES: ARKitBlendshapes = {
   jawOpen: 0,
   mouthFunnel: 0,
   mouthPucker: 0,
-  mouthSmileLeft: 0.12,
-  mouthSmileRight: 0.12,
+  mouthSmileLeft: 0.08,
+  mouthSmileRight: 0.08,
   mouthStretchLeft: 0,
   mouthStretchRight: 0,
   mouthRollLower: 0,
@@ -83,7 +84,7 @@ export const DEFAULT_ARKIT_BLENDSHAPES: ARKitBlendshapes = {
   mouthDimpleRight: 0,
   mouthFrownLeft: 0,
   mouthFrownRight: 0,
-  browInnerUp: 0.05,
+  browInnerUp: 0.04,
   browOuterUpLeft: 0,
   browOuterUpRight: 0,
   browDownLeft: 0,
@@ -115,124 +116,126 @@ export const OCULUS_VISEME_WEIGHTS: Record<OculusViseme, Partial<ARKitBlendshape
     mouthFunnel: 0,
     mouthPressLeft: 0,
     mouthPressRight: 0,
+    mouthSmileLeft: 0.06,
+    mouthSmileRight: 0.06,
   },
   viseme_PP: { 
-    // Plosive: P, B, M - lips pressed together gently with slight roll
-    jawOpen: 0.01, 
-    mouthPucker: 0.08, 
-    mouthPressLeft: 0.28, 
-    mouthPressRight: 0.28, 
-    mouthRollLower: 0.18, 
-    mouthRollUpper: 0.12 
+    // Plosive: P, B, M - lips pressed gently
+    jawOpen: 0.0, 
+    mouthPucker: 0.04, 
+    mouthPressLeft: 0.22, 
+    mouthPressRight: 0.22, 
+    mouthRollLower: 0.12, 
+    mouthRollUpper: 0.08 
   },
   viseme_FF: { 
-    // Labiodental: F, V - lower lip pulled slightly under upper incisors
-    jawOpen: 0.05, 
-    mouthRollLower: 0.22, 
-    mouthUpperUpLeft: 0.08, 
-    mouthUpperUpRight: 0.08, 
-    mouthStretchLeft: 0.14, 
-    mouthStretchRight: 0.14 
+    // Labiodental: F, V - lower lip tucked under upper incisors
+    jawOpen: 0.04, 
+    mouthRollLower: 0.18, 
+    mouthUpperUpLeft: 0.06, 
+    mouthUpperUpRight: 0.06, 
+    mouthStretchLeft: 0.10, 
+    mouthStretchRight: 0.10 
   },
   viseme_TH: { 
     // Dental: TH - tongue tip between teeth, relaxed mouth
-    jawOpen: 0.09, 
-    mouthFunnel: 0.06, 
-    mouthStretchLeft: 0.10, 
-    mouthStretchRight: 0.10,
-    tongueOut: 0.22
+    jawOpen: 0.07, 
+    mouthFunnel: 0.04, 
+    mouthStretchLeft: 0.08, 
+    mouthStretchRight: 0.08,
+    tongueOut: 0.18
   },
   viseme_DD: { 
     // Alveolar: T, D, N - tongue to ridge behind upper teeth
-    jawOpen: 0.12, 
-    mouthStretchLeft: 0.16, 
-    mouthStretchRight: 0.16,
-    mouthLowerDownLeft: 0.08,
-    mouthLowerDownRight: 0.08
-  },
-  viseme_kk: { 
-    // Velar: K, G, NG - mouth slightly open, tongue raised at back
-    jawOpen: 0.16, 
-    mouthStretchLeft: 0.18, 
-    mouthStretchRight: 0.18,
-    mouthLowerDownLeft: 0.09,
-    mouthLowerDownRight: 0.09
-  },
-  viseme_CH: { 
-    // Affricate: CH, J, SH - teeth closed, lips slightly flared
-    jawOpen: 0.11, 
-    mouthPucker: 0.22, 
-    mouthFunnel: 0.18,
-    mouthUpperUpLeft: 0.08,
-    mouthUpperUpRight: 0.08
-  },
-  viseme_SS: { 
-    // Sibilant: S, Z - incisors together, lips pulled wide
-    jawOpen: 0.05, 
-    mouthStretchLeft: 0.24, 
-    mouthStretchRight: 0.24, 
-    mouthSmileLeft: 0.15, 
-    mouthSmileRight: 0.15 
-  },
-  viseme_nn: { 
-    // Nasal: N, L - tongue pressed up, mouth partially parted
-    jawOpen: 0.10, 
+    jawOpen: 0.09, 
     mouthStretchLeft: 0.12, 
     mouthStretchRight: 0.12,
     mouthLowerDownLeft: 0.06,
     mouthLowerDownRight: 0.06
   },
+  viseme_kk: { 
+    // Velar: K, G, NG - mouth slightly open, tongue raised at back
+    jawOpen: 0.12, 
+    mouthStretchLeft: 0.14, 
+    mouthStretchRight: 0.14,
+    mouthLowerDownLeft: 0.06,
+    mouthLowerDownRight: 0.06
+  },
+  viseme_CH: { 
+    // Affricate: CH, J, SH - teeth together, lips slightly flared
+    jawOpen: 0.08, 
+    mouthPucker: 0.16, 
+    mouthFunnel: 0.12,
+    mouthUpperUpLeft: 0.06,
+    mouthUpperUpRight: 0.06
+  },
+  viseme_SS: { 
+    // Sibilant: S, Z - incisors together, lips pulled in gentle horizontal stretch
+    jawOpen: 0.04, 
+    mouthStretchLeft: 0.18, 
+    mouthStretchRight: 0.18, 
+    mouthSmileLeft: 0.12, 
+    mouthSmileRight: 0.12 
+  },
+  viseme_nn: { 
+    // Nasal: N, L - tongue pressed up, mouth partially parted
+    jawOpen: 0.08, 
+    mouthStretchLeft: 0.10, 
+    mouthStretchRight: 0.10,
+    mouthLowerDownLeft: 0.04,
+    mouthLowerDownRight: 0.04
+  },
   viseme_RR: { 
     // Rhotic: R - pursed and rounded
-    jawOpen: 0.10, 
-    mouthPucker: 0.24, 
-    mouthFunnel: 0.16,
-    mouthRollLower: 0.08
+    jawOpen: 0.08, 
+    mouthPucker: 0.18, 
+    mouthFunnel: 0.12,
+    mouthRollLower: 0.06
   },
   viseme_aa: { 
     // Low back vowel: AA, AH, AW - natural conversational jaw opening
-    jawOpen: 0.32, 
-    mouthFunnel: 0.12, 
-    mouthLowerDownLeft: 0.10, 
-    mouthLowerDownRight: 0.10,
-    mouthStretchLeft: 0.08, 
-    mouthStretchRight: 0.08 
+    jawOpen: 0.22, 
+    mouthFunnel: 0.08, 
+    mouthLowerDownLeft: 0.08, 
+    mouthLowerDownRight: 0.08,
+    mouthStretchLeft: 0.06, 
+    mouthStretchRight: 0.06 
   },
   viseme_E: { 
     // Mid front vowel: EH, EY, AE - wide subtle smile, mild jaw drop
-    jawOpen: 0.20, 
-    mouthStretchLeft: 0.28, 
-    mouthStretchRight: 0.28, 
-    mouthSmileLeft: 0.18, 
-    mouthSmileRight: 0.18,
-    mouthUpperUpLeft: 0.10,
-    mouthUpperUpRight: 0.10
+    jawOpen: 0.15, 
+    mouthStretchLeft: 0.20, 
+    mouthStretchRight: 0.20, 
+    mouthSmileLeft: 0.14, 
+    mouthSmileRight: 0.14,
+    mouthUpperUpLeft: 0.08,
+    mouthUpperUpRight: 0.08
   },
   viseme_I: { 
-    // High front vowel: EE, IH, Y - teeth showing, gentle horizontal stretch
-    jawOpen: 0.14, 
-    mouthStretchLeft: 0.32, 
-    mouthStretchRight: 0.32, 
-    mouthSmileLeft: 0.22, 
-    mouthSmileRight: 0.22,
-    mouthUpperUpLeft: 0.12,
-    mouthUpperUpRight: 0.12
+    // High front vowel: EE, IH, Y - gentle horizontal stretch, teeth visible
+    jawOpen: 0.10, 
+    mouthStretchLeft: 0.24, 
+    mouthStretchRight: 0.24, 
+    mouthSmileLeft: 0.16, 
+    mouthSmileRight: 0.16,
+    mouthUpperUpLeft: 0.08,
+    mouthUpperUpRight: 0.08
   },
   viseme_O: { 
     // Mid back rounded: OH, OA, AW - natural circular aperture
-    jawOpen: 0.26, 
-    mouthFunnel: 0.32, 
-    mouthPucker: 0.20, 
-    mouthRollUpper: 0.06,
-    mouthRollLower: 0.06
+    jawOpen: 0.18, 
+    mouthFunnel: 0.24, 
+    mouthPucker: 0.16, 
+    mouthRollUpper: 0.04,
+    mouthRollLower: 0.04
   },
   viseme_U: { 
     // High back rounded: OO, W, UW - subtle circular funnel
-    jawOpen: 0.12, 
-    mouthPucker: 0.35, 
-    mouthFunnel: 0.20,
-    mouthRollUpper: 0.08,
-    mouthRollLower: 0.08
+    jawOpen: 0.08, 
+    mouthPucker: 0.26, 
+    mouthFunnel: 0.16,
+    mouthRollUpper: 0.06,
+    mouthRollLower: 0.06
   },
 };
 
@@ -270,4 +273,3 @@ export function mapVisemeIdToOculus(visemeId: string): OculusViseme {
     default: return 'viseme_sil';
   }
 }
-

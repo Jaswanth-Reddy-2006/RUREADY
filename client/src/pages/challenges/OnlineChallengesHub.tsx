@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════
-// RU Ready? — Online Challenges Hub (/challenges)
+// RU Ready? — Gamified Online Challenges Hub (/challenges)
 // ═══════════════════════════════════════════════════════════════
 
 import { useState, useEffect } from 'react';
@@ -24,11 +24,23 @@ import {
   Loader2,
   X,
   ChevronRight,
+  Bug,
+  Layout,
+  Calendar,
+  TrendingUp,
+  Award,
+  RefreshCw,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '../../store/authStore';
-import { challengesApi, type ChallengeRoom, type ChallengeUserStats, type LeaderboardEntry } from '../../api/challenges';
+import {
+  challengesApi,
+  type ChallengeRoom,
+  type ChallengeUserStats,
+  type LeaderboardEntry,
+  type LeaderboardPayload,
+} from '../../api/challenges';
 import { useChallengesSocket } from '../../hooks/useChallengesSocket';
 
 export default function OnlineChallengesHub() {
@@ -47,8 +59,11 @@ export default function OnlineChallengesHub() {
     rankTier: 'BRONZE',
   });
   const [publicRooms, setPublicRooms] = useState<ChallengeRoom[]>([]);
-  const [topLeaderboard, setTopLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [activeLeaderboardTab, setActiveLeaderboardTab] = useState<'weekly' | 'monthly' | 'all_time'>('weekly');
+  const [weeklyLeaderboard, setWeeklyLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [seasonMeta, setSeasonMeta] = useState<LeaderboardPayload | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [roomFilter, setRoomFilter] = useState<'ALL' | 'BATTLE_1V1' | 'CONTEST' | 'QUIZ'>('ALL');
 
   // Matchmaking modal state
   const [isSearching, setIsSearching] = useState<boolean>(false);
@@ -73,11 +88,19 @@ export default function OnlineChallengesHub() {
   const loadHubData = async () => {
     try {
       setIsLoading(true);
-      const res = await challengesApi.getHubOverview(user?.id);
-      if (res.success && res.data) {
-        if (res.data.userStats) setStats(res.data.userStats);
-        if (res.data.publicRooms) setPublicRooms(res.data.publicRooms);
-        if (res.data.topLeaderboard) setTopLeaderboard(res.data.topLeaderboard);
+      const [hubRes, lbRes] = await Promise.all([
+        challengesApi.getHubOverview(user?.id),
+        challengesApi.getLeaderboard(activeLeaderboardTab, undefined, 5),
+      ]);
+
+      if (hubRes.success && hubRes.data) {
+        if (hubRes.data.userStats) setStats(hubRes.data.userStats);
+        if (hubRes.data.publicRooms) setPublicRooms(hubRes.data.publicRooms);
+      }
+
+      if (lbRes.success && lbRes.data) {
+        setWeeklyLeaderboard(lbRes.data.entries);
+        setSeasonMeta(lbRes.data);
       }
     } catch (err: any) {
       console.error('Failed to load challenges overview:', err);
@@ -88,7 +111,7 @@ export default function OnlineChallengesHub() {
 
   useEffect(() => {
     loadHubData();
-  }, [user]);
+  }, [user, activeLeaderboardTab]);
 
   // Matchmaking timer
   useEffect(() => {
@@ -225,24 +248,29 @@ export default function OnlineChallengesHub() {
     }
   };
 
+  const filteredRooms = publicRooms.filter((r) => {
+    if (roomFilter === 'ALL') return true;
+    return r.type === roomFilter;
+  });
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] pb-16 font-sans">
       {/* Top Banner Header */}
       <div className="bg-white border-b border-slate-200/80 sticky top-0 z-20 shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#3B82F6] to-[#2563EB] flex items-center justify-center text-white shadow-md shadow-blue-500/20">
               <Swords size={22} className="animate-pulse" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-lg font-bold text-slate-900 tracking-tight">Online Challenges</h1>
+                <h1 className="text-lg font-bold text-slate-900 tracking-tight">Online Challenges Arena</h1>
                 <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide bg-emerald-50 text-emerald-600 border border-emerald-200 font-mono">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
-                  LIVE ARENA
+                  LIVE COMPETITION
                 </span>
               </div>
-              <p className="text-xs text-slate-500">Real-time 1v1 DSA battles, multiplayer contests & technical quizzes</p>
+              <p className="text-xs text-slate-500">Real-time 1v1 DSA duels, speed coding, bug hunts & technical quiz battles</p>
             </div>
           </div>
 
@@ -261,7 +289,7 @@ export default function OnlineChallengesHub() {
               <button
                 type="submit"
                 disabled={isJoiningCode || !joinCodeInput}
-                className="absolute right-1 text-slate-400 hover:text-blue-600 disabled:opacity-30 p-1"
+                className="absolute right-1 text-slate-400 hover:text-blue-600 disabled:opacity-30 p-1 cursor-pointer"
                 title="Join room"
               >
                 {isJoiningCode ? <Loader2 size={14} className="animate-spin" /> : <ArrowRight size={14} />}
@@ -275,6 +303,48 @@ export default function OnlineChallengesHub() {
               <Plus size={14} />
               <span>Create Room</span>
             </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Gamified Weekly Season & Streak Banner */}
+      <div className="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white border-b border-indigo-800/40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-amber-400/20 border border-amber-400/30 flex items-center justify-center text-amber-300">
+                <Flame size={26} className="animate-bounce" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-black text-amber-300 uppercase tracking-widest font-mono">
+                    {seasonMeta?.seasonLabel || 'WEEKLY SPRINT SEASON'}
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full bg-indigo-800/80 text-indigo-200 text-[10px] font-bold border border-indigo-700 font-mono">
+                    TIER AWARDS ACTIVE
+                  </span>
+                </div>
+                <h2 className="text-base font-bold text-white tracking-tight">
+                  Climb the Weekly Ladder — Win Badges & Score Streak Multipliers
+                </h2>
+              </div>
+            </div>
+
+            {/* Streak Multiplier & Leaderboard Shortcut */}
+            <div className="flex items-center gap-3">
+              <div className="bg-white/10 backdrop-blur-md px-3.5 py-2 rounded-xl border border-white/15 text-center">
+                <span className="text-[10px] uppercase font-bold text-indigo-200 block">Streak Bonus</span>
+                <span className="text-xs font-black text-amber-300 font-mono">🔥 1.5× Multiplier</span>
+              </div>
+              <button
+                onClick={() => navigate('/challenges/leaderboard')}
+                className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 text-xs font-black rounded-xl shadow-lg shadow-amber-500/20 flex items-center gap-1.5 transition-all cursor-pointer"
+              >
+                <Trophy size={14} />
+                <span>Full Leaderboards</span>
+                <ChevronRight size={14} />
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -333,9 +403,9 @@ export default function OnlineChallengesHub() {
             className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-4 text-white shadow-md shadow-blue-600/15 flex items-center justify-between cursor-pointer hover:opacity-95 transition-all group"
           >
             <div>
-              <span className="text-[11px] font-bold text-blue-100 uppercase tracking-wider">Global Rankings</span>
-              <div className="text-base font-bold text-white mt-1 flex items-center gap-1">
-                <span>View Leaderboard</span>
+              <span className="text-[11px] font-bold text-blue-100 uppercase tracking-wider">Rankings Hub</span>
+              <div className="text-sm font-bold text-white mt-1 flex items-center gap-1">
+                <span>Weekly & Monthly</span>
                 <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
@@ -345,170 +415,204 @@ export default function OnlineChallengesHub() {
           </div>
         </div>
 
-        {/* 3 Main Battle Modes Grid */}
+        {/* 5 Gamified Challenge Game Modes */}
         <div>
-          <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-3.5 flex items-center gap-2">
-            <Sparkles size={16} className="text-blue-600" />
-            <span>Select Competition Mode</span>
-          </h2>
+          <div className="flex items-center justify-between mb-3.5">
+            <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+              <Sparkles size={16} className="text-blue-600" />
+              <span>Select Challenge Mode</span>
+            </h2>
+            <span className="text-xs font-semibold text-slate-400">5 Live Arena Formats</span>
+          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {/* 1. 1v1 Ranked DSA Battle */}
-            <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-lg transition-all overflow-hidden flex flex-col justify-between group">
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-105 transition-transform">
-                    <Swords size={26} />
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            {/* 1. 1v1 Code Duel */}
+            <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-lg transition-all p-5 flex flex-col justify-between group">
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+                    <Swords size={20} />
                   </div>
-                  <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-200/60 font-mono">
-                    RANKED ELO
+                  <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-blue-50 text-blue-600 border border-blue-200/60 font-mono">
+                    1V1 ELO
                   </span>
                 </div>
-                <h3 className="text-base font-black text-slate-900 mb-1">1v1 DSA Battle</h3>
-                <p className="text-xs text-slate-500 leading-relaxed">
-                  Real-time head-to-head algorithm duel. Solve the problem, pass hidden test cases, and climb the Elo ladder.
+                <h3 className="text-sm font-black text-slate-900 mb-1">1v1 Code Duel</h3>
+                <p className="text-[11px] text-slate-500 leading-relaxed">
+                  Real-time head-to-head algorithm duel. Solve DSA problems and pass test cases first.
                 </p>
-
-                {/* Quick Difficulty Pills */}
-                <div className="mt-5 space-y-1.5">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase">Select Difficulty:</span>
-                  <div className="grid grid-cols-3 gap-1.5">
-                    {(['EASY', 'MEDIUM', 'HARD'] as const).map((diff) => (
-                      <button
-                        key={diff}
-                        type="button"
-                        onClick={() => handleStartQuickMatch(diff)}
-                        className={`py-1.5 text-[11px] font-bold rounded-lg border transition-all cursor-pointer ${
-                          diff === 'EASY'
-                            ? 'border-emerald-200 text-emerald-700 bg-emerald-50/50 hover:bg-emerald-100'
-                            : diff === 'MEDIUM'
-                            ? 'border-amber-200 text-amber-700 bg-amber-50/50 hover:bg-amber-100'
-                            : 'border-rose-200 text-rose-700 bg-rose-50/50 hover:bg-rose-100'
-                        }`}
-                      >
-                        {diff}
-                      </button>
-                    ))}
-                  </div>
-                </div>
               </div>
 
-              <div className="p-4 bg-slate-50 border-t border-slate-100">
+              <div className="mt-4 pt-3 border-t border-slate-100 space-y-2">
                 <button
                   type="button"
                   onClick={() => handleStartQuickMatch('MEDIUM')}
-                  className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-xs hover:shadow-md transition-all cursor-pointer"
+                  className="w-full py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer"
                 >
-                  <Zap size={15} />
-                  <span>Find Ranked Match (1v1)</span>
+                  <Zap size={13} />
+                  <span>Find Duel</span>
                 </button>
               </div>
             </div>
 
-            {/* 2. Multiplayer Coding Arena */}
-            <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-lg transition-all overflow-hidden flex flex-col justify-between group">
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:scale-105 transition-transform">
-                    <Code2 size={26} />
+            {/* 2. Multiplayer Quiz Royale */}
+            <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-lg transition-all p-5 flex flex-col justify-between group">
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+                    <HelpCircle size={20} />
                   </div>
-                  <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-600 border border-indigo-200/60 font-mono">
-                    3 - 10 PLAYERS
+                  <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-amber-50 text-amber-600 border border-amber-200/60 font-mono">
+                    QUIZ ROYALE
                   </span>
                 </div>
-                <h3 className="text-base font-black text-slate-900 mb-1">Coding Contest Arena</h3>
-                <p className="text-xs text-slate-500 leading-relaxed">
-                  Compete with friends or study groups in custom multiplayer DSA tournaments with live progress leaderboards.
+                <h3 className="text-sm font-black text-slate-900 mb-1">Quiz Royale</h3>
+                <p className="text-[11px] text-slate-500 leading-relaxed">
+                  Fast-paced synchronized MCQs covering OS, DBMS, Networks, and DSA theory.
                 </p>
-
-                <div className="mt-5 p-3 rounded-xl bg-indigo-50/60 border border-indigo-100/80 text-indigo-900 text-xs flex items-center gap-2.5">
-                  <Users size={16} className="text-indigo-600 shrink-0" />
-                  <span>Invite friends via 6-character room codes or private direct links.</span>
-                </div>
               </div>
 
-              <div className="p-4 bg-slate-50 border-t border-slate-100">
+              <div className="mt-4 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => navigate('/challenges/quizzes')}
+                  className="w-full py-2 px-3 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-bold flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer"
+                >
+                  <Zap size={13} />
+                  <span>Play Quiz</span>
+                </button>
+              </div>
+            </div>
+
+            {/* 3. Speed Bug Hunter */}
+            <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-lg transition-all p-5 flex flex-col justify-between group">
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+                    <Bug size={20} />
+                  </div>
+                  <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-rose-50 text-rose-600 border border-rose-200/60 font-mono">
+                    DEBUG SPEED
+                  </span>
+                </div>
+                <h3 className="text-sm font-black text-slate-900 mb-1">Speed Bug Hunter</h3>
+                <p className="text-[11px] text-slate-500 leading-relaxed">
+                  Spot memory leaks, off-by-one errors, and async bugs against a ticking clock.
+                </p>
+              </div>
+
+              <div className="mt-4 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => handleStartQuickMatch('HARD')}
+                  className="w-full py-2 px-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-bold flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer"
+                >
+                  <Bug size={13} />
+                  <span>Hunt Bugs</span>
+                </button>
+              </div>
+            </div>
+
+            {/* 4. Architecture Sprint */}
+            <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-lg transition-all p-5 flex flex-col justify-between group">
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+                    <Layout size={20} />
+                  </div>
+                  <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-indigo-50 text-indigo-600 border border-indigo-200/60 font-mono">
+                    SYS DESIGN
+                  </span>
+                </div>
+                <h3 className="text-sm font-black text-slate-900 mb-1">Architecture Sprint</h3>
+                <p className="text-[11px] text-slate-500 leading-relaxed">
+                  Rapid system design scenarios: rate limiting, caching tiers, and microservice scale.
+                </p>
+              </div>
+
+              <div className="mt-4 pt-3 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => {
                     setRoomType('CONTEST');
+                    setRoomTopic('SYSTEM_DESIGN');
                     setCreateModalOpen(true);
                   }}
-                  className="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-xs hover:shadow-md transition-all cursor-pointer"
+                  className="w-full py-2 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer"
                 >
-                  <Plus size={15} />
-                  <span>Host Coding Contest</span>
+                  <Plus size={13} />
+                  <span>Host Sprint</span>
                 </button>
               </div>
             </div>
 
-            {/* 3. Multiplayer Technical Quiz Arena */}
-            <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-lg transition-all overflow-hidden flex flex-col justify-between group">
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center group-hover:scale-105 transition-transform">
-                    <HelpCircle size={26} />
+            {/* 5. Daily Algo Sprint */}
+            <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-lg transition-all p-5 flex flex-col justify-between group">
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+                    <Calendar size={20} />
                   </div>
-                  <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-200/60 font-mono">
-                    TIMED MCQs
+                  <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-50 text-emerald-600 border border-emerald-200/60 font-mono">
+                    DAILY 2× XP
                   </span>
                 </div>
-                <h3 className="text-base font-black text-slate-900 mb-1">Technical Quiz Arena</h3>
-                <p className="text-xs text-slate-500 leading-relaxed">
-                  Fast-paced synchronized multiple-choice quiz covering DSA, OS, DBMS, Networks, and System Design.
+                <h3 className="text-sm font-black text-slate-900 mb-1">Daily Algo Sprint</h3>
+                <p className="text-[11px] text-slate-500 leading-relaxed">
+                  Solve today's featured puzzle to protect your streak and score 2× leaderboard points.
                 </p>
-
-                <div className="mt-5 flex flex-wrap gap-1.5">
-                  {['DSA', 'OS', 'DBMS', 'Networks', 'OOP', 'System Design'].map((cat) => (
-                    <span
-                      key={cat}
-                      className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-slate-100 text-slate-600 border border-slate-200"
-                    >
-                      {cat}
-                    </span>
-                  ))}
-                </div>
               </div>
 
-              <div className="p-4 bg-slate-50 border-t border-slate-100">
+              <div className="mt-4 pt-3 border-t border-slate-100">
                 <button
                   type="button"
-                  onClick={() => navigate('/challenges/quizzes')}
-                  className="w-full py-2.5 px-4 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-xs hover:shadow-md transition-all cursor-pointer"
+                  onClick={() => handleStartQuickMatch('EASY')}
+                  className="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer"
                 >
-                  <Zap size={15} />
-                  <span>Enter Quiz Arena</span>
+                  <Flame size={13} />
+                  <span>Daily Puzzle</span>
                 </button>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Bottom Section: Active Public Rooms & Global Leaderboard */}
+        {/* Bottom Section: Active Public Rooms & Leaderboard Preview */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-2">
           {/* Active Public Rooms (2 Columns) */}
           <div className="lg:col-span-2 space-y-3.5">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
                 <Globe size={16} className="text-blue-600" />
-                <span>Live Public Rooms ({publicRooms.length})</span>
+                <span>Live Public Lobbies ({filteredRooms.length})</span>
               </h3>
-              <button
-                onClick={loadHubData}
-                className="text-xs font-semibold text-blue-600 hover:underline cursor-pointer"
-              >
-                Refresh
-              </button>
+
+              {/* Lobby Type Filter Pills */}
+              <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl">
+                {(['ALL', 'BATTLE_1V1', 'CONTEST', 'QUIZ'] as const).map((filter) => (
+                  <button
+                    key={filter}
+                    onClick={() => setRoomFilter(filter)}
+                    className={`px-2.5 py-1 text-[10px] font-bold rounded-lg transition-all cursor-pointer ${
+                      roomFilter === filter
+                        ? 'bg-white text-blue-600 shadow-xs'
+                        : 'text-slate-500 hover:text-slate-900'
+                    }`}
+                  >
+                    {filter === 'ALL' ? 'All' : filter === 'BATTLE_1V1' ? '1v1' : filter === 'CONTEST' ? 'Contest' : 'Quiz'}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            {publicRooms.length === 0 ? (
+            {filteredRooms.length === 0 ? (
               <div className="bg-white rounded-2xl border border-dashed border-slate-300 p-8 text-center">
                 <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-400 mx-auto flex items-center justify-center mb-3">
                   <Swords size={20} />
                 </div>
-                <h4 className="text-sm font-bold text-slate-700">No active public rooms right now</h4>
+                <h4 className="text-sm font-bold text-slate-700">No open lobbies in this category</h4>
                 <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
-                  Create your own challenge room or queue up for a 1v1 matchmaking battle above!
+                  Host your own room or queue up for instant 1v1 matchmaking above!
                 </p>
                 <button
                   onClick={() => setCreateModalOpen(true)}
@@ -519,7 +623,7 @@ export default function OnlineChallengesHub() {
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                {publicRooms.map((room) => (
+                {filteredRooms.map((room) => (
                   <div
                     key={room.id}
                     onClick={() => {
@@ -568,32 +672,44 @@ export default function OnlineChallengesHub() {
             )}
           </div>
 
-          {/* Top Leaderboard Snippet (1 Column) */}
+          {/* Mini Weekly Leaderboard Widget (1 Column) */}
           <div className="space-y-3.5">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                <Trophy size={16} className="text-amber-500" />
-                <span>Top Elo Leaders</span>
-              </h3>
+              <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl">
+                {(['weekly', 'monthly', 'all_time'] as const).map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveLeaderboardTab(tab)}
+                    className={`px-2 py-0.5 text-[10px] font-black rounded-lg transition-all uppercase font-mono cursor-pointer ${
+                      activeLeaderboardTab === tab
+                        ? 'bg-white text-blue-600 shadow-xs'
+                        : 'text-slate-500 hover:text-slate-900'
+                    }`}
+                  >
+                    {tab === 'weekly' ? 'Weekly' : tab === 'monthly' ? 'Monthly' : 'All-Time'}
+                  </button>
+                ))}
+              </div>
               <button
                 onClick={() => navigate('/challenges/leaderboard')}
-                className="text-xs font-semibold text-blue-600 hover:underline cursor-pointer"
+                className="text-xs font-semibold text-blue-600 hover:underline cursor-pointer flex items-center gap-1"
               >
-                View All
+                <span>View Full</span>
+                <ChevronRight size={13} />
               </button>
             </div>
 
-            {topLeaderboard.length === 0 ? (
+            {weeklyLeaderboard.length === 0 ? (
               <div className="bg-white rounded-2xl border border-slate-200/90 p-6 text-center shadow-xs">
                 <Trophy size={24} className="text-slate-300 mx-auto mb-2" />
-                <p className="text-xs font-bold text-slate-700">No ranked matches yet</p>
-                <p className="text-[11px] text-slate-400 mt-0.5">Play your first 1v1 battle to set your Elo rank!</p>
+                <p className="text-xs font-bold text-slate-700">No ranked matches in this timeframe</p>
+                <p className="text-[11px] text-slate-400 mt-0.5">Play a duel to claim the #1 rank!</p>
               </div>
             ) : (
               <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs divide-y divide-slate-100 overflow-hidden">
-                {topLeaderboard.slice(0, 5).map((entry, idx) => (
-                  <div key={entry.userId} className="p-3.5 flex items-center justify-between hover:bg-slate-50/80 transition-colors">
-                    <div className="flex items-center gap-3">
+                {weeklyLeaderboard.slice(0, 5).map((entry, idx) => (
+                  <div key={entry.userId} className="p-3 flex items-center justify-between hover:bg-slate-50/80 transition-colors">
+                    <div className="flex items-center gap-2.5">
                       <span
                         className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-black font-mono ${
                           idx === 0
@@ -608,7 +724,14 @@ export default function OnlineChallengesHub() {
                         {idx + 1}
                       </span>
                       <div>
-                        <div className="text-xs font-bold text-slate-900">{entry.userName}</div>
+                        <div className="text-xs font-bold text-slate-900 flex items-center gap-1">
+                          <span>{entry.userName}</span>
+                          {entry.currentStreak && entry.currentStreak > 1 && (
+                            <span className="text-[10px] font-black text-amber-600 font-mono">
+                              🔥{entry.currentStreak}
+                            </span>
+                          )}
+                        </div>
                         <div className="text-[10px] text-slate-400 font-mono">
                           {entry.wins}W - {entry.losses}L ({entry.winRate}%)
                         </div>
@@ -616,7 +739,9 @@ export default function OnlineChallengesHub() {
                     </div>
 
                     <div className="text-right">
-                      <div className="text-xs font-black text-slate-900 font-mono">{entry.rating}</div>
+                      <div className="text-xs font-black text-slate-900 font-mono">
+                        {entry.seasonPoints ? `${entry.seasonPoints} pts` : entry.rating}
+                      </div>
                       <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded-md ${getTierColor(entry.rankTier)}`}>
                         {entry.rankTier}
                       </span>

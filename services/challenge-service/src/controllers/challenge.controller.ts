@@ -196,7 +196,8 @@ export const challengeController = {
       }
 
       // Hide correct index for active questions until answered to prevent client inspection
-      const sanitizedQuestions = session.questions.map((q, idx) => {
+      const sanitizedQuestions = (session.questions || []).map((q, idx) => {
+        if (!q) return q;
         if (session.status === 'COMPLETED' || idx < session.currentQuestionIndex) {
           return q;
         }
@@ -239,8 +240,10 @@ export const challengeController = {
   // ─────────────────────────────────────────────────────────────
   async getLeaderboard(req: Request, res: Response) {
     try {
-      const limit = Number(req.query.limit) || 20;
-      const leaderboard = await challengeService.getGlobalLeaderboard(limit);
+      const limit = Number(req.query.limit) || 50;
+      const timeframe = (req.query.timeframe as any) || 'weekly';
+      const tier = String(req.query.tier || 'ALL');
+      const leaderboard = await challengeService.getLeaderboardWithTimeframe(timeframe, tier, limit);
       res.json({ success: true, data: leaderboard });
     } catch (error: any) {
       res.status(500).json({ success: false, error: error.message });

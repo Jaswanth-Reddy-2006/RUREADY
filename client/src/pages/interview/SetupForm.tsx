@@ -328,7 +328,7 @@ export default function SetupForm() {
       durationMins,
     };
     sessionStorage.setItem('ru_ready_oral_config', JSON.stringify(config));
-    navigate('/oral/review');
+    navigate('/video/review');
   };
 
   // Launch interview based on user profile
@@ -360,7 +360,7 @@ export default function SetupForm() {
       durationMins,
     };
     sessionStorage.setItem('ru_ready_oral_config', JSON.stringify(config));
-    navigate('/oral/review');
+    navigate('/video/review');
   };
 
   // Device Test Actions with live track listening
@@ -579,7 +579,7 @@ export default function SetupForm() {
               if (wizardStep > 1) {
                 setWizardStep(wizardStep - 1);
               } else {
-                navigate('/oral');
+                navigate('/video');
               }
             }}
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs text-xs font-bold text-slate-700 hover:text-blue-600 hover:border-blue-300 transition-all cursor-pointer shrink-0"
@@ -587,7 +587,7 @@ export default function SetupForm() {
             <ChevronLeft className="w-4 h-4 text-slate-600" />
             <span>
               {wizardStep === 1
-                ? 'Back to Oral Command Center'
+                ? 'Back to Video Command Center'
                 : wizardStep === 2
                 ? 'Back to Customization'
                 : 'Back to Review'}

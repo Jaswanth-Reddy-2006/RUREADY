@@ -1,3 +1,8 @@
+// ═══════════════════════════════════════════════════════════════
+// Coding Interview & Sandbox Microservice — Prisma Schema
+// Data ownership: coding_sessions, pre_defined_problems, code_execution_deltas
+// ═══════════════════════════════════════════════════════════════
+
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/client"
@@ -9,34 +14,44 @@ datasource db {
 }
 
 model CodingSession {
-  id               String   @id @default(cuid())
+  id               String               @id @default(cuid())
   userId           String
   targetRole       String
-  difficulty       String   @default("MEDIUM")
-  selectedLanguage String   @default("javascript")
-  status           String   @default("IN_PROGRESS")
-  testCasesPassed  Int?     @default(0)
-  startedAt        DateTime @default(now())
+  focusTrack       String?              @default("DSA") // DSA, MACHINE_CODING, SQL, FRONTEND, BACKEND
+  problemId        String?
+  difficulty       String               @default("MEDIUM")
+  selectedLanguage String               @default("javascript")
+  durationMins     Int                  @default(30)
+  status           String               @default("IN_PROGRESS") // IN_PROGRESS, COMPLETED, ABANDONED
+  testCasesPassed  Int?                 @default(0)
+  totalTestCases   Int?                 @default(0)
+  overallScore     Int?
+  feedbackSummary  String?
+  startedAt        DateTime             @default(now())
   completedAt      DateTime?
 
   executionDeltas  CodeExecutionDelta[]
 
-  @@index([userId])
+  @@index([userId, status])
   @@map("coding_sessions")
 }
 
 model PreDefinedProblem {
-  id              String @id @default(uuid())
+  id              String   @id @default(uuid())
   title           String
-  difficulty      String
+  difficulty      String   @default("MEDIUM")
   pattern         String
-  description     String
+  category        String?  @default("DSA")
+  topicTags       String[] @default([])
+  description     String   @db.Text
   starterCode     Json
   testCases       Json
-  optimalSolution String
+  optimalSolution String   @db.Text
   optimalTime     String
   optimalSpace    String
+  createdAt       DateTime @default(now())
 
+  @@index([difficulty, pattern])
   @@map("pre_defined_problems")
 }
 
@@ -44,9 +59,9 @@ model CodeExecutionDelta {
   id        String        @id @default(uuid())
   sessionId String
   session   CodingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  code      String
+  code      String        @db.Text
   language  String
-  output    String?
+  output    String?       @db.Text
   success   Boolean?
   timestamp DateTime      @default(now())
 

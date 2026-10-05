@@ -3,6 +3,7 @@ import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { Agentation } from 'agentation';
 import { useProfileStore } from './store/useProfileStore';
+import { useAuthStore } from './store/authStore';
 import ProtectedRoute from './components/layout/ProtectedRoute';
 import ErrorBoundary from './components/ui/ErrorBoundary';
 import Navbar from './components/layout/Navbar';
@@ -56,6 +57,7 @@ import ChallengesLeaderboardPage from './pages/challenges/ChallengesLeaderboardP
 import SystemDesignHub from './pages/system-design/SystemDesignHub';
 import SystemDesignStudio from './pages/system-design/SystemDesignStudio';
 import SystemDesignHistory from './pages/system-design/SystemDesignHistory';
+import SystemDesignSetupForm from './pages/system-design/SystemDesignSetupForm';
 
 // Analysis pages
 import Dashboard from './pages/analysis/Dashboard';
@@ -94,6 +96,7 @@ import AdminSessionDetail from './pages/admin/AdminSessionDetail';
 import AdminSystemControls from './pages/admin/AdminSystemControls';
 import AdminBroadcasts from './pages/admin/AdminBroadcasts';
 import AdminIntegrity from './pages/admin/AdminIntegrity';
+import FeatureGuard from './components/auth/FeatureGuard';
 
 /** The global marketing header/footer should only render on public marketing pages. */
 function shouldShowHeaderFooter(pathname: string): boolean {
@@ -108,18 +111,54 @@ function shouldShowHeaderFooter(pathname: string): boolean {
 
 function App() {
   const location = useLocation();
-  const { preferences } = useProfileStore();
+  const { user } = useAuthStore();
+  const { preferences, syncWithAuthUser } = useProfileStore();
 
-  // Maintain crisp light SaaS theme globally on root html
+  // Sync profile store with current authenticated user state
+  useEffect(() => {
+    if (user) {
+      syncWithAuthUser(user);
+    }
+  }, [user]);
+
+  // Dynamically apply theme (light, dark, or system preference) on root html
   useEffect(() => {
     const root = document.documentElement;
-    root.classList.remove('dark');
-    root.style.colorScheme = 'light';
-  }, [preferences.themeMode]);
+    const mode = preferences?.themeMode || 'light';
+
+    const applyTheme = (isDark: boolean) => {
+      if (isDark) {
+        root.classList.add('dark');
+        root.style.colorScheme = 'dark';
+      } else {
+        root.classList.remove('dark');
+        root.style.colorScheme = 'light';
+      }
+    };
+
+    if (mode === 'dark') {
+      applyTheme(true);
+    } else if (mode === 'light') {
+      applyTheme(false);
+    } else if (mode === 'system') {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      applyTheme(mediaQuery.matches);
+
+      const handleChange = (e: MediaQueryListEvent) => {
+        applyTheme(e.matches);
+      };
+
+      mediaQuery.addEventListener('change', handleChange);
+      return () => mediaQuery.removeEventListener('change', handleChange);
+    }
+  }, [preferences?.themeMode]);
 
   const showHeaderFooter = shouldShowHeaderFooter(location.pathname);
   const isLiveInterviewRoom =
-    (/^\/interview\/(coding\/)?[^/]+$/.test(location.pathname) || /^\/oral\/room\/[^/]+$/.test(location.pathname)) &&
+    (/^\/interview\/(coding\/)?[^/]+$/.test(location.pathname) ||
+     /^\/video\/room\/[^/]+$/.test(location.pathname) ||
+     /^\/oral\/room\/[^/]+$/.test(location.pathname) ||
+     /^\/coding\/room\/[^/]+$/.test(location.pathname)) &&
     location.pathname !== '/interview/setup' &&
     location.pathname !== '/interview/new' &&
     location.pathname !== '/interview/review' &&
@@ -127,6 +166,12 @@ function App() {
     location.pathname !== '/interview/history' &&
     location.pathname !== '/interview/coding' &&
     location.pathname !== '/interview/coding/new' &&
+    location.pathname !== '/video/new' &&
+    location.pathname !== '/video/setup' &&
+    location.pathname !== '/video/review' &&
+    location.pathname !== '/video/precheck' &&
+    location.pathname !== '/video/history' &&
+    location.pathname !== '/video/device-check' &&
     location.pathname !== '/oral/new' &&
     location.pathname !== '/oral/setup' &&
     location.pathname !== '/oral/review' &&
@@ -242,21 +287,225 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+              {/* Video Interview Routes */}
               <Route
-                path="/interview"
+                path="/video"
                 element={
                   <ProtectedRoute>
-                    <UnifiedInterviewHub />
+                    <FeatureGuard featureKey="video_interview" featureTitle="Video Interview">
+                      <OralCommandCenter />
+                    </FeatureGuard>
                   </ProtectedRoute>
                 }
               />
               <Route
-                path="/interviews"
+                path="/video/new"
                 element={
                   <ProtectedRoute>
-                    <UnifiedInterviewHub />
+                    <FeatureGuard featureKey="video_interview" featureTitle="Video Interview">
+                      <SetupForm />
+                    </FeatureGuard>
                   </ProtectedRoute>
                 }
+              />
+              <Route
+                path="/video/setup"
+                element={
+                  <ProtectedRoute>
+                    <FeatureGuard featureKey="video_interview" featureTitle="Video Interview">
+                      <SetupForm />
+                    </FeatureGuard>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/video/review"
+                element={
+                  <ProtectedRoute>
+                    <FeatureGuard featureKey="video_interview" featureTitle="Video Interview">
+                      <OralReviewPage />
+                    </FeatureGuard>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/video/precheck"
+                element={
+                  <ProtectedRoute>
+                    <FeatureGuard featureKey="video_interview" featureTitle="Video Interview">
+                      <OralPreCheckPage />
+                    </FeatureGuard>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/video/device-check"
+                element={
+                  <ProtectedRoute>
+                    <FeatureGuard featureKey="video_interview" featureTitle="Video Interview">
+                      <OralPreCheckPage />
+                    </FeatureGuard>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/video/history"
+                element={
+                  <ProtectedRoute>
+                    <InterviewHistoryPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/video/room/:id"
+                element={
+                  <ProtectedRoute>
+                    <FeatureGuard featureKey="video_interview" featureTitle="Video Interview">
+                      <ErrorBoundary fallbackTitle="Interview room error">
+                        <InterviewRoom />
+                      </ErrorBoundary>
+                    </FeatureGuard>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/video/:id"
+                element={
+                  <ProtectedRoute>
+                    <FeatureGuard featureKey="video_interview" featureTitle="Video Interview">
+                      <ErrorBoundary fallbackTitle="Interview room error">
+                        <InterviewRoom />
+                      </ErrorBoundary>
+                    </FeatureGuard>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/video/:id/room"
+                element={
+                  <ProtectedRoute>
+                    <FeatureGuard featureKey="video_interview" featureTitle="Video Interview">
+                      <ErrorBoundary fallbackTitle="Interview room error">
+                        <InterviewRoom />
+                      </ErrorBoundary>
+                    </FeatureGuard>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/video/:id/analysis"
+                element={
+                  <ProtectedRoute>
+                    <AnalysisReport />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/video/:id/complete"
+                element={
+                  <ProtectedRoute>
+                    <Complete />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/video/:id/replay"
+                element={
+                  <ProtectedRoute>
+                    <InterviewReplay />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Automatic Redirects for Legacy Hub & Oral Routes */}
+              <Route path="/interview" element={<Navigate to="/video" replace />} />
+              <Route path="/interviews" element={<Navigate to="/video" replace />} />
+              <Route path="/oral" element={<Navigate to="/video" replace />} />
+              <Route path="/oral/new" element={<Navigate to="/video/new" replace />} />
+              <Route path="/oral/setup" element={<Navigate to="/video/setup" replace />} />
+              <Route path="/oral/review" element={<Navigate to="/video/review" replace />} />
+              <Route path="/oral/precheck" element={<Navigate to="/video/precheck" replace />} />
+              <Route path="/oral/device-check" element={<Navigate to="/video/device-check" replace />} />
+              <Route path="/oral/history" element={<Navigate to="/video/history" replace />} />
+
+              {/* Coding Interview Routes */}
+              <Route
+                path="/coding"
+                element={
+                  <ProtectedRoute>
+                    <FeatureGuard featureKey="coding_interview" featureTitle="Coding Interview">
+                      <CodingCommandCenter />
+                    </FeatureGuard>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/coding/new"
+                element={
+                  <ProtectedRoute>
+                    <FeatureGuard featureKey="coding_interview" featureTitle="Coding Interview">
+                      <CodingSetupForm />
+                    </FeatureGuard>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/coding/history"
+                element={
+                  <ProtectedRoute>
+                    <InterviewHistoryPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/coding/:id"
+                element={
+                  <ProtectedRoute>
+                    <FeatureGuard featureKey="coding_interview" featureTitle="Coding Interview">
+                      <ErrorBoundary fallbackTitle="Coding room error">
+                        <CodingInterviewRoom />
+                      </ErrorBoundary>
+                    </FeatureGuard>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/coding/:id/room"
+                element={
+                  <ProtectedRoute>
+                    <FeatureGuard featureKey="coding_interview" featureTitle="Coding Interview">
+                      <ErrorBoundary fallbackTitle="Coding room error">
+                        <CodingInterviewRoom />
+                      </ErrorBoundary>
+                    </FeatureGuard>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/coding/room/:id"
+                element={
+                  <ProtectedRoute>
+                    <FeatureGuard featureKey="coding_interview" featureTitle="Coding Interview">
+                      <ErrorBoundary fallbackTitle="Coding room error">
+                        <CodingInterviewRoom />
+                      </ErrorBoundary>
+                    </FeatureGuard>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/coding/:id/analysis"
+                element={
+                  <ProtectedRoute>
+                    <FeatureGuard featureKey="coding_interview" featureTitle="Coding Interview">
+                      <SessionDetail />
+                    </FeatureGuard>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/interview/coding"
+                element={<Navigate to="/coding" replace />}
               />
               <Route
                 path="/interview/history"
@@ -275,130 +524,12 @@ function App() {
                 }
               />
               <Route
-                path="/oral"
-                element={
-                  <ProtectedRoute>
-                    <OralCommandCenter />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/coding"
-                element={
-                  <ProtectedRoute>
-                    <CodingCommandCenter />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/coding/new"
-                element={
-                  <ProtectedRoute>
-                    <CodingSetupForm />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/coding/history"
-                element={
-                  <ProtectedRoute>
-                    <InterviewHistoryPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/interview/coding"
-                element={
-                  <ProtectedRoute>
-                    <CodingCommandCenter />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/interview/new"
-                element={
-                  <ProtectedRoute>
-                    <SetupForm />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/interview/setup"
-                element={
-                  <ProtectedRoute>
-                    <SetupForm />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/interview/review"
-                element={
-                  <ProtectedRoute>
-                    <OralReviewPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/interview/precheck"
-                element={
-                  <ProtectedRoute>
-                    <OralPreCheckPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/oral/new"
-                element={
-                  <ProtectedRoute>
-                    <SetupForm />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/oral/setup"
-                element={
-                  <ProtectedRoute>
-                    <SetupForm />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/oral/review"
-                element={
-                  <ProtectedRoute>
-                    <OralReviewPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/oral/precheck"
-                element={
-                  <ProtectedRoute>
-                    <OralPreCheckPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/oral/device-check"
-                element={
-                  <ProtectedRoute>
-                    <OralPreCheckPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/oral/history"
-                element={
-                  <ProtectedRoute>
-                    <InterviewHistoryPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
                 path="/interviews/company-wise"
                 element={
                   <ProtectedRoute>
-                    <CompanyWiseCatalogPage />
+                    <FeatureGuard featureKey="company_wise_interview" featureTitle="Company-wise Tracks">
+                      <CompanyWiseCatalogPage />
+                    </FeatureGuard>
                   </ProtectedRoute>
                 }
               />
@@ -406,7 +537,9 @@ function App() {
                 path="/interview/company-wise"
                 element={
                   <ProtectedRoute>
-                    <CompanyWiseCatalogPage />
+                    <FeatureGuard featureKey="company_wise_interview" featureTitle="Company-wise Tracks">
+                      <CompanyWiseCatalogPage />
+                    </FeatureGuard>
                   </ProtectedRoute>
                 }
               />
@@ -414,7 +547,9 @@ function App() {
                 path="/company-wise"
                 element={
                   <ProtectedRoute>
-                    <CompanyWiseCatalogPage />
+                    <FeatureGuard featureKey="company_wise_interview" featureTitle="Company-wise Tracks">
+                      <CompanyWiseCatalogPage />
+                    </FeatureGuard>
                   </ProtectedRoute>
                 }
               />
@@ -422,7 +557,9 @@ function App() {
                 path="/interviews/company-wise/:companyId"
                 element={
                   <ProtectedRoute>
-                    <CompanyTrackDetailPage />
+                    <FeatureGuard featureKey="company_wise_interview" featureTitle="Company-wise Tracks">
+                      <CompanyTrackDetailPage />
+                    </FeatureGuard>
                   </ProtectedRoute>
                 }
               />
@@ -432,7 +569,9 @@ function App() {
                 path="/challenges"
                 element={
                   <ProtectedRoute>
-                    <OnlineChallengesHub />
+                    <FeatureGuard featureKey="challenges_arena" featureTitle="Online Challenges">
+                      <OnlineChallengesHub />
+                    </FeatureGuard>
                   </ProtectedRoute>
                 }
               />
@@ -440,7 +579,9 @@ function App() {
                 path="/challenges/quizzes"
                 element={
                   <ProtectedRoute>
-                    <MultiplayerQuizArena />
+                    <FeatureGuard featureKey="challenges_arena" featureTitle="Online Challenges">
+                      <MultiplayerQuizArena />
+                    </FeatureGuard>
                   </ProtectedRoute>
                 }
               />
@@ -448,7 +589,9 @@ function App() {
                 path="/challenges/quiz/:sessionId"
                 element={
                   <ProtectedRoute>
-                    <MultiplayerQuizArena />
+                    <FeatureGuard featureKey="challenges_arena" featureTitle="Online Challenges">
+                      <MultiplayerQuizArena />
+                    </FeatureGuard>
                   </ProtectedRoute>
                 }
               />
@@ -456,7 +599,9 @@ function App() {
                 path="/challenges/room/:roomId"
                 element={
                   <ProtectedRoute>
-                    <MultiplayerContestRoom />
+                    <FeatureGuard featureKey="challenges_arena" featureTitle="Online Challenges">
+                      <MultiplayerContestRoom />
+                    </FeatureGuard>
                   </ProtectedRoute>
                 }
               />
@@ -464,7 +609,9 @@ function App() {
                 path="/challenges/leaderboard"
                 element={
                   <ProtectedRoute>
-                    <ChallengesLeaderboardPage />
+                    <FeatureGuard featureKey="challenges_arena" featureTitle="Online Challenges">
+                      <ChallengesLeaderboardPage />
+                    </FeatureGuard>
                   </ProtectedRoute>
                 }
               />
@@ -472,7 +619,9 @@ function App() {
                 path="/challenges/match/:matchId"
                 element={
                   <ProtectedRoute>
-                    <BattleArena1v1 />
+                    <FeatureGuard featureKey="challenges_arena" featureTitle="Online Challenges">
+                      <BattleArena1v1 />
+                    </FeatureGuard>
                   </ProtectedRoute>
                 }
               />
@@ -482,7 +631,19 @@ function App() {
                 path="/system-design"
                 element={
                   <ProtectedRoute>
-                    <SystemDesignHub />
+                    <FeatureGuard featureKey="system_design_interview" featureTitle="System Design">
+                      <SystemDesignHub />
+                    </FeatureGuard>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/system-design/new"
+                element={
+                  <ProtectedRoute>
+                    <FeatureGuard featureKey="system_design_interview" featureTitle="System Design Setup">
+                      <SystemDesignSetupForm />
+                    </FeatureGuard>
                   </ProtectedRoute>
                 }
               />
@@ -490,7 +651,9 @@ function App() {
                 path="/system-design/studio/:sessionId"
                 element={
                   <ProtectedRoute>
-                    <SystemDesignStudio />
+                    <FeatureGuard featureKey="system_design_interview" featureTitle="System Design Studio">
+                      <SystemDesignStudio />
+                    </FeatureGuard>
                   </ProtectedRoute>
                 }
               />
@@ -506,7 +669,9 @@ function App() {
                 path="/interview/company-wise/:companyId"
                 element={
                   <ProtectedRoute>
-                    <CompanyTrackDetailPage />
+                    <FeatureGuard featureKey="company_wise_interview" featureTitle="Company-wise Tracks">
+                      <CompanyTrackDetailPage />
+                    </FeatureGuard>
                   </ProtectedRoute>
                 }
               />
@@ -514,7 +679,9 @@ function App() {
                 path="/company-wise/:companyId"
                 element={
                   <ProtectedRoute>
-                    <CompanyTrackDetailPage />
+                    <FeatureGuard featureKey="company_wise_interview" featureTitle="Company-wise Tracks">
+                      <CompanyTrackDetailPage />
+                    </FeatureGuard>
                   </ProtectedRoute>
                 }
               />
@@ -563,7 +730,9 @@ function App() {
                 path="/resume"
                 element={
                   <ProtectedRoute>
-                    <ResumeDashboard />
+                    <FeatureGuard featureKey="ai_resume_ats" featureTitle="AI Resume & ATS">
+                      <ResumeDashboard />
+                    </FeatureGuard>
                   </ProtectedRoute>
                 }
               />
@@ -571,7 +740,9 @@ function App() {
                 path="/resume/builder"
                 element={
                   <ProtectedRoute>
-                    <ResumeBuilderPage />
+                    <FeatureGuard featureKey="ai_resume_ats" featureTitle="AI Resume & ATS">
+                      <ResumeBuilderPage />
+                    </FeatureGuard>
                   </ProtectedRoute>
                 }
               />
@@ -579,7 +750,9 @@ function App() {
                 path="/resume/edit/:id"
                 element={
                   <ProtectedRoute>
-                    <ResumeBuilderPage />
+                    <FeatureGuard featureKey="ai_resume_ats" featureTitle="AI Resume & ATS">
+                      <ResumeBuilderPage />
+                    </FeatureGuard>
                   </ProtectedRoute>
                 }
               />
@@ -587,7 +760,9 @@ function App() {
                 path="/resume/analyze"
                 element={
                   <ProtectedRoute>
-                    <AtsAnalyzerPage />
+                    <FeatureGuard featureKey="ai_resume_ats" featureTitle="AI Resume & ATS">
+                      <AtsAnalyzerPage />
+                    </FeatureGuard>
                   </ProtectedRoute>
                 }
               />
@@ -595,7 +770,9 @@ function App() {
                 path="/resume/versions"
                 element={
                   <ProtectedRoute>
-                    <ResumeVersionsPage />
+                    <FeatureGuard featureKey="ai_resume_ats" featureTitle="AI Resume & ATS">
+                      <ResumeVersionsPage />
+                    </FeatureGuard>
                   </ProtectedRoute>
                 }
               />
@@ -603,7 +780,9 @@ function App() {
                 path="/resume/preview/:id"
                 element={
                   <ProtectedRoute>
-                    <ResumePreviewPage />
+                    <FeatureGuard featureKey="ai_resume_ats" featureTitle="AI Resume & ATS">
+                      <ResumePreviewPage />
+                    </FeatureGuard>
                   </ProtectedRoute>
                 }
               />
@@ -611,7 +790,9 @@ function App() {
                 path="/ats"
                 element={
                   <ProtectedRoute>
-                    <AtsAnalyzerPage />
+                    <FeatureGuard featureKey="ai_resume_ats" featureTitle="AI Resume & ATS">
+                      <AtsAnalyzerPage />
+                    </FeatureGuard>
                   </ProtectedRoute>
                 }
               />
@@ -619,7 +800,9 @@ function App() {
                 path="/ats/report/:id"
                 element={
                   <ProtectedRoute>
-                    <AtsAnalyzerPage />
+                    <FeatureGuard featureKey="ai_resume_ats" featureTitle="AI Resume & ATS">
+                      <AtsAnalyzerPage />
+                    </FeatureGuard>
                   </ProtectedRoute>
                 }
               />
@@ -627,7 +810,9 @@ function App() {
                 path="/placement-crm"
                 element={
                   <ProtectedRoute>
-                    <PlacementCommandCenterPage />
+                    <FeatureGuard featureKey="placement_crm" featureTitle="Placement CRM">
+                      <PlacementCommandCenterPage />
+                    </FeatureGuard>
                   </ProtectedRoute>
                 }
               />
@@ -635,7 +820,9 @@ function App() {
                 path="/placement-crm/add"
                 element={
                   <ProtectedRoute>
-                    <AddApplicationPage />
+                    <FeatureGuard featureKey="placement_crm" featureTitle="Placement CRM">
+                      <AddApplicationPage />
+                    </FeatureGuard>
                   </ProtectedRoute>
                 }
               />
@@ -643,7 +830,9 @@ function App() {
                 path="/placement-crm/new"
                 element={
                   <ProtectedRoute>
-                    <AddApplicationPage />
+                    <FeatureGuard featureKey="placement_crm" featureTitle="Placement CRM">
+                      <AddApplicationPage />
+                    </FeatureGuard>
                   </ProtectedRoute>
                 }
               />
@@ -651,7 +840,9 @@ function App() {
                 path="/placement-crm/application/:id"
                 element={
                   <ProtectedRoute>
-                    <ApplicationDetailPage />
+                    <FeatureGuard featureKey="placement_crm" featureTitle="Placement CRM">
+                      <ApplicationDetailPage />
+                    </FeatureGuard>
                   </ProtectedRoute>
                 }
               />
@@ -659,7 +850,9 @@ function App() {
                 path="/placement-crm/app/:id"
                 element={
                   <ProtectedRoute>
-                    <ApplicationDetailPage />
+                    <FeatureGuard featureKey="placement_crm" featureTitle="Placement CRM">
+                      <ApplicationDetailPage />
+                    </FeatureGuard>
                   </ProtectedRoute>
                 }
               />

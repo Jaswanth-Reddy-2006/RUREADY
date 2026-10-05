@@ -1,49 +1,159 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import {
-  Code2,
+  Sparkles,
   Plus,
   Play,
   Clock,
   Award,
   TrendingUp,
   BarChart3,
-  Terminal,
   ChevronRight,
   Target,
-  Sparkles,
-  ShieldCheck,
-  CheckCircle2,
-  Zap,
-  Layers,
-  ArrowRight,
-  Database,
-  Bug,
-  Cpu,
-  FileCode,
-  Check,
-  Search,
-  MessageSquare,
   FileText,
+  ShieldCheck,
+  Zap,
+  Building2,
+  Users,
+  Code2,
   Lightbulb,
-  Keyboard,
-  FlaskConical,
-  Binary,
+  MessageSquare,
+  ArrowRight,
+  CheckCircle2,
+  FileCode,
+  Terminal,
+  Layers,
+  Database,
+  Cpu,
+  Sliders,
+  Compass,
 } from 'lucide-react';
 import apiClient from '../../api/client';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import Badge from '../../components/ui/Badge';
+import { INBUILT_CODING_INTERVIEWS, InbuiltInterview } from '../../data/inbuiltInterviewsData';
+import InbuiltInterviewModal from '../../components/interview/InbuiltInterviewModal';
+import InbuiltCatalogModal from '../../components/interview/InbuiltCatalogModal';
 
-// ─── MINI BAR GRAPH COMPONENT (REAL DATA ONLY) ───
+// ─── SVG RADAR PENTAGON CHART (SOLO CODING PERFORMANCE) ───
+function CodingRadarChart({ scores }: { scores: number[] }) {
+  const cx = 130;
+  const cy = 120;
+  const radius = 72;
+
+  const axes = [
+    { label: 'Algorithm Correctness', angle: -90 },
+    { label: 'Time & Space Complexity', angle: -18 },
+    { label: 'Code Quality & Cleanliness', angle: 54 },
+    { label: 'Problem Solving Speed', angle: 126 },
+    { label: 'Edge Case Handling', angle: 198 },
+  ];
+
+  const getPoint = (score: number, angleDeg: number) => {
+    const rad = (angleDeg * Math.PI) / 180;
+    const r = (score / 100) * radius;
+    return {
+      x: cx + r * Math.cos(rad),
+      y: cy + r * Math.sin(rad),
+    };
+  };
+
+  const points = axes.map((a, idx) => getPoint(scores[idx] || 0, a.angle));
+  const pathD = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + ' Z';
+
+  const gridLevels = [0.25, 0.5, 0.75, 1.0];
+
+  return (
+    <div className="flex flex-col items-center justify-center space-y-2">
+      <svg width="260" height="230" className="overflow-visible">
+        {/* Concentric Pentagon Grids */}
+        {gridLevels.map((lvl) => {
+          const pts = axes.map((a) => {
+            const rad = (a.angle * Math.PI) / 180;
+            const r = lvl * radius;
+            return `${cx + r * Math.cos(rad)},${cy + r * Math.sin(rad)}`;
+          });
+          return (
+            <polygon
+              key={lvl}
+              points={pts.join(' ')}
+              fill="none"
+              stroke="currentColor"
+              className="text-slate-200 dark:text-slate-700"
+              strokeWidth="1"
+              strokeDasharray={lvl === 1 ? 'none' : '2,2'}
+            />
+          );
+        })}
+
+        {/* Radial Axis Lines */}
+        {axes.map((a, i) => {
+          const outerP = getPoint(100, a.angle);
+          return (
+            <line
+              key={i}
+              x1={cx}
+              y1={cy}
+              x2={outerP.x}
+              y2={outerP.y}
+              stroke="currentColor"
+              className="text-slate-200 dark:text-slate-700"
+              strokeWidth="1"
+            />
+          );
+        })}
+
+        {/* Score Polygon */}
+        <path
+          d={pathD}
+          fill="rgba(59, 130, 246, 0.20)"
+          stroke="#3B82F6"
+          strokeWidth="2.5"
+        />
+
+        {/* Data Points */}
+        {points.map((p, i) => (
+          <circle key={i} cx={p.x} cy={p.y} r="3.5" fill="#3B82F6" stroke="#FFFFFF" strokeWidth="2" />
+        ))}
+
+        {/* Axis Labels */}
+        {axes.map((a, i) => {
+          const rad = (a.angle * Math.PI) / 180;
+          const labelDist = radius + 22;
+          const lx = cx + labelDist * Math.cos(rad);
+          const ly = cy + labelDist * Math.sin(rad);
+
+          let textAnchor: 'inherit' | 'end' | 'middle' | 'start' = 'middle';
+          if (a.angle === -18 || a.angle === 54) textAnchor = 'start';
+          if (a.angle === 126 || a.angle === 198) textAnchor = 'end';
+
+          return (
+            <text
+              key={i}
+              x={lx}
+              y={ly}
+              textAnchor={textAnchor}
+              dominantBaseline="middle"
+              className="text-[9.5px] font-semibold fill-slate-600 dark:fill-slate-400 font-sans"
+            >
+              {a.label}
+            </text>
+          );
+        })}
+      </svg>
+    </div>
+  );
+}
+
+// ─── MINI BAR GRAPH COMPONENT ───
 function MiniBarGraph({ color = 'bg-blue-400' }: { color?: string }) {
   return (
     <div className="flex items-end gap-1 h-8 shrink-0">
-      <div className={`w-1.5 h-3 ${color} opacity-30 rounded-t`} />
-      <div className={`w-1.5 h-5 ${color} opacity-50 rounded-t`} />
-      <div className={`w-1.5 h-4 ${color} opacity-40 rounded-t`} />
-      <div className={`w-1.5 h-7 ${color} opacity-80 rounded-t`} />
+      <div className={`w-1.5 h-3 ${color} opacity-40 rounded-t`} />
+      <div className={`w-1.5 h-5 ${color} opacity-60 rounded-t`} />
+      <div className={`w-1.5 h-4 ${color} opacity-50 rounded-t`} />
+      <div className={`w-1.5 h-7 ${color} opacity-90 rounded-t`} />
       <div className={`w-1.5 h-6 ${color} rounded-t`} />
     </div>
   );
@@ -54,13 +164,17 @@ export default function CodingCommandCenter() {
   const [codingSessions, setCodingSessions] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // In-Built Modals State
+  const [selectedInbuilt, setSelectedInbuilt] = useState<InbuiltInterview | null>(null);
+  const [isCatalogModalOpen, setIsCatalogModalOpen] = useState(false);
+
   useEffect(() => {
     async function fetchCodingSessions() {
       try {
         const response = await apiClient.get('/interview/sessions');
         const allSessions = response.data || [];
         const codingOnly = allSessions.filter(
-          (s: any) => s.interviewType === 'CODING'
+          (s: any) => s.interviewType === 'CODING' || s.mode === 'CODING' || s.type === 'CODING'
         );
         codingOnly.sort(
           (a: any, b: any) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
@@ -101,569 +215,702 @@ export default function CodingCommandCenter() {
     ? `${Math.round(latestSession.evalScore || latestSession.analysis?.overallScore || 0)}%`
     : '—';
 
+  // Derived Performance Dimensions
+  const calcDimension = (key: string, fallback: number) => {
+    if (!hasHistory) return 0;
+    const scores = completedSessions
+      .map((s) => s.analysis?.[key] || s.evalScore || fallback)
+      .filter((n) => typeof n === 'number' && n > 0);
+    if (scores.length === 0) return fallback;
+    return Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+  };
+
+  const algoCorrectness = calcDimension('technicalScore', 82);
+  const timeComplexity = calcDimension('structureScore', 76);
+  const codeQuality = calcDimension('communicationScore', 84);
+  const problemSolvingSpeed = calcDimension('confidenceScore', 70);
+  const edgeCaseHandling = calcDimension('structureScore', 78);
+
+  const performanceBars = [
+    { label: 'Algorithm Correctness', value: algoCorrectness, color: 'bg-blue-600' },
+    { label: 'Time & Space Complexity', value: timeComplexity, color: 'bg-purple-600' },
+    { label: 'Code Quality & Cleanliness', value: codeQuality, color: 'bg-pink-500' },
+    { label: 'Problem Solving Speed', value: problemSolvingSpeed, color: 'bg-amber-500' },
+    { label: 'Edge Case Handling', value: edgeCaseHandling, color: 'bg-teal-500' },
+  ];
+
+  const radarScores = [algoCorrectness, timeComplexity, codeQuality, problemSolvingSpeed, edgeCaseHandling];
+  const primaryCtaText = hasHistory ? 'Start Coding Session →' : 'Start Your First Coding Session →';
+
   return (
-    <div className="min-h-screen bg-[#F4F7FC] text-slate-900 py-6 px-4 sm:px-6 lg:px-8 font-sans">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen bg-[#F4F7FC] dark:bg-[#080C1D] text-slate-900 dark:text-slate-100 py-6 px-4 sm:px-6 lg:px-8 font-sans transition-colors">
+      <div className="max-w-7xl mx-auto space-y-7">
         
-        {/* ─── 1. HERO CODING COMMAND CENTER BANNER ─── */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#EBF3FE] via-[#EDF5FF] to-[#E6F1FE] border border-blue-100 shadow-sm min-h-[340px] md:min-h-[320px]">
+        {/* ─── 1. HERO CODING BANNER ─── */}
+        <div className="relative overflow-hidden rounded-3xl bg-[#EEF5FF] dark:bg-[#11183D] border border-blue-100/90 dark:border-[#1E293B] shadow-sm min-h-[340px] md:min-h-[320px]">
           
-          {/* Left / Background 3D Illustration */}
-          <div className="absolute inset-y-0 left-0 w-full sm:w-[50%] lg:w-[45%] pointer-events-none overflow-hidden z-0">
+          {/* 3D Background Image */}
+          <div className="absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden">
             <img
               src="/images/coding_hero_3d.jpg"
-              alt="3D Coding Interview Avatar"
-              className="w-full h-full object-cover object-[center_15%] filter brightness-[1.02]"
+              alt="3D AI Coding Interviewer"
+              className="w-full h-full object-cover object-[88%_top] filter brightness-[1.04] contrast-[1.02]"
             />
-            {/* Desktop Fade Gradient to text area */}
-            <div className="hidden sm:block absolute inset-y-0 right-0 w-44 bg-gradient-to-r from-transparent via-[#EDF5FF]/90 to-[#EDF5FF]" />
-            {/* Mobile Gradient Scrim */}
-            <div className="sm:hidden absolute inset-0 bg-gradient-to-b from-transparent via-[#EDF5FF]/90 to-[#EDF5FF]" />
+            {/* Gradient Overlay strictly on Left Half */}
+            <div className="absolute inset-y-0 left-0 w-full sm:w-[65%] lg:w-[55%] bg-gradient-to-r from-[#EEF5FF] via-[#EEF5FF]/92 to-transparent dark:from-[#11183D] dark:via-[#11183D]/95 dark:to-transparent z-10" />
           </div>
 
-          <div className="relative z-10 p-6 sm:p-8 lg:p-10 lg:pl-[42%] flex flex-col justify-between space-y-6 h-full">
+          <div className="relative z-20 p-6 md:p-8 flex flex-col lg:flex-row items-stretch justify-between gap-8 h-full">
             
-            {/* Header Text & Badges */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between flex-wrap gap-2">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-50 border border-pink-200/80 text-pink-700 text-xs font-bold tracking-wide shadow-2xs">
-                  <Sparkles className="w-3.5 h-3.5 text-pink-600" />
-                  <span>AI-Powered Coding Interview Practice</span>
-                </div>
-
-                {/* Slogan on Right */}
-                <div className="hidden lg:flex flex-col items-end">
-                  <span className="font-extrabold text-xs text-slate-800 tracking-tight">
-                    Code Practice Smarter
-                  </span>
-                  <span className="font-extrabold text-xs text-purple-600 tracking-tight">
-                    Get Hired!
-                  </span>
+            {/* Left Column: Heading, Subtitle & Compact Feature Chips */}
+            <div className="flex-1 flex flex-col justify-between space-y-6 max-w-xl">
+              <div className="space-y-3">
+                <div className="space-y-2">
+                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-950 dark:text-white tracking-tight font-display">
+                    Coding Interview
+                  </h1>
+                  <p className="text-slate-600 dark:text-slate-300 font-medium text-sm sm:text-base leading-relaxed max-w-lg">
+                    Solve live algorithmic, machine coding, and database problems in an observed Monaco IDE with AI feedback.
+                  </p>
                 </div>
               </div>
 
-              <div className="space-y-1.5">
-                <h1 className="text-3xl sm:text-4xl lg:text-[42px] font-black text-slate-950 tracking-tight font-display leading-tight">
-                  Coding Interview Command Center
-                </h1>
-                <p className="text-slate-600 font-medium text-xs sm:text-sm leading-relaxed max-w-xl">
-                  Solve algorithmic problems in an observed Monaco IDE. Ava tracks your coding speed, edge case coverage, and debugging approach.
-                </p>
-              </div>
-            </div>
+              {/* 4 Compact Feature Chips Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-w-lg pt-2">
+                <div className="flex items-center gap-2.5 p-2.5 px-3 rounded-2xl bg-white/95 dark:bg-[#152046]/90 backdrop-blur-md border border-white/90 dark:border-[#1E293B] shadow-xs">
+                  <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 flex items-center justify-center shrink-0">
+                    <Code2 className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <span className="text-xs font-extrabold text-slate-900 dark:text-white block leading-tight">Monaco IDE Sandbox</span>
+                    <span className="text-[10px] font-medium text-slate-600 dark:text-slate-400 block leading-tight">Multi-language execution</span>
+                  </div>
+                </div>
 
-            {/* 4 Feature Badges Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-xl">
-              <div className="flex items-center gap-2.5 p-2.5 px-3 rounded-2xl bg-white/95 backdrop-blur-md border border-white/90 shadow-2xs">
-                <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
-                  <Code2 className="w-4 h-4" />
+                <div className="flex items-center gap-2.5 p-2.5 px-3 rounded-2xl bg-white/95 dark:bg-[#152046]/90 backdrop-blur-md border border-white/90 dark:border-[#1E293B] shadow-xs">
+                  <div className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 flex items-center justify-center shrink-0">
+                    <Layers className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <span className="text-xs font-extrabold text-slate-900 dark:text-white block leading-tight">Multi-Track Practice</span>
+                    <span className="text-[10px] font-medium text-slate-600 dark:text-slate-400 block leading-tight">DSA, LLD, SQL & Systems</span>
+                  </div>
                 </div>
-                <div className="min-w-0 flex-1">
-                  <span className="text-xs font-extrabold text-slate-900 block leading-tight">Real-time AI Evaluation</span>
-                  <span className="text-[10px] font-medium text-slate-600 block leading-tight">Live code analysis</span>
-                </div>
-              </div>
 
-              <div className="flex items-center gap-2.5 p-2.5 px-3 rounded-2xl bg-white/95 backdrop-blur-md border border-white/90 shadow-2xs">
-                <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
-                  <ShieldCheck className="w-4 h-4" />
+                <div className="flex items-center gap-2.5 p-2.5 px-3 rounded-2xl bg-white/95 dark:bg-[#152046]/90 backdrop-blur-md border border-white/90 dark:border-[#1E293B] shadow-xs">
+                  <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 flex items-center justify-center shrink-0">
+                    <Lightbulb className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <span className="text-xs font-extrabold text-slate-900 dark:text-white block leading-tight">Socratic AI Hints</span>
+                    <span className="text-[10px] font-medium text-slate-600 dark:text-slate-400 block leading-tight">Guided problem breakdown</span>
+                  </div>
                 </div>
-                <div className="min-w-0 flex-1">
-                  <span className="text-xs font-extrabold text-slate-900 block leading-tight">Detailed Feedback</span>
-                  <span className="text-[10px] font-medium text-slate-600 block leading-tight">Code quality, test cases</span>
-                </div>
-              </div>
 
-              <div className="flex items-center gap-2.5 p-2.5 px-3 rounded-2xl bg-white/95 backdrop-blur-md border border-white/90 shadow-2xs">
-                <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center shrink-0">
-                  <Layers className="w-4 h-4" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <span className="text-xs font-extrabold text-slate-900 block leading-tight">Multiple Challenge Types</span>
-                  <span className="text-[10px] font-medium text-slate-600 block leading-tight">DSA, System Design, Debugging</span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2.5 p-2.5 px-3 rounded-2xl bg-white/95 backdrop-blur-md border border-white/90 shadow-2xs">
-                <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0">
-                  <BarChart3 className="w-4 h-4" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <span className="text-xs font-extrabold text-slate-900 block leading-tight">Track Your Progress</span>
-                  <span className="text-[10px] font-medium text-slate-600 block leading-tight">See improvement over time</span>
+                <div className="flex items-center gap-2.5 p-2.5 px-3 rounded-2xl bg-white/95 dark:bg-[#152046]/90 backdrop-blur-md border border-white/90 dark:border-[#1E293B] shadow-xs">
+                  <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 flex items-center justify-center shrink-0">
+                    <BarChart3 className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <span className="text-xs font-extrabold text-slate-900 dark:text-white block leading-tight">Automated Code Metrics</span>
+                    <span className="text-[10px] font-medium text-slate-600 dark:text-slate-400 block leading-tight">Time, space & STAR analysis</span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Main CTA Button */}
-            <div className="pt-2">
-              <button
-                type="button"
-                onClick={() => navigate('/interview/coding/new')}
-                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-sm shadow-md hover:shadow-blue-500/25 transition-all cursor-pointer active:scale-98"
-              >
-                <Plus className="w-4 h-4 stroke-[2.5]" />
-                <span>Start New Coding Session</span>
-                <ArrowRight className="w-4 h-4 ml-1" />
-              </button>
+            {/* Right Column: Handwritten Callout with Arrow Pointing directly to AI Face + CTA Button */}
+            <div className="relative flex flex-col items-center lg:items-end justify-between min-w-[240px] lg:min-w-[280px] z-20 pt-4 lg:pt-0">
+              
+              <div className="relative w-full flex items-center justify-center lg:justify-end pt-2 min-h-[120px]">
+                <div className="flex flex-col items-end rotate-[-4deg] z-30 mr-4 sm:mr-8 lg:mr-10">
+                  <span className="font-serif italic font-black text-slate-950 dark:text-white text-lg sm:text-xl drop-shadow-[0_2px_4px_rgba(255,255,255,1)] dark:drop-shadow-[0_2px_4px_rgba(0,0,0,1)] tracking-wide leading-tight text-right">
+                    Your AI<br />Interviewer<br />is ready!
+                  </span>
+                  <svg className="w-10 h-10 text-slate-950 dark:text-white drop-shadow-[0_2px_4px_rgba(255,255,255,1)] dark:drop-shadow-[0_2px_4px_rgba(0,0,0,1)] mt-1 -mr-2" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M 4 4 Q 20 2 24 18 M 24 18 L 17 14 M 24 18 L 21 11" />
+                  </svg>
+                </div>
+              </div>
+
+              {/* Primary CTA Button */}
+              <div className="w-full flex justify-center lg:justify-end pt-4 z-20">
+                <Button
+                  onClick={() => navigate('/coding/new')}
+                  className="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 text-white font-extrabold text-sm sm:text-base px-8 py-3.5 rounded-full shadow-lg shadow-blue-500/30 border-2 border-white/60 flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer"
+                >
+                  <span>{primaryCtaText}</span>
+                </Button>
+              </div>
+
             </div>
 
           </div>
         </div>
 
-        {/* ─── 2. FOUR PERFORMANCE STAT CARDS ─── */}
+        {/* ─── 2. POPULAR & RELEVANT IN-BUILT CODING CHALLENGES ─── */}
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/80 dark:border-slate-800 pb-3">
+            <div>
+              <div className="flex items-center gap-2">
+                <Code2 className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white font-display">
+                  Curated & In-Built Coding Sandboxes
+                </h2>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Practice verified algorithmic, machine coding, and database challenges. Click to preview problem specs, starter code, and launch.
+              </p>
+            </div>
+
+            <Button
+              onClick={() => setIsCatalogModalOpen(true)}
+              className="bg-white dark:bg-[#152046] hover:bg-slate-50 dark:hover:bg-[#1c2c5e] text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-900/60 font-bold text-xs px-4 py-2 rounded-xl shadow-2xs inline-flex items-center gap-1.5 self-start sm:self-auto cursor-pointer"
+            >
+              <span>View All Coding Tracks ({INBUILT_CODING_INTERVIEWS.length})</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Button>
+          </div>
+
+          {/* 4 Top In-Built Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {INBUILT_CODING_INTERVIEWS.slice(0, 4).map((interview) => (
+              <div
+                key={interview.id}
+                onClick={() => setSelectedInbuilt(interview)}
+                className="group p-5 rounded-3xl bg-white dark:bg-[#11183D] border border-slate-200/90 dark:border-[#1E293B] hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-md transition-all duration-200 cursor-pointer flex flex-col justify-between space-y-4 relative"
+              >
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between gap-1.5">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800/60">
+                      <Layers className="w-3 h-3" />
+                      {interview.trackType}
+                    </span>
+
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/40">
+                      {interview.tag}
+                    </span>
+                  </div>
+
+                  <div>
+                    <h3 className="font-bold text-sm text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors line-clamp-1">
+                      {interview.title}
+                    </h3>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                      Target: <strong className="text-slate-800 dark:text-slate-200">{interview.role}</strong>
+                    </p>
+                  </div>
+
+                  <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed">
+                    {interview.description}
+                  </p>
+
+                  <div className="flex flex-wrap gap-1 pt-0.5">
+                    {interview.skills.slice(0, 3).map((s) => (
+                      <span
+                        key={s}
+                        className="px-2 py-0.5 rounded-lg bg-slate-50 dark:bg-[#0E152E] text-slate-600 dark:text-slate-400 text-[10px] font-medium border border-slate-200/50 dark:border-[#1E293B]"
+                      >
+                        {s}
+                      </span>
+                    ))}
+                    {interview.skills.length > 3 && (
+                      <span className="text-[10px] text-slate-400 self-center">
+                        +{interview.skills.length - 3}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs">
+                  <span className="text-slate-500 dark:text-slate-400 font-mono text-[11px] flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5 text-slate-400" />
+                    {interview.durationMins}m • {interview.questionCount} {interview.questionCount > 1 ? 'Problems' : 'Problem'}
+                  </span>
+
+                  <span className="font-bold text-purple-600 dark:text-purple-400 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform text-[11px]">
+                    <span>Inspect</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ─── 3. STATISTICS CARDS ─── */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           
-          {/* Card 1: Coding Sessions */}
-          <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between transition-all hover:border-slate-300">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2 text-slate-600 font-semibold text-xs">
-                <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                  <FileCode className="w-4 h-4" />
-                </div>
-                <span>Coding Sessions</span>
-              </div>
-              <div className="text-2xl font-black text-slate-900 font-display">
-                {totalCoding}
-              </div>
-              <p className="text-[11px] text-slate-500 font-medium">
-                Challenges completed
-              </p>
-            </div>
-            <MiniBarGraph color="bg-emerald-500" />
-          </div>
-
-          {/* Card 2: Average Score */}
-          <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between transition-all hover:border-slate-300">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2 text-slate-600 font-semibold text-xs">
-                <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
-                  <Award className="w-4 h-4" />
-                </div>
-                <span>Average Score</span>
-              </div>
-              <div className="text-2xl font-black text-slate-900 font-display">
-                {hasHistory ? `${avgScore}%` : '—'}
-              </div>
-              <p className="text-[11px] text-slate-500 font-medium">
-                {hasHistory ? 'Across all submissions' : 'Complete a session to unlock'}
-              </p>
-            </div>
-            <MiniBarGraph color="bg-amber-500" />
-          </div>
-
-          {/* Card 3: Coding Time */}
-          <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between transition-all hover:border-slate-300">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2 text-slate-600 font-semibold text-xs">
-                <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
-                  <Clock className="w-4 h-4" />
-                </div>
-                <span>Coding Time</span>
-              </div>
-              <div className="text-2xl font-black text-slate-900 font-display">
-                {codingTimeDisplay}
-              </div>
-              <p className="text-[11px] text-slate-500 font-medium">
-                Hours in IDE
-              </p>
-            </div>
-            <MiniBarGraph color="bg-blue-500" />
-          </div>
-
-          {/* Card 4: Latest Score */}
-          <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between transition-all hover:border-slate-300">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2 text-slate-600 font-semibold text-xs">
-                <div className="w-7 h-7 rounded-lg bg-pink-50 text-pink-600 flex items-center justify-center">
-                  <TrendingUp className="w-4 h-4" />
-                </div>
-                <span>Latest Score</span>
-              </div>
-              <div className="text-2xl font-black text-slate-900 font-display">
-                {latestScoreDisplay}
-              </div>
-              <p className="text-[11px] text-slate-500 font-medium">
-                {hasHistory ? 'Recent performance' : 'Your first score will appear here'}
-              </p>
-            </div>
-            <MiniBarGraph color="bg-pink-500" />
-          </div>
-
-        </div>
-
-        {/* ─── 3. START YOUR CODING JOURNEY TRACKS ─── */}
-        <div className="bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xs">
-          
-          {/* Section Header */}
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
-                <Code2 className="w-4 h-4" />
-              </div>
-              <h2 className="text-xl font-bold text-slate-900 font-display tracking-tight">
-                Start Your Coding Journey
-              </h2>
-            </div>
-            <p className="text-xs sm:text-sm text-slate-500 font-medium">
-              Choose a challenge type below. You'll code live in Monaco while Ava observes your solution logic.
-            </p>
-          </div>
-
-          {/* 4 Track Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-            
-            {/* Track 1: DSA Algorithmic Challenge */}
-            <div className="relative flex flex-col justify-between p-5 rounded-2xl bg-white border border-blue-200/80 shadow-xs hover:shadow-md transition-all hover:border-blue-300 group">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
-                    <Code2 className="w-5 h-5" />
-                  </div>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-pink-50 text-pink-700 border border-pink-200">
-                    Recommended
-                  </span>
-                </div>
-
-                <div className="space-y-1.5">
-                  <h3 className="text-sm font-bold text-slate-900 font-display group-hover:text-blue-600 transition-colors">
-                    DSA Algorithmic Challenge
-                  </h3>
-                  <p className="text-xs text-slate-500 leading-relaxed">
-                    Solve real algorithmic problems with live observation, edge case analysis and complexity checks.
-                  </p>
-                </div>
-              </div>
-
-              <div className="pt-4 space-y-3">
-                <div className="flex items-center gap-3 text-[11px] text-slate-500 font-medium">
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5 text-slate-400" />
-                    15–30 mins
-                  </span>
-                  <span>•</span>
-                  <span className="flex items-center gap-1">
-                    <BarChart3 className="w-3.5 h-3.5 text-slate-400" />
-                    All Levels
-                  </span>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => navigate('/interview/coding/new?focus=DSA')}
-                  className="w-full py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
-                >
-                  <span>Start DSA Challenge</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
-
-            {/* Track 2: Low-Level Design */}
-            <div className="relative flex flex-col justify-between p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md transition-all hover:border-slate-300 group">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                    <Layers className="w-5 h-5" />
-                  </div>
-                </div>
-
-                <div className="space-y-1.5">
-                  <h3 className="text-sm font-bold text-slate-900 font-display group-hover:text-emerald-600 transition-colors">
-                    Low-Level Design
-                  </h3>
-                  <p className="text-xs text-slate-500 leading-relaxed">
-                    Design scalable components like LRU Cache, Rate Limiter, or In-Memory File System.
-                  </p>
-                </div>
-              </div>
-
-              <div className="pt-4 space-y-3">
-                <div className="flex items-center gap-3 text-[11px] text-slate-500 font-medium">
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5 text-slate-400" />
-                    30–45 mins
-                  </span>
-                  <span>•</span>
-                  <span className="flex items-center gap-1">
-                    <BarChart3 className="w-3.5 h-3.5 text-slate-400" />
-                    Intermediate+
-                  </span>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => navigate('/interview/coding/new?focus=MachineCoding')}
-                  className="w-full py-2.5 px-3 rounded-xl bg-sky-50 hover:bg-sky-100 text-blue-700 border border-blue-200 font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-                >
-                  <span>Start LLD Challenge</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
-
-            {/* Track 3: Database & SQL Lab */}
-            <div className="relative flex flex-col justify-between p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md transition-all hover:border-slate-300 group">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="w-9 h-9 rounded-xl bg-pink-50 text-pink-600 flex items-center justify-center">
-                    <Database className="w-5 h-5" />
-                  </div>
-                </div>
-
-                <div className="space-y-1.5">
-                  <h3 className="text-sm font-bold text-slate-900 font-display group-hover:text-pink-600 transition-colors">
-                    Database & SQL Lab
-                  </h3>
-                  <p className="text-xs text-slate-500 leading-relaxed">
-                    Write complex queries, optimize performance, and work with real schema-based problems.
-                  </p>
-                </div>
-              </div>
-
-              <div className="pt-4 space-y-3">
-                <div className="flex items-center gap-3 text-[11px] text-slate-500 font-medium">
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5 text-slate-400" />
-                    15–30 mins
-                  </span>
-                  <span>•</span>
-                  <span className="flex items-center gap-1">
-                    <BarChart3 className="w-3.5 h-3.5 text-slate-400" />
-                    All Levels
-                  </span>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => navigate('/interview/coding/new?focus=SQL')}
-                  className="w-full py-2.5 px-3 rounded-xl bg-sky-50 hover:bg-sky-100 text-blue-700 border border-blue-200 font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-                >
-                  <span>Start SQL Challenge</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
-
-            {/* Track 4: Code Debugging & Refactoring */}
-            <div className="relative flex flex-col justify-between p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md transition-all hover:border-slate-300 group">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
-                    <Bug className="w-5 h-5" />
-                  </div>
-                </div>
-
-                <div className="space-y-1.5">
-                  <h3 className="text-sm font-bold text-slate-900 font-display group-hover:text-amber-600 transition-colors">
-                    Code Debugging & Refactoring
-                  </h3>
-                  <p className="text-xs text-slate-500 leading-relaxed">
-                    Identify bugs, memory leaks, and concurrency issues in real codebases.
-                  </p>
-                </div>
-              </div>
-
-              <div className="pt-4 space-y-3">
-                <div className="flex items-center gap-3 text-[11px] text-slate-500 font-medium">
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5 text-slate-400" />
-                    15–30 mins
-                  </span>
-                  <span>•</span>
-                  <span className="flex items-center gap-1">
-                    <BarChart3 className="w-3.5 h-3.5 text-slate-400" />
-                    All Levels
-                  </span>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => navigate('/interview/coding/new?focus=Debugging')}
-                  className="w-full py-2.5 px-3 rounded-xl bg-sky-50 hover:bg-sky-100 text-blue-700 border border-blue-200 font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-                >
-                  <span>Start Debug Challenge</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
-
-          </div>
-
-        </div>
-
-        {/* ─── 4. WHAT AVA OBSERVES IN THE LIVE MONACO IDE ─── */}
-        <div className="bg-white border border-blue-100/90 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xs">
-          
-          <div className="space-y-1">
-            <h2 className="text-xl font-bold text-slate-900 font-display tracking-tight">
-              What Ava Observes in the Live Monaco IDE
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-500 font-medium">
-              Unlike standard coding platforms, Ava evaluates your entire problem-solving process.
-            </p>
-          </div>
-
-          <div className="flex flex-col lg:flex-row items-stretch gap-6">
-            
-            {/* Left Code Editor Preview Widget */}
-            <div className="w-full lg:w-72 bg-slate-950 rounded-2xl p-4 border border-slate-800 shadow-md flex flex-col justify-between relative overflow-hidden shrink-0 min-h-[160px]">
-              <div className="space-y-2">
-                {/* 3 Top Editor Dots */}
-                <div className="flex items-center gap-1.5 pb-2 border-b border-slate-800">
-                  <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                </div>
-                {/* Code lines simulation */}
-                <div className="space-y-1.5 font-mono text-[10px]">
-                  <div className="flex items-center gap-2 text-slate-400">
-                    <span className="text-slate-600">1</span>
-                    <span className="text-purple-400">function</span>
-                    <span className="text-blue-400">solve</span>
-                    <span className="text-slate-300">(nums) &#123;</span>
-                  </div>
-                  <div className="flex items-center gap-2 pl-3 text-slate-400">
-                    <span className="text-slate-600">2</span>
-                    <span className="text-pink-400">const</span>
-                    <span className="text-slate-200">map = </span>
-                    <span className="text-amber-300">new Map();</span>
-                  </div>
-                  <div className="flex items-center gap-2 pl-3 text-slate-400">
-                    <span className="text-slate-600">3</span>
-                    <span className="text-emerald-400">// Asymptotic O(N)</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Floating Highlight Pill */}
-              <div className="mt-4 p-2.5 rounded-xl bg-white/95 text-slate-900 border border-slate-200 shadow-lg flex items-center gap-2">
-                <div className="w-6 h-6 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
-                  <Lightbulb className="w-3.5 h-3.5" />
-                </div>
-                <div className="text-[10px] font-bold leading-tight">
-                  Real-world coding environment in your browser
-                </div>
-              </div>
-            </div>
-
-            {/* Right 4 Pillars Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 flex-1">
-              
-              {/* Pillar 1: Keystroke & Flow */}
-              <div className="p-4 rounded-2xl bg-[#F8FAFC] border border-slate-200/70 space-y-2">
-                <div className="w-8 h-8 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center">
-                  <Keyboard className="w-4 h-4" />
-                </div>
-                <h4 className="text-xs font-bold text-slate-900 font-display">
-                  Keystroke & Flow
-                </h4>
-                <p className="text-[11px] text-slate-500 leading-relaxed">
-                  Tracks thinking pauses, refactoring frequency, and structured coding.
-                </p>
-              </div>
-
-              {/* Pillar 2: Code Quality */}
-              <div className="p-4 rounded-2xl bg-[#F8FAFC] border border-slate-200/70 space-y-2">
-                <div className="w-8 h-8 rounded-xl bg-pink-100 text-pink-700 flex items-center justify-center">
-                  <Code2 className="w-4 h-4" />
-                </div>
-                <h4 className="text-xs font-bold text-slate-900 font-display">
-                  Code Quality
-                </h4>
-                <p className="text-[11px] text-slate-500 leading-relaxed">
-                  Analyzes clean code practices, modularization and readability.
-                </p>
-              </div>
-
-              {/* Pillar 3: Test Case Handling */}
-              <div className="p-4 rounded-2xl bg-[#F8FAFC] border border-slate-200/70 space-y-2">
-                <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
-                  <FlaskConical className="w-4 h-4" />
-                </div>
-                <h4 className="text-xs font-bold text-slate-900 font-display">
-                  Test Case Handling
-                </h4>
-                <p className="text-[11px] text-slate-500 leading-relaxed">
-                  Verifies edge case coverage and correctness of your solution.
-                </p>
-              </div>
-
-              {/* Pillar 4: Problem-Solving Approach */}
-              <div className="p-4 rounded-2xl bg-[#F8FAFC] border border-slate-200/70 space-y-2">
-                <div className="w-8 h-8 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center">
-                  <Target className="w-4 h-4" />
-                </div>
-                <h4 className="text-xs font-bold text-slate-900 font-display">
-                  Problem-Solving Approach
-                </h4>
-                <p className="text-[11px] text-slate-500 leading-relaxed">
-                  Understands your logic, complexity analysis and optimization decisions.
-                </p>
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-        {/* ─── 5. RECENT CODING SESSIONS HISTORY (IF ANY) ─── */}
-        {hasHistory && (
-          <div className="bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
+          {/* CARD 1: CODING SESSIONS */}
+          <Card className="p-5 bg-white dark:bg-[#11183D] border-slate-200/80 dark:border-[#1E293B] shadow-xs rounded-2xl flex flex-col justify-between space-y-3">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
-                  <FileText className="w-4 h-4" />
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-100 dark:border-emerald-800/60">
+                  <FileCode className="w-5 h-5" />
                 </div>
-                <h3 className="text-lg font-bold text-slate-900 font-display">
-                  Recent Coding Sessions
-                </h3>
+                <div>
+                  <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                    Coding Sessions
+                  </span>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-extrabold text-slate-900 dark:text-white">{totalCoding}</span>
+                  </div>
+                </div>
               </div>
-              <span className="text-xs text-slate-500 font-medium">
-                {completedSessions.length} completed
-              </span>
+              {hasHistory && <MiniBarGraph color="bg-emerald-500" />}
             </div>
 
-            <div className="divide-y divide-slate-100">
-              {completedSessions.slice(0, 5).map((sess) => {
-                const score = Math.round(sess.evalScore || sess.analysis?.overallScore || 0);
-                const scoreColor = score >= 80 ? 'text-emerald-700 bg-emerald-50 border-emerald-200' : score >= 60 ? 'text-amber-700 bg-amber-50 border-amber-200' : 'text-slate-700 bg-slate-50 border-slate-200';
-                
-                return (
-                  <div
-                    key={sess.id}
-                    onClick={() => navigate(`/interview/${sess.id}/analysis`)}
-                    className="py-3.5 flex items-center justify-between hover:bg-slate-50/80 px-3 -mx-3 rounded-xl transition-colors cursor-pointer"
-                  >
-                    <div className="flex items-center gap-3.5">
-                      <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-mono font-bold text-xs">
-                        <Code2 size={16} />
+            <span className="text-[11px] text-slate-400 block font-medium">
+              {hasHistory ? 'Challenges completed' : 'No coding sessions yet'}
+            </span>
+
+            {hasHistory && (
+              <button
+                onClick={() => navigate('/coding/new')}
+                className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 pt-1 self-start cursor-pointer"
+              >
+                Start New <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </Card>
+
+          {/* CARD 2: AVERAGE SCORE */}
+          <Card className="p-5 bg-white dark:bg-[#11183D] border-slate-200/80 dark:border-[#1E293B] shadow-xs rounded-2xl flex flex-col justify-between space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-100 dark:border-amber-800/60">
+                  <Award className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                    Average Score
+                  </span>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-extrabold text-slate-900 dark:text-white">
+                      {hasHistory ? `${avgScore}%` : '—'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              {hasHistory && <MiniBarGraph color="bg-amber-500" />}
+            </div>
+
+            <span className="text-[11px] text-slate-400 block font-medium">
+              {hasHistory ? 'Across all code evaluations' : 'Complete a session to unlock'}
+            </span>
+
+            {hasHistory && (
+              <button
+                onClick={() => navigate('/analytics')}
+                className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 pt-1 self-start cursor-pointer"
+              >
+                View Analytics <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </Card>
+
+          {/* CARD 3: CODING TIME */}
+          <Card className="p-5 bg-white dark:bg-[#11183D] border-slate-200/80 dark:border-[#1E293B] shadow-xs rounded-2xl flex flex-col justify-between space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-100 dark:border-blue-800/60">
+                  <Clock className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                    Coding Time
+                  </span>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-extrabold text-slate-900 dark:text-white">{codingTimeDisplay}</span>
+                  </div>
+                </div>
+              </div>
+              {hasHistory && <MiniBarGraph color="bg-blue-500" />}
+            </div>
+
+            <span className="text-[11px] text-slate-400 block font-medium">
+              {hasHistory ? 'Time spent in IDE' : 'No practice sessions yet'}
+            </span>
+          </Card>
+
+          {/* CARD 4: LATEST SCORE */}
+          <Card className="p-5 bg-white dark:bg-[#11183D] border-slate-200/80 dark:border-[#1E293B] shadow-xs rounded-2xl flex flex-col justify-between space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center border border-purple-100 dark:border-purple-800/60">
+                  <BarChart3 className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                    Latest Score
+                  </span>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-extrabold text-slate-900 dark:text-white">
+                      {latestScoreDisplay}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              {hasHistory && <MiniBarGraph color="bg-purple-500" />}
+            </div>
+
+            <span className="text-[11px] text-slate-400 block font-medium truncate">
+              {latestSession ? `${latestSession.targetRole || 'Coding Session'}` : 'Your first score will appear here'}
+            </span>
+
+            {hasHistory && latestSession && (
+              <button
+                onClick={() => navigate(`/coding/${latestSession.id}/analysis`)}
+                className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 pt-1 self-start cursor-pointer"
+              >
+                View Result →
+              </button>
+            )}
+          </Card>
+        </div>
+
+        {/* ─── 4. MIDDLE SECTION: PERFORMANCE & RECOMMENDATIONS ─── */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          
+          {/* LEFT CARD (8 COLS): YOUR CODING PERFORMANCE */}
+          <Card className="lg:col-span-8 p-6 bg-white dark:bg-[#11183D] border-slate-200/80 dark:border-[#1E293B] shadow-xs rounded-3xl space-y-5">
+            <div className="border-b border-slate-100 dark:border-slate-800 pb-4">
+              <div className="flex items-center gap-2">
+                <FileCode className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                <h2 className="text-base font-bold text-slate-900 dark:text-white">Your Coding Performance</h2>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Your algorithmic correctness, time complexity, and clean code breakdown.</p>
+            </div>
+
+            {!hasHistory ? (
+              <div className="py-12 px-6 text-center space-y-4 max-w-md mx-auto">
+                <div className="w-14 h-14 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center mx-auto border border-blue-100 dark:border-blue-800/60">
+                  <BarChart3 className="w-7 h-7" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">No coding performance data yet</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                    Complete your first coding interview to see your algorithmic correctness, time complexity, clean code architecture, problem solving speed, and edge case coverage.
+                  </p>
+                </div>
+                <Button
+                  onClick={() => navigate('/coding/new')}
+                  className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-xs px-6 py-2.5 rounded-full shadow-xs inline-flex items-center gap-1.5 cursor-pointer"
+                >
+                  <span>Start Your First Coding Session →</span>
+                </Button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                <div className="md:col-span-5 flex items-center justify-center py-2">
+                  <CodingRadarChart scores={radarScores} />
+                </div>
+
+                <div className="md:col-span-7 space-y-3.5">
+                  {performanceBars.map((bar) => (
+                    <div key={bar.label} className="space-y-1">
+                      <div className="flex items-center justify-between text-xs font-bold">
+                        <span className="text-slate-800 dark:text-slate-200">{bar.label}</span>
+                        <span className="font-mono text-slate-900 dark:text-white">{bar.value}%</span>
                       </div>
-                      <div>
-                        <div className="text-xs font-bold text-slate-900">
-                          {sess.targetRole || 'Technical Coding Assessment'}
-                        </div>
-                        <div className="text-[11px] text-slate-500 font-medium">
-                          {sess.focusAreas?.join(', ') || 'DSA & Algorithms'} • {sess.createdAt ? new Date(sess.createdAt).toLocaleDateString() : 'Recent'}
-                        </div>
+                      <div className="h-2.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full ${bar.color} rounded-full transition-all duration-500`}
+                          style={{ width: `${bar.value}%` }}
+                        />
                       </div>
                     </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </Card>
 
-                    <div className="flex items-center gap-3">
-                      <span className={`px-2.5 py-1 rounded-full text-xs font-bold border ${scoreColor}`}>
-                        {score > 0 ? `${score}% Score` : 'Evaluated'}
-                      </span>
-                      <ChevronRight size={16} className="text-slate-400" />
+          {/* RIGHT CARD (4 COLS): RECOMMENDATIONS */}
+          <Card className="lg:col-span-4 p-6 bg-white dark:bg-[#11183D] border-slate-200/80 dark:border-[#1E293B] shadow-xs rounded-3xl space-y-4">
+            <div className="space-y-1 border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2 text-amber-500">
+                <Lightbulb className="w-5 h-5 fill-amber-100 text-amber-500" />
+                <h3 className="text-base font-bold text-slate-900 dark:text-white">Recommended Next Steps</h3>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Based on your recent code submissions, focus on:</p>
+            </div>
+
+            {!hasHistory ? (
+              <div className="py-8 px-2 text-center space-y-4">
+                <div className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto border border-amber-100 dark:border-amber-800/60">
+                  <Lightbulb className="w-6 h-6 fill-amber-100 text-amber-500" />
+                </div>
+                <div className="space-y-1">
+                  <h4 className="text-xs font-bold text-slate-900 dark:text-white leading-snug">
+                    Personalized recommendations appear after your first coding session.
+                  </h4>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed max-w-xs mx-auto">
+                    Complete a session and Ava will evaluate your complexity analysis, time-to-first-pass, and recommend specific topics.
+                  </p>
+                </div>
+                <Button
+                  onClick={() => navigate('/coding/new')}
+                  className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-xs inline-flex items-center gap-1.5 cursor-pointer"
+                >
+                  <span>Start Coding Practice →</span>
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-3 text-xs">
+                <div
+                  onClick={() => navigate('/coding/new?focus=DSA')}
+                  className="p-3.5 rounded-2xl bg-blue-50/60 dark:bg-[#152046] border border-blue-100 dark:border-[#1E293B] hover:border-blue-300 transition-all cursor-pointer flex items-center justify-between gap-3 group"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 mt-0.5">
+                      <Target className="w-4 h-4" />
+                    </div>
+                    <div className="space-y-0.5">
+                      <h4 className="font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                        Master Two Pointers & Sliding Window
+                      </h4>
+                      <p className="text-slate-500 dark:text-slate-400 text-[11px] leading-snug">
+                        Optimize O(N^2) loops to linear O(N) runtime.
+                      </p>
                     </div>
                   </div>
-                );
-              })}
+                  <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
+                </div>
+
+                <div
+                  onClick={() => navigate('/coding/new?focus=MachineCoding')}
+                  className="p-3.5 rounded-2xl bg-purple-50/60 dark:bg-[#152046] border border-purple-100 dark:border-[#1E293B] hover:border-purple-300 transition-all cursor-pointer flex items-center justify-between gap-3 group"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-purple-600 text-white flex items-center justify-center shrink-0 mt-0.5">
+                      <Layers className="w-4 h-4" />
+                    </div>
+                    <div className="space-y-0.5">
+                      <h4 className="font-bold text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                        Machine Coding & LLD Round
+                      </h4>
+                      <p className="text-slate-500 dark:text-slate-400 text-[11px] leading-snug">
+                        Practice In-Memory Cache and Rate Limiter design.
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
+                </div>
+
+                <Button
+                  onClick={() => navigate('/coding/new?mode=adaptive')}
+                  className="w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-xs font-bold py-3 rounded-2xl shadow-sm flex items-center justify-center gap-1.5 transition-all mt-2 cursor-pointer"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  <span>Start Targeted Problem →</span>
+                </Button>
+              </div>
+            )}
+          </Card>
+        </div>
+
+        {/* ─── 5. BOTTOM SECTION: CODING HISTORY & QUICK START ─── */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          
+          {/* LEFT TABLE CARD (8 COLS): CODING INTERVIEW HISTORY */}
+          <Card className="lg:col-span-8 p-6 bg-white dark:bg-[#11183D] border-slate-200/80 dark:border-[#1E293B] shadow-xs rounded-3xl space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <FileCode className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                <h3 className="text-base font-bold text-slate-900 dark:text-white">Coding Interview History</h3>
+              </div>
+              {hasHistory && (
+                <button
+                  onClick={() => navigate('/coding/new')}
+                  className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 cursor-pointer"
+                >
+                  Practice More <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
-          </div>
-        )}
+
+            {!hasHistory ? (
+              <div className="py-12 text-center space-y-3 max-w-sm mx-auto">
+                <div className="w-12 h-12 rounded-2xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center mx-auto border border-purple-100 dark:border-purple-800/60">
+                  <FileCode className="w-6 h-6" />
+                </div>
+                <div className="space-y-1">
+                  <h4 className="text-sm font-bold text-slate-900 dark:text-white">No coding sessions yet</h4>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Your completed code submissions and analyses will appear here.</p>
+                </div>
+                <Button
+                  onClick={() => navigate('/coding/new')}
+                  className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-xs inline-flex items-center gap-1.5 cursor-pointer"
+                >
+                  <span>Start Your First Coding Session →</span>
+                </Button>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead>
+                    <tr className="border-b border-slate-100 dark:border-slate-800 text-slate-400 font-mono text-[10.5px] uppercase">
+                      <th className="pb-3 font-semibold">Date</th>
+                      <th className="pb-3 font-semibold">Track</th>
+                      <th className="pb-3 font-semibold">Target Role</th>
+                      <th className="pb-3 font-semibold">Duration</th>
+                      <th className="pb-3 font-semibold">Score</th>
+                      <th className="pb-3 font-semibold">Status</th>
+                      <th className="pb-3 text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                    {completedSessions.map((s) => {
+                      const scoreVal = Math.round(s.evalScore || s.analysis?.overallScore || 0);
+                      const badgeColor =
+                        scoreVal >= 80
+                          ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300'
+                          : scoreVal >= 70
+                          ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300'
+                          : 'bg-orange-100 text-orange-800 dark:bg-orange-950/80 dark:text-orange-300';
+
+                      return (
+                        <tr
+                          key={s.id}
+                          onClick={() => navigate(`/coding/${s.id}/analysis`)}
+                          className="hover:bg-blue-50/30 dark:hover:bg-white/[0.03] cursor-pointer transition-colors"
+                        >
+                          <td className="py-3.5 font-mono text-slate-500 dark:text-slate-400">
+                            {s.createdAt ? new Date(s.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent'}
+                          </td>
+                          <td className="py-3.5 font-semibold text-slate-700 dark:text-slate-300">
+                            {s.focusAreas?.[0] || 'DSA & Algorithms'}
+                          </td>
+                          <td className="py-3.5 font-bold text-slate-900 dark:text-white">
+                            {s.targetRole || 'Software Engineer'}
+                          </td>
+                          <td className="py-3.5 font-mono text-slate-600 dark:text-slate-400">
+                            {s.durationMins || 30} min
+                          </td>
+                          <td className="py-3.5">
+                            <span className={`px-2.5 py-1 rounded-full font-mono font-bold text-xs ${badgeColor}`}>
+                              {scoreVal}%
+                            </span>
+                          </td>
+                          <td className="py-3.5 font-mono text-xs text-slate-500 uppercase">
+                            {s.status}
+                          </td>
+                          <td className="py-3.5 text-right font-bold text-blue-600 dark:text-blue-400">
+                            View Analysis →
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </Card>
+
+          {/* RIGHT CARD (4 COLS): QUICK START 2x2 GRID */}
+          <Card className="lg:col-span-4 p-6 bg-white dark:bg-[#11183D] border-slate-200/80 dark:border-[#1E293B] shadow-xs rounded-3xl space-y-4">
+            <div className="space-y-1 border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2 text-amber-500">
+                <Zap className="w-5 h-5 text-amber-500 fill-amber-100" />
+                <h3 className="text-base font-bold text-slate-900 dark:text-white">Quick Start</h3>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Choose a practice track to begin</p>
+            </div>
+
+            {/* 2x2 Quick Start Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              
+              {/* Card 1: DSA Problem Solving */}
+              <div
+                onClick={() => navigate('/coding/new?focus=DSA')}
+                className="p-3.5 rounded-2xl bg-blue-50/70 dark:bg-[#152046] border border-blue-100 dark:border-[#1E293B] hover:border-blue-300 transition-all cursor-pointer space-y-2 group"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center">
+                    <Code2 className="w-4 h-4" />
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-slate-900 dark:text-white">DSA Challenge</h4>
+                  <p className="text-[10.5px] text-slate-500 dark:text-slate-400 leading-tight">Arrays, DP, Graphs & Trees</p>
+                </div>
+              </div>
+
+              {/* Card 2: Machine Coding & LLD */}
+              <div
+                onClick={() => navigate('/coding/new?focus=MachineCoding')}
+                className="p-3.5 rounded-2xl bg-purple-50/70 dark:bg-[#152046] border border-purple-100 dark:border-[#1E293B] hover:border-purple-300 transition-all cursor-pointer space-y-2 group"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="w-8 h-8 rounded-xl bg-purple-600 text-white flex items-center justify-center">
+                    <Layers className="w-4 h-4" />
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-purple-600 transition-colors" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-slate-900 dark:text-white">Machine Coding</h4>
+                  <p className="text-[10.5px] text-slate-500 dark:text-slate-400 leading-tight">LLD & In-Memory Systems</p>
+                </div>
+              </div>
+
+              {/* Card 3: SQL & Database */}
+              <div
+                onClick={() => navigate('/coding/new?focus=SQL')}
+                className="p-3.5 rounded-2xl bg-amber-50/70 dark:bg-[#152046] border border-amber-100 dark:border-[#1E293B] hover:border-amber-300 transition-all cursor-pointer space-y-2 group"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="w-8 h-8 rounded-xl bg-amber-600 text-white flex items-center justify-center">
+                    <Database className="w-4 h-4" />
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-amber-600 transition-colors" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-slate-900 dark:text-white">SQL & Database</h4>
+                  <p className="text-[10.5px] text-slate-500 dark:text-slate-400 leading-tight">Complex Queries & Indexes</p>
+                </div>
+              </div>
+
+              {/* Card 4: Frontend JS Architecture */}
+              <div
+                onClick={() => navigate('/coding/new?focus=Frontend')}
+                className="p-3.5 rounded-2xl bg-teal-50/70 dark:bg-[#152046] border border-teal-100 dark:border-[#1E293B] hover:border-teal-300 transition-all cursor-pointer space-y-2 group"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="w-8 h-8 rounded-xl bg-teal-600 text-white flex items-center justify-center">
+                    <Cpu className="w-4 h-4" />
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-teal-600 transition-colors" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-slate-900 dark:text-white">Frontend JS</h4>
+                  <p className="text-[10.5px] text-slate-500 dark:text-slate-400 leading-tight">Async Queues & DOM Engines</p>
+                </div>
+              </div>
+
+            </div>
+          </Card>
+        </div>
 
       </div>
+
+      {/* In-Built Interview Detail Modal */}
+      <InbuiltInterviewModal
+        interview={selectedInbuilt}
+        onClose={() => setSelectedInbuilt(null)}
+      />
+
+      {/* In-Built Catalog Modal */}
+      <InbuiltCatalogModal
+        isOpen={isCatalogModalOpen}
+        onClose={() => setIsCatalogModalOpen(false)}
+        defaultCategory="coding"
+        onSelectInterview={(item) => {
+          setIsCatalogModalOpen(false);
+          setSelectedInbuilt(item);
+        }}
+      />
     </div>
   );
 }
