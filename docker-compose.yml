@@ -38,6 +38,7 @@ services:
       CODING_INTERVIEW_SERVICE_URL: http://coding-interview-service:4006
       PAYMENT_SERVICE_URL: http://payment-service:4007
       ADMIN_SERVICE_URL: http://admin-service:4008
+      RESUME_SERVICE_URL: http://resume-service:3009
     depends_on:
       - auth-service
       - oral-interview-service
@@ -47,6 +48,7 @@ services:
       - ai-analysis-service
       - analytics-service
       - admin-service
+      - resume-service
 
   auth-service:
     build:
@@ -173,6 +175,25 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+
+  resume-service:
+    build:
+      context: .
+      dockerfile: docker/resume-service/Dockerfile
+    container_name: ru_ready_resume
+    restart: unless-stopped
+    ports:
+      - '3009:3009'
+    environment:
+      RESUME_SERVICE_PORT: 3009
+      DATABASE_URL: postgresql://ruready:ruready_dev_pass@postgres:5432/ru_ready
+      AI_ANALYSIS_SERVICE_URL: http://ai-analysis-service:4003
+      AI_PROVIDER: mock
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ai-analysis-service:
+        condition: service_started
 
 volumes:
   postgres_data:

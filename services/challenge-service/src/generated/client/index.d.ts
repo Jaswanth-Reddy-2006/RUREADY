@@ -17384,6 +17384,12 @@ export namespace Prisma {
     currentStreak: number | null
     longestStreak: number | null
     totalXP: number | null
+    weeklyPoints: number | null
+    monthlyPoints: number | null
+    weeklyMatches: number | null
+    weeklyWins: number | null
+    monthlyMatches: number | null
+    monthlyWins: number | null
   }
 
   export type ChallengeRatingSumAggregateOutputType = {
@@ -17394,6 +17400,12 @@ export namespace Prisma {
     currentStreak: number | null
     longestStreak: number | null
     totalXP: number | null
+    weeklyPoints: number | null
+    monthlyPoints: number | null
+    weeklyMatches: number | null
+    weeklyWins: number | null
+    monthlyMatches: number | null
+    monthlyWins: number | null
   }
 
   export type ChallengeRatingMinAggregateOutputType = {
@@ -17409,6 +17421,13 @@ export namespace Prisma {
     currentStreak: number | null
     longestStreak: number | null
     totalXP: number | null
+    weeklyPoints: number | null
+    monthlyPoints: number | null
+    weeklyMatches: number | null
+    weeklyWins: number | null
+    monthlyMatches: number | null
+    monthlyWins: number | null
+    seasonResetAt: Date | null
     updatedAt: Date | null
   }
 
@@ -17425,6 +17444,13 @@ export namespace Prisma {
     currentStreak: number | null
     longestStreak: number | null
     totalXP: number | null
+    weeklyPoints: number | null
+    monthlyPoints: number | null
+    weeklyMatches: number | null
+    weeklyWins: number | null
+    monthlyMatches: number | null
+    monthlyWins: number | null
+    seasonResetAt: Date | null
     updatedAt: Date | null
   }
 
@@ -17441,6 +17467,13 @@ export namespace Prisma {
     currentStreak: number
     longestStreak: number
     totalXP: number
+    weeklyPoints: number
+    monthlyPoints: number
+    weeklyMatches: number
+    weeklyWins: number
+    monthlyMatches: number
+    monthlyWins: number
+    seasonResetAt: number
     updatedAt: number
     _all: number
   }
@@ -17454,6 +17487,12 @@ export namespace Prisma {
     currentStreak?: true
     longestStreak?: true
     totalXP?: true
+    weeklyPoints?: true
+    monthlyPoints?: true
+    weeklyMatches?: true
+    weeklyWins?: true
+    monthlyMatches?: true
+    monthlyWins?: true
   }
 
   export type ChallengeRatingSumAggregateInputType = {
@@ -17464,6 +17503,12 @@ export namespace Prisma {
     currentStreak?: true
     longestStreak?: true
     totalXP?: true
+    weeklyPoints?: true
+    monthlyPoints?: true
+    weeklyMatches?: true
+    weeklyWins?: true
+    monthlyMatches?: true
+    monthlyWins?: true
   }
 
   export type ChallengeRatingMinAggregateInputType = {
@@ -17479,6 +17524,13 @@ export namespace Prisma {
     currentStreak?: true
     longestStreak?: true
     totalXP?: true
+    weeklyPoints?: true
+    monthlyPoints?: true
+    weeklyMatches?: true
+    weeklyWins?: true
+    monthlyMatches?: true
+    monthlyWins?: true
+    seasonResetAt?: true
     updatedAt?: true
   }
 
@@ -17495,6 +17547,13 @@ export namespace Prisma {
     currentStreak?: true
     longestStreak?: true
     totalXP?: true
+    weeklyPoints?: true
+    monthlyPoints?: true
+    weeklyMatches?: true
+    weeklyWins?: true
+    monthlyMatches?: true
+    monthlyWins?: true
+    seasonResetAt?: true
     updatedAt?: true
   }
 
@@ -17511,6 +17570,13 @@ export namespace Prisma {
     currentStreak?: true
     longestStreak?: true
     totalXP?: true
+    weeklyPoints?: true
+    monthlyPoints?: true
+    weeklyMatches?: true
+    weeklyWins?: true
+    monthlyMatches?: true
+    monthlyWins?: true
+    seasonResetAt?: true
     updatedAt?: true
     _all?: true
   }
@@ -17614,6 +17680,13 @@ export namespace Prisma {
     currentStreak: number
     longestStreak: number
     totalXP: number
+    weeklyPoints: number
+    monthlyPoints: number
+    weeklyMatches: number
+    weeklyWins: number
+    monthlyMatches: number
+    monthlyWins: number
+    seasonResetAt: Date | null
     updatedAt: Date
     _count: ChallengeRatingCountAggregateOutputType | null
     _avg: ChallengeRatingAvgAggregateOutputType | null
@@ -17649,6 +17722,13 @@ export namespace Prisma {
     currentStreak?: boolean
     longestStreak?: boolean
     totalXP?: boolean
+    weeklyPoints?: boolean
+    monthlyPoints?: boolean
+    weeklyMatches?: boolean
+    weeklyWins?: boolean
+    monthlyMatches?: boolean
+    monthlyWins?: boolean
+    seasonResetAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["challengeRating"]>
 
@@ -17665,6 +17745,13 @@ export namespace Prisma {
     currentStreak?: boolean
     longestStreak?: boolean
     totalXP?: boolean
+    weeklyPoints?: boolean
+    monthlyPoints?: boolean
+    weeklyMatches?: boolean
+    weeklyWins?: boolean
+    monthlyMatches?: boolean
+    monthlyWins?: boolean
+    seasonResetAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["challengeRating"]>
 
@@ -17681,6 +17768,13 @@ export namespace Prisma {
     currentStreak?: boolean
     longestStreak?: boolean
     totalXP?: boolean
+    weeklyPoints?: boolean
+    monthlyPoints?: boolean
+    weeklyMatches?: boolean
+    weeklyWins?: boolean
+    monthlyMatches?: boolean
+    monthlyWins?: boolean
+    seasonResetAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["challengeRating"]>
 
@@ -17697,10 +17791,17 @@ export namespace Prisma {
     currentStreak?: boolean
     longestStreak?: boolean
     totalXP?: boolean
+    weeklyPoints?: boolean
+    monthlyPoints?: boolean
+    weeklyMatches?: boolean
+    weeklyWins?: boolean
+    monthlyMatches?: boolean
+    monthlyWins?: boolean
+    seasonResetAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ChallengeRatingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "userName" | "userAvatar" | "rating" | "tier" | "battlesTotal" | "battlesWon" | "winRate" | "currentStreak" | "longestStreak" | "totalXP" | "updatedAt", ExtArgs["result"]["challengeRating"]>
+  export type ChallengeRatingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "userName" | "userAvatar" | "rating" | "tier" | "battlesTotal" | "battlesWon" | "winRate" | "currentStreak" | "longestStreak" | "totalXP" | "weeklyPoints" | "monthlyPoints" | "weeklyMatches" | "weeklyWins" | "monthlyMatches" | "monthlyWins" | "seasonResetAt" | "updatedAt", ExtArgs["result"]["challengeRating"]>
 
   export type $ChallengeRatingPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "ChallengeRating"
@@ -17718,6 +17819,13 @@ export namespace Prisma {
       currentStreak: number
       longestStreak: number
       totalXP: number
+      weeklyPoints: number
+      monthlyPoints: number
+      weeklyMatches: number
+      weeklyWins: number
+      monthlyMatches: number
+      monthlyWins: number
+      seasonResetAt: Date | null
       updatedAt: Date
     }, ExtArgs["result"]["challengeRating"]>
     composites: {}
@@ -18154,6 +18262,13 @@ export namespace Prisma {
     readonly currentStreak: FieldRef<"ChallengeRating", 'Int'>
     readonly longestStreak: FieldRef<"ChallengeRating", 'Int'>
     readonly totalXP: FieldRef<"ChallengeRating", 'Int'>
+    readonly weeklyPoints: FieldRef<"ChallengeRating", 'Int'>
+    readonly monthlyPoints: FieldRef<"ChallengeRating", 'Int'>
+    readonly weeklyMatches: FieldRef<"ChallengeRating", 'Int'>
+    readonly weeklyWins: FieldRef<"ChallengeRating", 'Int'>
+    readonly monthlyMatches: FieldRef<"ChallengeRating", 'Int'>
+    readonly monthlyWins: FieldRef<"ChallengeRating", 'Int'>
+    readonly seasonResetAt: FieldRef<"ChallengeRating", 'DateTime'>
     readonly updatedAt: FieldRef<"ChallengeRating", 'DateTime'>
   }
     
@@ -19798,6 +19913,13 @@ export namespace Prisma {
     currentStreak: 'currentStreak',
     longestStreak: 'longestStreak',
     totalXP: 'totalXP',
+    weeklyPoints: 'weeklyPoints',
+    monthlyPoints: 'monthlyPoints',
+    weeklyMatches: 'weeklyMatches',
+    weeklyWins: 'weeklyWins',
+    monthlyMatches: 'monthlyMatches',
+    monthlyWins: 'monthlyWins',
+    seasonResetAt: 'seasonResetAt',
     updatedAt: 'updatedAt'
   };
 
@@ -21031,6 +21153,13 @@ export namespace Prisma {
     currentStreak?: IntFilter<"ChallengeRating"> | number
     longestStreak?: IntFilter<"ChallengeRating"> | number
     totalXP?: IntFilter<"ChallengeRating"> | number
+    weeklyPoints?: IntFilter<"ChallengeRating"> | number
+    monthlyPoints?: IntFilter<"ChallengeRating"> | number
+    weeklyMatches?: IntFilter<"ChallengeRating"> | number
+    weeklyWins?: IntFilter<"ChallengeRating"> | number
+    monthlyMatches?: IntFilter<"ChallengeRating"> | number
+    monthlyWins?: IntFilter<"ChallengeRating"> | number
+    seasonResetAt?: DateTimeNullableFilter<"ChallengeRating"> | Date | string | null
     updatedAt?: DateTimeFilter<"ChallengeRating"> | Date | string
   }
 
@@ -21047,6 +21176,13 @@ export namespace Prisma {
     currentStreak?: SortOrder
     longestStreak?: SortOrder
     totalXP?: SortOrder
+    weeklyPoints?: SortOrder
+    monthlyPoints?: SortOrder
+    weeklyMatches?: SortOrder
+    weeklyWins?: SortOrder
+    monthlyMatches?: SortOrder
+    monthlyWins?: SortOrder
+    seasonResetAt?: SortOrderInput | SortOrder
     updatedAt?: SortOrder
   }
 
@@ -21066,6 +21202,13 @@ export namespace Prisma {
     currentStreak?: IntFilter<"ChallengeRating"> | number
     longestStreak?: IntFilter<"ChallengeRating"> | number
     totalXP?: IntFilter<"ChallengeRating"> | number
+    weeklyPoints?: IntFilter<"ChallengeRating"> | number
+    monthlyPoints?: IntFilter<"ChallengeRating"> | number
+    weeklyMatches?: IntFilter<"ChallengeRating"> | number
+    weeklyWins?: IntFilter<"ChallengeRating"> | number
+    monthlyMatches?: IntFilter<"ChallengeRating"> | number
+    monthlyWins?: IntFilter<"ChallengeRating"> | number
+    seasonResetAt?: DateTimeNullableFilter<"ChallengeRating"> | Date | string | null
     updatedAt?: DateTimeFilter<"ChallengeRating"> | Date | string
   }, "id" | "userId">
 
@@ -21082,6 +21225,13 @@ export namespace Prisma {
     currentStreak?: SortOrder
     longestStreak?: SortOrder
     totalXP?: SortOrder
+    weeklyPoints?: SortOrder
+    monthlyPoints?: SortOrder
+    weeklyMatches?: SortOrder
+    weeklyWins?: SortOrder
+    monthlyMatches?: SortOrder
+    monthlyWins?: SortOrder
+    seasonResetAt?: SortOrderInput | SortOrder
     updatedAt?: SortOrder
     _count?: ChallengeRatingCountOrderByAggregateInput
     _avg?: ChallengeRatingAvgOrderByAggregateInput
@@ -21106,6 +21256,13 @@ export namespace Prisma {
     currentStreak?: IntWithAggregatesFilter<"ChallengeRating"> | number
     longestStreak?: IntWithAggregatesFilter<"ChallengeRating"> | number
     totalXP?: IntWithAggregatesFilter<"ChallengeRating"> | number
+    weeklyPoints?: IntWithAggregatesFilter<"ChallengeRating"> | number
+    monthlyPoints?: IntWithAggregatesFilter<"ChallengeRating"> | number
+    weeklyMatches?: IntWithAggregatesFilter<"ChallengeRating"> | number
+    weeklyWins?: IntWithAggregatesFilter<"ChallengeRating"> | number
+    monthlyMatches?: IntWithAggregatesFilter<"ChallengeRating"> | number
+    monthlyWins?: IntWithAggregatesFilter<"ChallengeRating"> | number
+    seasonResetAt?: DateTimeNullableWithAggregatesFilter<"ChallengeRating"> | Date | string | null
     updatedAt?: DateTimeWithAggregatesFilter<"ChallengeRating"> | Date | string
   }
 
@@ -22389,6 +22546,13 @@ export namespace Prisma {
     currentStreak?: number
     longestStreak?: number
     totalXP?: number
+    weeklyPoints?: number
+    monthlyPoints?: number
+    weeklyMatches?: number
+    weeklyWins?: number
+    monthlyMatches?: number
+    monthlyWins?: number
+    seasonResetAt?: Date | string | null
     updatedAt?: Date | string
   }
 
@@ -22405,6 +22569,13 @@ export namespace Prisma {
     currentStreak?: number
     longestStreak?: number
     totalXP?: number
+    weeklyPoints?: number
+    monthlyPoints?: number
+    weeklyMatches?: number
+    weeklyWins?: number
+    monthlyMatches?: number
+    monthlyWins?: number
+    seasonResetAt?: Date | string | null
     updatedAt?: Date | string
   }
 
@@ -22421,6 +22592,13 @@ export namespace Prisma {
     currentStreak?: IntFieldUpdateOperationsInput | number
     longestStreak?: IntFieldUpdateOperationsInput | number
     totalXP?: IntFieldUpdateOperationsInput | number
+    weeklyPoints?: IntFieldUpdateOperationsInput | number
+    monthlyPoints?: IntFieldUpdateOperationsInput | number
+    weeklyMatches?: IntFieldUpdateOperationsInput | number
+    weeklyWins?: IntFieldUpdateOperationsInput | number
+    monthlyMatches?: IntFieldUpdateOperationsInput | number
+    monthlyWins?: IntFieldUpdateOperationsInput | number
+    seasonResetAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -22437,6 +22615,13 @@ export namespace Prisma {
     currentStreak?: IntFieldUpdateOperationsInput | number
     longestStreak?: IntFieldUpdateOperationsInput | number
     totalXP?: IntFieldUpdateOperationsInput | number
+    weeklyPoints?: IntFieldUpdateOperationsInput | number
+    monthlyPoints?: IntFieldUpdateOperationsInput | number
+    weeklyMatches?: IntFieldUpdateOperationsInput | number
+    weeklyWins?: IntFieldUpdateOperationsInput | number
+    monthlyMatches?: IntFieldUpdateOperationsInput | number
+    monthlyWins?: IntFieldUpdateOperationsInput | number
+    seasonResetAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -22453,6 +22638,13 @@ export namespace Prisma {
     currentStreak?: number
     longestStreak?: number
     totalXP?: number
+    weeklyPoints?: number
+    monthlyPoints?: number
+    weeklyMatches?: number
+    weeklyWins?: number
+    monthlyMatches?: number
+    monthlyWins?: number
+    seasonResetAt?: Date | string | null
     updatedAt?: Date | string
   }
 
@@ -22469,6 +22661,13 @@ export namespace Prisma {
     currentStreak?: IntFieldUpdateOperationsInput | number
     longestStreak?: IntFieldUpdateOperationsInput | number
     totalXP?: IntFieldUpdateOperationsInput | number
+    weeklyPoints?: IntFieldUpdateOperationsInput | number
+    monthlyPoints?: IntFieldUpdateOperationsInput | number
+    weeklyMatches?: IntFieldUpdateOperationsInput | number
+    weeklyWins?: IntFieldUpdateOperationsInput | number
+    monthlyMatches?: IntFieldUpdateOperationsInput | number
+    monthlyWins?: IntFieldUpdateOperationsInput | number
+    seasonResetAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -22485,6 +22684,13 @@ export namespace Prisma {
     currentStreak?: IntFieldUpdateOperationsInput | number
     longestStreak?: IntFieldUpdateOperationsInput | number
     totalXP?: IntFieldUpdateOperationsInput | number
+    weeklyPoints?: IntFieldUpdateOperationsInput | number
+    monthlyPoints?: IntFieldUpdateOperationsInput | number
+    weeklyMatches?: IntFieldUpdateOperationsInput | number
+    weeklyWins?: IntFieldUpdateOperationsInput | number
+    monthlyMatches?: IntFieldUpdateOperationsInput | number
+    monthlyWins?: IntFieldUpdateOperationsInput | number
+    seasonResetAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -23534,6 +23740,13 @@ export namespace Prisma {
     currentStreak?: SortOrder
     longestStreak?: SortOrder
     totalXP?: SortOrder
+    weeklyPoints?: SortOrder
+    monthlyPoints?: SortOrder
+    weeklyMatches?: SortOrder
+    weeklyWins?: SortOrder
+    monthlyMatches?: SortOrder
+    monthlyWins?: SortOrder
+    seasonResetAt?: SortOrder
     updatedAt?: SortOrder
   }
 
@@ -23545,6 +23758,12 @@ export namespace Prisma {
     currentStreak?: SortOrder
     longestStreak?: SortOrder
     totalXP?: SortOrder
+    weeklyPoints?: SortOrder
+    monthlyPoints?: SortOrder
+    weeklyMatches?: SortOrder
+    weeklyWins?: SortOrder
+    monthlyMatches?: SortOrder
+    monthlyWins?: SortOrder
   }
 
   export type ChallengeRatingMaxOrderByAggregateInput = {
@@ -23560,6 +23779,13 @@ export namespace Prisma {
     currentStreak?: SortOrder
     longestStreak?: SortOrder
     totalXP?: SortOrder
+    weeklyPoints?: SortOrder
+    monthlyPoints?: SortOrder
+    weeklyMatches?: SortOrder
+    weeklyWins?: SortOrder
+    monthlyMatches?: SortOrder
+    monthlyWins?: SortOrder
+    seasonResetAt?: SortOrder
     updatedAt?: SortOrder
   }
 
@@ -23576,6 +23802,13 @@ export namespace Prisma {
     currentStreak?: SortOrder
     longestStreak?: SortOrder
     totalXP?: SortOrder
+    weeklyPoints?: SortOrder
+    monthlyPoints?: SortOrder
+    weeklyMatches?: SortOrder
+    weeklyWins?: SortOrder
+    monthlyMatches?: SortOrder
+    monthlyWins?: SortOrder
+    seasonResetAt?: SortOrder
     updatedAt?: SortOrder
   }
 
@@ -23587,6 +23820,12 @@ export namespace Prisma {
     currentStreak?: SortOrder
     longestStreak?: SortOrder
     totalXP?: SortOrder
+    weeklyPoints?: SortOrder
+    monthlyPoints?: SortOrder
+    weeklyMatches?: SortOrder
+    weeklyWins?: SortOrder
+    monthlyMatches?: SortOrder
+    monthlyWins?: SortOrder
   }
 
   export type FloatWithAggregatesFilter<$PrismaModel = never> = {

@@ -303,6 +303,13 @@ exports.Prisma.ChallengeRatingScalarFieldEnum = {
   currentStreak: 'currentStreak',
   longestStreak: 'longestStreak',
   totalXP: 'totalXP',
+  weeklyPoints: 'weeklyPoints',
+  monthlyPoints: 'monthlyPoints',
+  weeklyMatches: 'weeklyMatches',
+  weeklyWins: 'weeklyWins',
+  monthlyMatches: 'monthlyMatches',
+  monthlyWins: 'monthlyWins',
+  seasonResetAt: 'seasonResetAt',
   updatedAt: 'updatedAt'
 };
 

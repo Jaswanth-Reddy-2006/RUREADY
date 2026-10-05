@@ -1,3 +1,8 @@
+// ═══════════════════════════════════════════════════════════════
+// User Profile Microservice — Prisma Schema
+// Data ownership: user_profiles, resumes
+// ═══════════════════════════════════════════════════════════════
+
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/client"
@@ -13,16 +18,27 @@ model UserProfile {
   userId          String   @unique
   name            String
   email           String
+  phoneNumber     String?
   avatarUrl       String?
+  headline        String?
   bio             String?
   title           String?
+  targetRole      String?
+  targetCompany   String?
+  seniority       String?  @default("FRESHER") // FRESHER, MID, SENIOR, LEAD
+  location        String?
+  education       String?
+  githubUrl       String?
+  linkedinUrl     String?
+  portfolioUrl    String?
   experienceYears Int?     @default(0)
-  targetRoles     String[]
+  targetRoles     String[] @default([])
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
   resumes Resume[]
 
+  @@index([email])
   @@map("user_profiles")
 }
 
@@ -33,8 +49,9 @@ model Resume {
   fileName   String
   filePath   String
   parsedText String?
-  skills     String[]
+  skills     String[]    @default([])
   uploadedAt DateTime    @default(now())
 
+  @@index([profileId])
   @@map("resumes")
 }

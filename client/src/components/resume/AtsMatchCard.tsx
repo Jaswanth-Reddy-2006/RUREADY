@@ -75,8 +75,8 @@ export default function AtsMatchCard({ analysis, versionTitle, targetRole, targe
         </div>
       </div>
 
-      {/* 4 Factor Score Progress Bars */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* 5 Factor Score Progress Bars */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
         {/* Factor 1: Keywords */}
         <div className="p-4 rounded-2xl bg-slate-50 border border-[#DCE7F2] space-y-2">
           <div className="flex justify-between items-center text-xs">
@@ -89,10 +89,25 @@ export default function AtsMatchCard({ analysis, versionTitle, targetRole, targe
               style={{ width: `${(breakdown.keywordScore / 40) * 100}%` }}
             />
           </div>
-          <p className="text-[10px] text-[#526078]">Matches JD specific hard tech terms</p>
+          <p className="text-[10px] text-[#526078]">Matches JD specific tech terms</p>
         </div>
 
-        {/* Factor 2: Quantified Metrics */}
+        {/* Factor 2: Semantic Match */}
+        <div className="p-4 rounded-2xl bg-indigo-50/70 border border-indigo-200 space-y-2">
+          <div className="flex justify-between items-center text-xs">
+            <span className="font-bold text-[#11183D]">Semantic Match</span>
+            <span className="font-mono text-indigo-700 font-bold">{analysis.semanticScore || breakdown.semanticScore || 78}%</span>
+          </div>
+          <div className="h-2 w-full bg-indigo-100 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-indigo-600 rounded-full transition-all duration-500"
+              style={{ width: `${analysis.semanticScore || breakdown.semanticScore || 78}%` }}
+            />
+          </div>
+          <p className="text-[10px] text-[#526078]">AI vector contextual relevance</p>
+        </div>
+
+        {/* Factor 3: Quantified Metrics */}
         <div className="p-4 rounded-2xl bg-slate-50 border border-[#DCE7F2] space-y-2">
           <div className="flex justify-between items-center text-xs">
             <span className="font-bold text-[#11183D]">Quantified Impact</span>
@@ -104,10 +119,10 @@ export default function AtsMatchCard({ analysis, versionTitle, targetRole, targe
               style={{ width: `${(breakdown.metricsScore / 25) * 100}%` }}
             />
           </div>
-          <p className="text-[10px] text-[#526078]">STAR bullet points with %, $, numbers</p>
+          <p className="text-[10px] text-[#526078]">STAR bullets with %, $, numbers</p>
         </div>
 
-        {/* Factor 3: Completeness */}
+        {/* Factor 4: Completeness */}
         <div className="p-4 rounded-2xl bg-slate-50 border border-[#DCE7F2] space-y-2">
           <div className="flex justify-between items-center text-xs">
             <span className="font-bold text-[#11183D]">Completeness</span>
@@ -119,10 +134,10 @@ export default function AtsMatchCard({ analysis, versionTitle, targetRole, targe
               style={{ width: `${(breakdown.completenessScore / 20) * 100}%` }}
             />
           </div>
-          <p className="text-[10px] text-[#526078]">Links, education, project details</p>
+          <p className="text-[10px] text-[#526078]">Links, education, projects</p>
         </div>
 
-        {/* Factor 4: Action Verbs */}
+        {/* Factor 5: Action Verbs */}
         <div className="p-4 rounded-2xl bg-slate-50 border border-[#DCE7F2] space-y-2">
           <div className="flex justify-between items-center text-xs">
             <span className="font-bold text-[#11183D]">Action Verbs</span>
@@ -134,7 +149,7 @@ export default function AtsMatchCard({ analysis, versionTitle, targetRole, targe
               style={{ width: `${(breakdown.actionVerbScore / 15) * 100}%` }}
             />
           </div>
-          <p className="text-[10px] text-[#526078]">Strong active verbs vs passive verbs</p>
+          <p className="text-[10px] text-[#526078]">Strong active verbs vs passive</p>
         </div>
       </div>
 

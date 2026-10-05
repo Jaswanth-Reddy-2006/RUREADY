@@ -96,9 +96,14 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
 exports.Prisma.CareerRoadmapScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
+  title: 'title',
+  description: 'description',
   rolePath: 'rolePath',
   targetCompanyTier: 'targetCompanyTier',
+  estimatedWeeks: 'estimatedWeeks',
   overallReadiness: 'overallReadiness',
+  isPublic: 'isPublic',
+  isOfficial: 'isOfficial',
   nodesData: 'nodesData',
   customTechStack: 'customTechStack',
   createdAt: 'createdAt',
@@ -109,12 +114,25 @@ exports.Prisma.DiscussionPostScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   userName: 'userName',
+  userAvatar: 'userAvatar',
   roleCategory: 'roleCategory',
   title: 'title',
   content: 'content',
   tags: 'tags',
   upvotes: 'upvotes',
   aiReply: 'aiReply',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.DiscussionCommentScalarFieldEnum = {
+  id: 'id',
+  postId: 'postId',
+  userId: 'userId',
+  userName: 'userName',
+  userAvatar: 'userAvatar',
+  content: 'content',
+  upvotes: 'upvotes',
   createdAt: 'createdAt'
 };
 
@@ -151,7 +169,8 @@ exports.Prisma.NullsOrder = {
 
 exports.Prisma.ModelName = {
   CareerRoadmap: 'CareerRoadmap',
-  DiscussionPost: 'DiscussionPost'
+  DiscussionPost: 'DiscussionPost',
+  DiscussionComment: 'DiscussionComment'
 };
 /**
  * Create the Client
@@ -164,7 +183,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\Jaswanth Reddy\\OneDrive\\Desktop\\Projects\\RU_Ready\\services\\roadmap-service\\src\\generated\\client",
+      "value": "C:\\Users\\rafey\\Desktop\\Rennetus\\RUREADY\\services\\roadmap-service\\src\\generated\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -178,12 +197,11 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\Jaswanth Reddy\\OneDrive\\Desktop\\Projects\\RU_Ready\\services\\roadmap-service\\src\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\rafey\\Desktop\\Rennetus\\RUREADY\\services\\roadmap-service\\src\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": null,
-    "schemaEnvPath": "../../../.env"
+    "rootEnvPath": null
   },
   "relativePath": "../../prisma",
   "clientVersion": "6.19.3",
@@ -201,13 +219,13 @@ const config = {
       }
     }
   },
-  "inlineSchema": "// ═══════════════════════════════════════════════════════════════\n// Career Roadmap & Discussion Hub Microservice — Prisma Schema\n// Data ownership: career_roadmaps, discussion_posts\n// ═══════════════════════════════════════════════════════════════\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/client\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel CareerRoadmap {\n  id                String   @id @default(cuid())\n  userId            String\n  rolePath          String\n  targetCompanyTier String   @default(\"FAANG\")\n  overallReadiness  Int      @default(0)\n  nodesData         Json\n  customTechStack   Json?\n  createdAt         DateTime @default(now())\n  updatedAt         DateTime @updatedAt\n\n  @@map(\"career_roadmaps\")\n}\n\nmodel DiscussionPost {\n  id           String   @id @default(cuid())\n  userId       String\n  userName     String\n  roleCategory String\n  title        String\n  content      String   @db.Text\n  tags         String[]\n  upvotes      Int      @default(0)\n  aiReply      String?  @db.Text\n  createdAt    DateTime @default(now())\n\n  @@map(\"discussion_posts\")\n}\n",
-  "inlineSchemaHash": "dd487396504c083721bc43a2c2368bcc2cb5242bee74089c5d40f182729df85a",
+  "inlineSchema": "// ═══════════════════════════════════════════════════════════════\n// Career Roadmap & Discussion Hub Microservice — Prisma Schema\n// Data ownership: career_roadmaps, discussion_posts, discussion_comments\n// ═══════════════════════════════════════════════════════════════\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/client\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel CareerRoadmap {\n  id                String   @id @default(cuid())\n  userId            String\n  title             String?  @default(\"Career Roadmap\")\n  description       String?  @db.Text\n  rolePath          String\n  targetCompanyTier String   @default(\"FAANG\")\n  estimatedWeeks    Int      @default(8)\n  overallReadiness  Int      @default(0)\n  isPublic          Boolean  @default(false)\n  isOfficial        Boolean  @default(false)\n  nodesData         Json\n  customTechStack   Json?\n  createdAt         DateTime @default(now())\n  updatedAt         DateTime @updatedAt\n\n  @@index([userId])\n  @@index([rolePath])\n  @@map(\"career_roadmaps\")\n}\n\nmodel DiscussionPost {\n  id           String   @id @default(cuid())\n  userId       String\n  userName     String\n  userAvatar   String?\n  roleCategory String\n  title        String\n  content      String   @db.Text\n  tags         String[] @default([])\n  upvotes      Int      @default(0)\n  aiReply      String?  @db.Text\n  createdAt    DateTime @default(now())\n  updatedAt    DateTime @updatedAt\n\n  comments DiscussionComment[]\n\n  @@index([roleCategory])\n  @@map(\"discussion_posts\")\n}\n\nmodel DiscussionComment {\n  id         String         @id @default(cuid())\n  postId     String\n  post       DiscussionPost @relation(fields: [postId], references: [id], onDelete: Cascade)\n  userId     String\n  userName   String\n  userAvatar String?\n  content    String         @db.Text\n  upvotes    Int            @default(0)\n  createdAt  DateTime       @default(now())\n\n  @@index([postId])\n  @@map(\"discussion_comments\")\n}\n",
+  "inlineSchemaHash": "c1771a62758cedf90c69aa801c21829ec2cadf5fa0f1fedee985e02db9d0c503",
   "copyEngine": true
 }
 config.dirname = '/'
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"CareerRoadmap\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"rolePath\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"targetCompanyTier\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"overallReadiness\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"nodesData\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"customTechStack\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"career_roadmaps\"},\"DiscussionPost\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"roleCategory\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"content\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"tags\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"upvotes\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"aiReply\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"discussion_posts\"}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"CareerRoadmap\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"rolePath\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"targetCompanyTier\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"estimatedWeeks\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"overallReadiness\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"isPublic\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"isOfficial\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"nodesData\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"customTechStack\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"career_roadmaps\"},\"DiscussionPost\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userAvatar\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"roleCategory\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"content\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"tags\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"upvotes\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"aiReply\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"comments\",\"kind\":\"object\",\"type\":\"DiscussionComment\",\"relationName\":\"DiscussionCommentToDiscussionPost\"}],\"dbName\":\"discussion_posts\"},\"DiscussionComment\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"postId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"post\",\"kind\":\"object\",\"type\":\"DiscussionPost\",\"relationName\":\"DiscussionCommentToDiscussionPost\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userAvatar\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"content\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"upvotes\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"discussion_comments\"}},\"enums\":{},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.engineWasm = {
   getRuntime: async () => require('./query_engine_bg.js'),

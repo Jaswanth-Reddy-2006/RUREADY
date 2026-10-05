@@ -124,9 +124,14 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
 exports.Prisma.CareerRoadmapScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
+  title: 'title',
+  description: 'description',
   rolePath: 'rolePath',
   targetCompanyTier: 'targetCompanyTier',
+  estimatedWeeks: 'estimatedWeeks',
   overallReadiness: 'overallReadiness',
+  isPublic: 'isPublic',
+  isOfficial: 'isOfficial',
   nodesData: 'nodesData',
   customTechStack: 'customTechStack',
   createdAt: 'createdAt',
@@ -137,12 +142,25 @@ exports.Prisma.DiscussionPostScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   userName: 'userName',
+  userAvatar: 'userAvatar',
   roleCategory: 'roleCategory',
   title: 'title',
   content: 'content',
   tags: 'tags',
   upvotes: 'upvotes',
   aiReply: 'aiReply',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.DiscussionCommentScalarFieldEnum = {
+  id: 'id',
+  postId: 'postId',
+  userId: 'userId',
+  userName: 'userName',
+  userAvatar: 'userAvatar',
+  content: 'content',
+  upvotes: 'upvotes',
   createdAt: 'createdAt'
 };
 
@@ -179,7 +197,8 @@ exports.Prisma.NullsOrder = {
 
 exports.Prisma.ModelName = {
   CareerRoadmap: 'CareerRoadmap',
-  DiscussionPost: 'DiscussionPost'
+  DiscussionPost: 'DiscussionPost',
+  DiscussionComment: 'DiscussionComment'
 };
 
 /**

@@ -698,4 +698,69 @@ export const analysisService = {
       latestVerdict,
     };
   },
+
+  async computeAtsSemanticMatch(resumeText: string, jobDescription: string, targetRole?: string): Promise<{
+    semanticScore: number;
+    similarity: number;
+    matchDetails: {
+      roleAlignment: number;
+      coreRequirementsSimilarity: number;
+      experienceDepthSimilarity: number;
+    };
+  }> {
+    if (!resumeText || !jobDescription) {
+      return {
+        semanticScore: 70,
+        similarity: 0.70,
+        matchDetails: {
+          roleAlignment: 70,
+          coreRequirementsSimilarity: 70,
+          experienceDepthSimilarity: 70,
+        },
+      };
+    }
+
+    const cleanResume = resumeText.slice(0, 3000);
+    const cleanJD = jobDescription.slice(0, 3000);
+
+    // 1. Overall semantic similarity between resume and job description using Hugging Face all-MiniLM-L6-v2
+    const overallSim = await hfModelEngine.computeSemanticMatch(cleanResume, cleanJD);
+
+    // 2. Role alignment similarity
+    const roleSim = targetRole
+      ? await hfModelEngine.computeSemanticMatch(cleanResume.slice(0, 1000), targetRole)
+      : overallSim;
+
+    // 3. Technical requirement chunks similarity
+    const jdSnippets = cleanJD
+      .split(/\n\s*[-•*]?\s*/)
+      .map((s) => s.trim())
+      .filter((s) => s.length > 20)
+      .slice(0, 6);
+
+    let snippetSimSum = 0;
+    if (jdSnippets.length > 0) {
+      for (const snippet of jdSnippets) {
+        const sim = await hfModelEngine.computeSemanticMatch(cleanResume, snippet);
+        snippetSimSum += sim;
+      }
+      snippetSimSum /= jdSnippets.length;
+    } else {
+      snippetSimSum = overallSim;
+    }
+
+    // Weighted composite semantic similarity
+    const compositeSim = overallSim * 0.40 + roleSim * 0.25 + snippetSimSum * 0.35;
+    const normalizedScore = Math.min(98, Math.max(40, Math.round(compositeSim * 100)));
+
+    return {
+      semanticScore: normalizedScore,
+      similarity: Math.round(compositeSim * 100) / 100,
+      matchDetails: {
+        roleAlignment: Math.min(100, Math.max(40, Math.round(roleSim * 100))),
+        coreRequirementsSimilarity: Math.min(100, Math.max(40, Math.round(snippetSimSum * 100))),
+        experienceDepthSimilarity: Math.min(100, Math.max(40, Math.round(overallSim * 100))),
+      },
+    };
+  },
 };

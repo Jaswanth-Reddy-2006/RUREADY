@@ -49,6 +49,7 @@ app.use('/', analysisRoutes);
 app.post('/internal/evaluate-session', analysisController.evaluateSessionInternal);
 app.post('/internal/generate-next-question', analysisController.generateNextQuestionInternal);
 app.post('/internal/evaluate-answer', analysisController.evaluateAnswerInternal);
+app.post('/internal/ats-semantic-match', analysisController.evaluateAtsSemanticMatchInternal);
 
 // Global Error Handler
 app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {

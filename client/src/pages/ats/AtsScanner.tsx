@@ -555,11 +555,29 @@ export default function AtsScanner() {
                   </div>
 
                   <div className="flex justify-between text-xs">
+                    <span className="text-[#526078]">Section Completeness:</span>
+                    <span className="font-bold text-[#11183D]">{atsScoreResult.breakdown.completenessScore} / 20</span>
+                  </div>
+                  <div className="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                    <div className="h-full bg-teal-600 rounded-full" style={{ width: `${(atsScoreResult.breakdown.completenessScore / 20) * 100}%` }} />
+                  </div>
+
+                  <div className="flex justify-between text-xs">
                     <span className="text-[#526078]">Action Verb Power:</span>
                     <span className="font-bold text-[#11183D]">{atsScoreResult.breakdown.actionVerbScore} / 15</span>
                   </div>
                   <div className="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden">
                     <div className="h-full bg-indigo-600 rounded-full" style={{ width: `${(atsScoreResult.breakdown.actionVerbScore / 15) * 100}%` }} />
+                  </div>
+
+                  <div className="flex justify-between text-xs pt-1">
+                    <span className="text-[#A0006D] font-medium flex items-center gap-1">
+                      <Sparkles size={12} /> Semantic AI Match:
+                    </span>
+                    <span className="font-bold text-[#A0006D]">{atsScoreResult.semanticScore}%</span>
+                  </div>
+                  <div className="w-full h-1.5 rounded-full bg-fuchsia-50 overflow-hidden">
+                    <div className="h-full bg-[#A0006D] rounded-full" style={{ width: `${atsScoreResult.semanticScore}%` }} />
                   </div>
                 </div>
               </div>

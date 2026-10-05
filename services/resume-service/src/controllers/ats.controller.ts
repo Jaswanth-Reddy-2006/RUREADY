@@ -13,7 +13,7 @@ export const atsController = {
       const userId = getUserId(req);
       let resumeText = req.body.resumeText || '';
       
-      const file = (req as any).file;
+      const file = (req as any).file || (req as any).files?.[0];
       if (file && file.buffer) {
         resumeText = file.buffer.toString('utf-8');
       }

@@ -17,6 +17,7 @@ interface AtsReportData {
   jobTitle: string;
   companyName?: string;
   matchScore: number;
+  semanticScore?: number;
   summary: string;
   matchedSkills: string[];
   missingSkills: string[];
@@ -173,9 +174,16 @@ export default function AtsReport() {
                 </div>
 
                 <div className="space-y-1">
-                  <span className="text-xs font-bold text-[#11183D] block font-display">
-                    {report.matchScore >= 80 ? 'Exceptional Alignment' : report.matchScore >= 65 ? 'Moderate Match' : 'Targeted Gaps Identified'}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-[#11183D] block font-display">
+                      {report.matchScore >= 80 ? 'Exceptional Alignment' : report.matchScore >= 65 ? 'Moderate Match' : 'Targeted Gaps Identified'}
+                    </span>
+                    {typeof report.semanticScore === 'number' && (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#F8EAF4] text-[#A0006D] border border-[#A0006D]/30 flex items-center gap-1">
+                        <Sparkles size={10} /> {report.semanticScore}% Semantic
+                      </span>
+                    )}
+                  </div>
                   <span className="text-[11px] text-[#526078] block">
                     {report.experienceMatch}
                   </span>

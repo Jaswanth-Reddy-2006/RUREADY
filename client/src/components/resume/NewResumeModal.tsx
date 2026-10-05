@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, UserCheck, Upload, FileCode2, ArrowRight, Sparkles, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useResumeStore } from '../../store/useResumeStore';
-import { parseResumeFile } from '../../utils/resumeParser';
+import { parseResumeFile, normalizeResumeData, validateExtractionQuality } from '../../utils/resumeParser';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 
@@ -81,7 +81,8 @@ export default function NewResumeModal({ isOpen, onClose }: NewResumeModalProps)
 
     try {
       const parsed = await parseResumeFile(file);
-      setParsedPreview(parsed);
+      const normalized = normalizeResumeData(parsed);
+      setParsedPreview(normalized);
       setMode('UPLOAD_REVIEW');
       toast.success('Resume parsed successfully! Review extracted data below.');
     } catch (err: any) {
@@ -93,15 +94,16 @@ export default function NewResumeModal({ isOpen, onClose }: NewResumeModalProps)
 
   const handleConfirmParsed = () => {
     if (!parsedPreview) return;
-    const title = versionTitle.trim() || `Uploaded - ${uploadedFileName}`;
+    const normalized = normalizeResumeData(parsedPreview);
+    const title = versionTitle.trim() || `Uploaded - ${uploadedFileName || 'Resume'}`;
     const newId = createResumeVersion(
       title,
-      targetRole || parsedPreview.personalInfo?.title || 'Software Engineer',
+      targetRole || normalized.personalInfo?.title || 'Software Engineer',
       targetCompany || 'Imported Version',
       undefined,
-      parsedPreview
+      normalized
     );
-    extractAndLoadResume(parsedPreview);
+    extractAndLoadResume(normalized);
     toast.success('Loaded parsed resume into version manager!');
     onClose();
     navigate(`/resume/edit/${newId}`);
@@ -258,16 +260,37 @@ export default function NewResumeModal({ isOpen, onClose }: NewResumeModalProps)
             ) : (
               /* Review Extracted Data Mode */
               <div className="space-y-4">
-                <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-start gap-3">
-                  <CheckCircle2 size={18} className="text-emerald-600 mt-0.5 shrink-0" />
-                  <div className="text-xs text-emerald-900">
-                    <p className="font-bold">Parsing Completed for "{uploadedFileName}"</p>
-                    <p className="mt-0.5 opacity-90">
-                      Extracted contact details, {parsedPreview?.experience?.length || 0} work experiences, and{' '}
-                      {Object.values(parsedPreview?.skills || {}).flat().length} key technical skills.
-                    </p>
-                  </div>
-                </div>
+                {(() => {
+                  const quality = validateExtractionQuality(parsedPreview || normalizeResumeData({}));
+                  return (
+                    <>
+                      {quality.warnings.length > 0 ? (
+                        <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-start gap-3">
+                          <AlertCircle size={18} className="text-amber-600 mt-0.5 shrink-0" />
+                          <div className="text-xs text-amber-900">
+                            <p className="font-bold">Resume extraction may be incomplete. Please review imported sections.</p>
+                            <ul className="mt-1 list-disc list-inside space-y-0.5 opacity-90 text-[11px]">
+                              {quality.warnings.map((w: string, idx: number) => (
+                                <li key={idx}>{w}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-start gap-3">
+                          <CheckCircle2 size={18} className="text-emerald-600 mt-0.5 shrink-0" />
+                          <div className="text-xs text-emerald-900">
+                            <p className="font-bold">Parsing Completed for "{uploadedFileName}"</p>
+                            <p className="mt-0.5 opacity-90">
+                              Extracted contact details, {parsedPreview?.experience?.length || 0} work experiences, and{' '}
+                              {Object.values(parsedPreview?.skills || {}).flat().length} key technical skills.
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
 
                 {/* Data Overview Summary */}
                 <div className="p-4 bg-slate-50 rounded-2xl border border-[#DCE7F2] space-y-3 text-xs">

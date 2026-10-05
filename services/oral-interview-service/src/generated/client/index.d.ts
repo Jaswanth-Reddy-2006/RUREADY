@@ -1096,10 +1096,12 @@ export namespace Prisma {
 
   export type OralSessionAvgAggregateOutputType = {
     durationMins: number | null
+    overallScore: number | null
   }
 
   export type OralSessionSumAggregateOutputType = {
     durationMins: number | null
+    overallScore: number | null
   }
 
   export type OralSessionMinAggregateOutputType = {
@@ -1114,6 +1116,8 @@ export namespace Prisma {
     interviewGoal: string | null
     durationMins: number | null
     status: string | null
+    overallScore: number | null
+    feedbackSummary: string | null
     startedAt: Date | null
     completedAt: Date | null
     createdAt: Date | null
@@ -1131,6 +1135,8 @@ export namespace Prisma {
     interviewGoal: string | null
     durationMins: number | null
     status: string | null
+    overallScore: number | null
+    feedbackSummary: string | null
     startedAt: Date | null
     completedAt: Date | null
     createdAt: Date | null
@@ -1149,6 +1155,8 @@ export namespace Prisma {
     interviewGoal: number
     durationMins: number
     status: number
+    overallScore: number
+    feedbackSummary: number
     startedAt: number
     completedAt: number
     createdAt: number
@@ -1158,10 +1166,12 @@ export namespace Prisma {
 
   export type OralSessionAvgAggregateInputType = {
     durationMins?: true
+    overallScore?: true
   }
 
   export type OralSessionSumAggregateInputType = {
     durationMins?: true
+    overallScore?: true
   }
 
   export type OralSessionMinAggregateInputType = {
@@ -1176,6 +1186,8 @@ export namespace Prisma {
     interviewGoal?: true
     durationMins?: true
     status?: true
+    overallScore?: true
+    feedbackSummary?: true
     startedAt?: true
     completedAt?: true
     createdAt?: true
@@ -1193,6 +1205,8 @@ export namespace Prisma {
     interviewGoal?: true
     durationMins?: true
     status?: true
+    overallScore?: true
+    feedbackSummary?: true
     startedAt?: true
     completedAt?: true
     createdAt?: true
@@ -1211,6 +1225,8 @@ export namespace Prisma {
     interviewGoal?: true
     durationMins?: true
     status?: true
+    overallScore?: true
+    feedbackSummary?: true
     startedAt?: true
     completedAt?: true
     createdAt?: true
@@ -1316,6 +1332,8 @@ export namespace Prisma {
     interviewGoal: string | null
     durationMins: number
     status: string
+    overallScore: number | null
+    feedbackSummary: string | null
     startedAt: Date | null
     completedAt: Date | null
     createdAt: Date
@@ -1353,6 +1371,8 @@ export namespace Prisma {
     interviewGoal?: boolean
     durationMins?: boolean
     status?: boolean
+    overallScore?: boolean
+    feedbackSummary?: boolean
     startedAt?: boolean
     completedAt?: boolean
     createdAt?: boolean
@@ -1374,6 +1394,8 @@ export namespace Prisma {
     interviewGoal?: boolean
     durationMins?: boolean
     status?: boolean
+    overallScore?: boolean
+    feedbackSummary?: boolean
     startedAt?: boolean
     completedAt?: boolean
     createdAt?: boolean
@@ -1392,6 +1414,8 @@ export namespace Prisma {
     interviewGoal?: boolean
     durationMins?: boolean
     status?: boolean
+    overallScore?: boolean
+    feedbackSummary?: boolean
     startedAt?: boolean
     completedAt?: boolean
     createdAt?: boolean
@@ -1410,12 +1434,14 @@ export namespace Prisma {
     interviewGoal?: boolean
     durationMins?: boolean
     status?: boolean
+    overallScore?: boolean
+    feedbackSummary?: boolean
     startedAt?: boolean
     completedAt?: boolean
     createdAt?: boolean
   }
 
-  export type OralSessionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "resumeId" | "interviewType" | "targetRole" | "targetCompany" | "industry" | "experienceLevel" | "focusAreas" | "interviewGoal" | "durationMins" | "status" | "startedAt" | "completedAt" | "createdAt", ExtArgs["result"]["oralSession"]>
+  export type OralSessionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "resumeId" | "interviewType" | "targetRole" | "targetCompany" | "industry" | "experienceLevel" | "focusAreas" | "interviewGoal" | "durationMins" | "status" | "overallScore" | "feedbackSummary" | "startedAt" | "completedAt" | "createdAt", ExtArgs["result"]["oralSession"]>
   export type OralSessionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     questions?: boolean | OralSession$questionsArgs<ExtArgs>
     chatHistory?: boolean | OralSession$chatHistoryArgs<ExtArgs>
@@ -1443,6 +1469,8 @@ export namespace Prisma {
       interviewGoal: string | null
       durationMins: number
       status: string
+      overallScore: number | null
+      feedbackSummary: string | null
       startedAt: Date | null
       completedAt: Date | null
       createdAt: Date
@@ -1883,6 +1911,8 @@ export namespace Prisma {
     readonly interviewGoal: FieldRef<"OralSession", 'String'>
     readonly durationMins: FieldRef<"OralSession", 'Int'>
     readonly status: FieldRef<"OralSession", 'String'>
+    readonly overallScore: FieldRef<"OralSession", 'Int'>
+    readonly feedbackSummary: FieldRef<"OralSession", 'String'>
     readonly startedAt: FieldRef<"OralSession", 'DateTime'>
     readonly completedAt: FieldRef<"OralSession", 'DateTime'>
     readonly createdAt: FieldRef<"OralSession", 'DateTime'>
@@ -2370,6 +2400,7 @@ export namespace Prisma {
     orderIndex: number | null
     questionText: string | null
     questionType: string | null
+    category: string | null
     difficulty: string | null
     answerText: string | null
     answeredAt: Date | null
@@ -2385,6 +2416,7 @@ export namespace Prisma {
     orderIndex: number | null
     questionText: string | null
     questionType: string | null
+    category: string | null
     difficulty: string | null
     answerText: string | null
     answeredAt: Date | null
@@ -2400,6 +2432,7 @@ export namespace Prisma {
     orderIndex: number
     questionText: number
     questionType: number
+    category: number
     difficulty: number
     answerText: number
     answeredAt: number
@@ -2431,6 +2464,7 @@ export namespace Prisma {
     orderIndex?: true
     questionText?: true
     questionType?: true
+    category?: true
     difficulty?: true
     answerText?: true
     answeredAt?: true
@@ -2446,6 +2480,7 @@ export namespace Prisma {
     orderIndex?: true
     questionText?: true
     questionType?: true
+    category?: true
     difficulty?: true
     answerText?: true
     answeredAt?: true
@@ -2461,6 +2496,7 @@ export namespace Prisma {
     orderIndex?: true
     questionText?: true
     questionType?: true
+    category?: true
     difficulty?: true
     answerText?: true
     answeredAt?: true
@@ -2565,6 +2601,7 @@ export namespace Prisma {
     orderIndex: number
     questionText: string
     questionType: string
+    category: string | null
     difficulty: string
     answerText: string | null
     answeredAt: Date | null
@@ -2601,6 +2638,7 @@ export namespace Prisma {
     orderIndex?: boolean
     questionText?: boolean
     questionType?: boolean
+    category?: boolean
     difficulty?: boolean
     answerText?: boolean
     answeredAt?: boolean
@@ -2619,6 +2657,7 @@ export namespace Prisma {
     orderIndex?: boolean
     questionText?: boolean
     questionType?: boolean
+    category?: boolean
     difficulty?: boolean
     answerText?: boolean
     answeredAt?: boolean
@@ -2637,6 +2676,7 @@ export namespace Prisma {
     orderIndex?: boolean
     questionText?: boolean
     questionType?: boolean
+    category?: boolean
     difficulty?: boolean
     answerText?: boolean
     answeredAt?: boolean
@@ -2655,6 +2695,7 @@ export namespace Prisma {
     orderIndex?: boolean
     questionText?: boolean
     questionType?: boolean
+    category?: boolean
     difficulty?: boolean
     answerText?: boolean
     answeredAt?: boolean
@@ -2666,7 +2707,7 @@ export namespace Prisma {
     betterAnswer?: boolean
   }
 
-  export type OralQuestionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "sessionId" | "orderIndex" | "questionText" | "questionType" | "difficulty" | "answerText" | "answeredAt" | "timeTakenSecs" | "evalScore" | "evalFeedback" | "evalStrengths" | "evalWeaknesses" | "betterAnswer", ExtArgs["result"]["oralQuestion"]>
+  export type OralQuestionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "sessionId" | "orderIndex" | "questionText" | "questionType" | "category" | "difficulty" | "answerText" | "answeredAt" | "timeTakenSecs" | "evalScore" | "evalFeedback" | "evalStrengths" | "evalWeaknesses" | "betterAnswer", ExtArgs["result"]["oralQuestion"]>
   export type OralQuestionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     session?: boolean | OralSessionDefaultArgs<ExtArgs>
   }
@@ -2688,6 +2729,7 @@ export namespace Prisma {
       orderIndex: number
       questionText: string
       questionType: string
+      category: string | null
       difficulty: string
       answerText: string | null
       answeredAt: Date | null
@@ -3126,6 +3168,7 @@ export namespace Prisma {
     readonly orderIndex: FieldRef<"OralQuestion", 'Int'>
     readonly questionText: FieldRef<"OralQuestion", 'String'>
     readonly questionType: FieldRef<"OralQuestion", 'String'>
+    readonly category: FieldRef<"OralQuestion", 'String'>
     readonly difficulty: FieldRef<"OralQuestion", 'String'>
     readonly answerText: FieldRef<"OralQuestion", 'String'>
     readonly answeredAt: FieldRef<"OralQuestion", 'DateTime'>
@@ -4694,6 +4737,8 @@ export namespace Prisma {
     interviewGoal: 'interviewGoal',
     durationMins: 'durationMins',
     status: 'status',
+    overallScore: 'overallScore',
+    feedbackSummary: 'feedbackSummary',
     startedAt: 'startedAt',
     completedAt: 'completedAt',
     createdAt: 'createdAt'
@@ -4708,6 +4753,7 @@ export namespace Prisma {
     orderIndex: 'orderIndex',
     questionText: 'questionText',
     questionType: 'questionType',
+    category: 'category',
     difficulty: 'difficulty',
     answerText: 'answerText',
     answeredAt: 'answeredAt',
@@ -4839,6 +4885,8 @@ export namespace Prisma {
     interviewGoal?: StringNullableFilter<"OralSession"> | string | null
     durationMins?: IntFilter<"OralSession"> | number
     status?: StringFilter<"OralSession"> | string
+    overallScore?: IntNullableFilter<"OralSession"> | number | null
+    feedbackSummary?: StringNullableFilter<"OralSession"> | string | null
     startedAt?: DateTimeNullableFilter<"OralSession"> | Date | string | null
     completedAt?: DateTimeNullableFilter<"OralSession"> | Date | string | null
     createdAt?: DateTimeFilter<"OralSession"> | Date | string
@@ -4859,6 +4907,8 @@ export namespace Prisma {
     interviewGoal?: SortOrderInput | SortOrder
     durationMins?: SortOrder
     status?: SortOrder
+    overallScore?: SortOrderInput | SortOrder
+    feedbackSummary?: SortOrderInput | SortOrder
     startedAt?: SortOrderInput | SortOrder
     completedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -4882,6 +4932,8 @@ export namespace Prisma {
     interviewGoal?: StringNullableFilter<"OralSession"> | string | null
     durationMins?: IntFilter<"OralSession"> | number
     status?: StringFilter<"OralSession"> | string
+    overallScore?: IntNullableFilter<"OralSession"> | number | null
+    feedbackSummary?: StringNullableFilter<"OralSession"> | string | null
     startedAt?: DateTimeNullableFilter<"OralSession"> | Date | string | null
     completedAt?: DateTimeNullableFilter<"OralSession"> | Date | string | null
     createdAt?: DateTimeFilter<"OralSession"> | Date | string
@@ -4902,6 +4954,8 @@ export namespace Prisma {
     interviewGoal?: SortOrderInput | SortOrder
     durationMins?: SortOrder
     status?: SortOrder
+    overallScore?: SortOrderInput | SortOrder
+    feedbackSummary?: SortOrderInput | SortOrder
     startedAt?: SortOrderInput | SortOrder
     completedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -4928,6 +4982,8 @@ export namespace Prisma {
     interviewGoal?: StringNullableWithAggregatesFilter<"OralSession"> | string | null
     durationMins?: IntWithAggregatesFilter<"OralSession"> | number
     status?: StringWithAggregatesFilter<"OralSession"> | string
+    overallScore?: IntNullableWithAggregatesFilter<"OralSession"> | number | null
+    feedbackSummary?: StringNullableWithAggregatesFilter<"OralSession"> | string | null
     startedAt?: DateTimeNullableWithAggregatesFilter<"OralSession"> | Date | string | null
     completedAt?: DateTimeNullableWithAggregatesFilter<"OralSession"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"OralSession"> | Date | string
@@ -4942,6 +4998,7 @@ export namespace Prisma {
     orderIndex?: IntFilter<"OralQuestion"> | number
     questionText?: StringFilter<"OralQuestion"> | string
     questionType?: StringFilter<"OralQuestion"> | string
+    category?: StringNullableFilter<"OralQuestion"> | string | null
     difficulty?: StringFilter<"OralQuestion"> | string
     answerText?: StringNullableFilter<"OralQuestion"> | string | null
     answeredAt?: DateTimeNullableFilter<"OralQuestion"> | Date | string | null
@@ -4960,6 +5017,7 @@ export namespace Prisma {
     orderIndex?: SortOrder
     questionText?: SortOrder
     questionType?: SortOrder
+    category?: SortOrderInput | SortOrder
     difficulty?: SortOrder
     answerText?: SortOrderInput | SortOrder
     answeredAt?: SortOrderInput | SortOrder
@@ -4981,6 +5039,7 @@ export namespace Prisma {
     orderIndex?: IntFilter<"OralQuestion"> | number
     questionText?: StringFilter<"OralQuestion"> | string
     questionType?: StringFilter<"OralQuestion"> | string
+    category?: StringNullableFilter<"OralQuestion"> | string | null
     difficulty?: StringFilter<"OralQuestion"> | string
     answerText?: StringNullableFilter<"OralQuestion"> | string | null
     answeredAt?: DateTimeNullableFilter<"OralQuestion"> | Date | string | null
@@ -4999,6 +5058,7 @@ export namespace Prisma {
     orderIndex?: SortOrder
     questionText?: SortOrder
     questionType?: SortOrder
+    category?: SortOrderInput | SortOrder
     difficulty?: SortOrder
     answerText?: SortOrderInput | SortOrder
     answeredAt?: SortOrderInput | SortOrder
@@ -5024,6 +5084,7 @@ export namespace Prisma {
     orderIndex?: IntWithAggregatesFilter<"OralQuestion"> | number
     questionText?: StringWithAggregatesFilter<"OralQuestion"> | string
     questionType?: StringWithAggregatesFilter<"OralQuestion"> | string
+    category?: StringNullableWithAggregatesFilter<"OralQuestion"> | string | null
     difficulty?: StringWithAggregatesFilter<"OralQuestion"> | string
     answerText?: StringNullableWithAggregatesFilter<"OralQuestion"> | string | null
     answeredAt?: DateTimeNullableWithAggregatesFilter<"OralQuestion"> | Date | string | null
@@ -5110,11 +5171,13 @@ export namespace Prisma {
     targetRole: string
     targetCompany?: string | null
     industry: string
-    experienceLevel: string
+    experienceLevel?: string
     focusAreas?: OralSessionCreatefocusAreasInput | string[]
     interviewGoal?: string | null
     durationMins?: number
     status?: string
+    overallScore?: number | null
+    feedbackSummary?: string | null
     startedAt?: Date | string | null
     completedAt?: Date | string | null
     createdAt?: Date | string
@@ -5130,11 +5193,13 @@ export namespace Prisma {
     targetRole: string
     targetCompany?: string | null
     industry: string
-    experienceLevel: string
+    experienceLevel?: string
     focusAreas?: OralSessionCreatefocusAreasInput | string[]
     interviewGoal?: string | null
     durationMins?: number
     status?: string
+    overallScore?: number | null
+    feedbackSummary?: string | null
     startedAt?: Date | string | null
     completedAt?: Date | string | null
     createdAt?: Date | string
@@ -5155,6 +5220,8 @@ export namespace Prisma {
     interviewGoal?: NullableStringFieldUpdateOperationsInput | string | null
     durationMins?: IntFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    feedbackSummary?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -5175,6 +5242,8 @@ export namespace Prisma {
     interviewGoal?: NullableStringFieldUpdateOperationsInput | string | null
     durationMins?: IntFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    feedbackSummary?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -5190,11 +5259,13 @@ export namespace Prisma {
     targetRole: string
     targetCompany?: string | null
     industry: string
-    experienceLevel: string
+    experienceLevel?: string
     focusAreas?: OralSessionCreatefocusAreasInput | string[]
     interviewGoal?: string | null
     durationMins?: number
     status?: string
+    overallScore?: number | null
+    feedbackSummary?: string | null
     startedAt?: Date | string | null
     completedAt?: Date | string | null
     createdAt?: Date | string
@@ -5213,6 +5284,8 @@ export namespace Prisma {
     interviewGoal?: NullableStringFieldUpdateOperationsInput | string | null
     durationMins?: IntFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    feedbackSummary?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -5231,6 +5304,8 @@ export namespace Prisma {
     interviewGoal?: NullableStringFieldUpdateOperationsInput | string | null
     durationMins?: IntFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    feedbackSummary?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -5241,7 +5316,8 @@ export namespace Prisma {
     orderIndex: number
     questionText: string
     questionType: string
-    difficulty: string
+    category?: string | null
+    difficulty?: string
     answerText?: string | null
     answeredAt?: Date | string | null
     timeTakenSecs?: number | null
@@ -5259,7 +5335,8 @@ export namespace Prisma {
     orderIndex: number
     questionText: string
     questionType: string
-    difficulty: string
+    category?: string | null
+    difficulty?: string
     answerText?: string | null
     answeredAt?: Date | string | null
     timeTakenSecs?: number | null
@@ -5275,6 +5352,7 @@ export namespace Prisma {
     orderIndex?: IntFieldUpdateOperationsInput | number
     questionText?: StringFieldUpdateOperationsInput | string
     questionType?: StringFieldUpdateOperationsInput | string
+    category?: NullableStringFieldUpdateOperationsInput | string | null
     difficulty?: StringFieldUpdateOperationsInput | string
     answerText?: NullableStringFieldUpdateOperationsInput | string | null
     answeredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5293,6 +5371,7 @@ export namespace Prisma {
     orderIndex?: IntFieldUpdateOperationsInput | number
     questionText?: StringFieldUpdateOperationsInput | string
     questionType?: StringFieldUpdateOperationsInput | string
+    category?: NullableStringFieldUpdateOperationsInput | string | null
     difficulty?: StringFieldUpdateOperationsInput | string
     answerText?: NullableStringFieldUpdateOperationsInput | string | null
     answeredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5310,7 +5389,8 @@ export namespace Prisma {
     orderIndex: number
     questionText: string
     questionType: string
-    difficulty: string
+    category?: string | null
+    difficulty?: string
     answerText?: string | null
     answeredAt?: Date | string | null
     timeTakenSecs?: number | null
@@ -5326,6 +5406,7 @@ export namespace Prisma {
     orderIndex?: IntFieldUpdateOperationsInput | number
     questionText?: StringFieldUpdateOperationsInput | string
     questionType?: StringFieldUpdateOperationsInput | string
+    category?: NullableStringFieldUpdateOperationsInput | string | null
     difficulty?: StringFieldUpdateOperationsInput | string
     answerText?: NullableStringFieldUpdateOperationsInput | string | null
     answeredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5343,6 +5424,7 @@ export namespace Prisma {
     orderIndex?: IntFieldUpdateOperationsInput | number
     questionText?: StringFieldUpdateOperationsInput | string
     questionType?: StringFieldUpdateOperationsInput | string
+    category?: NullableStringFieldUpdateOperationsInput | string | null
     difficulty?: StringFieldUpdateOperationsInput | string
     answerText?: NullableStringFieldUpdateOperationsInput | string | null
     answeredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5472,6 +5554,17 @@ export namespace Prisma {
     not?: NestedIntFilter<$PrismaModel> | number
   }
 
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
   export type DateTimeNullableFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
@@ -5532,6 +5625,8 @@ export namespace Prisma {
     interviewGoal?: SortOrder
     durationMins?: SortOrder
     status?: SortOrder
+    overallScore?: SortOrder
+    feedbackSummary?: SortOrder
     startedAt?: SortOrder
     completedAt?: SortOrder
     createdAt?: SortOrder
@@ -5539,6 +5634,7 @@ export namespace Prisma {
 
   export type OralSessionAvgOrderByAggregateInput = {
     durationMins?: SortOrder
+    overallScore?: SortOrder
   }
 
   export type OralSessionMaxOrderByAggregateInput = {
@@ -5553,6 +5649,8 @@ export namespace Prisma {
     interviewGoal?: SortOrder
     durationMins?: SortOrder
     status?: SortOrder
+    overallScore?: SortOrder
+    feedbackSummary?: SortOrder
     startedAt?: SortOrder
     completedAt?: SortOrder
     createdAt?: SortOrder
@@ -5570,6 +5668,8 @@ export namespace Prisma {
     interviewGoal?: SortOrder
     durationMins?: SortOrder
     status?: SortOrder
+    overallScore?: SortOrder
+    feedbackSummary?: SortOrder
     startedAt?: SortOrder
     completedAt?: SortOrder
     createdAt?: SortOrder
@@ -5577,6 +5677,7 @@ export namespace Prisma {
 
   export type OralSessionSumOrderByAggregateInput = {
     durationMins?: SortOrder
+    overallScore?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -5631,6 +5732,22 @@ export namespace Prisma {
     _max?: NestedIntFilter<$PrismaModel>
   }
 
+  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
   export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
@@ -5659,17 +5776,6 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
-  export type IntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
-  }
-
   export type OralSessionScalarRelationFilter = {
     is?: OralSessionWhereInput
     isNot?: OralSessionWhereInput
@@ -5681,6 +5787,7 @@ export namespace Prisma {
     orderIndex?: SortOrder
     questionText?: SortOrder
     questionType?: SortOrder
+    category?: SortOrder
     difficulty?: SortOrder
     answerText?: SortOrder
     answeredAt?: SortOrder
@@ -5704,6 +5811,7 @@ export namespace Prisma {
     orderIndex?: SortOrder
     questionText?: SortOrder
     questionType?: SortOrder
+    category?: SortOrder
     difficulty?: SortOrder
     answerText?: SortOrder
     answeredAt?: SortOrder
@@ -5719,6 +5827,7 @@ export namespace Prisma {
     orderIndex?: SortOrder
     questionText?: SortOrder
     questionType?: SortOrder
+    category?: SortOrder
     difficulty?: SortOrder
     answerText?: SortOrder
     answeredAt?: SortOrder
@@ -5732,22 +5841,6 @@ export namespace Prisma {
     orderIndex?: SortOrder
     timeTakenSecs?: SortOrder
     evalScore?: SortOrder
-  }
-
-  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedIntNullableFilter<$PrismaModel>
-    _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
   export type OralChatHistoryCountOrderByAggregateInput = {
@@ -5841,6 +5934,14 @@ export namespace Prisma {
     divide?: number
   }
 
+  export type NullableIntFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
   export type NullableDateTimeFieldUpdateOperationsInput = {
     set?: Date | string | null
   }
@@ -5919,14 +6020,6 @@ export namespace Prisma {
     connect?: OralSessionWhereUniqueInput
   }
 
-  export type NullableIntFieldUpdateOperationsInput = {
-    set?: number | null
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
-  }
-
   export type OralQuestionUpdateevalStrengthsInput = {
     set?: string[]
     push?: string | string[]
@@ -5998,6 +6091,17 @@ export namespace Prisma {
     not?: NestedIntFilter<$PrismaModel> | number
   }
 
+  export type NestedIntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
   export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
@@ -6054,17 +6158,6 @@ export namespace Prisma {
     _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
-  export type NestedIntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
-  }
-
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -6090,6 +6183,33 @@ export namespace Prisma {
     gt?: number | FloatFieldRefInput<$PrismaModel>
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatFilter<$PrismaModel> | number
+  }
+
+  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type NestedFloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
   }
 
   export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -6120,39 +6240,13 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
-  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedIntNullableFilter<$PrismaModel>
-    _max?: NestedIntNullableFilter<$PrismaModel>
-  }
-
-  export type NestedFloatNullableFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
-  }
-
   export type OralQuestionCreateWithoutSessionInput = {
     id?: string
     orderIndex: number
     questionText: string
     questionType: string
-    difficulty: string
+    category?: string | null
+    difficulty?: string
     answerText?: string | null
     answeredAt?: Date | string | null
     timeTakenSecs?: number | null
@@ -6168,7 +6262,8 @@ export namespace Prisma {
     orderIndex: number
     questionText: string
     questionType: string
-    difficulty: string
+    category?: string | null
+    difficulty?: string
     answerText?: string | null
     answeredAt?: Date | string | null
     timeTakenSecs?: number | null
@@ -6242,6 +6337,7 @@ export namespace Prisma {
     orderIndex?: IntFilter<"OralQuestion"> | number
     questionText?: StringFilter<"OralQuestion"> | string
     questionType?: StringFilter<"OralQuestion"> | string
+    category?: StringNullableFilter<"OralQuestion"> | string | null
     difficulty?: StringFilter<"OralQuestion"> | string
     answerText?: StringNullableFilter<"OralQuestion"> | string | null
     answeredAt?: DateTimeNullableFilter<"OralQuestion"> | Date | string | null
@@ -6290,11 +6386,13 @@ export namespace Prisma {
     targetRole: string
     targetCompany?: string | null
     industry: string
-    experienceLevel: string
+    experienceLevel?: string
     focusAreas?: OralSessionCreatefocusAreasInput | string[]
     interviewGoal?: string | null
     durationMins?: number
     status?: string
+    overallScore?: number | null
+    feedbackSummary?: string | null
     startedAt?: Date | string | null
     completedAt?: Date | string | null
     createdAt?: Date | string
@@ -6309,11 +6407,13 @@ export namespace Prisma {
     targetRole: string
     targetCompany?: string | null
     industry: string
-    experienceLevel: string
+    experienceLevel?: string
     focusAreas?: OralSessionCreatefocusAreasInput | string[]
     interviewGoal?: string | null
     durationMins?: number
     status?: string
+    overallScore?: number | null
+    feedbackSummary?: string | null
     startedAt?: Date | string | null
     completedAt?: Date | string | null
     createdAt?: Date | string
@@ -6349,6 +6449,8 @@ export namespace Prisma {
     interviewGoal?: NullableStringFieldUpdateOperationsInput | string | null
     durationMins?: IntFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    feedbackSummary?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -6368,6 +6470,8 @@ export namespace Prisma {
     interviewGoal?: NullableStringFieldUpdateOperationsInput | string | null
     durationMins?: IntFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    feedbackSummary?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -6382,11 +6486,13 @@ export namespace Prisma {
     targetRole: string
     targetCompany?: string | null
     industry: string
-    experienceLevel: string
+    experienceLevel?: string
     focusAreas?: OralSessionCreatefocusAreasInput | string[]
     interviewGoal?: string | null
     durationMins?: number
     status?: string
+    overallScore?: number | null
+    feedbackSummary?: string | null
     startedAt?: Date | string | null
     completedAt?: Date | string | null
     createdAt?: Date | string
@@ -6401,11 +6507,13 @@ export namespace Prisma {
     targetRole: string
     targetCompany?: string | null
     industry: string
-    experienceLevel: string
+    experienceLevel?: string
     focusAreas?: OralSessionCreatefocusAreasInput | string[]
     interviewGoal?: string | null
     durationMins?: number
     status?: string
+    overallScore?: number | null
+    feedbackSummary?: string | null
     startedAt?: Date | string | null
     completedAt?: Date | string | null
     createdAt?: Date | string
@@ -6441,6 +6549,8 @@ export namespace Prisma {
     interviewGoal?: NullableStringFieldUpdateOperationsInput | string | null
     durationMins?: IntFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    feedbackSummary?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -6460,6 +6570,8 @@ export namespace Prisma {
     interviewGoal?: NullableStringFieldUpdateOperationsInput | string | null
     durationMins?: IntFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    feedbackSummary?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -6471,7 +6583,8 @@ export namespace Prisma {
     orderIndex: number
     questionText: string
     questionType: string
-    difficulty: string
+    category?: string | null
+    difficulty?: string
     answerText?: string | null
     answeredAt?: Date | string | null
     timeTakenSecs?: number | null
@@ -6496,6 +6609,7 @@ export namespace Prisma {
     orderIndex?: IntFieldUpdateOperationsInput | number
     questionText?: StringFieldUpdateOperationsInput | string
     questionType?: StringFieldUpdateOperationsInput | string
+    category?: NullableStringFieldUpdateOperationsInput | string | null
     difficulty?: StringFieldUpdateOperationsInput | string
     answerText?: NullableStringFieldUpdateOperationsInput | string | null
     answeredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -6512,6 +6626,7 @@ export namespace Prisma {
     orderIndex?: IntFieldUpdateOperationsInput | number
     questionText?: StringFieldUpdateOperationsInput | string
     questionType?: StringFieldUpdateOperationsInput | string
+    category?: NullableStringFieldUpdateOperationsInput | string | null
     difficulty?: StringFieldUpdateOperationsInput | string
     answerText?: NullableStringFieldUpdateOperationsInput | string | null
     answeredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -6528,6 +6643,7 @@ export namespace Prisma {
     orderIndex?: IntFieldUpdateOperationsInput | number
     questionText?: StringFieldUpdateOperationsInput | string
     questionType?: StringFieldUpdateOperationsInput | string
+    category?: NullableStringFieldUpdateOperationsInput | string | null
     difficulty?: StringFieldUpdateOperationsInput | string
     answerText?: NullableStringFieldUpdateOperationsInput | string | null
     answeredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null

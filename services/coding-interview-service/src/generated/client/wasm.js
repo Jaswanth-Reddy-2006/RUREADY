@@ -97,10 +97,16 @@ exports.Prisma.CodingSessionScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   targetRole: 'targetRole',
+  focusTrack: 'focusTrack',
+  problemId: 'problemId',
   difficulty: 'difficulty',
   selectedLanguage: 'selectedLanguage',
+  durationMins: 'durationMins',
   status: 'status',
   testCasesPassed: 'testCasesPassed',
+  totalTestCases: 'totalTestCases',
+  overallScore: 'overallScore',
+  feedbackSummary: 'feedbackSummary',
   startedAt: 'startedAt',
   completedAt: 'completedAt'
 };
@@ -110,12 +116,15 @@ exports.Prisma.PreDefinedProblemScalarFieldEnum = {
   title: 'title',
   difficulty: 'difficulty',
   pattern: 'pattern',
+  category: 'category',
+  topicTags: 'topicTags',
   description: 'description',
   starterCode: 'starterCode',
   testCases: 'testCases',
   optimalSolution: 'optimalSolution',
   optimalTime: 'optimalTime',
-  optimalSpace: 'optimalSpace'
+  optimalSpace: 'optimalSpace',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.CodeExecutionDeltaScalarFieldEnum = {
@@ -170,7 +179,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\Jaswanth Reddy\\OneDrive\\Desktop\\Projects\\RU_Ready\\services\\coding-interview-service\\src\\generated\\client",
+      "value": "C:\\Users\\rafey\\Desktop\\Rennetus\\RUREADY\\services\\coding-interview-service\\src\\generated\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -184,7 +193,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\Jaswanth Reddy\\OneDrive\\Desktop\\Projects\\RU_Ready\\services\\coding-interview-service\\src\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\rafey\\Desktop\\Rennetus\\RUREADY\\services\\coding-interview-service\\src\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -206,13 +215,13 @@ const config = {
       }
     }
   },
-  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/client\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel CodingSession {\n  id               String    @id @default(cuid())\n  userId           String\n  targetRole       String\n  difficulty       String    @default(\"MEDIUM\")\n  selectedLanguage String    @default(\"javascript\")\n  status           String    @default(\"IN_PROGRESS\")\n  testCasesPassed  Int?      @default(0)\n  startedAt        DateTime  @default(now())\n  completedAt      DateTime?\n\n  executionDeltas CodeExecutionDelta[]\n\n  @@index([userId])\n  @@map(\"coding_sessions\")\n}\n\nmodel PreDefinedProblem {\n  id              String @id @default(uuid())\n  title           String\n  difficulty      String\n  pattern         String\n  description     String\n  starterCode     Json\n  testCases       Json\n  optimalSolution String\n  optimalTime     String\n  optimalSpace    String\n\n  @@map(\"pre_defined_problems\")\n}\n\nmodel CodeExecutionDelta {\n  id        String        @id @default(uuid())\n  sessionId String\n  session   CodingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)\n  code      String\n  language  String\n  output    String?\n  success   Boolean?\n  timestamp DateTime      @default(now())\n\n  @@index([sessionId, timestamp])\n  @@map(\"code_execution_deltas\")\n}\n",
-  "inlineSchemaHash": "954c3131476e6618dc6a57f19309e300df34bf248a48547c481b679ee295b9fa",
+  "inlineSchema": "// ═══════════════════════════════════════════════════════════════\n// Coding Interview & Sandbox Microservice — Prisma Schema\n// Data ownership: coding_sessions, pre_defined_problems, code_execution_deltas\n// ═══════════════════════════════════════════════════════════════\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/client\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel CodingSession {\n  id               String    @id @default(cuid())\n  userId           String\n  targetRole       String\n  focusTrack       String?   @default(\"DSA\") // DSA, MACHINE_CODING, SQL, FRONTEND, BACKEND\n  problemId        String?\n  difficulty       String    @default(\"MEDIUM\")\n  selectedLanguage String    @default(\"javascript\")\n  durationMins     Int       @default(30)\n  status           String    @default(\"IN_PROGRESS\") // IN_PROGRESS, COMPLETED, ABANDONED\n  testCasesPassed  Int?      @default(0)\n  totalTestCases   Int?      @default(0)\n  overallScore     Int?\n  feedbackSummary  String?\n  startedAt        DateTime  @default(now())\n  completedAt      DateTime?\n\n  executionDeltas CodeExecutionDelta[]\n\n  @@index([userId, status])\n  @@map(\"coding_sessions\")\n}\n\nmodel PreDefinedProblem {\n  id              String   @id @default(uuid())\n  title           String\n  difficulty      String   @default(\"MEDIUM\")\n  pattern         String\n  category        String?  @default(\"DSA\")\n  topicTags       String[] @default([])\n  description     String   @db.Text\n  starterCode     Json\n  testCases       Json\n  optimalSolution String   @db.Text\n  optimalTime     String\n  optimalSpace    String\n  createdAt       DateTime @default(now())\n\n  @@index([difficulty, pattern])\n  @@map(\"pre_defined_problems\")\n}\n\nmodel CodeExecutionDelta {\n  id        String        @id @default(uuid())\n  sessionId String\n  session   CodingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)\n  code      String        @db.Text\n  language  String\n  output    String?       @db.Text\n  success   Boolean?\n  timestamp DateTime      @default(now())\n\n  @@index([sessionId, timestamp])\n  @@map(\"code_execution_deltas\")\n}\n",
+  "inlineSchemaHash": "f57b9c8039e18c7e0846869a8904ad70e969b98a30716429ec6610692ac8897d",
   "copyEngine": true
 }
 config.dirname = '/'
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"CodingSession\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"targetRole\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"difficulty\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"selectedLanguage\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"testCasesPassed\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"startedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"completedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"executionDeltas\",\"kind\":\"object\",\"type\":\"CodeExecutionDelta\",\"relationName\":\"CodeExecutionDeltaToCodingSession\"}],\"dbName\":\"coding_sessions\"},\"PreDefinedProblem\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"difficulty\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"pattern\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"starterCode\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"testCases\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"optimalSolution\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"optimalTime\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"optimalSpace\",\"kind\":\"scalar\",\"type\":\"String\"}],\"dbName\":\"pre_defined_problems\"},\"CodeExecutionDelta\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"sessionId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"session\",\"kind\":\"object\",\"type\":\"CodingSession\",\"relationName\":\"CodeExecutionDeltaToCodingSession\"},{\"name\":\"code\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"language\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"output\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"success\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"timestamp\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"code_execution_deltas\"}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"CodingSession\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"targetRole\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"focusTrack\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"problemId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"difficulty\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"selectedLanguage\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"durationMins\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"status\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"testCasesPassed\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"totalTestCases\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"overallScore\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"feedbackSummary\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"startedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"completedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"executionDeltas\",\"kind\":\"object\",\"type\":\"CodeExecutionDelta\",\"relationName\":\"CodeExecutionDeltaToCodingSession\"}],\"dbName\":\"coding_sessions\"},\"PreDefinedProblem\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"difficulty\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"pattern\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"category\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"topicTags\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"starterCode\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"testCases\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"optimalSolution\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"optimalTime\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"optimalSpace\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"pre_defined_problems\"},\"CodeExecutionDelta\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"sessionId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"session\",\"kind\":\"object\",\"type\":\"CodingSession\",\"relationName\":\"CodeExecutionDeltaToCodingSession\"},{\"name\":\"code\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"language\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"output\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"success\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"timestamp\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"code_execution_deltas\"}},\"enums\":{},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.engineWasm = {
   getRuntime: async () => require('./query_engine_bg.js'),

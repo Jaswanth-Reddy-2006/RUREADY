@@ -1087,10 +1087,12 @@ export namespace Prisma {
 
   export type AtsMatchAvgAggregateOutputType = {
     matchScore: number | null
+    semanticScore: number | null
   }
 
   export type AtsMatchSumAggregateOutputType = {
     matchScore: number | null
+    semanticScore: number | null
   }
 
   export type AtsMatchMinAggregateOutputType = {
@@ -1099,6 +1101,7 @@ export namespace Prisma {
     jobTitle: string | null
     companyName: string | null
     matchScore: number | null
+    semanticScore: number | null
     summary: string | null
     experienceMatch: string | null
     createdAt: Date | null
@@ -1110,6 +1113,7 @@ export namespace Prisma {
     jobTitle: string | null
     companyName: string | null
     matchScore: number | null
+    semanticScore: number | null
     summary: string | null
     experienceMatch: string | null
     createdAt: Date | null
@@ -1121,6 +1125,7 @@ export namespace Prisma {
     jobTitle: number
     companyName: number
     matchScore: number
+    semanticScore: number
     summary: number
     matchedSkills: number
     missingSkills: number
@@ -1135,10 +1140,12 @@ export namespace Prisma {
 
   export type AtsMatchAvgAggregateInputType = {
     matchScore?: true
+    semanticScore?: true
   }
 
   export type AtsMatchSumAggregateInputType = {
     matchScore?: true
+    semanticScore?: true
   }
 
   export type AtsMatchMinAggregateInputType = {
@@ -1147,6 +1154,7 @@ export namespace Prisma {
     jobTitle?: true
     companyName?: true
     matchScore?: true
+    semanticScore?: true
     summary?: true
     experienceMatch?: true
     createdAt?: true
@@ -1158,6 +1166,7 @@ export namespace Prisma {
     jobTitle?: true
     companyName?: true
     matchScore?: true
+    semanticScore?: true
     summary?: true
     experienceMatch?: true
     createdAt?: true
@@ -1169,6 +1178,7 @@ export namespace Prisma {
     jobTitle?: true
     companyName?: true
     matchScore?: true
+    semanticScore?: true
     summary?: true
     matchedSkills?: true
     missingSkills?: true
@@ -1272,6 +1282,7 @@ export namespace Prisma {
     jobTitle: string
     companyName: string | null
     matchScore: number
+    semanticScore: number | null
     summary: string
     matchedSkills: string[]
     missingSkills: string[]
@@ -1307,6 +1318,7 @@ export namespace Prisma {
     jobTitle?: boolean
     companyName?: boolean
     matchScore?: boolean
+    semanticScore?: boolean
     summary?: boolean
     matchedSkills?: boolean
     missingSkills?: boolean
@@ -1323,6 +1335,7 @@ export namespace Prisma {
     jobTitle?: boolean
     companyName?: boolean
     matchScore?: boolean
+    semanticScore?: boolean
     summary?: boolean
     matchedSkills?: boolean
     missingSkills?: boolean
@@ -1339,6 +1352,7 @@ export namespace Prisma {
     jobTitle?: boolean
     companyName?: boolean
     matchScore?: boolean
+    semanticScore?: boolean
     summary?: boolean
     matchedSkills?: boolean
     missingSkills?: boolean
@@ -1355,6 +1369,7 @@ export namespace Prisma {
     jobTitle?: boolean
     companyName?: boolean
     matchScore?: boolean
+    semanticScore?: boolean
     summary?: boolean
     matchedSkills?: boolean
     missingSkills?: boolean
@@ -1365,7 +1380,7 @@ export namespace Prisma {
     createdAt?: boolean
   }
 
-  export type AtsMatchOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "jobTitle" | "companyName" | "matchScore" | "summary" | "matchedSkills" | "missingSkills" | "experienceMatch" | "atsWarnings" | "bulletRewrites" | "tailoredQuestions" | "createdAt", ExtArgs["result"]["atsMatch"]>
+  export type AtsMatchOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "jobTitle" | "companyName" | "matchScore" | "semanticScore" | "summary" | "matchedSkills" | "missingSkills" | "experienceMatch" | "atsWarnings" | "bulletRewrites" | "tailoredQuestions" | "createdAt", ExtArgs["result"]["atsMatch"]>
 
   export type $AtsMatchPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "AtsMatch"
@@ -1376,6 +1391,7 @@ export namespace Prisma {
       jobTitle: string
       companyName: string | null
       matchScore: number
+      semanticScore: number | null
       summary: string
       matchedSkills: string[]
       missingSkills: string[]
@@ -1812,6 +1828,7 @@ export namespace Prisma {
     readonly jobTitle: FieldRef<"AtsMatch", 'String'>
     readonly companyName: FieldRef<"AtsMatch", 'String'>
     readonly matchScore: FieldRef<"AtsMatch", 'Int'>
+    readonly semanticScore: FieldRef<"AtsMatch", 'Int'>
     readonly summary: FieldRef<"AtsMatch", 'String'>
     readonly matchedSkills: FieldRef<"AtsMatch", 'String[]'>
     readonly missingSkills: FieldRef<"AtsMatch", 'String[]'>
@@ -4705,6 +4722,7 @@ export namespace Prisma {
     jobTitle: 'jobTitle',
     companyName: 'companyName',
     matchScore: 'matchScore',
+    semanticScore: 'semanticScore',
     summary: 'summary',
     matchedSkills: 'matchedSkills',
     missingSkills: 'missingSkills',
@@ -4897,6 +4915,7 @@ export namespace Prisma {
     jobTitle?: StringFilter<"AtsMatch"> | string
     companyName?: StringNullableFilter<"AtsMatch"> | string | null
     matchScore?: IntFilter<"AtsMatch"> | number
+    semanticScore?: IntNullableFilter<"AtsMatch"> | number | null
     summary?: StringFilter<"AtsMatch"> | string
     matchedSkills?: StringNullableListFilter<"AtsMatch">
     missingSkills?: StringNullableListFilter<"AtsMatch">
@@ -4913,6 +4932,7 @@ export namespace Prisma {
     jobTitle?: SortOrder
     companyName?: SortOrderInput | SortOrder
     matchScore?: SortOrder
+    semanticScore?: SortOrderInput | SortOrder
     summary?: SortOrder
     matchedSkills?: SortOrder
     missingSkills?: SortOrder
@@ -4932,6 +4952,7 @@ export namespace Prisma {
     jobTitle?: StringFilter<"AtsMatch"> | string
     companyName?: StringNullableFilter<"AtsMatch"> | string | null
     matchScore?: IntFilter<"AtsMatch"> | number
+    semanticScore?: IntNullableFilter<"AtsMatch"> | number | null
     summary?: StringFilter<"AtsMatch"> | string
     matchedSkills?: StringNullableListFilter<"AtsMatch">
     missingSkills?: StringNullableListFilter<"AtsMatch">
@@ -4948,6 +4969,7 @@ export namespace Prisma {
     jobTitle?: SortOrder
     companyName?: SortOrderInput | SortOrder
     matchScore?: SortOrder
+    semanticScore?: SortOrderInput | SortOrder
     summary?: SortOrder
     matchedSkills?: SortOrder
     missingSkills?: SortOrder
@@ -4972,6 +4994,7 @@ export namespace Prisma {
     jobTitle?: StringWithAggregatesFilter<"AtsMatch"> | string
     companyName?: StringNullableWithAggregatesFilter<"AtsMatch"> | string | null
     matchScore?: IntWithAggregatesFilter<"AtsMatch"> | number
+    semanticScore?: IntNullableWithAggregatesFilter<"AtsMatch"> | number | null
     summary?: StringWithAggregatesFilter<"AtsMatch"> | string
     matchedSkills?: StringNullableListFilter<"AtsMatch">
     missingSkills?: StringNullableListFilter<"AtsMatch">
@@ -5217,6 +5240,7 @@ export namespace Prisma {
     jobTitle: string
     companyName?: string | null
     matchScore: number
+    semanticScore?: number | null
     summary: string
     matchedSkills?: AtsMatchCreatematchedSkillsInput | string[]
     missingSkills?: AtsMatchCreatemissingSkillsInput | string[]
@@ -5233,6 +5257,7 @@ export namespace Prisma {
     jobTitle: string
     companyName?: string | null
     matchScore: number
+    semanticScore?: number | null
     summary: string
     matchedSkills?: AtsMatchCreatematchedSkillsInput | string[]
     missingSkills?: AtsMatchCreatemissingSkillsInput | string[]
@@ -5249,6 +5274,7 @@ export namespace Prisma {
     jobTitle?: StringFieldUpdateOperationsInput | string
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     matchScore?: IntFieldUpdateOperationsInput | number
+    semanticScore?: NullableIntFieldUpdateOperationsInput | number | null
     summary?: StringFieldUpdateOperationsInput | string
     matchedSkills?: AtsMatchUpdatematchedSkillsInput | string[]
     missingSkills?: AtsMatchUpdatemissingSkillsInput | string[]
@@ -5265,6 +5291,7 @@ export namespace Prisma {
     jobTitle?: StringFieldUpdateOperationsInput | string
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     matchScore?: IntFieldUpdateOperationsInput | number
+    semanticScore?: NullableIntFieldUpdateOperationsInput | number | null
     summary?: StringFieldUpdateOperationsInput | string
     matchedSkills?: AtsMatchUpdatematchedSkillsInput | string[]
     missingSkills?: AtsMatchUpdatemissingSkillsInput | string[]
@@ -5281,6 +5308,7 @@ export namespace Prisma {
     jobTitle: string
     companyName?: string | null
     matchScore: number
+    semanticScore?: number | null
     summary: string
     matchedSkills?: AtsMatchCreatematchedSkillsInput | string[]
     missingSkills?: AtsMatchCreatemissingSkillsInput | string[]
@@ -5297,6 +5325,7 @@ export namespace Prisma {
     jobTitle?: StringFieldUpdateOperationsInput | string
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     matchScore?: IntFieldUpdateOperationsInput | number
+    semanticScore?: NullableIntFieldUpdateOperationsInput | number | null
     summary?: StringFieldUpdateOperationsInput | string
     matchedSkills?: AtsMatchUpdatematchedSkillsInput | string[]
     missingSkills?: AtsMatchUpdatemissingSkillsInput | string[]
@@ -5313,6 +5342,7 @@ export namespace Prisma {
     jobTitle?: StringFieldUpdateOperationsInput | string
     companyName?: NullableStringFieldUpdateOperationsInput | string | null
     matchScore?: IntFieldUpdateOperationsInput | number
+    semanticScore?: NullableIntFieldUpdateOperationsInput | number | null
     summary?: StringFieldUpdateOperationsInput | string
     matchedSkills?: AtsMatchUpdatematchedSkillsInput | string[]
     missingSkills?: AtsMatchUpdatemissingSkillsInput | string[]
@@ -5640,6 +5670,17 @@ export namespace Prisma {
     not?: NestedIntFilter<$PrismaModel> | number
   }
 
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
   export type StringNullableListFilter<$PrismaModel = never> = {
     equals?: string[] | ListStringFieldRefInput<$PrismaModel> | null
     has?: string | StringFieldRefInput<$PrismaModel> | null
@@ -5693,6 +5734,7 @@ export namespace Prisma {
     jobTitle?: SortOrder
     companyName?: SortOrder
     matchScore?: SortOrder
+    semanticScore?: SortOrder
     summary?: SortOrder
     matchedSkills?: SortOrder
     missingSkills?: SortOrder
@@ -5705,6 +5747,7 @@ export namespace Prisma {
 
   export type AtsMatchAvgOrderByAggregateInput = {
     matchScore?: SortOrder
+    semanticScore?: SortOrder
   }
 
   export type AtsMatchMaxOrderByAggregateInput = {
@@ -5713,6 +5756,7 @@ export namespace Prisma {
     jobTitle?: SortOrder
     companyName?: SortOrder
     matchScore?: SortOrder
+    semanticScore?: SortOrder
     summary?: SortOrder
     experienceMatch?: SortOrder
     createdAt?: SortOrder
@@ -5724,6 +5768,7 @@ export namespace Prisma {
     jobTitle?: SortOrder
     companyName?: SortOrder
     matchScore?: SortOrder
+    semanticScore?: SortOrder
     summary?: SortOrder
     experienceMatch?: SortOrder
     createdAt?: SortOrder
@@ -5731,6 +5776,7 @@ export namespace Prisma {
 
   export type AtsMatchSumOrderByAggregateInput = {
     matchScore?: SortOrder
+    semanticScore?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -5784,6 +5830,22 @@ export namespace Prisma {
     _min?: NestedIntFilter<$PrismaModel>
     _max?: NestedIntFilter<$PrismaModel>
   }
+
+  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
   export type JsonWithAggregatesFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
@@ -5834,17 +5896,6 @@ export namespace Prisma {
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
-  }
-
-  export type IntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
   export type BoolFilter<$PrismaModel = never> = {
@@ -5952,22 +6003,6 @@ export namespace Prisma {
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
-  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedIntNullableFilter<$PrismaModel>
-    _max?: NestedIntNullableFilter<$PrismaModel>
-  }
-
   export type BoolWithAggregatesFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel>
     not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
@@ -6068,6 +6103,14 @@ export namespace Prisma {
     divide?: number
   }
 
+  export type NullableIntFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
   export type AtsMatchUpdatematchedSkillsInput = {
     set?: string[]
     push?: string | string[]
@@ -6112,14 +6155,6 @@ export namespace Prisma {
 
   export type NullableDateTimeFieldUpdateOperationsInput = {
     set?: Date | string | null
-  }
-
-  export type NullableIntFieldUpdateOperationsInput = {
-    set?: number | null
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
   }
 
   export type BoolFieldUpdateOperationsInput = {
@@ -6225,6 +6260,17 @@ export namespace Prisma {
     not?: NestedIntFilter<$PrismaModel> | number
   }
 
+  export type NestedIntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
   export type NestedDateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -6270,17 +6316,6 @@ export namespace Prisma {
     _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
-  export type NestedIntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
-  }
-
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -6306,6 +6341,33 @@ export namespace Prisma {
     gt?: number | FloatFieldRefInput<$PrismaModel>
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatFilter<$PrismaModel> | number
+  }
+
+  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type NestedFloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
   }
   export type NestedJsonFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -6373,33 +6435,6 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedDateTimeNullableFilter<$PrismaModel>
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
-  }
-
-  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedIntNullableFilter<$PrismaModel>
-    _max?: NestedIntNullableFilter<$PrismaModel>
-  }
-
-  export type NestedFloatNullableFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
   }
 
   export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {

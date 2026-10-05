@@ -1086,21 +1086,33 @@ export namespace Prisma {
   }
 
   export type CodingSessionAvgAggregateOutputType = {
+    durationMins: number | null
     testCasesPassed: number | null
+    totalTestCases: number | null
+    overallScore: number | null
   }
 
   export type CodingSessionSumAggregateOutputType = {
+    durationMins: number | null
     testCasesPassed: number | null
+    totalTestCases: number | null
+    overallScore: number | null
   }
 
   export type CodingSessionMinAggregateOutputType = {
     id: string | null
     userId: string | null
     targetRole: string | null
+    focusTrack: string | null
+    problemId: string | null
     difficulty: string | null
     selectedLanguage: string | null
+    durationMins: number | null
     status: string | null
     testCasesPassed: number | null
+    totalTestCases: number | null
+    overallScore: number | null
+    feedbackSummary: string | null
     startedAt: Date | null
     completedAt: Date | null
   }
@@ -1109,10 +1121,16 @@ export namespace Prisma {
     id: string | null
     userId: string | null
     targetRole: string | null
+    focusTrack: string | null
+    problemId: string | null
     difficulty: string | null
     selectedLanguage: string | null
+    durationMins: number | null
     status: string | null
     testCasesPassed: number | null
+    totalTestCases: number | null
+    overallScore: number | null
+    feedbackSummary: string | null
     startedAt: Date | null
     completedAt: Date | null
   }
@@ -1121,10 +1139,16 @@ export namespace Prisma {
     id: number
     userId: number
     targetRole: number
+    focusTrack: number
+    problemId: number
     difficulty: number
     selectedLanguage: number
+    durationMins: number
     status: number
     testCasesPassed: number
+    totalTestCases: number
+    overallScore: number
+    feedbackSummary: number
     startedAt: number
     completedAt: number
     _all: number
@@ -1132,21 +1156,33 @@ export namespace Prisma {
 
 
   export type CodingSessionAvgAggregateInputType = {
+    durationMins?: true
     testCasesPassed?: true
+    totalTestCases?: true
+    overallScore?: true
   }
 
   export type CodingSessionSumAggregateInputType = {
+    durationMins?: true
     testCasesPassed?: true
+    totalTestCases?: true
+    overallScore?: true
   }
 
   export type CodingSessionMinAggregateInputType = {
     id?: true
     userId?: true
     targetRole?: true
+    focusTrack?: true
+    problemId?: true
     difficulty?: true
     selectedLanguage?: true
+    durationMins?: true
     status?: true
     testCasesPassed?: true
+    totalTestCases?: true
+    overallScore?: true
+    feedbackSummary?: true
     startedAt?: true
     completedAt?: true
   }
@@ -1155,10 +1191,16 @@ export namespace Prisma {
     id?: true
     userId?: true
     targetRole?: true
+    focusTrack?: true
+    problemId?: true
     difficulty?: true
     selectedLanguage?: true
+    durationMins?: true
     status?: true
     testCasesPassed?: true
+    totalTestCases?: true
+    overallScore?: true
+    feedbackSummary?: true
     startedAt?: true
     completedAt?: true
   }
@@ -1167,10 +1209,16 @@ export namespace Prisma {
     id?: true
     userId?: true
     targetRole?: true
+    focusTrack?: true
+    problemId?: true
     difficulty?: true
     selectedLanguage?: true
+    durationMins?: true
     status?: true
     testCasesPassed?: true
+    totalTestCases?: true
+    overallScore?: true
+    feedbackSummary?: true
     startedAt?: true
     completedAt?: true
     _all?: true
@@ -1266,10 +1314,16 @@ export namespace Prisma {
     id: string
     userId: string
     targetRole: string
+    focusTrack: string | null
+    problemId: string | null
     difficulty: string
     selectedLanguage: string
+    durationMins: number
     status: string
     testCasesPassed: number | null
+    totalTestCases: number | null
+    overallScore: number | null
+    feedbackSummary: string | null
     startedAt: Date
     completedAt: Date | null
     _count: CodingSessionCountAggregateOutputType | null
@@ -1297,10 +1351,16 @@ export namespace Prisma {
     id?: boolean
     userId?: boolean
     targetRole?: boolean
+    focusTrack?: boolean
+    problemId?: boolean
     difficulty?: boolean
     selectedLanguage?: boolean
+    durationMins?: boolean
     status?: boolean
     testCasesPassed?: boolean
+    totalTestCases?: boolean
+    overallScore?: boolean
+    feedbackSummary?: boolean
     startedAt?: boolean
     completedAt?: boolean
     executionDeltas?: boolean | CodingSession$executionDeltasArgs<ExtArgs>
@@ -1311,10 +1371,16 @@ export namespace Prisma {
     id?: boolean
     userId?: boolean
     targetRole?: boolean
+    focusTrack?: boolean
+    problemId?: boolean
     difficulty?: boolean
     selectedLanguage?: boolean
+    durationMins?: boolean
     status?: boolean
     testCasesPassed?: boolean
+    totalTestCases?: boolean
+    overallScore?: boolean
+    feedbackSummary?: boolean
     startedAt?: boolean
     completedAt?: boolean
   }, ExtArgs["result"]["codingSession"]>
@@ -1323,10 +1389,16 @@ export namespace Prisma {
     id?: boolean
     userId?: boolean
     targetRole?: boolean
+    focusTrack?: boolean
+    problemId?: boolean
     difficulty?: boolean
     selectedLanguage?: boolean
+    durationMins?: boolean
     status?: boolean
     testCasesPassed?: boolean
+    totalTestCases?: boolean
+    overallScore?: boolean
+    feedbackSummary?: boolean
     startedAt?: boolean
     completedAt?: boolean
   }, ExtArgs["result"]["codingSession"]>
@@ -1335,15 +1407,21 @@ export namespace Prisma {
     id?: boolean
     userId?: boolean
     targetRole?: boolean
+    focusTrack?: boolean
+    problemId?: boolean
     difficulty?: boolean
     selectedLanguage?: boolean
+    durationMins?: boolean
     status?: boolean
     testCasesPassed?: boolean
+    totalTestCases?: boolean
+    overallScore?: boolean
+    feedbackSummary?: boolean
     startedAt?: boolean
     completedAt?: boolean
   }
 
-  export type CodingSessionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "targetRole" | "difficulty" | "selectedLanguage" | "status" | "testCasesPassed" | "startedAt" | "completedAt", ExtArgs["result"]["codingSession"]>
+  export type CodingSessionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "targetRole" | "focusTrack" | "problemId" | "difficulty" | "selectedLanguage" | "durationMins" | "status" | "testCasesPassed" | "totalTestCases" | "overallScore" | "feedbackSummary" | "startedAt" | "completedAt", ExtArgs["result"]["codingSession"]>
   export type CodingSessionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     executionDeltas?: boolean | CodingSession$executionDeltasArgs<ExtArgs>
     _count?: boolean | CodingSessionCountOutputTypeDefaultArgs<ExtArgs>
@@ -1360,10 +1438,16 @@ export namespace Prisma {
       id: string
       userId: string
       targetRole: string
+      focusTrack: string | null
+      problemId: string | null
       difficulty: string
       selectedLanguage: string
+      durationMins: number
       status: string
       testCasesPassed: number | null
+      totalTestCases: number | null
+      overallScore: number | null
+      feedbackSummary: string | null
       startedAt: Date
       completedAt: Date | null
     }, ExtArgs["result"]["codingSession"]>
@@ -1793,10 +1877,16 @@ export namespace Prisma {
     readonly id: FieldRef<"CodingSession", 'String'>
     readonly userId: FieldRef<"CodingSession", 'String'>
     readonly targetRole: FieldRef<"CodingSession", 'String'>
+    readonly focusTrack: FieldRef<"CodingSession", 'String'>
+    readonly problemId: FieldRef<"CodingSession", 'String'>
     readonly difficulty: FieldRef<"CodingSession", 'String'>
     readonly selectedLanguage: FieldRef<"CodingSession", 'String'>
+    readonly durationMins: FieldRef<"CodingSession", 'Int'>
     readonly status: FieldRef<"CodingSession", 'String'>
     readonly testCasesPassed: FieldRef<"CodingSession", 'Int'>
+    readonly totalTestCases: FieldRef<"CodingSession", 'Int'>
+    readonly overallScore: FieldRef<"CodingSession", 'Int'>
+    readonly feedbackSummary: FieldRef<"CodingSession", 'String'>
     readonly startedAt: FieldRef<"CodingSession", 'DateTime'>
     readonly completedAt: FieldRef<"CodingSession", 'DateTime'>
   }
@@ -2244,10 +2334,12 @@ export namespace Prisma {
     title: string | null
     difficulty: string | null
     pattern: string | null
+    category: string | null
     description: string | null
     optimalSolution: string | null
     optimalTime: string | null
     optimalSpace: string | null
+    createdAt: Date | null
   }
 
   export type PreDefinedProblemMaxAggregateOutputType = {
@@ -2255,10 +2347,12 @@ export namespace Prisma {
     title: string | null
     difficulty: string | null
     pattern: string | null
+    category: string | null
     description: string | null
     optimalSolution: string | null
     optimalTime: string | null
     optimalSpace: string | null
+    createdAt: Date | null
   }
 
   export type PreDefinedProblemCountAggregateOutputType = {
@@ -2266,12 +2360,15 @@ export namespace Prisma {
     title: number
     difficulty: number
     pattern: number
+    category: number
+    topicTags: number
     description: number
     starterCode: number
     testCases: number
     optimalSolution: number
     optimalTime: number
     optimalSpace: number
+    createdAt: number
     _all: number
   }
 
@@ -2281,10 +2378,12 @@ export namespace Prisma {
     title?: true
     difficulty?: true
     pattern?: true
+    category?: true
     description?: true
     optimalSolution?: true
     optimalTime?: true
     optimalSpace?: true
+    createdAt?: true
   }
 
   export type PreDefinedProblemMaxAggregateInputType = {
@@ -2292,10 +2391,12 @@ export namespace Prisma {
     title?: true
     difficulty?: true
     pattern?: true
+    category?: true
     description?: true
     optimalSolution?: true
     optimalTime?: true
     optimalSpace?: true
+    createdAt?: true
   }
 
   export type PreDefinedProblemCountAggregateInputType = {
@@ -2303,12 +2404,15 @@ export namespace Prisma {
     title?: true
     difficulty?: true
     pattern?: true
+    category?: true
+    topicTags?: true
     description?: true
     starterCode?: true
     testCases?: true
     optimalSolution?: true
     optimalTime?: true
     optimalSpace?: true
+    createdAt?: true
     _all?: true
   }
 
@@ -2389,12 +2493,15 @@ export namespace Prisma {
     title: string
     difficulty: string
     pattern: string
+    category: string | null
+    topicTags: string[]
     description: string
     starterCode: JsonValue
     testCases: JsonValue
     optimalSolution: string
     optimalTime: string
     optimalSpace: string
+    createdAt: Date
     _count: PreDefinedProblemCountAggregateOutputType | null
     _min: PreDefinedProblemMinAggregateOutputType | null
     _max: PreDefinedProblemMaxAggregateOutputType | null
@@ -2419,12 +2526,15 @@ export namespace Prisma {
     title?: boolean
     difficulty?: boolean
     pattern?: boolean
+    category?: boolean
+    topicTags?: boolean
     description?: boolean
     starterCode?: boolean
     testCases?: boolean
     optimalSolution?: boolean
     optimalTime?: boolean
     optimalSpace?: boolean
+    createdAt?: boolean
   }, ExtArgs["result"]["preDefinedProblem"]>
 
   export type PreDefinedProblemSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -2432,12 +2542,15 @@ export namespace Prisma {
     title?: boolean
     difficulty?: boolean
     pattern?: boolean
+    category?: boolean
+    topicTags?: boolean
     description?: boolean
     starterCode?: boolean
     testCases?: boolean
     optimalSolution?: boolean
     optimalTime?: boolean
     optimalSpace?: boolean
+    createdAt?: boolean
   }, ExtArgs["result"]["preDefinedProblem"]>
 
   export type PreDefinedProblemSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -2445,12 +2558,15 @@ export namespace Prisma {
     title?: boolean
     difficulty?: boolean
     pattern?: boolean
+    category?: boolean
+    topicTags?: boolean
     description?: boolean
     starterCode?: boolean
     testCases?: boolean
     optimalSolution?: boolean
     optimalTime?: boolean
     optimalSpace?: boolean
+    createdAt?: boolean
   }, ExtArgs["result"]["preDefinedProblem"]>
 
   export type PreDefinedProblemSelectScalar = {
@@ -2458,15 +2574,18 @@ export namespace Prisma {
     title?: boolean
     difficulty?: boolean
     pattern?: boolean
+    category?: boolean
+    topicTags?: boolean
     description?: boolean
     starterCode?: boolean
     testCases?: boolean
     optimalSolution?: boolean
     optimalTime?: boolean
     optimalSpace?: boolean
+    createdAt?: boolean
   }
 
-  export type PreDefinedProblemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "difficulty" | "pattern" | "description" | "starterCode" | "testCases" | "optimalSolution" | "optimalTime" | "optimalSpace", ExtArgs["result"]["preDefinedProblem"]>
+  export type PreDefinedProblemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "difficulty" | "pattern" | "category" | "topicTags" | "description" | "starterCode" | "testCases" | "optimalSolution" | "optimalTime" | "optimalSpace" | "createdAt", ExtArgs["result"]["preDefinedProblem"]>
 
   export type $PreDefinedProblemPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "PreDefinedProblem"
@@ -2476,12 +2595,15 @@ export namespace Prisma {
       title: string
       difficulty: string
       pattern: string
+      category: string | null
+      topicTags: string[]
       description: string
       starterCode: Prisma.JsonValue
       testCases: Prisma.JsonValue
       optimalSolution: string
       optimalTime: string
       optimalSpace: string
+      createdAt: Date
     }, ExtArgs["result"]["preDefinedProblem"]>
     composites: {}
   }
@@ -2909,12 +3031,15 @@ export namespace Prisma {
     readonly title: FieldRef<"PreDefinedProblem", 'String'>
     readonly difficulty: FieldRef<"PreDefinedProblem", 'String'>
     readonly pattern: FieldRef<"PreDefinedProblem", 'String'>
+    readonly category: FieldRef<"PreDefinedProblem", 'String'>
+    readonly topicTags: FieldRef<"PreDefinedProblem", 'String[]'>
     readonly description: FieldRef<"PreDefinedProblem", 'String'>
     readonly starterCode: FieldRef<"PreDefinedProblem", 'Json'>
     readonly testCases: FieldRef<"PreDefinedProblem", 'Json'>
     readonly optimalSolution: FieldRef<"PreDefinedProblem", 'String'>
     readonly optimalTime: FieldRef<"PreDefinedProblem", 'String'>
     readonly optimalSpace: FieldRef<"PreDefinedProblem", 'String'>
+    readonly createdAt: FieldRef<"PreDefinedProblem", 'DateTime'>
   }
     
 
@@ -4383,10 +4508,16 @@ export namespace Prisma {
     id: 'id',
     userId: 'userId',
     targetRole: 'targetRole',
+    focusTrack: 'focusTrack',
+    problemId: 'problemId',
     difficulty: 'difficulty',
     selectedLanguage: 'selectedLanguage',
+    durationMins: 'durationMins',
     status: 'status',
     testCasesPassed: 'testCasesPassed',
+    totalTestCases: 'totalTestCases',
+    overallScore: 'overallScore',
+    feedbackSummary: 'feedbackSummary',
     startedAt: 'startedAt',
     completedAt: 'completedAt'
   };
@@ -4399,12 +4530,15 @@ export namespace Prisma {
     title: 'title',
     difficulty: 'difficulty',
     pattern: 'pattern',
+    category: 'category',
+    topicTags: 'topicTags',
     description: 'description',
     starterCode: 'starterCode',
     testCases: 'testCases',
     optimalSolution: 'optimalSolution',
     optimalTime: 'optimalTime',
-    optimalSpace: 'optimalSpace'
+    optimalSpace: 'optimalSpace',
+    createdAt: 'createdAt'
   };
 
   export type PreDefinedProblemScalarFieldEnum = (typeof PreDefinedProblemScalarFieldEnum)[keyof typeof PreDefinedProblemScalarFieldEnum]
@@ -4555,10 +4689,16 @@ export namespace Prisma {
     id?: StringFilter<"CodingSession"> | string
     userId?: StringFilter<"CodingSession"> | string
     targetRole?: StringFilter<"CodingSession"> | string
+    focusTrack?: StringNullableFilter<"CodingSession"> | string | null
+    problemId?: StringNullableFilter<"CodingSession"> | string | null
     difficulty?: StringFilter<"CodingSession"> | string
     selectedLanguage?: StringFilter<"CodingSession"> | string
+    durationMins?: IntFilter<"CodingSession"> | number
     status?: StringFilter<"CodingSession"> | string
     testCasesPassed?: IntNullableFilter<"CodingSession"> | number | null
+    totalTestCases?: IntNullableFilter<"CodingSession"> | number | null
+    overallScore?: IntNullableFilter<"CodingSession"> | number | null
+    feedbackSummary?: StringNullableFilter<"CodingSession"> | string | null
     startedAt?: DateTimeFilter<"CodingSession"> | Date | string
     completedAt?: DateTimeNullableFilter<"CodingSession"> | Date | string | null
     executionDeltas?: CodeExecutionDeltaListRelationFilter
@@ -4568,10 +4708,16 @@ export namespace Prisma {
     id?: SortOrder
     userId?: SortOrder
     targetRole?: SortOrder
+    focusTrack?: SortOrderInput | SortOrder
+    problemId?: SortOrderInput | SortOrder
     difficulty?: SortOrder
     selectedLanguage?: SortOrder
+    durationMins?: SortOrder
     status?: SortOrder
     testCasesPassed?: SortOrderInput | SortOrder
+    totalTestCases?: SortOrderInput | SortOrder
+    overallScore?: SortOrderInput | SortOrder
+    feedbackSummary?: SortOrderInput | SortOrder
     startedAt?: SortOrder
     completedAt?: SortOrderInput | SortOrder
     executionDeltas?: CodeExecutionDeltaOrderByRelationAggregateInput
@@ -4584,10 +4730,16 @@ export namespace Prisma {
     NOT?: CodingSessionWhereInput | CodingSessionWhereInput[]
     userId?: StringFilter<"CodingSession"> | string
     targetRole?: StringFilter<"CodingSession"> | string
+    focusTrack?: StringNullableFilter<"CodingSession"> | string | null
+    problemId?: StringNullableFilter<"CodingSession"> | string | null
     difficulty?: StringFilter<"CodingSession"> | string
     selectedLanguage?: StringFilter<"CodingSession"> | string
+    durationMins?: IntFilter<"CodingSession"> | number
     status?: StringFilter<"CodingSession"> | string
     testCasesPassed?: IntNullableFilter<"CodingSession"> | number | null
+    totalTestCases?: IntNullableFilter<"CodingSession"> | number | null
+    overallScore?: IntNullableFilter<"CodingSession"> | number | null
+    feedbackSummary?: StringNullableFilter<"CodingSession"> | string | null
     startedAt?: DateTimeFilter<"CodingSession"> | Date | string
     completedAt?: DateTimeNullableFilter<"CodingSession"> | Date | string | null
     executionDeltas?: CodeExecutionDeltaListRelationFilter
@@ -4597,10 +4749,16 @@ export namespace Prisma {
     id?: SortOrder
     userId?: SortOrder
     targetRole?: SortOrder
+    focusTrack?: SortOrderInput | SortOrder
+    problemId?: SortOrderInput | SortOrder
     difficulty?: SortOrder
     selectedLanguage?: SortOrder
+    durationMins?: SortOrder
     status?: SortOrder
     testCasesPassed?: SortOrderInput | SortOrder
+    totalTestCases?: SortOrderInput | SortOrder
+    overallScore?: SortOrderInput | SortOrder
+    feedbackSummary?: SortOrderInput | SortOrder
     startedAt?: SortOrder
     completedAt?: SortOrderInput | SortOrder
     _count?: CodingSessionCountOrderByAggregateInput
@@ -4617,10 +4775,16 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"CodingSession"> | string
     userId?: StringWithAggregatesFilter<"CodingSession"> | string
     targetRole?: StringWithAggregatesFilter<"CodingSession"> | string
+    focusTrack?: StringNullableWithAggregatesFilter<"CodingSession"> | string | null
+    problemId?: StringNullableWithAggregatesFilter<"CodingSession"> | string | null
     difficulty?: StringWithAggregatesFilter<"CodingSession"> | string
     selectedLanguage?: StringWithAggregatesFilter<"CodingSession"> | string
+    durationMins?: IntWithAggregatesFilter<"CodingSession"> | number
     status?: StringWithAggregatesFilter<"CodingSession"> | string
     testCasesPassed?: IntNullableWithAggregatesFilter<"CodingSession"> | number | null
+    totalTestCases?: IntNullableWithAggregatesFilter<"CodingSession"> | number | null
+    overallScore?: IntNullableWithAggregatesFilter<"CodingSession"> | number | null
+    feedbackSummary?: StringNullableWithAggregatesFilter<"CodingSession"> | string | null
     startedAt?: DateTimeWithAggregatesFilter<"CodingSession"> | Date | string
     completedAt?: DateTimeNullableWithAggregatesFilter<"CodingSession"> | Date | string | null
   }
@@ -4633,12 +4797,15 @@ export namespace Prisma {
     title?: StringFilter<"PreDefinedProblem"> | string
     difficulty?: StringFilter<"PreDefinedProblem"> | string
     pattern?: StringFilter<"PreDefinedProblem"> | string
+    category?: StringNullableFilter<"PreDefinedProblem"> | string | null
+    topicTags?: StringNullableListFilter<"PreDefinedProblem">
     description?: StringFilter<"PreDefinedProblem"> | string
     starterCode?: JsonFilter<"PreDefinedProblem">
     testCases?: JsonFilter<"PreDefinedProblem">
     optimalSolution?: StringFilter<"PreDefinedProblem"> | string
     optimalTime?: StringFilter<"PreDefinedProblem"> | string
     optimalSpace?: StringFilter<"PreDefinedProblem"> | string
+    createdAt?: DateTimeFilter<"PreDefinedProblem"> | Date | string
   }
 
   export type PreDefinedProblemOrderByWithRelationInput = {
@@ -4646,12 +4813,15 @@ export namespace Prisma {
     title?: SortOrder
     difficulty?: SortOrder
     pattern?: SortOrder
+    category?: SortOrderInput | SortOrder
+    topicTags?: SortOrder
     description?: SortOrder
     starterCode?: SortOrder
     testCases?: SortOrder
     optimalSolution?: SortOrder
     optimalTime?: SortOrder
     optimalSpace?: SortOrder
+    createdAt?: SortOrder
   }
 
   export type PreDefinedProblemWhereUniqueInput = Prisma.AtLeast<{
@@ -4662,12 +4832,15 @@ export namespace Prisma {
     title?: StringFilter<"PreDefinedProblem"> | string
     difficulty?: StringFilter<"PreDefinedProblem"> | string
     pattern?: StringFilter<"PreDefinedProblem"> | string
+    category?: StringNullableFilter<"PreDefinedProblem"> | string | null
+    topicTags?: StringNullableListFilter<"PreDefinedProblem">
     description?: StringFilter<"PreDefinedProblem"> | string
     starterCode?: JsonFilter<"PreDefinedProblem">
     testCases?: JsonFilter<"PreDefinedProblem">
     optimalSolution?: StringFilter<"PreDefinedProblem"> | string
     optimalTime?: StringFilter<"PreDefinedProblem"> | string
     optimalSpace?: StringFilter<"PreDefinedProblem"> | string
+    createdAt?: DateTimeFilter<"PreDefinedProblem"> | Date | string
   }, "id">
 
   export type PreDefinedProblemOrderByWithAggregationInput = {
@@ -4675,12 +4848,15 @@ export namespace Prisma {
     title?: SortOrder
     difficulty?: SortOrder
     pattern?: SortOrder
+    category?: SortOrderInput | SortOrder
+    topicTags?: SortOrder
     description?: SortOrder
     starterCode?: SortOrder
     testCases?: SortOrder
     optimalSolution?: SortOrder
     optimalTime?: SortOrder
     optimalSpace?: SortOrder
+    createdAt?: SortOrder
     _count?: PreDefinedProblemCountOrderByAggregateInput
     _max?: PreDefinedProblemMaxOrderByAggregateInput
     _min?: PreDefinedProblemMinOrderByAggregateInput
@@ -4694,12 +4870,15 @@ export namespace Prisma {
     title?: StringWithAggregatesFilter<"PreDefinedProblem"> | string
     difficulty?: StringWithAggregatesFilter<"PreDefinedProblem"> | string
     pattern?: StringWithAggregatesFilter<"PreDefinedProblem"> | string
+    category?: StringNullableWithAggregatesFilter<"PreDefinedProblem"> | string | null
+    topicTags?: StringNullableListFilter<"PreDefinedProblem">
     description?: StringWithAggregatesFilter<"PreDefinedProblem"> | string
     starterCode?: JsonWithAggregatesFilter<"PreDefinedProblem">
     testCases?: JsonWithAggregatesFilter<"PreDefinedProblem">
     optimalSolution?: StringWithAggregatesFilter<"PreDefinedProblem"> | string
     optimalTime?: StringWithAggregatesFilter<"PreDefinedProblem"> | string
     optimalSpace?: StringWithAggregatesFilter<"PreDefinedProblem"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"PreDefinedProblem"> | Date | string
   }
 
   export type CodeExecutionDeltaWhereInput = {
@@ -4771,10 +4950,16 @@ export namespace Prisma {
     id?: string
     userId: string
     targetRole: string
+    focusTrack?: string | null
+    problemId?: string | null
     difficulty?: string
     selectedLanguage?: string
+    durationMins?: number
     status?: string
     testCasesPassed?: number | null
+    totalTestCases?: number | null
+    overallScore?: number | null
+    feedbackSummary?: string | null
     startedAt?: Date | string
     completedAt?: Date | string | null
     executionDeltas?: CodeExecutionDeltaCreateNestedManyWithoutSessionInput
@@ -4784,10 +4969,16 @@ export namespace Prisma {
     id?: string
     userId: string
     targetRole: string
+    focusTrack?: string | null
+    problemId?: string | null
     difficulty?: string
     selectedLanguage?: string
+    durationMins?: number
     status?: string
     testCasesPassed?: number | null
+    totalTestCases?: number | null
+    overallScore?: number | null
+    feedbackSummary?: string | null
     startedAt?: Date | string
     completedAt?: Date | string | null
     executionDeltas?: CodeExecutionDeltaUncheckedCreateNestedManyWithoutSessionInput
@@ -4797,10 +4988,16 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     targetRole?: StringFieldUpdateOperationsInput | string
+    focusTrack?: NullableStringFieldUpdateOperationsInput | string | null
+    problemId?: NullableStringFieldUpdateOperationsInput | string | null
     difficulty?: StringFieldUpdateOperationsInput | string
     selectedLanguage?: StringFieldUpdateOperationsInput | string
+    durationMins?: IntFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
     testCasesPassed?: NullableIntFieldUpdateOperationsInput | number | null
+    totalTestCases?: NullableIntFieldUpdateOperationsInput | number | null
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    feedbackSummary?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     executionDeltas?: CodeExecutionDeltaUpdateManyWithoutSessionNestedInput
@@ -4810,10 +5007,16 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     targetRole?: StringFieldUpdateOperationsInput | string
+    focusTrack?: NullableStringFieldUpdateOperationsInput | string | null
+    problemId?: NullableStringFieldUpdateOperationsInput | string | null
     difficulty?: StringFieldUpdateOperationsInput | string
     selectedLanguage?: StringFieldUpdateOperationsInput | string
+    durationMins?: IntFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
     testCasesPassed?: NullableIntFieldUpdateOperationsInput | number | null
+    totalTestCases?: NullableIntFieldUpdateOperationsInput | number | null
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    feedbackSummary?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     executionDeltas?: CodeExecutionDeltaUncheckedUpdateManyWithoutSessionNestedInput
@@ -4823,10 +5026,16 @@ export namespace Prisma {
     id?: string
     userId: string
     targetRole: string
+    focusTrack?: string | null
+    problemId?: string | null
     difficulty?: string
     selectedLanguage?: string
+    durationMins?: number
     status?: string
     testCasesPassed?: number | null
+    totalTestCases?: number | null
+    overallScore?: number | null
+    feedbackSummary?: string | null
     startedAt?: Date | string
     completedAt?: Date | string | null
   }
@@ -4835,10 +5044,16 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     targetRole?: StringFieldUpdateOperationsInput | string
+    focusTrack?: NullableStringFieldUpdateOperationsInput | string | null
+    problemId?: NullableStringFieldUpdateOperationsInput | string | null
     difficulty?: StringFieldUpdateOperationsInput | string
     selectedLanguage?: StringFieldUpdateOperationsInput | string
+    durationMins?: IntFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
     testCasesPassed?: NullableIntFieldUpdateOperationsInput | number | null
+    totalTestCases?: NullableIntFieldUpdateOperationsInput | number | null
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    feedbackSummary?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -4847,10 +5062,16 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     targetRole?: StringFieldUpdateOperationsInput | string
+    focusTrack?: NullableStringFieldUpdateOperationsInput | string | null
+    problemId?: NullableStringFieldUpdateOperationsInput | string | null
     difficulty?: StringFieldUpdateOperationsInput | string
     selectedLanguage?: StringFieldUpdateOperationsInput | string
+    durationMins?: IntFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
     testCasesPassed?: NullableIntFieldUpdateOperationsInput | number | null
+    totalTestCases?: NullableIntFieldUpdateOperationsInput | number | null
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    feedbackSummary?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -4858,27 +5079,33 @@ export namespace Prisma {
   export type PreDefinedProblemCreateInput = {
     id?: string
     title: string
-    difficulty: string
+    difficulty?: string
     pattern: string
+    category?: string | null
+    topicTags?: PreDefinedProblemCreatetopicTagsInput | string[]
     description: string
     starterCode: JsonNullValueInput | InputJsonValue
     testCases: JsonNullValueInput | InputJsonValue
     optimalSolution: string
     optimalTime: string
     optimalSpace: string
+    createdAt?: Date | string
   }
 
   export type PreDefinedProblemUncheckedCreateInput = {
     id?: string
     title: string
-    difficulty: string
+    difficulty?: string
     pattern: string
+    category?: string | null
+    topicTags?: PreDefinedProblemCreatetopicTagsInput | string[]
     description: string
     starterCode: JsonNullValueInput | InputJsonValue
     testCases: JsonNullValueInput | InputJsonValue
     optimalSolution: string
     optimalTime: string
     optimalSpace: string
+    createdAt?: Date | string
   }
 
   export type PreDefinedProblemUpdateInput = {
@@ -4886,12 +5113,15 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     difficulty?: StringFieldUpdateOperationsInput | string
     pattern?: StringFieldUpdateOperationsInput | string
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    topicTags?: PreDefinedProblemUpdatetopicTagsInput | string[]
     description?: StringFieldUpdateOperationsInput | string
     starterCode?: JsonNullValueInput | InputJsonValue
     testCases?: JsonNullValueInput | InputJsonValue
     optimalSolution?: StringFieldUpdateOperationsInput | string
     optimalTime?: StringFieldUpdateOperationsInput | string
     optimalSpace?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type PreDefinedProblemUncheckedUpdateInput = {
@@ -4899,25 +5129,31 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     difficulty?: StringFieldUpdateOperationsInput | string
     pattern?: StringFieldUpdateOperationsInput | string
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    topicTags?: PreDefinedProblemUpdatetopicTagsInput | string[]
     description?: StringFieldUpdateOperationsInput | string
     starterCode?: JsonNullValueInput | InputJsonValue
     testCases?: JsonNullValueInput | InputJsonValue
     optimalSolution?: StringFieldUpdateOperationsInput | string
     optimalTime?: StringFieldUpdateOperationsInput | string
     optimalSpace?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type PreDefinedProblemCreateManyInput = {
     id?: string
     title: string
-    difficulty: string
+    difficulty?: string
     pattern: string
+    category?: string | null
+    topicTags?: PreDefinedProblemCreatetopicTagsInput | string[]
     description: string
     starterCode: JsonNullValueInput | InputJsonValue
     testCases: JsonNullValueInput | InputJsonValue
     optimalSolution: string
     optimalTime: string
     optimalSpace: string
+    createdAt?: Date | string
   }
 
   export type PreDefinedProblemUpdateManyMutationInput = {
@@ -4925,12 +5161,15 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     difficulty?: StringFieldUpdateOperationsInput | string
     pattern?: StringFieldUpdateOperationsInput | string
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    topicTags?: PreDefinedProblemUpdatetopicTagsInput | string[]
     description?: StringFieldUpdateOperationsInput | string
     starterCode?: JsonNullValueInput | InputJsonValue
     testCases?: JsonNullValueInput | InputJsonValue
     optimalSolution?: StringFieldUpdateOperationsInput | string
     optimalTime?: StringFieldUpdateOperationsInput | string
     optimalSpace?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type PreDefinedProblemUncheckedUpdateManyInput = {
@@ -4938,12 +5177,15 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     difficulty?: StringFieldUpdateOperationsInput | string
     pattern?: StringFieldUpdateOperationsInput | string
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    topicTags?: PreDefinedProblemUpdatetopicTagsInput | string[]
     description?: StringFieldUpdateOperationsInput | string
     starterCode?: JsonNullValueInput | InputJsonValue
     testCases?: JsonNullValueInput | InputJsonValue
     optimalSolution?: StringFieldUpdateOperationsInput | string
     optimalTime?: StringFieldUpdateOperationsInput | string
     optimalSpace?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type CodeExecutionDeltaCreateInput = {
@@ -5030,6 +5272,32 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
+  export type StringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type IntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
   export type IntNullableFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel> | null
     in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
@@ -5082,26 +5350,41 @@ export namespace Prisma {
     id?: SortOrder
     userId?: SortOrder
     targetRole?: SortOrder
+    focusTrack?: SortOrder
+    problemId?: SortOrder
     difficulty?: SortOrder
     selectedLanguage?: SortOrder
+    durationMins?: SortOrder
     status?: SortOrder
     testCasesPassed?: SortOrder
+    totalTestCases?: SortOrder
+    overallScore?: SortOrder
+    feedbackSummary?: SortOrder
     startedAt?: SortOrder
     completedAt?: SortOrder
   }
 
   export type CodingSessionAvgOrderByAggregateInput = {
+    durationMins?: SortOrder
     testCasesPassed?: SortOrder
+    totalTestCases?: SortOrder
+    overallScore?: SortOrder
   }
 
   export type CodingSessionMaxOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
     targetRole?: SortOrder
+    focusTrack?: SortOrder
+    problemId?: SortOrder
     difficulty?: SortOrder
     selectedLanguage?: SortOrder
+    durationMins?: SortOrder
     status?: SortOrder
     testCasesPassed?: SortOrder
+    totalTestCases?: SortOrder
+    overallScore?: SortOrder
+    feedbackSummary?: SortOrder
     startedAt?: SortOrder
     completedAt?: SortOrder
   }
@@ -5110,16 +5393,25 @@ export namespace Prisma {
     id?: SortOrder
     userId?: SortOrder
     targetRole?: SortOrder
+    focusTrack?: SortOrder
+    problemId?: SortOrder
     difficulty?: SortOrder
     selectedLanguage?: SortOrder
+    durationMins?: SortOrder
     status?: SortOrder
     testCasesPassed?: SortOrder
+    totalTestCases?: SortOrder
+    overallScore?: SortOrder
+    feedbackSummary?: SortOrder
     startedAt?: SortOrder
     completedAt?: SortOrder
   }
 
   export type CodingSessionSumOrderByAggregateInput = {
+    durationMins?: SortOrder
     testCasesPassed?: SortOrder
+    totalTestCases?: SortOrder
+    overallScore?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -5138,6 +5430,40 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedStringFilter<$PrismaModel>
     _max?: NestedStringFilter<$PrismaModel>
+  }
+
+  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type IntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
   }
 
   export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -5183,6 +5509,14 @@ export namespace Prisma {
     _min?: NestedDateTimeNullableFilter<$PrismaModel>
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
+
+  export type StringNullableListFilter<$PrismaModel = never> = {
+    equals?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    has?: string | StringFieldRefInput<$PrismaModel> | null
+    hasEvery?: string[] | ListStringFieldRefInput<$PrismaModel>
+    hasSome?: string[] | ListStringFieldRefInput<$PrismaModel>
+    isEmpty?: boolean
+  }
   export type JsonFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
@@ -5212,12 +5546,15 @@ export namespace Prisma {
     title?: SortOrder
     difficulty?: SortOrder
     pattern?: SortOrder
+    category?: SortOrder
+    topicTags?: SortOrder
     description?: SortOrder
     starterCode?: SortOrder
     testCases?: SortOrder
     optimalSolution?: SortOrder
     optimalTime?: SortOrder
     optimalSpace?: SortOrder
+    createdAt?: SortOrder
   }
 
   export type PreDefinedProblemMaxOrderByAggregateInput = {
@@ -5225,10 +5562,12 @@ export namespace Prisma {
     title?: SortOrder
     difficulty?: SortOrder
     pattern?: SortOrder
+    category?: SortOrder
     description?: SortOrder
     optimalSolution?: SortOrder
     optimalTime?: SortOrder
     optimalSpace?: SortOrder
+    createdAt?: SortOrder
   }
 
   export type PreDefinedProblemMinOrderByAggregateInput = {
@@ -5236,10 +5575,12 @@ export namespace Prisma {
     title?: SortOrder
     difficulty?: SortOrder
     pattern?: SortOrder
+    category?: SortOrder
     description?: SortOrder
     optimalSolution?: SortOrder
     optimalTime?: SortOrder
     optimalSpace?: SortOrder
+    createdAt?: SortOrder
   }
   export type JsonWithAggregatesFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -5266,21 +5607,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedJsonFilter<$PrismaModel>
     _max?: NestedJsonFilter<$PrismaModel>
-  }
-
-  export type StringNullableFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
   export type BoolNullableFilter<$PrismaModel = never> = {
@@ -5323,24 +5649,6 @@ export namespace Prisma {
     timestamp?: SortOrder
   }
 
-  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
-  }
-
   export type BoolNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel> | null
     not?: NestedBoolNullableWithAggregatesFilter<$PrismaModel> | boolean | null
@@ -5365,6 +5673,18 @@ export namespace Prisma {
 
   export type StringFieldUpdateOperationsInput = {
     set?: string
+  }
+
+  export type NullableStringFieldUpdateOperationsInput = {
+    set?: string | null
+  }
+
+  export type IntFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
   }
 
   export type NullableIntFieldUpdateOperationsInput = {
@@ -5411,14 +5731,19 @@ export namespace Prisma {
     deleteMany?: CodeExecutionDeltaScalarWhereInput | CodeExecutionDeltaScalarWhereInput[]
   }
 
+  export type PreDefinedProblemCreatetopicTagsInput = {
+    set: string[]
+  }
+
+  export type PreDefinedProblemUpdatetopicTagsInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
   export type CodingSessionCreateNestedOneWithoutExecutionDeltasInput = {
     create?: XOR<CodingSessionCreateWithoutExecutionDeltasInput, CodingSessionUncheckedCreateWithoutExecutionDeltasInput>
     connectOrCreate?: CodingSessionCreateOrConnectWithoutExecutionDeltasInput
     connect?: CodingSessionWhereUniqueInput
-  }
-
-  export type NullableStringFieldUpdateOperationsInput = {
-    set?: string | null
   }
 
   export type NullableBoolFieldUpdateOperationsInput = {
@@ -5445,6 +5770,31 @@ export namespace Prisma {
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
     not?: NestedStringFilter<$PrismaModel> | string
+  }
+
+  export type NestedStringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type NestedIntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
   }
 
   export type NestedIntNullableFilter<$PrismaModel = never> = {
@@ -5497,7 +5847,24 @@ export namespace Prisma {
     _max?: NestedStringFilter<$PrismaModel>
   }
 
-  export type NestedIntFilter<$PrismaModel = never> = {
+  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
     notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -5505,7 +5872,23 @@ export namespace Prisma {
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
+  }
+
+  export type NestedFloatFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatFilter<$PrismaModel> | number
   }
 
   export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -5586,40 +5969,9 @@ export namespace Prisma {
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
-  export type NestedStringNullableFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringNullableFilter<$PrismaModel> | string | null
-  }
-
   export type NestedBoolNullableFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel> | null
     not?: NestedBoolNullableFilter<$PrismaModel> | boolean | null
-  }
-
-  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
   export type NestedBoolNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -5691,10 +6043,16 @@ export namespace Prisma {
     id?: string
     userId: string
     targetRole: string
+    focusTrack?: string | null
+    problemId?: string | null
     difficulty?: string
     selectedLanguage?: string
+    durationMins?: number
     status?: string
     testCasesPassed?: number | null
+    totalTestCases?: number | null
+    overallScore?: number | null
+    feedbackSummary?: string | null
     startedAt?: Date | string
     completedAt?: Date | string | null
   }
@@ -5703,10 +6061,16 @@ export namespace Prisma {
     id?: string
     userId: string
     targetRole: string
+    focusTrack?: string | null
+    problemId?: string | null
     difficulty?: string
     selectedLanguage?: string
+    durationMins?: number
     status?: string
     testCasesPassed?: number | null
+    totalTestCases?: number | null
+    overallScore?: number | null
+    feedbackSummary?: string | null
     startedAt?: Date | string
     completedAt?: Date | string | null
   }
@@ -5731,10 +6095,16 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     targetRole?: StringFieldUpdateOperationsInput | string
+    focusTrack?: NullableStringFieldUpdateOperationsInput | string | null
+    problemId?: NullableStringFieldUpdateOperationsInput | string | null
     difficulty?: StringFieldUpdateOperationsInput | string
     selectedLanguage?: StringFieldUpdateOperationsInput | string
+    durationMins?: IntFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
     testCasesPassed?: NullableIntFieldUpdateOperationsInput | number | null
+    totalTestCases?: NullableIntFieldUpdateOperationsInput | number | null
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    feedbackSummary?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -5743,10 +6113,16 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     targetRole?: StringFieldUpdateOperationsInput | string
+    focusTrack?: NullableStringFieldUpdateOperationsInput | string | null
+    problemId?: NullableStringFieldUpdateOperationsInput | string | null
     difficulty?: StringFieldUpdateOperationsInput | string
     selectedLanguage?: StringFieldUpdateOperationsInput | string
+    durationMins?: IntFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
     testCasesPassed?: NullableIntFieldUpdateOperationsInput | number | null
+    totalTestCases?: NullableIntFieldUpdateOperationsInput | number | null
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    feedbackSummary?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }

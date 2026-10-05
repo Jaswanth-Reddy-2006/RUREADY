@@ -65,5 +65,15 @@ export const analysisController = {
       next(error);
     }
   },
+
+  async evaluateAtsSemanticMatchInternal(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { resumeText, jobDescription, targetRole } = req.body;
+      const evalResult = await analysisService.computeAtsSemanticMatch(resumeText, jobDescription, targetRole);
+      res.status(200).json(evalResult);
+    } catch (error) {
+      next(error);
+    }
+  },
 };
 

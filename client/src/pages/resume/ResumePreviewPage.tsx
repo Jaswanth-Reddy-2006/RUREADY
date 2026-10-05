@@ -18,7 +18,7 @@ export default function ResumePreviewPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-200 font-sans -m-6 sm:-m-8 p-6 overflow-y-auto">
+    <div className="min-h-screen bg-slate-200 font-sans p-6 overflow-y-auto">
       {/* Floating Action Bar */}
       <div className="max-w-[800px] mx-auto mb-6 bg-white p-4 rounded-2xl border border-[#DCE7F2] shadow-md flex items-center justify-between gap-4 print:hidden">
         <div className="flex items-center gap-3">

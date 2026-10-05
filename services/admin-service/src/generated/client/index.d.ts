@@ -14,6 +14,11 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
 
 
 /**
+ * Model FeatureFlag
+ * 
+ */
+export type FeatureFlag = $Result.DefaultSelection<Prisma.$FeatureFlagPayload>
+/**
  * Model AuditLog
  * 
  */
@@ -56,8 +61,8 @@ export type Order = $Result.DefaultSelection<Prisma.$OrderPayload>
  * @example
  * ```
  * const prisma = new PrismaClient()
- * // Fetch zero or more AuditLogs
- * const auditLogs = await prisma.auditLog.findMany()
+ * // Fetch zero or more FeatureFlags
+ * const featureFlags = await prisma.featureFlag.findMany()
  * ```
  *
  *
@@ -77,8 +82,8 @@ export class PrismaClient<
    * @example
    * ```
    * const prisma = new PrismaClient()
-   * // Fetch zero or more AuditLogs
-   * const auditLogs = await prisma.auditLog.findMany()
+   * // Fetch zero or more FeatureFlags
+   * const featureFlags = await prisma.featureFlag.findMany()
    * ```
    *
    *
@@ -168,6 +173,16 @@ export class PrismaClient<
   }>>
 
       /**
+   * `prisma.featureFlag`: Exposes CRUD operations for the **FeatureFlag** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more FeatureFlags
+    * const featureFlags = await prisma.featureFlag.findMany()
+    * ```
+    */
+  get featureFlag(): Prisma.FeatureFlagDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.auditLog`: Exposes CRUD operations for the **AuditLog** model.
     * Example usage:
     * ```ts
@@ -677,6 +692,7 @@ export namespace Prisma {
 
 
   export const ModelName: {
+    FeatureFlag: 'FeatureFlag',
     AuditLog: 'AuditLog',
     SystemMetric: 'SystemMetric',
     User: 'User',
@@ -702,10 +718,84 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "auditLog" | "systemMetric" | "user" | "oralSession" | "codingSession" | "subscription" | "order"
+      modelProps: "featureFlag" | "auditLog" | "systemMetric" | "user" | "oralSession" | "codingSession" | "subscription" | "order"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
+      FeatureFlag: {
+        payload: Prisma.$FeatureFlagPayload<ExtArgs>
+        fields: Prisma.FeatureFlagFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.FeatureFlagFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeatureFlagPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.FeatureFlagFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeatureFlagPayload>
+          }
+          findFirst: {
+            args: Prisma.FeatureFlagFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeatureFlagPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.FeatureFlagFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeatureFlagPayload>
+          }
+          findMany: {
+            args: Prisma.FeatureFlagFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeatureFlagPayload>[]
+          }
+          create: {
+            args: Prisma.FeatureFlagCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeatureFlagPayload>
+          }
+          createMany: {
+            args: Prisma.FeatureFlagCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.FeatureFlagCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeatureFlagPayload>[]
+          }
+          delete: {
+            args: Prisma.FeatureFlagDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeatureFlagPayload>
+          }
+          update: {
+            args: Prisma.FeatureFlagUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeatureFlagPayload>
+          }
+          deleteMany: {
+            args: Prisma.FeatureFlagDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.FeatureFlagUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.FeatureFlagUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeatureFlagPayload>[]
+          }
+          upsert: {
+            args: Prisma.FeatureFlagUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeatureFlagPayload>
+          }
+          aggregate: {
+            args: Prisma.FeatureFlagAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateFeatureFlag>
+          }
+          groupBy: {
+            args: Prisma.FeatureFlagGroupByArgs<ExtArgs>
+            result: $Utils.Optional<FeatureFlagGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.FeatureFlagCountArgs<ExtArgs>
+            result: $Utils.Optional<FeatureFlagCountAggregateOutputType> | number
+          }
+        }
+      }
       AuditLog: {
         payload: Prisma.$AuditLogPayload<ExtArgs>
         fields: Prisma.AuditLogFieldRefs
@@ -1320,6 +1410,7 @@ export namespace Prisma {
     omit?: Prisma.GlobalOmitConfig
   }
   export type GlobalOmitConfig = {
+    featureFlag?: FeatureFlagOmit
     auditLog?: AuditLogOmit
     systemMetric?: SystemMetricOmit
     user?: UserOmit
@@ -1406,6 +1497,1049 @@ export namespace Prisma {
   /**
    * Models
    */
+
+  /**
+   * Model FeatureFlag
+   */
+
+  export type AggregateFeatureFlag = {
+    _count: FeatureFlagCountAggregateOutputType | null
+    _min: FeatureFlagMinAggregateOutputType | null
+    _max: FeatureFlagMaxAggregateOutputType | null
+  }
+
+  export type FeatureFlagMinAggregateOutputType = {
+    id: string | null
+    key: string | null
+    name: string | null
+    description: string | null
+    enabled: boolean | null
+    updatedBy: string | null
+    updatedAt: Date | null
+    createdAt: Date | null
+  }
+
+  export type FeatureFlagMaxAggregateOutputType = {
+    id: string | null
+    key: string | null
+    name: string | null
+    description: string | null
+    enabled: boolean | null
+    updatedBy: string | null
+    updatedAt: Date | null
+    createdAt: Date | null
+  }
+
+  export type FeatureFlagCountAggregateOutputType = {
+    id: number
+    key: number
+    name: number
+    description: number
+    enabled: number
+    allowedTiers: number
+    updatedBy: number
+    updatedAt: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type FeatureFlagMinAggregateInputType = {
+    id?: true
+    key?: true
+    name?: true
+    description?: true
+    enabled?: true
+    updatedBy?: true
+    updatedAt?: true
+    createdAt?: true
+  }
+
+  export type FeatureFlagMaxAggregateInputType = {
+    id?: true
+    key?: true
+    name?: true
+    description?: true
+    enabled?: true
+    updatedBy?: true
+    updatedAt?: true
+    createdAt?: true
+  }
+
+  export type FeatureFlagCountAggregateInputType = {
+    id?: true
+    key?: true
+    name?: true
+    description?: true
+    enabled?: true
+    allowedTiers?: true
+    updatedBy?: true
+    updatedAt?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type FeatureFlagAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FeatureFlag to aggregate.
+     */
+    where?: FeatureFlagWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FeatureFlags to fetch.
+     */
+    orderBy?: FeatureFlagOrderByWithRelationInput | FeatureFlagOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: FeatureFlagWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FeatureFlags from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FeatureFlags.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned FeatureFlags
+    **/
+    _count?: true | FeatureFlagCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: FeatureFlagMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: FeatureFlagMaxAggregateInputType
+  }
+
+  export type GetFeatureFlagAggregateType<T extends FeatureFlagAggregateArgs> = {
+        [P in keyof T & keyof AggregateFeatureFlag]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateFeatureFlag[P]>
+      : GetScalarType<T[P], AggregateFeatureFlag[P]>
+  }
+
+
+
+
+  export type FeatureFlagGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FeatureFlagWhereInput
+    orderBy?: FeatureFlagOrderByWithAggregationInput | FeatureFlagOrderByWithAggregationInput[]
+    by: FeatureFlagScalarFieldEnum[] | FeatureFlagScalarFieldEnum
+    having?: FeatureFlagScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: FeatureFlagCountAggregateInputType | true
+    _min?: FeatureFlagMinAggregateInputType
+    _max?: FeatureFlagMaxAggregateInputType
+  }
+
+  export type FeatureFlagGroupByOutputType = {
+    id: string
+    key: string
+    name: string
+    description: string | null
+    enabled: boolean
+    allowedTiers: string[]
+    updatedBy: string | null
+    updatedAt: Date
+    createdAt: Date
+    _count: FeatureFlagCountAggregateOutputType | null
+    _min: FeatureFlagMinAggregateOutputType | null
+    _max: FeatureFlagMaxAggregateOutputType | null
+  }
+
+  type GetFeatureFlagGroupByPayload<T extends FeatureFlagGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<FeatureFlagGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof FeatureFlagGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], FeatureFlagGroupByOutputType[P]>
+            : GetScalarType<T[P], FeatureFlagGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type FeatureFlagSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    key?: boolean
+    name?: boolean
+    description?: boolean
+    enabled?: boolean
+    allowedTiers?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["featureFlag"]>
+
+  export type FeatureFlagSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    key?: boolean
+    name?: boolean
+    description?: boolean
+    enabled?: boolean
+    allowedTiers?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["featureFlag"]>
+
+  export type FeatureFlagSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    key?: boolean
+    name?: boolean
+    description?: boolean
+    enabled?: boolean
+    allowedTiers?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["featureFlag"]>
+
+  export type FeatureFlagSelectScalar = {
+    id?: boolean
+    key?: boolean
+    name?: boolean
+    description?: boolean
+    enabled?: boolean
+    allowedTiers?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
+    createdAt?: boolean
+  }
+
+  export type FeatureFlagOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "key" | "name" | "description" | "enabled" | "allowedTiers" | "updatedBy" | "updatedAt" | "createdAt", ExtArgs["result"]["featureFlag"]>
+
+  export type $FeatureFlagPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "FeatureFlag"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      key: string
+      name: string
+      description: string | null
+      enabled: boolean
+      allowedTiers: string[]
+      updatedBy: string | null
+      updatedAt: Date
+      createdAt: Date
+    }, ExtArgs["result"]["featureFlag"]>
+    composites: {}
+  }
+
+  type FeatureFlagGetPayload<S extends boolean | null | undefined | FeatureFlagDefaultArgs> = $Result.GetResult<Prisma.$FeatureFlagPayload, S>
+
+  type FeatureFlagCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<FeatureFlagFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: FeatureFlagCountAggregateInputType | true
+    }
+
+  export interface FeatureFlagDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['FeatureFlag'], meta: { name: 'FeatureFlag' } }
+    /**
+     * Find zero or one FeatureFlag that matches the filter.
+     * @param {FeatureFlagFindUniqueArgs} args - Arguments to find a FeatureFlag
+     * @example
+     * // Get one FeatureFlag
+     * const featureFlag = await prisma.featureFlag.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends FeatureFlagFindUniqueArgs>(args: SelectSubset<T, FeatureFlagFindUniqueArgs<ExtArgs>>): Prisma__FeatureFlagClient<$Result.GetResult<Prisma.$FeatureFlagPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one FeatureFlag that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {FeatureFlagFindUniqueOrThrowArgs} args - Arguments to find a FeatureFlag
+     * @example
+     * // Get one FeatureFlag
+     * const featureFlag = await prisma.featureFlag.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends FeatureFlagFindUniqueOrThrowArgs>(args: SelectSubset<T, FeatureFlagFindUniqueOrThrowArgs<ExtArgs>>): Prisma__FeatureFlagClient<$Result.GetResult<Prisma.$FeatureFlagPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first FeatureFlag that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FeatureFlagFindFirstArgs} args - Arguments to find a FeatureFlag
+     * @example
+     * // Get one FeatureFlag
+     * const featureFlag = await prisma.featureFlag.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends FeatureFlagFindFirstArgs>(args?: SelectSubset<T, FeatureFlagFindFirstArgs<ExtArgs>>): Prisma__FeatureFlagClient<$Result.GetResult<Prisma.$FeatureFlagPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first FeatureFlag that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FeatureFlagFindFirstOrThrowArgs} args - Arguments to find a FeatureFlag
+     * @example
+     * // Get one FeatureFlag
+     * const featureFlag = await prisma.featureFlag.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends FeatureFlagFindFirstOrThrowArgs>(args?: SelectSubset<T, FeatureFlagFindFirstOrThrowArgs<ExtArgs>>): Prisma__FeatureFlagClient<$Result.GetResult<Prisma.$FeatureFlagPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more FeatureFlags that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FeatureFlagFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all FeatureFlags
+     * const featureFlags = await prisma.featureFlag.findMany()
+     * 
+     * // Get first 10 FeatureFlags
+     * const featureFlags = await prisma.featureFlag.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const featureFlagWithIdOnly = await prisma.featureFlag.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends FeatureFlagFindManyArgs>(args?: SelectSubset<T, FeatureFlagFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FeatureFlagPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a FeatureFlag.
+     * @param {FeatureFlagCreateArgs} args - Arguments to create a FeatureFlag.
+     * @example
+     * // Create one FeatureFlag
+     * const FeatureFlag = await prisma.featureFlag.create({
+     *   data: {
+     *     // ... data to create a FeatureFlag
+     *   }
+     * })
+     * 
+     */
+    create<T extends FeatureFlagCreateArgs>(args: SelectSubset<T, FeatureFlagCreateArgs<ExtArgs>>): Prisma__FeatureFlagClient<$Result.GetResult<Prisma.$FeatureFlagPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many FeatureFlags.
+     * @param {FeatureFlagCreateManyArgs} args - Arguments to create many FeatureFlags.
+     * @example
+     * // Create many FeatureFlags
+     * const featureFlag = await prisma.featureFlag.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends FeatureFlagCreateManyArgs>(args?: SelectSubset<T, FeatureFlagCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many FeatureFlags and returns the data saved in the database.
+     * @param {FeatureFlagCreateManyAndReturnArgs} args - Arguments to create many FeatureFlags.
+     * @example
+     * // Create many FeatureFlags
+     * const featureFlag = await prisma.featureFlag.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many FeatureFlags and only return the `id`
+     * const featureFlagWithIdOnly = await prisma.featureFlag.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends FeatureFlagCreateManyAndReturnArgs>(args?: SelectSubset<T, FeatureFlagCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FeatureFlagPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a FeatureFlag.
+     * @param {FeatureFlagDeleteArgs} args - Arguments to delete one FeatureFlag.
+     * @example
+     * // Delete one FeatureFlag
+     * const FeatureFlag = await prisma.featureFlag.delete({
+     *   where: {
+     *     // ... filter to delete one FeatureFlag
+     *   }
+     * })
+     * 
+     */
+    delete<T extends FeatureFlagDeleteArgs>(args: SelectSubset<T, FeatureFlagDeleteArgs<ExtArgs>>): Prisma__FeatureFlagClient<$Result.GetResult<Prisma.$FeatureFlagPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one FeatureFlag.
+     * @param {FeatureFlagUpdateArgs} args - Arguments to update one FeatureFlag.
+     * @example
+     * // Update one FeatureFlag
+     * const featureFlag = await prisma.featureFlag.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends FeatureFlagUpdateArgs>(args: SelectSubset<T, FeatureFlagUpdateArgs<ExtArgs>>): Prisma__FeatureFlagClient<$Result.GetResult<Prisma.$FeatureFlagPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more FeatureFlags.
+     * @param {FeatureFlagDeleteManyArgs} args - Arguments to filter FeatureFlags to delete.
+     * @example
+     * // Delete a few FeatureFlags
+     * const { count } = await prisma.featureFlag.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends FeatureFlagDeleteManyArgs>(args?: SelectSubset<T, FeatureFlagDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FeatureFlags.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FeatureFlagUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many FeatureFlags
+     * const featureFlag = await prisma.featureFlag.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends FeatureFlagUpdateManyArgs>(args: SelectSubset<T, FeatureFlagUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FeatureFlags and returns the data updated in the database.
+     * @param {FeatureFlagUpdateManyAndReturnArgs} args - Arguments to update many FeatureFlags.
+     * @example
+     * // Update many FeatureFlags
+     * const featureFlag = await prisma.featureFlag.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more FeatureFlags and only return the `id`
+     * const featureFlagWithIdOnly = await prisma.featureFlag.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends FeatureFlagUpdateManyAndReturnArgs>(args: SelectSubset<T, FeatureFlagUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FeatureFlagPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one FeatureFlag.
+     * @param {FeatureFlagUpsertArgs} args - Arguments to update or create a FeatureFlag.
+     * @example
+     * // Update or create a FeatureFlag
+     * const featureFlag = await prisma.featureFlag.upsert({
+     *   create: {
+     *     // ... data to create a FeatureFlag
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the FeatureFlag we want to update
+     *   }
+     * })
+     */
+    upsert<T extends FeatureFlagUpsertArgs>(args: SelectSubset<T, FeatureFlagUpsertArgs<ExtArgs>>): Prisma__FeatureFlagClient<$Result.GetResult<Prisma.$FeatureFlagPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of FeatureFlags.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FeatureFlagCountArgs} args - Arguments to filter FeatureFlags to count.
+     * @example
+     * // Count the number of FeatureFlags
+     * const count = await prisma.featureFlag.count({
+     *   where: {
+     *     // ... the filter for the FeatureFlags we want to count
+     *   }
+     * })
+    **/
+    count<T extends FeatureFlagCountArgs>(
+      args?: Subset<T, FeatureFlagCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], FeatureFlagCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a FeatureFlag.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FeatureFlagAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends FeatureFlagAggregateArgs>(args: Subset<T, FeatureFlagAggregateArgs>): Prisma.PrismaPromise<GetFeatureFlagAggregateType<T>>
+
+    /**
+     * Group by FeatureFlag.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FeatureFlagGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends FeatureFlagGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: FeatureFlagGroupByArgs['orderBy'] }
+        : { orderBy?: FeatureFlagGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, FeatureFlagGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetFeatureFlagGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the FeatureFlag model
+   */
+  readonly fields: FeatureFlagFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for FeatureFlag.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__FeatureFlagClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the FeatureFlag model
+   */
+  interface FeatureFlagFieldRefs {
+    readonly id: FieldRef<"FeatureFlag", 'String'>
+    readonly key: FieldRef<"FeatureFlag", 'String'>
+    readonly name: FieldRef<"FeatureFlag", 'String'>
+    readonly description: FieldRef<"FeatureFlag", 'String'>
+    readonly enabled: FieldRef<"FeatureFlag", 'Boolean'>
+    readonly allowedTiers: FieldRef<"FeatureFlag", 'String[]'>
+    readonly updatedBy: FieldRef<"FeatureFlag", 'String'>
+    readonly updatedAt: FieldRef<"FeatureFlag", 'DateTime'>
+    readonly createdAt: FieldRef<"FeatureFlag", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * FeatureFlag findUnique
+   */
+  export type FeatureFlagFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeatureFlag
+     */
+    select?: FeatureFlagSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeatureFlag
+     */
+    omit?: FeatureFlagOmit<ExtArgs> | null
+    /**
+     * Filter, which FeatureFlag to fetch.
+     */
+    where: FeatureFlagWhereUniqueInput
+  }
+
+  /**
+   * FeatureFlag findUniqueOrThrow
+   */
+  export type FeatureFlagFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeatureFlag
+     */
+    select?: FeatureFlagSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeatureFlag
+     */
+    omit?: FeatureFlagOmit<ExtArgs> | null
+    /**
+     * Filter, which FeatureFlag to fetch.
+     */
+    where: FeatureFlagWhereUniqueInput
+  }
+
+  /**
+   * FeatureFlag findFirst
+   */
+  export type FeatureFlagFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeatureFlag
+     */
+    select?: FeatureFlagSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeatureFlag
+     */
+    omit?: FeatureFlagOmit<ExtArgs> | null
+    /**
+     * Filter, which FeatureFlag to fetch.
+     */
+    where?: FeatureFlagWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FeatureFlags to fetch.
+     */
+    orderBy?: FeatureFlagOrderByWithRelationInput | FeatureFlagOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FeatureFlags.
+     */
+    cursor?: FeatureFlagWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FeatureFlags from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FeatureFlags.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FeatureFlags.
+     */
+    distinct?: FeatureFlagScalarFieldEnum | FeatureFlagScalarFieldEnum[]
+  }
+
+  /**
+   * FeatureFlag findFirstOrThrow
+   */
+  export type FeatureFlagFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeatureFlag
+     */
+    select?: FeatureFlagSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeatureFlag
+     */
+    omit?: FeatureFlagOmit<ExtArgs> | null
+    /**
+     * Filter, which FeatureFlag to fetch.
+     */
+    where?: FeatureFlagWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FeatureFlags to fetch.
+     */
+    orderBy?: FeatureFlagOrderByWithRelationInput | FeatureFlagOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FeatureFlags.
+     */
+    cursor?: FeatureFlagWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FeatureFlags from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FeatureFlags.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FeatureFlags.
+     */
+    distinct?: FeatureFlagScalarFieldEnum | FeatureFlagScalarFieldEnum[]
+  }
+
+  /**
+   * FeatureFlag findMany
+   */
+  export type FeatureFlagFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeatureFlag
+     */
+    select?: FeatureFlagSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeatureFlag
+     */
+    omit?: FeatureFlagOmit<ExtArgs> | null
+    /**
+     * Filter, which FeatureFlags to fetch.
+     */
+    where?: FeatureFlagWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FeatureFlags to fetch.
+     */
+    orderBy?: FeatureFlagOrderByWithRelationInput | FeatureFlagOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing FeatureFlags.
+     */
+    cursor?: FeatureFlagWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FeatureFlags from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FeatureFlags.
+     */
+    skip?: number
+    distinct?: FeatureFlagScalarFieldEnum | FeatureFlagScalarFieldEnum[]
+  }
+
+  /**
+   * FeatureFlag create
+   */
+  export type FeatureFlagCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeatureFlag
+     */
+    select?: FeatureFlagSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeatureFlag
+     */
+    omit?: FeatureFlagOmit<ExtArgs> | null
+    /**
+     * The data needed to create a FeatureFlag.
+     */
+    data: XOR<FeatureFlagCreateInput, FeatureFlagUncheckedCreateInput>
+  }
+
+  /**
+   * FeatureFlag createMany
+   */
+  export type FeatureFlagCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many FeatureFlags.
+     */
+    data: FeatureFlagCreateManyInput | FeatureFlagCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * FeatureFlag createManyAndReturn
+   */
+  export type FeatureFlagCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeatureFlag
+     */
+    select?: FeatureFlagSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeatureFlag
+     */
+    omit?: FeatureFlagOmit<ExtArgs> | null
+    /**
+     * The data used to create many FeatureFlags.
+     */
+    data: FeatureFlagCreateManyInput | FeatureFlagCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * FeatureFlag update
+   */
+  export type FeatureFlagUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeatureFlag
+     */
+    select?: FeatureFlagSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeatureFlag
+     */
+    omit?: FeatureFlagOmit<ExtArgs> | null
+    /**
+     * The data needed to update a FeatureFlag.
+     */
+    data: XOR<FeatureFlagUpdateInput, FeatureFlagUncheckedUpdateInput>
+    /**
+     * Choose, which FeatureFlag to update.
+     */
+    where: FeatureFlagWhereUniqueInput
+  }
+
+  /**
+   * FeatureFlag updateMany
+   */
+  export type FeatureFlagUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update FeatureFlags.
+     */
+    data: XOR<FeatureFlagUpdateManyMutationInput, FeatureFlagUncheckedUpdateManyInput>
+    /**
+     * Filter which FeatureFlags to update
+     */
+    where?: FeatureFlagWhereInput
+    /**
+     * Limit how many FeatureFlags to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * FeatureFlag updateManyAndReturn
+   */
+  export type FeatureFlagUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeatureFlag
+     */
+    select?: FeatureFlagSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeatureFlag
+     */
+    omit?: FeatureFlagOmit<ExtArgs> | null
+    /**
+     * The data used to update FeatureFlags.
+     */
+    data: XOR<FeatureFlagUpdateManyMutationInput, FeatureFlagUncheckedUpdateManyInput>
+    /**
+     * Filter which FeatureFlags to update
+     */
+    where?: FeatureFlagWhereInput
+    /**
+     * Limit how many FeatureFlags to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * FeatureFlag upsert
+   */
+  export type FeatureFlagUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeatureFlag
+     */
+    select?: FeatureFlagSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeatureFlag
+     */
+    omit?: FeatureFlagOmit<ExtArgs> | null
+    /**
+     * The filter to search for the FeatureFlag to update in case it exists.
+     */
+    where: FeatureFlagWhereUniqueInput
+    /**
+     * In case the FeatureFlag found by the `where` argument doesn't exist, create a new FeatureFlag with this data.
+     */
+    create: XOR<FeatureFlagCreateInput, FeatureFlagUncheckedCreateInput>
+    /**
+     * In case the FeatureFlag was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<FeatureFlagUpdateInput, FeatureFlagUncheckedUpdateInput>
+  }
+
+  /**
+   * FeatureFlag delete
+   */
+  export type FeatureFlagDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeatureFlag
+     */
+    select?: FeatureFlagSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeatureFlag
+     */
+    omit?: FeatureFlagOmit<ExtArgs> | null
+    /**
+     * Filter which FeatureFlag to delete.
+     */
+    where: FeatureFlagWhereUniqueInput
+  }
+
+  /**
+   * FeatureFlag deleteMany
+   */
+  export type FeatureFlagDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FeatureFlags to delete
+     */
+    where?: FeatureFlagWhereInput
+    /**
+     * Limit how many FeatureFlags to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * FeatureFlag without action
+   */
+  export type FeatureFlagDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeatureFlag
+     */
+    select?: FeatureFlagSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeatureFlag
+     */
+    omit?: FeatureFlagOmit<ExtArgs> | null
+  }
+
 
   /**
    * Model AuditLog
@@ -3442,6 +4576,10 @@ export namespace Prisma {
     email: string | null
     passwordHash: string | null
     name: string | null
+    role: string | null
+    isEmailVerified: boolean | null
+    bannedAt: Date | null
+    lastLoginAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -3451,6 +4589,10 @@ export namespace Prisma {
     email: string | null
     passwordHash: string | null
     name: string | null
+    role: string | null
+    isEmailVerified: boolean | null
+    bannedAt: Date | null
+    lastLoginAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -3460,6 +4602,10 @@ export namespace Prisma {
     email: number
     passwordHash: number
     name: number
+    role: number
+    isEmailVerified: number
+    bannedAt: number
+    lastLoginAt: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -3471,6 +4617,10 @@ export namespace Prisma {
     email?: true
     passwordHash?: true
     name?: true
+    role?: true
+    isEmailVerified?: true
+    bannedAt?: true
+    lastLoginAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -3480,6 +4630,10 @@ export namespace Prisma {
     email?: true
     passwordHash?: true
     name?: true
+    role?: true
+    isEmailVerified?: true
+    bannedAt?: true
+    lastLoginAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -3489,6 +4643,10 @@ export namespace Prisma {
     email?: true
     passwordHash?: true
     name?: true
+    role?: true
+    isEmailVerified?: true
+    bannedAt?: true
+    lastLoginAt?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -3571,6 +4729,10 @@ export namespace Prisma {
     email: string
     passwordHash: string
     name: string
+    role: string
+    isEmailVerified: boolean
+    bannedAt: Date | null
+    lastLoginAt: Date | null
     createdAt: Date
     updatedAt: Date
     _count: UserCountAggregateOutputType | null
@@ -3597,6 +4759,10 @@ export namespace Prisma {
     email?: boolean
     passwordHash?: boolean
     name?: boolean
+    role?: boolean
+    isEmailVerified?: boolean
+    bannedAt?: boolean
+    lastLoginAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -3606,6 +4772,10 @@ export namespace Prisma {
     email?: boolean
     passwordHash?: boolean
     name?: boolean
+    role?: boolean
+    isEmailVerified?: boolean
+    bannedAt?: boolean
+    lastLoginAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -3615,6 +4785,10 @@ export namespace Prisma {
     email?: boolean
     passwordHash?: boolean
     name?: boolean
+    role?: boolean
+    isEmailVerified?: boolean
+    bannedAt?: boolean
+    lastLoginAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -3624,11 +4798,15 @@ export namespace Prisma {
     email?: boolean
     passwordHash?: boolean
     name?: boolean
+    role?: boolean
+    isEmailVerified?: boolean
+    bannedAt?: boolean
+    lastLoginAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "passwordHash" | "name" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "passwordHash" | "name" | "role" | "isEmailVerified" | "bannedAt" | "lastLoginAt" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 
   export type $UserPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "User"
@@ -3638,6 +4816,10 @@ export namespace Prisma {
       email: string
       passwordHash: string
       name: string
+      role: string
+      isEmailVerified: boolean
+      bannedAt: Date | null
+      lastLoginAt: Date | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["user"]>
@@ -4067,6 +5249,10 @@ export namespace Prisma {
     readonly email: FieldRef<"User", 'String'>
     readonly passwordHash: FieldRef<"User", 'String'>
     readonly name: FieldRef<"User", 'String'>
+    readonly role: FieldRef<"User", 'String'>
+    readonly isEmailVerified: FieldRef<"User", 'Boolean'>
+    readonly bannedAt: FieldRef<"User", 'DateTime'>
+    readonly lastLoginAt: FieldRef<"User", 'DateTime'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
   }
@@ -4449,10 +5635,12 @@ export namespace Prisma {
 
   export type OralSessionAvgAggregateOutputType = {
     durationMins: number | null
+    overallScore: number | null
   }
 
   export type OralSessionSumAggregateOutputType = {
     durationMins: number | null
+    overallScore: number | null
   }
 
   export type OralSessionMinAggregateOutputType = {
@@ -4467,6 +5655,8 @@ export namespace Prisma {
     interviewGoal: string | null
     durationMins: number | null
     status: string | null
+    overallScore: number | null
+    feedbackSummary: string | null
     startedAt: Date | null
     completedAt: Date | null
     createdAt: Date | null
@@ -4484,6 +5674,8 @@ export namespace Prisma {
     interviewGoal: string | null
     durationMins: number | null
     status: string | null
+    overallScore: number | null
+    feedbackSummary: string | null
     startedAt: Date | null
     completedAt: Date | null
     createdAt: Date | null
@@ -4502,6 +5694,8 @@ export namespace Prisma {
     interviewGoal: number
     durationMins: number
     status: number
+    overallScore: number
+    feedbackSummary: number
     startedAt: number
     completedAt: number
     createdAt: number
@@ -4511,10 +5705,12 @@ export namespace Prisma {
 
   export type OralSessionAvgAggregateInputType = {
     durationMins?: true
+    overallScore?: true
   }
 
   export type OralSessionSumAggregateInputType = {
     durationMins?: true
+    overallScore?: true
   }
 
   export type OralSessionMinAggregateInputType = {
@@ -4529,6 +5725,8 @@ export namespace Prisma {
     interviewGoal?: true
     durationMins?: true
     status?: true
+    overallScore?: true
+    feedbackSummary?: true
     startedAt?: true
     completedAt?: true
     createdAt?: true
@@ -4546,6 +5744,8 @@ export namespace Prisma {
     interviewGoal?: true
     durationMins?: true
     status?: true
+    overallScore?: true
+    feedbackSummary?: true
     startedAt?: true
     completedAt?: true
     createdAt?: true
@@ -4564,6 +5764,8 @@ export namespace Prisma {
     interviewGoal?: true
     durationMins?: true
     status?: true
+    overallScore?: true
+    feedbackSummary?: true
     startedAt?: true
     completedAt?: true
     createdAt?: true
@@ -4669,6 +5871,8 @@ export namespace Prisma {
     interviewGoal: string | null
     durationMins: number
     status: string
+    overallScore: number | null
+    feedbackSummary: string | null
     startedAt: Date | null
     completedAt: Date | null
     createdAt: Date
@@ -4706,6 +5910,8 @@ export namespace Prisma {
     interviewGoal?: boolean
     durationMins?: boolean
     status?: boolean
+    overallScore?: boolean
+    feedbackSummary?: boolean
     startedAt?: boolean
     completedAt?: boolean
     createdAt?: boolean
@@ -4724,6 +5930,8 @@ export namespace Prisma {
     interviewGoal?: boolean
     durationMins?: boolean
     status?: boolean
+    overallScore?: boolean
+    feedbackSummary?: boolean
     startedAt?: boolean
     completedAt?: boolean
     createdAt?: boolean
@@ -4742,6 +5950,8 @@ export namespace Prisma {
     interviewGoal?: boolean
     durationMins?: boolean
     status?: boolean
+    overallScore?: boolean
+    feedbackSummary?: boolean
     startedAt?: boolean
     completedAt?: boolean
     createdAt?: boolean
@@ -4760,12 +5970,14 @@ export namespace Prisma {
     interviewGoal?: boolean
     durationMins?: boolean
     status?: boolean
+    overallScore?: boolean
+    feedbackSummary?: boolean
     startedAt?: boolean
     completedAt?: boolean
     createdAt?: boolean
   }
 
-  export type OralSessionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "resumeId" | "interviewType" | "targetRole" | "targetCompany" | "industry" | "experienceLevel" | "focusAreas" | "interviewGoal" | "durationMins" | "status" | "startedAt" | "completedAt" | "createdAt", ExtArgs["result"]["oralSession"]>
+  export type OralSessionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "resumeId" | "interviewType" | "targetRole" | "targetCompany" | "industry" | "experienceLevel" | "focusAreas" | "interviewGoal" | "durationMins" | "status" | "overallScore" | "feedbackSummary" | "startedAt" | "completedAt" | "createdAt", ExtArgs["result"]["oralSession"]>
 
   export type $OralSessionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "OralSession"
@@ -4783,6 +5995,8 @@ export namespace Prisma {
       interviewGoal: string | null
       durationMins: number
       status: string
+      overallScore: number | null
+      feedbackSummary: string | null
       startedAt: Date | null
       completedAt: Date | null
       createdAt: Date
@@ -5221,6 +6435,8 @@ export namespace Prisma {
     readonly interviewGoal: FieldRef<"OralSession", 'String'>
     readonly durationMins: FieldRef<"OralSession", 'Int'>
     readonly status: FieldRef<"OralSession", 'String'>
+    readonly overallScore: FieldRef<"OralSession", 'Int'>
+    readonly feedbackSummary: FieldRef<"OralSession", 'String'>
     readonly startedAt: FieldRef<"OralSession", 'DateTime'>
     readonly completedAt: FieldRef<"OralSession", 'DateTime'>
     readonly createdAt: FieldRef<"OralSession", 'DateTime'>
@@ -5604,20 +6820,25 @@ export namespace Prisma {
 
   export type CodingSessionAvgAggregateOutputType = {
     testCasesPassed: number | null
+    overallScore: number | null
   }
 
   export type CodingSessionSumAggregateOutputType = {
     testCasesPassed: number | null
+    overallScore: number | null
   }
 
   export type CodingSessionMinAggregateOutputType = {
     id: string | null
     userId: string | null
     targetRole: string | null
+    focusTrack: string | null
     difficulty: string | null
     selectedLanguage: string | null
     status: string | null
     testCasesPassed: number | null
+    overallScore: number | null
+    feedbackSummary: string | null
     startedAt: Date | null
     completedAt: Date | null
   }
@@ -5626,10 +6847,13 @@ export namespace Prisma {
     id: string | null
     userId: string | null
     targetRole: string | null
+    focusTrack: string | null
     difficulty: string | null
     selectedLanguage: string | null
     status: string | null
     testCasesPassed: number | null
+    overallScore: number | null
+    feedbackSummary: string | null
     startedAt: Date | null
     completedAt: Date | null
   }
@@ -5638,10 +6862,13 @@ export namespace Prisma {
     id: number
     userId: number
     targetRole: number
+    focusTrack: number
     difficulty: number
     selectedLanguage: number
     status: number
     testCasesPassed: number
+    overallScore: number
+    feedbackSummary: number
     startedAt: number
     completedAt: number
     _all: number
@@ -5650,20 +6877,25 @@ export namespace Prisma {
 
   export type CodingSessionAvgAggregateInputType = {
     testCasesPassed?: true
+    overallScore?: true
   }
 
   export type CodingSessionSumAggregateInputType = {
     testCasesPassed?: true
+    overallScore?: true
   }
 
   export type CodingSessionMinAggregateInputType = {
     id?: true
     userId?: true
     targetRole?: true
+    focusTrack?: true
     difficulty?: true
     selectedLanguage?: true
     status?: true
     testCasesPassed?: true
+    overallScore?: true
+    feedbackSummary?: true
     startedAt?: true
     completedAt?: true
   }
@@ -5672,10 +6904,13 @@ export namespace Prisma {
     id?: true
     userId?: true
     targetRole?: true
+    focusTrack?: true
     difficulty?: true
     selectedLanguage?: true
     status?: true
     testCasesPassed?: true
+    overallScore?: true
+    feedbackSummary?: true
     startedAt?: true
     completedAt?: true
   }
@@ -5684,10 +6919,13 @@ export namespace Prisma {
     id?: true
     userId?: true
     targetRole?: true
+    focusTrack?: true
     difficulty?: true
     selectedLanguage?: true
     status?: true
     testCasesPassed?: true
+    overallScore?: true
+    feedbackSummary?: true
     startedAt?: true
     completedAt?: true
     _all?: true
@@ -5783,10 +7021,13 @@ export namespace Prisma {
     id: string
     userId: string
     targetRole: string
+    focusTrack: string | null
     difficulty: string
     selectedLanguage: string
     status: string
     testCasesPassed: number | null
+    overallScore: number | null
+    feedbackSummary: string | null
     startedAt: Date
     completedAt: Date | null
     _count: CodingSessionCountAggregateOutputType | null
@@ -5814,10 +7055,13 @@ export namespace Prisma {
     id?: boolean
     userId?: boolean
     targetRole?: boolean
+    focusTrack?: boolean
     difficulty?: boolean
     selectedLanguage?: boolean
     status?: boolean
     testCasesPassed?: boolean
+    overallScore?: boolean
+    feedbackSummary?: boolean
     startedAt?: boolean
     completedAt?: boolean
   }, ExtArgs["result"]["codingSession"]>
@@ -5826,10 +7070,13 @@ export namespace Prisma {
     id?: boolean
     userId?: boolean
     targetRole?: boolean
+    focusTrack?: boolean
     difficulty?: boolean
     selectedLanguage?: boolean
     status?: boolean
     testCasesPassed?: boolean
+    overallScore?: boolean
+    feedbackSummary?: boolean
     startedAt?: boolean
     completedAt?: boolean
   }, ExtArgs["result"]["codingSession"]>
@@ -5838,10 +7085,13 @@ export namespace Prisma {
     id?: boolean
     userId?: boolean
     targetRole?: boolean
+    focusTrack?: boolean
     difficulty?: boolean
     selectedLanguage?: boolean
     status?: boolean
     testCasesPassed?: boolean
+    overallScore?: boolean
+    feedbackSummary?: boolean
     startedAt?: boolean
     completedAt?: boolean
   }, ExtArgs["result"]["codingSession"]>
@@ -5850,15 +7100,18 @@ export namespace Prisma {
     id?: boolean
     userId?: boolean
     targetRole?: boolean
+    focusTrack?: boolean
     difficulty?: boolean
     selectedLanguage?: boolean
     status?: boolean
     testCasesPassed?: boolean
+    overallScore?: boolean
+    feedbackSummary?: boolean
     startedAt?: boolean
     completedAt?: boolean
   }
 
-  export type CodingSessionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "targetRole" | "difficulty" | "selectedLanguage" | "status" | "testCasesPassed" | "startedAt" | "completedAt", ExtArgs["result"]["codingSession"]>
+  export type CodingSessionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "targetRole" | "focusTrack" | "difficulty" | "selectedLanguage" | "status" | "testCasesPassed" | "overallScore" | "feedbackSummary" | "startedAt" | "completedAt", ExtArgs["result"]["codingSession"]>
 
   export type $CodingSessionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "CodingSession"
@@ -5867,10 +7120,13 @@ export namespace Prisma {
       id: string
       userId: string
       targetRole: string
+      focusTrack: string | null
       difficulty: string
       selectedLanguage: string
       status: string
       testCasesPassed: number | null
+      overallScore: number | null
+      feedbackSummary: string | null
       startedAt: Date
       completedAt: Date | null
     }, ExtArgs["result"]["codingSession"]>
@@ -6299,10 +7555,13 @@ export namespace Prisma {
     readonly id: FieldRef<"CodingSession", 'String'>
     readonly userId: FieldRef<"CodingSession", 'String'>
     readonly targetRole: FieldRef<"CodingSession", 'String'>
+    readonly focusTrack: FieldRef<"CodingSession", 'String'>
     readonly difficulty: FieldRef<"CodingSession", 'String'>
     readonly selectedLanguage: FieldRef<"CodingSession", 'String'>
     readonly status: FieldRef<"CodingSession", 'String'>
     readonly testCasesPassed: FieldRef<"CodingSession", 'Int'>
+    readonly overallScore: FieldRef<"CodingSession", 'Int'>
+    readonly feedbackSummary: FieldRef<"CodingSession", 'String'>
     readonly startedAt: FieldRef<"CodingSession", 'DateTime'>
     readonly completedAt: FieldRef<"CodingSession", 'DateTime'>
   }
@@ -8761,6 +10020,21 @@ export namespace Prisma {
   export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
+  export const FeatureFlagScalarFieldEnum: {
+    id: 'id',
+    key: 'key',
+    name: 'name',
+    description: 'description',
+    enabled: 'enabled',
+    allowedTiers: 'allowedTiers',
+    updatedBy: 'updatedBy',
+    updatedAt: 'updatedAt',
+    createdAt: 'createdAt'
+  };
+
+  export type FeatureFlagScalarFieldEnum = (typeof FeatureFlagScalarFieldEnum)[keyof typeof FeatureFlagScalarFieldEnum]
+
+
   export const AuditLogScalarFieldEnum: {
     id: 'id',
     adminId: 'adminId',
@@ -8788,6 +10062,10 @@ export namespace Prisma {
     email: 'email',
     passwordHash: 'passwordHash',
     name: 'name',
+    role: 'role',
+    isEmailVerified: 'isEmailVerified',
+    bannedAt: 'bannedAt',
+    lastLoginAt: 'lastLoginAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -8808,6 +10086,8 @@ export namespace Prisma {
     interviewGoal: 'interviewGoal',
     durationMins: 'durationMins',
     status: 'status',
+    overallScore: 'overallScore',
+    feedbackSummary: 'feedbackSummary',
     startedAt: 'startedAt',
     completedAt: 'completedAt',
     createdAt: 'createdAt'
@@ -8820,10 +10100,13 @@ export namespace Prisma {
     id: 'id',
     userId: 'userId',
     targetRole: 'targetRole',
+    focusTrack: 'focusTrack',
     difficulty: 'difficulty',
     selectedLanguage: 'selectedLanguage',
     status: 'status',
     testCasesPassed: 'testCasesPassed',
+    overallScore: 'overallScore',
+    feedbackSummary: 'feedbackSummary',
     startedAt: 'startedAt',
     completedAt: 'completedAt'
   };
@@ -8881,6 +10164,14 @@ export namespace Prisma {
   export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
 
 
+  export const NullsOrder: {
+    first: 'first',
+    last: 'last'
+  };
+
+  export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
   export const JsonNullValueFilter: {
     DbNull: typeof DbNull,
     JsonNull: typeof JsonNull,
@@ -8888,14 +10179,6 @@ export namespace Prisma {
   };
 
   export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
-
-
-  export const NullsOrder: {
-    first: 'first',
-    last: 'last'
-  };
-
-  export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
 
   /**
@@ -8918,16 +10201,9 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Json'
+   * Reference to a field of type 'Boolean'
    */
-  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
-    
-
-
-  /**
-   * Reference to a field of type 'QueryMode'
-   */
-  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
@@ -8942,6 +10218,20 @@ export namespace Prisma {
    * Reference to a field of type 'DateTime[]'
    */
   export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Json'
+   */
+  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+  /**
+   * Reference to a field of type 'QueryMode'
+   */
+  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -8975,6 +10265,78 @@ export namespace Prisma {
    * Deep Input Types
    */
 
+
+  export type FeatureFlagWhereInput = {
+    AND?: FeatureFlagWhereInput | FeatureFlagWhereInput[]
+    OR?: FeatureFlagWhereInput[]
+    NOT?: FeatureFlagWhereInput | FeatureFlagWhereInput[]
+    id?: StringFilter<"FeatureFlag"> | string
+    key?: StringFilter<"FeatureFlag"> | string
+    name?: StringFilter<"FeatureFlag"> | string
+    description?: StringNullableFilter<"FeatureFlag"> | string | null
+    enabled?: BoolFilter<"FeatureFlag"> | boolean
+    allowedTiers?: StringNullableListFilter<"FeatureFlag">
+    updatedBy?: StringNullableFilter<"FeatureFlag"> | string | null
+    updatedAt?: DateTimeFilter<"FeatureFlag"> | Date | string
+    createdAt?: DateTimeFilter<"FeatureFlag"> | Date | string
+  }
+
+  export type FeatureFlagOrderByWithRelationInput = {
+    id?: SortOrder
+    key?: SortOrder
+    name?: SortOrder
+    description?: SortOrderInput | SortOrder
+    enabled?: SortOrder
+    allowedTiers?: SortOrder
+    updatedBy?: SortOrderInput | SortOrder
+    updatedAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type FeatureFlagWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    key?: string
+    AND?: FeatureFlagWhereInput | FeatureFlagWhereInput[]
+    OR?: FeatureFlagWhereInput[]
+    NOT?: FeatureFlagWhereInput | FeatureFlagWhereInput[]
+    name?: StringFilter<"FeatureFlag"> | string
+    description?: StringNullableFilter<"FeatureFlag"> | string | null
+    enabled?: BoolFilter<"FeatureFlag"> | boolean
+    allowedTiers?: StringNullableListFilter<"FeatureFlag">
+    updatedBy?: StringNullableFilter<"FeatureFlag"> | string | null
+    updatedAt?: DateTimeFilter<"FeatureFlag"> | Date | string
+    createdAt?: DateTimeFilter<"FeatureFlag"> | Date | string
+  }, "id" | "key">
+
+  export type FeatureFlagOrderByWithAggregationInput = {
+    id?: SortOrder
+    key?: SortOrder
+    name?: SortOrder
+    description?: SortOrderInput | SortOrder
+    enabled?: SortOrder
+    allowedTiers?: SortOrder
+    updatedBy?: SortOrderInput | SortOrder
+    updatedAt?: SortOrder
+    createdAt?: SortOrder
+    _count?: FeatureFlagCountOrderByAggregateInput
+    _max?: FeatureFlagMaxOrderByAggregateInput
+    _min?: FeatureFlagMinOrderByAggregateInput
+  }
+
+  export type FeatureFlagScalarWhereWithAggregatesInput = {
+    AND?: FeatureFlagScalarWhereWithAggregatesInput | FeatureFlagScalarWhereWithAggregatesInput[]
+    OR?: FeatureFlagScalarWhereWithAggregatesInput[]
+    NOT?: FeatureFlagScalarWhereWithAggregatesInput | FeatureFlagScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"FeatureFlag"> | string
+    key?: StringWithAggregatesFilter<"FeatureFlag"> | string
+    name?: StringWithAggregatesFilter<"FeatureFlag"> | string
+    description?: StringNullableWithAggregatesFilter<"FeatureFlag"> | string | null
+    enabled?: BoolWithAggregatesFilter<"FeatureFlag"> | boolean
+    allowedTiers?: StringNullableListFilter<"FeatureFlag">
+    updatedBy?: StringNullableWithAggregatesFilter<"FeatureFlag"> | string | null
+    updatedAt?: DateTimeWithAggregatesFilter<"FeatureFlag"> | Date | string
+    createdAt?: DateTimeWithAggregatesFilter<"FeatureFlag"> | Date | string
+  }
 
   export type AuditLogWhereInput = {
     AND?: AuditLogWhereInput | AuditLogWhereInput[]
@@ -9090,6 +10452,10 @@ export namespace Prisma {
     email?: StringFilter<"User"> | string
     passwordHash?: StringFilter<"User"> | string
     name?: StringFilter<"User"> | string
+    role?: StringFilter<"User"> | string
+    isEmailVerified?: BoolFilter<"User"> | boolean
+    bannedAt?: DateTimeNullableFilter<"User"> | Date | string | null
+    lastLoginAt?: DateTimeNullableFilter<"User"> | Date | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
   }
@@ -9099,6 +10465,10 @@ export namespace Prisma {
     email?: SortOrder
     passwordHash?: SortOrder
     name?: SortOrder
+    role?: SortOrder
+    isEmailVerified?: SortOrder
+    bannedAt?: SortOrderInput | SortOrder
+    lastLoginAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -9111,6 +10481,10 @@ export namespace Prisma {
     NOT?: UserWhereInput | UserWhereInput[]
     passwordHash?: StringFilter<"User"> | string
     name?: StringFilter<"User"> | string
+    role?: StringFilter<"User"> | string
+    isEmailVerified?: BoolFilter<"User"> | boolean
+    bannedAt?: DateTimeNullableFilter<"User"> | Date | string | null
+    lastLoginAt?: DateTimeNullableFilter<"User"> | Date | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
   }, "id" | "email">
@@ -9120,6 +10494,10 @@ export namespace Prisma {
     email?: SortOrder
     passwordHash?: SortOrder
     name?: SortOrder
+    role?: SortOrder
+    isEmailVerified?: SortOrder
+    bannedAt?: SortOrderInput | SortOrder
+    lastLoginAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: UserCountOrderByAggregateInput
@@ -9135,6 +10513,10 @@ export namespace Prisma {
     email?: StringWithAggregatesFilter<"User"> | string
     passwordHash?: StringWithAggregatesFilter<"User"> | string
     name?: StringWithAggregatesFilter<"User"> | string
+    role?: StringWithAggregatesFilter<"User"> | string
+    isEmailVerified?: BoolWithAggregatesFilter<"User"> | boolean
+    bannedAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+    lastLoginAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
   }
@@ -9155,6 +10537,8 @@ export namespace Prisma {
     interviewGoal?: StringNullableFilter<"OralSession"> | string | null
     durationMins?: IntFilter<"OralSession"> | number
     status?: StringFilter<"OralSession"> | string
+    overallScore?: IntNullableFilter<"OralSession"> | number | null
+    feedbackSummary?: StringNullableFilter<"OralSession"> | string | null
     startedAt?: DateTimeNullableFilter<"OralSession"> | Date | string | null
     completedAt?: DateTimeNullableFilter<"OralSession"> | Date | string | null
     createdAt?: DateTimeFilter<"OralSession"> | Date | string
@@ -9173,6 +10557,8 @@ export namespace Prisma {
     interviewGoal?: SortOrderInput | SortOrder
     durationMins?: SortOrder
     status?: SortOrder
+    overallScore?: SortOrderInput | SortOrder
+    feedbackSummary?: SortOrderInput | SortOrder
     startedAt?: SortOrderInput | SortOrder
     completedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -9194,6 +10580,8 @@ export namespace Prisma {
     interviewGoal?: StringNullableFilter<"OralSession"> | string | null
     durationMins?: IntFilter<"OralSession"> | number
     status?: StringFilter<"OralSession"> | string
+    overallScore?: IntNullableFilter<"OralSession"> | number | null
+    feedbackSummary?: StringNullableFilter<"OralSession"> | string | null
     startedAt?: DateTimeNullableFilter<"OralSession"> | Date | string | null
     completedAt?: DateTimeNullableFilter<"OralSession"> | Date | string | null
     createdAt?: DateTimeFilter<"OralSession"> | Date | string
@@ -9212,6 +10600,8 @@ export namespace Prisma {
     interviewGoal?: SortOrderInput | SortOrder
     durationMins?: SortOrder
     status?: SortOrder
+    overallScore?: SortOrderInput | SortOrder
+    feedbackSummary?: SortOrderInput | SortOrder
     startedAt?: SortOrderInput | SortOrder
     completedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -9238,6 +10628,8 @@ export namespace Prisma {
     interviewGoal?: StringNullableWithAggregatesFilter<"OralSession"> | string | null
     durationMins?: IntWithAggregatesFilter<"OralSession"> | number
     status?: StringWithAggregatesFilter<"OralSession"> | string
+    overallScore?: IntNullableWithAggregatesFilter<"OralSession"> | number | null
+    feedbackSummary?: StringNullableWithAggregatesFilter<"OralSession"> | string | null
     startedAt?: DateTimeNullableWithAggregatesFilter<"OralSession"> | Date | string | null
     completedAt?: DateTimeNullableWithAggregatesFilter<"OralSession"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"OralSession"> | Date | string
@@ -9250,10 +10642,13 @@ export namespace Prisma {
     id?: StringFilter<"CodingSession"> | string
     userId?: StringFilter<"CodingSession"> | string
     targetRole?: StringFilter<"CodingSession"> | string
+    focusTrack?: StringNullableFilter<"CodingSession"> | string | null
     difficulty?: StringFilter<"CodingSession"> | string
     selectedLanguage?: StringFilter<"CodingSession"> | string
     status?: StringFilter<"CodingSession"> | string
     testCasesPassed?: IntNullableFilter<"CodingSession"> | number | null
+    overallScore?: IntNullableFilter<"CodingSession"> | number | null
+    feedbackSummary?: StringNullableFilter<"CodingSession"> | string | null
     startedAt?: DateTimeFilter<"CodingSession"> | Date | string
     completedAt?: DateTimeNullableFilter<"CodingSession"> | Date | string | null
   }
@@ -9262,10 +10657,13 @@ export namespace Prisma {
     id?: SortOrder
     userId?: SortOrder
     targetRole?: SortOrder
+    focusTrack?: SortOrderInput | SortOrder
     difficulty?: SortOrder
     selectedLanguage?: SortOrder
     status?: SortOrder
     testCasesPassed?: SortOrderInput | SortOrder
+    overallScore?: SortOrderInput | SortOrder
+    feedbackSummary?: SortOrderInput | SortOrder
     startedAt?: SortOrder
     completedAt?: SortOrderInput | SortOrder
   }
@@ -9277,10 +10675,13 @@ export namespace Prisma {
     NOT?: CodingSessionWhereInput | CodingSessionWhereInput[]
     userId?: StringFilter<"CodingSession"> | string
     targetRole?: StringFilter<"CodingSession"> | string
+    focusTrack?: StringNullableFilter<"CodingSession"> | string | null
     difficulty?: StringFilter<"CodingSession"> | string
     selectedLanguage?: StringFilter<"CodingSession"> | string
     status?: StringFilter<"CodingSession"> | string
     testCasesPassed?: IntNullableFilter<"CodingSession"> | number | null
+    overallScore?: IntNullableFilter<"CodingSession"> | number | null
+    feedbackSummary?: StringNullableFilter<"CodingSession"> | string | null
     startedAt?: DateTimeFilter<"CodingSession"> | Date | string
     completedAt?: DateTimeNullableFilter<"CodingSession"> | Date | string | null
   }, "id">
@@ -9289,10 +10690,13 @@ export namespace Prisma {
     id?: SortOrder
     userId?: SortOrder
     targetRole?: SortOrder
+    focusTrack?: SortOrderInput | SortOrder
     difficulty?: SortOrder
     selectedLanguage?: SortOrder
     status?: SortOrder
     testCasesPassed?: SortOrderInput | SortOrder
+    overallScore?: SortOrderInput | SortOrder
+    feedbackSummary?: SortOrderInput | SortOrder
     startedAt?: SortOrder
     completedAt?: SortOrderInput | SortOrder
     _count?: CodingSessionCountOrderByAggregateInput
@@ -9309,10 +10713,13 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"CodingSession"> | string
     userId?: StringWithAggregatesFilter<"CodingSession"> | string
     targetRole?: StringWithAggregatesFilter<"CodingSession"> | string
+    focusTrack?: StringNullableWithAggregatesFilter<"CodingSession"> | string | null
     difficulty?: StringWithAggregatesFilter<"CodingSession"> | string
     selectedLanguage?: StringWithAggregatesFilter<"CodingSession"> | string
     status?: StringWithAggregatesFilter<"CodingSession"> | string
     testCasesPassed?: IntNullableWithAggregatesFilter<"CodingSession"> | number | null
+    overallScore?: IntNullableWithAggregatesFilter<"CodingSession"> | number | null
+    feedbackSummary?: StringNullableWithAggregatesFilter<"CodingSession"> | string | null
     startedAt?: DateTimeWithAggregatesFilter<"CodingSession"> | Date | string
     completedAt?: DateTimeNullableWithAggregatesFilter<"CodingSession"> | Date | string | null
   }
@@ -9443,6 +10850,90 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"Order"> | Date | string
   }
 
+  export type FeatureFlagCreateInput = {
+    id?: string
+    key: string
+    name: string
+    description?: string | null
+    enabled?: boolean
+    allowedTiers?: FeatureFlagCreateallowedTiersInput | string[]
+    updatedBy?: string | null
+    updatedAt?: Date | string
+    createdAt?: Date | string
+  }
+
+  export type FeatureFlagUncheckedCreateInput = {
+    id?: string
+    key: string
+    name: string
+    description?: string | null
+    enabled?: boolean
+    allowedTiers?: FeatureFlagCreateallowedTiersInput | string[]
+    updatedBy?: string | null
+    updatedAt?: Date | string
+    createdAt?: Date | string
+  }
+
+  export type FeatureFlagUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    key?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    enabled?: BoolFieldUpdateOperationsInput | boolean
+    allowedTiers?: FeatureFlagUpdateallowedTiersInput | string[]
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FeatureFlagUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    key?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    enabled?: BoolFieldUpdateOperationsInput | boolean
+    allowedTiers?: FeatureFlagUpdateallowedTiersInput | string[]
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FeatureFlagCreateManyInput = {
+    id?: string
+    key: string
+    name: string
+    description?: string | null
+    enabled?: boolean
+    allowedTiers?: FeatureFlagCreateallowedTiersInput | string[]
+    updatedBy?: string | null
+    updatedAt?: Date | string
+    createdAt?: Date | string
+  }
+
+  export type FeatureFlagUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    key?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    enabled?: BoolFieldUpdateOperationsInput | boolean
+    allowedTiers?: FeatureFlagUpdateallowedTiersInput | string[]
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FeatureFlagUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    key?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    enabled?: BoolFieldUpdateOperationsInput | boolean
+    allowedTiers?: FeatureFlagUpdateallowedTiersInput | string[]
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type AuditLogCreateInput = {
     id?: string
     adminId: string
@@ -9560,6 +11051,10 @@ export namespace Prisma {
     email: string
     passwordHash: string
     name: string
+    role?: string
+    isEmailVerified?: boolean
+    bannedAt?: Date | string | null
+    lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -9569,6 +11064,10 @@ export namespace Prisma {
     email: string
     passwordHash: string
     name: string
+    role?: string
+    isEmailVerified?: boolean
+    bannedAt?: Date | string | null
+    lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -9578,6 +11077,10 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    role?: StringFieldUpdateOperationsInput | string
+    isEmailVerified?: BoolFieldUpdateOperationsInput | boolean
+    bannedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -9587,6 +11090,10 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    role?: StringFieldUpdateOperationsInput | string
+    isEmailVerified?: BoolFieldUpdateOperationsInput | boolean
+    bannedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -9596,6 +11103,10 @@ export namespace Prisma {
     email: string
     passwordHash: string
     name: string
+    role?: string
+    isEmailVerified?: boolean
+    bannedAt?: Date | string | null
+    lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -9605,6 +11116,10 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    role?: StringFieldUpdateOperationsInput | string
+    isEmailVerified?: BoolFieldUpdateOperationsInput | boolean
+    bannedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -9614,6 +11129,10 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    role?: StringFieldUpdateOperationsInput | string
+    isEmailVerified?: BoolFieldUpdateOperationsInput | boolean
+    bannedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -9631,6 +11150,8 @@ export namespace Prisma {
     interviewGoal?: string | null
     durationMins?: number
     status?: string
+    overallScore?: number | null
+    feedbackSummary?: string | null
     startedAt?: Date | string | null
     completedAt?: Date | string | null
     createdAt?: Date | string
@@ -9649,6 +11170,8 @@ export namespace Prisma {
     interviewGoal?: string | null
     durationMins?: number
     status?: string
+    overallScore?: number | null
+    feedbackSummary?: string | null
     startedAt?: Date | string | null
     completedAt?: Date | string | null
     createdAt?: Date | string
@@ -9667,6 +11190,8 @@ export namespace Prisma {
     interviewGoal?: NullableStringFieldUpdateOperationsInput | string | null
     durationMins?: IntFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    feedbackSummary?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -9685,6 +11210,8 @@ export namespace Prisma {
     interviewGoal?: NullableStringFieldUpdateOperationsInput | string | null
     durationMins?: IntFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    feedbackSummary?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -9703,6 +11230,8 @@ export namespace Prisma {
     interviewGoal?: string | null
     durationMins?: number
     status?: string
+    overallScore?: number | null
+    feedbackSummary?: string | null
     startedAt?: Date | string | null
     completedAt?: Date | string | null
     createdAt?: Date | string
@@ -9721,6 +11250,8 @@ export namespace Prisma {
     interviewGoal?: NullableStringFieldUpdateOperationsInput | string | null
     durationMins?: IntFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    feedbackSummary?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -9739,6 +11270,8 @@ export namespace Prisma {
     interviewGoal?: NullableStringFieldUpdateOperationsInput | string | null
     durationMins?: IntFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    feedbackSummary?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -9748,10 +11281,13 @@ export namespace Prisma {
     id?: string
     userId: string
     targetRole: string
+    focusTrack?: string | null
     difficulty?: string
     selectedLanguage?: string
     status?: string
     testCasesPassed?: number | null
+    overallScore?: number | null
+    feedbackSummary?: string | null
     startedAt?: Date | string
     completedAt?: Date | string | null
   }
@@ -9760,10 +11296,13 @@ export namespace Prisma {
     id?: string
     userId: string
     targetRole: string
+    focusTrack?: string | null
     difficulty?: string
     selectedLanguage?: string
     status?: string
     testCasesPassed?: number | null
+    overallScore?: number | null
+    feedbackSummary?: string | null
     startedAt?: Date | string
     completedAt?: Date | string | null
   }
@@ -9772,10 +11311,13 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     targetRole?: StringFieldUpdateOperationsInput | string
+    focusTrack?: NullableStringFieldUpdateOperationsInput | string | null
     difficulty?: StringFieldUpdateOperationsInput | string
     selectedLanguage?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     testCasesPassed?: NullableIntFieldUpdateOperationsInput | number | null
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    feedbackSummary?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -9784,10 +11326,13 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     targetRole?: StringFieldUpdateOperationsInput | string
+    focusTrack?: NullableStringFieldUpdateOperationsInput | string | null
     difficulty?: StringFieldUpdateOperationsInput | string
     selectedLanguage?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     testCasesPassed?: NullableIntFieldUpdateOperationsInput | number | null
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    feedbackSummary?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -9796,10 +11341,13 @@ export namespace Prisma {
     id?: string
     userId: string
     targetRole: string
+    focusTrack?: string | null
     difficulty?: string
     selectedLanguage?: string
     status?: string
     testCasesPassed?: number | null
+    overallScore?: number | null
+    feedbackSummary?: string | null
     startedAt?: Date | string
     completedAt?: Date | string | null
   }
@@ -9808,10 +11356,13 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     targetRole?: StringFieldUpdateOperationsInput | string
+    focusTrack?: NullableStringFieldUpdateOperationsInput | string | null
     difficulty?: StringFieldUpdateOperationsInput | string
     selectedLanguage?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     testCasesPassed?: NullableIntFieldUpdateOperationsInput | number | null
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    feedbackSummary?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -9820,10 +11371,13 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     targetRole?: StringFieldUpdateOperationsInput | string
+    focusTrack?: NullableStringFieldUpdateOperationsInput | string | null
     difficulty?: StringFieldUpdateOperationsInput | string
     selectedLanguage?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     testCasesPassed?: NullableIntFieldUpdateOperationsInput | number | null
+    overallScore?: NullableIntFieldUpdateOperationsInput | number | null
+    feedbackSummary?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -9997,28 +11551,18 @@ export namespace Prisma {
     mode?: QueryMode
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
-  export type JsonNullableFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonNullableFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
 
-  export type JsonNullableFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
+  export type StringNullableListFilter<$PrismaModel = never> = {
+    equals?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    has?: string | StringFieldRefInput<$PrismaModel> | null
+    hasEvery?: string[] | ListStringFieldRefInput<$PrismaModel>
+    hasSome?: string[] | ListStringFieldRefInput<$PrismaModel>
+    isEmpty?: boolean
   }
 
   export type DateTimeFilter<$PrismaModel = never> = {
@@ -10037,28 +11581,37 @@ export namespace Prisma {
     nulls?: NullsOrder
   }
 
-  export type AuditLogCountOrderByAggregateInput = {
+  export type FeatureFlagCountOrderByAggregateInput = {
     id?: SortOrder
-    adminId?: SortOrder
-    action?: SortOrder
-    targetId?: SortOrder
-    metadata?: SortOrder
+    key?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    enabled?: SortOrder
+    allowedTiers?: SortOrder
+    updatedBy?: SortOrder
+    updatedAt?: SortOrder
     createdAt?: SortOrder
   }
 
-  export type AuditLogMaxOrderByAggregateInput = {
+  export type FeatureFlagMaxOrderByAggregateInput = {
     id?: SortOrder
-    adminId?: SortOrder
-    action?: SortOrder
-    targetId?: SortOrder
+    key?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    enabled?: SortOrder
+    updatedBy?: SortOrder
+    updatedAt?: SortOrder
     createdAt?: SortOrder
   }
 
-  export type AuditLogMinOrderByAggregateInput = {
+  export type FeatureFlagMinOrderByAggregateInput = {
     id?: SortOrder
-    adminId?: SortOrder
-    action?: SortOrder
-    targetId?: SortOrder
+    key?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    enabled?: SortOrder
+    updatedBy?: SortOrder
+    updatedAt?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -10097,6 +11650,76 @@ export namespace Prisma {
     _min?: NestedStringNullableFilter<$PrismaModel>
     _max?: NestedStringNullableFilter<$PrismaModel>
   }
+
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
+  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+  export type JsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type AuditLogCountOrderByAggregateInput = {
+    id?: SortOrder
+    adminId?: SortOrder
+    action?: SortOrder
+    targetId?: SortOrder
+    metadata?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type AuditLogMaxOrderByAggregateInput = {
+    id?: SortOrder
+    adminId?: SortOrder
+    action?: SortOrder
+    targetId?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type AuditLogMinOrderByAggregateInput = {
+    id?: SortOrder
+    adminId?: SortOrder
+    action?: SortOrder
+    targetId?: SortOrder
+    createdAt?: SortOrder
+  }
   export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
@@ -10122,20 +11745,6 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedJsonNullableFilter<$PrismaModel>
     _max?: NestedJsonNullableFilter<$PrismaModel>
-  }
-
-  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedDateTimeFilter<$PrismaModel>
-    _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
   export type FloatFilter<$PrismaModel = never> = {
@@ -10194,11 +11803,26 @@ export namespace Prisma {
     _max?: NestedFloatFilter<$PrismaModel>
   }
 
+  export type DateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
   export type UserCountOrderByAggregateInput = {
     id?: SortOrder
     email?: SortOrder
     passwordHash?: SortOrder
     name?: SortOrder
+    role?: SortOrder
+    isEmailVerified?: SortOrder
+    bannedAt?: SortOrder
+    lastLoginAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -10208,6 +11832,10 @@ export namespace Prisma {
     email?: SortOrder
     passwordHash?: SortOrder
     name?: SortOrder
+    role?: SortOrder
+    isEmailVerified?: SortOrder
+    bannedAt?: SortOrder
+    lastLoginAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -10217,16 +11845,26 @@ export namespace Prisma {
     email?: SortOrder
     passwordHash?: SortOrder
     name?: SortOrder
+    role?: SortOrder
+    isEmailVerified?: SortOrder
+    bannedAt?: SortOrder
+    lastLoginAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
-  export type StringNullableListFilter<$PrismaModel = never> = {
-    equals?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    has?: string | StringFieldRefInput<$PrismaModel> | null
-    hasEvery?: string[] | ListStringFieldRefInput<$PrismaModel>
-    hasSome?: string[] | ListStringFieldRefInput<$PrismaModel>
-    isEmpty?: boolean
+  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type IntFilter<$PrismaModel = never> = {
@@ -10240,15 +11878,15 @@ export namespace Prisma {
     not?: NestedIntFilter<$PrismaModel> | number
   }
 
-  export type DateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
   export type OralSessionCountOrderByAggregateInput = {
@@ -10264,6 +11902,8 @@ export namespace Prisma {
     interviewGoal?: SortOrder
     durationMins?: SortOrder
     status?: SortOrder
+    overallScore?: SortOrder
+    feedbackSummary?: SortOrder
     startedAt?: SortOrder
     completedAt?: SortOrder
     createdAt?: SortOrder
@@ -10271,6 +11911,7 @@ export namespace Prisma {
 
   export type OralSessionAvgOrderByAggregateInput = {
     durationMins?: SortOrder
+    overallScore?: SortOrder
   }
 
   export type OralSessionMaxOrderByAggregateInput = {
@@ -10285,6 +11926,8 @@ export namespace Prisma {
     interviewGoal?: SortOrder
     durationMins?: SortOrder
     status?: SortOrder
+    overallScore?: SortOrder
+    feedbackSummary?: SortOrder
     startedAt?: SortOrder
     completedAt?: SortOrder
     createdAt?: SortOrder
@@ -10302,6 +11945,8 @@ export namespace Prisma {
     interviewGoal?: SortOrder
     durationMins?: SortOrder
     status?: SortOrder
+    overallScore?: SortOrder
+    feedbackSummary?: SortOrder
     startedAt?: SortOrder
     completedAt?: SortOrder
     createdAt?: SortOrder
@@ -10309,6 +11954,7 @@ export namespace Prisma {
 
   export type OralSessionSumOrderByAggregateInput = {
     durationMins?: SortOrder
+    overallScore?: SortOrder
   }
 
   export type IntWithAggregatesFilter<$PrismaModel = never> = {
@@ -10327,75 +11973,6 @@ export namespace Prisma {
     _max?: NestedIntFilter<$PrismaModel>
   }
 
-  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
-  }
-
-  export type IntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
-  }
-
-  export type CodingSessionCountOrderByAggregateInput = {
-    id?: SortOrder
-    userId?: SortOrder
-    targetRole?: SortOrder
-    difficulty?: SortOrder
-    selectedLanguage?: SortOrder
-    status?: SortOrder
-    testCasesPassed?: SortOrder
-    startedAt?: SortOrder
-    completedAt?: SortOrder
-  }
-
-  export type CodingSessionAvgOrderByAggregateInput = {
-    testCasesPassed?: SortOrder
-  }
-
-  export type CodingSessionMaxOrderByAggregateInput = {
-    id?: SortOrder
-    userId?: SortOrder
-    targetRole?: SortOrder
-    difficulty?: SortOrder
-    selectedLanguage?: SortOrder
-    status?: SortOrder
-    testCasesPassed?: SortOrder
-    startedAt?: SortOrder
-    completedAt?: SortOrder
-  }
-
-  export type CodingSessionMinOrderByAggregateInput = {
-    id?: SortOrder
-    userId?: SortOrder
-    targetRole?: SortOrder
-    difficulty?: SortOrder
-    selectedLanguage?: SortOrder
-    status?: SortOrder
-    testCasesPassed?: SortOrder
-    startedAt?: SortOrder
-    completedAt?: SortOrder
-  }
-
-  export type CodingSessionSumOrderByAggregateInput = {
-    testCasesPassed?: SortOrder
-  }
-
   export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel> | null
     in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
@@ -10410,6 +11987,61 @@ export namespace Prisma {
     _sum?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedIntNullableFilter<$PrismaModel>
     _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type CodingSessionCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    targetRole?: SortOrder
+    focusTrack?: SortOrder
+    difficulty?: SortOrder
+    selectedLanguage?: SortOrder
+    status?: SortOrder
+    testCasesPassed?: SortOrder
+    overallScore?: SortOrder
+    feedbackSummary?: SortOrder
+    startedAt?: SortOrder
+    completedAt?: SortOrder
+  }
+
+  export type CodingSessionAvgOrderByAggregateInput = {
+    testCasesPassed?: SortOrder
+    overallScore?: SortOrder
+  }
+
+  export type CodingSessionMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    targetRole?: SortOrder
+    focusTrack?: SortOrder
+    difficulty?: SortOrder
+    selectedLanguage?: SortOrder
+    status?: SortOrder
+    testCasesPassed?: SortOrder
+    overallScore?: SortOrder
+    feedbackSummary?: SortOrder
+    startedAt?: SortOrder
+    completedAt?: SortOrder
+  }
+
+  export type CodingSessionMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    targetRole?: SortOrder
+    focusTrack?: SortOrder
+    difficulty?: SortOrder
+    selectedLanguage?: SortOrder
+    status?: SortOrder
+    testCasesPassed?: SortOrder
+    overallScore?: SortOrder
+    feedbackSummary?: SortOrder
+    startedAt?: SortOrder
+    completedAt?: SortOrder
+  }
+
+  export type CodingSessionSumOrderByAggregateInput = {
+    testCasesPassed?: SortOrder
+    overallScore?: SortOrder
   }
 
   export type SubscriptionCountOrderByAggregateInput = {
@@ -10480,12 +12112,25 @@ export namespace Prisma {
     amount?: SortOrder
   }
 
+  export type FeatureFlagCreateallowedTiersInput = {
+    set: string[]
+  }
+
   export type StringFieldUpdateOperationsInput = {
     set?: string
   }
 
   export type NullableStringFieldUpdateOperationsInput = {
     set?: string | null
+  }
+
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
+  }
+
+  export type FeatureFlagUpdateallowedTiersInput = {
+    set?: string[]
+    push?: string | string[]
   }
 
   export type DateTimeFieldUpdateOperationsInput = {
@@ -10498,6 +12143,10 @@ export namespace Prisma {
     decrement?: number
     multiply?: number
     divide?: number
+  }
+
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
   }
 
   export type OralSessionCreatefocusAreasInput = {
@@ -10515,10 +12164,6 @@ export namespace Prisma {
     decrement?: number
     multiply?: number
     divide?: number
-  }
-
-  export type NullableDateTimeFieldUpdateOperationsInput = {
-    set?: Date | string | null
   }
 
   export type NullableIntFieldUpdateOperationsInput = {
@@ -10555,6 +12200,11 @@ export namespace Prisma {
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
   export type NestedDateTimeFilter<$PrismaModel = never> = {
@@ -10623,6 +12273,28 @@ export namespace Prisma {
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
+
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
+  export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
+  }
   export type NestedJsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
@@ -10645,20 +12317,6 @@ export namespace Prisma {
     gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-  }
-
-  export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedDateTimeFilter<$PrismaModel>
-    _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
   export type NestedFloatFilter<$PrismaModel = never> = {
@@ -10699,6 +12357,20 @@ export namespace Prisma {
     not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
+  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -10713,20 +12385,6 @@ export namespace Prisma {
     _sum?: NestedIntFilter<$PrismaModel>
     _min?: NestedIntFilter<$PrismaModel>
     _max?: NestedIntFilter<$PrismaModel>
-  }
-
-  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {

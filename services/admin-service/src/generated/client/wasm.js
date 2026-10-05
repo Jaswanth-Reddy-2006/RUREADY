@@ -93,6 +93,18 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
+exports.Prisma.FeatureFlagScalarFieldEnum = {
+  id: 'id',
+  key: 'key',
+  name: 'name',
+  description: 'description',
+  enabled: 'enabled',
+  allowedTiers: 'allowedTiers',
+  updatedBy: 'updatedBy',
+  updatedAt: 'updatedAt',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.AuditLogScalarFieldEnum = {
   id: 'id',
   adminId: 'adminId',
@@ -114,6 +126,10 @@ exports.Prisma.UserScalarFieldEnum = {
   email: 'email',
   passwordHash: 'passwordHash',
   name: 'name',
+  role: 'role',
+  isEmailVerified: 'isEmailVerified',
+  bannedAt: 'bannedAt',
+  lastLoginAt: 'lastLoginAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -131,6 +147,8 @@ exports.Prisma.OralSessionScalarFieldEnum = {
   interviewGoal: 'interviewGoal',
   durationMins: 'durationMins',
   status: 'status',
+  overallScore: 'overallScore',
+  feedbackSummary: 'feedbackSummary',
   startedAt: 'startedAt',
   completedAt: 'completedAt',
   createdAt: 'createdAt'
@@ -140,10 +158,13 @@ exports.Prisma.CodingSessionScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   targetRole: 'targetRole',
+  focusTrack: 'focusTrack',
   difficulty: 'difficulty',
   selectedLanguage: 'selectedLanguage',
   status: 'status',
   testCasesPassed: 'testCasesPassed',
+  overallScore: 'overallScore',
+  feedbackSummary: 'feedbackSummary',
   startedAt: 'startedAt',
   completedAt: 'completedAt'
 };
@@ -183,19 +204,20 @@ exports.Prisma.QueryMode = {
   insensitive: 'insensitive'
 };
 
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
+};
+
 exports.Prisma.JsonNullValueFilter = {
   DbNull: Prisma.DbNull,
   JsonNull: Prisma.JsonNull,
   AnyNull: Prisma.AnyNull
 };
 
-exports.Prisma.NullsOrder = {
-  first: 'first',
-  last: 'last'
-};
-
 
 exports.Prisma.ModelName = {
+  FeatureFlag: 'FeatureFlag',
   AuditLog: 'AuditLog',
   SystemMetric: 'SystemMetric',
   User: 'User',
@@ -215,7 +237,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\Jaswanth Reddy\\OneDrive\\Desktop\\Projects\\RU_Ready\\services\\admin-service\\src\\generated\\client",
+      "value": "C:\\Users\\rafey\\Desktop\\Rennetus\\RUREADY\\services\\admin-service\\src\\generated\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -229,7 +251,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\Jaswanth Reddy\\OneDrive\\Desktop\\Projects\\RU_Ready\\services\\admin-service\\src\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\rafey\\Desktop\\Rennetus\\RUREADY\\services\\admin-service\\src\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -251,13 +273,13 @@ const config = {
       }
     }
   },
-  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/client\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel AuditLog {\n  id        String   @id @default(cuid())\n  adminId   String\n  action    String\n  targetId  String?\n  metadata  Json?\n  createdAt DateTime @default(now())\n\n  @@map(\"audit_logs\")\n}\n\nmodel SystemMetric {\n  id        String   @id @default(cuid())\n  metric    String\n  value     Float\n  timestamp DateTime @default(now())\n\n  @@map(\"system_metrics\")\n}\n\nmodel User {\n  id           String   @id @default(cuid())\n  email        String   @unique\n  passwordHash String\n  name         String\n  createdAt    DateTime @default(now())\n  updatedAt    DateTime @updatedAt\n\n  @@map(\"users\")\n}\n\nmodel OralSession {\n  id              String    @id @default(cuid())\n  userId          String\n  resumeId        String?\n  interviewType   String\n  targetRole      String\n  targetCompany   String?\n  industry        String\n  experienceLevel String\n  focusAreas      String[]\n  interviewGoal   String?\n  durationMins    Int       @default(20)\n  status          String    @default(\"SETUP\")\n  startedAt       DateTime?\n  completedAt     DateTime?\n  createdAt       DateTime  @default(now())\n\n  @@index([userId])\n  @@map(\"oral_sessions\")\n}\n\nmodel CodingSession {\n  id               String    @id @default(cuid())\n  userId           String\n  targetRole       String\n  difficulty       String    @default(\"MEDIUM\")\n  selectedLanguage String    @default(\"javascript\")\n  status           String    @default(\"IN_PROGRESS\")\n  testCasesPassed  Int?      @default(0)\n  startedAt        DateTime  @default(now())\n  completedAt      DateTime?\n\n  @@index([userId])\n  @@map(\"coding_sessions\")\n}\n\nmodel Subscription {\n  id               String   @id @default(cuid())\n  userId           String   @unique\n  plan             String   @default(\"FREE\")\n  status           String   @default(\"ACTIVE\")\n  currentPeriodEnd DateTime\n  createdAt        DateTime @default(now())\n\n  @@map(\"subscriptions\")\n}\n\nmodel Order {\n  id              String   @id @default(cuid())\n  userId          String\n  planId          String\n  amount          Float\n  currency        String   @default(\"USD\")\n  status          String   @default(\"CREATED\")\n  providerOrderId String?\n  createdAt       DateTime @default(now())\n\n  @@index([userId])\n  @@map(\"orders\")\n}\n",
-  "inlineSchemaHash": "b698d6e574dbc44362447d77db561e90edf9935f819faf5107760fd9e47eaa37",
+  "inlineSchema": "// ═══════════════════════════════════════════════════════════════\n// Admin Microservice — Prisma Schema\n// Data ownership: audit_logs, system_metrics, feature_flags, + read mappings\n// ═══════════════════════════════════════════════════════════════\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/client\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel FeatureFlag {\n  id           String   @id @default(cuid())\n  key          String   @unique\n  name         String\n  description  String?\n  enabled      Boolean  @default(true)\n  allowedTiers String[] @default([\"ALL\"])\n  updatedBy    String?\n  updatedAt    DateTime @updatedAt\n  createdAt    DateTime @default(now())\n\n  @@map(\"feature_flags\")\n}\n\nmodel AuditLog {\n  id        String   @id @default(cuid())\n  adminId   String\n  action    String\n  targetId  String?\n  metadata  Json?\n  createdAt DateTime @default(now())\n\n  @@index([adminId, action])\n  @@map(\"audit_logs\")\n}\n\nmodel SystemMetric {\n  id        String   @id @default(cuid())\n  metric    String\n  value     Float\n  timestamp DateTime @default(now())\n\n  @@index([metric, timestamp])\n  @@map(\"system_metrics\")\n}\n\nmodel User {\n  id              String    @id @default(cuid())\n  email           String    @unique\n  passwordHash    String\n  name            String\n  role            String    @default(\"USER\") // USER, ADMIN, RECRUITER\n  isEmailVerified Boolean   @default(false)\n  bannedAt        DateTime?\n  lastLoginAt     DateTime?\n  createdAt       DateTime  @default(now())\n  updatedAt       DateTime  @updatedAt\n\n  @@map(\"users\")\n}\n\nmodel OralSession {\n  id              String    @id @default(cuid())\n  userId          String\n  resumeId        String?\n  interviewType   String\n  targetRole      String\n  targetCompany   String?\n  industry        String\n  experienceLevel String\n  focusAreas      String[]\n  interviewGoal   String?\n  durationMins    Int       @default(20)\n  status          String    @default(\"SETUP\")\n  overallScore    Int?\n  feedbackSummary String?\n  startedAt       DateTime?\n  completedAt     DateTime?\n  createdAt       DateTime  @default(now())\n\n  @@index([userId])\n  @@map(\"oral_sessions\")\n}\n\nmodel CodingSession {\n  id               String    @id @default(cuid())\n  userId           String\n  targetRole       String\n  focusTrack       String?   @default(\"DSA\")\n  difficulty       String    @default(\"MEDIUM\")\n  selectedLanguage String    @default(\"javascript\")\n  status           String    @default(\"IN_PROGRESS\")\n  testCasesPassed  Int?      @default(0)\n  overallScore     Int?\n  feedbackSummary  String?\n  startedAt        DateTime  @default(now())\n  completedAt      DateTime?\n\n  @@index([userId])\n  @@map(\"coding_sessions\")\n}\n\nmodel Subscription {\n  id               String   @id @default(cuid())\n  userId           String   @unique\n  plan             String   @default(\"FREE\")\n  status           String   @default(\"ACTIVE\")\n  currentPeriodEnd DateTime\n  createdAt        DateTime @default(now())\n\n  @@map(\"subscriptions\")\n}\n\nmodel Order {\n  id              String   @id @default(cuid())\n  userId          String\n  planId          String\n  amount          Float\n  currency        String   @default(\"USD\")\n  status          String   @default(\"CREATED\")\n  providerOrderId String?\n  createdAt       DateTime @default(now())\n\n  @@index([userId])\n  @@map(\"orders\")\n}\n",
+  "inlineSchemaHash": "73ea7ee2c22f8931cb319757dab227a38320c93ed286025f6c1326d6dbb039a2",
   "copyEngine": true
 }
 config.dirname = '/'
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"AuditLog\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"adminId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"action\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"targetId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"metadata\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"audit_logs\"},\"SystemMetric\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"metric\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"value\",\"kind\":\"scalar\",\"type\":\"Float\"},{\"name\":\"timestamp\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"system_metrics\"},\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"passwordHash\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"users\"},\"OralSession\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"resumeId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"interviewType\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"targetRole\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"targetCompany\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"industry\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"experienceLevel\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"focusAreas\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"interviewGoal\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"durationMins\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"status\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"startedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"completedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"oral_sessions\"},\"CodingSession\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"targetRole\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"difficulty\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"selectedLanguage\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"testCasesPassed\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"startedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"completedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"coding_sessions\"},\"Subscription\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"plan\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"currentPeriodEnd\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"subscriptions\"},\"Order\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"planId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"amount\",\"kind\":\"scalar\",\"type\":\"Float\"},{\"name\":\"currency\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"providerOrderId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"orders\"}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"FeatureFlag\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"key\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"enabled\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"allowedTiers\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"updatedBy\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"feature_flags\"},\"AuditLog\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"adminId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"action\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"targetId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"metadata\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"audit_logs\"},\"SystemMetric\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"metric\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"value\",\"kind\":\"scalar\",\"type\":\"Float\"},{\"name\":\"timestamp\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"system_metrics\"},\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"passwordHash\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"role\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"isEmailVerified\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"bannedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"lastLoginAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"users\"},\"OralSession\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"resumeId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"interviewType\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"targetRole\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"targetCompany\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"industry\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"experienceLevel\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"focusAreas\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"interviewGoal\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"durationMins\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"status\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"overallScore\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"feedbackSummary\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"startedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"completedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"oral_sessions\"},\"CodingSession\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"targetRole\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"focusTrack\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"difficulty\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"selectedLanguage\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"testCasesPassed\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"overallScore\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"feedbackSummary\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"startedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"completedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"coding_sessions\"},\"Subscription\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"plan\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"currentPeriodEnd\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"subscriptions\"},\"Order\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"planId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"amount\",\"kind\":\"scalar\",\"type\":\"Float\"},{\"name\":\"currency\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"providerOrderId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"orders\"}},\"enums\":{},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.engineWasm = {
   getRuntime: async () => require('./query_engine_bg.js'),

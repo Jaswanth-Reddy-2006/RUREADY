@@ -19,6 +19,7 @@ model AtsMatch {
   jobTitle          String
   companyName       String?
   matchScore        Int
+  semanticScore     Int?     @default(75)
   summary           String
   matchedSkills     String[]
   missingSkills     String[]

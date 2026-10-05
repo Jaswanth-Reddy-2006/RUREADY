@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { ResumeData, calculateAtsScore, AtsScoreResult, extractKeywordsFromJd } from '../utils/atsEngine';
+import { ResumeData, calculateAtsScore, AtsScoreResult, extractKeywordsFromJd, normalizeResumeData } from '../utils/atsEngine';
 
 export type ResumeTemplateId =
   | 'modern-tech'
@@ -486,7 +486,7 @@ Requirements:
 
       createResumeVersion: (name, targetRole, targetCompany, targetJd, customData) => {
         const id = `ver_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
-        const dataToUse = customData || JSON.parse(JSON.stringify(get().masterResume));
+        const dataToUse = normalizeResumeData(customData || JSON.parse(JSON.stringify(get().masterResume)));
         const newVersion: ResumeVersion = {
           id,
           name,
@@ -511,7 +511,14 @@ Requirements:
       updateResumeVersion: (id, updates) => {
         set((state) => ({
           resumeVersions: state.resumeVersions.map((v) =>
-            v.id === id ? { ...v, ...updates, lastUpdated: new Date().toISOString() } : v
+            v.id === id
+              ? {
+                  ...v,
+                  ...updates,
+                  resumeData: updates.resumeData ? normalizeResumeData(updates.resumeData) : v.resumeData,
+                  lastUpdated: new Date().toISOString()
+                }
+              : v
           ),
         }));
       },
@@ -1085,16 +1092,16 @@ Requirements:
                 id: `edu-${Date.now()}`,
                 degree: profile.education,
                 school: 'University',
-                location: profile.location || 'USA',
-                startDate: '2020',
-                endDate: '2024',
-                gpa: '3.8 / 4.0'
+                location: profile.location || '',
+                startDate: '',
+                endDate: '',
+                gpa: ''
               }
             ];
           }
 
           return {
-            masterResume: updated,
+            masterResume: normalizeResumeData(updated),
             tailoredResume: state.tailoredResume ? updated : null
           };
         });
@@ -1102,35 +1109,8 @@ Requirements:
 
       // Extract & Load from parsed resume
       extractAndLoadResume: (parsedData: Partial<ResumeData>) => {
-        set((state) => {
-          const merged: ResumeData = {
-            personalInfo: {
-              ...state.masterResume.personalInfo,
-              ...(parsedData.personalInfo || {})
-            },
-            summary: parsedData.summary || state.masterResume.summary,
-            experience: parsedData.experience && parsedData.experience.length > 0
-              ? parsedData.experience
-              : state.masterResume.experience,
-            education: parsedData.education && parsedData.education.length > 0
-              ? parsedData.education
-              : state.masterResume.education,
-            projects: parsedData.projects && parsedData.projects.length > 0
-              ? parsedData.projects
-              : state.masterResume.projects,
-            skills: {
-              languages: parsedData.skills?.languages?.length ? parsedData.skills.languages : state.masterResume.skills.languages,
-              frameworks: parsedData.skills?.frameworks?.length ? parsedData.skills.frameworks : state.masterResume.skills.frameworks,
-              databases: parsedData.skills?.databases?.length ? parsedData.skills.databases : state.masterResume.skills.databases,
-              cloudDevOps: parsedData.skills?.cloudDevOps?.length ? parsedData.skills.cloudDevOps : state.masterResume.skills.cloudDevOps,
-              tools: parsedData.skills?.tools?.length ? parsedData.skills.tools : state.masterResume.skills.tools,
-            },
-            certifications: parsedData.certifications && parsedData.certifications.length > 0
-              ? parsedData.certifications
-              : state.masterResume.certifications
-          };
-          return { masterResume: merged, tailoredResume: null, isTailoringActive: false };
-        });
+        const normalized = normalizeResumeData(parsedData);
+        set({ masterResume: normalized, tailoredResume: null, isTailoringActive: false });
       },
 
       resetToDefaultResume: () => {

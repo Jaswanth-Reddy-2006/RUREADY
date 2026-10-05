@@ -98,9 +98,19 @@ exports.Prisma.UserProfileScalarFieldEnum = {
   userId: 'userId',
   name: 'name',
   email: 'email',
+  phoneNumber: 'phoneNumber',
   avatarUrl: 'avatarUrl',
+  headline: 'headline',
   bio: 'bio',
   title: 'title',
+  targetRole: 'targetRole',
+  targetCompany: 'targetCompany',
+  seniority: 'seniority',
+  location: 'location',
+  education: 'education',
+  githubUrl: 'githubUrl',
+  linkedinUrl: 'linkedinUrl',
+  portfolioUrl: 'portfolioUrl',
   experienceYears: 'experienceYears',
   targetRoles: 'targetRoles',
   createdAt: 'createdAt',
@@ -148,7 +158,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\Jaswanth Reddy\\OneDrive\\Desktop\\Projects\\RU_Ready\\services\\user-service\\src\\generated\\client",
+      "value": "C:\\Users\\rafey\\Desktop\\Rennetus\\RUREADY\\services\\user-service\\src\\generated\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -162,7 +172,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\Jaswanth Reddy\\OneDrive\\Desktop\\Projects\\RU_Ready\\services\\user-service\\src\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\rafey\\Desktop\\Rennetus\\RUREADY\\services\\user-service\\src\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -184,13 +194,13 @@ const config = {
       }
     }
   },
-  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/client\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel UserProfile {\n  id              String   @id @default(cuid())\n  userId          String   @unique\n  name            String\n  email           String\n  avatarUrl       String?\n  bio             String?\n  title           String?\n  experienceYears Int?     @default(0)\n  targetRoles     String[]\n  createdAt       DateTime @default(now())\n  updatedAt       DateTime @updatedAt\n\n  resumes Resume[]\n\n  @@map(\"user_profiles\")\n}\n\nmodel Resume {\n  id         String      @id @default(cuid())\n  profileId  String\n  profile    UserProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)\n  fileName   String\n  filePath   String\n  parsedText String?\n  skills     String[]\n  uploadedAt DateTime    @default(now())\n\n  @@map(\"resumes\")\n}\n",
-  "inlineSchemaHash": "28d80395887c4a04a9e1796fa954a48cfd58f1f91ec2d1ed7e33e621720b5168",
+  "inlineSchema": "// ═══════════════════════════════════════════════════════════════\n// User Profile Microservice — Prisma Schema\n// Data ownership: user_profiles, resumes\n// ═══════════════════════════════════════════════════════════════\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/client\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel UserProfile {\n  id              String   @id @default(cuid())\n  userId          String   @unique\n  name            String\n  email           String\n  phoneNumber     String?\n  avatarUrl       String?\n  headline        String?\n  bio             String?\n  title           String?\n  targetRole      String?\n  targetCompany   String?\n  seniority       String?  @default(\"FRESHER\") // FRESHER, MID, SENIOR, LEAD\n  location        String?\n  education       String?\n  githubUrl       String?\n  linkedinUrl     String?\n  portfolioUrl    String?\n  experienceYears Int?     @default(0)\n  targetRoles     String[] @default([])\n  createdAt       DateTime @default(now())\n  updatedAt       DateTime @updatedAt\n\n  resumes Resume[]\n\n  @@index([email])\n  @@map(\"user_profiles\")\n}\n\nmodel Resume {\n  id         String      @id @default(cuid())\n  profileId  String\n  profile    UserProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)\n  fileName   String\n  filePath   String\n  parsedText String?\n  skills     String[]    @default([])\n  uploadedAt DateTime    @default(now())\n\n  @@index([profileId])\n  @@map(\"resumes\")\n}\n",
+  "inlineSchemaHash": "a968198b83b949b1d98041da5e500af1ad10e17a38d0ce7ae1c15bdfb024bb1a",
   "copyEngine": true
 }
 config.dirname = '/'
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"UserProfile\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"avatarUrl\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"bio\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"experienceYears\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"targetRoles\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"resumes\",\"kind\":\"object\",\"type\":\"Resume\",\"relationName\":\"ResumeToUserProfile\"}],\"dbName\":\"user_profiles\"},\"Resume\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"profileId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"profile\",\"kind\":\"object\",\"type\":\"UserProfile\",\"relationName\":\"ResumeToUserProfile\"},{\"name\":\"fileName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"filePath\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"parsedText\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"skills\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"uploadedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"resumes\"}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"UserProfile\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"phoneNumber\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"avatarUrl\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"headline\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"bio\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"targetRole\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"targetCompany\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"seniority\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"location\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"education\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"githubUrl\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"linkedinUrl\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"portfolioUrl\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"experienceYears\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"targetRoles\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"resumes\",\"kind\":\"object\",\"type\":\"Resume\",\"relationName\":\"ResumeToUserProfile\"}],\"dbName\":\"user_profiles\"},\"Resume\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"profileId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"profile\",\"kind\":\"object\",\"type\":\"UserProfile\",\"relationName\":\"ResumeToUserProfile\"},{\"name\":\"fileName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"filePath\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"parsedText\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"skills\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"uploadedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"resumes\"}},\"enums\":{},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.engineWasm = {
   getRuntime: async () => require('./query_engine_bg.js'),

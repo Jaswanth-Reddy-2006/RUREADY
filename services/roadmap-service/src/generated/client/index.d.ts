@@ -23,6 +23,11 @@ export type CareerRoadmap = $Result.DefaultSelection<Prisma.$CareerRoadmapPayloa
  * 
  */
 export type DiscussionPost = $Result.DefaultSelection<Prisma.$DiscussionPostPayload>
+/**
+ * Model DiscussionComment
+ * 
+ */
+export type DiscussionComment = $Result.DefaultSelection<Prisma.$DiscussionCommentPayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -161,6 +166,16 @@ export class PrismaClient<
     * ```
     */
   get discussionPost(): Prisma.DiscussionPostDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.discussionComment`: Exposes CRUD operations for the **DiscussionComment** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more DiscussionComments
+    * const discussionComments = await prisma.discussionComment.findMany()
+    * ```
+    */
+  get discussionComment(): Prisma.DiscussionCommentDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -603,7 +618,8 @@ export namespace Prisma {
 
   export const ModelName: {
     CareerRoadmap: 'CareerRoadmap',
-    DiscussionPost: 'DiscussionPost'
+    DiscussionPost: 'DiscussionPost',
+    DiscussionComment: 'DiscussionComment'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -622,7 +638,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "careerRoadmap" | "discussionPost"
+      modelProps: "careerRoadmap" | "discussionPost" | "discussionComment"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -774,6 +790,80 @@ export namespace Prisma {
           }
         }
       }
+      DiscussionComment: {
+        payload: Prisma.$DiscussionCommentPayload<ExtArgs>
+        fields: Prisma.DiscussionCommentFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.DiscussionCommentFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscussionCommentPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.DiscussionCommentFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscussionCommentPayload>
+          }
+          findFirst: {
+            args: Prisma.DiscussionCommentFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscussionCommentPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.DiscussionCommentFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscussionCommentPayload>
+          }
+          findMany: {
+            args: Prisma.DiscussionCommentFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscussionCommentPayload>[]
+          }
+          create: {
+            args: Prisma.DiscussionCommentCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscussionCommentPayload>
+          }
+          createMany: {
+            args: Prisma.DiscussionCommentCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.DiscussionCommentCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscussionCommentPayload>[]
+          }
+          delete: {
+            args: Prisma.DiscussionCommentDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscussionCommentPayload>
+          }
+          update: {
+            args: Prisma.DiscussionCommentUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscussionCommentPayload>
+          }
+          deleteMany: {
+            args: Prisma.DiscussionCommentDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.DiscussionCommentUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.DiscussionCommentUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscussionCommentPayload>[]
+          }
+          upsert: {
+            args: Prisma.DiscussionCommentUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscussionCommentPayload>
+          }
+          aggregate: {
+            args: Prisma.DiscussionCommentAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateDiscussionComment>
+          }
+          groupBy: {
+            args: Prisma.DiscussionCommentGroupByArgs<ExtArgs>
+            result: $Utils.Optional<DiscussionCommentGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.DiscussionCommentCountArgs<ExtArgs>
+            result: $Utils.Optional<DiscussionCommentCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -872,6 +962,7 @@ export namespace Prisma {
   export type GlobalOmitConfig = {
     careerRoadmap?: CareerRoadmapOmit
     discussionPost?: DiscussionPostOmit
+    discussionComment?: DiscussionCommentOmit
   }
 
   /* Types for Logging */
@@ -947,6 +1038,36 @@ export namespace Prisma {
    */
 
 
+  /**
+   * Count Type DiscussionPostCountOutputType
+   */
+
+  export type DiscussionPostCountOutputType = {
+    comments: number
+  }
+
+  export type DiscussionPostCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    comments?: boolean | DiscussionPostCountOutputTypeCountCommentsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * DiscussionPostCountOutputType without action
+   */
+  export type DiscussionPostCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionPostCountOutputType
+     */
+    select?: DiscussionPostCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * DiscussionPostCountOutputType without action
+   */
+  export type DiscussionPostCountOutputTypeCountCommentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DiscussionCommentWhereInput
+  }
+
 
   /**
    * Models
@@ -965,19 +1086,26 @@ export namespace Prisma {
   }
 
   export type CareerRoadmapAvgAggregateOutputType = {
+    estimatedWeeks: number | null
     overallReadiness: number | null
   }
 
   export type CareerRoadmapSumAggregateOutputType = {
+    estimatedWeeks: number | null
     overallReadiness: number | null
   }
 
   export type CareerRoadmapMinAggregateOutputType = {
     id: string | null
     userId: string | null
+    title: string | null
+    description: string | null
     rolePath: string | null
     targetCompanyTier: string | null
+    estimatedWeeks: number | null
     overallReadiness: number | null
+    isPublic: boolean | null
+    isOfficial: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -985,9 +1113,14 @@ export namespace Prisma {
   export type CareerRoadmapMaxAggregateOutputType = {
     id: string | null
     userId: string | null
+    title: string | null
+    description: string | null
     rolePath: string | null
     targetCompanyTier: string | null
+    estimatedWeeks: number | null
     overallReadiness: number | null
+    isPublic: boolean | null
+    isOfficial: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -995,9 +1128,14 @@ export namespace Prisma {
   export type CareerRoadmapCountAggregateOutputType = {
     id: number
     userId: number
+    title: number
+    description: number
     rolePath: number
     targetCompanyTier: number
+    estimatedWeeks: number
     overallReadiness: number
+    isPublic: number
+    isOfficial: number
     nodesData: number
     customTechStack: number
     createdAt: number
@@ -1007,19 +1145,26 @@ export namespace Prisma {
 
 
   export type CareerRoadmapAvgAggregateInputType = {
+    estimatedWeeks?: true
     overallReadiness?: true
   }
 
   export type CareerRoadmapSumAggregateInputType = {
+    estimatedWeeks?: true
     overallReadiness?: true
   }
 
   export type CareerRoadmapMinAggregateInputType = {
     id?: true
     userId?: true
+    title?: true
+    description?: true
     rolePath?: true
     targetCompanyTier?: true
+    estimatedWeeks?: true
     overallReadiness?: true
+    isPublic?: true
+    isOfficial?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -1027,9 +1172,14 @@ export namespace Prisma {
   export type CareerRoadmapMaxAggregateInputType = {
     id?: true
     userId?: true
+    title?: true
+    description?: true
     rolePath?: true
     targetCompanyTier?: true
+    estimatedWeeks?: true
     overallReadiness?: true
+    isPublic?: true
+    isOfficial?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -1037,9 +1187,14 @@ export namespace Prisma {
   export type CareerRoadmapCountAggregateInputType = {
     id?: true
     userId?: true
+    title?: true
+    description?: true
     rolePath?: true
     targetCompanyTier?: true
+    estimatedWeeks?: true
     overallReadiness?: true
+    isPublic?: true
+    isOfficial?: true
     nodesData?: true
     customTechStack?: true
     createdAt?: true
@@ -1136,9 +1291,14 @@ export namespace Prisma {
   export type CareerRoadmapGroupByOutputType = {
     id: string
     userId: string
+    title: string | null
+    description: string | null
     rolePath: string
     targetCompanyTier: string
+    estimatedWeeks: number
     overallReadiness: number
+    isPublic: boolean
+    isOfficial: boolean
     nodesData: JsonValue
     customTechStack: JsonValue | null
     createdAt: Date
@@ -1167,9 +1327,14 @@ export namespace Prisma {
   export type CareerRoadmapSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
+    title?: boolean
+    description?: boolean
     rolePath?: boolean
     targetCompanyTier?: boolean
+    estimatedWeeks?: boolean
     overallReadiness?: boolean
+    isPublic?: boolean
+    isOfficial?: boolean
     nodesData?: boolean
     customTechStack?: boolean
     createdAt?: boolean
@@ -1179,9 +1344,14 @@ export namespace Prisma {
   export type CareerRoadmapSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
+    title?: boolean
+    description?: boolean
     rolePath?: boolean
     targetCompanyTier?: boolean
+    estimatedWeeks?: boolean
     overallReadiness?: boolean
+    isPublic?: boolean
+    isOfficial?: boolean
     nodesData?: boolean
     customTechStack?: boolean
     createdAt?: boolean
@@ -1191,9 +1361,14 @@ export namespace Prisma {
   export type CareerRoadmapSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
+    title?: boolean
+    description?: boolean
     rolePath?: boolean
     targetCompanyTier?: boolean
+    estimatedWeeks?: boolean
     overallReadiness?: boolean
+    isPublic?: boolean
+    isOfficial?: boolean
     nodesData?: boolean
     customTechStack?: boolean
     createdAt?: boolean
@@ -1203,16 +1378,21 @@ export namespace Prisma {
   export type CareerRoadmapSelectScalar = {
     id?: boolean
     userId?: boolean
+    title?: boolean
+    description?: boolean
     rolePath?: boolean
     targetCompanyTier?: boolean
+    estimatedWeeks?: boolean
     overallReadiness?: boolean
+    isPublic?: boolean
+    isOfficial?: boolean
     nodesData?: boolean
     customTechStack?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type CareerRoadmapOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "rolePath" | "targetCompanyTier" | "overallReadiness" | "nodesData" | "customTechStack" | "createdAt" | "updatedAt", ExtArgs["result"]["careerRoadmap"]>
+  export type CareerRoadmapOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "title" | "description" | "rolePath" | "targetCompanyTier" | "estimatedWeeks" | "overallReadiness" | "isPublic" | "isOfficial" | "nodesData" | "customTechStack" | "createdAt" | "updatedAt", ExtArgs["result"]["careerRoadmap"]>
 
   export type $CareerRoadmapPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "CareerRoadmap"
@@ -1220,9 +1400,14 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: string
       userId: string
+      title: string | null
+      description: string | null
       rolePath: string
       targetCompanyTier: string
+      estimatedWeeks: number
       overallReadiness: number
+      isPublic: boolean
+      isOfficial: boolean
       nodesData: Prisma.JsonValue
       customTechStack: Prisma.JsonValue | null
       createdAt: Date
@@ -1652,9 +1837,14 @@ export namespace Prisma {
   interface CareerRoadmapFieldRefs {
     readonly id: FieldRef<"CareerRoadmap", 'String'>
     readonly userId: FieldRef<"CareerRoadmap", 'String'>
+    readonly title: FieldRef<"CareerRoadmap", 'String'>
+    readonly description: FieldRef<"CareerRoadmap", 'String'>
     readonly rolePath: FieldRef<"CareerRoadmap", 'String'>
     readonly targetCompanyTier: FieldRef<"CareerRoadmap", 'String'>
+    readonly estimatedWeeks: FieldRef<"CareerRoadmap", 'Int'>
     readonly overallReadiness: FieldRef<"CareerRoadmap", 'Int'>
+    readonly isPublic: FieldRef<"CareerRoadmap", 'Boolean'>
+    readonly isOfficial: FieldRef<"CareerRoadmap", 'Boolean'>
     readonly nodesData: FieldRef<"CareerRoadmap", 'Json'>
     readonly customTechStack: FieldRef<"CareerRoadmap", 'Json'>
     readonly createdAt: FieldRef<"CareerRoadmap", 'DateTime'>
@@ -2049,30 +2239,35 @@ export namespace Prisma {
     id: string | null
     userId: string | null
     userName: string | null
+    userAvatar: string | null
     roleCategory: string | null
     title: string | null
     content: string | null
     upvotes: number | null
     aiReply: string | null
     createdAt: Date | null
+    updatedAt: Date | null
   }
 
   export type DiscussionPostMaxAggregateOutputType = {
     id: string | null
     userId: string | null
     userName: string | null
+    userAvatar: string | null
     roleCategory: string | null
     title: string | null
     content: string | null
     upvotes: number | null
     aiReply: string | null
     createdAt: Date | null
+    updatedAt: Date | null
   }
 
   export type DiscussionPostCountAggregateOutputType = {
     id: number
     userId: number
     userName: number
+    userAvatar: number
     roleCategory: number
     title: number
     content: number
@@ -2080,6 +2275,7 @@ export namespace Prisma {
     upvotes: number
     aiReply: number
     createdAt: number
+    updatedAt: number
     _all: number
   }
 
@@ -2096,30 +2292,35 @@ export namespace Prisma {
     id?: true
     userId?: true
     userName?: true
+    userAvatar?: true
     roleCategory?: true
     title?: true
     content?: true
     upvotes?: true
     aiReply?: true
     createdAt?: true
+    updatedAt?: true
   }
 
   export type DiscussionPostMaxAggregateInputType = {
     id?: true
     userId?: true
     userName?: true
+    userAvatar?: true
     roleCategory?: true
     title?: true
     content?: true
     upvotes?: true
     aiReply?: true
     createdAt?: true
+    updatedAt?: true
   }
 
   export type DiscussionPostCountAggregateInputType = {
     id?: true
     userId?: true
     userName?: true
+    userAvatar?: true
     roleCategory?: true
     title?: true
     content?: true
@@ -2127,6 +2328,7 @@ export namespace Prisma {
     upvotes?: true
     aiReply?: true
     createdAt?: true
+    updatedAt?: true
     _all?: true
   }
 
@@ -2220,6 +2422,7 @@ export namespace Prisma {
     id: string
     userId: string
     userName: string
+    userAvatar: string | null
     roleCategory: string
     title: string
     content: string
@@ -2227,6 +2430,7 @@ export namespace Prisma {
     upvotes: number
     aiReply: string | null
     createdAt: Date
+    updatedAt: Date
     _count: DiscussionPostCountAggregateOutputType | null
     _avg: DiscussionPostAvgAggregateOutputType | null
     _sum: DiscussionPostSumAggregateOutputType | null
@@ -2252,6 +2456,7 @@ export namespace Prisma {
     id?: boolean
     userId?: boolean
     userName?: boolean
+    userAvatar?: boolean
     roleCategory?: boolean
     title?: boolean
     content?: boolean
@@ -2259,12 +2464,16 @@ export namespace Prisma {
     upvotes?: boolean
     aiReply?: boolean
     createdAt?: boolean
+    updatedAt?: boolean
+    comments?: boolean | DiscussionPost$commentsArgs<ExtArgs>
+    _count?: boolean | DiscussionPostCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["discussionPost"]>
 
   export type DiscussionPostSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
     userName?: boolean
+    userAvatar?: boolean
     roleCategory?: boolean
     title?: boolean
     content?: boolean
@@ -2272,12 +2481,14 @@ export namespace Prisma {
     upvotes?: boolean
     aiReply?: boolean
     createdAt?: boolean
+    updatedAt?: boolean
   }, ExtArgs["result"]["discussionPost"]>
 
   export type DiscussionPostSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
     userName?: boolean
+    userAvatar?: boolean
     roleCategory?: boolean
     title?: boolean
     content?: boolean
@@ -2285,12 +2496,14 @@ export namespace Prisma {
     upvotes?: boolean
     aiReply?: boolean
     createdAt?: boolean
+    updatedAt?: boolean
   }, ExtArgs["result"]["discussionPost"]>
 
   export type DiscussionPostSelectScalar = {
     id?: boolean
     userId?: boolean
     userName?: boolean
+    userAvatar?: boolean
     roleCategory?: boolean
     title?: boolean
     content?: boolean
@@ -2298,17 +2511,27 @@ export namespace Prisma {
     upvotes?: boolean
     aiReply?: boolean
     createdAt?: boolean
+    updatedAt?: boolean
   }
 
-  export type DiscussionPostOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "userName" | "roleCategory" | "title" | "content" | "tags" | "upvotes" | "aiReply" | "createdAt", ExtArgs["result"]["discussionPost"]>
+  export type DiscussionPostOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "userName" | "userAvatar" | "roleCategory" | "title" | "content" | "tags" | "upvotes" | "aiReply" | "createdAt" | "updatedAt", ExtArgs["result"]["discussionPost"]>
+  export type DiscussionPostInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    comments?: boolean | DiscussionPost$commentsArgs<ExtArgs>
+    _count?: boolean | DiscussionPostCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type DiscussionPostIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type DiscussionPostIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
 
   export type $DiscussionPostPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "DiscussionPost"
-    objects: {}
+    objects: {
+      comments: Prisma.$DiscussionCommentPayload<ExtArgs>[]
+    }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       userId: string
       userName: string
+      userAvatar: string | null
       roleCategory: string
       title: string
       content: string
@@ -2316,6 +2539,7 @@ export namespace Prisma {
       upvotes: number
       aiReply: string | null
       createdAt: Date
+      updatedAt: Date
     }, ExtArgs["result"]["discussionPost"]>
     composites: {}
   }
@@ -2710,6 +2934,7 @@ export namespace Prisma {
    */
   export interface Prisma__DiscussionPostClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    comments<T extends DiscussionPost$commentsArgs<ExtArgs> = {}>(args?: Subset<T, DiscussionPost$commentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DiscussionCommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2742,6 +2967,7 @@ export namespace Prisma {
     readonly id: FieldRef<"DiscussionPost", 'String'>
     readonly userId: FieldRef<"DiscussionPost", 'String'>
     readonly userName: FieldRef<"DiscussionPost", 'String'>
+    readonly userAvatar: FieldRef<"DiscussionPost", 'String'>
     readonly roleCategory: FieldRef<"DiscussionPost", 'String'>
     readonly title: FieldRef<"DiscussionPost", 'String'>
     readonly content: FieldRef<"DiscussionPost", 'String'>
@@ -2749,6 +2975,7 @@ export namespace Prisma {
     readonly upvotes: FieldRef<"DiscussionPost", 'Int'>
     readonly aiReply: FieldRef<"DiscussionPost", 'String'>
     readonly createdAt: FieldRef<"DiscussionPost", 'DateTime'>
+    readonly updatedAt: FieldRef<"DiscussionPost", 'DateTime'>
   }
     
 
@@ -2765,6 +2992,10 @@ export namespace Prisma {
      * Omit specific fields from the DiscussionPost
      */
     omit?: DiscussionPostOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionPostInclude<ExtArgs> | null
     /**
      * Filter, which DiscussionPost to fetch.
      */
@@ -2784,6 +3015,10 @@ export namespace Prisma {
      */
     omit?: DiscussionPostOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionPostInclude<ExtArgs> | null
+    /**
      * Filter, which DiscussionPost to fetch.
      */
     where: DiscussionPostWhereUniqueInput
@@ -2801,6 +3036,10 @@ export namespace Prisma {
      * Omit specific fields from the DiscussionPost
      */
     omit?: DiscussionPostOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionPostInclude<ExtArgs> | null
     /**
      * Filter, which DiscussionPost to fetch.
      */
@@ -2850,6 +3089,10 @@ export namespace Prisma {
      */
     omit?: DiscussionPostOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionPostInclude<ExtArgs> | null
+    /**
      * Filter, which DiscussionPost to fetch.
      */
     where?: DiscussionPostWhereInput
@@ -2898,6 +3141,10 @@ export namespace Prisma {
      */
     omit?: DiscussionPostOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionPostInclude<ExtArgs> | null
+    /**
      * Filter, which DiscussionPosts to fetch.
      */
     where?: DiscussionPostWhereInput
@@ -2940,6 +3187,10 @@ export namespace Prisma {
      * Omit specific fields from the DiscussionPost
      */
     omit?: DiscussionPostOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionPostInclude<ExtArgs> | null
     /**
      * The data needed to create a DiscussionPost.
      */
@@ -2988,6 +3239,10 @@ export namespace Prisma {
      * Omit specific fields from the DiscussionPost
      */
     omit?: DiscussionPostOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionPostInclude<ExtArgs> | null
     /**
      * The data needed to update a DiscussionPost.
      */
@@ -3055,6 +3310,10 @@ export namespace Prisma {
      */
     omit?: DiscussionPostOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionPostInclude<ExtArgs> | null
+    /**
      * The filter to search for the DiscussionPost to update in case it exists.
      */
     where: DiscussionPostWhereUniqueInput
@@ -3081,6 +3340,10 @@ export namespace Prisma {
      */
     omit?: DiscussionPostOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionPostInclude<ExtArgs> | null
+    /**
      * Filter which DiscussionPost to delete.
      */
     where: DiscussionPostWhereUniqueInput
@@ -3101,6 +3364,30 @@ export namespace Prisma {
   }
 
   /**
+   * DiscussionPost.comments
+   */
+  export type DiscussionPost$commentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionComment
+     */
+    select?: DiscussionCommentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionComment
+     */
+    omit?: DiscussionCommentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionCommentInclude<ExtArgs> | null
+    where?: DiscussionCommentWhereInput
+    orderBy?: DiscussionCommentOrderByWithRelationInput | DiscussionCommentOrderByWithRelationInput[]
+    cursor?: DiscussionCommentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DiscussionCommentScalarFieldEnum | DiscussionCommentScalarFieldEnum[]
+  }
+
+  /**
    * DiscussionPost without action
    */
   export type DiscussionPostDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3112,6 +3399,1141 @@ export namespace Prisma {
      * Omit specific fields from the DiscussionPost
      */
     omit?: DiscussionPostOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionPostInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model DiscussionComment
+   */
+
+  export type AggregateDiscussionComment = {
+    _count: DiscussionCommentCountAggregateOutputType | null
+    _avg: DiscussionCommentAvgAggregateOutputType | null
+    _sum: DiscussionCommentSumAggregateOutputType | null
+    _min: DiscussionCommentMinAggregateOutputType | null
+    _max: DiscussionCommentMaxAggregateOutputType | null
+  }
+
+  export type DiscussionCommentAvgAggregateOutputType = {
+    upvotes: number | null
+  }
+
+  export type DiscussionCommentSumAggregateOutputType = {
+    upvotes: number | null
+  }
+
+  export type DiscussionCommentMinAggregateOutputType = {
+    id: string | null
+    postId: string | null
+    userId: string | null
+    userName: string | null
+    userAvatar: string | null
+    content: string | null
+    upvotes: number | null
+    createdAt: Date | null
+  }
+
+  export type DiscussionCommentMaxAggregateOutputType = {
+    id: string | null
+    postId: string | null
+    userId: string | null
+    userName: string | null
+    userAvatar: string | null
+    content: string | null
+    upvotes: number | null
+    createdAt: Date | null
+  }
+
+  export type DiscussionCommentCountAggregateOutputType = {
+    id: number
+    postId: number
+    userId: number
+    userName: number
+    userAvatar: number
+    content: number
+    upvotes: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type DiscussionCommentAvgAggregateInputType = {
+    upvotes?: true
+  }
+
+  export type DiscussionCommentSumAggregateInputType = {
+    upvotes?: true
+  }
+
+  export type DiscussionCommentMinAggregateInputType = {
+    id?: true
+    postId?: true
+    userId?: true
+    userName?: true
+    userAvatar?: true
+    content?: true
+    upvotes?: true
+    createdAt?: true
+  }
+
+  export type DiscussionCommentMaxAggregateInputType = {
+    id?: true
+    postId?: true
+    userId?: true
+    userName?: true
+    userAvatar?: true
+    content?: true
+    upvotes?: true
+    createdAt?: true
+  }
+
+  export type DiscussionCommentCountAggregateInputType = {
+    id?: true
+    postId?: true
+    userId?: true
+    userName?: true
+    userAvatar?: true
+    content?: true
+    upvotes?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type DiscussionCommentAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DiscussionComment to aggregate.
+     */
+    where?: DiscussionCommentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DiscussionComments to fetch.
+     */
+    orderBy?: DiscussionCommentOrderByWithRelationInput | DiscussionCommentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: DiscussionCommentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DiscussionComments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DiscussionComments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned DiscussionComments
+    **/
+    _count?: true | DiscussionCommentCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: DiscussionCommentAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: DiscussionCommentSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: DiscussionCommentMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: DiscussionCommentMaxAggregateInputType
+  }
+
+  export type GetDiscussionCommentAggregateType<T extends DiscussionCommentAggregateArgs> = {
+        [P in keyof T & keyof AggregateDiscussionComment]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateDiscussionComment[P]>
+      : GetScalarType<T[P], AggregateDiscussionComment[P]>
+  }
+
+
+
+
+  export type DiscussionCommentGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DiscussionCommentWhereInput
+    orderBy?: DiscussionCommentOrderByWithAggregationInput | DiscussionCommentOrderByWithAggregationInput[]
+    by: DiscussionCommentScalarFieldEnum[] | DiscussionCommentScalarFieldEnum
+    having?: DiscussionCommentScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: DiscussionCommentCountAggregateInputType | true
+    _avg?: DiscussionCommentAvgAggregateInputType
+    _sum?: DiscussionCommentSumAggregateInputType
+    _min?: DiscussionCommentMinAggregateInputType
+    _max?: DiscussionCommentMaxAggregateInputType
+  }
+
+  export type DiscussionCommentGroupByOutputType = {
+    id: string
+    postId: string
+    userId: string
+    userName: string
+    userAvatar: string | null
+    content: string
+    upvotes: number
+    createdAt: Date
+    _count: DiscussionCommentCountAggregateOutputType | null
+    _avg: DiscussionCommentAvgAggregateOutputType | null
+    _sum: DiscussionCommentSumAggregateOutputType | null
+    _min: DiscussionCommentMinAggregateOutputType | null
+    _max: DiscussionCommentMaxAggregateOutputType | null
+  }
+
+  type GetDiscussionCommentGroupByPayload<T extends DiscussionCommentGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<DiscussionCommentGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof DiscussionCommentGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], DiscussionCommentGroupByOutputType[P]>
+            : GetScalarType<T[P], DiscussionCommentGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type DiscussionCommentSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    postId?: boolean
+    userId?: boolean
+    userName?: boolean
+    userAvatar?: boolean
+    content?: boolean
+    upvotes?: boolean
+    createdAt?: boolean
+    post?: boolean | DiscussionPostDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["discussionComment"]>
+
+  export type DiscussionCommentSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    postId?: boolean
+    userId?: boolean
+    userName?: boolean
+    userAvatar?: boolean
+    content?: boolean
+    upvotes?: boolean
+    createdAt?: boolean
+    post?: boolean | DiscussionPostDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["discussionComment"]>
+
+  export type DiscussionCommentSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    postId?: boolean
+    userId?: boolean
+    userName?: boolean
+    userAvatar?: boolean
+    content?: boolean
+    upvotes?: boolean
+    createdAt?: boolean
+    post?: boolean | DiscussionPostDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["discussionComment"]>
+
+  export type DiscussionCommentSelectScalar = {
+    id?: boolean
+    postId?: boolean
+    userId?: boolean
+    userName?: boolean
+    userAvatar?: boolean
+    content?: boolean
+    upvotes?: boolean
+    createdAt?: boolean
+  }
+
+  export type DiscussionCommentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "postId" | "userId" | "userName" | "userAvatar" | "content" | "upvotes" | "createdAt", ExtArgs["result"]["discussionComment"]>
+  export type DiscussionCommentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    post?: boolean | DiscussionPostDefaultArgs<ExtArgs>
+  }
+  export type DiscussionCommentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    post?: boolean | DiscussionPostDefaultArgs<ExtArgs>
+  }
+  export type DiscussionCommentIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    post?: boolean | DiscussionPostDefaultArgs<ExtArgs>
+  }
+
+  export type $DiscussionCommentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "DiscussionComment"
+    objects: {
+      post: Prisma.$DiscussionPostPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      postId: string
+      userId: string
+      userName: string
+      userAvatar: string | null
+      content: string
+      upvotes: number
+      createdAt: Date
+    }, ExtArgs["result"]["discussionComment"]>
+    composites: {}
+  }
+
+  type DiscussionCommentGetPayload<S extends boolean | null | undefined | DiscussionCommentDefaultArgs> = $Result.GetResult<Prisma.$DiscussionCommentPayload, S>
+
+  type DiscussionCommentCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<DiscussionCommentFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: DiscussionCommentCountAggregateInputType | true
+    }
+
+  export interface DiscussionCommentDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['DiscussionComment'], meta: { name: 'DiscussionComment' } }
+    /**
+     * Find zero or one DiscussionComment that matches the filter.
+     * @param {DiscussionCommentFindUniqueArgs} args - Arguments to find a DiscussionComment
+     * @example
+     * // Get one DiscussionComment
+     * const discussionComment = await prisma.discussionComment.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends DiscussionCommentFindUniqueArgs>(args: SelectSubset<T, DiscussionCommentFindUniqueArgs<ExtArgs>>): Prisma__DiscussionCommentClient<$Result.GetResult<Prisma.$DiscussionCommentPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one DiscussionComment that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {DiscussionCommentFindUniqueOrThrowArgs} args - Arguments to find a DiscussionComment
+     * @example
+     * // Get one DiscussionComment
+     * const discussionComment = await prisma.discussionComment.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends DiscussionCommentFindUniqueOrThrowArgs>(args: SelectSubset<T, DiscussionCommentFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DiscussionCommentClient<$Result.GetResult<Prisma.$DiscussionCommentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DiscussionComment that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DiscussionCommentFindFirstArgs} args - Arguments to find a DiscussionComment
+     * @example
+     * // Get one DiscussionComment
+     * const discussionComment = await prisma.discussionComment.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends DiscussionCommentFindFirstArgs>(args?: SelectSubset<T, DiscussionCommentFindFirstArgs<ExtArgs>>): Prisma__DiscussionCommentClient<$Result.GetResult<Prisma.$DiscussionCommentPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DiscussionComment that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DiscussionCommentFindFirstOrThrowArgs} args - Arguments to find a DiscussionComment
+     * @example
+     * // Get one DiscussionComment
+     * const discussionComment = await prisma.discussionComment.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends DiscussionCommentFindFirstOrThrowArgs>(args?: SelectSubset<T, DiscussionCommentFindFirstOrThrowArgs<ExtArgs>>): Prisma__DiscussionCommentClient<$Result.GetResult<Prisma.$DiscussionCommentPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more DiscussionComments that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DiscussionCommentFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all DiscussionComments
+     * const discussionComments = await prisma.discussionComment.findMany()
+     * 
+     * // Get first 10 DiscussionComments
+     * const discussionComments = await prisma.discussionComment.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const discussionCommentWithIdOnly = await prisma.discussionComment.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends DiscussionCommentFindManyArgs>(args?: SelectSubset<T, DiscussionCommentFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DiscussionCommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a DiscussionComment.
+     * @param {DiscussionCommentCreateArgs} args - Arguments to create a DiscussionComment.
+     * @example
+     * // Create one DiscussionComment
+     * const DiscussionComment = await prisma.discussionComment.create({
+     *   data: {
+     *     // ... data to create a DiscussionComment
+     *   }
+     * })
+     * 
+     */
+    create<T extends DiscussionCommentCreateArgs>(args: SelectSubset<T, DiscussionCommentCreateArgs<ExtArgs>>): Prisma__DiscussionCommentClient<$Result.GetResult<Prisma.$DiscussionCommentPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many DiscussionComments.
+     * @param {DiscussionCommentCreateManyArgs} args - Arguments to create many DiscussionComments.
+     * @example
+     * // Create many DiscussionComments
+     * const discussionComment = await prisma.discussionComment.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends DiscussionCommentCreateManyArgs>(args?: SelectSubset<T, DiscussionCommentCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many DiscussionComments and returns the data saved in the database.
+     * @param {DiscussionCommentCreateManyAndReturnArgs} args - Arguments to create many DiscussionComments.
+     * @example
+     * // Create many DiscussionComments
+     * const discussionComment = await prisma.discussionComment.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many DiscussionComments and only return the `id`
+     * const discussionCommentWithIdOnly = await prisma.discussionComment.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends DiscussionCommentCreateManyAndReturnArgs>(args?: SelectSubset<T, DiscussionCommentCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DiscussionCommentPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a DiscussionComment.
+     * @param {DiscussionCommentDeleteArgs} args - Arguments to delete one DiscussionComment.
+     * @example
+     * // Delete one DiscussionComment
+     * const DiscussionComment = await prisma.discussionComment.delete({
+     *   where: {
+     *     // ... filter to delete one DiscussionComment
+     *   }
+     * })
+     * 
+     */
+    delete<T extends DiscussionCommentDeleteArgs>(args: SelectSubset<T, DiscussionCommentDeleteArgs<ExtArgs>>): Prisma__DiscussionCommentClient<$Result.GetResult<Prisma.$DiscussionCommentPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one DiscussionComment.
+     * @param {DiscussionCommentUpdateArgs} args - Arguments to update one DiscussionComment.
+     * @example
+     * // Update one DiscussionComment
+     * const discussionComment = await prisma.discussionComment.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends DiscussionCommentUpdateArgs>(args: SelectSubset<T, DiscussionCommentUpdateArgs<ExtArgs>>): Prisma__DiscussionCommentClient<$Result.GetResult<Prisma.$DiscussionCommentPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more DiscussionComments.
+     * @param {DiscussionCommentDeleteManyArgs} args - Arguments to filter DiscussionComments to delete.
+     * @example
+     * // Delete a few DiscussionComments
+     * const { count } = await prisma.discussionComment.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends DiscussionCommentDeleteManyArgs>(args?: SelectSubset<T, DiscussionCommentDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DiscussionComments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DiscussionCommentUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many DiscussionComments
+     * const discussionComment = await prisma.discussionComment.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends DiscussionCommentUpdateManyArgs>(args: SelectSubset<T, DiscussionCommentUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DiscussionComments and returns the data updated in the database.
+     * @param {DiscussionCommentUpdateManyAndReturnArgs} args - Arguments to update many DiscussionComments.
+     * @example
+     * // Update many DiscussionComments
+     * const discussionComment = await prisma.discussionComment.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more DiscussionComments and only return the `id`
+     * const discussionCommentWithIdOnly = await prisma.discussionComment.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends DiscussionCommentUpdateManyAndReturnArgs>(args: SelectSubset<T, DiscussionCommentUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DiscussionCommentPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one DiscussionComment.
+     * @param {DiscussionCommentUpsertArgs} args - Arguments to update or create a DiscussionComment.
+     * @example
+     * // Update or create a DiscussionComment
+     * const discussionComment = await prisma.discussionComment.upsert({
+     *   create: {
+     *     // ... data to create a DiscussionComment
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the DiscussionComment we want to update
+     *   }
+     * })
+     */
+    upsert<T extends DiscussionCommentUpsertArgs>(args: SelectSubset<T, DiscussionCommentUpsertArgs<ExtArgs>>): Prisma__DiscussionCommentClient<$Result.GetResult<Prisma.$DiscussionCommentPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of DiscussionComments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DiscussionCommentCountArgs} args - Arguments to filter DiscussionComments to count.
+     * @example
+     * // Count the number of DiscussionComments
+     * const count = await prisma.discussionComment.count({
+     *   where: {
+     *     // ... the filter for the DiscussionComments we want to count
+     *   }
+     * })
+    **/
+    count<T extends DiscussionCommentCountArgs>(
+      args?: Subset<T, DiscussionCommentCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], DiscussionCommentCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a DiscussionComment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DiscussionCommentAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends DiscussionCommentAggregateArgs>(args: Subset<T, DiscussionCommentAggregateArgs>): Prisma.PrismaPromise<GetDiscussionCommentAggregateType<T>>
+
+    /**
+     * Group by DiscussionComment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DiscussionCommentGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends DiscussionCommentGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: DiscussionCommentGroupByArgs['orderBy'] }
+        : { orderBy?: DiscussionCommentGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, DiscussionCommentGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDiscussionCommentGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the DiscussionComment model
+   */
+  readonly fields: DiscussionCommentFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for DiscussionComment.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__DiscussionCommentClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    post<T extends DiscussionPostDefaultArgs<ExtArgs> = {}>(args?: Subset<T, DiscussionPostDefaultArgs<ExtArgs>>): Prisma__DiscussionPostClient<$Result.GetResult<Prisma.$DiscussionPostPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the DiscussionComment model
+   */
+  interface DiscussionCommentFieldRefs {
+    readonly id: FieldRef<"DiscussionComment", 'String'>
+    readonly postId: FieldRef<"DiscussionComment", 'String'>
+    readonly userId: FieldRef<"DiscussionComment", 'String'>
+    readonly userName: FieldRef<"DiscussionComment", 'String'>
+    readonly userAvatar: FieldRef<"DiscussionComment", 'String'>
+    readonly content: FieldRef<"DiscussionComment", 'String'>
+    readonly upvotes: FieldRef<"DiscussionComment", 'Int'>
+    readonly createdAt: FieldRef<"DiscussionComment", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * DiscussionComment findUnique
+   */
+  export type DiscussionCommentFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionComment
+     */
+    select?: DiscussionCommentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionComment
+     */
+    omit?: DiscussionCommentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionCommentInclude<ExtArgs> | null
+    /**
+     * Filter, which DiscussionComment to fetch.
+     */
+    where: DiscussionCommentWhereUniqueInput
+  }
+
+  /**
+   * DiscussionComment findUniqueOrThrow
+   */
+  export type DiscussionCommentFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionComment
+     */
+    select?: DiscussionCommentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionComment
+     */
+    omit?: DiscussionCommentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionCommentInclude<ExtArgs> | null
+    /**
+     * Filter, which DiscussionComment to fetch.
+     */
+    where: DiscussionCommentWhereUniqueInput
+  }
+
+  /**
+   * DiscussionComment findFirst
+   */
+  export type DiscussionCommentFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionComment
+     */
+    select?: DiscussionCommentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionComment
+     */
+    omit?: DiscussionCommentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionCommentInclude<ExtArgs> | null
+    /**
+     * Filter, which DiscussionComment to fetch.
+     */
+    where?: DiscussionCommentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DiscussionComments to fetch.
+     */
+    orderBy?: DiscussionCommentOrderByWithRelationInput | DiscussionCommentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DiscussionComments.
+     */
+    cursor?: DiscussionCommentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DiscussionComments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DiscussionComments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DiscussionComments.
+     */
+    distinct?: DiscussionCommentScalarFieldEnum | DiscussionCommentScalarFieldEnum[]
+  }
+
+  /**
+   * DiscussionComment findFirstOrThrow
+   */
+  export type DiscussionCommentFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionComment
+     */
+    select?: DiscussionCommentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionComment
+     */
+    omit?: DiscussionCommentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionCommentInclude<ExtArgs> | null
+    /**
+     * Filter, which DiscussionComment to fetch.
+     */
+    where?: DiscussionCommentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DiscussionComments to fetch.
+     */
+    orderBy?: DiscussionCommentOrderByWithRelationInput | DiscussionCommentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DiscussionComments.
+     */
+    cursor?: DiscussionCommentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DiscussionComments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DiscussionComments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DiscussionComments.
+     */
+    distinct?: DiscussionCommentScalarFieldEnum | DiscussionCommentScalarFieldEnum[]
+  }
+
+  /**
+   * DiscussionComment findMany
+   */
+  export type DiscussionCommentFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionComment
+     */
+    select?: DiscussionCommentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionComment
+     */
+    omit?: DiscussionCommentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionCommentInclude<ExtArgs> | null
+    /**
+     * Filter, which DiscussionComments to fetch.
+     */
+    where?: DiscussionCommentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DiscussionComments to fetch.
+     */
+    orderBy?: DiscussionCommentOrderByWithRelationInput | DiscussionCommentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing DiscussionComments.
+     */
+    cursor?: DiscussionCommentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DiscussionComments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DiscussionComments.
+     */
+    skip?: number
+    distinct?: DiscussionCommentScalarFieldEnum | DiscussionCommentScalarFieldEnum[]
+  }
+
+  /**
+   * DiscussionComment create
+   */
+  export type DiscussionCommentCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionComment
+     */
+    select?: DiscussionCommentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionComment
+     */
+    omit?: DiscussionCommentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionCommentInclude<ExtArgs> | null
+    /**
+     * The data needed to create a DiscussionComment.
+     */
+    data: XOR<DiscussionCommentCreateInput, DiscussionCommentUncheckedCreateInput>
+  }
+
+  /**
+   * DiscussionComment createMany
+   */
+  export type DiscussionCommentCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many DiscussionComments.
+     */
+    data: DiscussionCommentCreateManyInput | DiscussionCommentCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * DiscussionComment createManyAndReturn
+   */
+  export type DiscussionCommentCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionComment
+     */
+    select?: DiscussionCommentSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionComment
+     */
+    omit?: DiscussionCommentOmit<ExtArgs> | null
+    /**
+     * The data used to create many DiscussionComments.
+     */
+    data: DiscussionCommentCreateManyInput | DiscussionCommentCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionCommentIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * DiscussionComment update
+   */
+  export type DiscussionCommentUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionComment
+     */
+    select?: DiscussionCommentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionComment
+     */
+    omit?: DiscussionCommentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionCommentInclude<ExtArgs> | null
+    /**
+     * The data needed to update a DiscussionComment.
+     */
+    data: XOR<DiscussionCommentUpdateInput, DiscussionCommentUncheckedUpdateInput>
+    /**
+     * Choose, which DiscussionComment to update.
+     */
+    where: DiscussionCommentWhereUniqueInput
+  }
+
+  /**
+   * DiscussionComment updateMany
+   */
+  export type DiscussionCommentUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update DiscussionComments.
+     */
+    data: XOR<DiscussionCommentUpdateManyMutationInput, DiscussionCommentUncheckedUpdateManyInput>
+    /**
+     * Filter which DiscussionComments to update
+     */
+    where?: DiscussionCommentWhereInput
+    /**
+     * Limit how many DiscussionComments to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * DiscussionComment updateManyAndReturn
+   */
+  export type DiscussionCommentUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionComment
+     */
+    select?: DiscussionCommentSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionComment
+     */
+    omit?: DiscussionCommentOmit<ExtArgs> | null
+    /**
+     * The data used to update DiscussionComments.
+     */
+    data: XOR<DiscussionCommentUpdateManyMutationInput, DiscussionCommentUncheckedUpdateManyInput>
+    /**
+     * Filter which DiscussionComments to update
+     */
+    where?: DiscussionCommentWhereInput
+    /**
+     * Limit how many DiscussionComments to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionCommentIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * DiscussionComment upsert
+   */
+  export type DiscussionCommentUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionComment
+     */
+    select?: DiscussionCommentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionComment
+     */
+    omit?: DiscussionCommentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionCommentInclude<ExtArgs> | null
+    /**
+     * The filter to search for the DiscussionComment to update in case it exists.
+     */
+    where: DiscussionCommentWhereUniqueInput
+    /**
+     * In case the DiscussionComment found by the `where` argument doesn't exist, create a new DiscussionComment with this data.
+     */
+    create: XOR<DiscussionCommentCreateInput, DiscussionCommentUncheckedCreateInput>
+    /**
+     * In case the DiscussionComment was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<DiscussionCommentUpdateInput, DiscussionCommentUncheckedUpdateInput>
+  }
+
+  /**
+   * DiscussionComment delete
+   */
+  export type DiscussionCommentDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionComment
+     */
+    select?: DiscussionCommentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionComment
+     */
+    omit?: DiscussionCommentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionCommentInclude<ExtArgs> | null
+    /**
+     * Filter which DiscussionComment to delete.
+     */
+    where: DiscussionCommentWhereUniqueInput
+  }
+
+  /**
+   * DiscussionComment deleteMany
+   */
+  export type DiscussionCommentDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DiscussionComments to delete
+     */
+    where?: DiscussionCommentWhereInput
+    /**
+     * Limit how many DiscussionComments to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * DiscussionComment without action
+   */
+  export type DiscussionCommentDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionComment
+     */
+    select?: DiscussionCommentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionComment
+     */
+    omit?: DiscussionCommentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionCommentInclude<ExtArgs> | null
   }
 
 
@@ -3132,9 +4554,14 @@ export namespace Prisma {
   export const CareerRoadmapScalarFieldEnum: {
     id: 'id',
     userId: 'userId',
+    title: 'title',
+    description: 'description',
     rolePath: 'rolePath',
     targetCompanyTier: 'targetCompanyTier',
+    estimatedWeeks: 'estimatedWeeks',
     overallReadiness: 'overallReadiness',
+    isPublic: 'isPublic',
+    isOfficial: 'isOfficial',
     nodesData: 'nodesData',
     customTechStack: 'customTechStack',
     createdAt: 'createdAt',
@@ -3148,16 +4575,32 @@ export namespace Prisma {
     id: 'id',
     userId: 'userId',
     userName: 'userName',
+    userAvatar: 'userAvatar',
     roleCategory: 'roleCategory',
     title: 'title',
     content: 'content',
     tags: 'tags',
     upvotes: 'upvotes',
     aiReply: 'aiReply',
-    createdAt: 'createdAt'
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
   };
 
   export type DiscussionPostScalarFieldEnum = (typeof DiscussionPostScalarFieldEnum)[keyof typeof DiscussionPostScalarFieldEnum]
+
+
+  export const DiscussionCommentScalarFieldEnum: {
+    id: 'id',
+    postId: 'postId',
+    userId: 'userId',
+    userName: 'userName',
+    userAvatar: 'userAvatar',
+    content: 'content',
+    upvotes: 'upvotes',
+    createdAt: 'createdAt'
+  };
+
+  export type DiscussionCommentScalarFieldEnum = (typeof DiscussionCommentScalarFieldEnum)[keyof typeof DiscussionCommentScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -3242,6 +4685,13 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'Boolean'
+   */
+  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+  /**
    * Reference to a field of type 'Json'
    */
   export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
@@ -3292,9 +4742,14 @@ export namespace Prisma {
     NOT?: CareerRoadmapWhereInput | CareerRoadmapWhereInput[]
     id?: StringFilter<"CareerRoadmap"> | string
     userId?: StringFilter<"CareerRoadmap"> | string
+    title?: StringNullableFilter<"CareerRoadmap"> | string | null
+    description?: StringNullableFilter<"CareerRoadmap"> | string | null
     rolePath?: StringFilter<"CareerRoadmap"> | string
     targetCompanyTier?: StringFilter<"CareerRoadmap"> | string
+    estimatedWeeks?: IntFilter<"CareerRoadmap"> | number
     overallReadiness?: IntFilter<"CareerRoadmap"> | number
+    isPublic?: BoolFilter<"CareerRoadmap"> | boolean
+    isOfficial?: BoolFilter<"CareerRoadmap"> | boolean
     nodesData?: JsonFilter<"CareerRoadmap">
     customTechStack?: JsonNullableFilter<"CareerRoadmap">
     createdAt?: DateTimeFilter<"CareerRoadmap"> | Date | string
@@ -3304,9 +4759,14 @@ export namespace Prisma {
   export type CareerRoadmapOrderByWithRelationInput = {
     id?: SortOrder
     userId?: SortOrder
+    title?: SortOrderInput | SortOrder
+    description?: SortOrderInput | SortOrder
     rolePath?: SortOrder
     targetCompanyTier?: SortOrder
+    estimatedWeeks?: SortOrder
     overallReadiness?: SortOrder
+    isPublic?: SortOrder
+    isOfficial?: SortOrder
     nodesData?: SortOrder
     customTechStack?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -3319,9 +4779,14 @@ export namespace Prisma {
     OR?: CareerRoadmapWhereInput[]
     NOT?: CareerRoadmapWhereInput | CareerRoadmapWhereInput[]
     userId?: StringFilter<"CareerRoadmap"> | string
+    title?: StringNullableFilter<"CareerRoadmap"> | string | null
+    description?: StringNullableFilter<"CareerRoadmap"> | string | null
     rolePath?: StringFilter<"CareerRoadmap"> | string
     targetCompanyTier?: StringFilter<"CareerRoadmap"> | string
+    estimatedWeeks?: IntFilter<"CareerRoadmap"> | number
     overallReadiness?: IntFilter<"CareerRoadmap"> | number
+    isPublic?: BoolFilter<"CareerRoadmap"> | boolean
+    isOfficial?: BoolFilter<"CareerRoadmap"> | boolean
     nodesData?: JsonFilter<"CareerRoadmap">
     customTechStack?: JsonNullableFilter<"CareerRoadmap">
     createdAt?: DateTimeFilter<"CareerRoadmap"> | Date | string
@@ -3331,9 +4796,14 @@ export namespace Prisma {
   export type CareerRoadmapOrderByWithAggregationInput = {
     id?: SortOrder
     userId?: SortOrder
+    title?: SortOrderInput | SortOrder
+    description?: SortOrderInput | SortOrder
     rolePath?: SortOrder
     targetCompanyTier?: SortOrder
+    estimatedWeeks?: SortOrder
     overallReadiness?: SortOrder
+    isPublic?: SortOrder
+    isOfficial?: SortOrder
     nodesData?: SortOrder
     customTechStack?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -3351,9 +4821,14 @@ export namespace Prisma {
     NOT?: CareerRoadmapScalarWhereWithAggregatesInput | CareerRoadmapScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"CareerRoadmap"> | string
     userId?: StringWithAggregatesFilter<"CareerRoadmap"> | string
+    title?: StringNullableWithAggregatesFilter<"CareerRoadmap"> | string | null
+    description?: StringNullableWithAggregatesFilter<"CareerRoadmap"> | string | null
     rolePath?: StringWithAggregatesFilter<"CareerRoadmap"> | string
     targetCompanyTier?: StringWithAggregatesFilter<"CareerRoadmap"> | string
+    estimatedWeeks?: IntWithAggregatesFilter<"CareerRoadmap"> | number
     overallReadiness?: IntWithAggregatesFilter<"CareerRoadmap"> | number
+    isPublic?: BoolWithAggregatesFilter<"CareerRoadmap"> | boolean
+    isOfficial?: BoolWithAggregatesFilter<"CareerRoadmap"> | boolean
     nodesData?: JsonWithAggregatesFilter<"CareerRoadmap">
     customTechStack?: JsonNullableWithAggregatesFilter<"CareerRoadmap">
     createdAt?: DateTimeWithAggregatesFilter<"CareerRoadmap"> | Date | string
@@ -3367,6 +4842,7 @@ export namespace Prisma {
     id?: StringFilter<"DiscussionPost"> | string
     userId?: StringFilter<"DiscussionPost"> | string
     userName?: StringFilter<"DiscussionPost"> | string
+    userAvatar?: StringNullableFilter<"DiscussionPost"> | string | null
     roleCategory?: StringFilter<"DiscussionPost"> | string
     title?: StringFilter<"DiscussionPost"> | string
     content?: StringFilter<"DiscussionPost"> | string
@@ -3374,12 +4850,15 @@ export namespace Prisma {
     upvotes?: IntFilter<"DiscussionPost"> | number
     aiReply?: StringNullableFilter<"DiscussionPost"> | string | null
     createdAt?: DateTimeFilter<"DiscussionPost"> | Date | string
+    updatedAt?: DateTimeFilter<"DiscussionPost"> | Date | string
+    comments?: DiscussionCommentListRelationFilter
   }
 
   export type DiscussionPostOrderByWithRelationInput = {
     id?: SortOrder
     userId?: SortOrder
     userName?: SortOrder
+    userAvatar?: SortOrderInput | SortOrder
     roleCategory?: SortOrder
     title?: SortOrder
     content?: SortOrder
@@ -3387,6 +4866,8 @@ export namespace Prisma {
     upvotes?: SortOrder
     aiReply?: SortOrderInput | SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
+    comments?: DiscussionCommentOrderByRelationAggregateInput
   }
 
   export type DiscussionPostWhereUniqueInput = Prisma.AtLeast<{
@@ -3396,6 +4877,7 @@ export namespace Prisma {
     NOT?: DiscussionPostWhereInput | DiscussionPostWhereInput[]
     userId?: StringFilter<"DiscussionPost"> | string
     userName?: StringFilter<"DiscussionPost"> | string
+    userAvatar?: StringNullableFilter<"DiscussionPost"> | string | null
     roleCategory?: StringFilter<"DiscussionPost"> | string
     title?: StringFilter<"DiscussionPost"> | string
     content?: StringFilter<"DiscussionPost"> | string
@@ -3403,12 +4885,15 @@ export namespace Prisma {
     upvotes?: IntFilter<"DiscussionPost"> | number
     aiReply?: StringNullableFilter<"DiscussionPost"> | string | null
     createdAt?: DateTimeFilter<"DiscussionPost"> | Date | string
+    updatedAt?: DateTimeFilter<"DiscussionPost"> | Date | string
+    comments?: DiscussionCommentListRelationFilter
   }, "id">
 
   export type DiscussionPostOrderByWithAggregationInput = {
     id?: SortOrder
     userId?: SortOrder
     userName?: SortOrder
+    userAvatar?: SortOrderInput | SortOrder
     roleCategory?: SortOrder
     title?: SortOrder
     content?: SortOrder
@@ -3416,6 +4901,7 @@ export namespace Prisma {
     upvotes?: SortOrder
     aiReply?: SortOrderInput | SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
     _count?: DiscussionPostCountOrderByAggregateInput
     _avg?: DiscussionPostAvgOrderByAggregateInput
     _max?: DiscussionPostMaxOrderByAggregateInput
@@ -3430,6 +4916,7 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"DiscussionPost"> | string
     userId?: StringWithAggregatesFilter<"DiscussionPost"> | string
     userName?: StringWithAggregatesFilter<"DiscussionPost"> | string
+    userAvatar?: StringNullableWithAggregatesFilter<"DiscussionPost"> | string | null
     roleCategory?: StringWithAggregatesFilter<"DiscussionPost"> | string
     title?: StringWithAggregatesFilter<"DiscussionPost"> | string
     content?: StringWithAggregatesFilter<"DiscussionPost"> | string
@@ -3437,14 +4924,92 @@ export namespace Prisma {
     upvotes?: IntWithAggregatesFilter<"DiscussionPost"> | number
     aiReply?: StringNullableWithAggregatesFilter<"DiscussionPost"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"DiscussionPost"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"DiscussionPost"> | Date | string
+  }
+
+  export type DiscussionCommentWhereInput = {
+    AND?: DiscussionCommentWhereInput | DiscussionCommentWhereInput[]
+    OR?: DiscussionCommentWhereInput[]
+    NOT?: DiscussionCommentWhereInput | DiscussionCommentWhereInput[]
+    id?: StringFilter<"DiscussionComment"> | string
+    postId?: StringFilter<"DiscussionComment"> | string
+    userId?: StringFilter<"DiscussionComment"> | string
+    userName?: StringFilter<"DiscussionComment"> | string
+    userAvatar?: StringNullableFilter<"DiscussionComment"> | string | null
+    content?: StringFilter<"DiscussionComment"> | string
+    upvotes?: IntFilter<"DiscussionComment"> | number
+    createdAt?: DateTimeFilter<"DiscussionComment"> | Date | string
+    post?: XOR<DiscussionPostScalarRelationFilter, DiscussionPostWhereInput>
+  }
+
+  export type DiscussionCommentOrderByWithRelationInput = {
+    id?: SortOrder
+    postId?: SortOrder
+    userId?: SortOrder
+    userName?: SortOrder
+    userAvatar?: SortOrderInput | SortOrder
+    content?: SortOrder
+    upvotes?: SortOrder
+    createdAt?: SortOrder
+    post?: DiscussionPostOrderByWithRelationInput
+  }
+
+  export type DiscussionCommentWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: DiscussionCommentWhereInput | DiscussionCommentWhereInput[]
+    OR?: DiscussionCommentWhereInput[]
+    NOT?: DiscussionCommentWhereInput | DiscussionCommentWhereInput[]
+    postId?: StringFilter<"DiscussionComment"> | string
+    userId?: StringFilter<"DiscussionComment"> | string
+    userName?: StringFilter<"DiscussionComment"> | string
+    userAvatar?: StringNullableFilter<"DiscussionComment"> | string | null
+    content?: StringFilter<"DiscussionComment"> | string
+    upvotes?: IntFilter<"DiscussionComment"> | number
+    createdAt?: DateTimeFilter<"DiscussionComment"> | Date | string
+    post?: XOR<DiscussionPostScalarRelationFilter, DiscussionPostWhereInput>
+  }, "id">
+
+  export type DiscussionCommentOrderByWithAggregationInput = {
+    id?: SortOrder
+    postId?: SortOrder
+    userId?: SortOrder
+    userName?: SortOrder
+    userAvatar?: SortOrderInput | SortOrder
+    content?: SortOrder
+    upvotes?: SortOrder
+    createdAt?: SortOrder
+    _count?: DiscussionCommentCountOrderByAggregateInput
+    _avg?: DiscussionCommentAvgOrderByAggregateInput
+    _max?: DiscussionCommentMaxOrderByAggregateInput
+    _min?: DiscussionCommentMinOrderByAggregateInput
+    _sum?: DiscussionCommentSumOrderByAggregateInput
+  }
+
+  export type DiscussionCommentScalarWhereWithAggregatesInput = {
+    AND?: DiscussionCommentScalarWhereWithAggregatesInput | DiscussionCommentScalarWhereWithAggregatesInput[]
+    OR?: DiscussionCommentScalarWhereWithAggregatesInput[]
+    NOT?: DiscussionCommentScalarWhereWithAggregatesInput | DiscussionCommentScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"DiscussionComment"> | string
+    postId?: StringWithAggregatesFilter<"DiscussionComment"> | string
+    userId?: StringWithAggregatesFilter<"DiscussionComment"> | string
+    userName?: StringWithAggregatesFilter<"DiscussionComment"> | string
+    userAvatar?: StringNullableWithAggregatesFilter<"DiscussionComment"> | string | null
+    content?: StringWithAggregatesFilter<"DiscussionComment"> | string
+    upvotes?: IntWithAggregatesFilter<"DiscussionComment"> | number
+    createdAt?: DateTimeWithAggregatesFilter<"DiscussionComment"> | Date | string
   }
 
   export type CareerRoadmapCreateInput = {
     id?: string
     userId: string
+    title?: string | null
+    description?: string | null
     rolePath: string
     targetCompanyTier?: string
+    estimatedWeeks?: number
     overallReadiness?: number
+    isPublic?: boolean
+    isOfficial?: boolean
     nodesData: JsonNullValueInput | InputJsonValue
     customTechStack?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -3454,9 +5019,14 @@ export namespace Prisma {
   export type CareerRoadmapUncheckedCreateInput = {
     id?: string
     userId: string
+    title?: string | null
+    description?: string | null
     rolePath: string
     targetCompanyTier?: string
+    estimatedWeeks?: number
     overallReadiness?: number
+    isPublic?: boolean
+    isOfficial?: boolean
     nodesData: JsonNullValueInput | InputJsonValue
     customTechStack?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -3466,9 +5036,14 @@ export namespace Prisma {
   export type CareerRoadmapUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
+    title?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     rolePath?: StringFieldUpdateOperationsInput | string
     targetCompanyTier?: StringFieldUpdateOperationsInput | string
+    estimatedWeeks?: IntFieldUpdateOperationsInput | number
     overallReadiness?: IntFieldUpdateOperationsInput | number
+    isPublic?: BoolFieldUpdateOperationsInput | boolean
+    isOfficial?: BoolFieldUpdateOperationsInput | boolean
     nodesData?: JsonNullValueInput | InputJsonValue
     customTechStack?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -3478,9 +5053,14 @@ export namespace Prisma {
   export type CareerRoadmapUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
+    title?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     rolePath?: StringFieldUpdateOperationsInput | string
     targetCompanyTier?: StringFieldUpdateOperationsInput | string
+    estimatedWeeks?: IntFieldUpdateOperationsInput | number
     overallReadiness?: IntFieldUpdateOperationsInput | number
+    isPublic?: BoolFieldUpdateOperationsInput | boolean
+    isOfficial?: BoolFieldUpdateOperationsInput | boolean
     nodesData?: JsonNullValueInput | InputJsonValue
     customTechStack?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -3490,9 +5070,14 @@ export namespace Prisma {
   export type CareerRoadmapCreateManyInput = {
     id?: string
     userId: string
+    title?: string | null
+    description?: string | null
     rolePath: string
     targetCompanyTier?: string
+    estimatedWeeks?: number
     overallReadiness?: number
+    isPublic?: boolean
+    isOfficial?: boolean
     nodesData: JsonNullValueInput | InputJsonValue
     customTechStack?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -3502,9 +5087,14 @@ export namespace Prisma {
   export type CareerRoadmapUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
+    title?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     rolePath?: StringFieldUpdateOperationsInput | string
     targetCompanyTier?: StringFieldUpdateOperationsInput | string
+    estimatedWeeks?: IntFieldUpdateOperationsInput | number
     overallReadiness?: IntFieldUpdateOperationsInput | number
+    isPublic?: BoolFieldUpdateOperationsInput | boolean
+    isOfficial?: BoolFieldUpdateOperationsInput | boolean
     nodesData?: JsonNullValueInput | InputJsonValue
     customTechStack?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -3514,9 +5104,14 @@ export namespace Prisma {
   export type CareerRoadmapUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
+    title?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     rolePath?: StringFieldUpdateOperationsInput | string
     targetCompanyTier?: StringFieldUpdateOperationsInput | string
+    estimatedWeeks?: IntFieldUpdateOperationsInput | number
     overallReadiness?: IntFieldUpdateOperationsInput | number
+    isPublic?: BoolFieldUpdateOperationsInput | boolean
+    isOfficial?: BoolFieldUpdateOperationsInput | boolean
     nodesData?: JsonNullValueInput | InputJsonValue
     customTechStack?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -3527,6 +5122,7 @@ export namespace Prisma {
     id?: string
     userId: string
     userName: string
+    userAvatar?: string | null
     roleCategory: string
     title: string
     content: string
@@ -3534,12 +5130,15 @@ export namespace Prisma {
     upvotes?: number
     aiReply?: string | null
     createdAt?: Date | string
+    updatedAt?: Date | string
+    comments?: DiscussionCommentCreateNestedManyWithoutPostInput
   }
 
   export type DiscussionPostUncheckedCreateInput = {
     id?: string
     userId: string
     userName: string
+    userAvatar?: string | null
     roleCategory: string
     title: string
     content: string
@@ -3547,12 +5146,15 @@ export namespace Prisma {
     upvotes?: number
     aiReply?: string | null
     createdAt?: Date | string
+    updatedAt?: Date | string
+    comments?: DiscussionCommentUncheckedCreateNestedManyWithoutPostInput
   }
 
   export type DiscussionPostUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     userName?: StringFieldUpdateOperationsInput | string
+    userAvatar?: NullableStringFieldUpdateOperationsInput | string | null
     roleCategory?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
@@ -3560,12 +5162,15 @@ export namespace Prisma {
     upvotes?: IntFieldUpdateOperationsInput | number
     aiReply?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    comments?: DiscussionCommentUpdateManyWithoutPostNestedInput
   }
 
   export type DiscussionPostUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     userName?: StringFieldUpdateOperationsInput | string
+    userAvatar?: NullableStringFieldUpdateOperationsInput | string | null
     roleCategory?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
@@ -3573,12 +5178,15 @@ export namespace Prisma {
     upvotes?: IntFieldUpdateOperationsInput | number
     aiReply?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    comments?: DiscussionCommentUncheckedUpdateManyWithoutPostNestedInput
   }
 
   export type DiscussionPostCreateManyInput = {
     id?: string
     userId: string
     userName: string
+    userAvatar?: string | null
     roleCategory: string
     title: string
     content: string
@@ -3586,12 +5194,14 @@ export namespace Prisma {
     upvotes?: number
     aiReply?: string | null
     createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type DiscussionPostUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     userName?: StringFieldUpdateOperationsInput | string
+    userAvatar?: NullableStringFieldUpdateOperationsInput | string | null
     roleCategory?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
@@ -3599,18 +5209,97 @@ export namespace Prisma {
     upvotes?: IntFieldUpdateOperationsInput | number
     aiReply?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type DiscussionPostUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     userName?: StringFieldUpdateOperationsInput | string
+    userAvatar?: NullableStringFieldUpdateOperationsInput | string | null
     roleCategory?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
     tags?: DiscussionPostUpdatetagsInput | string[]
     upvotes?: IntFieldUpdateOperationsInput | number
     aiReply?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DiscussionCommentCreateInput = {
+    id?: string
+    userId: string
+    userName: string
+    userAvatar?: string | null
+    content: string
+    upvotes?: number
+    createdAt?: Date | string
+    post: DiscussionPostCreateNestedOneWithoutCommentsInput
+  }
+
+  export type DiscussionCommentUncheckedCreateInput = {
+    id?: string
+    postId: string
+    userId: string
+    userName: string
+    userAvatar?: string | null
+    content: string
+    upvotes?: number
+    createdAt?: Date | string
+  }
+
+  export type DiscussionCommentUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    userName?: StringFieldUpdateOperationsInput | string
+    userAvatar?: NullableStringFieldUpdateOperationsInput | string | null
+    content?: StringFieldUpdateOperationsInput | string
+    upvotes?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    post?: DiscussionPostUpdateOneRequiredWithoutCommentsNestedInput
+  }
+
+  export type DiscussionCommentUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    postId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    userName?: StringFieldUpdateOperationsInput | string
+    userAvatar?: NullableStringFieldUpdateOperationsInput | string | null
+    content?: StringFieldUpdateOperationsInput | string
+    upvotes?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DiscussionCommentCreateManyInput = {
+    id?: string
+    postId: string
+    userId: string
+    userName: string
+    userAvatar?: string | null
+    content: string
+    upvotes?: number
+    createdAt?: Date | string
+  }
+
+  export type DiscussionCommentUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    userName?: StringFieldUpdateOperationsInput | string
+    userAvatar?: NullableStringFieldUpdateOperationsInput | string | null
+    content?: StringFieldUpdateOperationsInput | string
+    upvotes?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DiscussionCommentUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    postId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    userName?: StringFieldUpdateOperationsInput | string
+    userAvatar?: NullableStringFieldUpdateOperationsInput | string | null
+    content?: StringFieldUpdateOperationsInput | string
+    upvotes?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -3629,6 +5318,21 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
+  export type StringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -3638,6 +5342,11 @@ export namespace Prisma {
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntFilter<$PrismaModel> | number
+  }
+
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
   }
   export type JsonFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -3705,9 +5414,14 @@ export namespace Prisma {
   export type CareerRoadmapCountOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
     rolePath?: SortOrder
     targetCompanyTier?: SortOrder
+    estimatedWeeks?: SortOrder
     overallReadiness?: SortOrder
+    isPublic?: SortOrder
+    isOfficial?: SortOrder
     nodesData?: SortOrder
     customTechStack?: SortOrder
     createdAt?: SortOrder
@@ -3715,15 +5429,21 @@ export namespace Prisma {
   }
 
   export type CareerRoadmapAvgOrderByAggregateInput = {
+    estimatedWeeks?: SortOrder
     overallReadiness?: SortOrder
   }
 
   export type CareerRoadmapMaxOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
     rolePath?: SortOrder
     targetCompanyTier?: SortOrder
+    estimatedWeeks?: SortOrder
     overallReadiness?: SortOrder
+    isPublic?: SortOrder
+    isOfficial?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -3731,14 +5451,20 @@ export namespace Prisma {
   export type CareerRoadmapMinOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
     rolePath?: SortOrder
     targetCompanyTier?: SortOrder
+    estimatedWeeks?: SortOrder
     overallReadiness?: SortOrder
+    isPublic?: SortOrder
+    isOfficial?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type CareerRoadmapSumOrderByAggregateInput = {
+    estimatedWeeks?: SortOrder
     overallReadiness?: SortOrder
   }
 
@@ -3760,6 +5486,24 @@ export namespace Prisma {
     _max?: NestedStringFilter<$PrismaModel>
   }
 
+  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
   export type IntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -3774,6 +5518,14 @@ export namespace Prisma {
     _sum?: NestedIntFilter<$PrismaModel>
     _min?: NestedIntFilter<$PrismaModel>
     _max?: NestedIntFilter<$PrismaModel>
+  }
+
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
   }
   export type JsonWithAggregatesFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -3850,25 +5602,21 @@ export namespace Prisma {
     isEmpty?: boolean
   }
 
-  export type StringNullableFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  export type DiscussionCommentListRelationFilter = {
+    every?: DiscussionCommentWhereInput
+    some?: DiscussionCommentWhereInput
+    none?: DiscussionCommentWhereInput
+  }
+
+  export type DiscussionCommentOrderByRelationAggregateInput = {
+    _count?: SortOrder
   }
 
   export type DiscussionPostCountOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
     userName?: SortOrder
+    userAvatar?: SortOrder
     roleCategory?: SortOrder
     title?: SortOrder
     content?: SortOrder
@@ -3876,6 +5624,7 @@ export namespace Prisma {
     upvotes?: SortOrder
     aiReply?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type DiscussionPostAvgOrderByAggregateInput = {
@@ -3886,50 +5635,86 @@ export namespace Prisma {
     id?: SortOrder
     userId?: SortOrder
     userName?: SortOrder
+    userAvatar?: SortOrder
     roleCategory?: SortOrder
     title?: SortOrder
     content?: SortOrder
     upvotes?: SortOrder
     aiReply?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type DiscussionPostMinOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
     userName?: SortOrder
+    userAvatar?: SortOrder
     roleCategory?: SortOrder
     title?: SortOrder
     content?: SortOrder
     upvotes?: SortOrder
     aiReply?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type DiscussionPostSumOrderByAggregateInput = {
     upvotes?: SortOrder
   }
 
-  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
+  export type DiscussionPostScalarRelationFilter = {
+    is?: DiscussionPostWhereInput
+    isNot?: DiscussionPostWhereInput
+  }
+
+  export type DiscussionCommentCountOrderByAggregateInput = {
+    id?: SortOrder
+    postId?: SortOrder
+    userId?: SortOrder
+    userName?: SortOrder
+    userAvatar?: SortOrder
+    content?: SortOrder
+    upvotes?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type DiscussionCommentAvgOrderByAggregateInput = {
+    upvotes?: SortOrder
+  }
+
+  export type DiscussionCommentMaxOrderByAggregateInput = {
+    id?: SortOrder
+    postId?: SortOrder
+    userId?: SortOrder
+    userName?: SortOrder
+    userAvatar?: SortOrder
+    content?: SortOrder
+    upvotes?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type DiscussionCommentMinOrderByAggregateInput = {
+    id?: SortOrder
+    postId?: SortOrder
+    userId?: SortOrder
+    userName?: SortOrder
+    userAvatar?: SortOrder
+    content?: SortOrder
+    upvotes?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type DiscussionCommentSumOrderByAggregateInput = {
+    upvotes?: SortOrder
   }
 
   export type StringFieldUpdateOperationsInput = {
     set?: string
+  }
+
+  export type NullableStringFieldUpdateOperationsInput = {
+    set?: string | null
   }
 
   export type IntFieldUpdateOperationsInput = {
@@ -3940,6 +5725,10 @@ export namespace Prisma {
     divide?: number
   }
 
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
+  }
+
   export type DateTimeFieldUpdateOperationsInput = {
     set?: Date | string
   }
@@ -3948,13 +5737,65 @@ export namespace Prisma {
     set: string[]
   }
 
+  export type DiscussionCommentCreateNestedManyWithoutPostInput = {
+    create?: XOR<DiscussionCommentCreateWithoutPostInput, DiscussionCommentUncheckedCreateWithoutPostInput> | DiscussionCommentCreateWithoutPostInput[] | DiscussionCommentUncheckedCreateWithoutPostInput[]
+    connectOrCreate?: DiscussionCommentCreateOrConnectWithoutPostInput | DiscussionCommentCreateOrConnectWithoutPostInput[]
+    createMany?: DiscussionCommentCreateManyPostInputEnvelope
+    connect?: DiscussionCommentWhereUniqueInput | DiscussionCommentWhereUniqueInput[]
+  }
+
+  export type DiscussionCommentUncheckedCreateNestedManyWithoutPostInput = {
+    create?: XOR<DiscussionCommentCreateWithoutPostInput, DiscussionCommentUncheckedCreateWithoutPostInput> | DiscussionCommentCreateWithoutPostInput[] | DiscussionCommentUncheckedCreateWithoutPostInput[]
+    connectOrCreate?: DiscussionCommentCreateOrConnectWithoutPostInput | DiscussionCommentCreateOrConnectWithoutPostInput[]
+    createMany?: DiscussionCommentCreateManyPostInputEnvelope
+    connect?: DiscussionCommentWhereUniqueInput | DiscussionCommentWhereUniqueInput[]
+  }
+
   export type DiscussionPostUpdatetagsInput = {
     set?: string[]
     push?: string | string[]
   }
 
-  export type NullableStringFieldUpdateOperationsInput = {
-    set?: string | null
+  export type DiscussionCommentUpdateManyWithoutPostNestedInput = {
+    create?: XOR<DiscussionCommentCreateWithoutPostInput, DiscussionCommentUncheckedCreateWithoutPostInput> | DiscussionCommentCreateWithoutPostInput[] | DiscussionCommentUncheckedCreateWithoutPostInput[]
+    connectOrCreate?: DiscussionCommentCreateOrConnectWithoutPostInput | DiscussionCommentCreateOrConnectWithoutPostInput[]
+    upsert?: DiscussionCommentUpsertWithWhereUniqueWithoutPostInput | DiscussionCommentUpsertWithWhereUniqueWithoutPostInput[]
+    createMany?: DiscussionCommentCreateManyPostInputEnvelope
+    set?: DiscussionCommentWhereUniqueInput | DiscussionCommentWhereUniqueInput[]
+    disconnect?: DiscussionCommentWhereUniqueInput | DiscussionCommentWhereUniqueInput[]
+    delete?: DiscussionCommentWhereUniqueInput | DiscussionCommentWhereUniqueInput[]
+    connect?: DiscussionCommentWhereUniqueInput | DiscussionCommentWhereUniqueInput[]
+    update?: DiscussionCommentUpdateWithWhereUniqueWithoutPostInput | DiscussionCommentUpdateWithWhereUniqueWithoutPostInput[]
+    updateMany?: DiscussionCommentUpdateManyWithWhereWithoutPostInput | DiscussionCommentUpdateManyWithWhereWithoutPostInput[]
+    deleteMany?: DiscussionCommentScalarWhereInput | DiscussionCommentScalarWhereInput[]
+  }
+
+  export type DiscussionCommentUncheckedUpdateManyWithoutPostNestedInput = {
+    create?: XOR<DiscussionCommentCreateWithoutPostInput, DiscussionCommentUncheckedCreateWithoutPostInput> | DiscussionCommentCreateWithoutPostInput[] | DiscussionCommentUncheckedCreateWithoutPostInput[]
+    connectOrCreate?: DiscussionCommentCreateOrConnectWithoutPostInput | DiscussionCommentCreateOrConnectWithoutPostInput[]
+    upsert?: DiscussionCommentUpsertWithWhereUniqueWithoutPostInput | DiscussionCommentUpsertWithWhereUniqueWithoutPostInput[]
+    createMany?: DiscussionCommentCreateManyPostInputEnvelope
+    set?: DiscussionCommentWhereUniqueInput | DiscussionCommentWhereUniqueInput[]
+    disconnect?: DiscussionCommentWhereUniqueInput | DiscussionCommentWhereUniqueInput[]
+    delete?: DiscussionCommentWhereUniqueInput | DiscussionCommentWhereUniqueInput[]
+    connect?: DiscussionCommentWhereUniqueInput | DiscussionCommentWhereUniqueInput[]
+    update?: DiscussionCommentUpdateWithWhereUniqueWithoutPostInput | DiscussionCommentUpdateWithWhereUniqueWithoutPostInput[]
+    updateMany?: DiscussionCommentUpdateManyWithWhereWithoutPostInput | DiscussionCommentUpdateManyWithWhereWithoutPostInput[]
+    deleteMany?: DiscussionCommentScalarWhereInput | DiscussionCommentScalarWhereInput[]
+  }
+
+  export type DiscussionPostCreateNestedOneWithoutCommentsInput = {
+    create?: XOR<DiscussionPostCreateWithoutCommentsInput, DiscussionPostUncheckedCreateWithoutCommentsInput>
+    connectOrCreate?: DiscussionPostCreateOrConnectWithoutCommentsInput
+    connect?: DiscussionPostWhereUniqueInput
+  }
+
+  export type DiscussionPostUpdateOneRequiredWithoutCommentsNestedInput = {
+    create?: XOR<DiscussionPostCreateWithoutCommentsInput, DiscussionPostUncheckedCreateWithoutCommentsInput>
+    connectOrCreate?: DiscussionPostCreateOrConnectWithoutCommentsInput
+    upsert?: DiscussionPostUpsertWithoutCommentsInput
+    connect?: DiscussionPostWhereUniqueInput
+    update?: XOR<XOR<DiscussionPostUpdateToOneWithWhereWithoutCommentsInput, DiscussionPostUpdateWithoutCommentsInput>, DiscussionPostUncheckedUpdateWithoutCommentsInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -3971,6 +5812,20 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
+  export type NestedStringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
   export type NestedIntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -3980,6 +5835,11 @@ export namespace Prisma {
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntFilter<$PrismaModel> | number
+  }
+
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
   export type NestedDateTimeFilter<$PrismaModel = never> = {
@@ -4010,6 +5870,34 @@ export namespace Prisma {
     _max?: NestedStringFilter<$PrismaModel>
   }
 
+  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type NestedIntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -4036,6 +5924,14 @@ export namespace Prisma {
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatFilter<$PrismaModel> | number
   }
+
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
   export type NestedJsonFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
@@ -4058,17 +5954,6 @@ export namespace Prisma {
     gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-  }
-
-  export type NestedIntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
   export type NestedJsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -4108,35 +5993,180 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
-  export type NestedStringNullableFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  export type DiscussionCommentCreateWithoutPostInput = {
+    id?: string
+    userId: string
+    userName: string
+    userAvatar?: string | null
+    content: string
+    upvotes?: number
+    createdAt?: Date | string
   }
 
-  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
+  export type DiscussionCommentUncheckedCreateWithoutPostInput = {
+    id?: string
+    userId: string
+    userName: string
+    userAvatar?: string | null
+    content: string
+    upvotes?: number
+    createdAt?: Date | string
+  }
+
+  export type DiscussionCommentCreateOrConnectWithoutPostInput = {
+    where: DiscussionCommentWhereUniqueInput
+    create: XOR<DiscussionCommentCreateWithoutPostInput, DiscussionCommentUncheckedCreateWithoutPostInput>
+  }
+
+  export type DiscussionCommentCreateManyPostInputEnvelope = {
+    data: DiscussionCommentCreateManyPostInput | DiscussionCommentCreateManyPostInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type DiscussionCommentUpsertWithWhereUniqueWithoutPostInput = {
+    where: DiscussionCommentWhereUniqueInput
+    update: XOR<DiscussionCommentUpdateWithoutPostInput, DiscussionCommentUncheckedUpdateWithoutPostInput>
+    create: XOR<DiscussionCommentCreateWithoutPostInput, DiscussionCommentUncheckedCreateWithoutPostInput>
+  }
+
+  export type DiscussionCommentUpdateWithWhereUniqueWithoutPostInput = {
+    where: DiscussionCommentWhereUniqueInput
+    data: XOR<DiscussionCommentUpdateWithoutPostInput, DiscussionCommentUncheckedUpdateWithoutPostInput>
+  }
+
+  export type DiscussionCommentUpdateManyWithWhereWithoutPostInput = {
+    where: DiscussionCommentScalarWhereInput
+    data: XOR<DiscussionCommentUpdateManyMutationInput, DiscussionCommentUncheckedUpdateManyWithoutPostInput>
+  }
+
+  export type DiscussionCommentScalarWhereInput = {
+    AND?: DiscussionCommentScalarWhereInput | DiscussionCommentScalarWhereInput[]
+    OR?: DiscussionCommentScalarWhereInput[]
+    NOT?: DiscussionCommentScalarWhereInput | DiscussionCommentScalarWhereInput[]
+    id?: StringFilter<"DiscussionComment"> | string
+    postId?: StringFilter<"DiscussionComment"> | string
+    userId?: StringFilter<"DiscussionComment"> | string
+    userName?: StringFilter<"DiscussionComment"> | string
+    userAvatar?: StringNullableFilter<"DiscussionComment"> | string | null
+    content?: StringFilter<"DiscussionComment"> | string
+    upvotes?: IntFilter<"DiscussionComment"> | number
+    createdAt?: DateTimeFilter<"DiscussionComment"> | Date | string
+  }
+
+  export type DiscussionPostCreateWithoutCommentsInput = {
+    id?: string
+    userId: string
+    userName: string
+    userAvatar?: string | null
+    roleCategory: string
+    title: string
+    content: string
+    tags?: DiscussionPostCreatetagsInput | string[]
+    upvotes?: number
+    aiReply?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DiscussionPostUncheckedCreateWithoutCommentsInput = {
+    id?: string
+    userId: string
+    userName: string
+    userAvatar?: string | null
+    roleCategory: string
+    title: string
+    content: string
+    tags?: DiscussionPostCreatetagsInput | string[]
+    upvotes?: number
+    aiReply?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DiscussionPostCreateOrConnectWithoutCommentsInput = {
+    where: DiscussionPostWhereUniqueInput
+    create: XOR<DiscussionPostCreateWithoutCommentsInput, DiscussionPostUncheckedCreateWithoutCommentsInput>
+  }
+
+  export type DiscussionPostUpsertWithoutCommentsInput = {
+    update: XOR<DiscussionPostUpdateWithoutCommentsInput, DiscussionPostUncheckedUpdateWithoutCommentsInput>
+    create: XOR<DiscussionPostCreateWithoutCommentsInput, DiscussionPostUncheckedCreateWithoutCommentsInput>
+    where?: DiscussionPostWhereInput
+  }
+
+  export type DiscussionPostUpdateToOneWithWhereWithoutCommentsInput = {
+    where?: DiscussionPostWhereInput
+    data: XOR<DiscussionPostUpdateWithoutCommentsInput, DiscussionPostUncheckedUpdateWithoutCommentsInput>
+  }
+
+  export type DiscussionPostUpdateWithoutCommentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    userName?: StringFieldUpdateOperationsInput | string
+    userAvatar?: NullableStringFieldUpdateOperationsInput | string | null
+    roleCategory?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    tags?: DiscussionPostUpdatetagsInput | string[]
+    upvotes?: IntFieldUpdateOperationsInput | number
+    aiReply?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DiscussionPostUncheckedUpdateWithoutCommentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    userName?: StringFieldUpdateOperationsInput | string
+    userAvatar?: NullableStringFieldUpdateOperationsInput | string | null
+    roleCategory?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    tags?: DiscussionPostUpdatetagsInput | string[]
+    upvotes?: IntFieldUpdateOperationsInput | number
+    aiReply?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DiscussionCommentCreateManyPostInput = {
+    id?: string
+    userId: string
+    userName: string
+    userAvatar?: string | null
+    content: string
+    upvotes?: number
+    createdAt?: Date | string
+  }
+
+  export type DiscussionCommentUpdateWithoutPostInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    userName?: StringFieldUpdateOperationsInput | string
+    userAvatar?: NullableStringFieldUpdateOperationsInput | string | null
+    content?: StringFieldUpdateOperationsInput | string
+    upvotes?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DiscussionCommentUncheckedUpdateWithoutPostInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    userName?: StringFieldUpdateOperationsInput | string
+    userAvatar?: NullableStringFieldUpdateOperationsInput | string | null
+    content?: StringFieldUpdateOperationsInput | string
+    upvotes?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DiscussionCommentUncheckedUpdateManyWithoutPostInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    userName?: StringFieldUpdateOperationsInput | string
+    userAvatar?: NullableStringFieldUpdateOperationsInput | string | null
+    content?: StringFieldUpdateOperationsInput | string
+    upvotes?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 

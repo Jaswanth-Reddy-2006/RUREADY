@@ -14,15 +14,21 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
-  passwordHash String
-  name         String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id              String    @id @default(cuid())
+  email           String    @unique
+  passwordHash    String
+  name            String
+  role            String    @default("USER") // USER, ADMIN, RECRUITER
+  isEmailVerified Boolean   @default(false)
+  avatarUrl       String?
+  bannedAt        DateTime?
+  lastLoginAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   refreshTokens RefreshToken[]
 
+  @@index([role])
   @@map("users")
 }
 

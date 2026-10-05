@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════
 // Career Roadmap & Discussion Hub Microservice — Prisma Schema
-// Data ownership: career_roadmaps, discussion_posts
+// Data ownership: career_roadmaps, discussion_posts, discussion_comments
 // ═══════════════════════════════════════════════════════════════
 
 generator client {
@@ -16,14 +16,21 @@ datasource db {
 model CareerRoadmap {
   id                String   @id @default(cuid())
   userId            String
+  title             String?  @default("Career Roadmap")
+  description       String?  @db.Text
   rolePath          String
   targetCompanyTier String   @default("FAANG")
+  estimatedWeeks    Int      @default(8)
   overallReadiness  Int      @default(0)
+  isPublic          Boolean  @default(false)
+  isOfficial        Boolean  @default(false)
   nodesData         Json
   customTechStack   Json?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
+  @@index([userId])
+  @@index([rolePath])
   @@map("career_roadmaps")
 }
 
@@ -31,13 +38,33 @@ model DiscussionPost {
   id           String   @id @default(cuid())
   userId       String
   userName     String
+  userAvatar   String?
   roleCategory String
   title        String
   content      String   @db.Text
-  tags         String[]
+  tags         String[] @default([])
   upvotes      Int      @default(0)
   aiReply      String?  @db.Text
   createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
+  comments DiscussionComment[]
+
+  @@index([roleCategory])
   @@map("discussion_posts")
+}
+
+model DiscussionComment {
+  id         String         @id @default(cuid())
+  postId     String
+  post       DiscussionPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId     String
+  userName   String
+  userAvatar String?
+  content    String         @db.Text
+  upvotes    Int            @default(0)
+  createdAt  DateTime       @default(now())
+
+  @@index([postId])
+  @@map("discussion_comments")
 }
