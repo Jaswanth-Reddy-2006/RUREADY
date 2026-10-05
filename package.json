@@ -18,6 +18,7 @@
     "db:generate": "pnpm -r db:generate",
     "lint": "pnpm -r typecheck",
     "clean": "pnpm -r exec -- rm -rf node_modules dist .turbo",
+    "test:roadmap": "vitest run --config vitest.roadmap.config.ts",
     "test:e2e": "vitest run --config vitest.e2e.config.ts"
   },
   "devDependencies": {

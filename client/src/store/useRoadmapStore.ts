@@ -1,6 +1,31 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import apiClient from '../api/client';
+import {
+  UserRoadmapDTO,
+  SprintTaskDTO,
+  TaskState,
+  SprintPerformanceInput,
+  SprintReviewResultDTO,
+  SkillEvidenceDTO,
+  SelfReportedEvidenceInput,
+  MicroAssessmentDTO,
+  SubmitAssessmentInput,
+  AssessmentAttemptResultDTO,
+  PracticalDrillResultDTO,
+  SubmitPracticalDrillInput,
+  UnifiedSprintTelemetryDTO,
+  RoadmapReadinessAnalyticsDTO,
+  VerifiedCareerProfileDTO,
+  PublicVerifiedProfileDTO,
+  RoadmapLearningHistoryDTO,
+  RoadmapProfileSummaryDTO,
+  deriveRoadmapProfileSummary,
+  ResumeRoadmapPrefillDTO,
+  ResumeRoadmapPrefillInput,
+} from '@ru-ready/shared';
+import { roadmapApi, buildDefaultPersonalization, RoadmapPersonalizationInput } from '../api/roadmap';
+
 
 export interface RoadmapSourceItem {
   id: string;
@@ -891,6 +916,34 @@ interface RoadmapStoreState {
   likedRoadmapIds: string[];
   previewRoadmap: Roadmap | null;
   activeRoadmapId: string | null;
+  userRoadmaps: Record<string, UserRoadmapDTO>;
+  activeUserRoadmap: UserRoadmapDTO | null;
+  isEnrolling: boolean;
+  isCompletingSprint: boolean;
+  isSubmittingEvidence: boolean;
+
+  // Micro-Assessment State (Stage 5.1)
+  currentAssessment: MicroAssessmentDTO | null;
+  assessmentResults: Record<string, AssessmentAttemptResultDTO>;
+  isAssessmentLoading: boolean;
+
+  // Stage 7.1/7.2 Learning History & Proof-of-Work State
+  roadmapHistories: Record<string, RoadmapLearningHistoryDTO>;
+  isHistoryLoading: boolean;
+  historyError: string | null;
+
+  // Stage 7.4 Profile Integration State
+  profileSummary: RoadmapProfileSummaryDTO | null;
+  isProfileSummaryLoading: boolean;
+  profileSummaryError: string | null;
+  fetchProfileSummary: (userRoadmapId?: string) => Promise<RoadmapProfileSummaryDTO | null>;
+
+  // Stage 8.1 Resume-to-Roadmap Bridge State
+  resumePrefill: ResumeRoadmapPrefillDTO | null;
+  isResumePrefillLoading: boolean;
+  resumePrefillError: string | null;
+  fetchResumePrefill: (options?: ResumeRoadmapPrefillInput) => Promise<ResumeRoadmapPrefillDTO | null>;
+  clearResumePrefill: () => void;
 
   // Granular Node Engagement State
   completedChecklistItems: Record<string, number[]>;
@@ -908,10 +961,34 @@ interface RoadmapStoreState {
   // Actions
   setPreviewRoadmap: (roadmap: Roadmap | null) => void;
   setActiveRoadmap: (id: string | null) => void;
-  enrollRoadmap: (id: string) => void;
+  enrollRoadmap: (id: string, personalization?: Partial<RoadmapPersonalizationInput>) => Promise<UserRoadmapDTO | null>;
   unenrollRoadmap: (id: string) => void;
-  claimRoadmap: (id: string) => void;
+  claimRoadmap: (id: string, personalization?: Partial<RoadmapPersonalizationInput>) => Promise<UserRoadmapDTO | null>;
   unclaimRoadmap: (id: string) => void;
+  updateSprintTaskStatus: (
+    sprintId: string,
+    taskId: string,
+    status: TaskState
+  ) => Promise<{ success: boolean; task?: SprintTaskDTO; error?: string }>;
+  completeSprint: (
+    sprintId: string,
+    performance?: SprintPerformanceInput
+  ) => Promise<{ success: boolean; review?: SprintReviewResultDTO; error?: string }>;
+  fetchSprintTelemetry: (sprintId: string) => Promise<UnifiedSprintTelemetryDTO | null>;
+  fetchRoadmapReadiness: (userRoadmapId: string) => Promise<RoadmapReadinessAnalyticsDTO | null>;
+  fetchVerifiedProfile: (userRoadmapId: string) => Promise<VerifiedCareerProfileDTO | null>;
+  exportVerifiedProfile: (userRoadmapId: string) => Promise<VerifiedCareerProfileDTO | null>;
+  fetchRoadmapHistory: (userRoadmapId: string) => Promise<RoadmapLearningHistoryDTO | null>;
+  submitSkillEvidence: (
+    userRoadmapId: string,
+    evidence: SelfReportedEvidenceInput
+  ) => Promise<{ success: boolean; evidence?: SkillEvidenceDTO; error?: string }>;
+  fetchUserRoadmap: (userRoadmapId: string) => Promise<UserRoadmapDTO | null>;
+  fetchAssessmentForNode: (nodeId: string, skillId?: string) => Promise<MicroAssessmentDTO | null>;
+  fetchAssessmentById: (assessmentId: string) => Promise<MicroAssessmentDTO | null>;
+  submitAssessmentAnswers: (input: SubmitAssessmentInput) => Promise<{ success: boolean; result?: AssessmentAttemptResultDTO; error?: string }>;
+  evaluatePracticalDrill: (input: SubmitPracticalDrillInput) => Promise<{ success: boolean; data?: PracticalDrillResultDTO; error?: string }>;
+  clearCurrentAssessment: () => void;
   toggleUpvoteRoadmap: (id: string) => void;
   createManualRoadmap: (roadmapData: Omit<Roadmap, 'id' | 'createdAt' | 'updatedAt' | 'overallReadiness' | 'enrolledCount' | 'upvotes'>) => Roadmap;
   createAiRoadmap: (params: {
@@ -947,6 +1024,27 @@ export const useRoadmapStore = create<RoadmapStoreState>()(
       likedRoadmapIds: ['official-fullstack-faang'],
       previewRoadmap: null,
       activeRoadmapId: 'official-fullstack-faang',
+      userRoadmaps: {},
+      activeUserRoadmap: null,
+      isEnrolling: false,
+      isCompletingSprint: false,
+      isSubmittingEvidence: false,
+
+      currentAssessment: null,
+      assessmentResults: {},
+      isAssessmentLoading: false,
+
+      roadmapHistories: {},
+      isHistoryLoading: false,
+      historyError: null,
+
+      profileSummary: null,
+      isProfileSummaryLoading: false,
+      profileSummaryError: null,
+
+      resumePrefill: null,
+      isResumePrefillLoading: false,
+      resumePrefillError: null,
 
       completedChecklistItems: {},
       readSourceIds: {},
@@ -954,12 +1052,20 @@ export const useRoadmapStore = create<RoadmapStoreState>()(
       nodeCode: {},
       nodeSubmissions: {},
 
+
       setPreviewRoadmap: (roadmap) => set({ previewRoadmap: roadmap }),
 
-      setActiveRoadmap: (id) => set({ activeRoadmapId: id }),
+      setActiveRoadmap: (id) => {
+        const { userRoadmaps } = get();
+        const activeUr = id ? (userRoadmaps[id] || null) : null;
+        set({ activeRoadmapId: id, activeUserRoadmap: activeUr });
+      },
 
-      enrollRoadmap: (id) => {
+      enrollRoadmap: async (id, customPersonalization) => {
         const { enrolledRoadmapIds, roadmaps } = get();
+        const targetRoadmap = roadmaps.find((r) => r.id === id);
+
+        // Optimistically mark as active & enrolled in local cache
         if (!enrolledRoadmapIds.includes(id)) {
           const updatedRoadmaps = roadmaps.map((r) =>
             r.id === id ? { ...r, enrolledCount: (r.enrolledCount || 0) + 1 } : r
@@ -968,8 +1074,66 @@ export const useRoadmapStore = create<RoadmapStoreState>()(
             enrolledRoadmapIds: [...enrolledRoadmapIds, id],
             roadmaps: updatedRoadmaps,
             activeRoadmapId: id,
+            isEnrolling: true,
           });
+        } else {
+          set({ activeRoadmapId: id, isEnrolling: true });
         }
+
+        // Build valid personalization payload complying with backend schema
+        const defaultPersonalization = buildDefaultPersonalization(targetRoadmap);
+        const personalizationPayload: RoadmapPersonalizationInput = {
+          ...defaultPersonalization,
+          ...customPersonalization,
+          targetRole: (customPersonalization?.targetRole || defaultPersonalization.targetRole).trim().slice(0, 120),
+          targetOutcome: (customPersonalization?.targetOutcome || defaultPersonalization.targetOutcome).trim().slice(0, 160),
+          hoursPerDay: customPersonalization?.hoursPerDay ?? defaultPersonalization.hoursPerDay,
+          daysPerWeek: customPersonalization?.daysPerWeek ?? defaultPersonalization.daysPerWeek,
+          sprintDurationDays: customPersonalization?.sprintDurationDays ?? defaultPersonalization.sprintDurationDays,
+        };
+
+        try {
+          // Call POST /api/roadmap/:id/follow
+          const userRoadmap = await roadmapApi.followRoadmap(id, personalizationPayload);
+          if (userRoadmap) {
+            set((state) => ({
+              userRoadmaps: {
+                ...state.userRoadmaps,
+                [id]: userRoadmap,
+                [userRoadmap.id]: userRoadmap,
+                ...(userRoadmap.sourceRoadmapId ? { [userRoadmap.sourceRoadmapId]: userRoadmap } : {}),
+              },
+              activeUserRoadmap: userRoadmap,
+              activeRoadmapId: id,
+              enrolledRoadmapIds: state.enrolledRoadmapIds.includes(id)
+                ? state.enrolledRoadmapIds
+                : [...state.enrolledRoadmapIds, id],
+              isEnrolling: false,
+            }));
+            return userRoadmap;
+          }
+        } catch (err: any) {
+          // If backend returns existing user roadmap, handle gracefully
+          const maybeUserRoadmap = err?.response?.data?.data;
+          if (maybeUserRoadmap && maybeUserRoadmap.id) {
+            set((state) => ({
+              userRoadmaps: {
+                ...state.userRoadmaps,
+                [id]: maybeUserRoadmap,
+                [maybeUserRoadmap.id]: maybeUserRoadmap,
+                ...(maybeUserRoadmap.sourceRoadmapId ? { [maybeUserRoadmap.sourceRoadmapId]: maybeUserRoadmap } : {}),
+              },
+              activeUserRoadmap: maybeUserRoadmap,
+              activeRoadmapId: id,
+              isEnrolling: false,
+            }));
+            return maybeUserRoadmap;
+          }
+          console.warn('[useRoadmapStore] Backend followRoadmap notice:', err?.message || err);
+        } finally {
+          set({ isEnrolling: false });
+        }
+        return null;
       },
 
       unenrollRoadmap: (id) => {
@@ -980,16 +1144,562 @@ export const useRoadmapStore = create<RoadmapStoreState>()(
             r.id === id ? { ...r, enrolledCount: Math.max(0, (r.enrolledCount || 1) - 1) } : r
           ),
           activeRoadmapId: get().activeRoadmapId === id ? null : get().activeRoadmapId,
+          activeUserRoadmap: get().activeRoadmapId === id ? null : get().activeUserRoadmap,
         });
       },
 
-      claimRoadmap: (id) => {
-        get().enrollRoadmap(id);
+      claimRoadmap: async (id, personalization) => {
+        return get().enrollRoadmap(id, personalization);
       },
 
       unclaimRoadmap: (id) => {
         get().unenrollRoadmap(id);
       },
+
+      updateSprintTaskStatus: async (sprintId, taskId, status) => {
+        const { userRoadmaps, activeUserRoadmap } = get();
+
+        // 1. Locate the affected user roadmap & sprint & task
+        let previousStatus: TaskState = 'TODO';
+        let foundTask: SprintTaskDTO | null = null;
+
+        const allUserRoadmaps = Object.values(userRoadmaps);
+        if (activeUserRoadmap && !allUserRoadmaps.some((ur) => ur.id === activeUserRoadmap.id)) {
+          allUserRoadmaps.push(activeUserRoadmap);
+        }
+
+        for (const ur of allUserRoadmaps) {
+          const sprint = ur.sprints?.find((s) => s.id === sprintId);
+          if (sprint) {
+            const task = sprint.tasks?.find((t) => t.id === taskId);
+            if (task) {
+              previousStatus = task.status;
+              foundTask = task;
+              break;
+            }
+          }
+        }
+
+        // Helper to produce updated userRoadmap state with mutated task
+        const applyTaskUpdate = (newStatus: TaskState, completedAt: string | null = null) => {
+          const updateSprints = (sprints: any[]) =>
+            sprints.map((s) => {
+              if (s.id !== sprintId) return s;
+              return {
+                ...s,
+                tasks: s.tasks.map((t: any) =>
+                  t.id === taskId ? { ...t, status: newStatus, completedAt } : t
+                ),
+              };
+            });
+
+          set((state) => {
+            const nextUserRoadmaps: Record<string, UserRoadmapDTO> = {};
+            for (const [key, ur] of Object.entries(state.userRoadmaps)) {
+              if (ur.sprints?.some((s) => s.id === sprintId)) {
+                nextUserRoadmaps[key] = {
+                  ...ur,
+                  sprints: updateSprints(ur.sprints),
+                };
+              } else {
+                nextUserRoadmaps[key] = ur;
+              }
+            }
+
+            const nextActive = state.activeUserRoadmap?.sprints?.some((s) => s.id === sprintId)
+              ? {
+                  ...state.activeUserRoadmap,
+                  sprints: updateSprints(state.activeUserRoadmap.sprints),
+                }
+              : state.activeUserRoadmap;
+
+            return {
+              userRoadmaps: nextUserRoadmaps,
+              activeUserRoadmap: nextActive,
+            };
+          });
+        };
+
+        // 2. Optimistically apply status update
+        applyTaskUpdate(status, status === 'COMPLETED' ? new Date().toISOString() : null);
+
+        // 3. Dispatch PATCH request to backend
+        try {
+          const updatedTask = await roadmapApi.updateSprintTask(sprintId, taskId, status);
+          if (updatedTask) {
+            applyTaskUpdate(updatedTask.status, updatedTask.completedAt || null);
+            return { success: true, task: updatedTask };
+          }
+          return { success: true };
+        } catch (err: any) {
+          // 4. Rollback optimistic update on failure (evidence gate / network / 400 error)
+          applyTaskUpdate(previousStatus, foundTask?.completedAt || null);
+          const errorMsg =
+            err?.response?.data?.message ||
+            err?.message ||
+            'Failed to update task status';
+          return { success: false, error: errorMsg };
+        }
+      },
+
+      completeSprint: async (sprintId, performance) => {
+        set({ isCompletingSprint: true });
+        try {
+          const review = await roadmapApi.completeSprint(sprintId, performance);
+          if (review && review.sprint) {
+            set((state) => {
+              const nextUserRoadmaps: Record<string, UserRoadmapDTO> = {};
+              let updatedActive = state.activeUserRoadmap;
+
+              const updateSprintsList = (sprints: any[]) => {
+                const updated = sprints.map((s) => {
+                  if (s.id === sprintId) {
+                    return {
+                      ...s,
+                      status: 'COMPLETED' as const,
+                      decision: review.recommendation.decision,
+                      performance: review.sprint.performance || s.performance,
+                    };
+                  }
+                  return s;
+                });
+
+                if (review.nextSprint && !updated.some((s) => s.id === review.nextSprint!.id)) {
+                  updated.push(review.nextSprint);
+                }
+                return updated;
+              };
+
+              for (const [key, ur] of Object.entries(state.userRoadmaps)) {
+                if (ur.sprints?.some((s) => s.id === sprintId)) {
+                  nextUserRoadmaps[key] = {
+                    ...ur,
+                    sprints: updateSprintsList(ur.sprints),
+                  };
+                } else {
+                  nextUserRoadmaps[key] = ur;
+                }
+              }
+
+              if (state.activeUserRoadmap?.sprints?.some((s) => s.id === sprintId)) {
+                updatedActive = {
+                  ...state.activeUserRoadmap,
+                  sprints: updateSprintsList(state.activeUserRoadmap.sprints),
+                };
+              }
+
+              return {
+                userRoadmaps: nextUserRoadmaps,
+                activeUserRoadmap: updatedActive,
+                isCompletingSprint: false,
+              };
+            });
+
+            // Refresh user roadmap from backend to reconcile state
+            const activeUr = get().activeUserRoadmap;
+            if (activeUr?.id) {
+              get().fetchUserRoadmap(activeUr.id).catch(() => {});
+            }
+
+            return { success: true, review };
+          }
+          set({ isCompletingSprint: false });
+          return { success: true };
+        } catch (err: any) {
+          const errorMsg =
+            err?.response?.data?.message ||
+            err?.message ||
+            'Failed to complete sprint review';
+          set({ isCompletingSprint: false });
+          return { success: false, error: errorMsg };
+        }
+      },
+
+      fetchSprintTelemetry: async (sprintId: string) => {
+        try {
+          const telemetry = await roadmapApi.getSprintTelemetry(sprintId);
+          return telemetry;
+        } catch {
+          return null;
+        }
+      },
+
+      fetchRoadmapReadiness: async (userRoadmapId: string) => {
+        try {
+          const readiness = await roadmapApi.getRoadmapReadiness(userRoadmapId);
+          return readiness;
+        } catch {
+          return null;
+        }
+      },
+
+      fetchVerifiedProfile: async (userRoadmapId: string) => {
+        try {
+          const profile = await roadmapApi.getVerifiedProfile(userRoadmapId);
+          return profile;
+        } catch {
+          return null;
+        }
+      },
+
+      exportVerifiedProfile: async (userRoadmapId: string) => {
+        try {
+          const profile = await roadmapApi.getVerifiedProfile(userRoadmapId);
+          if (profile && typeof window !== 'undefined') {
+            const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(profile, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute('href', dataStr);
+            downloadAnchor.setAttribute('download', `verified-career-profile-${profile.verificationId}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+          }
+          return profile;
+        } catch {
+          return null;
+        }
+      },
+
+      fetchRoadmapHistory: async (userRoadmapId: string) => {
+        set({ isHistoryLoading: true, historyError: null });
+        try {
+          const history = await roadmapApi.getRoadmapHistory(userRoadmapId);
+          if (history) {
+            set((state) => ({
+              roadmapHistories: {
+                ...state.roadmapHistories,
+                [userRoadmapId]: history,
+                ...(history.roadmapId ? { [history.roadmapId]: history } : {}),
+              },
+              isHistoryLoading: false,
+              historyError: null,
+            }));
+            return history;
+          }
+          set({ isHistoryLoading: false });
+          return null;
+        } catch (err: any) {
+          const errorMsg =
+            err?.response?.data?.message ||
+            err?.message ||
+            'Failed to load learning history & proof of work';
+          set({ isHistoryLoading: false, historyError: errorMsg });
+          return null;
+        }
+      },
+
+      fetchProfileSummary: async (userRoadmapId?: string) => {
+        set({ isProfileSummaryLoading: true, profileSummaryError: null });
+        try {
+          const summary = await roadmapApi.getProfileSummary(userRoadmapId);
+          if (summary) {
+            set({
+              profileSummary: summary,
+              isProfileSummaryLoading: false,
+              profileSummaryError: null,
+            });
+            return summary;
+          }
+          // Local fallback derivation
+          const state = get();
+          const targetUr =
+            (userRoadmapId && state.userRoadmaps[userRoadmapId]) ||
+            state.activeUserRoadmap ||
+            Object.values(state.userRoadmaps)[0];
+          if (targetUr) {
+            const derived = deriveRoadmapProfileSummary(targetUr);
+            set({
+              profileSummary: derived,
+              isProfileSummaryLoading: false,
+              profileSummaryError: null,
+            });
+            return derived;
+          }
+          set({ profileSummary: null, isProfileSummaryLoading: false });
+          return null;
+        } catch (err: any) {
+          const state = get();
+          const targetUr =
+            (userRoadmapId && state.userRoadmaps[userRoadmapId]) ||
+            state.activeUserRoadmap ||
+            Object.values(state.userRoadmaps)[0];
+          if (targetUr) {
+            const derived = deriveRoadmapProfileSummary(targetUr);
+            set({
+              profileSummary: derived,
+              isProfileSummaryLoading: false,
+              profileSummaryError: null,
+            });
+            return derived;
+          }
+          const errorMsg =
+            err?.response?.data?.message ||
+            err?.message ||
+            'Failed to load roadmap profile summary';
+          set({ isProfileSummaryLoading: false, profileSummaryError: errorMsg });
+          return null;
+        }
+      },
+
+      fetchResumePrefill: async (options) => {
+        set({ isResumePrefillLoading: true, resumePrefillError: null });
+        try {
+          const prefill = await roadmapApi.getResumePrefill(options);
+          set({
+            resumePrefill: prefill,
+            isResumePrefillLoading: false,
+            resumePrefillError: null,
+          });
+          return prefill;
+        } catch (err: any) {
+          const errorMsg =
+            err?.response?.data?.message ||
+            err?.message ||
+            'Failed to load resume skill prefill';
+          set({
+            isResumePrefillLoading: false,
+            resumePrefillError: errorMsg,
+          });
+          return null;
+        }
+      },
+
+      clearResumePrefill: () => {
+        set({ resumePrefill: null, resumePrefillError: null, isResumePrefillLoading: false });
+      },
+
+      submitSkillEvidence: async (userRoadmapId, evidence) => {
+        set({ isSubmittingEvidence: true });
+        try {
+          const evidenceRecord = await roadmapApi.submitSkillEvidence(userRoadmapId, evidence);
+          if (evidenceRecord) {
+            set((state) => {
+              const nextUserRoadmaps: Record<string, UserRoadmapDTO> = {};
+              let updatedActive = state.activeUserRoadmap;
+
+              for (const [key, ur] of Object.entries(state.userRoadmaps)) {
+                if (ur.id === userRoadmapId || ur.sourceRoadmapId === userRoadmapId) {
+                  const currentEvidence = ur.skillEvidence || [];
+                  nextUserRoadmaps[key] = {
+                    ...ur,
+                    skillEvidence: [evidenceRecord, ...currentEvidence.filter((e) => e.id !== evidenceRecord.id)],
+                  };
+                } else {
+                  nextUserRoadmaps[key] = ur;
+                }
+              }
+
+              if (state.activeUserRoadmap?.id === userRoadmapId || state.activeUserRoadmap?.sourceRoadmapId === userRoadmapId) {
+                const currentEvidence = state.activeUserRoadmap.skillEvidence || [];
+                updatedActive = {
+                  ...state.activeUserRoadmap,
+                  skillEvidence: [evidenceRecord, ...currentEvidence.filter((e) => e.id !== evidenceRecord.id)],
+                };
+              }
+
+              return {
+                userRoadmaps: nextUserRoadmaps,
+                activeUserRoadmap: updatedActive,
+                isSubmittingEvidence: false,
+              };
+            });
+
+            // Re-sync with backend to get latest relationships
+            get().fetchUserRoadmap(userRoadmapId).catch(() => {});
+
+            return { success: true, evidence: evidenceRecord };
+          }
+          set({ isSubmittingEvidence: false });
+          return { success: true };
+        } catch (err: any) {
+          const errorMsg =
+            err?.response?.data?.message ||
+            err?.message ||
+            'Failed to record skill evidence';
+          set({ isSubmittingEvidence: false });
+          return { success: false, error: errorMsg };
+        }
+      },
+
+      fetchUserRoadmap: async (userRoadmapId: string) => {
+        try {
+          const ur = await roadmapApi.getAdaptiveRoadmap(userRoadmapId);
+          if (ur) {
+            set((state) => ({
+              userRoadmaps: {
+                ...state.userRoadmaps,
+                [ur.id]: ur,
+                ...(ur.sourceRoadmapId ? { [ur.sourceRoadmapId]: ur } : {}),
+              },
+              activeUserRoadmap: ur,
+            }));
+            return ur;
+          }
+        } catch (err) {
+          console.warn('[useRoadmapStore] fetchUserRoadmap error:', err);
+        }
+        return null;
+      },
+
+      fetchAssessmentForNode: async (nodeId: string, skillId?: string) => {
+        set({ isAssessmentLoading: true });
+        try {
+          const assessment = await roadmapApi.getAssessmentForNode(nodeId, skillId);
+          set({ currentAssessment: assessment, isAssessmentLoading: false });
+          return assessment;
+        } catch (err) {
+          console.warn('[useRoadmapStore] fetchAssessmentForNode error:', err);
+          set({ isAssessmentLoading: false });
+          return null;
+        }
+      },
+
+      fetchAssessmentById: async (assessmentId: string) => {
+        set({ isAssessmentLoading: true });
+        try {
+          const assessment = await roadmapApi.getAssessment(assessmentId);
+          set({ currentAssessment: assessment, isAssessmentLoading: false });
+          return assessment;
+        } catch (err) {
+          console.warn('[useRoadmapStore] fetchAssessmentById error:', err);
+          set({ isAssessmentLoading: false });
+          return null;
+        }
+      },
+
+      submitAssessmentAnswers: async (input: SubmitAssessmentInput) => {
+        try {
+          const result = await roadmapApi.submitAssessment(input);
+
+          set((state) => {
+            const nextResults = {
+              ...state.assessmentResults,
+              [result.id]: result,
+              [input.assessmentId]: result,
+            };
+
+            let nextActiveUr = state.activeUserRoadmap;
+            let nextUserRoadmaps = { ...state.userRoadmaps };
+
+            if (input.userRoadmapId && result.evidenceRecorded) {
+              const targetUr = state.userRoadmaps[input.userRoadmapId] || state.activeUserRoadmap;
+              if (targetUr) {
+                const newEvidence: SkillEvidenceDTO = {
+                  id: `ev_${result.id}`,
+                  userRoadmapId: input.userRoadmapId,
+                  skillId: input.skillId || 'assessed-skill',
+                  source: 'ASSESSMENT',
+                  demonstratedScore: result.score,
+                  confidence: Math.max(50, Math.min(95, result.score)),
+                  assessedAt: result.completedAt,
+                };
+                const updatedEvidenceList = [newEvidence, ...(targetUr.skillEvidence || []).filter((e) => e.id !== newEvidence.id)];
+                const updatedUr = { ...targetUr, skillEvidence: updatedEvidenceList };
+
+                if (state.activeUserRoadmap?.id === input.userRoadmapId) {
+                  nextActiveUr = updatedUr;
+                }
+                nextUserRoadmaps[input.userRoadmapId] = updatedUr;
+                if (targetUr.sourceRoadmapId) {
+                  nextUserRoadmaps[targetUr.sourceRoadmapId] = updatedUr;
+                }
+              }
+            }
+
+            return {
+              assessmentResults: nextResults,
+              activeUserRoadmap: nextActiveUr,
+              userRoadmaps: nextUserRoadmaps,
+            };
+          });
+
+          // Also trigger background fetch for userRoadmap if present
+          if (input.userRoadmapId) {
+            get().fetchUserRoadmap(input.userRoadmapId).catch(() => {});
+          }
+
+          return { success: true, result };
+        } catch (err: any) {
+          const errorMsg =
+            err?.response?.data?.message ||
+            err?.message ||
+            'Failed to submit assessment answers';
+          return { success: false, error: errorMsg };
+        }
+      },
+
+      evaluatePracticalDrill: async (input: SubmitPracticalDrillInput) => {
+        try {
+          const result = await roadmapApi.evaluatePracticalDrill(input);
+
+          if (result.evidenceRecorded && input.userRoadmapId) {
+            const userRoadmapId = input.userRoadmapId;
+            set((state) => {
+              const nextUserRoadmaps: Record<string, UserRoadmapDTO> = {};
+              let updatedActive = state.activeUserRoadmap;
+
+              const newEvidence: SkillEvidenceDTO = {
+                id: result.evidenceId || `ev_${result.id}`,
+                userRoadmapId,
+                skillId: result.skillId || input.skillId || 'practical-skill',
+                source: 'PROJECT',
+                demonstratedScore: result.score,
+                estimatedProficiency: result.score,
+                confidence: 85,
+                externalReference: result.id,
+                assessedAt: result.completedAt,
+                metadata: {
+                  practicalDrill: true,
+                  passedCount: result.passedCount,
+                  totalCount: result.totalCount,
+                  runtimeMs: result.runtimeMs,
+                },
+              };
+
+              for (const [key, ur] of Object.entries(state.userRoadmaps)) {
+                if (ur.id === userRoadmapId || ur.sourceRoadmapId === userRoadmapId) {
+                  const currentEvidence = ur.skillEvidence || [];
+                  nextUserRoadmaps[key] = {
+                    ...ur,
+                    skillEvidence: [newEvidence, ...currentEvidence.filter((e) => e.id !== newEvidence.id)],
+                  };
+                } else {
+                  nextUserRoadmaps[key] = ur;
+                }
+              }
+
+              if (state.activeUserRoadmap?.id === userRoadmapId || state.activeUserRoadmap?.sourceRoadmapId === userRoadmapId) {
+                const currentEvidence = state.activeUserRoadmap.skillEvidence || [];
+                updatedActive = {
+                  ...state.activeUserRoadmap,
+                  skillEvidence: [newEvidence, ...currentEvidence.filter((e) => e.id !== newEvidence.id)],
+                };
+              }
+
+              return {
+                userRoadmaps: nextUserRoadmaps,
+                activeUserRoadmap: updatedActive,
+              };
+            });
+
+            get().fetchUserRoadmap(userRoadmapId).catch(() => {});
+          }
+
+          return { success: result.success && result.passed, data: result };
+        } catch (err: any) {
+          const errorMsg =
+            err?.response?.data?.error ||
+            err?.response?.data?.message ||
+            err?.message ||
+            'Failed to evaluate practical drill';
+          return { success: false, error: errorMsg };
+        }
+      },
+
+      clearCurrentAssessment: () => {
+        set({ currentAssessment: null });
+      },
+
 
       toggleUpvoteRoadmap: (id) => {
         const { likedRoadmapIds, roadmaps } = get();
@@ -1352,6 +2062,40 @@ export const useRoadmapStore = create<RoadmapStoreState>()(
           }
         } catch {
           // Backend may be offline; local state is preserved
+        }
+
+        try {
+          const adaptiveRes = await apiClient.get('/roadmap/adaptive');
+          if (adaptiveRes.data?.data && Array.isArray(adaptiveRes.data.data)) {
+            const myUserRoadmaps: UserRoadmapDTO[] = adaptiveRes.data.data;
+            if (myUserRoadmaps.length > 0) {
+              const userRoadmapsMap: Record<string, UserRoadmapDTO> = { ...get().userRoadmaps };
+              const backendEnrolledIds: string[] = [];
+
+              for (const ur of myUserRoadmaps) {
+                if (ur.sourceRoadmapId) {
+                  userRoadmapsMap[ur.sourceRoadmapId] = ur;
+                  backendEnrolledIds.push(ur.sourceRoadmapId);
+                }
+                if (ur.id) {
+                  userRoadmapsMap[ur.id] = ur;
+                }
+              }
+
+              const currentEnrolled = get().enrolledRoadmapIds;
+              const mergedEnrolled = Array.from(new Set([...currentEnrolled, ...backendEnrolledIds]));
+              const currentActiveId = get().activeRoadmapId;
+              const activeUr = currentActiveId ? userRoadmapsMap[currentActiveId] : (myUserRoadmaps[0] || null);
+
+              set({
+                userRoadmaps: userRoadmapsMap,
+                enrolledRoadmapIds: mergedEnrolled,
+                activeUserRoadmap: activeUr || get().activeUserRoadmap,
+              });
+            }
+          }
+        } catch {
+          // If unauthenticated or offline, continue gracefully
         }
       },
     }),
