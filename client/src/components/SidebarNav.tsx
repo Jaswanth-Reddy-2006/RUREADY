@@ -159,6 +159,27 @@ export default function SidebarNav() {
             )}
           </NavLink>
 
+          {/* 2. RESUME PARSER */}
+          <NavLink
+            to="/resume-parser"
+            className={({ isActive }) =>
+              clsx(
+                "flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold font-sans transition-all duration-200 group relative",
+                isActive
+                  ? "bg-[#EFFAFD] dark:bg-[#4A8BDF]/20 text-[#11183D] dark:text-[#4A8BDF] shadow-xs"
+                  : "text-[#526078] dark:text-[#94A3B8] hover:bg-[#F8FAFC] dark:hover:bg-white/[0.05] hover:text-[#11183D] dark:hover:text-white"
+              )
+            }
+          >
+            {({ isActive }) => (
+              <>
+                <FileText size={17} className={isActive ? "text-[#4A8BDF]" : "text-[#526078] dark:text-[#94A3B8] group-hover:text-[#11183D] dark:group-hover:text-white"} />
+                <span className="truncate">Resume</span>
+                {isActive && <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 bg-[#4A8BDF] rounded-r-full shadow-sm" />}
+              </>
+            )}
+          </NavLink>
+
           {/* 2. INTERVIEWS DROPDOWN */}
           <div className="space-y-1">
             <button

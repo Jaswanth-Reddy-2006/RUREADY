@@ -71,6 +71,7 @@ import ResumeBuilderPage from './pages/resume/ResumeBuilderPage';
 import AtsAnalyzerPage from './pages/resume/AtsAnalyzerPage';
 import ResumeVersionsPage from './pages/resume/ResumeVersionsPage';
 import ResumePreviewPage from './pages/resume/ResumePreviewPage';
+import ResumeParserPage from './pages/ResumeParserPage';
 import RoadmapCatalog from './pages/roadmap/RoadmapCatalog';
 import RoadmapView from './pages/roadmap/RoadmapView';
 import RoadmapBuilderPage from './pages/roadmap/RoadmapBuilderPage';
@@ -723,6 +724,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Settings />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/resume-parser"
+                element={
+                  <ProtectedRoute>
+                    <ResumeParserPage />
                   </ProtectedRoute>
                 }
               />

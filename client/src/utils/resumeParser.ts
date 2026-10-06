@@ -9,6 +9,7 @@
 import mammoth from 'mammoth';
 import JSZip from 'jszip';
 import * as pdfjsLib from 'pdfjs-dist';
+import apiClient from '../api/client';
 import {
   ResumeData,
   normalizeResumeData,
@@ -255,24 +256,74 @@ export async function extractTextFromPdfArrayBuffer(arrayBuffer: ArrayBuffer): P
 }
 
 /**
- * Universal File Reader: Converts any PDF, DOCX, DOC, TXT, or MD into clean rawText
+ * Attempts to extract text using the dedicated Docling backend parser.
+ */
+async function extractTextViaDoclingBackend(file: File): Promise<string | null> {
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    const res = await apiClient.post('/ats/extract', formData, {
+      timeout: 60000,
+    });
+    if (res.data?.success && res.data?.data) {
+      const { resumeText, plain_text, markdown } = res.data.data;
+      return resumeText || plain_text || markdown || null;
+    }
+  } catch (err: any) {
+    if (
+      err.response?.data?.errorType === 'UnsupportedFormatError' ||
+      err.response?.data?.error?.includes('.doc')
+    ) {
+      throw new Error(
+        err.response?.data?.error ||
+        'Legacy Microsoft Word format (.doc) is not supported by Docling. Please save or export your document as .docx or .pdf and upload again.'
+      );
+    }
+    console.warn('[ResumeParser] Docling backend extraction notice:', err?.response?.data?.error || err.message);
+  }
+  return null;
+}
+
+/**
+ * Universal File Reader: Converts any PDF, DOCX, DOC, TXT, or MD into clean rawText using Docling
  */
 export async function readFileToPlainText(file: File): Promise<string> {
   const fileExt = file.name.split('.').pop()?.toLowerCase();
 
-  // 1. DOCX / DOC
-  if (fileExt === 'docx' || fileExt === 'doc') {
+  if (fileExt === 'doc') {
+    throw new Error(
+      'Legacy Microsoft Word format (.doc) is not supported by Docling. Please save or export your document as .docx or .pdf and upload again.'
+    );
+  }
+
+  // 1. Primary: Extract directly via backend Docling engine for PDF and DOCX
+  if (fileExt === 'pdf' || fileExt === 'docx') {
+    try {
+      const doclingText = await extractTextViaDoclingBackend(file);
+      if (doclingText && doclingText.trim().length > 0) {
+        return doclingText.trim();
+      }
+    } catch (err: any) {
+      if (err.message?.includes('.doc') || err.message?.includes('Legacy Microsoft Word') || err.message?.includes('Unsupported')) {
+        throw err;
+      }
+      console.warn('[ResumeParser] Docling backend extraction fallback triggered:', err);
+    }
+  }
+
+  // 2. DOCX Fallback
+  if (fileExt === 'docx') {
     const arrayBuffer = await file.arrayBuffer();
     return extractTextFromDocxArrayBuffer(arrayBuffer);
   }
 
-  // 2. PDF
+  // 3. PDF Fallback
   if (fileExt === 'pdf') {
     const arrayBuffer = await file.arrayBuffer();
     return extractTextFromPdfArrayBuffer(arrayBuffer);
   }
 
-  // 3. TXT / Markdown / Plain text files
+  // 4. TXT / Markdown / Plain text files
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {

@@ -8,7 +8,9 @@
     "build": "tsc && node -e \"const fs=require('fs'); if(fs.existsSync('src/generated')) fs.cpSync('src/generated', 'dist/generated', {recursive:true});\"",
     "start": "node dist/index.js",
     "db:generate": "npx prisma generate --schema=src/prisma/schema.prisma",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:bridge": "tsx tests/test_node_bridge.ts",
+    "test:parser": "tsx tests/test_resume_parser_endpoint.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.2.0",

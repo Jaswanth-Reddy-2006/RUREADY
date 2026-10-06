@@ -9,6 +9,8 @@ const upload = multer({
 
 const router: Router = Router();
 
+router.post('/extract', upload.any(), atsController.extractDocument);
+router.post('/parse-document', upload.any(), atsController.extractDocument);
 router.post('/analyze', upload.any(), atsController.analyze);
 router.post('/upload', upload.any(), atsController.analyze);
 router.get('/:id', atsController.getAtsMatch);

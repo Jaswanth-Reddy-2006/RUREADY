@@ -36,13 +36,8 @@ model CareerRoadmap {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
-<<<<<<< HEAD
   @@index([userId, createdAt])
   @@index([rolePath, visibility, updatedAt])
-=======
-  @@index([userId])
-  @@index([rolePath])
->>>>>>> origin/main
   @@map("career_roadmaps")
 }
 
