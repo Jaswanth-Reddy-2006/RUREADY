@@ -10,7 +10,9 @@
     "db:generate": "npx prisma generate --schema=src/prisma/schema.prisma",
     "typecheck": "tsc --noEmit",
     "test:bridge": "tsx tests/test_node_bridge.ts",
-    "test:parser": "tsx tests/test_resume_parser_endpoint.ts"
+    "test:parser": "tsx tests/test_resume_parser_endpoint.ts",
+    "test:matcher": "tsx tests/test_competitive_match.ts",
+    "test:matcher:py": "python tests/test_competitive_matcher.py"
   },
   "dependencies": {
     "@prisma/client": "^6.2.0",

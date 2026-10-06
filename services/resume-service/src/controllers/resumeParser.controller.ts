@@ -2,6 +2,10 @@ import { Request, Response, NextFunction } from 'express';
 import path from 'node:path';
 import { documentParserService, DocumentParserError } from '../services/documentParser.service.js';
 import { bgeAtsService, BgeAtsScorerError } from '../services/bgeAts.service.js';
+import {
+  competitiveMatchService,
+  CompetitiveMatchError,
+} from '../services/competitiveMatch.service.js';
 
 export const resumeParserController = {
   /**
@@ -87,6 +91,46 @@ export const resumeParserController = {
       res.status(200).json({
         success: true,
         data: result,
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /**
+   * Combined evaluation: role-independent ATS Score (deterministic six-pillar
+   * engine) + Competitive Score (BGE-based resume/JD matcher). The two scores
+   * are computed independently and returned separately — never merged.
+   *
+   * Body: { resumeText, structuredElements?, jobDescription, role? }
+   * Response data: { ats: {...}, competitive: {...} }
+   */
+  async evaluateResume(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { resumeText, structuredElements, jobDescription, role } = req.body;
+      if (!resumeText || !resumeText.trim()) {
+        throw new BgeAtsScorerError('resumeText is required for evaluation.', 400);
+      }
+      if (!jobDescription || !jobDescription.trim()) {
+        throw new CompetitiveMatchError('jobDescription is required for the Competitive Score.', 400);
+      }
+
+      console.log(`[Resume Evaluate] Scoring resume (${resumeText.length} chars): ATS + Competitive`);
+
+      const [ats, competitive] = await Promise.all([
+        bgeAtsService.scoreResume({ resumeText, structuredElements }),
+        competitiveMatchService.match({ resumeText, jobDescription, role, structuredElements }),
+      ]);
+
+      console.log(
+        `[Resume Evaluate] ATS ${ats.overallScore}/100 | Competitive ${
+          competitive.status === 'MATCHED' ? `${competitive.score}/100` : 'N/A'
+        } (${competitive.modelSource})`
+      );
+
+      res.status(200).json({
+        success: true,
+        data: { ats, competitive },
       });
     } catch (err) {
       next(err);

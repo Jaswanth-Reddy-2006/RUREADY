@@ -1,0 +1,8 @@
+# Training-only dependencies (NOT needed for production inference).
+# Production inference only needs the service requirements.txt
+# (sentence-transformers + torch) plus the model files in ml/models/.
+huggingface_hub>=0.23.0
+pandas>=2.0.0
+numpy>=1.26.0
+sentence-transformers>=3.0.0
+torch>=2.0.0

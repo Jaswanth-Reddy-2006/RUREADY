@@ -11,5 +11,6 @@ const router: Router = Router();
 
 router.post('/parse', upload.any(), resumeParserController.parseResume);
 router.post('/score', resumeParserController.scoreResumeWithBge);
+router.post('/evaluate', resumeParserController.evaluateResume);
 
 export default router;

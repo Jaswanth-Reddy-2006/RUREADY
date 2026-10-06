@@ -6,6 +6,10 @@ import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { aiProviderManager } from '../lib/ai-provider-manager.js';
 import { NotFoundError, BadRequestError } from '../lib/errors.js';
+import {
+  competitiveMatchService,
+  CompetitiveMatchResult,
+} from './competitiveMatch.service.js';
 
 export const AtsAnalysisSchema = z.object({
   jobTitle: z.string().min(1),
@@ -39,7 +43,10 @@ export const AtsAnalysisSchema = z.object({
   ),
 });
 
-export type AtsAnalysisResult = z.infer<typeof AtsAnalysisSchema> & { id?: string };
+export type AtsAnalysisResult = z.infer<typeof AtsAnalysisSchema> & {
+  id?: string;
+  competitive?: CompetitiveMatchResult;
+};
 
 const COMMON_TECH_KEYWORDS = [
   'TypeScript', 'JavaScript', 'React', 'Next.js', 'Vue', 'Angular', 'Node.js',
@@ -205,46 +212,87 @@ Perform a comprehensive ATS audit and output ONLY valid JSON adhering strictly t
       };
     }
 
-    // Retrieve Semantic Similarity from AI Analysis Service (Hugging Face Xenova/all-MiniLM-L6-v2)
-    const AI_ANALYSIS_SERVICE_URL = process.env.AI_ANALYSIS_SERVICE_URL || process.env.AI_SERVICE_URL || 'http://localhost:4003';
-    let semanticScore = 78;
+    // ── Competitive Score (MODEL 3: BGE-based resume↔JD matcher) ─────────
+    // Replaces the previous LLM matchScore + ai-analysis-service MiniLM blend.
+    // The numeric matchScore now comes solely from the transparent matcher:
+    //   0.45·semanticSimilarity + 0.25·skillOverlap + 0.15·experienceRelevance
+    //   + 0.15·terminologyMatch, gated by a multi-signal role-match check.
+    const role = jobTitleInput || parsedResult.jobTitle || 'Selected Role';
+    let competitive: CompetitiveMatchResult;
 
     try {
-      const semResponse = await fetch(`${AI_ANALYSIS_SERVICE_URL}/internal/ats-semantic-match`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          resumeText: cleanResume,
-          jobDescription: cleanJD,
-          targetRole: jobTitleInput || parsedResult.jobTitle,
-        }),
+      competitive = await competitiveMatchService.match({
+        resumeText,
+        jobDescription,
+        role,
       });
-
-      if (semResponse.ok) {
-        const semData = (await semResponse.json()) as any;
-        if (typeof semData.semanticScore === 'number') {
-          semanticScore = semData.semanticScore;
-        }
-      }
-    } catch {
-      // Heuristic fallback for semantic relevance
+    } catch (err) {
+      console.error('[ATS] Competitive matcher failed, using heuristic fallback:', err);
+      // Deterministic word-overlap fallback so the endpoint degrades gracefully
+      // if the Python model layer is unavailable.
       const jdWords = new Set(cleanJD.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter((w) => w.length > 3));
       const resWords = new Set(cleanResume.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter((w) => w.length > 3));
       let overlap = 0;
       for (const w of jdWords) {
         if (resWords.has(w)) overlap++;
       }
-      const ratio = jdWords.size > 0 ? overlap / jdWords.size : 0.75;
-      semanticScore = Math.min(95, Math.max(50, Math.round(ratio * 100)));
+      const coverage = jdWords.size > 0 ? overlap / jdWords.size : 0;
+      const requiredSkills = COMMON_TECH_KEYWORDS.filter((k) => cleanJD.toUpperCase().includes(k.toUpperCase()));
+      const matchedSkills = requiredSkills.filter((k) => cleanResume.toUpperCase().includes(k.toUpperCase()));
+      const skillRatio = requiredSkills.length > 0 ? matchedSkills.length / requiredSkills.length : coverage;
+
+      competitive = {
+        status: coverage >= 0.15 || skillRatio >= 0.2 ? 'MATCHED' : 'NOT_RELEVANT',
+        score: null,
+        role,
+        model: 'heuristic-word-overlap',
+        modelSource: 'base-bge',
+        weights: { semanticSimilarity: 0.45, skillOverlap: 0.25, experienceRelevance: 0.15, terminologyMatch: 0.15 },
+        gate: {},
+        matchSignals: {
+          semanticSimilarity: Number(coverage.toFixed(4)),
+          skillOverlap: Number(skillRatio.toFixed(4)),
+          experienceRelevance: Number(coverage.toFixed(4)),
+          terminologyMatch: Number(coverage.toFixed(4)),
+        },
+        signalsDetail: {
+          rawCosine: 0,
+          matchedSkills,
+          missingSkills: requiredSkills.filter((k) => !cleanResume.toUpperCase().includes(k.toUpperCase())),
+          resumeSkills: [],
+        },
+      };
+      if (competitive.status === 'MATCHED') {
+        const w = competitive.weights;
+        const s = competitive.matchSignals;
+        competitive.score = Math.max(0, Math.min(100, Math.round(
+          100 * (w.semanticSimilarity * s.semanticSimilarity
+            + w.skillOverlap * s.skillOverlap
+            + w.experienceRelevance * s.experienceRelevance
+            + w.terminologyMatch * s.terminologyMatch)
+        )));
+      } else {
+        competitive.reason = 'Resume domain does not sufficiently match the selected role (heuristic fallback).';
+      }
     }
 
-    // Blend Deterministic ATS Score (70%) + Semantic AI Score (30%) strictly within 0-100
-    const deterministicScore = parsedResult.matchScore;
-    const finalMatchScore = Math.min(100, Math.max(0, Math.round(deterministicScore * 0.70 + semanticScore * 0.30)));
+    // The LLM-provided matchScore is qualitative context only; the persisted
+    // numeric score is the calibrated Competitive Score (0 when not relevant).
+    const finalMatchScore = competitive.status === 'MATCHED' ? (competitive.score ?? 0) : 0;
+    const semanticScore = Math.round(competitive.matchSignals.semanticSimilarity * 100);
 
     parsedResult.matchScore = finalMatchScore;
     parsedResult.semanticScore = semanticScore;
     parsedResult.overallScore = finalMatchScore;
+    parsedResult.matchedSkills = competitive.signalsDetail.matchedSkills.length
+      ? competitive.signalsDetail.matchedSkills
+      : parsedResult.matchedSkills;
+    parsedResult.missingSkills = competitive.signalsDetail.missingSkills.length
+      ? competitive.signalsDetail.missingSkills
+      : parsedResult.missingSkills;
+    if (competitive.status === 'NOT_RELEVANT' && competitive.reason) {
+      parsedResult.experienceMatch = `NOT_RELEVANT — ${competitive.reason}`;
+    }
 
     // Save ATS Match Record to database
     const dbRecord = await prisma.atsMatch.create({
