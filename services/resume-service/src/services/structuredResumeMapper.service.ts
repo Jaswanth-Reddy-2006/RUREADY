@@ -360,6 +360,7 @@ function sectionTextLines(sec: Section): string[] {
 
 // ── Personal info ─────────────────────────────────────────────────────────
 const SECTION_HEADING_WORDS = /^(?:resume|curriculum\s+vitae|cv|experience|work\s+experience|education|skills|technical\s+skills|projects|summary|profile|contact|contact\s+info|certifications|achievements|courses|publications|patents)$/i;
+const TITLE_OR_ROLE_PATTERN = /\b(?:software|frontend|backend|full\s*stack|devops|cloud|data|ml|ai|cybersecurity|security|ui\/ux|product|web|mobile|ios|android|system|engineer|developer|designer|architect|manager|specialist|analyst|scientist|consultant|researcher|administrator|officer|coordinator|lead|intern|student|curriculum\s+vitae|resume)\b/i;
 
 function looksLikeName(line: string): boolean {
   const clean = cleanMarkdownDecorators(line);
@@ -368,6 +369,7 @@ function looksLikeName(line: string): boolean {
   if (/\d/.test(clean) || /[|•\/]/.test(clean)) return false;
   if (SECTION_HEADING_WORDS.test(clean)) return false;
   if (classifyHeader(clean) !== 'unknown') return false;
+  if (TITLE_OR_ROLE_PATTERN.test(clean)) return false;
   const words = clean.split(/\s+/);
   if (words.length < 1 || words.length > 5) return false;
   return words.every((w) => /^[A-Za-z.'\-]+$/.test(w));
@@ -380,16 +382,41 @@ function extractPersonalInfo(preamble: Block[], fullText: string): StructuredRes
   const searchPool = [...preLines, ...fullTopLines];
   const joined = searchPool.join('\n');
 
-  // Name: first name-like line in preamble, fallback to top lines of fullText
-  for (const rawLine of [...preLines.slice(0, 6), ...fullTopLines.slice(0, 6)]) {
-    const cleaned = cleanMarkdownDecorators(rawLine);
-    if (looksLikeName(cleaned)) {
-      info.fullName = cleaned;
-      break;
+  // 1. Structural name extraction: check if Docling explicitly tagged a 'title' element in preamble
+  const titleBlock = preamble.find((b) => b.type === 'title' && b.text && !isSectionHeaderLine(b.text));
+  if (titleBlock) {
+    const cleanedTitle = cleanMarkdownDecorators(titleBlock.text);
+    if (looksLikeName(cleanedTitle)) {
+      info.fullName = cleanedTitle;
+    } else {
+      const segs = cleanedTitle.split(/[|•–—\n]/).map((s) => s.trim());
+      if (segs.length > 1 && looksLikeName(segs[0])) {
+        info.fullName = segs[0];
+      }
     }
-    const segments = cleaned.split(/[|•–—]/).map((s) => s.trim());
-    if (segments.length > 1 && looksLikeName(segments[0])) {
-      info.fullName = segments[0];
+  }
+
+  // 2. Contact-context validation: find name candidate near/above contact anchors
+  if (!info.fullName) {
+    for (const rawLine of [...preLines.slice(0, 6), ...fullTopLines.slice(0, 6)]) {
+      const cleaned = cleanMarkdownDecorators(rawLine);
+      if (looksLikeName(cleaned)) {
+        info.fullName = cleaned;
+        break;
+      }
+      const segments = cleaned.split(/[|•–—]/).map((s) => s.trim());
+      if (segments.length > 1 && looksLikeName(segments[0])) {
+        info.fullName = segments[0];
+        break;
+      }
+    }
+  }
+
+  // 3. Professional role/title in preamble (not candidate name, not contact info)
+  for (const rawLine of preLines.slice(0, 6)) {
+    const clean = cleanMarkdownDecorators(rawLine);
+    if (clean !== info.fullName && TITLE_OR_ROLE_PATTERN.test(clean) && !EMAIL_RE.test(clean) && !PHONE_RE.test(clean)) {
+      info.title = clean.split(/[|•–—]/)[0].trim();
       break;
     }
   }
@@ -452,20 +479,6 @@ function extractPersonalInfo(preamble: Block[], fullText: string): StructuredRes
     if (portfolio) {
       const rawPort = portfolio.trim().replace(/[)\]]+$/, '');
       info.portfolio = rawPort.startsWith('http') ? rawPort : `https://${rawPort}`;
-    }
-  }
-
-  // Professional Title: search near the name or inspect top lines
-  const roleRegex = /^(?:Senior|Junior|Lead|Principal|Staff|Associate|Chief|Founding)?\s*(?:Software|Full\s*Stack|Frontend|Backend|DevOps|Cloud|Data|ML|AI|Cybersecurity|Systems?|Platform|Product|Design|UI\/UX|Mobile|iOS|Android|Web|Research|Graduate)?\s*(?:Engineer|Developer|Designer|Architect|Manager|Specialist|Analyst|Scientist|Consultant|Researcher|Administrator|Lead|Intern|Fellow|Assistant)\b/i;
-
-  for (const cand of searchPool.slice(0, 8)) {
-    const cleanCand = cleanMarkdownDecorators(cand);
-    if (!cleanCand || cleanCand === info.fullName) continue;
-    if (EMAIL_RE.test(cleanCand) || URL_RE.test(cleanCand)) continue;
-    if (classifyHeader(cleanCand) !== 'unknown') continue;
-    if (roleRegex.test(cleanCand) && cleanCand.length <= 80) {
-      info.title = cleanCand;
-      break;
     }
   }
 
@@ -1218,10 +1231,6 @@ export function mapDoclingToStructuredResume(input: DoclingInput): StructuredRes
             title: sec.header || 'Courses',
             items,
           });
-          // Also link to first education entry coursework if empty
-          if (resume.education.length > 0 && !resume.education[0].coursework) {
-            resume.education[0].coursework = items.join(', ');
-          }
         }
         break;
       }
@@ -1233,7 +1242,6 @@ export function mapDoclingToStructuredResume(input: DoclingInput): StructuredRes
             title: sec.header || 'Extra Curricular Activities',
             items,
           });
-          resume.hobbies.push(...items);
         }
         break;
       }
@@ -1258,7 +1266,10 @@ export function mapDoclingToStructuredResume(input: DoclingInput): StructuredRes
   // Preserve any unrecognized non-empty section as a custom section, EXCEPT if it's canonical info
   customSectionCandidates.forEach((sec, i) => {
     const headerLower = (sec.header || '').toLowerCase();
-    if (/\b(?:personal|contact|education|academic|experience|skills|summary|profile|awards|achievements|certifications|publications|patents)\b/i.test(headerLower)) {
+    if (
+      classifyHeader(sec.header || '') !== 'unknown' ||
+      /\b(?:personal|contact|education|academic|experience|skills|summary|profile|awards|achievements|certifications|publications|patents|languages)\b/i.test(headerLower)
+    ) {
       return;
     }
     const items = mapStringList(sec);
