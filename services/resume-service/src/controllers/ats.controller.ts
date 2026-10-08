@@ -56,7 +56,13 @@ export const atsController = {
     try {
       const userId = getUserId(req);
       let resumeText = req.body.resumeText || '';
-      
+      // Structured Docling elements, when available, are forwarded to the
+      // competitive matcher so experience relevance uses real document
+      // structure instead of flat-text chunking.
+      let structuredElements: any[] | undefined = Array.isArray(req.body.structuredElements)
+        ? req.body.structuredElements
+        : undefined;
+
       const file = (req as any).file || (req as any).files?.[0];
       if (file && file.buffer) {
         console.log(`[Resume] File received for ATS analysis: ${file.originalname}`);
@@ -68,6 +74,9 @@ export const atsController = {
           file.originalname || 'resume.pdf'
         );
         resumeText = parsed.resumeText || parsed.plain_text || parsed.markdown || '';
+        if (Array.isArray(parsed.structured_elements) && parsed.structured_elements.length) {
+          structuredElements = parsed.structured_elements;
+        }
         
         console.log(`[Resume] Docling extraction completed`);
         console.log(`[Resume] Extracted characters: ${parsed.character_count || resumeText.length}`);
@@ -80,7 +89,8 @@ export const atsController = {
         resumeText,
         jobDescription,
         jobTitle,
-        companyName
+        companyName,
+        structuredElements
       );
 
       res.status(200).json({

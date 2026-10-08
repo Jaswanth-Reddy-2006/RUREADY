@@ -95,26 +95,48 @@ export default function MinimalExecutiveTemplate({ data }: TemplateProps) {
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5 text-[11px]">
-          <div>
-            <span className="font-bold text-slate-900">Languages: </span>
-            <span className="text-slate-700">{data.skills.languages.join(', ')}</span>
-          </div>
-          <div>
-            <span className="font-bold text-slate-900">Frameworks: </span>
-            <span className="text-slate-700">{data.skills.frameworks.join(', ')}</span>
-          </div>
-          <div>
-            <span className="font-bold text-slate-900">Databases: </span>
-            <span className="text-slate-700">{data.skills.databases.join(', ')}</span>
-          </div>
-          <div>
-            <span className="font-bold text-slate-900">Cloud & DevOps: </span>
-            <span className="text-slate-700">{data.skills.cloudDevOps.join(', ')}</span>
-          </div>
-          <div>
-            <span className="font-bold text-slate-900">Tools: </span>
-            <span className="text-slate-700">{data.skills.tools.join(', ')}</span>
-          </div>
+          {data.skills.languages?.length > 0 && (
+            <div>
+              <span className="font-bold text-slate-900">Languages: </span>
+              <span className="text-slate-700">{data.skills.languages.join(', ')}</span>
+            </div>
+          )}
+          {((data.skills.frameworks && data.skills.frameworks.length > 0) || (data.skills.libraries && data.skills.libraries.length > 0)) && (
+            <div>
+              <span className="font-bold text-slate-900">Frameworks & Libraries: </span>
+              <span className="text-slate-700">{[...(data.skills.frameworks || []), ...(data.skills.libraries || [])].join(', ')}</span>
+            </div>
+          )}
+          {data.skills.databases?.length > 0 && (
+            <div>
+              <span className="font-bold text-slate-900">Databases: </span>
+              <span className="text-slate-700">{data.skills.databases.join(', ')}</span>
+            </div>
+          )}
+          {data.skills.cloudDevOps?.length > 0 && (
+            <div>
+              <span className="font-bold text-slate-900">Cloud & DevOps: </span>
+              <span className="text-slate-700">{data.skills.cloudDevOps.join(', ')}</span>
+            </div>
+          )}
+          {data.skills.tools && data.skills.tools.length > 0 && (
+            <div>
+              <span className="font-bold text-slate-900">Tools: </span>
+              <span className="text-slate-700">{data.skills.tools.join(', ')}</span>
+            </div>
+          )}
+          {data.skills.security && data.skills.security.length > 0 && (
+            <div>
+              <span className="font-bold text-slate-900">Security: </span>
+              <span className="text-slate-700">{data.skills.security.join(', ')}</span>
+            </div>
+          )}
+          {data.skills.other && data.skills.other.length > 0 && (
+            <div>
+              <span className="font-bold text-slate-900">Other: </span>
+              <span className="text-slate-700">{data.skills.other.join(', ')}</span>
+            </div>
+          )}
         </div>
       </section>
 
@@ -150,34 +172,135 @@ export default function MinimalExecutiveTemplate({ data }: TemplateProps) {
       )}
 
       {/* Education */}
-      <section>
-        <h2 className="text-[11px] font-black uppercase tracking-wider text-slate-900 mb-2 border-b border-slate-200 pb-0.5">
-          Education & Credentials
-        </h2>
+      {data.education.length > 0 && (
+        <section className="mb-4">
+          <h2 className="text-[11px] font-black uppercase tracking-wider text-slate-900 mb-2 border-b border-slate-200 pb-0.5">
+            Education
+          </h2>
 
-        <div className="space-y-1.5">
-          {data.education.map((edu) => (
-            <div key={edu.id} className="flex justify-between items-baseline text-[11px]">
-              <div>
-                <strong className="text-slate-900">{edu.degree}</strong>
-                <span className="text-slate-600 ml-1.5">— {edu.school}</span>
-                {edu.gpa && <span className="text-slate-500 ml-2 font-mono">(GPA: {edu.gpa})</span>}
+          <div className="space-y-1.5">
+            {data.education.map((edu) => (
+              <div key={edu.id} className="flex justify-between items-baseline text-[11px]">
+                <div>
+                  <strong className="text-slate-900">{edu.degree}</strong>
+                  <span className="text-slate-600 ml-1.5">— {edu.school}</span>
+                  {edu.gpa && <span className="text-slate-500 ml-2 font-mono">(GPA: {edu.gpa})</span>}
+                </div>
+                <span className="text-[10px] font-mono text-slate-500">{edu.startDate} – {edu.endDate}</span>
               </div>
-              <span className="text-[10px] font-mono text-slate-500">{edu.startDate} – {edu.endDate}</span>
-            </div>
-          ))}
+            ))}
+          </div>
+        </section>
+      )}
 
-          {data.certifications.map((c) => (
-            <div key={c.id} className="flex justify-between items-baseline text-[11px]">
-              <div>
-                <strong className="text-slate-900">{c.title}</strong>
-                <span className="text-slate-600 ml-1.5">— {c.issuer}</span>
+      {/* Certifications */}
+      {data.certifications && data.certifications.length > 0 && (
+        <section className="mb-4">
+          <h2 className="text-[11px] font-black uppercase tracking-wider text-slate-900 mb-2 border-b border-slate-200 pb-0.5">
+            Certifications
+          </h2>
+
+          <div className="space-y-1.5">
+            {data.certifications.map((c) => (
+              <div key={c.id} className="flex justify-between items-baseline text-[11px]">
+                <div>
+                  <strong className="text-slate-900">{c.title}</strong>
+                  {c.issuer && <span className="text-slate-600 ml-1.5">— {c.issuer}</span>}
+                </div>
+                {c.date && <span className="text-[10px] font-mono text-slate-500">{c.date}</span>}
               </div>
-              <span className="text-[10px] font-mono text-slate-500">{c.date}</span>
-            </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Publications */}
+      {data.publications && data.publications.length > 0 && (
+        <section className="mb-4">
+          <h2 className="text-[11px] font-black uppercase tracking-wider text-slate-900 mb-2 border-b border-slate-200 pb-0.5">
+            Publications
+          </h2>
+          <div className="space-y-1 text-[11px]">
+            {data.publications.map((pub) => (
+              <div key={pub.id} className="flex justify-between items-baseline">
+                <div>
+                  <strong className="text-slate-900">{pub.title}</strong>
+                  {pub.venue && <span className="text-slate-600 ml-1.5">— {pub.venue}</span>}
+                </div>
+                {pub.date && <span className="text-[10px] font-mono text-slate-500">{pub.date}</span>}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Patents */}
+      {data.patents && data.patents.length > 0 && (
+        <section className="mb-4">
+          <h2 className="text-[11px] font-black uppercase tracking-wider text-slate-900 mb-2 border-b border-slate-200 pb-0.5">
+            Patents
+          </h2>
+          <div className="space-y-1 text-[11px]">
+            {data.patents.map((pat) => (
+              <div key={pat.id} className="flex justify-between items-baseline">
+                <div>
+                  <strong className="text-slate-900">{pat.title}</strong>
+                  {pat.number && <span className="text-slate-600 ml-1.5">({pat.number})</span>}
+                </div>
+                {pat.date && <span className="text-[10px] font-mono text-slate-500">{pat.date}</span>}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Achievements */}
+      {data.achievements && data.achievements.length > 0 && (
+        <section className="mb-4">
+          <h2 className="text-[11px] font-black uppercase tracking-wider text-slate-900 mb-2 border-b border-slate-200 pb-0.5">
+            Key Achievements
+          </h2>
+          <ul className="list-disc list-outside ml-4 space-y-0.5 text-[11px] text-slate-700">
+            {data.achievements.map((ach, idx) => (
+              <li key={idx}>{ach}</li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {/* Languages */}
+      {data.languages && data.languages.length > 0 && (
+        <section className="mb-4">
+          <h2 className="text-[11px] font-black uppercase tracking-wider text-slate-900 mb-2 border-b border-slate-200 pb-0.5">
+            Languages
+          </h2>
+          <div className="flex flex-wrap gap-2 text-[11px] text-slate-800">
+            {data.languages.map((lang, idx) => (
+              <span key={idx} className="bg-slate-100 px-2 py-0.5 rounded">
+                {lang}
+              </span>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Custom Sections */}
+      {data.customSections && data.customSections.length > 0 && (
+        <div className="space-y-4">
+          {data.customSections.map((sec) => (
+            <section key={sec.id}>
+              <h2 className="text-[11px] font-black uppercase tracking-wider text-slate-900 mb-2 border-b border-slate-200 pb-0.5">
+                {sec.title}
+              </h2>
+              <ul className="list-disc list-outside ml-4 space-y-0.5 text-[11px] text-slate-700">
+                {sec.items.map((item, idx) => (
+                  <li key={idx}>{item}</li>
+                ))}
+              </ul>
+            </section>
           ))}
         </div>
-      </section>
+      )}
 
     </div>
   );

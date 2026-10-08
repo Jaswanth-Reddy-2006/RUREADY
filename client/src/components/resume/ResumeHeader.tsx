@@ -15,10 +15,10 @@ export default function ResumeHeader({ onCreateClick, onAnalyzeClick }: ResumeHe
     <div className="bg-white border border-slate-200/80 shadow-xs rounded-3xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
       <div className="space-y-1">
         <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-          AI Resume & ATS Command Center
+          Resume Workspace
         </h1>
         <p className="text-xs sm:text-sm text-slate-500">
-          Build resumes that clearly communicate your skills, experience, and relevance to target roles.
+          Build, parse, edit, and analyze your resumes with comprehensive ATS diagnostics and job relevance matching.
         </p>
       </div>
 

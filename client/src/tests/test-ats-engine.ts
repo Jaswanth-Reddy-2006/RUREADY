@@ -169,7 +169,6 @@ testCases.forEach(({ name, raw }, idx) => {
   console.log(`     Metrics/Outcomes: ${generalScore.breakdown.metricsScore}/25`);
   console.log(`     Completeness: ${generalScore.breakdown.completenessScore}/20`);
   console.log(`     Action Verbs: ${generalScore.breakdown.actionVerbScore}/15`);
-  console.log(`     Semantic Score: ${generalScore.semanticScore}% (Target JD Linked: ${generalScore.hasTargetJd})`);
 
   if (generalScore.totalScore < 60) {
     throw new Error(`FAILED: Score too low (${generalScore.totalScore}/100) for valid resume!`);
@@ -192,7 +191,6 @@ const targetedUiuxScore = calculateAtsScore(uiuxParsed, uiuxJd, 'Senior Product 
 console.log(`  Targeted ATS Score: ${targetedUiuxScore.totalScore}/100 (${targetedUiuxScore.grade})`);
 console.log(`  Matched Keywords: [${targetedUiuxScore.matchedKeywords.join(', ')}]`);
 console.log(`  Missing Keywords: [${targetedUiuxScore.missingKeywords.join(', ')}]`);
-console.log(`  Semantic Score: ${targetedUiuxScore.semanticScore}%`);
 if (targetedUiuxScore.totalScore < 75 || targetedUiuxScore.matchedKeywords.length < 5) {
   throw new Error(`Targeted UI/UX match failed!`);
 } else {
@@ -212,12 +210,50 @@ const targetedSweScore = calculateAtsScore(sweParsed, sweJd, 'Senior Backend Eng
 console.log(`  Targeted ATS Score: ${targetedSweScore.totalScore}/100 (${targetedSweScore.grade})`);
 console.log(`  Matched Keywords: [${targetedSweScore.matchedKeywords.join(', ')}]`);
 console.log(`  Missing Keywords: [${targetedSweScore.missingKeywords.join(', ')}]`);
-console.log(`  Semantic Score: ${targetedSweScore.semanticScore}%`);
 if (targetedSweScore.totalScore < 75 || targetedSweScore.matchedKeywords.length < 5) {
   throw new Error(`Targeted Software Engineer match failed!`);
 } else {
   console.log(`  ✅ PASSED Targeted Software Engineer JD match!\n`);
 }
+
+// Test 3b: The client ATS engine must NOT fabricate a semantic/competitive score
+// and must NOT blend one into totalScore. totalScore is a purely deterministic
+// ATS-readiness preview; the authoritative Competitive Score comes only from the
+// backend BGE matcher.
+console.log('[TEST 7b] No Client-Side Fake Semantic Score / No ATS+Semantic Blending');
+if ('semanticScore' in targetedSweScore) {
+  throw new Error('FAILED: client ATS result must not expose a fabricated semanticScore');
+}
+if ('semanticScore' in targetedSweScore.breakdown) {
+  throw new Error('FAILED: client ATS breakdown must not expose a fabricated semanticScore');
+}
+{
+  const b = targetedSweScore.breakdown;
+  const deterministicSum = Math.min(
+    100,
+    Math.max(
+      0,
+      b.structureScore +
+        b.completenessScore +
+        b.extractabilityScore +
+        b.skillsScore +
+        b.experienceQualityScore +
+        b.formattingScore
+    )
+  );
+  if (targetedSweScore.totalScore !== deterministicSum) {
+    throw new Error(
+      `FAILED: totalScore (${targetedSweScore.totalScore}) must equal the deterministic sum of the 6 fixed pillars (${deterministicSum}); no semantic blending allowed`
+    );
+  }
+  // A JD is linked, yet the score must still be the deterministic sum (proving
+  // the old 70/30 ATS+semantic blend is gone even when hasTargetJd is true).
+  if (targetedSweScore.hasTargetJd !== true) {
+    throw new Error('FAILED: expected a target JD to be linked for this case');
+  }
+}
+console.log(`  totalScore=${targetedSweScore.totalScore} == deterministic sum, semanticScore absent`);
+console.log(`  ✅ PASSED No fabricated semantic score and no ATS+semantic blending!\n`);
 
 // Test 4: Strict Data Integrity Verification (No Fake Data Injected)
 console.log('[TEST 8] Strict Data Integrity & Zero Fake Defaults Verification');
@@ -440,8 +476,8 @@ Requirements:
 const atsScorePdf = calculateAtsScore(canonicalFromPdf, targetJobDescription, 'Full Stack Software Engineer');
 const atsScoreDocx = calculateAtsScore(canonicalFromDocx, targetJobDescription, 'Full Stack Software Engineer');
 
-console.log(`  Canonical PDF ATS Score:  ${atsScorePdf.totalScore}/100 (Keyword: ${atsScorePdf.breakdown.keywordScore}, Semantic: ${atsScorePdf.semanticScore}%, Action: ${atsScorePdf.breakdown.actionVerbScore})`);
-console.log(`  Canonical DOCX ATS Score: ${atsScoreDocx.totalScore}/100 (Keyword: ${atsScoreDocx.breakdown.keywordScore}, Semantic: ${atsScoreDocx.semanticScore}%, Action: ${atsScoreDocx.breakdown.actionVerbScore})`);
+console.log(`  Canonical PDF ATS Score:  ${atsScorePdf.totalScore}/100 (Keyword: ${atsScorePdf.breakdown.keywordScore}, Action: ${atsScorePdf.breakdown.actionVerbScore})`);
+console.log(`  Canonical DOCX ATS Score: ${atsScoreDocx.totalScore}/100 (Keyword: ${atsScoreDocx.breakdown.keywordScore}, Action: ${atsScoreDocx.breakdown.actionVerbScore})`);
 
 const scoreDiff = Math.abs(atsScorePdf.totalScore - atsScoreDocx.totalScore);
 console.log(`  Score Difference between PDF & DOCX: ${scoreDiff} point(s)`);

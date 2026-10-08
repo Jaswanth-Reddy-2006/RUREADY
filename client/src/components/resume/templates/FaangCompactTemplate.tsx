@@ -82,10 +82,10 @@ export default function FaangCompactTemplate({ data, highlightKeywords = [] }: T
               <span className="text-slate-700">{data.skills.languages.join(', ')}</span>
             </div>
           )}
-          {data.skills.frameworks?.length > 0 && (
+          {((data.skills.frameworks && data.skills.frameworks.length > 0) || (data.skills.libraries && data.skills.libraries.length > 0)) && (
             <div>
               <strong className="text-slate-900 font-semibold">Frameworks & Libraries: </strong>
-              <span className="text-slate-700">{data.skills.frameworks.join(', ')}</span>
+              <span className="text-slate-700">{[...(data.skills.frameworks || []), ...(data.skills.libraries || [])].join(', ')}</span>
             </div>
           )}
           {data.skills.databases?.length > 0 && (
@@ -104,6 +104,18 @@ export default function FaangCompactTemplate({ data, highlightKeywords = [] }: T
             <div>
               <strong className="text-slate-900 font-semibold">Developer Tools: </strong>
               <span className="text-slate-700">{data.skills.tools.join(', ')}</span>
+            </div>
+          )}
+          {data.skills.security && data.skills.security.length > 0 && (
+            <div>
+              <strong className="text-slate-900 font-semibold">Security: </strong>
+              <span className="text-slate-700">{data.skills.security.join(', ')}</span>
+            </div>
+          )}
+          {data.skills.other && data.skills.other.length > 0 && (
+            <div>
+              <strong className="text-slate-900 font-semibold">Other Skills: </strong>
+              <span className="text-slate-700">{data.skills.other.join(', ')}</span>
             </div>
           )}
         </div>
@@ -215,7 +227,7 @@ export default function FaangCompactTemplate({ data, highlightKeywords = [] }: T
 
       {/* Certifications */}
       {data.certifications?.length > 0 && (
-        <section>
+        <section className="mb-3">
           <h2 className="text-[11px] font-bold uppercase tracking-wider text-slate-900 border-b border-slate-300 pb-0.5 mb-1">
             Certifications
           </h2>
@@ -223,11 +235,99 @@ export default function FaangCompactTemplate({ data, highlightKeywords = [] }: T
             {data.certifications.map((cert) => (
               <div key={cert.id} className="flex items-center gap-1">
                 <span className="font-semibold text-slate-900">{cert.title}</span>
-                <span className="text-slate-500">({cert.issuer}, {cert.date})</span>
+                <span className="text-slate-500">({cert.issuer}{cert.date ? `, ${cert.date}` : ''})</span>
               </div>
             ))}
           </div>
         </section>
+      )}
+
+      {/* Publications */}
+      {data.publications && data.publications.length > 0 && (
+        <section className="mb-3">
+          <h2 className="text-[11px] font-bold uppercase tracking-wider text-slate-900 border-b border-slate-300 pb-0.5 mb-1">
+            Publications
+          </h2>
+          <div className="space-y-1 text-[10.5px]">
+            {data.publications.map((pub) => (
+              <div key={pub.id} className="flex justify-between items-baseline">
+                <div>
+                  <span className="font-semibold text-slate-900">{pub.title}</span>
+                  {pub.venue && <span className="text-slate-600 ml-1.5">— {pub.venue}</span>}
+                </div>
+                {pub.date && <span className="text-[10px] font-mono text-slate-500">{pub.date}</span>}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Patents */}
+      {data.patents && data.patents.length > 0 && (
+        <section className="mb-3">
+          <h2 className="text-[11px] font-bold uppercase tracking-wider text-slate-900 border-b border-slate-300 pb-0.5 mb-1">
+            Patents
+          </h2>
+          <div className="space-y-1 text-[10.5px]">
+            {data.patents.map((pat) => (
+              <div key={pat.id} className="flex justify-between items-baseline">
+                <div>
+                  <span className="font-semibold text-slate-900">{pat.title}</span>
+                  {pat.number && <span className="text-slate-600 ml-1.5">({pat.number})</span>}
+                </div>
+                {pat.date && <span className="text-[10px] font-mono text-slate-500">{pat.date}</span>}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Achievements / Honors */}
+      {data.achievements && data.achievements.length > 0 && (
+        <section className="mb-3">
+          <h2 className="text-[11px] font-bold uppercase tracking-wider text-slate-900 border-b border-slate-300 pb-0.5 mb-1">
+            Honors & Achievements
+          </h2>
+          <ul className="list-disc list-outside ml-4 space-y-0.5 text-[10.5px] text-slate-700">
+            {data.achievements.map((ach, idx) => (
+              <li key={idx}>{ach}</li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {/* Languages */}
+      {data.languages && data.languages.length > 0 && (
+        <section className="mb-3">
+          <h2 className="text-[11px] font-bold uppercase tracking-wider text-slate-900 border-b border-slate-300 pb-0.5 mb-1">
+            Languages
+          </h2>
+          <div className="flex flex-wrap gap-2 text-[10.5px] text-slate-700">
+            {data.languages.map((lang, idx) => (
+              <span key={idx} className="bg-slate-100 px-2 py-0.5 rounded text-slate-800 font-medium">
+                {lang}
+              </span>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Custom Sections */}
+      {data.customSections && data.customSections.length > 0 && (
+        <div className="space-y-3">
+          {data.customSections.map((sec) => (
+            <section key={sec.id}>
+              <h2 className="text-[11px] font-bold uppercase tracking-wider text-slate-900 border-b border-slate-300 pb-0.5 mb-1">
+                {sec.title}
+              </h2>
+              <ul className="list-disc list-outside ml-4 space-y-0.5 text-[10.5px] text-slate-700">
+                {sec.items.map((item, idx) => (
+                  <li key={idx}>{item}</li>
+                ))}
+              </ul>
+            </section>
+          ))}
+        </div>
       )}
 
     </div>

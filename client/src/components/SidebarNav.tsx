@@ -65,9 +65,7 @@ export default function SidebarNav() {
   );
 
   const [applicationsCrmOpen, setApplicationsCrmOpen] = useState(
-    location.pathname.startsWith('/resume') ||
-    location.pathname.startsWith('/placement-crm') ||
-    location.pathname.startsWith('/ats')
+    location.pathname.startsWith('/placement-crm')
   );
 
   const [profileData, setProfileData] = useState<{
@@ -118,9 +116,7 @@ export default function SidebarNav() {
     location.pathname.startsWith('/roadmap');
 
   const isApplicationsCrmActive =
-    location.pathname.startsWith('/resume') ||
-    location.pathname.startsWith('/placement-crm') ||
-    location.pathname.startsWith('/ats');
+    location.pathname.startsWith('/placement-crm');
 
   return (
     <>
@@ -159,23 +155,23 @@ export default function SidebarNav() {
             )}
           </NavLink>
 
-          {/* 2. RESUME PARSER */}
+          {/* 2. RESUME */}
           <NavLink
-            to="/resume-parser"
+            to="/resume"
             className={({ isActive }) =>
               clsx(
                 "flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold font-sans transition-all duration-200 group relative",
-                isActive
-                  ? "bg-[#EFFAFD] dark:bg-[#4A8BDF]/20 text-[#11183D] dark:text-[#4A8BDF] shadow-xs"
+                isActive || location.pathname.startsWith('/resume')
+                  ? "bg-[#EFFAFD] dark:bg-[#4A8BDF]/20 text-[#11183D] dark:text-[#4A8BDF] shadow-xs font-extrabold"
                   : "text-[#526078] dark:text-[#94A3B8] hover:bg-[#F8FAFC] dark:hover:bg-white/[0.05] hover:text-[#11183D] dark:hover:text-white"
               )
             }
           >
             {({ isActive }) => (
               <>
-                <FileText size={17} className={isActive ? "text-[#4A8BDF]" : "text-[#526078] dark:text-[#94A3B8] group-hover:text-[#11183D] dark:group-hover:text-white"} />
+                <FileText size={17} className={isActive || location.pathname.startsWith('/resume') ? "text-[#4A8BDF]" : "text-[#526078] dark:text-[#94A3B8] group-hover:text-[#11183D] dark:group-hover:text-white"} />
                 <span className="truncate">Resume</span>
-                {isActive && <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 bg-[#4A8BDF] rounded-r-full shadow-sm" />}
+                {(isActive || location.pathname.startsWith('/resume')) && <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 bg-[#4A8BDF] rounded-r-full shadow-sm" />}
               </>
             )}
           </NavLink>
@@ -441,7 +437,7 @@ export default function SidebarNav() {
           </div>
 
           {/* 4. APPLICATIONS CRM DROPDOWN */}
-          {(isFeatureEnabled('ai_resume_ats') || isFeatureEnabled('placement_crm')) && (
+          {isFeatureEnabled('placement_crm') && (
             <div className="space-y-1">
               <button
                 type="button"
@@ -464,29 +460,6 @@ export default function SidebarNav() {
 
               {applicationsCrmOpen && (
                 <div className="pl-4 space-y-1 border-l-2 border-slate-100 dark:border-slate-800 ml-4 py-1">
-                  {/* AI Resume & ATS */}
-                  {isFeatureEnabled('ai_resume_ats') && (
-                    <NavLink
-                      to="/resume"
-                      className={({ isActive }) =>
-                        clsx(
-                          "flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all",
-                          isActive || location.pathname.startsWith('/resume') || location.pathname.startsWith('/ats')
-                            ? "bg-[#EFFAFD] dark:bg-[#4A8BDF]/20 text-[#4A8BDF] font-extrabold"
-                            : "text-slate-600 dark:text-[#94A3B8] hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/[0.05]"
-                        )
-                      }
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <FileText size={15} />
-                        <span>AI Resume & ATS</span>
-                      </div>
-                      <span className="px-1.5 py-0.5 rounded text-[8px] font-bold bg-[#F8EAF4] dark:bg-[#2A0E2E] text-[#A0006D] dark:text-[#E28DC5] font-mono">
-                        AI
-                      </span>
-                    </NavLink>
-                  )}
-
                   {/* Placement CRM */}
                   {isFeatureEnabled('placement_crm') && (
                     <NavLink

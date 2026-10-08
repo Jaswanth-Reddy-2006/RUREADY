@@ -96,7 +96,37 @@ export interface ResumeStoreState {
 
   // Certifications CRUD
   addCertification: (cert: Omit<ResumeData['certifications'][0], 'id'>) => void;
+  updateCertification: (id: string, cert: Partial<ResumeData['certifications'][0]>) => void;
   removeCertification: (id: string) => void;
+
+  // Publications CRUD
+  addPublication: (pub: Omit<NonNullable<ResumeData['publications']>[0], 'id'>) => void;
+  updatePublication: (id: string, pub: Partial<NonNullable<ResumeData['publications']>[0]>) => void;
+  removePublication: (id: string) => void;
+
+  // Patents CRUD
+  addPatent: (pat: Omit<NonNullable<ResumeData['patents']>[0], 'id'>) => void;
+  updatePatent: (id: string, pat: Partial<NonNullable<ResumeData['patents']>[0]>) => void;
+  removePatent: (id: string) => void;
+
+  // Achievements CRUD
+  addAchievement: (achievement: string) => void;
+  updateAchievement: (index: number, value: string) => void;
+  removeAchievement: (index: number) => void;
+  setAchievements: (achievements: string[]) => void;
+
+  // Languages CRUD
+  addLanguage: (language: string) => void;
+  updateLanguage: (index: number, value: string) => void;
+  removeLanguage: (index: number) => void;
+  setLanguages: (languages: string[]) => void;
+
+  // Custom Sections CRUD
+  addCustomSection: (title: string, items?: string[]) => void;
+  updateCustomSection: (id: string, title: string, items: string[]) => void;
+  removeCustomSection: (id: string) => void;
+  addCustomSectionItem: (sectionId: string, item: string) => void;
+  removeCustomSectionItem: (sectionId: string, itemIndex: number) => void;
 
   // Job Tailoring
   setTargetJob: (title: string, company: string, jd: string) => void;
@@ -979,12 +1009,27 @@ Requirements:
         set((state) => ({
           masterResume: {
             ...state.masterResume,
-            certifications: [...state.masterResume.certifications, newCert]
+            certifications: [...(state.masterResume.certifications || []), newCert]
           },
           tailoredResume: state.tailoredResume
             ? {
                 ...state.tailoredResume,
-                certifications: [...state.masterResume.certifications, newCert]
+                certifications: [...(state.tailoredResume.certifications || []), newCert]
+              }
+            : null
+        }));
+      },
+
+      updateCertification: (id, cert) => {
+        set((state) => ({
+          masterResume: {
+            ...state.masterResume,
+            certifications: (state.masterResume.certifications || []).map((c) => (c.id === id ? { ...c, ...cert } : c))
+          },
+          tailoredResume: state.tailoredResume
+            ? {
+                ...state.tailoredResume,
+                certifications: (state.tailoredResume.certifications || []).map((c) => (c.id === id ? { ...c, ...cert } : c))
               }
             : null
         }));
@@ -994,12 +1039,295 @@ Requirements:
         set((state) => ({
           masterResume: {
             ...state.masterResume,
-            certifications: state.masterResume.certifications.filter((c) => c.id !== id)
+            certifications: (state.masterResume.certifications || []).filter((c) => c.id !== id)
           },
           tailoredResume: state.tailoredResume
             ? {
                 ...state.tailoredResume,
-                certifications: state.tailoredResume.certifications.filter((c) => c.id !== id)
+                certifications: (state.tailoredResume.certifications || []).filter((c) => c.id !== id)
+              }
+            : null
+        }));
+      },
+
+      // Publications CRUD
+      addPublication: (pub) => {
+        const newPub = { ...pub, id: `pub-${Date.now()}` };
+        set((state) => ({
+          masterResume: {
+            ...state.masterResume,
+            publications: [...(state.masterResume.publications || []), newPub]
+          },
+          tailoredResume: state.tailoredResume
+            ? {
+                ...state.tailoredResume,
+                publications: [...(state.tailoredResume.publications || []), newPub]
+              }
+            : null
+        }));
+      },
+
+      updatePublication: (id, pub) => {
+        set((state) => ({
+          masterResume: {
+            ...state.masterResume,
+            publications: (state.masterResume.publications || []).map((p) => (p.id === id ? { ...p, ...pub } : p))
+          },
+          tailoredResume: state.tailoredResume
+            ? {
+                ...state.tailoredResume,
+                publications: (state.tailoredResume.publications || []).map((p) => (p.id === id ? { ...p, ...pub } : p))
+              }
+            : null
+        }));
+      },
+
+      removePublication: (id) => {
+        set((state) => ({
+          masterResume: {
+            ...state.masterResume,
+            publications: (state.masterResume.publications || []).filter((p) => p.id !== id)
+          },
+          tailoredResume: state.tailoredResume
+            ? {
+                ...state.tailoredResume,
+                publications: (state.tailoredResume.publications || []).filter((p) => p.id !== id)
+              }
+            : null
+        }));
+      },
+
+      // Patents CRUD
+      addPatent: (pat) => {
+        const newPat = { ...pat, id: `pat-${Date.now()}` };
+        set((state) => ({
+          masterResume: {
+            ...state.masterResume,
+            patents: [...(state.masterResume.patents || []), newPat]
+          },
+          tailoredResume: state.tailoredResume
+            ? {
+                ...state.tailoredResume,
+                patents: [...(state.tailoredResume.patents || []), newPat]
+              }
+            : null
+        }));
+      },
+
+      updatePatent: (id, pat) => {
+        set((state) => ({
+          masterResume: {
+            ...state.masterResume,
+            patents: (state.masterResume.patents || []).map((p) => (p.id === id ? { ...p, ...pat } : p))
+          },
+          tailoredResume: state.tailoredResume
+            ? {
+                ...state.tailoredResume,
+                patents: (state.tailoredResume.patents || []).map((p) => (p.id === id ? { ...p, ...pat } : p))
+              }
+            : null
+        }));
+      },
+
+      removePatent: (id) => {
+        set((state) => ({
+          masterResume: {
+            ...state.masterResume,
+            patents: (state.masterResume.patents || []).filter((p) => p.id !== id)
+          },
+          tailoredResume: state.tailoredResume
+            ? {
+                ...state.tailoredResume,
+                patents: (state.tailoredResume.patents || []).filter((p) => p.id !== id)
+              }
+            : null
+        }));
+      },
+
+      // Achievements CRUD
+      addAchievement: (achievement) => {
+        const trimmed = achievement.trim();
+        if (!trimmed) return;
+        set((state) => ({
+          masterResume: {
+            ...state.masterResume,
+            achievements: [...(state.masterResume.achievements || []), trimmed]
+          },
+          tailoredResume: state.tailoredResume
+            ? {
+                ...state.tailoredResume,
+                achievements: [...(state.tailoredResume.achievements || []), trimmed]
+              }
+            : null
+        }));
+      },
+
+      updateAchievement: (index, value) => {
+        set((state) => {
+          const list = [...(state.masterResume.achievements || [])];
+          list[index] = value;
+          return {
+            masterResume: { ...state.masterResume, achievements: list },
+            tailoredResume: state.tailoredResume ? { ...state.tailoredResume, achievements: list } : null
+          };
+        });
+      },
+
+      removeAchievement: (index) => {
+        set((state) => ({
+          masterResume: {
+            ...state.masterResume,
+            achievements: (state.masterResume.achievements || []).filter((_, i) => i !== index)
+          },
+          tailoredResume: state.tailoredResume
+            ? {
+                ...state.tailoredResume,
+                achievements: (state.tailoredResume.achievements || []).filter((_, i) => i !== index)
+              }
+            : null
+        }));
+      },
+
+      setAchievements: (achievements) => {
+        set((state) => ({
+          masterResume: { ...state.masterResume, achievements },
+          tailoredResume: state.tailoredResume ? { ...state.tailoredResume, achievements } : null
+        }));
+      },
+
+      // Languages CRUD
+      addLanguage: (language) => {
+        const trimmed = language.trim();
+        if (!trimmed) return;
+        set((state) => ({
+          masterResume: {
+            ...state.masterResume,
+            languages: [...(state.masterResume.languages || []), trimmed]
+          },
+          tailoredResume: state.tailoredResume
+            ? {
+                ...state.tailoredResume,
+                languages: [...(state.tailoredResume.languages || []), trimmed]
+              }
+            : null
+        }));
+      },
+
+      updateLanguage: (index, value) => {
+        set((state) => {
+          const list = [...(state.masterResume.languages || [])];
+          list[index] = value;
+          return {
+            masterResume: { ...state.masterResume, languages: list },
+            tailoredResume: state.tailoredResume ? { ...state.tailoredResume, languages: list } : null
+          };
+        });
+      },
+
+      removeLanguage: (index) => {
+        set((state) => ({
+          masterResume: {
+            ...state.masterResume,
+            languages: (state.masterResume.languages || []).filter((_, i) => i !== index)
+          },
+          tailoredResume: state.tailoredResume
+            ? {
+                ...state.tailoredResume,
+                languages: (state.tailoredResume.languages || []).filter((_, i) => i !== index)
+              }
+            : null
+        }));
+      },
+
+      setLanguages: (languages) => {
+        set((state) => ({
+          masterResume: { ...state.masterResume, languages },
+          tailoredResume: state.tailoredResume ? { ...state.tailoredResume, languages } : null
+        }));
+      },
+
+      // Custom Sections CRUD
+      addCustomSection: (title, items = []) => {
+        const newSec = { id: `custom-${Date.now()}`, title: title.trim() || 'Custom Section', items };
+        set((state) => ({
+          masterResume: {
+            ...state.masterResume,
+            customSections: [...(state.masterResume.customSections || []), newSec]
+          },
+          tailoredResume: state.tailoredResume
+            ? {
+                ...state.tailoredResume,
+                customSections: [...(state.tailoredResume.customSections || []), newSec]
+              }
+            : null
+        }));
+      },
+
+      updateCustomSection: (id, title, items) => {
+        set((state) => ({
+          masterResume: {
+            ...state.masterResume,
+            customSections: (state.masterResume.customSections || []).map((s) => (s.id === id ? { ...s, title, items } : s))
+          },
+          tailoredResume: state.tailoredResume
+            ? {
+                ...state.tailoredResume,
+                customSections: (state.tailoredResume.customSections || []).map((s) => (s.id === id ? { ...s, title, items } : s))
+              }
+            : null
+        }));
+      },
+
+      removeCustomSection: (id) => {
+        set((state) => ({
+          masterResume: {
+            ...state.masterResume,
+            customSections: (state.masterResume.customSections || []).filter((s) => s.id !== id)
+          },
+          tailoredResume: state.tailoredResume
+            ? {
+                ...state.tailoredResume,
+                customSections: (state.tailoredResume.customSections || []).filter((s) => s.id !== id)
+              }
+            : null
+        }));
+      },
+
+      addCustomSectionItem: (sectionId, item) => {
+        const trimmed = item.trim();
+        if (!trimmed) return;
+        set((state) => ({
+          masterResume: {
+            ...state.masterResume,
+            customSections: (state.masterResume.customSections || []).map((s) =>
+              s.id === sectionId ? { ...s, items: [...s.items, trimmed] } : s
+            )
+          },
+          tailoredResume: state.tailoredResume
+            ? {
+                ...state.tailoredResume,
+                customSections: (state.tailoredResume.customSections || []).map((s) =>
+                  s.id === sectionId ? { ...s, items: [...s.items, trimmed] } : s
+                )
+              }
+            : null
+        }));
+      },
+
+      removeCustomSectionItem: (sectionId, itemIndex) => {
+        set((state) => ({
+          masterResume: {
+            ...state.masterResume,
+            customSections: (state.masterResume.customSections || []).map((s) =>
+              s.id === sectionId ? { ...s, items: s.items.filter((_, i) => i !== itemIndex) } : s
+            )
+          },
+          tailoredResume: state.tailoredResume
+            ? {
+                ...state.tailoredResume,
+                customSections: (state.tailoredResume.customSections || []).map((s) =>
+                  s.id === sectionId ? { ...s, items: s.items.filter((_, i) => i !== itemIndex) } : s
+                )
               }
             : null
         }));

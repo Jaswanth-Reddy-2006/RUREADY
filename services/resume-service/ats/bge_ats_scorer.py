@@ -234,6 +234,265 @@ WEAK_OPENINGS = [
 GENERIC_FILLER_PHRASES = WEAK_OPENINGS
 
 
+# =====================================================================
+# CONTENT TAXONOMY LEXICONS (role-independent, structural only)
+# =====================================================================
+# Canonical content types produced by classify_line_content_type.
+CONTENT_TYPES = [
+    "SECTION_HEADING", "SUBSECTION_HEADING", "JOB_TITLE", "COMPANY_NAME",
+    "DATE", "EXPERIENCE_BULLET", "ACHIEVEMENT_BULLET", "PROJECT_TITLE",
+    "PROJECT_DESCRIPTION", "TECHNOLOGY_LINE", "EDUCATION", "CERTIFICATION",
+    "PATENT", "PUBLICATION", "AWARD", "OTHER",
+]
+
+_SENIORITY = r'(?:senior|sr\.?|junior|jr\.?|lead|principal|staff|chief|head|associate|assistant|distinguished|entry[- ]level|mid[- ]level|graduate)'
+_ROLE_MOD = r'(?:software|full[- ]stack|frontend|front[- ]end|backend|back[- ]end|data|machine[- ]learning|ml|devops|site[- ]reliability|sre|cloud|mobile|android|ios|security|qa|test|testing|platform|systems?|solutions?|product|program|research|technical|infrastructure|network|database|support|operations|marketing|sales|business|hr|human[- ]resources|finance|financial)?'
+_TITLE_CORE = r'(?:engineer|developer|scientist|analyst|architect|manager|designer|consultant|administrator|admin|technician|specialist|coordinator|director|intern|trainee|researcher|programmer|developer|writer|editor|recruiter|accountant|officer|associate|lead|head)'
+_TITLE_LEVEL = r'(?:i{1,3}v?|iv|v|vi|1|2|3|4|one|two|three|senior|junior|lead|principal|staff|ii|iii)'
+JOB_TITLE_RE = re.compile(
+    rf'^(?:{_SENIORITY}\s+)*{_ROLE_MOD}\s*{_TITLE_CORE}(?:\s+[-–—]?\s*(?:{_SENIORITY}|{_TITLE_LEVEL}))*\.?$',
+    re.IGNORECASE
+)
+
+COMPANY_SUFFIX_RE = re.compile(
+    r'\b(?:inc|inc\.|llc|ltd|ltd\.|corp|corp\.|corporation|co\.|company|companies|technologies|technology|'
+    r'networks|systems|solutions|software|labs|lab|digital|studios|studio|group|holdings|enterprises|'
+    r'partners|consulting|consultancy|media|industries|motors|aerospace|ventures|capital|bank|healthcare|'
+    r'hospital|university|institute|college|school|academy|foundation|association|pvt|private limited|limited)\b',
+    re.IGNORECASE
+)
+
+CERTIFICATION_RE = re.compile(
+    r'\b(?:certif(?:ied|ication|icate)|comptia|comp?tia|ccna|ccnp|ccie|cissp|ceh|cism|pmp|itil|'
+    r'aws certified|google cloud certified|microsoft certified|azure certified|oracle certified|'
+    r'certified\s+\w+|ocp|ocjp|kubernetes\s+certif|cka|ckad)\b',
+    re.IGNORECASE
+)
+
+AWARD_RE = re.compile(
+    r'\b(?:awards?|awarded|honou?rs?|honou?red|winner|won|championship|champion|1st place|first place|'
+    r'2nd place|second place|3rd place|third place|best paper|best thesis|scholarship|medal|'
+    r'recognition|prize|fellowship|dean\'?s list|star performer|employee of the)\b',
+    re.IGNORECASE
+)
+
+PATENT_RE = re.compile(
+    r'\b(?:patents?|patent application|us patent|u\.s\. patent|provisional patent|patent no|pat\. no|'
+    r'application no|inventors?|assignee|issued patent|patent pending)\b',
+    re.IGNORECASE
+)
+
+PUBLICATION_RE = re.compile(
+    r'\b(?:et al\.|ieee|acm|arxiv|springer|elsevier|conference on|proceedings of|journal of|trans\.|'
+    r'symposium on|workshop on|doi:\s*10\.\d+|issn|isbn|publication|published in|research paper|'
+    r'technical report|whitepaper|white paper)\b',
+    re.IGNORECASE
+)
+
+# A line that is essentially only a date or date-range.
+DATE_ONLY_RE = re.compile(
+    r'^[\(\[]?\s*'
+    r'(?:(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+\d{4}|\d{4}|q[1-4]\s*\d{4})'
+    r'(?:\s*(?:[-–—/]|to)\s*'
+    r'(?:(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+\d{4}|\d{4}|present|current|now|ongoing))?'
+    r'\s*[\)\]]?\.?$'
+    r'|^[\(\[]?\s*(?:(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+\d{4}|\d{4})\s*[\)\]]?\.?$',
+    re.IGNORECASE
+)
+
+# Generic employment work-mode / arrangement metadata that commonly trails a
+# job-title header inside parentheses or after a separator, e.g.
+# "Senior Software Engineer II (Juniper Networks, Work From Home)".
+# These are structural metadata tokens, never experience content.
+WORK_MODE_RE = re.compile(
+    r'\b(?:remote|hybrid|on[- ]?site|onsite|work[- ]from[- ]home|wfh|in[- ]office|'
+    r'full[- ]time|part[- ]time|contract|contractor|temporary|internship|intern|'
+    r'freelance|seasonal|volunteer)\b',
+    re.IGNORECASE
+)
+
+EDUCATION_LINE_RE = re.compile(
+    r'\b(?:gpa|cgpa|grade|bachelor|bachelors|master|masters|b\.tech|btech|m\.tech|mtech|b\.e\.|m\.s\.|m\.sc|'
+    r'b\.s\.|bsc|b\.sc|ph\.?d|doctorate|mba|bba|dean\'?s list|graduated|graduation|major|minor|'
+    r'intermediate|high school|secondary school|diploma|coursework|university|institute|college)\b',
+    re.IGNORECASE
+)
+
+TECH_LINE_RE = re.compile(
+    r'^(?:technologies|technology|tools?|tech stack|technology stack|environment|languages?|frameworks?|'
+    r'stack|platforms?|libraries|skills?)\s*[:|]',
+    re.IGNORECASE
+)
+
+# Section-header recognition (ordered; first match wins).
+SECTION_HEADER_PATTERNS = [
+    ("PATENTS", re.compile(r'^(?:patents?|intellectual property|ip)\b', re.IGNORECASE)),
+    ("PUBLICATIONS", re.compile(r'^(?:publications?|papers?|research papers?|articles?|writing|writings)\b', re.IGNORECASE)),
+    ("AWARDS", re.compile(r'^(?:awards?|honors?|honours?|achievements?|accomplishments?|recognitions?|prizes?)\b', re.IGNORECASE)),
+    ("CERTIFICATIONS", re.compile(r'^(?:certifications?|certificates?|licenses?|licences?|credentials?)\b', re.IGNORECASE)),
+    ("SUMMARY", re.compile(r'^(?:summary|professional summary|profile|objective|career objective|about me|about)\b', re.IGNORECASE)),
+    ("EDUCATION", re.compile(r'^(?:education|academic|academics|qualification|qualifications|scholastic|schooling)\b', re.IGNORECASE)),
+    ("SKILLS", re.compile(r'^(?:skills|technical skills|technical competencies|technologies|core competencies|competencies|tools|skills & competencies|expertise|areas of expertise)\b', re.IGNORECASE)),
+    ("EXPERIENCE", re.compile(r'^(?:experience|work experience|employment|employment history|work history|professional experience|internship|internships|work|career history|industry experience)\b', re.IGNORECASE)),
+    ("PROJECTS", re.compile(r'^(?:projects|academic projects|key projects|personal projects|technical projects|notable projects|coursework projects)\b', re.IGNORECASE)),
+    ("LEADERSHIP", re.compile(r'^(?:leadership|volunteer|volunteering|activities|extracurricular|clubs?|involvement)\b', re.IGNORECASE)),
+]
+
+_ALL_SECTION_KEYS = [
+    "HEADER", "SUMMARY", "EDUCATION", "SKILLS", "EXPERIENCE", "PROJECTS",
+    "CERTIFICATIONS", "PATENTS", "PUBLICATIONS", "AWARDS", "LEADERSHIP", "OTHER",
+]
+
+
+def section_bucket_for_header(header_text: str) -> Optional[str]:
+    """Map a heading string to a section bucket, or None if it is not a heading."""
+    clean_hdr = re.sub(r'[^a-zA-Z\s]', '', header_text).strip()
+    words = clean_hdr.split()
+    if not words or len(words) > 4:
+        return None
+    for bucket, pattern in SECTION_HEADER_PATTERNS:
+        if pattern.search(clean_hdr):
+            return bucket
+    return None
+
+
+# =====================================================================
+# CONTEXT-AWARE SKILL DETECTION (explicit vs inferred)
+# =====================================================================
+# Skills whose surface form collides with ordinary English. These are ONLY
+# counted as explicit when strong contextual evidence is present; otherwise
+# they are reported as inferred (never scored).
+STRICT_AMBIGUOUS_KEYS = {"go", "react", "express", "spring", "dart", "rust", "node"}
+CONTEXT_AMBIGUOUS_KEYS = {"c", "ts", "js", "rest", "ruby", "vue", "flask", "lambda", "mongo", "s3", "ec2"}
+AMBIGUOUS_KEYS = STRICT_AMBIGUOUS_KEYS | CONTEXT_AMBIGUOUS_KEYS
+
+# Capitalization alone is NOT trusted for these (common sentence-initial words).
+PROSE_CAP_RISK = {"go", "react", "express", "spring", "dart", "rust", "node", "rest", "c"}
+
+AMBIGUOUS_CONTEXT = {
+    "go": r'\b(?:golang|goroutines?|go\.mod|go module|go language|go standard library)\b',
+    "rust": r'\b(?:cargo|rustc|rustup|rust language|rust crate|rustlang)\b',
+    "react": r'\b(?:jsx|reactjs|react\.js|redux|react native|react hooks?|react component|react router)\b',
+    "express": r'\b(?:expressjs|express\.js)\b|\bexpress\s+(?:server|framework|app|route|middleware)',
+    "spring": r'\b(?:spring boot|springboot|spring framework|spring core|spring mvc|spring data|spring cloud|hibernate)\b',
+    "dart": r'\b(?:flutter|dartpad|dart language|dart sdk|dart lang)\b',
+    "node": r'\b(?:nodejs|node\.js|npm|node runtime|node server)\b',
+    "vue": r'\b(?:vuejs|vue\.js|nuxt|vue component|vue router)\b',
+    "ruby": r'\b(?:rails|ruby on rails|gemfile|rvm|rake)\b',
+    "flask": r'\b(?:python flask|wsgi|jinja)\b|\bflask\s+(?:app|route|server|blueprint)',
+    "lambda": r'\b(?:aws lambda|lambda function|lambda handler|serverless lambda)\b',
+    "mongo": r'\b(?:mongodb|mongo db|mongo shell|mongo atlas|nosql)\b',
+    "s3": r'\b(?:aws s3|amazon s3|s3 bucket|s3 storage)\b',
+    "ec2": r'\b(?:aws ec2|amazon ec2|ec2 instance)\b',
+    "c": r'\b(?:c language|c programming|ansi c|gnu c|gcc|embedded c|c standard library)\b',
+    "ts": r'\btypescript\b|\.ts\b',
+    "js": r'\bjavascript\b|\.js\b',
+    "rest": r'\brest api\b|\brest apis\b|\brestful\b|\brest architecture\b|\brest\s+(?:service|endpoint)',
+}
+
+# Canonical skill -> category (first surface form wins).
+CANONICAL_CATEGORY: Dict[str, str] = {}
+for _surf, (_canon, _cat) in SKILL_NORMALIZATION_MAP.items():
+    CANONICAL_CATEGORY.setdefault(_canon, _cat)
+
+# Precompile a boundary-safe regex per skill surface form (longest first so
+# multi-word keys such as "spring boot" are preferred over "spring").
+_SKILL_KEYS_SORTED = sorted(SKILL_NORMALIZATION_MAP.keys(), key=len, reverse=True)
+_SKILL_REGEXES: List[Tuple[str, "re.Pattern"]] = []
+for _key in _SKILL_KEYS_SORTED:
+    _parts = _key.split(' ')
+    if len(_parts) > 1:
+        _body = r'[\s\-]+'.join(re.escape(p) for p in _parts)
+    else:
+        _body = re.escape(_key)
+    _pre = r'(?<![a-z0-9\-])' if _key[0].isalnum() else ''
+    _post = r'(?![a-z0-9+#\-])' if _key[-1].isalnum() else ''
+    _SKILL_REGEXES.append((_key, re.compile(_pre + _body + _post, re.IGNORECASE)))
+
+_LIST_DELIM_RE = re.compile(r'[,;|/\n]')
+
+
+def _normalized_segment(seg: str) -> str:
+    s = seg.strip().strip('().,:').strip().lower()
+    for suffix in (".js", "js", ".net", "++", "#"):
+        if s.endswith(suffix):
+            s = s[:-len(suffix)].strip()
+    return s
+
+
+def detect_skills_in_text(text: str, force_list: bool = False) -> Tuple[Set[str], Set[str]]:
+    """
+    Detect skills with contextual awareness.
+
+    Returns (explicit, inferred) sets of canonical skill names. Only `explicit`
+    should contribute to ATS / Competitive scoring. Ambiguous surface forms
+    (Go, React, Spring, Express, Rust, Dart, Node, C, ...) are counted as
+    explicit only with strong evidence:
+      - they appear as an isolated item of a delimited list line, or
+      - a technical-context phrase appears near them, or
+      - they are Capitalized and not a common sentence-initial English word.
+    Non-ambiguous technologies (Python, Docker, Kubernetes, AWS, ...) are always
+    explicit when present as a whole token.
+    """
+    explicit: Set[str] = set()
+    inferred: Set[str] = set()
+    if not text:
+        return explicit, inferred
+
+    # Per-line list-like detection: a line with delimiters yields isolated
+    # segments; an ambiguous token equal to a whole segment is list-context.
+    line_segments: Dict[int, Set[str]] = {}
+    for ln, line in enumerate(text.split('\n')):
+        segs = set()
+        if _LIST_DELIM_RE.search(line):
+            for seg in _LIST_DELIM_RE.split(line):
+                norm = _normalized_segment(seg)
+                if norm:
+                    segs.add(norm)
+        line_segments[ln] = segs
+
+    # Map char offset -> line index for window/list lookups.
+    line_starts = []
+    pos = 0
+    for line in text.split('\n'):
+        line_starts.append(pos)
+        pos += len(line) + 1
+
+    def _line_index(idx: int) -> int:
+        lo = 0
+        for li, start in enumerate(line_starts):
+            if start <= idx:
+                lo = li
+            else:
+                break
+        return lo
+
+    for key, regex in _SKILL_REGEXES:
+        canonical, _cat = SKILL_NORMALIZATION_MAP[key]
+        ambiguous = key in AMBIGUOUS_KEYS
+        for m in regex.finditer(text):
+            matched_text = m.group(0)
+            is_explicit = True
+            if ambiguous and not force_list:
+                start, end = m.start(), m.end()
+                window = text[max(0, start - 45):min(len(text), end + 45)]
+                ctx = AMBIGUOUS_CONTEXT.get(key)
+                has_ctx = bool(ctx and re.search(ctx, window, re.IGNORECASE))
+                li = _line_index(start)
+                seg_norm = _normalized_segment(matched_text)
+                is_isolated = seg_norm in line_segments.get(li, set())
+                is_cap = matched_text[0].isupper() and key not in PROSE_CAP_RISK and len(key) >= 3
+                is_explicit = has_ctx or is_isolated or is_cap
+            if is_explicit:
+                explicit.add(canonical)
+            else:
+                inferred.add(canonical)
+        if canonical in explicit:
+            inferred.discard(canonical)
+
+    return explicit, inferred
+
+
 class RoleIndependentAtsScorer:
     """
     Evaluates resumes strictly across the 6 role-independent ATS pillars (Total 100 points).
@@ -242,40 +501,60 @@ class RoleIndependentAtsScorer:
 
     def parse_sections_and_bullets(self, raw_text: str, structured_elements: Optional[List[Dict[str, Any]]] = None) -> Dict[str, Any]:
         """
-        Segment resume into classified sections to prevent false positives in quantification audits.
+        Segment resume into classified sections to prevent false positives in
+        quantification audits.
+
+        When Docling `structured_elements` are available the section hierarchy is
+        taken directly from the document labels (section_header/list_item/
+        paragraph) instead of being re-guessed from flattened plain text. A
+        line-based heuristic is used only as a fallback.
         """
+        sections_map: Dict[str, List[str]] = {k: [] for k in _ALL_SECTION_KEYS}
+
+        # ---- Preferred path: Docling structured hierarchy ----
+        used_structured = False
+        if structured_elements:
+            current_section = "HEADER"
+            header_run = 0
+            for el in structured_elements:
+                if not isinstance(el, dict):
+                    continue
+                el_type = str(el.get("type", "")).lower()
+                text = (el.get("text") or "").strip()
+                if el_type == "table":
+                    text = (el.get("markdown") or el.get("html") or "").strip()
+                if not text:
+                    continue
+                used_structured = True
+
+                if el_type == "section_header":
+                    bucket = section_bucket_for_header(text)
+                    if bucket:
+                        current_section = bucket
+                        header_run = 0
+                        continue
+                    # A heading Docling found but we have no bucket for -> OTHER.
+                    current_section = "OTHER"
+                    header_run = 0
+                    continue
+
+                if current_section == "HEADER" and header_run < 3:
+                    sections_map["HEADER"].append(text)
+                    header_run += 1
+                else:
+                    sections_map[current_section].append(text)
+
+            if used_structured and sum(len(v) for k, v in sections_map.items() if k != "HEADER") > 0:
+                return sections_map
+            # Otherwise fall through to the line-based heuristic.
+            sections_map = {k: [] for k in _ALL_SECTION_KEYS}
+
+        # ---- Fallback path: line-based heuristic ----
         lines = [l.strip() for l in raw_text.split('\n') if l.strip()]
-
         current_section = "HEADER"
-        sections_map: Dict[str, List[str]] = {
-            "HEADER": [],
-            "SUMMARY": [],
-            "EDUCATION": [],
-            "SKILLS": [],
-            "EXPERIENCE": [],
-            "PROJECTS": [],
-            "CERTIFICATIONS": [],
-            "OTHER": []
-        }
-
-        # Regular expressions for section header recognition
-        section_headers = {
-            "SUMMARY": re.compile(r'^(?:summary|professional summary|profile|objective|career objective|about me)\b', re.IGNORECASE),
-            "EDUCATION": re.compile(r'^(?:education|academic|academics|qualification|qualifications|scholastic)\b', re.IGNORECASE),
-            "SKILLS": re.compile(r'^(?:skills|technical skills|technical competencies|technologies|core competencies|tools|skills & competencies)\b', re.IGNORECASE),
-            "EXPERIENCE": re.compile(r'^(?:experience|work experience|employment|work history|professional experience|internship|internships|work)\b', re.IGNORECASE),
-            "PROJECTS": re.compile(r'^(?:projects|academic projects|key projects|personal projects|technical projects|notable projects)\b', re.IGNORECASE),
-            "CERTIFICATIONS": re.compile(r'^(?:certifications|certificates|licenses|achievements|honors|awards|leadership)\b', re.IGNORECASE),
-        }
 
         for idx, line in enumerate(lines):
-            clean_hdr = re.sub(r'[^a-zA-Z\s]', '', line).strip()
-            matched_section = None
-            if len(clean_hdr.split()) <= 4:
-                for sec_name, pattern in section_headers.items():
-                    if pattern.search(clean_hdr):
-                        matched_section = sec_name
-                        break
+            matched_section = section_bucket_for_header(line)
 
             if matched_section:
                 current_section = matched_section
@@ -289,135 +568,277 @@ class RoleIndependentAtsScorer:
 
         return sections_map
 
-    def normalize_extracted_skills(self, skills_lines: List[str], full_text: str) -> Tuple[List[str], Set[str], bool]:
-        """Extracts, normalizes, and categorizes technical & domain skills."""
-        combined_skills_text = " ".join(skills_lines) if skills_lines else full_text
-        found_skills: Set[str] = set()
+    def normalize_extracted_skills(self, skills_lines: List[str], full_text: str) -> Tuple[List[str], Set[str], bool, List[str]]:
+        """
+        Extract, normalize, and categorize technical & domain skills.
+
+        Returns (explicit_skills, categories, is_categorized, inferred_skills).
+        Only explicit skills contribute to the ATS score. The dedicated SKILLS
+        section is treated as a list (all whole-token matches are explicit);
+        the remaining text is scanned with context-aware detection so that
+        ordinary English (e.g. "go beyond", "react quickly", "spring cleaning")
+        never produces false skills. The legacy "scan everything when <3 skills
+        are found" amplification has been removed.
+        """
+        combined_skills_text = " ".join(skills_lines) if skills_lines else ""
+
+        is_categorized = bool(re.search(
+            r'\b(?:languages|frameworks|libraries|databases|tools|platforms|developer tools|cloud|methodologies|core competencies)\s*:',
+            combined_skills_text or full_text, re.IGNORECASE))
+
+        explicit: Set[str] = set()
+        inferred: Set[str] = set()
+
+        # 1. Dedicated skills section: delimited list -> all tokens explicit.
+        if combined_skills_text.strip():
+            e, i = detect_skills_in_text(combined_skills_text, force_list=True)
+            explicit |= e
+            inferred |= i
+
+        # 2. Full text: context-aware scan (explicit for real technologies,
+        #    inferred for weakly-evidenced ambiguous tokens).
+        e2, i2 = detect_skills_in_text(full_text, force_list=False)
+        explicit |= e2
+        inferred |= i2
+
+        inferred -= explicit
+
         categories: Set[str] = set()
-
-        # Check for category indicators like "Languages:", "Frameworks:", "Databases:", "Tools:"
-        is_categorized = bool(re.search(r'\b(?:languages|frameworks|libraries|databases|tools|platforms|developer tools|cloud|methodologies|core competencies)\s*:', combined_skills_text, re.IGNORECASE))
-
-        # Tokenize by comma, pipe, slash, colon, newlines
-        raw_tokens = re.split(r'[,|;:\n•\t/]+', combined_skills_text)
-        for token in raw_tokens:
-            cleaned = token.strip().lower()
-            if cleaned in SKILL_NORMALIZATION_MAP:
-                canonical, cat = SKILL_NORMALIZATION_MAP[cleaned]
-                found_skills.add(canonical)
+        for canon in explicit:
+            cat = CANONICAL_CATEGORY.get(canon)
+            if cat:
                 categories.add(cat)
-            else:
-                # Substring check for multi-word or compound skills
-                for pattern_key, (canonical, cat) in SKILL_NORMALIZATION_MAP.items():
-                    if re.search(r'\b' + re.escape(pattern_key) + r'\b', cleaned):
-                        found_skills.add(canonical)
-                        categories.add(cat)
 
-        # Fallback scan across full text if skills section was empty
-        if len(found_skills) < 3:
-            full_lower = full_text.lower()
-            for pattern_key, (canonical, cat) in SKILL_NORMALIZATION_MAP.items():
-                if re.search(r'\b' + re.escape(pattern_key) + r'\b', full_lower):
-                    found_skills.add(canonical)
-                    categories.add(cat)
+        return sorted(explicit), categories, is_categorized, sorted(inferred)
 
-        return sorted(list(found_skills)), categories, is_categorized
+    # Docling block labels that represent real bullets vs. non-bullet blocks.
+    _BULLET_ELEMENT_TYPES = {"list_item"}
+    _NON_BULLET_ELEMENT_TYPES = {
+        "paragraph", "caption", "text", "title", "page_header", "page_footer",
+        "section_header", "reference", "formula",
+    }
 
-    def classify_line_content_type(self, line: str, section_name: str) -> str:
+    def classify_line_content_type(self, line: str, section_name: str, element_type: Optional[str] = None) -> str:
         """
-        Classifies candidate text into its semantic content-type:
-        - PATENT_OR_PUBLICATION
-        - COMPANY_OR_LOCATION
-        - EDUCATION
-        - TECHNOLOGY_LINE
-        - PROJECT_TITLE
-        - PROJECT_DESCRIPTION
-        - ACHIEVEMENT_BULLET
-        - EXPERIENCE_BULLET
-        - OTHER
+        Classify a candidate line into one of the structural content types:
+          SECTION_HEADING, SUBSECTION_HEADING, JOB_TITLE, COMPANY_NAME, DATE,
+          EXPERIENCE_BULLET, ACHIEVEMENT_BULLET, PROJECT_TITLE,
+          PROJECT_DESCRIPTION, TECHNOLOGY_LINE, EDUCATION, CERTIFICATION,
+          PATENT, PUBLICATION, AWARD, OTHER.
+
+        Only EXPERIENCE_BULLET, ACHIEVEMENT_BULLET and PROJECT_DESCRIPTION are
+        ever audited for quality; every metadata/heading type is excluded so
+        job titles, companies, dates, certifications, patents and publications
+        never receive "weak action verb" / "missing metric" suggestions.
+
+        `element_type` is the Docling block label (list_item / paragraph /
+        section_header / caption / ...) when the document hierarchy is
+        available. It is preferred over flattened-text guessing: a non-bullet
+        block (e.g. a paragraph) is never promoted to EXPERIENCE_BULLET merely
+        because it is long, while a list_item keeps bullet semantics.
         """
+        el_type = str(element_type).lower() if element_type else None
+        is_bullet_element = el_type in self._BULLET_ELEMENT_TYPES
+        is_non_bullet_element = el_type in self._NON_BULLET_ELEMENT_TYPES
+
         clean = line.strip()
         if not clean:
             return "OTHER"
 
-        # 1. Patent & Publication references
-        patent_pattern = re.compile(
-            r'\b(?:patent|patent application|us patent|provisional patent|patent no|pat\. no|u\.s\. patent|application no|inventor|inventors|assignee)\b',
-            re.IGNORECASE
-        )
-        publication_pattern = re.compile(
-            r'\b(?:et al\.|ieee|acm|arxiv|springer|elsevier|conference on|proceedings of|journal of|trans\.|symposium on|workshop on|doi:\s*10\.\d+|issn|isbn)\b',
-            re.IGNORECASE
-        )
-        author_citation_pattern = re.compile(
-            r'^[A-Z][a-z]+(?:\s+[A-Z]\.?)?\s+[A-Z][a-z]+(?:,\s+[A-Z][a-z]+(?:\s+[A-Z]\.?)?\s+[A-Z][a-z]+)*\s+(?:et al\.|and\s+[A-Z][a-z]+)',
-            re.IGNORECASE
-        )
-        if patent_pattern.search(clean) or publication_pattern.search(clean) or author_citation_pattern.search(clean):
-            return "PATENT_OR_PUBLICATION"
+        no_bullet = re.sub(r'^[•\-\*▪◦‣⁃]\s*', '', clean).strip()
+        no_bullet = re.sub(r'^\d+[.)]\s*', '', no_bullet).strip()
+        has_bullet_marker = no_bullet != clean
+        word_count = len(no_bullet.split())
+        lower_nb = no_bullet.lower()
 
-        # 2. URLs / Links / Contact
-        if re.search(r'https?://\S+|www\.\S+|github\.com/\S+|linkedin\.com/\S+', clean, re.IGNORECASE) and len(clean.split()) <= 6:
+        # 0. Explicit section heading (consumed by the parser, but classified
+        #    here too so direct callers get a consistent answer).
+        if not has_bullet_marker and section_bucket_for_header(clean) is not None:
+            return "SECTION_HEADING"
+
+        # 1. A line that is nothing but a date / date-range.
+        if not has_bullet_marker and DATE_ONLY_RE.match(clean):
+            return "DATE"
+
+        # 2. Patents & publications (always excluded from experience analysis).
+        if PATENT_RE.search(clean):
+            return "PATENT"
+        author_citation_pattern = re.compile(
+            r'^[A-Z][a-z]+(?:\s+[A-Z]\.?)?\s+[A-Z][a-z]+(?:,\s+[A-Z][a-z]+(?:\s+[A-Z]\.?)?\s+[A-Z][a-z]+)*\s+(?:et al\.|and\s+[A-Z][a-z]+)'
+        )
+        if PUBLICATION_RE.search(clean) or author_citation_pattern.match(clean):
+            return "PUBLICATION"
+
+        # 3. Certifications & awards (check before company/job-title because
+        #    e.g. "AWS Certified Solutions Architect" contains company words).
+        if CERTIFICATION_RE.search(clean) and word_count <= 14:
+            return "CERTIFICATION"
+        if AWARD_RE.search(clean) and word_count <= 14:
+            return "AWARD"
+
+        # 4. URLs / links / short contact lines.
+        if re.search(r'https?://\S+|www\.\S+|github\.com/\S+|linkedin\.com/\S+', clean, re.IGNORECASE) and word_count <= 8:
             return "OTHER"
 
-        # 3. Technology Inventory Lines
-        if re.match(r'^(?:technologies|tools|tech stack|environment|languages|frameworks|stack)\s*[:|]', clean, re.IGNORECASE):
+        # 5. Technology inventory lines.
+        if TECH_LINE_RE.match(clean):
             return "TECHNOLOGY_LINE"
-        if '|' in clean and not clean.startswith(('•', '-', '*')) and len(clean.split()) <= 12 and not any(v in clean.lower() for v in ['built', 'developed', 'designed', 'managed', 'led']):
+        if '|' in clean and not has_bullet_marker and word_count <= 14 and not any(
+            re.search(r'\b' + v + r'\b', lower_nb) for v in ['built', 'developed', 'designed', 'managed', 'led', 'architected', 'engineered', 'implemented']
+        ) and not JOB_TITLE_RE.match(self._leading_header_segment(no_bullet)):
             return "TECHNOLOGY_LINE"
 
-        # 4. Company / Location Metadata Lines
-        company_or_loc_markers = re.compile(
-            r'\b(?:inc|llc|ltd|corp|corporation|company of america|insurance company|technologies|solutions|bank|hospital|university|institute|college|school)\b|,\s*(?:[A-Z]{2}|India|USA|UK|Canada|Germany|Australia|Remote|Hyderabad|Bangalore|California|Texas|New York|NJ|NY|CA|TX|MA|WA)\b',
-            re.IGNORECASE
-        )
-        date_range_pattern = re.compile(
-            r'\b(?:(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s+\d{4}|\d{4})\s*(?:[-–—]|to)\s*(?:(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s+\d{4}|\d{4}|present|current)\b',
-            re.IGNORECASE
-        )
-        if not clean.startswith(('•', '-', '*', '–', '—', '1.', '2.', '3.', '4.', '5.')):
-            if date_range_pattern.search(clean) or company_or_loc_markers.search(clean):
-                return "COMPANY_OR_LOCATION"
-
-        # 5. Education Lines
-        edu_markers = re.compile(
-            r'\b(?:gpa|cgpa|grade|bachelor|master|b\.tech|m\.tech|b\.s\.|m\.s\.|ph\.d|dean\'s list|graduated|major|minor)\b',
-            re.IGNORECASE
-        )
-        if edu_markers.search(clean) and (section_name == "EDUCATION" or len(clean.split()) <= 8):
+        # 6. Education lines.
+        if EDUCATION_LINE_RE.search(clean) and (section_name == "EDUCATION" or word_count <= 10):
             return "EDUCATION"
 
-        # 6. Project Title vs Project Description vs Achievement Bullet
-        # Check Project Title + Description pattern: "ProjectName - Description..." or "ProjectName: Description..."
-        project_desc_pattern = re.compile(r'^[A-Za-z0-9\s/+#.-]{2,35}\s*[-–—:|]\s+(?=[A-Z0-9])', re.IGNORECASE)
+        # 7. Job titles & company names (structural metadata inside EXPERIENCE /
+        #    HEADER / OTHER, not PROJECTS where they would clash with titles).
+        #    A header core is recognised even when trailing metadata follows,
+        #    e.g. "Senior Software Engineer II (Acme Corp, Work From Home)".
+        #    A line that starts with an action verb is a bullet, never a header.
+        meta_section = section_name in ("EXPERIENCE", "HEADER", "OTHER", "LEADERSHIP", "CERTIFICATIONS", "SUMMARY")
+        starts_with_verb = self._first_word_is_verb(no_bullet) or self._starts_with_label_verb(no_bullet)
+        if meta_section and not has_bullet_marker and not starts_with_verb:
+            title_core = self._leading_header_segment(no_bullet)
+            core_words = len(title_core.split()) if title_core else 0
+            if title_core and core_words <= 10 and JOB_TITLE_RE.match(title_core):
+                return "JOB_TITLE"
+            if not is_bullet_element and word_count <= 10 and COMPANY_SUFFIX_RE.search(no_bullet):
+                return "COMPANY_NAME"
+
+        # 8. Subsection label with no trailing content -> heading.
+        if not has_bullet_marker and clean.endswith(':') and word_count <= 6:
+            return "SUBSECTION_HEADING"
+
+        # 9. Projects: title vs description vs achievement bullet.
+        project_desc_pattern = re.compile(r'^[A-Za-z0-9\s/+#.\'&-]{2,40}\s*[-–—:|]\s+(?=[A-Z0-9])')
         if section_name == "PROJECTS" or project_desc_pattern.match(clean):
-            # Check standalone project title (short name without bullet marker)
-            clean_no_bullet = re.sub(r'^[•\-\*\d\.\s]+', '', clean).strip()
-            first_w = clean_no_bullet.split()[0].lower() if clean_no_bullet.split() else ''
-            
+            clean_no_bullet = no_bullet
+            first_w = clean_no_bullet.split()[0].lower().rstrip(':,;.') if clean_no_bullet.split() else ''
+
             if project_desc_pattern.match(clean_no_bullet):
-                # E.g. "ScaleETL - High-performance CLI for..."
-                # Extract the post-hyphen text to see if it's a descriptive phrase or an action bullet
                 parts = re.split(r'\s*[-–—:|]\s+', clean_no_bullet, maxsplit=1)
                 if len(parts) == 2:
                     after_title = parts[1].strip()
                     after_first_w = after_title.split()[0].lower() if after_title.split() else ''
-                    if after_first_w not in STRONG_ACTION_VERBS:
+                    if after_first_w not in STRONG_ACTION_VERBS and not self._starts_with_label_verb(after_title):
                         return "PROJECT_DESCRIPTION"
 
-            if not clean.startswith(('•', '-', '*', '–', '—', '1.', '2.', '3.')):
-                if len(clean.split()) <= 4 and first_w not in STRONG_ACTION_VERBS and first_w not in NEUTRAL_ACTION_VERBS:
+            if not has_bullet_marker:
+                if word_count <= 4 and first_w not in STRONG_ACTION_VERBS and first_w not in NEUTRAL_ACTION_VERBS:
                     return "PROJECT_TITLE"
-                if first_w not in STRONG_ACTION_VERBS and first_w not in NEUTRAL_ACTION_VERBS and not any(clean.lower().startswith(v + ' ') for v in STRONG_ACTION_VERBS):
+                if (first_w not in STRONG_ACTION_VERBS and first_w not in NEUTRAL_ACTION_VERBS
+                        and not any(lower_nb.startswith(v + ' ') for v in STRONG_ACTION_VERBS)
+                        and not self._starts_with_label_verb(clean_no_bullet)):
                     return "PROJECT_DESCRIPTION"
 
-        # 7. Achievement / Experience Bullets
-        if section_name == "EXPERIENCE":
-            return "EXPERIENCE_BULLET"
+        # 10. Experience / achievement bullets.
         if section_name == "PROJECTS":
             return "ACHIEVEMENT_BULLET"
 
-        return "ACHIEVEMENT_BULLET"
+        verb_led = self._first_word_is_verb(no_bullet) or self._starts_with_label_verb(no_bullet)
+
+        # A header line carrying trailing company/date/work-mode metadata is
+        # structural, not an experience bullet (e.g. "Title (Acme Corp, Remote)").
+        if not has_bullet_marker and not verb_led and self._has_trailing_header_metadata(no_bullet):
+            return "OTHER"
+
+        # When the Docling hierarchy marks this block as a non-bullet paragraph /
+        # caption / heading, do not promote it to a bullet merely for being long;
+        # require an explicit bullet marker, list_item label, or a verb-led /
+        # sentence-like line.
+        if is_non_bullet_element and not has_bullet_marker and not verb_led:
+            return "OTHER"
+
+        # Default for EXPERIENCE (and anything else): only treat as a bullet if
+        # it genuinely looks like one; otherwise it is stray metadata -> OTHER.
+        looks_like_bullet = (
+            has_bullet_marker
+            or is_bullet_element
+            or word_count >= 6
+            or verb_led
+        )
+        if looks_like_bullet:
+            return "EXPERIENCE_BULLET"
+        return "OTHER"
+
+    @staticmethod
+    def _first_word_is_verb(text: str) -> bool:
+        words = text.split()
+        if not words:
+            return False
+        first = re.sub(r'[^a-z]', '', words[0].lower())
+        if first in STRONG_ACTION_VERBS or first in NEUTRAL_ACTION_VERBS:
+            return True
+        return bool(first.endswith('ed') and len(first) >= 4 and first not in ('need', 'deed', 'seed', 'feed', 'weed', 'speed'))
+
+    @staticmethod
+    def _norm_text_key(text: str) -> str:
+        """Normalize a block's text for matching a section line back to its
+        Docling element label (strip bullet markers, collapse whitespace)."""
+        t = re.sub(r'^[•\-\*▪◦‣⁃]\s*', '', (text or '').strip())
+        t = re.sub(r'^\d+[.)]\s*', '', t).strip()
+        return re.sub(r'\s+', ' ', t).lower()
+
+    @staticmethod
+    def _starts_with_label_verb(text: str) -> bool:
+        """
+        True when a leading label/subsection precedes an action verb, e.g.
+        "Application Infrastructure & Packaging: Architected ..." or
+        "CI/CD & Release Automation: Built ...".
+        """
+        m = re.match(r'^([A-Z][^:]{2,60}):\s+(.*)$', text)
+        if not m:
+            return False
+        remainder = m.group(2).strip()
+        return RoleIndependentAtsScorer._first_word_is_verb(remainder)
+
+    @staticmethod
+    def _leading_header_segment(text: str) -> str:
+        """
+        Return the leading noun-phrase segment of a header line, dropping any
+        trailing parenthetical group and separator-delimited metadata. Fully
+        generic — no specific title / company / person is hard-coded. Handles
+        the common resume header layouts:
+
+          "Title (Company, Work Mode)"    -> "Title"
+          "Title (Company, Date Range)"   -> "Title"
+          "Title, Company, Dates"         -> "Title"
+          "Title | Company | Mode"        -> "Title"
+          "Title – Company"               -> "Title"
+          "Title at Company"              -> "Title"
+          "Title"                         -> "Title"
+        """
+        core = text.strip()
+        # Drop a trailing parenthetical / bracketed group, e.g. "(Acme, Remote)".
+        core = re.sub(r'\s*[\(\[][^()\[\]]*[\)\]]\s*$', '', core).strip()
+        # Leading segment before the first structural separator.
+        sep = r'[,|·•\u2013\u2014]|\s+at\s+|\s+@\s+|\s+-\s+'
+        parts = [p.strip() for p in re.split(sep, core, flags=re.IGNORECASE) if p.strip()]
+        return parts[0] if parts else core
+
+    @staticmethod
+    def _has_trailing_header_metadata(text: str) -> bool:
+        """
+        True when the line ends with a parenthetical or separator-delimited
+        metadata group holding a date, work-mode, or company-suffix token, e.g.
+        "(Acme Corp, Remote)", "| Jan 2020 - Present", "– Initech". Used to keep
+        header lines out of the experience-bullet analyzer without hard-coding
+        any particular title or company.
+        """
+        tails: List[str] = []
+        m = re.search(r'[\(\[]([^()\[\]]*)[\)\]]\s*$', text)
+        if m:
+            tails.append(m.group(1))
+        m2 = re.match(r'^.*?[,|·•\u2013\u2014]\s*([^,|·•\u2013\u2014]+)$', text)
+        if m2:
+            tails.append(m2.group(1))
+        for g in tails:
+            g = g.strip()
+            if g and (DATE_ONLY_RE.match(g) or WORK_MODE_RE.search(g) or COMPANY_SUFFIX_RE.search(g)):
+                return True
+        return False
 
     def audit_experience_and_project_bullets(self, sections_map: Dict[str, List[str]], structured_elements: Optional[List[Dict[str, Any]]] = None) -> Dict[str, Any]:
         """
@@ -427,46 +848,83 @@ class RoleIndependentAtsScorer:
            - PROJECT_TITLE -> Excluded from quality audit
            - PROJECT_DESCRIPTION -> Handled specifically; NEVER receives weak action verb warnings
            - ACHIEVEMENT_BULLET / EXPERIENCE_BULLET -> Audited across 8 semantic signals
-           - PATENT_OR_PUBLICATION / COMPANY_OR_LOCATION / EDUCATION / TECHNOLOGY_LINE / OTHER -> Excluded
+           - SECTION_HEADING / SUBSECTION_HEADING / JOB_TITLE / COMPANY_NAME / DATE /
+             EDUCATION / CERTIFICATION / PATENT / PUBLICATION / AWARD /
+             TECHNOLOGY_LINE / OTHER -> Excluded
 
         2. Recognizes existing scale metrics in project descriptions and achievement bullets:
-           (e.g., '1 billion rows', '1200+ developers', 'over 10,000 users', '4M users')
+           (e.g., '1 billion rows', '1200+ developers', 'over 10,000 users', '4M users',
+            'mentored 6 junior engineers')
 
         3. Selects ONE highest-impact recommendation per bullet, capped at the TOP 3–5 highest-value improvements.
         """
         experience_lines = sections_map.get("EXPERIENCE", [])
         project_lines = sections_map.get("PROJECTS", [])
 
+        # Unit nouns that turn a preceding number into a quantitative outcome.
+        unit_nouns = (
+            r'users|clients|customers|records|rows|datasets|requests|transactions|events|'
+            r'msgs|messages|qps|rps|tps|ms|milliseconds|seconds|mins|minutes|hours|days|weeks|'
+            r'months|years|engineers|developers|members|endpoints|subscribers|leads|visitors|'
+            r'queries|nodes|clusters|servers|services|apis?|tests?|tickets|issues|bugs|'
+            r'features|modules|reports|documents|pages|screens|integrations|migrations|'
+            r'terabytes|tb|gb|mb|kb|million|billion|thousand|hundred|k|m|b|people|teams|'
+            r'employees|students|candidates|accounts|orders|payments|invoices|shipments'
+        )
         # Metric patterns (including 1 billion rows, 1200+ developers, 10,000 users, 4M users, $500k, 45% speedup, etc.)
         metric_patterns = [
             r'\b\d+(?:\.\d+)?%',  # 45%, 94%, 3.5%
             r'\$\d+(?:,\d+)*(?:\.\d+)?[kKmMbB]?',  # $500k, $1.2M, $50k
-            r'\b(?:over|more than|approximately|approx|around|up to|>\s*)?\s*\d+(?:,\d+)*(?:\.\d+)?[kKmMbB]?\+?\s*(?:users|clients|customers|records|rows|datasets|requests|transactions|events|msgs|messages|qps|rps|tps|ms|milliseconds|seconds|mins|minutes|hours|days|weeks|months|engineers|developers|members|endpoints|subscribers|leads|visitors|queries|nodes|clusters|terabytes|tb|gb|mb|million|billion)\b',
+            # number immediately followed by a unit noun (any magnitude, incl. single digit)
+            rf'\b(?:over|more than|approximately|approx|around|up to|>\s*)?\s*\d+(?:,\d+)*(?:\.\d+)?[kKmMbB]?\+?\s*(?:{unit_nouns})\b',
+            # number followed by up to TWO intervening words then a unit noun,
+            # e.g. "6 junior engineers", "3 distributed services", "5 cloud regions"
+            rf'\b\d+(?:\.\d+)?[kKmMbB]?\+?\s+(?:[a-zA-Z]+\s+){{0,2}}?(?:{unit_nouns})\b',
             r'\b(?:reduced|improved|increased|decreased|accelerated|optimized|scaled|boosted)\s+.*?\bby\s+\d+',
             r'\b\d+x\b',
-            r'\b\d{2,}\b' # counts >= 10 in context
+            r'\b\d{2,}\b'  # bare counts >= 10 in context
         ]
 
         outcome_patterns = [
             r'\b(?:resulting in|leading to|achieving|yielding|enabling|reducing|improving|increasing|decreasing|accelerating|saving|optimizing|boosting|facilitating|ensuring|to develop|to simplify|to optimize|to automate|to scale|to ensure|to accelerate)\b'
         ]
 
+        # Prefer the Docling document hierarchy when available: map each block's
+        # normalized text to its element label (list_item / paragraph /
+        # section_header / caption / ...) so classification can distinguish real
+        # bullets from header/metadata paragraphs instead of guessing from
+        # flattened plain text alone.
+        el_type_by_text: Dict[str, str] = {}
+        if structured_elements:
+            for el in structured_elements:
+                if not isinstance(el, dict):
+                    continue
+                txt = (el.get("text") or "").strip()
+                if not txt and str(el.get("type", "")).lower() == "table":
+                    txt = (el.get("markdown") or el.get("html") or "").strip()
+                if txt:
+                    el_type_by_text[self._norm_text_key(txt)] = str(el.get("type", "")).lower()
+
         classified_items = []
         for line in experience_lines:
-            c_type = self.classify_line_content_type(line, "EXPERIENCE")
+            et = el_type_by_text.get(self._norm_text_key(line))
+            c_type = self.classify_line_content_type(line, "EXPERIENCE", et)
             classified_items.append((line, c_type, "EXPERIENCE"))
 
         for line in project_lines:
-            c_type = self.classify_line_content_type(line, "PROJECTS")
+            et = el_type_by_text.get(self._norm_text_key(line))
+            c_type = self.classify_line_content_type(line, "PROJECTS", et)
             classified_items.append((line, c_type, "PROJECTS"))
 
         actionable_bullets = []
+        # Only true work/achievement bullets and project descriptions are audited.
+        AUDITED_TYPES = {"EXPERIENCE_BULLET", "ACHIEVEMENT_BULLET", "PROJECT_DESCRIPTION"}
         for line, c_type, sec in classified_items:
-            # Exclude non-achievement metadata
-            if c_type in ["PATENT_OR_PUBLICATION", "COMPANY_OR_LOCATION", "EDUCATION", "TECHNOLOGY_LINE", "PROJECT_TITLE", "OTHER"]:
+            if c_type not in AUDITED_TYPES:
                 continue
 
-            clean_text = re.sub(r'^[•\-\*\d\.\s]+', '', line).strip()
+            clean_text = re.sub(r'^[•\-\*▪◦‣⁃]\s*', '', line).strip()
+            clean_text = re.sub(r'^\d+[.)]\s*', '', clean_text).strip()
             if len(clean_text.split()) >= 4:
                 actionable_bullets.append((clean_text, c_type, sec))
 
@@ -475,16 +933,22 @@ class RoleIndependentAtsScorer:
                 "quantifiedCount": 0,
                 "actionVerbCount": 0,
                 "fillerCount": 0,
+                "impactCount": 0,
+                "specificCount": 0,
                 "totalBullets": 0,
                 "densityPercentage": 0,
                 "actionVerbRatio": 0,
                 "fillerRatio": 0,
+                "impactRatio": 0,
+                "specificityRatio": 0,
                 "audits": []
             }
 
         quantified_count = 0
         action_verb_count = 0
         filler_count = 0
+        impact_count = 0
+        specific_count = 0
         raw_audits = []
 
         for idx, (clean_b, c_type, sec) in enumerate(actionable_bullets):
@@ -492,19 +956,30 @@ class RoleIndependentAtsScorer:
             if not words:
                 continue
 
-            first_word = words[0].lower().rstrip(':,;.')
+            # When a subsection label precedes the verb, e.g.
+            # "Application Infrastructure & Packaging: Architected ...", the
+            # verb is not the first token of the whole line. Analyze the text
+            # AFTER the label so these bullets get credit for their action verb.
+            verb_probe = clean_b
+            label_match = re.match(r'^([A-Z][^:]{2,60}):\s+(.*)$', clean_b)
+            if label_match and self._first_word_is_verb(label_match.group(2).strip()):
+                verb_probe = label_match.group(2).strip()
+
+            probe_words = verb_probe.split()
+            first_word = probe_words[0].lower().rstrip(':,;.') if probe_words else ''
             first_word_clean = re.sub(r'[^a-z]', '', first_word)
+            probe_lower = verb_probe.lower()
 
             # Robust verb recognition
             is_regular_ed_verb = bool(first_word_clean.endswith('ed') and len(first_word_clean) >= 4 and first_word_clean not in ['need', 'deed', 'seed', 'feed', 'weed', 'speed'])
             has_strong_action = bool(
                 first_word_clean in STRONG_ACTION_VERBS or
                 (is_regular_ed_verb and first_word_clean not in NEUTRAL_ACTION_VERBS) or
-                any(clean_b.lower().startswith(verb + ' ') for verb in STRONG_ACTION_VERBS)
+                any(probe_lower.startswith(verb + ' ') for verb in STRONG_ACTION_VERBS)
             )
             has_neutral = bool(
                 first_word_clean in NEUTRAL_ACTION_VERBS or
-                any(clean_b.lower().startswith(verb + ' ') for verb in NEUTRAL_ACTION_VERBS)
+                any(probe_lower.startswith(verb + ' ') for verb in NEUTRAL_ACTION_VERBS)
             )
             is_verb_form = has_strong_action or has_neutral or is_regular_ed_verb
 
@@ -528,12 +1003,33 @@ class RoleIndependentAtsScorer:
             has_outcome = bool(has_metric or has_outcome_phrase)
             has_ownership = bool(not has_weak_opening and (has_strong_action or (has_neutral and has_domain_tools and has_outcome)))
 
+            # Substantive technical flow: a detailed, domain-specific statement that
+            # reads as a real implementation even without an explicit number.
+            is_substantive_flow = (has_security and len(words) >= 8) or (has_android and len(words) >= 8) or (has_api and len(words) >= 9)
+
+            # Achievement / impact signal: measurable outcome, substantive technical
+            # flow, or a concrete technical contribution of sufficient length that is
+            # owned (not a vague responsibility). Computed for ALL audited types,
+            # including PROJECT_DESCRIPTION, so strong project work earns credit.
+            has_impact = bool(
+                has_metric or has_outcome_phrase or is_substantive_flow or
+                (has_domain_tools and len(words) >= 7 and not has_weak_opening)
+            )
+
+            # Specificity / clarity signal: names concrete technical substance, is
+            # sufficiently detailed, and avoids vague-responsibility openings.
+            is_specific = bool(not has_weak_opening and has_domain_tools and len(words) >= 6)
+
             if has_metric:
                 quantified_count += 1
             if is_verb_form or c_type == "PROJECT_DESCRIPTION":
                 action_verb_count += 1
             if has_weak_opening:
                 filler_count += 1
+            if has_impact:
+                impact_count += 1
+            if is_specific:
+                specific_count += 1
 
             # -------------------------------------------------------------
             # SPECIAL HANDLING: PROJECT_DESCRIPTION
@@ -559,7 +1055,6 @@ class RoleIndependentAtsScorer:
             # ACHIEVEMENT & EXPERIENCE BULLETS
             # -------------------------------------------------------------
             # 6. STRONG BULLET CHECK (Action verb + technical details + outcome/metric/security mechanism + sufficient length + clean ownership)
-            is_substantive_flow = (has_security and len(words) >= 8) or (has_android and len(words) >= 8) or (has_api and len(words) >= 9)
             if is_verb_form and (has_outcome or is_substantive_flow) and has_domain_tools and len(words) >= 7 and not has_weak_opening:
                 if has_outcome or len(words) >= 10:
                     continue # ALREADY STRONG! Exclude from suggestions.
@@ -706,15 +1201,21 @@ class RoleIndependentAtsScorer:
         density_pct = round((quantified_count / max(1, total)) * 100, 1)
         action_ratio_pct = round((action_verb_count / max(1, total)) * 100, 1)
         filler_ratio_pct = round((filler_count / max(1, total)) * 100, 1)
+        impact_ratio_pct = round((impact_count / max(1, total)) * 100, 1)
+        specificity_ratio_pct = round((specific_count / max(1, total)) * 100, 1)
 
         return {
             "quantifiedCount": quantified_count,
             "actionVerbCount": action_verb_count,
             "fillerCount": filler_count,
+            "impactCount": impact_count,
+            "specificCount": specific_count,
             "totalBullets": total,
             "densityPercentage": density_pct,
             "actionVerbRatio": action_ratio_pct,
             "fillerRatio": filler_ratio_pct,
+            "impactRatio": impact_ratio_pct,
+            "specificityRatio": specificity_ratio_pct,
             "audits": final_audits
         }
 
@@ -827,7 +1328,7 @@ class RoleIndependentAtsScorer:
             completeness_work_pts = 2
 
         # Signal 4: Skills Coverage (4 pts)
-        extracted_skills, skill_categories, is_categorized = self.normalize_extracted_skills(sections_map["SKILLS"], clean_text)
+        extracted_skills, skill_categories, is_categorized, inferred_skills = self.normalize_extracted_skills(sections_map["SKILLS"], clean_text)
         skill_count = len(extracted_skills)
         completeness_skills_pts = 0
         if skill_count >= 8:
@@ -922,51 +1423,77 @@ class RoleIndependentAtsScorer:
         # 5. Experience / Achievement Quality (15 Points Max)
         # ---------------------------------------------------------------------
         # STRICT: Only Experience & Project bullets evaluated
-        bullet_audit_data = self.audit_experience_and_project_bullets(sections_map)
+        bullet_audit_data = self.audit_experience_and_project_bullets(sections_map, structured_elements)
         action_ratio = bullet_audit_data["actionVerbRatio"]
         quant_density = bullet_audit_data["densityPercentage"]
         filler_ratio = bullet_audit_data["fillerRatio"]
+        impact_ratio = bullet_audit_data["impactRatio"]
+        specificity_ratio = bullet_audit_data["specificityRatio"]
         total_work_bullets = bullet_audit_data["totalBullets"]
 
+        # Balanced composition (15 pts max) across four independent dimensions so
+        # that a single weak dimension — most commonly missing metrics — can never
+        # collapse the pillar when bullets are verb-led, specific, and impactful:
+        #   Action-verb quality   : 4 pts
+        #   Specificity / clarity : 4 pts
+        #   Achievement / impact  : 4 pts
+        #   Quantified metrics    : 3 pts
         exp_action_pts = 0
+        exp_specific_pts = 0
+        exp_impact_pts = 0
         exp_quant_pts = 0
-        exp_substance_pts = 0
 
         if total_work_bullets > 0:
-            # Action verbs component (5 pts)
+            # Action-verb quality (4 pts)
             if action_ratio >= 75:
-                exp_action_pts = 5
-            elif action_ratio >= 50:
                 exp_action_pts = 4
+            elif action_ratio >= 50:
+                exp_action_pts = 3
             elif action_ratio >= 25:
                 exp_action_pts = 2
             else:
                 exp_action_pts = 1
 
-            # Metric / Quantification density component (5 pts)
+            # Specificity / clarity (4 pts) — concrete, technical, non-vague bullets
+            if specificity_ratio >= 75:
+                exp_specific_pts = 4
+            elif specificity_ratio >= 50:
+                exp_specific_pts = 3
+            elif specificity_ratio >= 25:
+                exp_specific_pts = 2
+            else:
+                exp_specific_pts = 1
+
+            # Achievement / impact (4 pts) — outcome, scale, or substantive contribution
+            if impact_ratio >= 75:
+                exp_impact_pts = 4
+            elif impact_ratio >= 50:
+                exp_impact_pts = 3
+            elif impact_ratio >= 25:
+                exp_impact_pts = 2
+            else:
+                exp_impact_pts = 1
+
+            # Quantified metrics (3 pts) — valuable but capped so it cannot dominate
             if quant_density >= 60:
-                exp_quant_pts = 5
+                exp_quant_pts = 3
             elif quant_density >= 30:
-                exp_quant_pts = 4
-            elif quant_density >= 15:
                 exp_quant_pts = 2
+            elif quant_density >= 15:
+                exp_quant_pts = 1
             else:
                 exp_quant_pts = 0
-
-            # Substance vs Filler component (5 pts)
-            if filler_ratio == 0 and total_work_bullets >= 2:
-                exp_substance_pts = 5
-            elif filler_ratio < 25:
-                exp_substance_pts = 3
-            else:
-                exp_substance_pts = 1
         else:
             # Fallback if candidate only provided summary/non-bullet descriptions
             exp_action_pts = 1
+            exp_specific_pts = 1
+            exp_impact_pts = 1
             exp_quant_pts = 0
-            exp_substance_pts = 2
 
-        experience_quality_score = min(15, exp_action_pts + exp_quant_pts + exp_substance_pts)
+        experience_quality_score = min(
+            15,
+            exp_action_pts + exp_specific_pts + exp_impact_pts + exp_quant_pts
+        )
 
         # ---------------------------------------------------------------------
         # 6. Basic ATS Formatting (10 Points Max)
@@ -1022,13 +1549,31 @@ class RoleIndependentAtsScorer:
             improvements.append("Expand and categorize your technical skills section (e.g. Languages, Frameworks, Developer Tools, Databases).")
 
         if experience_quality_score >= 12:
-            strengths.append(f"High-impact accomplishment bullets featuring strong action verbs and quantified outcomes ({quant_density}% metrics density).")
+            if quant_density >= 30:
+                strengths.append(f"High-impact accomplishment bullets featuring strong action verbs and quantified outcomes ({quant_density}% metrics density).")
+            else:
+                strengths.append("High-impact accomplishment bullets featuring strong action verbs and clear, specific technical contributions.")
         else:
-            if quant_density < 30:
+            # Bullet-quality recommendations are only meaningful when the content
+            # classifier actually found genuine EXPERIENCE_BULLET / ACHIEVEMENT_BULLET /
+            # PROJECT_DESCRIPTION items to analyze. A resume with no audited bullets
+            # (e.g. a student resume whose projects are short titles, or one carrying
+            # only certifications/awards) must NOT be told its bullets lack strong
+            # verbs or metrics — there are none to judge. This also avoids penalizing
+            # a resume merely for having no traditional WORK EXPERIENCE section.
+            has_audited_bullets = total_work_bullets > 0
+
+            if has_audited_bullets and quant_density < 30:
                 improvements.append("Add quantified metrics (e.g. % performance increase, latency reduction, user count, dataset size) to project & work bullets.")
-            if action_ratio < 60:
+
+            # Only recommend strong action verbs when verb-led bullets are NOT the
+            # majority of the analyzed set. If most genuine bullets already begin
+            # with a strong/valid action verb, do not emit the generic advice, and
+            # never emit it just to manufacture a suggestion.
+            if has_audited_bullets and action_ratio <= 50:
                 improvements.append("Start each project and experience bullet point with strong active verbs (e.g. Architected, Engineered, Developed).")
-            if filler_ratio > 0:
+
+            if has_audited_bullets and filler_ratio > 0:
                 improvements.append("Replace passive filler phrases (e.g. 'responsible for', 'worked on') with active accomplishment statements.")
 
         if extractability_score >= 16 and formatting_score >= 8:
@@ -1054,9 +1599,13 @@ class RoleIndependentAtsScorer:
                 "formatting": 10
             },
             "extractedSkills": extracted_skills,
+            "explicitlyDetectedSkills": extracted_skills,
+            "inferredSkills": inferred_skills,
             "quantification": {
                 "densityPercentage": bullet_audit_data["densityPercentage"],
                 "actionVerbRatio": bullet_audit_data["actionVerbRatio"],
+                "impactRatio": bullet_audit_data["impactRatio"],
+                "specificityRatio": bullet_audit_data["specificityRatio"],
                 "quantifiedCount": bullet_audit_data["quantifiedCount"],
                 "totalBullets": bullet_audit_data["totalBullets"]
             },

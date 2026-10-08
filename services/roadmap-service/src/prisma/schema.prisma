@@ -26,8 +26,6 @@ model CareerRoadmap {
   isOfficial        Boolean  @default(false)
   nodesData         Json
   customTechStack   Json?
-  title             String?
-  description       String?  @db.Text
   visibility        RoadmapVisibility @default(PUBLIC)
   goal              RoadmapGoal?
   phases            RoadmapPhase[]

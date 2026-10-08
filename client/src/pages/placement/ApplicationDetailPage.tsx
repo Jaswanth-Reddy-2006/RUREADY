@@ -527,7 +527,7 @@ export default function ApplicationDetailPage() {
                       </h3>
                     </div>
                     <button 
-                      onClick={() => navigate('/ats')}
+                      onClick={() => navigate('/resume')}
                       className="text-[11px] font-bold text-[#2459A8] hover:underline cursor-pointer"
                     >
                       Change Resume
@@ -564,13 +564,13 @@ export default function ApplicationDetailPage() {
 
                 <div className="grid grid-cols-2 gap-2">
                   <button
-                    onClick={() => navigate('/ats')}
+                    onClick={() => navigate('/resume')}
                     className="py-2 px-3 rounded-xl border border-[#DCE7F2] bg-white text-xs font-bold text-[#11183D] hover:bg-slate-50 transition-colors cursor-pointer text-center"
                   >
                     View Resume
                   </button>
                   <button
-                    onClick={() => navigate('/ats')}
+                    onClick={() => navigate('/resume')}
                     className="py-2 px-3 rounded-xl bg-[#2459A8] text-white text-xs font-bold hover:bg-[#1a4380] transition-colors cursor-pointer text-center shadow-xs"
                   >
                     Analyze Again

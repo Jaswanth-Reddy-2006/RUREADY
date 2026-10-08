@@ -161,7 +161,7 @@ export default function OralHistoryPage() {
                   <div className="flex items-center gap-4 self-end sm:self-auto">
                     <div className="text-right">
                       <span className="text-base font-black text-blue-600 block">
-                        {s.evalScore || s.analysis?.overallScore || 78}%
+                        {(s.evalScore ?? s.analysis?.overallScore) !== undefined ? `${s.evalScore ?? s.analysis?.overallScore}%` : '—'}
                       </span>
                       <span className="text-[10px] text-slate-400 font-mono">Evaluation Score</span>
                     </div>

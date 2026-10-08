@@ -46,10 +46,12 @@ SERVICE_DIR = ML_DIR.parent
 FINETUNED_MODEL_DIR = ML_DIR / "models" / "competitive-bge"
 BASE_MODEL_NAME = "BAAI/bge-large-en-v1.5"
 
-# Reuse the deterministic skill lexicon from the six-pillar ATS engine so both
-# layers agree on normalized skill names (no duplicated vocabulary).
+# Reuse the deterministic skill lexicon AND the hardened, context-aware
+# detector from the six-pillar ATS engine so both layers agree on normalized
+# skill names and never count ordinary English words ("go beyond", "react
+# quickly") as skills. Only explicitly detected skills are used here.
 sys.path.insert(0, str(SERVICE_DIR / "ats"))
-from bge_ats_scorer import SKILL_NORMALIZATION_MAP  # noqa: E402
+from bge_ats_scorer import SKILL_NORMALIZATION_MAP, detect_skills_in_text  # noqa: E402
 
 COMPETITIVE_WEIGHTS = {
     "semanticSimilarity": 0.45,
@@ -153,14 +155,14 @@ def normalize_cosine(cos: float, calibration: Optional[dict]) -> float:
 # ----------------------------------------------------------------------
 
 def detect_skills(text: str) -> Set[str]:
-    """Only skills explicitly present in the text (Phase-4 rule: no inference)."""
-    lowered = text.lower()
-    found: Set[str] = set()
-    for surface, (canonical, _category) in SKILL_NORMALIZATION_MAP.items():
-        pattern = r"(?<![a-z0-9])" + re.escape(surface) + r"(?![a-z0-9])"
-        if re.search(pattern, lowered):
-            found.add(canonical)
-    return found
+    """
+    Explicit skills only (Phase-4/5 rule: no inference, no English collisions).
+    Delegates to the shared, context-aware detector in the ATS engine so the
+    matcher and the six-pillar scorer agree exactly. Weakly-evidenced ambiguous
+    tokens (e.g. "go" in "go beyond", "react" in "react quickly") are dropped.
+    """
+    explicit, _inferred = detect_skills_in_text(text, force_list=False)
+    return explicit
 
 
 def skill_overlap(resume_text: str, jd_text: str) -> Tuple[float, List[str], List[str], List[str]]:
@@ -326,11 +328,60 @@ def main() -> None:
     if len(sys.argv) < 2:
         print(json.dumps({
             "success": False,
-            "error": "Usage: python competitive_matcher.py <payload_json_path_or_string>",
+            "error": "Usage: python competitive_matcher.py <payload_json_path_or_string | --server>",
         }))
         sys.exit(1)
 
     payload_input = sys.argv[1]
+
+    if payload_input == "--server":
+        if hasattr(sys.stdin, "reconfigure"):
+            sys.stdin.reconfigure(encoding="utf-8", line_buffering=True)
+        if hasattr(sys.stdout, "reconfigure"):
+            sys.stdout.reconfigure(encoding="utf-8", line_buffering=True)
+
+        # Persistent daemon worker mode: pre-load model, then process JSON lines on stdin
+        try:
+            resolve_model()
+            sys.stdout.write(json.dumps({"ready": True, "model": BASE_MODEL_NAME}) + "\n")
+            sys.stdout.flush()
+        except Exception as init_err:  # noqa: BLE001
+            sys.stdout.write(json.dumps({"ready": False, "error": str(init_err)}) + "\n")
+            sys.stdout.flush()
+            sys.exit(1)
+
+        while True:
+            line = sys.stdin.readline()
+            if not line:
+                break
+            raw_line = line.strip()
+            if not raw_line:
+                continue
+            if raw_line == "PING":
+                sys.stdout.write(json.dumps({"pong": True}) + "\n")
+                sys.stdout.flush()
+                continue
+            try:
+                payload = json.loads(raw_line)
+                resume_text = (payload.get("resumeText") or "").strip()
+                job_description = (payload.get("jobDescription") or "").strip()
+                if not resume_text:
+                    sys.stdout.write(json.dumps({"success": False, "error": "resumeText is required"}) + "\n")
+                elif not job_description:
+                    sys.stdout.write(json.dumps({"success": False, "error": "jobDescription is required for competitive matching"}) + "\n")
+                else:
+                    result = compute_match(
+                        resume_text=resume_text,
+                        job_description=job_description,
+                        role=payload.get("role"),
+                        structured_elements=payload.get("structuredElements"),
+                    )
+                    sys.stdout.write(json.dumps({"success": True, "data": result}) + "\n")
+            except Exception as e:  # noqa: BLE001
+                sys.stdout.write(json.dumps({"success": False, "error": str(e)}) + "\n")
+            sys.stdout.flush()
+        sys.exit(0)
+
     try:
         if os.path.exists(payload_input):
             with open(payload_input, "r", encoding="utf-8") as f:
@@ -360,3 +411,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

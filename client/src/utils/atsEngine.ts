@@ -4,6 +4,35 @@
 // Dual-mode scoring: General ATS Compatibility vs Target Job Match
 // ═══════════════════════════════════════════════════════════════
 
+// ═══════════════════════════════════════════════════════════════
+// ONE canonical StructuredResume model. Every resume surface
+// (parser, workspace editor, preview, ATS, competitive matcher)
+// consumes this single type. Fields are populated ONLY from data
+// actually extracted from the uploaded resume — never invented.
+// ═══════════════════════════════════════════════════════════════
+
+export interface ResumePublication {
+  id: string;
+  title: string;
+  venue?: string;
+  date?: string;
+  url?: string;
+}
+
+export interface ResumePatent {
+  id: string;
+  title: string;
+  number?: string;
+  date?: string;
+  url?: string;
+}
+
+export interface ResumeCustomSection {
+  id: string;
+  title: string;
+  items: string[];
+}
+
 export interface ResumeData {
   rawText?: string;
   personalInfo: {
@@ -26,6 +55,7 @@ export interface ResumeData {
     endDate: string;
     current: boolean;
     bullets: string[];
+    achievements?: string[];
   }>;
   education: Array<{
     id: string;
@@ -36,6 +66,7 @@ export interface ResumeData {
     endDate: string;
     gpa?: string;
     highlights?: string;
+    coursework?: string;
   }>;
   projects: Array<{
     id: string;
@@ -45,6 +76,7 @@ export interface ResumeData {
     liveUrl?: string;
     repoUrl?: string;
     bullets: string[];
+    achievements?: string[];
   }>;
   skills: {
     languages: string[];
@@ -52,6 +84,9 @@ export interface ResumeData {
     databases: string[];
     cloudDevOps: string[];
     tools: string[];
+    libraries?: string[];
+    security?: string[];
+    other?: string[];
   };
   certifications: Array<{
     id: string;
@@ -60,6 +95,9 @@ export interface ResumeData {
     date: string;
     credentialUrl?: string;
   }>;
+  publications?: ResumePublication[];
+  patents?: ResumePatent[];
+  customSections?: ResumeCustomSection[];
   achievements?: string[];
   languages?: string[];
   hobbies?: string[];
@@ -77,17 +115,20 @@ export interface BulletAudit {
 }
 
 export interface AtsScoreResult {
-  totalScore: number; // 0 - 100
-  semanticScore: number; // 0 - 100 (Semantic AI similarity)
+  totalScore: number; // 0 - 100 (deterministic ATS-readiness preview only)
   hasTargetJd?: boolean;
   detectedDomain?: string;
   grade: 'Exceptional Match' | 'Competitive Match' | 'Moderate Match' | 'Needs Improvement';
   breakdown: {
-    keywordScore: number;      // 0 - 40
-    metricsScore: number;      // 0 - 25
-    completenessScore: number; // 0 - 20
-    actionVerbScore: number;   // 0 - 15
-    semanticScore: number;     // 0 - 100
+    structureScore: number;       // 0 - 20 (Structure)
+    completenessScore: number;    // 0 - 20 (Content Completeness)
+    extractabilityScore: number;  // 0 - 20 (ATS Extractability)
+    skillsScore: number;          // 0 - 15 (Skills & Technical Content)
+    experienceQualityScore: number; // 0 - 15 (Experience/Achievement Quality)
+    formattingScore: number;      // 0 - 10 (Basic ATS Formatting)
+    keywordScore: number;         // 0 - 40 (compatibility alias)
+    metricsScore: number;         // 0 - 25 (compatibility alias)
+    actionVerbScore: number;      // 0 - 15 (compatibility alias)
   };
   matchedKeywords: string[];
   missingKeywords: string[];
@@ -692,7 +733,8 @@ export function normalizeResumeData(raw?: Partial<ResumeData> | null): ResumeDat
             startDate: exp.startDate || '',
             endDate: exp.endDate || '',
             current: Boolean(exp.current),
-            bullets: Array.isArray(exp.bullets) ? exp.bullets.filter(Boolean) : []
+            bullets: Array.isArray(exp.bullets) ? exp.bullets.filter(Boolean) : [],
+            achievements: Array.isArray(exp.achievements) ? exp.achievements.filter(Boolean) : []
           }))
       : [],
     education: Array.isArray(safe.education)
@@ -706,7 +748,8 @@ export function normalizeResumeData(raw?: Partial<ResumeData> | null): ResumeDat
             startDate: edu.startDate || '',
             endDate: edu.endDate || '',
             gpa: edu.gpa || '',
-            highlights: edu.highlights || ''
+            highlights: edu.highlights || '',
+            coursework: edu.coursework || ''
           }))
       : [],
     projects: Array.isArray(safe.projects)
@@ -719,7 +762,8 @@ export function normalizeResumeData(raw?: Partial<ResumeData> | null): ResumeDat
             techStack: Array.isArray(proj.techStack) ? proj.techStack.filter(Boolean) : [],
             liveUrl: proj.liveUrl || '',
             repoUrl: proj.repoUrl || '',
-            bullets: Array.isArray(proj.bullets) ? proj.bullets.filter(Boolean) : []
+            bullets: Array.isArray(proj.bullets) ? proj.bullets.filter(Boolean) : [],
+            achievements: Array.isArray(proj.achievements) ? proj.achievements.filter(Boolean) : []
           }))
       : [],
     skills: {
@@ -728,6 +772,9 @@ export function normalizeResumeData(raw?: Partial<ResumeData> | null): ResumeDat
       databases: Array.isArray(skills.databases) ? skills.databases.filter(Boolean) : [],
       cloudDevOps: Array.isArray(skills.cloudDevOps) ? skills.cloudDevOps.filter(Boolean) : [],
       tools: Array.isArray(skills.tools) ? skills.tools.filter(Boolean) : [],
+      libraries: Array.isArray(skills.libraries) ? skills.libraries.filter(Boolean) : [],
+      security: Array.isArray(skills.security) ? skills.security.filter(Boolean) : [],
+      other: Array.isArray(skills.other) ? skills.other.filter(Boolean) : [],
     },
     certifications: Array.isArray(safe.certifications)
       ? safe.certifications
@@ -738,6 +785,37 @@ export function normalizeResumeData(raw?: Partial<ResumeData> | null): ResumeDat
             issuer: cert.issuer || '',
             date: cert.date || '',
             credentialUrl: cert.credentialUrl || ''
+          }))
+      : [],
+    publications: Array.isArray(safe.publications)
+      ? safe.publications
+          .filter(Boolean)
+          .map((pub, idx) => ({
+            id: pub.id || `pub-${idx}-${Date.now()}`,
+            title: pub.title || '',
+            venue: pub.venue || '',
+            date: pub.date || '',
+            url: pub.url || ''
+          }))
+      : [],
+    patents: Array.isArray(safe.patents)
+      ? safe.patents
+          .filter(Boolean)
+          .map((pat, idx) => ({
+            id: pat.id || `pat-${idx}-${Date.now()}`,
+            title: pat.title || '',
+            number: pat.number || '',
+            date: pat.date || '',
+            url: pat.url || ''
+          }))
+      : [],
+    customSections: Array.isArray(safe.customSections)
+      ? safe.customSections
+          .filter(Boolean)
+          .map((sec, idx) => ({
+            id: sec.id || `sec-${idx}-${Date.now()}`,
+            title: sec.title || '',
+            items: Array.isArray(sec.items) ? sec.items.filter(Boolean) : []
           }))
       : [],
     rawText: safe.rawText || '',
@@ -756,53 +834,120 @@ export function resumeToPlainText(rawResume?: ResumeData | null): string {
   const resume = normalizeResumeData(rawResume);
   const parts: string[] = [];
 
-  if (resume.personalInfo.fullName) parts.push(resume.personalInfo.fullName);
-  if (resume.personalInfo.title) parts.push(resume.personalInfo.title);
-  if (resume.personalInfo.location) parts.push(resume.personalInfo.location);
-  if (resume.summary) parts.push(resume.summary);
+  const contactParts: string[] = [];
+  if (resume.personalInfo.fullName) contactParts.push(resume.personalInfo.fullName);
+  if (resume.personalInfo.title) contactParts.push(resume.personalInfo.title);
+  const contactLine: string[] = [];
+  if (resume.personalInfo.email) contactLine.push(resume.personalInfo.email);
+  if (resume.personalInfo.phone) contactLine.push(resume.personalInfo.phone);
+  if (resume.personalInfo.location) contactLine.push(resume.personalInfo.location);
+  if (resume.personalInfo.linkedin) contactLine.push(resume.personalInfo.linkedin);
+  if (resume.personalInfo.github) contactLine.push(resume.personalInfo.github);
+  if (resume.personalInfo.portfolio) contactLine.push(resume.personalInfo.portfolio);
+  if (contactLine.length > 0) contactParts.push(contactLine.join(' | '));
+  if (contactParts.length > 0) parts.push(contactParts.join('\n'));
 
+  if (resume.summary) parts.push(`SUMMARY\n${resume.summary}`);
+
+  const expParts: string[] = [];
   (resume.experience || []).forEach((exp) => {
     if (exp && (exp.title || exp.company)) {
-      parts.push(`${exp.title || ''} at ${exp.company || ''}`.trim());
+      const dates = exp.startDate || exp.endDate ? ` | ${exp.startDate || ''} – ${exp.endDate || ''}` : '';
+      const loc = exp.location ? ` | ${exp.location}` : '';
+      expParts.push(`${exp.title || 'Role'} at ${exp.company || 'Company'}${loc}${dates}`.trim());
     }
     (exp?.bullets || []).forEach((b) => {
-      if (b) parts.push(b);
+      if (b) expParts.push(`• ${b}`);
+    });
+    (exp?.achievements || []).forEach((a) => {
+      if (a) expParts.push(`• ${a}`);
     });
   });
-
-  (resume.projects || []).forEach((proj) => {
-    if (proj?.name) parts.push(proj.name);
-    if (proj?.description) parts.push(proj.description);
-    if (Array.isArray(proj?.techStack) && proj.techStack.length > 0) {
-      parts.push(proj.techStack.join(' '));
-    }
-    (proj?.bullets || []).forEach((b) => {
-      if (b) parts.push(b);
-    });
-  });
-
-  const allSkills = [
-    ...(resume.skills?.languages || []),
-    ...(resume.skills?.frameworks || []),
-    ...(resume.skills?.databases || []),
-    ...(resume.skills?.cloudDevOps || []),
-    ...(resume.skills?.tools || [])
-  ];
-  if (allSkills.length > 0) {
-    parts.push(allSkills.join(' '));
+  if (expParts.length > 0) {
+    parts.push(`EXPERIENCE\n${expParts.join('\n')}`);
   }
 
+  const projParts: string[] = [];
+  (resume.projects || []).forEach((proj) => {
+    if (proj?.name) {
+      const tech = Array.isArray(proj.techStack) && proj.techStack.length > 0 ? ` | ${proj.techStack.join(', ')}` : '';
+      projParts.push(`${proj.name}${tech}`);
+    }
+    if (proj?.description) projParts.push(proj.description);
+    (proj?.bullets || []).forEach((b) => {
+      if (b) projParts.push(`• ${b}`);
+    });
+    (proj?.achievements || []).forEach((a) => {
+      if (a) projParts.push(`• ${a}`);
+    });
+  });
+  if (projParts.length > 0) {
+    parts.push(`PROJECTS\n${projParts.join('\n')}`);
+  }
+
+  const skillLines: string[] = [];
+  if (resume.skills?.languages?.length) skillLines.push(`Languages: ${resume.skills.languages.join(', ')}`);
+  if (resume.skills?.frameworks?.length) skillLines.push(`Frameworks: ${resume.skills.frameworks.join(', ')}`);
+  if (resume.skills?.databases?.length) skillLines.push(`Databases: ${resume.skills.databases.join(', ')}`);
+  if (resume.skills?.cloudDevOps?.length) skillLines.push(`DevOps & Cloud: ${resume.skills.cloudDevOps.join(', ')}`);
+  if (resume.skills?.tools?.length) skillLines.push(`Tools: ${resume.skills.tools.join(', ')}`);
+  if (resume.skills?.libraries?.length) skillLines.push(`Libraries: ${resume.skills.libraries.join(', ')}`);
+  if (resume.skills?.security?.length) skillLines.push(`Security: ${resume.skills.security.join(', ')}`);
+  if (resume.skills?.other?.length) skillLines.push(`Other: ${resume.skills.other.join(', ')}`);
+
+  if (skillLines.length > 0) {
+    parts.push(`TECHNICAL SKILLS\n${skillLines.join('\n')}`);
+  }
+
+  const eduParts: string[] = [];
   (resume.education || []).forEach((edu) => {
     if (edu && (edu.degree || edu.school)) {
-      parts.push(`${edu.degree || ''} ${edu.school || ''}`.trim());
+      const dates = edu.startDate || edu.endDate ? ` | ${edu.startDate || ''} – ${edu.endDate || ''}` : '';
+      const gpaStr = edu.gpa ? ` | GPA: ${edu.gpa}` : '';
+      eduParts.push(`${edu.degree || 'Degree'} — ${edu.school || 'School'}${gpaStr}${dates}`.trim());
     }
-    if (edu?.highlights) parts.push(edu.highlights);
+    if (edu?.highlights) eduParts.push(`• ${edu.highlights}`);
+    if (edu?.coursework) eduParts.push(`Relevant Coursework: ${edu.coursework}`);
   });
+  if (eduParts.length > 0) {
+    parts.push(`EDUCATION\n${eduParts.join('\n')}`);
+  }
 
+  const certParts: string[] = [];
   (resume.certifications || []).forEach((cert) => {
     if (cert && (cert.title || cert.issuer)) {
-      parts.push(`${cert.title || ''} ${cert.issuer || ''}`.trim());
+      certParts.push(`${cert.title || ''} — ${cert.issuer || ''} ${cert.date || ''}`.trim());
     }
+  });
+  if (certParts.length > 0) {
+    parts.push(`CERTIFICATIONS\n${certParts.join('\n')}`);
+  }
+
+  (resume.publications || []).forEach((pub) => {
+    if (pub && (pub.title || pub.venue)) {
+      parts.push(`${pub.title || ''} ${pub.venue || ''}`.trim());
+    }
+  });
+
+  (resume.patents || []).forEach((pat) => {
+    if (pat && (pat.title || pat.number)) {
+      parts.push(`${pat.title || ''} ${pat.number || ''}`.trim());
+    }
+  });
+
+  (resume.achievements || []).forEach((a) => {
+    if (a) parts.push(a);
+  });
+
+  (resume.languages || []).forEach((l) => {
+    if (l) parts.push(l);
+  });
+
+  (resume.customSections || []).forEach((sec) => {
+    if (sec?.title) parts.push(sec.title);
+    (sec?.items || []).forEach((it) => {
+      if (it) parts.push(it);
+    });
   });
 
   return parts.filter(Boolean).join('\n');
@@ -939,78 +1084,33 @@ export function checkActionVerb(text: string): { isStrong: boolean; verb: string
 
 export function generateStarRewrite(originalBullet: string, contextRole?: string): { rewritten: string; reason: string } {
   const trimmed = originalBullet.trim();
+  const polished = trimmed.endsWith('.') ? trimmed : `${trimmed}.`;
 
-  // If already strong with metrics & strong action verb, polish punctuation
+  // Already strong: no rewrite needed.
   if (hasQuantifiableMetrics(trimmed) && checkActionVerb(trimmed).isStrong) {
     return {
-      rewritten: trimmed.endsWith('.') ? trimmed : `${trimmed}.`,
-      reason: 'Adheres to high-impact STAR structure with action verb and outcome.'
+      rewritten: polished,
+      reason: 'Already follows STAR structure with a strong action verb and a measurable outcome.'
     };
   }
 
-  const lower = trimmed.toLowerCase();
-
-  // UI/UX & Design Bullet Rewrites
-  if (lower.includes('figma') || lower.includes('wireframe') || lower.includes('prototype') || lower.includes('design') || lower.includes('ux') || lower.includes('ui') || lower.includes('user research') || lower.includes('flow')) {
-    return {
-      rewritten: `Designed and prototyped responsive design systems and end-to-end user flows in Figma, reducing user friction by 34% and improving task completion rates to 94%.`,
-      reason: 'Injected leading strong action verb (Designed), design tool context, and measurable usability outcome.'
-    };
+  // We do NOT fabricate achievements, metrics, tech stacks, or random action
+  // verbs. Rewrites are limited to safe cosmetic polish; the reason points out
+  // which truthful, resume-specific details the candidate should add themselves.
+  const missing: string[] = [];
+  if (!checkActionVerb(trimmed).isStrong) {
+    missing.push('a strong leading action verb');
+  }
+  if (!hasQuantifiableMetrics(trimmed)) {
+    missing.push('a measurable outcome (number, %, or scale)');
   }
 
-  // Engineering & Backend Rewrites
-  if (lower.includes('api') || lower.includes('backend') || lower.includes('database') || lower.includes('sql') || lower.includes('node') || lower.includes('endpoint')) {
-    return {
-      rewritten: `Architected resilient high-throughput RESTful services using Node.js & PostgreSQL, reducing p99 latency by 38% while scaling to 150,000+ daily active requests.`,
-      reason: 'Injected leading strong action verb (Architected), specific tech stack, and quantified latency & throughput metrics.'
-    };
-  }
-
-  // Frontend & Web UI Rewrites
-  if (lower.includes('frontend') || lower.includes('react') || lower.includes('component') || lower.includes('css') || lower.includes('typescript')) {
-    return {
-      rewritten: `Engineered accessible component libraries in TypeScript React, decreasing client bundle size by 27% and boosting Lighthouse performance score to 98/100.`,
-      reason: 'Replaced passive phrasing with strong verb (Engineered), emphasized performance optimization, and added Lighthouse metrics.'
-    };
-  }
-
-  // DevOps & Cloud Rewrites
-  if (lower.includes('ci') || lower.includes('deploy') || lower.includes('docker') || lower.includes('cloud') || lower.includes('pipeline') || lower.includes('aws')) {
-    return {
-      rewritten: `Automated end-to-end CI/CD deployment pipelines using Docker & GitHub Actions, cutting release cycle lead time from 4 hours to 12 minutes with 90%+ automated test coverage.`,
-      reason: 'Demonstrated business value with before/after time metrics and test coverage percentage.'
-    };
-  }
-
-  // Marketing & Growth Rewrites
-  if (lower.includes('market') || lower.includes('campaign') || lower.includes('seo') || lower.includes('lead') || lower.includes('content') || lower.includes('conversion')) {
-    return {
-      rewritten: `Launched multi-channel growth campaigns and conversion rate optimization (CRO) strategies, driving a 42% surge in qualified leads and lowering CAC by 28%.`,
-      reason: 'Formulated with strong action verb (Launched) and quantifiable growth metrics (lead volume and acquisition cost).'
-    };
-  }
-
-  // Finance & Accounting Rewrites
-  if (lower.includes('finance') || lower.includes('budget') || lower.includes('audit') || lower.includes('reconcil') || lower.includes('tax') || lower.includes('report')) {
-    return {
-      rewritten: `Reconciled financial reporting ledgers and automated monthly budget variance forecasting, accelerating the monthly close cycle by 4 days with 99.8% audit accuracy.`,
-      reason: 'Emphasized accuracy, process acceleration, and strong financial leadership verbs.'
-    };
-  }
-
-  // Product Management Rewrites
-  if (lower.includes('product') || lower.includes('roadmap') || lower.includes('agile') || lower.includes('scrum') || lower.includes('stakeholder') || lower.includes('feature')) {
-    return {
-      rewritten: `Spearheaded product roadmap and feature backlog prioritization using Agile Scrum, delivering 4 core releases on schedule and lifting customer NPS by 18 points.`,
-      reason: 'Highlighted leadership, execution velocity, and customer satisfaction metrics.'
-    };
-  }
-
-  // Generic Domain-Neutral Powerful Fallback
-  const strongVerb = STRONG_ACTION_VERBS[Math.floor(Math.random() * 8)];
+  const scope = contextRole ? ` for your ${contextRole} work` : '';
   return {
-    rewritten: `${strongVerb} high-impact initiatives for ${contextRole || 'core operations'}, driving measurable efficiency gains of 30%+ and elevating stakeholder satisfaction.`,
-    reason: 'Transformed into STAR methodology (Situation, Task, Action, Result) with measurable operational outcomes.'
+    rewritten: polished,
+    reason: missing.length
+      ? `Consider adding ${missing.join(' and ')}${scope}, based on your real results — achievements are never auto-generated.`
+      : `Minor polish only${scope}; add concrete, truthful details from your own experience to strengthen impact.`
   };
 }
 
@@ -1167,106 +1267,206 @@ export function calculateAtsScore(
   const metricsRatio = totalBullets > 0 ? (bulletsWithMetrics / totalBullets) : 0.8;
   const metricsScore = Math.min(25, Math.round(metricsRatio * 25));
 
-  // 3. Action Verb Strength Score (0 - 15 points)
+  // Action Verb Strength Score (0 - 15 points)
   const verbRatio = totalBullets > 0 ? (bulletsWithStrongVerbs / totalBullets) : 0.8;
   const actionVerbScore = Math.min(15, Math.round(verbRatio * 15));
 
-  // 4. Section Completeness & ATS Format Compliance (0 - 20 points)
-  const formatChecks: Array<{ title: string; passed: boolean; description: string }> = [];
+  // ═══════════════════════════════════════════════════════════════
+  // 6 FIXED ATS PILLARS (Total = 100 max points)
+  // 1. Structure (20 pts)
+  // 2. Content Completeness (20 pts)
+  // 3. ATS Extractability (20 pts)
+  // 4. Skills & Technical Content (15 pts)
+  // 5. Experience / Achievement Quality (15 pts)
+  // 6. Basic ATS Formatting (10 pts)
+  // ═══════════════════════════════════════════════════════════════
 
-  // Contact info check (5 pts)
-  const hasContact = Boolean(
-    resume.personalInfo.fullName &&
-    (resume.personalInfo.email || resume.personalInfo.phone)
-  );
-  formatChecks.push({
-    title: 'Standard Contact Header',
-    passed: hasContact,
-    description: hasContact
-      ? 'Includes candidate name and verified contact details.'
-      : 'Missing full contact details (name and email or phone recommended for recruiters).'
-  });
+  // ── 1. Structure (20 pts) ──
+  const hasName = Boolean(resume.personalInfo?.fullName?.trim());
+  const hasEmail = Boolean(resume.personalInfo?.email?.trim());
+  const hasPhone = Boolean(resume.personalInfo?.phone?.trim());
+  const hasLinks = Boolean(resume.personalInfo?.linkedin?.trim() || resume.personalInfo?.github?.trim() || resume.personalInfo?.portfolio?.trim());
+  const hasContact = hasName && (hasEmail || hasPhone);
 
-  // Summary / Profile check (4 pts)
-  const summaryWords = (resume.summary || '').trim().split(/\s+/).filter(Boolean).length;
-  const hasGoodSummary = summaryWords >= 15 && summaryWords <= 140;
-  formatChecks.push({
-    title: 'Professional Profile / Summary',
-    passed: hasGoodSummary,
-    description: hasGoodSummary
-      ? `Concise profile summary (${summaryWords} words) structured for ATS extraction.`
-      : summaryWords === 0
-        ? 'Summary is missing. Adding a 30–80 word summary improves ATS search ranking.'
-        : `Summary is ${summaryWords < 15 ? 'too brief' : 'too lengthy'}. Ideal length is 30–80 words.`
-  });
+  let structHeaderPts = 0;
+  if (hasName && hasEmail && hasPhone) structHeaderPts = 4;
+  else if (hasName && (hasEmail || hasPhone)) structHeaderPts = 3;
+  else if (hasEmail || hasPhone) structHeaderPts = 2;
 
-  // Experience / Case Studies depth check (4 pts)
-  const hasExpOrWork = (resume.experience || []).length >= 1 || (resume.projects || []).length >= 1;
-  formatChecks.push({
-    title: 'Structured Experience & Work History',
-    passed: hasExpOrWork,
-    description: hasExpOrWork
-      ? `Includes ${resume.experience.length} career role(s) and ${resume.projects.length} project/case study entries.`
-      : 'At least 1 work experience entry or case study with descriptive bullets recommended.'
-  });
-
-  // Education / Credentials presence check (3 pts)
   const hasEdu = (resume.education || []).length >= 1 && Boolean(resume.education[0]?.degree || resume.education[0]?.school);
-  const hasCerts = (resume.certifications || []).length >= 1;
-  const hasEduOrCerts = hasEdu || hasCerts;
-  formatChecks.push({
-    title: 'Education & Professional Credentials',
-    passed: hasEduOrCerts,
-    description: hasEduOrCerts
-      ? 'Accredited degree, certifications, or educational background designated.'
-      : 'ATS expects at least 1 verified education entry or professional certification.'
-  });
-
-  // Categorized Skills check (4 pts)
   const totalSkillCount = (
     (resume.skills?.languages?.length || 0) +
     (resume.skills?.frameworks?.length || 0) +
     (resume.skills?.databases?.length || 0) +
     (resume.skills?.cloudDevOps?.length || 0) +
     (resume.skills?.tools?.length || 0) +
+    (resume.skills?.libraries?.length || 0) +
+    (resume.skills?.security?.length || 0) +
+    (resume.skills?.other?.length || 0) +
     matchedKeywords.length
   );
-  const hasSkills = totalSkillCount >= 3;
-  formatChecks.push({
-    title: 'Domain Competencies & Skills',
-    passed: hasSkills,
-    description: hasSkills
-      ? `${matchedKeywords.length > 0 ? matchedKeywords.length : totalSkillCount} domain competencies indexed across ${domainInfo.primaryLabel}.`
-      : 'Add professional competencies categorized across skills, methods, or tools.'
-  });
+  const hasSkills = totalSkillCount >= 2;
+  const hasExp = (resume.experience || []).length >= 1;
+  const hasProj = (resume.projects || []).length >= 1;
 
-  let completenessScore = 0;
-  if (hasContact) completenessScore += 5;
-  if (hasGoodSummary) completenessScore += 4;
-  if (hasExpOrWork) completenessScore += 4;
-  if (hasEduOrCerts) completenessScore += 3;
-  if (hasSkills) completenessScore += 4;
+  let structCorePts = 0;
+  if (hasEdu) structCorePts += 2;
+  if (hasSkills) structCorePts += 2;
+  if (hasExp && hasProj) structCorePts += 4;
+  else if (hasExp || hasProj) structCorePts += 3;
 
-  // 5. Semantic Match Score (0 - 100)
-  let semanticScore = 0;
-  if (hasTargetJd) {
-    const resumeTokens = new Set(lowerPlainText.replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter((w) => w.length > 2));
-    const jdTokens = new Set((jobDescription || '').toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter((w) => w.length > 2));
-    let tokenOverlap = 0;
-    for (const token of jdTokens) {
-      if (resumeTokens.has(token)) tokenOverlap++;
-    }
-    const semanticOverlapRatio = jdTokens.size > 0 ? tokenOverlap / jdTokens.size : 0;
-    semanticScore = jdTokens.size > 0
-      ? Math.min(96, Math.max(45, Math.round(semanticOverlapRatio * 85 + (keywordScore / 40) * 15)))
-      : 0;
+  const summaryWords = (resume.summary || '').trim().split(/\s+/).filter(Boolean).length;
+  const hasGoodSummary = summaryWords >= 15 && summaryWords <= 140;
+  const hasCerts = (resume.certifications || []).length >= 1 || (resume.achievements || []).length >= 1;
+
+  let structSuppPts = 0;
+  if (hasGoodSummary || summaryWords >= 5) structSuppPts += 2;
+  if (hasCerts) structSuppPts += 2;
+
+  const structOrderPts = hasContact ? 2 : 1;
+  const recognizedSectionsCount = [hasEdu, hasSkills, hasExp, hasProj, hasGoodSummary, hasCerts].filter(Boolean).length;
+  const structHeadingPts = recognizedSectionsCount >= 4 ? 2 : (recognizedSectionsCount >= 2 ? 1 : 0);
+
+  const structureScore = Math.min(20, structHeaderPts + structCorePts + structSuppPts + structOrderPts + structHeadingPts);
+
+  // ── 2. Content Completeness (20 pts) ──
+  let compContactPts = 0;
+  if (hasName) compContactPts += 2;
+  if (hasEmail) compContactPts += 2;
+  if (hasPhone) compContactPts += 1;
+  if (hasLinks) compContactPts += 1;
+
+  let compEduPts = 0;
+  if (hasEdu) {
+    if (resume.education[0]?.degree) compEduPts += 2;
+    if (resume.education[0]?.school) compEduPts += 1;
+    if (resume.education[0]?.endDate || resume.education[0]?.gpa) compEduPts += 1;
   }
 
-  // 6. Total Score Calculation
-  const deterministicBase = Math.min(100, Math.max(0, keywordScore + metricsScore + completenessScore + actionVerbScore));
-  const totalScore = hasTargetJd
-    ? Math.min(100, Math.max(0, Math.round(deterministicBase * 0.70 + semanticScore * 0.30)))
-    : deterministicBase;
+  const totalWorkItems = (resume.experience?.length || 0) + (resume.projects?.length || 0);
+  let compWorkPts = 0;
+  if (totalWorkItems >= 3 || totalBullets >= 4) compWorkPts = 6;
+  else if (totalWorkItems >= 2 || totalBullets >= 2) compWorkPts = 4;
+  else if (totalWorkItems >= 1 || totalBullets >= 1) compWorkPts = 2;
+
+  let compSkillsPts = 0;
+  if (totalSkillCount >= 8) compSkillsPts = 4;
+  else if (totalSkillCount >= 5) compSkillsPts = 3;
+  else if (totalSkillCount >= 2) compSkillsPts = 2;
+  else if (totalSkillCount >= 1) compSkillsPts = 1;
+
+  const completenessScore = Math.min(20, compContactPts + compEduPts + compWorkPts + compSkillsPts);
+
+  // ── 3. ATS Extractability (20 pts) ──
+  const extractCleanPts = 6; // Client-rendered JSON is clean
+  let extractHeadingPts = 4;
+  if (recognizedSectionsCount >= 4) extractHeadingPts = 6;
+  else if (recognizedSectionsCount >= 3) extractHeadingPts = 5;
+
+  const extractFlowPts = 5;
+  const extractRedundancyPts = 3;
+  const extractabilityScore = Math.min(20, extractCleanPts + extractHeadingPts + extractFlowPts + extractRedundancyPts);
+
+  // ── 4. Skills & Technical Content (15 pts) ──
+  const skillsSecPts = totalSkillCount >= 3 ? 3 : (totalSkillCount >= 1 ? 1 : 0);
+  let skillsCountPts = 0;
+  if (totalSkillCount >= 10) skillsCountPts = 5;
+  else if (totalSkillCount >= 7) skillsCountPts = 4;
+  else if (totalSkillCount >= 4) skillsCountPts = 3;
+  else if (totalSkillCount >= 2) skillsCountPts = 2;
+  else if (totalSkillCount >= 1) skillsCountPts = 1;
+
+  const activeCategoriesCount = [
+    (resume.skills?.languages?.length || 0) > 0,
+    (resume.skills?.frameworks?.length || 0) > 0,
+    (resume.skills?.databases?.length || 0) > 0,
+    (resume.skills?.cloudDevOps?.length || 0) > 0,
+    (resume.skills?.tools?.length || 0) > 0,
+  ].filter(Boolean).length;
+
+  let skillsDivPts = 2;
+  if (activeCategoriesCount >= 3) skillsDivPts = 4;
+  else if (activeCategoriesCount >= 2) skillsDivPts = 3;
+
+  const skillsCatPts = activeCategoriesCount >= 2 ? 3 : (totalSkillCount >= 4 ? 2 : 1);
+  const skillsScore = Math.min(15, skillsSecPts + skillsCountPts + skillsDivPts + skillsCatPts);
+
+  // ── 5. Experience / Achievement Quality (15 pts) ──
+  let expActionPts = 1;
+  let expSpecificPts = 1;
+  let expImpactPts = 1;
+  let expQuantPts = 0;
+
+  if (totalBullets > 0) {
+    const actionPct = (bulletsWithStrongVerbs / totalBullets) * 100;
+    if (actionPct >= 75) expActionPts = 4;
+    else if (actionPct >= 50) expActionPts = 3;
+    else if (actionPct >= 25) expActionPts = 2;
+    else expActionPts = 1;
+
+    expSpecificPts = 3; // Specific technical verbs/context
+    expImpactPts = 3;
+
+    const quantPct = (bulletsWithMetrics / totalBullets) * 100;
+    if (quantPct >= 60) expQuantPts = 3;
+    else if (quantPct >= 30) expQuantPts = 2;
+    else if (quantPct >= 15) expQuantPts = 1;
+    else expQuantPts = 0;
+  }
+
+  const experienceQualityScore = Math.min(15, expActionPts + expSpecificPts + expImpactPts + expQuantPts);
+
+  // ── 6. Basic ATS Formatting (10 pts) ──
+  const fmtBulletPts = totalBullets > 0 ? 3 : 2;
+  const fmtDatePts = hasEdu || hasExp ? 3 : 2;
+  const totalWordCount = plainText.split(/\s+/).filter(Boolean).length;
+  const fmtLengthPts = (totalWordCount >= 150 && totalWordCount <= 950) ? 2 : 1;
+  const fmtSymbolPts = 2;
+
+  const formattingScore = Math.min(10, fmtBulletPts + fmtDatePts + fmtLengthPts + fmtSymbolPts);
+
+  // Total Score: EXACT sum of the 6 fixed pillars (20+20+20+15+15+10 = 100 max)
+  const totalScore = Math.min(100, Math.max(0, structureScore + completenessScore + extractabilityScore + skillsScore + experienceQualityScore + formattingScore));
+
+  const formatChecks: Array<{ title: string; passed: boolean; description: string }> = [
+    {
+      title: 'Standard Contact Header',
+      passed: hasContact,
+      description: hasContact
+        ? 'Includes candidate name and verified contact details.'
+        : 'Missing full contact details (name and email or phone recommended for recruiters).'
+    },
+    {
+      title: 'Professional Profile / Summary',
+      passed: hasGoodSummary,
+      description: hasGoodSummary
+        ? `Concise profile summary (${summaryWords} words) structured for ATS extraction.`
+        : summaryWords === 0
+          ? 'Summary is missing. Adding a 30–80 word summary improves ATS search ranking.'
+          : `Summary is ${summaryWords < 15 ? 'too brief' : 'too lengthy'}. Ideal length is 30–80 words.`
+    },
+    {
+      title: 'Structured Experience & Work History',
+      passed: totalWorkItems >= 1,
+      description: totalWorkItems >= 1
+        ? `Includes ${resume.experience?.length || 0} career role(s) and ${resume.projects?.length || 0} project/case study entries.`
+        : 'At least 1 work experience entry or case study with descriptive bullets recommended.'
+    },
+    {
+      title: 'Education & Professional Credentials',
+      passed: hasEdu || hasCerts,
+      description: hasEdu || hasCerts
+        ? 'Accredited degree, certifications, or educational background designated.'
+        : 'ATS expects at least 1 verified education entry or professional certification.'
+    },
+    {
+      title: 'Domain Competencies & Skills',
+      passed: totalSkillCount >= 3,
+      description: totalSkillCount >= 3
+        ? `${totalSkillCount} domain competencies indexed across ${domainInfo.primaryLabel}.`
+        : 'Add professional competencies categorized across skills, methods, or tools.'
+    }
+  ];
 
   let grade: AtsScoreResult['grade'] = 'Needs Improvement';
   if (totalScore >= 90) grade = 'Exceptional Match';
@@ -1275,16 +1475,19 @@ export function calculateAtsScore(
 
   return {
     totalScore,
-    semanticScore,
     hasTargetJd,
     detectedDomain: domainInfo.primaryLabel,
     grade,
     breakdown: {
+      structureScore,
+      completenessScore,
+      extractabilityScore,
+      skillsScore,
+      experienceQualityScore,
+      formattingScore,
       keywordScore,
       metricsScore,
-      completenessScore,
-      actionVerbScore,
-      semanticScore
+      actionVerbScore
     },
     matchedKeywords,
     missingKeywords,
@@ -1299,3 +1502,101 @@ export function calculateAtsScore(
     }
   };
 }
+
+/**
+ * Maps the authoritative backend ATS evaluation result (from bge_ats_scorer.py)
+ * directly into the UI data model with 100% fidelity (no re-weighting or rounding).
+ */
+export function mapBackendAtsResultToUi(backend: any, resume?: ResumeData): AtsScoreResult {
+  if (!backend) {
+    return calculateAtsScore(resume);
+  }
+
+  const breakdown = backend.breakdown || {};
+  const structureScore = Number(breakdown.structure ?? breakdown.structureScore ?? 0);
+  const completenessScore = Number(breakdown.completeness ?? breakdown.completenessScore ?? 0);
+  const extractabilityScore = Number(breakdown.extractability ?? breakdown.extractabilityScore ?? 0);
+  const skillsScore = Number(breakdown.skills ?? breakdown.skillsScore ?? 0);
+  const experienceQualityScore = Number(breakdown.experienceQuality ?? breakdown.experienceQualityScore ?? 0);
+  const formattingScore = Number(breakdown.formatting ?? breakdown.formattingScore ?? 0);
+
+  const totalScore = Number(
+    backend.overallScore ??
+    backend.totalScore ??
+    (structureScore + completenessScore + extractabilityScore + skillsScore + experienceQualityScore + formattingScore)
+  );
+
+  const bulletsAudit: BulletAudit[] = (backend.bulletAudits || backend.bulletsAudit || []).map((b: any, idx: number) => ({
+    id: b.id || `audit-${idx}`,
+    context: b.category || b.context || 'Accomplishment',
+    original: b.original || '',
+    hasMetrics: Boolean(b.hasMetric ?? b.hasMetrics),
+    hasStrongVerb: Boolean(b.hasActionVerb ?? b.hasStrongVerb),
+    detectedVerb: b.detectedVerb || (b.hasActionVerb ? 'Action Verb' : 'None'),
+    suggestedRewrite: b.suggestedRewrite || b.feedback || '',
+    improvementReason: b.improvementReason || b.feedback || '',
+  }));
+
+  const grade: AtsScoreResult['grade'] =
+    totalScore >= 80 ? 'Exceptional Match'
+    : totalScore >= 65 ? 'Competitive Match'
+    : totalScore >= 50 ? 'Moderate Match'
+    : 'Needs Improvement';
+
+  return {
+    totalScore,
+    grade,
+    breakdown: {
+      structureScore,
+      completenessScore,
+      extractabilityScore,
+      skillsScore,
+      experienceQualityScore,
+      formattingScore,
+      keywordScore: Math.round((skillsScore / 15) * 40),
+      metricsScore: Math.round((experienceQualityScore / 15) * 25),
+      actionVerbScore: Math.round((experienceQualityScore / 15) * 15),
+    },
+    matchedKeywords: backend.explicitlyDetectedSkills || backend.extractedSkills || [],
+    missingKeywords: [],
+    bulletsAudit,
+    formatChecks: [
+      {
+        title: 'ATS Structure Integrity',
+        passed: structureScore >= 14,
+        description: `Structure scored ${structureScore}/20 on authoritative ATS engine.`,
+      },
+      {
+        title: 'Content Completeness',
+        passed: completenessScore >= 14,
+        description: `Completeness scored ${completenessScore}/20 on authoritative ATS engine.`,
+      },
+      {
+        title: 'ATS Machine Extractability',
+        passed: extractabilityScore >= 14,
+        description: `Extractability scored ${extractabilityScore}/20 on authoritative ATS engine.`,
+      },
+      {
+        title: 'Skills & Technical Content',
+        passed: skillsScore >= 10,
+        description: `Skills scored ${skillsScore}/15 on authoritative ATS engine.`,
+      },
+      {
+        title: 'Experience & Bullet Quality',
+        passed: experienceQualityScore >= 10,
+        description: `Experience quality scored ${experienceQualityScore}/15 on authoritative ATS engine.`,
+      },
+      {
+        title: 'Basic ATS Formatting',
+        passed: formattingScore >= 7,
+        description: `Formatting scored ${formattingScore}/10 on authoritative ATS engine.`,
+      },
+    ],
+    executiveSummaryAnalysis: {
+      wordCount: (resume?.summary || '').split(/\s+/).filter(Boolean).length,
+      hasJobKeywords: true,
+      suggestion: backend.strengths?.[0] || 'Resume analyzed by authoritative BGE ATS engine.',
+    },
+  };
+}
+

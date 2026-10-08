@@ -80,8 +80,12 @@ export default function StartupInnovatorTemplate({ data, highlightKeywords = [] 
           {[
             ...(data.skills.languages || []),
             ...(data.skills.frameworks || []),
+            ...(data.skills.libraries || []),
             ...(data.skills.databases || []),
-            ...(data.skills.cloudDevOps || [])
+            ...(data.skills.cloudDevOps || []),
+            ...(data.skills.tools || []),
+            ...(data.skills.security || []),
+            ...(data.skills.other || [])
           ].map((skill, idx) => (
             <span
               key={idx}
@@ -176,35 +180,131 @@ export default function StartupInnovatorTemplate({ data, highlightKeywords = [] 
       )}
 
       {/* Education & Certs Inline */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-200">
-        {data.education?.length > 0 && (
-          <div>
-            <h3 className="text-[10.5px] font-extrabold uppercase tracking-wider text-slate-900 mb-1">
-              Education
-            </h3>
-            {data.education.map((edu) => (
-              <div key={edu.id} className="text-[11px]">
-                <div className="font-bold text-slate-900">{edu.degree}</div>
-                <div className="text-slate-600">{edu.school} ({edu.startDate}–{edu.endDate})</div>
-              </div>
-            ))}
-          </div>
-        )}
+      {((data.education && data.education.length > 0) || (data.certifications && data.certifications.length > 0)) && (
+        <div className={`grid ${data.education?.length && data.certifications?.length ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'} gap-4 pt-2 border-t border-slate-200 mb-4`}>
+          {data.education?.length > 0 && (
+            <div>
+              <h3 className="text-[10.5px] font-extrabold uppercase tracking-wider text-slate-900 mb-1">
+                Education
+              </h3>
+              {data.education.map((edu) => (
+                <div key={edu.id} className="text-[11px]">
+                  <div className="font-bold text-slate-900">{edu.degree}</div>
+                  <div className="text-slate-600">{edu.school} {edu.startDate || edu.endDate ? `(${edu.startDate}–${edu.endDate})` : ''}</div>
+                  {edu.gpa && <div className="text-[10px] font-mono text-indigo-600">GPA: {edu.gpa}</div>}
+                </div>
+              ))}
+            </div>
+          )}
 
-        {data.certifications?.length > 0 && (
-          <div>
-            <h3 className="text-[10.5px] font-extrabold uppercase tracking-wider text-slate-900 mb-1">
-              Credentials
-            </h3>
-            {data.certifications.map((c) => (
-              <div key={c.id} className="text-[11px]">
-                <span className="font-bold text-slate-900">{c.title}</span>
-                <span className="text-slate-500 text-[10.5px] ml-1">({c.issuer})</span>
+          {data.certifications?.length > 0 && (
+            <div>
+              <h3 className="text-[10.5px] font-extrabold uppercase tracking-wider text-slate-900 mb-1">
+                Credentials
+              </h3>
+              {data.certifications.map((c) => (
+                <div key={c.id} className="text-[11px]">
+                  <span className="font-bold text-slate-900">{c.title}</span>
+                  <span className="text-slate-500 text-[10.5px] ml-1">({c.issuer}{c.date ? `, ${c.date}` : ''})</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Publications */}
+      {data.publications && data.publications.length > 0 && (
+        <section className="mb-4">
+          <h2 className="text-[11px] font-extrabold uppercase tracking-wider text-indigo-700 mb-2 flex items-center gap-2">
+            <span>Publications</span>
+            <div className="h-[1px] bg-indigo-100 flex-1" />
+          </h2>
+          <div className="space-y-1.5 text-[11px]">
+            {data.publications.map((pub) => (
+              <div key={pub.id} className="flex justify-between items-baseline">
+                <div>
+                  <strong className="text-slate-900">{pub.title}</strong>
+                  {pub.venue && <span className="text-slate-500 ml-1.5">— {pub.venue}</span>}
+                </div>
+                {pub.date && <span className="text-[10px] font-mono text-slate-500">{pub.date}</span>}
               </div>
             ))}
           </div>
-        )}
-      </div>
+        </section>
+      )}
+
+      {/* Patents */}
+      {data.patents && data.patents.length > 0 && (
+        <section className="mb-4">
+          <h2 className="text-[11px] font-extrabold uppercase tracking-wider text-indigo-700 mb-2 flex items-center gap-2">
+            <span>Patents</span>
+            <div className="h-[1px] bg-indigo-100 flex-1" />
+          </h2>
+          <div className="space-y-1.5 text-[11px]">
+            {data.patents.map((pat) => (
+              <div key={pat.id} className="flex justify-between items-baseline">
+                <div>
+                  <strong className="text-slate-900">{pat.title}</strong>
+                  {pat.number && <span className="text-slate-500 ml-1.5">({pat.number})</span>}
+                </div>
+                {pat.date && <span className="text-[10px] font-mono text-slate-500">{pat.date}</span>}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Achievements */}
+      {data.achievements && data.achievements.length > 0 && (
+        <section className="mb-4">
+          <h2 className="text-[11px] font-extrabold uppercase tracking-wider text-indigo-700 mb-2 flex items-center gap-2">
+            <span>Honors & Achievements</span>
+            <div className="h-[1px] bg-indigo-100 flex-1" />
+          </h2>
+          <ul className="list-disc list-outside ml-4 space-y-0.5 text-[11px] text-slate-700">
+            {data.achievements.map((ach, idx) => (
+              <li key={idx}>{ach}</li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {/* Languages */}
+      {data.languages && data.languages.length > 0 && (
+        <section className="mb-4">
+          <h2 className="text-[11px] font-extrabold uppercase tracking-wider text-indigo-700 mb-2 flex items-center gap-2">
+            <span>Languages</span>
+            <div className="h-[1px] bg-indigo-100 flex-1" />
+          </h2>
+          <div className="flex flex-wrap gap-2 text-[11px] text-slate-800">
+            {data.languages.map((lang, idx) => (
+              <span key={idx} className="bg-indigo-50 text-indigo-900 px-2 py-0.5 rounded font-medium text-[10.5px]">
+                {lang}
+              </span>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Custom Sections */}
+      {data.customSections && data.customSections.length > 0 && (
+        <div className="space-y-3">
+          {data.customSections.map((sec) => (
+            <section key={sec.id}>
+              <h2 className="text-[11px] font-extrabold uppercase tracking-wider text-indigo-700 mb-2 flex items-center gap-2">
+                <span>{sec.title}</span>
+                <div className="h-[1px] bg-indigo-100 flex-1" />
+              </h2>
+              <ul className="list-disc list-outside ml-4 space-y-0.5 text-[11px] text-slate-700">
+                {sec.items.map((item, idx) => (
+                  <li key={idx}>{item}</li>
+                ))}
+              </ul>
+            </section>
+          ))}
+        </div>
+      )}
 
     </div>
   );

@@ -525,7 +525,7 @@ export default function FeaturesMegaMenu({ isOpen, onClose }: FeaturesMegaMenuPr
                     </Link>
 
                     <Link
-                      to="/ats"
+                      to="/resume"
                       onClick={onClose}
                       className="p-3.5 rounded-2xl border border-[#DCE7F2] hover:border-blue-500 hover:bg-blue-50/30 transition-all group"
                     >
@@ -534,14 +534,14 @@ export default function FeaturesMegaMenu({ isOpen, onClose }: FeaturesMegaMenuPr
                           <FileCheck2 className="w-4 h-4" />
                         </div>
                         <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
-                          Instant Scan
+                          Workspace
                         </span>
                       </div>
                       <h5 className="text-xs font-bold text-[#11183D] group-hover:text-blue-600 transition-colors">
-                        AI ATS Resume Scanner
+                        Resume & ATS Workspace
                       </h5>
                       <p className="text-[11px] text-[#526078] mt-1">
-                        Test your resume against real job descriptions with keyword matching and formatting audits.
+                        Build and test your resume with 6-pillar ATS quality diagnostics and competitive job matching.
                       </p>
                     </Link>
 

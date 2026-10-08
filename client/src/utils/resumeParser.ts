@@ -341,9 +341,21 @@ export async function readFileToPlainText(file: File): Promise<string> {
 
 /**
  * Universal resume parser entry point:
- * PDF/DOCX/TXT -> rawText -> parseRawResumeToData -> normalizeResumeData
+ * Uses Docling backend extraction first (structuredResume), with graceful client fallback
  */
-export async function parseResumeFile(file: File): Promise<ResumeData> {
+export async function parseResumeFile(file: File): Promise<ResumeData & { _atsScore?: any }> {
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    const res = await apiClient.post('/resume-parser/parse', formData);
+    if (res.data?.data?.structuredResume) {
+      const normalized = normalizeResumeData(res.data.data.structuredResume);
+      (normalized as any)._atsScore = res.data.data.atsScore || null;
+      return normalized;
+    }
+  } catch (err) {
+    console.warn('[Docling Bridge] Backend extraction unavailable, using client fallback parser:', err);
+  }
   const rawText = await readFileToPlainText(file);
   const parsed = parseRawResumeToData(rawText);
   return normalizeResumeData(parsed);
@@ -459,23 +471,23 @@ export function parseRawResumeToData(rawText: string): Partial<ResumeData> {
 
   // 6. Location (e.g. Hyderabad, Telangana, India | San Francisco, CA | Seattle, WA | Bangalore, Karnataka)
   let location = '';
-  for (let i = 0; i < Math.min(8, lines.length); i++) {
+  for (let i = 0; i < Math.min(10, lines.length); i++) {
     const line = lines[i].trim();
     if (line === fullName || line === title || /^(?:education|experience|skills|summary|projects)/i.test(line)) continue;
 
     // Check if line contains pipe/separator with location
-    const parts = line.split(/[|•–—]/).map((p) => p.trim());
+    const parts = line.split(/[|•–—\n]/).map((p) => p.trim());
     for (const part of parts) {
       if (
         !part.includes('@') &&
         !part.includes('http') &&
-        !part.includes('.com') &&
-        !part.includes('.in') &&
+        !part.includes('www.') &&
+        !/\.(?:com|org|net|io|dev|app)\b/i.test(part) &&
         !/university|college|institute|school|technologies|solutions/i.test(part) &&
-        !/^(?:phone|email|portfolio|github|linkedin)/i.test(part) &&
-        /\b(?:[A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+)*,\s*[A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+)*(?:,\s*[A-Z][a-zA-Z]+)?|Remote|Hybrid|On-site)\b/i.test(part)
+        !/^(?:phone|email|portfolio|github|linkedin|website)/i.test(part) &&
+        /\b(?:[A-Z][a-zA-Z.\-]+(?:\s+[A-Z][a-zA-Z.\-]+)*,\s*[A-Z][a-zA-Z.\-]+(?:\s+[A-Z][a-zA-Z.\-]+)*(?:,\s*[A-Z][a-zA-Z.\-]+)?|Remote|Hybrid|On-site)\b/i.test(part)
       ) {
-        location = part;
+        location = part.replace(/^Location\s*[:\-]\s*/i, '').trim();
         break;
       }
     }
@@ -739,9 +751,9 @@ function extractSectionContent(text: string, headerRegex: RegExp): string {
     if (currentProj && currentProj.name) projects.push(currentProj);
   }
 
-  // 12. Certifications & Credentials Extraction
+  // 12. Certifications & Credentials Extraction (Strict: does not capture awards/honors)
   const certifications: ResumeData['certifications'] = [];
-  const certBody = extractSectionContent(cleanFull, /(?:^|\n)\s*(?:CERTIFICATIONS|CERTIFICATES|LICENSES|CREDENTIALS|AWARDS|ACCREDITATIONS|HONORS)[^\n]*\n/i);
+  const certBody = extractSectionContent(cleanFull, /(?:^|\n)\s*(?:CERTIFICATIONS|CERTIFICATES|LICENSES|CREDENTIALS|PROFESSIONAL CERTIFICATIONS)[^\n]*\n/i);
   if (certBody) {
     const certLines = certBody
       .split('\n')
@@ -750,6 +762,10 @@ function extractSectionContent(text: string, headerRegex: RegExp): string {
 
     certLines.forEach((line) => {
       const cleanLine = line.replace(/^[•\-*]\s*/, '').trim();
+      // Guard against education degrees or company lines leaking into certifications
+      if (/\b(?:bachelor|master|b\.?tech|m\.?tech|ph\.?d|degree|university|institute|cgpa|gpa)\b/i.test(cleanLine)) {
+        return;
+      }
       if (cleanLine.length > 3 && cleanLine.length < 100) {
         const yearMatch = cleanLine.match(/\b(19\d\d|20\d\d)\b/);
         const certDate = yearMatch ? yearMatch[0] : '';
@@ -777,9 +793,9 @@ function extractSectionContent(text: string, headerRegex: RegExp): string {
     });
   }
 
-  // 13. Auxiliary sections (Achievements, Languages, Hobbies)
+  // 13. Auxiliary sections (Achievements, Spoken Languages, Hobbies)
   const achievements: string[] = [];
-  const achBody = extractSectionContent(cleanFull, /(?:^|\n)\s*(?:ACHIEVEMENTS|KEY ACHIEVEMENTS|HONORS|ACCOMPLISHMENTS)[^\n]*\n/i);
+  const achBody = extractSectionContent(cleanFull, /(?:^|\n)\s*(?:SCHOLASTIC ACHIEVEMENTS|ACADEMIC ACHIEVEMENTS|ACHIEVEMENTS|KEY ACHIEVEMENTS|HONORS|AWARDS|ACCOMPLISHMENTS)[^\n]*\n/i);
   if (achBody) {
     achBody.split('\n').map((l) => l.trim()).filter(Boolean).forEach((line) => {
       const cleanLine = line.replace(/^[•\-*]\s*/, '').trim();
@@ -788,10 +804,14 @@ function extractSectionContent(text: string, headerRegex: RegExp): string {
   }
 
   const languages: string[] = [];
-  const langBody = extractSectionContent(cleanFull, /(?:^|\n)\s*(?:LANGUAGES|LANGUAGE PROFICIENCY)[^\n]*\n/i);
+  const langBody = extractSectionContent(cleanFull, /(?:^|\n)\s*(?:SPOKEN LANGUAGES|LANGUAGE PROFICIENCY|FOREIGN LANGUAGES|NATURAL LANGUAGES)[^\n]*\n/i);
   if (langBody) {
     langBody.split(/[,\n|•]/).map((l) => l.trim()).filter(Boolean).forEach((lang) => {
-      if (lang.length > 2 && lang.length < 30) languages.push(lang);
+      const cleanLang = lang.replace(/\s*\([^)]*\)/, '').trim().toLowerCase();
+      const isTech = /^(?:c\+\+|c#|python|java|javascript|typescript|go|golang|rust|ruby|php|sql|bash|html|css)$/i.test(cleanLang);
+      if (!isTech && lang.length > 2 && lang.length < 30) {
+        languages.push(lang);
+      }
     });
   }
 

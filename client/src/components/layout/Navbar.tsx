@@ -32,9 +32,8 @@ const LANDING_NAV_ITEMS = ['Home', 'Features', 'Benefits', 'Pricing', 'FAQ'];
 
 const NAV_LINKS = [
   { label: 'Features', href: '#features', isFeaturesTrigger: true },
-  { label: 'Resume', href: '/resume-parser' },
+  { label: 'Resume', href: '/resume' },
   { label: 'Benefits', href: '/#benefits' },
-  { label: 'ATS Scanner', href: '/ats' },
   { label: 'Roadmaps', href: '/roadmap' },
   { label: 'Placement CRM', href: '/placement-crm' },
   { label: 'Pricing', href: '/#pricing' },

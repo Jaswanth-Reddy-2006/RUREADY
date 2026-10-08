@@ -1,21 +1,56 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useResumeStore, ResumeTemplateId, TEMPLATE_METADATA } from '../../store/useResumeStore';
 import ResumeRenderer from '../../components/resume/templates/ResumeRenderer';
 import ResumeCopilotDrawer from '../../components/resume/ResumeCopilotDrawer';
 import TemplateOverviewModal from '../../components/resume/TemplateOverviewModal';
-import { calculateAtsScore, normalizeResumeData, ResumeData } from '../../utils/atsEngine';
+import { calculateAtsScore, mapBackendAtsResultToUi, normalizeResumeData, resumeToPlainText, ResumeData, AtsScoreResult } from '../../utils/atsEngine';
+import { parseResumeFile } from '../../utils/resumeParser';
+import apiClient from '../../api/client';
 import { 
   User, FileText, Briefcase, GraduationCap, FolderGit2, Wrench, Award, Layout, 
-  Sparkles, Download, ArrowLeft, Plus, Trash2, Check, ShieldCheck, ExternalLink
+  Sparkles, Download, ArrowLeft, Plus, Trash2, Check, ShieldCheck, ExternalLink,
+  BookOpen, Lightbulb, Trophy, Languages, Layers, Target, UploadCloud, RefreshCw,
+  CheckCircle2, XCircle, AlertCircle
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-type SectionId = 'PERSONAL' | 'SUMMARY' | 'EXPERIENCE' | 'EDUCATION' | 'PROJECTS' | 'SKILLS' | 'CERTS' | 'TEMPLATES';
+type SectionId = 
+  | 'PERSONAL' 
+  | 'SUMMARY' 
+  | 'EXPERIENCE' 
+  | 'EDUCATION' 
+  | 'PROJECTS' 
+  | 'SKILLS' 
+  | 'CERTS' 
+  | 'PUBLICATIONS'
+  | 'PATENTS'
+  | 'ACHIEVEMENTS'
+  | 'LANGUAGES'
+  | 'CUSTOM'
+  | 'ATS_DIAGNOSTICS'
+  | 'COMPETITIVE_MATCH'
+  | 'TEMPLATES';
+
+interface CompetitiveMatchData {
+  status: 'MATCHED' | 'NOT_RELEVANT';
+  score: number | null;
+  semanticSimilarity: number;
+  skillOverlap: number;
+  experienceRelevance: number;
+  terminologyMatch: number;
+  matchedSkills: string[];
+  missingSkills: string[];
+  relevanceGate: {
+    passed: boolean;
+    reason?: string;
+  };
+}
 
 export default function ResumeBuilderPage() {
   const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const {
     masterResume,
@@ -35,15 +70,53 @@ export default function ResumeBuilderPage() {
     removeProject,
     updateSkillsCategory,
     addCertification,
+    updateCertification,
     removeCertification,
+    addPublication,
+    updatePublication,
+    removePublication,
+    addPatent,
+    updatePatent,
+    removePatent,
+    addAchievement,
+    updateAchievement,
+    removeAchievement,
+    addLanguage,
+    updateLanguage,
+    removeLanguage,
+    addCustomSection,
+    updateCustomSection,
+    removeCustomSection,
+    addCustomSectionItem,
+    removeCustomSectionItem,
     updateResumeVersion,
-    createResumeVersion
+    createResumeVersion,
+    extractAndLoadResume
   } = useResumeStore();
 
   const [activeSection, setActiveSection] = useState<SectionId>('PERSONAL');
   const [mobileTab, setMobileTab] = useState<'EDITOR' | 'PREVIEW'>('EDITOR');
   const [isCopilotOpen, setIsCopilotOpen] = useState(false);
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+
+  // Competitive matching state
+  const [targetJdText, setTargetJdText] = useState(
+    `Responsibilities:
+• Architect, build, and maintain high-throughput backend services in Node.js, TypeScript, and Go.
+• Build performant web client interfaces in React, TypeScript, and modern CSS.
+• Design and optimize database schemas in PostgreSQL and Redis distributed caching.
+• Own end-to-end reliability, CI/CD pipelines, and observability.
+
+Requirements:
+• 3+ years of professional full stack engineering experience.
+• Proficiency with TypeScript/JavaScript, React, Node.js, and SQL.
+• Hands-on experience with Docker, microservices, and automated testing.`
+  );
+  const [targetJobRole, setTargetJobRole] = useState('Senior Full Stack Engineer');
+  const [targetCompanyName, setTargetCompanyName] = useState('Stripe');
+  const [isMatching, setIsMatching] = useState(false);
+  const [competitiveResult, setCompetitiveResult] = useState<CompetitiveMatchData | null>(null);
 
   // Find target version or default to master
   const currentVersion = id ? resumeVersions.find((v) => v.id === id) : null;
@@ -74,14 +147,41 @@ export default function ResumeBuilderPage() {
   const activeResumeData = normalizeResumeData(rawResumeData);
   const currentTemplate = currentVersion ? currentVersion.templateId : activeTemplate;
 
-  const hasTargetJd = Boolean(currentVersion?.targetJd && currentVersion.targetJd.trim().length > 0);
+  // Authoritative Backend ATS evaluation state
+  const [backendAtsResult, setBackendAtsResult] = useState<AtsScoreResult | null>(null);
+  const prevPlainTextRef = useRef<string>('');
 
-  // Realtime ATS Audit for Copilot & Diagnostics
-  const currentAtsAnalysis = useMemo(() => {
-    const jd = currentVersion?.targetJd || '';
-    const role = currentVersion?.targetRole || '';
-    return calculateAtsScore(activeResumeData, jd, role);
-  }, [activeResumeData, currentVersion?.targetJd, currentVersion?.targetRole]);
+  useEffect(() => {
+    let isMounted = true;
+    const plainText = resumeToPlainText(activeResumeData);
+    if (!plainText.trim() || plainText === prevPlainTextRef.current) return;
+    prevPlainTextRef.current = plainText;
+
+    const timer = setTimeout(async () => {
+      try {
+        const res = await apiClient.post('/resume-parser/score', {
+          resumeText: plainText,
+        });
+        if (isMounted && res.data?.data) {
+          const mapped = mapBackendAtsResultToUi(res.data.data, activeResumeData);
+          setBackendAtsResult(mapped);
+        }
+      } catch (err) {
+        // Backend unavailable, fallback seamlessly to client evaluation
+      }
+    }, 400);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timer);
+    };
+  }, [activeResumeData]);
+
+  // Realtime ATS Audit for Copilot & Diagnostics (Role-Independent 6-Pillar Model)
+  const currentAtsAnalysis: AtsScoreResult = useMemo(() => {
+    if (backendAtsResult) return backendAtsResult;
+    return calculateAtsScore(activeResumeData);
+  }, [backendAtsResult, activeResumeData]);
 
   // Version-aware updaters
   const handleUpdatePersonalInfo = (info: Partial<ResumeData['personalInfo']>) => {
@@ -257,6 +357,19 @@ export default function ResumeBuilderPage() {
     }
   };
 
+  const handleUpdateCertification = (certId: string, updates: Partial<ResumeData['certifications'][0]>) => {
+    if (currentVersion) {
+      updateResumeVersion(currentVersion.id, {
+        resumeData: {
+          ...activeResumeData,
+          certifications: (activeResumeData.certifications || []).map((c) => (c.id === certId ? { ...c, ...updates } : c))
+        }
+      });
+    } else {
+      updateCertification(certId, updates);
+    }
+  };
+
   const handleRemoveCertification = (certId: string) => {
     if (currentVersion) {
       updateResumeVersion(currentVersion.id, {
@@ -267,6 +380,205 @@ export default function ResumeBuilderPage() {
       });
     } else {
       removeCertification(certId);
+    }
+  };
+
+  // Publications
+  const handleAddPublication = (pub: Omit<NonNullable<ResumeData['publications']>[0], 'id'>) => {
+    const newPub = { ...pub, id: `pub-${Date.now()}` };
+    if (currentVersion) {
+      updateResumeVersion(currentVersion.id, {
+        resumeData: {
+          ...activeResumeData,
+          publications: [newPub, ...(activeResumeData.publications || [])]
+        }
+      });
+    } else {
+      addPublication(pub);
+    }
+  };
+
+  const handleUpdatePublication = (id: string, updates: Partial<NonNullable<ResumeData['publications']>[0]>) => {
+    if (currentVersion) {
+      updateResumeVersion(currentVersion.id, {
+        resumeData: {
+          ...activeResumeData,
+          publications: (activeResumeData.publications || []).map((p) => (p.id === id ? { ...p, ...updates } : p))
+        }
+      });
+    } else {
+      updatePublication(id, updates);
+    }
+  };
+
+  const handleRemovePublication = (id: string) => {
+    if (currentVersion) {
+      updateResumeVersion(currentVersion.id, {
+        resumeData: {
+          ...activeResumeData,
+          publications: (activeResumeData.publications || []).filter((p) => p.id !== id)
+        }
+      });
+    } else {
+      removePublication(id);
+    }
+  };
+
+  // Patents
+  const handleAddPatent = (pat: Omit<NonNullable<ResumeData['patents']>[0], 'id'>) => {
+    const newPat = { ...pat, id: `pat-${Date.now()}` };
+    if (currentVersion) {
+      updateResumeVersion(currentVersion.id, {
+        resumeData: {
+          ...activeResumeData,
+          patents: [newPat, ...(activeResumeData.patents || [])]
+        }
+      });
+    } else {
+      addPatent(pat);
+    }
+  };
+
+  const handleUpdatePatent = (id: string, updates: Partial<NonNullable<ResumeData['patents']>[0]>) => {
+    if (currentVersion) {
+      updateResumeVersion(currentVersion.id, {
+        resumeData: {
+          ...activeResumeData,
+          patents: (activeResumeData.patents || []).map((p) => (p.id === id ? { ...p, ...updates } : p))
+        }
+      });
+    } else {
+      updatePatent(id, updates);
+    }
+  };
+
+  const handleRemovePatent = (id: string) => {
+    if (currentVersion) {
+      updateResumeVersion(currentVersion.id, {
+        resumeData: {
+          ...activeResumeData,
+          patents: (activeResumeData.patents || []).filter((p) => p.id !== id)
+        }
+      });
+    } else {
+      removePatent(id);
+    }
+  };
+
+  // Achievements
+  const handleAddAchievement = (ach: string) => {
+    if (!ach.trim()) return;
+    if (currentVersion) {
+      updateResumeVersion(currentVersion.id, {
+        resumeData: {
+          ...activeResumeData,
+          achievements: [...(activeResumeData.achievements || []), ach.trim()]
+        }
+      });
+    } else {
+      addAchievement(ach);
+    }
+  };
+
+  const handleUpdateAchievement = (idx: number, val: string) => {
+    const next = [...(activeResumeData.achievements || [])];
+    next[idx] = val;
+    if (currentVersion) {
+      updateResumeVersion(currentVersion.id, {
+        resumeData: { ...activeResumeData, achievements: next }
+      });
+    } else {
+      updateAchievement(idx, val);
+    }
+  };
+
+  const handleRemoveAchievement = (idx: number) => {
+    const next = (activeResumeData.achievements || []).filter((_, i) => i !== idx);
+    if (currentVersion) {
+      updateResumeVersion(currentVersion.id, {
+        resumeData: { ...activeResumeData, achievements: next }
+      });
+    } else {
+      removeAchievement(idx);
+    }
+  };
+
+  // Languages
+  const handleAddLanguage = (lang: string) => {
+    if (!lang.trim()) return;
+    if (currentVersion) {
+      updateResumeVersion(currentVersion.id, {
+        resumeData: {
+          ...activeResumeData,
+          languages: [...(activeResumeData.languages || []), lang.trim()]
+        }
+      });
+    } else {
+      addLanguage(lang);
+    }
+  };
+
+  const handleUpdateLanguage = (idx: number, val: string) => {
+    const next = [...(activeResumeData.languages || [])];
+    next[idx] = val;
+    if (currentVersion) {
+      updateResumeVersion(currentVersion.id, {
+        resumeData: { ...activeResumeData, languages: next }
+      });
+    } else {
+      updateLanguage(idx, val);
+    }
+  };
+
+  const handleRemoveLanguage = (idx: number) => {
+    const next = (activeResumeData.languages || []).filter((_, i) => i !== idx);
+    if (currentVersion) {
+      updateResumeVersion(currentVersion.id, {
+        resumeData: { ...activeResumeData, languages: next }
+      });
+    } else {
+      removeLanguage(idx);
+    }
+  };
+
+  // Custom Sections
+  const handleAddCustomSection = (title: string) => {
+    const newSec = { id: `custom-${Date.now()}`, title: title.trim() || 'Additional Section', items: [] };
+    if (currentVersion) {
+      updateResumeVersion(currentVersion.id, {
+        resumeData: {
+          ...activeResumeData,
+          customSections: [...(activeResumeData.customSections || []), newSec]
+        }
+      });
+    } else {
+      addCustomSection(title);
+    }
+  };
+
+  const handleUpdateCustomSection = (id: string, title: string, items: string[]) => {
+    if (currentVersion) {
+      updateResumeVersion(currentVersion.id, {
+        resumeData: {
+          ...activeResumeData,
+          customSections: (activeResumeData.customSections || []).map((s) => (s.id === id ? { ...s, title, items } : s))
+        }
+      });
+    } else {
+      updateCustomSection(id, title, items);
+    }
+  };
+
+  const handleRemoveCustomSection = (id: string) => {
+    if (currentVersion) {
+      updateResumeVersion(currentVersion.id, {
+        resumeData: {
+          ...activeResumeData,
+          customSections: (activeResumeData.customSections || []).filter((s) => s.id !== id)
+        }
+      });
+    } else {
+      removeCustomSection(id);
     }
   };
 
@@ -282,6 +594,85 @@ export default function ResumeBuilderPage() {
 
   const handlePrintDownload = () => {
     window.print();
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    const toastId = toast.loading(`Extracting resume with Docling: ${file.name}...`);
+
+    try {
+      const parsedData = await parseResumeFile(file);
+      const normalized = normalizeResumeData(parsedData);
+
+      if ((parsedData as any)._atsScore) {
+        setBackendAtsResult(mapBackendAtsResultToUi((parsedData as any)._atsScore, normalized));
+      }
+      
+      if (currentVersion) {
+        updateResumeVersion(currentVersion.id, {
+          resumeData: normalized,
+          lastUpdated: new Date().toISOString()
+        });
+      } else {
+        extractAndLoadResume(normalized);
+      }
+
+      toast.success(`Successfully extracted resume! (${normalized.experience.length} experiences, ${normalized.education.length} degrees)`, { id: toastId });
+    } catch (err: any) {
+      toast.error(`Extraction failed: ${err.message || 'Unknown error'}`, { id: toastId });
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const handleRunCompetitiveMatch = async () => {
+    if (!targetJdText.trim()) {
+      toast.error('Please enter a target Job Description to run competitive analysis.');
+      return;
+    }
+
+    setIsMatching(true);
+    const toastId = toast.loading('Running BGE Semantic Competitive Matching...');
+
+    try {
+      const resumeText = resumeToPlainText(activeResumeData);
+      const res = await apiClient.post('/resume-parser/evaluate', {
+        resumeText,
+        jobDescription: targetJdText,
+        role: targetJobRole || undefined,
+      });
+
+      if (res.data?.data?.competitive) {
+        const comp = res.data.data.competitive;
+        setCompetitiveResult({
+          status: comp.status || 'MATCHED',
+          score: comp.score !== undefined ? comp.score : null,
+          semanticSimilarity: comp.matchSignals?.semanticSimilarity ?? comp.semanticSimilarity ?? 0,
+          skillOverlap: comp.matchSignals?.skillOverlap ?? comp.skillOverlap ?? 0,
+          experienceRelevance: comp.matchSignals?.experienceRelevance ?? comp.experienceRelevance ?? 0,
+          terminologyMatch: comp.matchSignals?.terminologyMatch ?? comp.terminologyMatch ?? 0,
+          matchedSkills: comp.signalsDetail?.matchedSkills ?? comp.matchedSkills ?? [],
+          missingSkills: comp.signalsDetail?.missingSkills ?? comp.missingSkills ?? [],
+          relevanceGate: comp.relevanceGate || { passed: comp.status === 'MATCHED' },
+        });
+        toast.success(
+          comp.status === 'MATCHED'
+            ? `Competitive Match Score: ${comp.score}/100`
+            : 'Evaluation complete: Role not relevant (Score: N/A)',
+          { id: toastId }
+        );
+      } else {
+        throw new Error('Invalid response from competitive evaluation service.');
+      }
+    } catch (err: any) {
+      toast.error(`Competitive matching error: ${err.message || 'Check connection to resume service.'}`, { id: toastId });
+    } finally {
+      setIsMatching(false);
+    }
   };
 
   const handleSaveAsVersion = () => {
@@ -307,19 +698,35 @@ export default function ResumeBuilderPage() {
     }
   };
 
-  const sectionsList: Array<{ id: SectionId; label: string; icon: React.ReactNode }> = [
+  const sectionsList: Array<{ id: SectionId; label: string; icon: React.ReactNode; count?: number }> = [
     { id: 'PERSONAL', label: 'Personal Info', icon: <User size={16} /> },
     { id: 'SUMMARY', label: 'Executive Summary', icon: <FileText size={16} /> },
-    { id: 'EXPERIENCE', label: 'Work Experience', icon: <Briefcase size={16} /> },
-    { id: 'EDUCATION', label: 'Education', icon: <GraduationCap size={16} /> },
-    { id: 'PROJECTS', label: 'Key Projects', icon: <FolderGit2 size={16} /> },
-    { id: 'SKILLS', label: 'Technical Skills', icon: <Wrench size={16} /> },
-    { id: 'CERTS', label: 'Certifications', icon: <Award size={16} /> },
+    { id: 'EXPERIENCE', label: 'Work Experience', icon: <Briefcase size={16} />, count: activeResumeData.experience.length },
+    { id: 'PROJECTS', label: 'Key Projects', icon: <FolderGit2 size={16} />, count: activeResumeData.projects.length },
+    { id: 'EDUCATION', label: 'Education', icon: <GraduationCap size={16} />, count: activeResumeData.education.length },
+    { id: 'SKILLS', label: 'Technical Skills', icon: <Wrench size={16} />, count: Object.values(activeResumeData.skills).flat().length },
+    { id: 'CERTS', label: 'Certifications', icon: <Award size={16} />, count: activeResumeData.certifications.length },
+    { id: 'PUBLICATIONS', label: 'Publications', icon: <BookOpen size={16} />, count: activeResumeData.publications?.length || 0 },
+    { id: 'PATENTS', label: 'Patents', icon: <Lightbulb size={16} />, count: activeResumeData.patents?.length || 0 },
+    { id: 'ACHIEVEMENTS', label: 'Achievements / Awards', icon: <Trophy size={16} />, count: activeResumeData.achievements?.length || 0 },
+    { id: 'LANGUAGES', label: 'Languages', icon: <Languages size={16} />, count: activeResumeData.languages?.length || 0 },
+    { id: 'CUSTOM', label: 'Additional Sections', icon: <Layers size={16} />, count: activeResumeData.customSections?.length || 0 },
+    { id: 'ATS_DIAGNOSTICS', label: 'ATS Quality Score', icon: <ShieldCheck size={16} /> },
+    { id: 'COMPETITIVE_MATCH', label: 'Competitive Job Match', icon: <Target size={16} /> },
     { id: 'TEMPLATES', label: 'Design Layouts', icon: <Layout size={16} /> },
   ];
 
   return (
     <div className="flex flex-col h-full min-h-[calc(100vh-4rem)] font-sans bg-slate-100 overflow-hidden">
+      {/* Hidden File Input for PDF/DOCX Docling Extraction */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileUpload}
+        accept=".pdf,.docx"
+        className="hidden"
+      />
+
       {/* Top Builder Control Bar */}
       <header className="bg-white border-b border-[#DCE7F2] px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3 shrink-0 shadow-2xs z-20 sticky top-0">
         <div className="flex items-center gap-3 min-w-0">
@@ -335,13 +742,17 @@ export default function ResumeBuilderPage() {
               {currentVersion ? currentVersion.name : 'Master Candidate Resume'}
             </h3>
             <p className="text-[11px] sm:text-xs text-[#526078] truncate">
-              {currentVersion ? `Target: ${currentVersion.targetRole} (${currentVersion.targetCompany || 'General'})` : 'Master Profile Canvas'}
+              {currentVersion ? `Target: ${currentVersion.targetRole} (${currentVersion.targetCompany || 'General'})` : 'Canonical Resume Workspace'}
             </p>
           </div>
 
           {/* Top ATS Score Badge */}
           <div className="hidden sm:flex items-center gap-2 pl-3 border-l border-[#DCE7F2]">
-            <div className="flex items-center gap-1.5 bg-[#EFFAFD] px-2.5 py-1 rounded-xl border border-[#DCE7F2]">
+            <button
+              onClick={() => setActiveSection('ATS_DIAGNOSTICS')}
+              className="flex items-center gap-1.5 bg-[#EFFAFD] hover:bg-blue-100 px-2.5 py-1 rounded-xl border border-[#DCE7F2] cursor-pointer transition-colors"
+              title="Click to view full ATS breakdown"
+            >
               <ShieldCheck size={14} className="text-[#2459A8]" />
               <span className="text-xs font-bold font-mono text-[#11183D]">
                 ATS: {currentAtsAnalysis.totalScore}%
@@ -357,7 +768,7 @@ export default function ResumeBuilderPage() {
               >
                 {currentAtsAnalysis.grade}
               </span>
-            </div>
+            </button>
           </div>
         </div>
 
@@ -384,12 +795,22 @@ export default function ResumeBuilderPage() {
           </div>
 
           <button
-            onClick={() => navigate(`/resume/analyze?versionId=${currentVersion?.id || 'master'}`)}
-            className="px-3 py-2 bg-white hover:bg-slate-50 text-[#2459A8] border border-[#DCE7F2] rounded-xl text-xs font-bold font-display flex items-center gap-1.5 cursor-pointer transition-colors shadow-2xs"
-            title="Open comprehensive ATS gap report"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isUploading}
+            className="px-3 py-2 bg-white hover:bg-slate-50 text-[#11183D] border border-[#DCE7F2] rounded-xl text-xs font-bold font-display flex items-center gap-1.5 cursor-pointer transition-colors shadow-2xs"
+            title="Upload PDF or DOCX directly into this workspace"
           >
-            <ShieldCheck size={14} />
-            <span className="hidden sm:inline">ATS Scan</span>
+            <UploadCloud size={14} className={isUploading ? 'animate-bounce text-[#2459A8]' : 'text-[#2459A8]'} />
+            <span>{isUploading ? 'Extracting...' : 'Upload PDF/DOCX'}</span>
+          </button>
+
+          <button
+            onClick={() => setActiveSection('COMPETITIVE_MATCH')}
+            className="px-3 py-2 bg-white hover:bg-slate-50 text-[#2459A8] border border-[#DCE7F2] rounded-xl text-xs font-bold font-display flex items-center gap-1.5 cursor-pointer transition-colors shadow-2xs"
+            title="Match resume against specific Job Description"
+          >
+            <Target size={14} />
+            <span className="hidden sm:inline">Job Match</span>
           </button>
 
           <button
@@ -421,7 +842,7 @@ export default function ResumeBuilderPage() {
       {/* Main 3-Pane Body */}
       <div className="flex-1 flex overflow-hidden min-h-0">
         {/* PANE 1: Section Navigation (Left Column) */}
-        <div className={`w-56 lg:w-60 bg-white border-r border-[#DCE7F2] p-4 flex flex-col justify-between shrink-0 overflow-y-auto ${
+        <div className={`w-60 lg:w-64 bg-white border-r border-[#DCE7F2] p-4 flex flex-col justify-between shrink-0 overflow-y-auto ${
           mobileTab === 'EDITOR' ? 'hidden md:flex' : 'hidden md:flex'
         }`}>
           <div className="space-y-1">
@@ -432,16 +853,23 @@ export default function ResumeBuilderPage() {
               <button
                 key={sec.id}
                 onClick={() => setActiveSection(sec.id)}
-                className={`w-full px-3 py-2.5 rounded-xl text-xs font-bold font-display flex items-center gap-2.5 transition-all cursor-pointer ${
+                className={`w-full px-3 py-2 rounded-xl text-xs font-bold font-display flex items-center justify-between transition-all cursor-pointer ${
                   activeSection === sec.id
                     ? 'bg-[#EFFAFD] text-[#2459A8] border border-[#DCE7F2] shadow-2xs'
                     : 'text-[#526078] hover:text-[#11183D] hover:bg-slate-50'
                 }`}
               >
-                <span className={activeSection === sec.id ? 'text-[#2459A8]' : 'text-[#7B8799]'}>
-                  {sec.icon}
-                </span>
-                <span>{sec.label}</span>
+                <div className="flex items-center gap-2.5 truncate">
+                  <span className={activeSection === sec.id ? 'text-[#2459A8]' : 'text-[#7B8799]'}>
+                    {sec.icon}
+                  </span>
+                  <span className="truncate">{sec.label}</span>
+                </div>
+                {sec.count !== undefined && sec.count > 0 && (
+                  <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-100 text-[#526078]">
+                    {sec.count}
+                  </span>
+                )}
               </button>
             ))}
           </div>
@@ -449,7 +877,7 @@ export default function ResumeBuilderPage() {
           <div className="pt-4 border-t border-slate-100 space-y-2">
             <button
               onClick={() => setIsTemplateModalOpen(true)}
-              className="w-full p-3 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 text-xs text-[#2459A8] font-bold flex items-center justify-between group cursor-pointer"
+              className="w-full p-2.5 rounded-2xl bg-linear-to-r from-blue-50 to-indigo-50 border border-blue-200 text-xs text-[#2459A8] font-bold flex items-center justify-between group cursor-pointer"
             >
               <div className="flex items-center gap-2">
                 <Layout size={15} />
@@ -462,186 +890,11 @@ export default function ResumeBuilderPage() {
           </div>
         </div>
 
-        {/* PANE 2: Form Editor (Center Column) */}
+        {/* PANE 2: Form Editor / Analysis (Center Column) */}
         <div className={`flex-1 min-w-0 bg-white p-4 sm:p-6 lg:p-7 overflow-y-auto ${
           mobileTab === 'EDITOR' ? 'block' : 'hidden lg:block'
         }`}>
           <div className="max-w-3xl mx-auto space-y-6 w-full">
-
-            {/* REFINED ATS COMPATIBILITY DIAGNOSTIC PANEL */}
-            <div className="rounded-2xl bg-slate-50 border border-[#DCE7F2] p-4 sm:p-5 space-y-4 shadow-2xs">
-              
-              {/* Header Row: Title on Left, Score on Right */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-[#DCE7F2]">
-                <div className="min-w-0 space-y-1">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs font-bold uppercase tracking-wider text-[#2459A8] font-mono">
-                      ATS Compatibility
-                    </span>
-                    {hasTargetJd && (
-                      <span className="text-[10px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded border border-emerald-200 font-mono">
-                        Target JD Linked
-                      </span>
-                    )}
-                  </div>
-                  <h4 className="text-base font-bold text-[#11183D] font-display">
-                    Resume ATS Readiness & Diagnostics
-                  </h4>
-                  <p className="text-xs text-[#526078]">
-                    Your current resume ATS compatibility score and section audit
-                  </p>
-                </div>
-
-                {/* Score & Grade Display */}
-                <div className="flex items-center gap-3 shrink-0 self-start sm:self-center">
-                  <div className="bg-white px-4 py-2 rounded-xl border border-[#DCE7F2] flex items-center gap-2.5 shadow-2xs">
-                    <span className="text-2xl font-black font-mono text-[#11183D]">
-                      {currentAtsAnalysis.totalScore}
-                      <span className="text-xs text-[#526078] font-normal"> / 100</span>
-                    </span>
-                    <span
-                      className={`text-xs font-bold px-2.5 py-1 rounded-lg border ${
-                        currentAtsAnalysis.totalScore >= 80
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                          : currentAtsAnalysis.totalScore >= 65
-                          ? 'bg-amber-50 text-amber-700 border-amber-200'
-                          : 'bg-rose-50 text-rose-700 border-rose-200'
-                      }`}
-                    >
-                      {currentAtsAnalysis.grade}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Link Row */}
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-[11px] text-[#526078] font-medium">
-                  {hasTargetJd
-                    ? `Benchmarked against ${currentAtsAnalysis.matchedKeywords.length + currentAtsAnalysis.missingKeywords.length} target job requirements`
-                    : `Evaluated for ${currentAtsAnalysis.detectedDomain || 'Professional'} domain competencies`}
-                </span>
-                <button
-                  onClick={() => navigate(`/resume/analyze?versionId=${currentVersion?.id || 'master'}`)}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-blue-50 text-[#2459A8] border border-[#DCE7F2] hover:border-blue-300 rounded-xl text-xs font-bold font-display transition-colors cursor-pointer shadow-2xs shrink-0"
-                >
-                  <span>View Full ATS Analysis</span>
-                  <ExternalLink size={13} />
-                </button>
-              </div>
-
-              {/* 5 Factor Breakdown Cards Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
-                
-                {/* 1. Keyword Match Card */}
-                <div className="bg-white p-3.5 rounded-xl border border-[#DCE7F2] flex flex-col justify-between space-y-2 shadow-2xs">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="font-bold text-xs text-[#11183D] truncate">
-                      {hasTargetJd ? 'Keyword Match' : 'Domain Skills'}
-                    </span>
-                    <span className="font-mono font-bold text-xs text-[#2459A8] shrink-0">
-                      {Math.round((currentAtsAnalysis.breakdown.keywordScore / 40) * 100)}% ({currentAtsAnalysis.breakdown.keywordScore}/40)
-                    </span>
-                  </div>
-                  <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-[#2459A8] rounded-full transition-all duration-300"
-                      style={{ width: `${(currentAtsAnalysis.breakdown.keywordScore / 40) * 100}%` }}
-                    />
-                  </div>
-                  <p className="text-[11px] text-[#526078] leading-tight break-words">
-                    {hasTargetJd
-                      ? `${currentAtsAnalysis.matchedKeywords.length} JD keywords matched`
-                      : `${currentAtsAnalysis.matchedKeywords.length} professional skills recognized`}
-                  </p>
-                </div>
-
-                {/* 2. Semantic Match Card */}
-                <div className="bg-white p-3.5 rounded-xl border border-[#DCE7F2] flex flex-col justify-between space-y-2 shadow-2xs">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="font-bold text-xs text-[#11183D] truncate">Semantic Match</span>
-                    {hasTargetJd ? (
-                      <span className="font-mono font-bold text-xs text-indigo-700 shrink-0">
-                        {currentAtsAnalysis.semanticScore}%
-                      </span>
-                    ) : (
-                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200 shrink-0">
-                        No JD attached
-                      </span>
-                    )}
-                  </div>
-                  <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-indigo-600 rounded-full transition-all duration-300"
-                      style={{ width: hasTargetJd ? `${currentAtsAnalysis.semanticScore}%` : '0%' }}
-                    />
-                  </div>
-                  <p className="text-[11px] text-[#526078] leading-tight break-words">
-                    {hasTargetJd
-                      ? 'AI vector contextual relevance to job'
-                      : 'Add a target job description to calculate semantic similarity.'}
-                  </p>
-                </div>
-
-                {/* 3. Section Completeness Card */}
-                <div className="bg-white p-3.5 rounded-xl border border-[#DCE7F2] flex flex-col justify-between space-y-2 shadow-2xs">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="font-bold text-xs text-[#11183D] truncate">Completeness</span>
-                    <span className="font-mono font-bold text-xs text-emerald-700 shrink-0">
-                      {Math.round((currentAtsAnalysis.breakdown.completenessScore / 20) * 100)}% ({currentAtsAnalysis.breakdown.completenessScore}/20)
-                    </span>
-                  </div>
-                  <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-emerald-500 rounded-full transition-all duration-300"
-                      style={{ width: `${(currentAtsAnalysis.breakdown.completenessScore / 20) * 100}%` }}
-                    />
-                  </div>
-                  <p className="text-[11px] text-[#526078] leading-tight break-words">
-                    Contact, summary, experience & skills sections
-                  </p>
-                </div>
-
-                {/* 4. Action Verbs Card */}
-                <div className="bg-white p-3.5 rounded-xl border border-[#DCE7F2] flex flex-col justify-between space-y-2 shadow-2xs">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="font-bold text-xs text-[#11183D] truncate">Action Verbs</span>
-                    <span className="font-mono font-bold text-xs text-amber-700 shrink-0">
-                      {Math.round((currentAtsAnalysis.breakdown.actionVerbScore / 15) * 100)}% ({currentAtsAnalysis.breakdown.actionVerbScore}/15)
-                    </span>
-                  </div>
-                  <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-amber-500 rounded-full transition-all duration-300"
-                      style={{ width: `${(currentAtsAnalysis.breakdown.actionVerbScore / 15) * 100}%` }}
-                    />
-                  </div>
-                  <p className="text-[11px] text-[#526078] leading-tight break-words">
-                    Strong active verbs vs passive phrasing
-                  </p>
-                </div>
-
-                {/* 5. Quantified Impact (STAR Metrics) Card */}
-                <div className="bg-white p-3.5 rounded-xl border border-[#DCE7F2] flex flex-col justify-between space-y-2 shadow-2xs sm:col-span-2 lg:col-span-2">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="font-bold text-xs text-[#11183D] truncate">Quantified Impact (STAR Metrics)</span>
-                    <span className="font-mono font-bold text-xs text-purple-700 shrink-0">
-                      {Math.round((currentAtsAnalysis.breakdown.metricsScore / 25) * 100)}% ({currentAtsAnalysis.breakdown.metricsScore}/25)
-                    </span>
-                  </div>
-                  <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-purple-600 rounded-full transition-all duration-300"
-                      style={{ width: `${(currentAtsAnalysis.breakdown.metricsScore / 25) * 100}%` }}
-                    />
-                  </div>
-                  <p className="text-[11px] text-[#526078] leading-tight break-words">
-                    Bullets containing %, $, numbers, or measurable scale outcomes
-                  </p>
-                </div>
-
-              </div>
-            </div>
 
             {/* 1. Personal Info Section */}
             {activeSection === 'PERSONAL' && (
@@ -764,12 +1017,12 @@ export default function ResumeBuilderPage() {
                     onClick={() =>
                       handleAddExperience({
                         title: 'Software Engineer',
-                        company: 'New Company',
-                        location: 'City, State',
+                        company: 'Company Name',
+                        location: 'Location',
                         startDate: '2023-01',
                         endDate: 'Present',
                         current: true,
-                        bullets: ['Designed high-throughput APIs handling daily user volume with 99.9% uptime.']
+                        bullets: ['Engineered scalable microservices and customer-facing features.']
                       })
                     }
                     className="px-3 py-1.5 bg-[#EFFAFD] border border-[#DCE7F2] text-[#2459A8] rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer hover:bg-blue-100 transition-colors"
@@ -899,13 +1152,13 @@ export default function ResumeBuilderPage() {
                   <button
                     onClick={() =>
                       handleAddEducation({
-                        degree: 'B.S. in Computer Science',
+                        degree: 'Degree / Major',
                         school: 'University Name',
                         location: 'City, State',
                         startDate: '2019-08',
                         endDate: '2023-05',
-                        gpa: '3.8 / 4.0',
-                        highlights: 'Coursework: Algorithms, Operating Systems, Database Systems'
+                        gpa: '',
+                        highlights: ''
                       })
                     }
                     className="px-3 py-1.5 bg-[#EFFAFD] border border-[#DCE7F2] text-[#2459A8] rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer hover:bg-blue-100 transition-colors"
@@ -972,9 +1225,9 @@ export default function ResumeBuilderPage() {
                         <label className="block text-[11px] font-bold text-[#526078] mb-1">Academic Highlights / Coursework</label>
                         <input
                           type="text"
-                          placeholder="e.g. Honors in Distributed Systems, Algorithms, Machine Learning"
-                          value={edu.highlights || ''}
-                          onChange={(e) => handleUpdateEducation(edu.id, { highlights: e.target.value })}
+                          placeholder="e.g. Coursework: Distributed Systems, Algorithms, Machine Learning"
+                          value={edu.highlights || edu.coursework || ''}
+                          onChange={(e) => handleUpdateEducation(edu.id, { highlights: e.target.value, coursework: e.target.value })}
                           className="w-full p-2 bg-white border border-[#DCE7F2] rounded-xl text-xs"
                         />
                       </div>
@@ -993,9 +1246,9 @@ export default function ResumeBuilderPage() {
                     onClick={() =>
                       handleAddProject({
                         name: 'New Project',
-                        description: 'High-performance scalable web application.',
-                        techStack: ['TypeScript', 'React', 'Node.js'],
-                        bullets: ['Engineered responsive user interface with automated test coverage.']
+                        description: 'High-performance scalable application.',
+                        techStack: ['TypeScript', 'React', 'PostgreSQL'],
+                        bullets: ['Designed responsive architecture with automated CI/CD.']
                       })
                     }
                     className="px-3 py-1.5 bg-[#EFFAFD] border border-[#DCE7F2] text-[#2459A8] rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer hover:bg-blue-100 transition-colors"
@@ -1039,6 +1292,26 @@ export default function ResumeBuilderPage() {
                               techStack: e.target.value.split(',').map((s) => s.trim()).filter(Boolean)
                             })
                           }
+                          className="w-full p-2 bg-white border border-[#DCE7F2] rounded-xl text-xs"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-bold text-[#526078] mb-1">Live Demo URL</label>
+                        <input
+                          type="text"
+                          placeholder="https://demo.app"
+                          value={proj.liveUrl || ''}
+                          onChange={(e) => handleUpdateProject(proj.id, { liveUrl: e.target.value })}
+                          className="w-full p-2 bg-white border border-[#DCE7F2] rounded-xl text-xs"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-bold text-[#526078] mb-1">GitHub / Repo URL</label>
+                        <input
+                          type="text"
+                          placeholder="https://github.com/username/repo"
+                          value={proj.repoUrl || ''}
+                          onChange={(e) => handleUpdateProject(proj.id, { repoUrl: e.target.value })}
                           className="w-full p-2 bg-white border border-[#DCE7F2] rounded-xl text-xs"
                         />
                       </div>
@@ -1087,6 +1360,7 @@ export default function ResumeBuilderPage() {
                               handleUpdateProject(proj.id, { bullets: nextBullets });
                             }}
                             className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg cursor-pointer"
+                            title="Remove bullet"
                           >
                             <Trash2 size={13} />
                           </button>
@@ -1103,13 +1377,13 @@ export default function ResumeBuilderPage() {
               <div className="space-y-4">
                 <h3 className="text-lg font-bold font-display text-[#11183D]">Technical Skills</h3>
                 <p className="text-xs text-[#526078]">
-                  Categorized skills are prioritized by modern ATS parsers. Separate multiple items with commas.
+                  Categorized technical skills recognized by ATS. Separate items with commas.
                 </p>
 
-                {(['languages', 'frameworks', 'databases', 'cloudDevOps', 'tools'] as const).map((cat) => (
+                {(['languages', 'frameworks', 'libraries', 'databases', 'cloudDevOps', 'security', 'tools', 'other'] as const).map((cat) => (
                   <div key={cat} className="p-4 bg-slate-50 rounded-2xl border border-[#DCE7F2] space-y-2">
                     <label className="block text-xs font-bold text-[#11183D] capitalize">
-                      {cat.replace(/([A-Z])/g, ' $1')}
+                      {cat === 'cloudDevOps' ? 'Cloud & DevOps' : cat.replace(/([A-Z])/g, ' $1')}
                     </label>
                     <input
                       type="text"
@@ -1121,7 +1395,7 @@ export default function ResumeBuilderPage() {
                         )
                       }
                       className="w-full p-2.5 bg-white border border-[#DCE7F2] rounded-xl text-xs text-[#11183D]"
-                      placeholder="Comma-separated skills (e.g. TypeScript, React, Node.js)"
+                      placeholder={`Comma-separated ${cat} (e.g. Python, SQL, Docker)`}
                     />
                   </div>
                 ))}
@@ -1132,12 +1406,12 @@ export default function ResumeBuilderPage() {
             {activeSection === 'CERTS' && (
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-bold font-display text-[#11183D]">Certifications & Licenses</h3>
+                  <h3 className="text-lg font-bold font-display text-[#11183D]">Certifications</h3>
                   <button
                     onClick={() =>
                       handleAddCertification({
-                        title: 'AWS Certified Solutions Architect',
-                        issuer: 'Amazon Web Services',
+                        title: 'Certification Title',
+                        issuer: 'Issuing Body',
                         date: '2023-09'
                       })
                     }
@@ -1162,44 +1436,38 @@ export default function ResumeBuilderPage() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-[11px] font-bold text-[#526078] mb-1">Certification Title</label>
+                        <label className="block text-[11px] font-bold text-[#526078] mb-1">Title</label>
                         <input
                           type="text"
-                          placeholder="e.g. Certified Kubernetes Administrator"
                           value={cert.title}
-                          onChange={(e) => {
-                            if (currentVersion) {
-                              updateResumeVersion(currentVersion.id, {
-                                resumeData: {
-                                  ...activeResumeData,
-                                  certifications: (activeResumeData.certifications || []).map((c) =>
-                                    c.id === cert.id ? { ...c, title: e.target.value } : c
-                                  )
-                                }
-                              });
-                            }
-                          }}
+                          onChange={(e) => handleUpdateCertification(cert.id, { title: e.target.value })}
                           className="w-full p-2 bg-white border border-[#DCE7F2] rounded-xl text-xs"
                         />
                       </div>
                       <div>
-                        <label className="block text-[11px] font-bold text-[#526078] mb-1">Issuing Organization</label>
+                        <label className="block text-[11px] font-bold text-[#526078] mb-1">Issuer</label>
                         <input
                           type="text"
-                          placeholder="e.g. Linux Foundation"
                           value={cert.issuer}
-                          onChange={(e) => {
-                            if (currentVersion) {
-                              updateResumeVersion(currentVersion.id, {
-                                resumeData: {
-                                  ...activeResumeData,
-                                  certifications: (activeResumeData.certifications || []).map((c) =>
-                                    c.id === cert.id ? { ...c, issuer: e.target.value } : c
-                                  )
-                                }
-                              });
-                            }
-                          }}
+                          onChange={(e) => handleUpdateCertification(cert.id, { issuer: e.target.value })}
+                          className="w-full p-2 bg-white border border-[#DCE7F2] rounded-xl text-xs"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-bold text-[#526078] mb-1">Date</label>
+                        <input
+                          type="text"
+                          value={cert.date}
+                          onChange={(e) => handleUpdateCertification(cert.id, { date: e.target.value })}
+                          className="w-full p-2 bg-white border border-[#DCE7F2] rounded-xl text-xs"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-bold text-[#526078] mb-1">Credential URL (Optional)</label>
+                        <input
+                          type="text"
+                          value={cert.credentialUrl || ''}
+                          onChange={(e) => handleUpdateCertification(cert.id, { credentialUrl: e.target.value })}
                           className="w-full p-2 bg-white border border-[#DCE7F2] rounded-xl text-xs"
                         />
                       </div>
@@ -1209,7 +1477,588 @@ export default function ResumeBuilderPage() {
               </div>
             )}
 
-            {/* 8. Design Templates Section */}
+            {/* 8. Publications Section */}
+            {activeSection === 'PUBLICATIONS' && (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-bold font-display text-[#11183D]">Publications</h3>
+                  <button
+                    onClick={() =>
+                      handleAddPublication({
+                        title: 'Paper / Article Title',
+                        venue: 'Conference / Journal / Publisher',
+                        date: '2023-05'
+                      })
+                    }
+                    className="px-3 py-1.5 bg-[#EFFAFD] border border-[#DCE7F2] text-[#2459A8] rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer hover:bg-blue-100 transition-colors"
+                  >
+                    <Plus size={14} />
+                    <span>Add Publication</span>
+                  </button>
+                </div>
+
+                {(activeResumeData.publications || []).map((pub, idx) => (
+                  <div key={pub.id} className="p-4 bg-slate-50 rounded-2xl border border-[#DCE7F2] space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-bold font-mono text-[#2459A8]"># {idx + 1} Publication</span>
+                      <button
+                        onClick={() => handleRemovePublication(pub.id)}
+                        className="text-rose-600 hover:text-rose-800 text-xs flex items-center gap-1 cursor-pointer"
+                      >
+                        <Trash2 size={13} /> Remove
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="sm:col-span-2">
+                        <label className="block text-[11px] font-bold text-[#526078] mb-1">Title</label>
+                        <input
+                          type="text"
+                          value={pub.title}
+                          onChange={(e) => handleUpdatePublication(pub.id, { title: e.target.value })}
+                          className="w-full p-2 bg-white border border-[#DCE7F2] rounded-xl text-xs"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-bold text-[#526078] mb-1">Venue / Publisher</label>
+                        <input
+                          type="text"
+                          value={pub.venue || ''}
+                          onChange={(e) => handleUpdatePublication(pub.id, { venue: e.target.value })}
+                          className="w-full p-2 bg-white border border-[#DCE7F2] rounded-xl text-xs"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-bold text-[#526078] mb-1">Date</label>
+                        <input
+                          type="text"
+                          value={pub.date || ''}
+                          onChange={(e) => handleUpdatePublication(pub.id, { date: e.target.value })}
+                          className="w-full p-2 bg-white border border-[#DCE7F2] rounded-xl text-xs"
+                        />
+                      </div>
+                      <div className="sm:col-span-2">
+                        <label className="block text-[11px] font-bold text-[#526078] mb-1">URL (Optional)</label>
+                        <input
+                          type="text"
+                          value={pub.url || ''}
+                          onChange={(e) => handleUpdatePublication(pub.id, { url: e.target.value })}
+                          className="w-full p-2 bg-white border border-[#DCE7F2] rounded-xl text-xs"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* 9. Patents Section */}
+            {activeSection === 'PATENTS' && (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-bold font-display text-[#11183D]">Patents</h3>
+                  <button
+                    onClick={() =>
+                      handleAddPatent({
+                        title: 'Patent Title',
+                        number: 'US12345678',
+                        date: '2023-01'
+                      })
+                    }
+                    className="px-3 py-1.5 bg-[#EFFAFD] border border-[#DCE7F2] text-[#2459A8] rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer hover:bg-blue-100 transition-colors"
+                  >
+                    <Plus size={14} />
+                    <span>Add Patent</span>
+                  </button>
+                </div>
+
+                {(activeResumeData.patents || []).map((pat, idx) => (
+                  <div key={pat.id} className="p-4 bg-slate-50 rounded-2xl border border-[#DCE7F2] space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-bold font-mono text-[#2459A8]"># {idx + 1} Patent</span>
+                      <button
+                        onClick={() => handleRemovePatent(pat.id)}
+                        className="text-rose-600 hover:text-rose-800 text-xs flex items-center gap-1 cursor-pointer"
+                      >
+                        <Trash2 size={13} /> Remove
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="sm:col-span-2">
+                        <label className="block text-[11px] font-bold text-[#526078] mb-1">Title</label>
+                        <input
+                          type="text"
+                          value={pat.title}
+                          onChange={(e) => handleUpdatePatent(pat.id, { title: e.target.value })}
+                          className="w-full p-2 bg-white border border-[#DCE7F2] rounded-xl text-xs"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-bold text-[#526078] mb-1">Patent Number</label>
+                        <input
+                          type="text"
+                          value={pat.number || ''}
+                          onChange={(e) => handleUpdatePatent(pat.id, { number: e.target.value })}
+                          className="w-full p-2 bg-white border border-[#DCE7F2] rounded-xl text-xs"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-bold text-[#526078] mb-1">Filing / Issue Date</label>
+                        <input
+                          type="text"
+                          value={pat.date || ''}
+                          onChange={(e) => handleUpdatePatent(pat.id, { date: e.target.value })}
+                          className="w-full p-2 bg-white border border-[#DCE7F2] rounded-xl text-xs"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* 10. Achievements / Awards Section */}
+            {activeSection === 'ACHIEVEMENTS' && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-bold font-display text-[#11183D]">Achievements & Awards</h3>
+                  <button
+                    onClick={() => handleAddAchievement('1st Place - National Hackathon 2023')}
+                    className="px-3 py-1.5 bg-[#EFFAFD] border border-[#DCE7F2] text-[#2459A8] rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer hover:bg-blue-100 transition-colors"
+                  >
+                    <Plus size={14} />
+                    <span>Add Achievement</span>
+                  </button>
+                </div>
+
+                {(activeResumeData.achievements || []).map((ach, idx) => (
+                  <div key={idx} className="flex gap-2 items-center p-2.5 bg-slate-50 rounded-xl border border-[#DCE7F2]">
+                    <input
+                      type="text"
+                      value={ach}
+                      onChange={(e) => handleUpdateAchievement(idx, e.target.value)}
+                      className="flex-1 p-2 bg-white border border-[#DCE7F2] rounded-lg text-xs"
+                    />
+                    <button
+                      onClick={() => handleRemoveAchievement(idx)}
+                      className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg cursor-pointer"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* 11. Languages Section */}
+            {activeSection === 'LANGUAGES' && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-bold font-display text-[#11183D]">Languages</h3>
+                  <button
+                    onClick={() => handleAddLanguage('English (Fluent)')}
+                    className="px-3 py-1.5 bg-[#EFFAFD] border border-[#DCE7F2] text-[#2459A8] rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer hover:bg-blue-100 transition-colors"
+                  >
+                    <Plus size={14} />
+                    <span>Add Language</span>
+                  </button>
+                </div>
+
+                {(activeResumeData.languages || []).map((lang, idx) => (
+                  <div key={idx} className="flex gap-2 items-center p-2.5 bg-slate-50 rounded-xl border border-[#DCE7F2]">
+                    <input
+                      type="text"
+                      value={lang}
+                      onChange={(e) => handleUpdateLanguage(idx, e.target.value)}
+                      className="flex-1 p-2 bg-white border border-[#DCE7F2] rounded-lg text-xs"
+                      placeholder="e.g. English (Fluent), Spanish (Conversational)"
+                    />
+                    <button
+                      onClick={() => handleRemoveLanguage(idx)}
+                      className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg cursor-pointer"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* 12. Additional / Custom Sections */}
+            {activeSection === 'CUSTOM' && (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-bold font-display text-[#11183D]">Custom Sections</h3>
+                  <button
+                    onClick={() => handleAddCustomSection('Leadership & Volunteering')}
+                    className="px-3 py-1.5 bg-[#EFFAFD] border border-[#DCE7F2] text-[#2459A8] rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer hover:bg-blue-100 transition-colors"
+                  >
+                    <Plus size={14} />
+                    <span>Add Custom Section</span>
+                  </button>
+                </div>
+
+                {(activeResumeData.customSections || []).map((sec) => (
+                  <div key={sec.id} className="p-4 bg-slate-50 rounded-2xl border border-[#DCE7F2] space-y-3">
+                    <div className="flex justify-between items-center">
+                      <input
+                        type="text"
+                        value={sec.title}
+                        onChange={(e) => handleUpdateCustomSection(sec.id, e.target.value, sec.items)}
+                        className="font-bold text-xs p-1.5 bg-white border border-[#DCE7F2] rounded-lg"
+                        placeholder="Section Title"
+                      />
+                      <button
+                        onClick={() => handleRemoveCustomSection(sec.id)}
+                        className="text-rose-600 hover:text-rose-800 text-xs flex items-center gap-1 cursor-pointer"
+                      >
+                        <Trash2 size={13} /> Remove Section
+                      </button>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <label className="text-[11px] font-bold text-[#526078]">Section Items</label>
+                        <button
+                          onClick={() => {
+                            const next = [...sec.items, 'New item description'];
+                            handleUpdateCustomSection(sec.id, sec.title, next);
+                          }}
+                          className="text-[11px] font-bold text-[#2459A8] hover:underline flex items-center gap-0.5 cursor-pointer"
+                        >
+                          <Plus size={12} /> Add Item
+                        </button>
+                      </div>
+
+                      {sec.items.map((item, iIdx) => (
+                        <div key={iIdx} className="flex gap-2 items-center">
+                          <input
+                            type="text"
+                            value={item}
+                            onChange={(e) => {
+                              const next = [...sec.items];
+                              next[iIdx] = e.target.value;
+                              handleUpdateCustomSection(sec.id, sec.title, next);
+                            }}
+                            className="flex-1 p-2 bg-white border border-[#DCE7F2] rounded-xl text-xs"
+                          />
+                          <button
+                            onClick={() => {
+                              const next = sec.items.filter((_, i) => i !== iIdx);
+                              handleUpdateCustomSection(sec.id, sec.title, next);
+                            }}
+                            className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg cursor-pointer"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* ATS QUALITY ANALYSIS VIEW (Role-Independent 6-Pillar Model) */}
+            {activeSection === 'ATS_DIAGNOSTICS' && (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between pb-3 border-b border-[#DCE7F2]">
+                  <div>
+                    <span className="text-xs font-bold uppercase tracking-wider text-[#2459A8] font-mono">
+                      Role-Independent ATS Engine
+                    </span>
+                    <h3 className="text-xl font-bold font-display text-[#11183D]">
+                      6-Pillar ATS Compatibility Audit
+                    </h3>
+                  </div>
+                  <div className="bg-[#EFFAFD] border border-[#DCE7F2] p-3 rounded-2xl flex items-center gap-3">
+                    <span className="text-2xl font-black font-mono text-[#11183D]">
+                      {currentAtsAnalysis.totalScore}
+                      <span className="text-xs text-[#526078] font-normal"> / 100</span>
+                    </span>
+                    <span
+                      className={`text-xs font-bold px-2.5 py-1 rounded-lg border ${
+                        currentAtsAnalysis.totalScore >= 80
+                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                          : currentAtsAnalysis.totalScore >= 65
+                          ? 'bg-amber-50 text-amber-700 border-amber-200'
+                          : 'bg-rose-50 text-rose-700 border-rose-200'
+                      }`}
+                    >
+                      {currentAtsAnalysis.grade}
+                    </span>
+                  </div>
+                </div>
+
+                {/* 6 Pillars Breakdown */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                  <div className="p-4 bg-slate-50 rounded-2xl border border-[#DCE7F2] space-y-2">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="font-bold text-[#11183D]">Structure</span>
+                      <span className="font-mono text-[#2459A8] font-bold">{currentAtsAnalysis.breakdown.structureScore} / 20</span>
+                    </div>
+                    <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                      <div className="h-full bg-[#2459A8]" style={{ width: `${(currentAtsAnalysis.breakdown.structureScore / 20) * 100}%` }} />
+                    </div>
+                    <p className="text-[10.5px] text-[#526078]">Header, contact info, standard section headers</p>
+                  </div>
+
+                  <div className="p-4 bg-slate-50 rounded-2xl border border-[#DCE7F2] space-y-2">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="font-bold text-[#11183D]">Content Completeness</span>
+                      <span className="font-mono text-emerald-700 font-bold">{currentAtsAnalysis.breakdown.completenessScore} / 20</span>
+                    </div>
+                    <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                      <div className="h-full bg-emerald-500" style={{ width: `${(currentAtsAnalysis.breakdown.completenessScore / 20) * 100}%` }} />
+                    </div>
+                    <p className="text-[10.5px] text-[#526078]">Education, experience, summary, skills populated</p>
+                  </div>
+
+                  <div className="p-4 bg-slate-50 rounded-2xl border border-[#DCE7F2] space-y-2">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="font-bold text-[#11183D]">ATS Extractability</span>
+                      <span className="font-mono text-indigo-700 font-bold">{currentAtsAnalysis.breakdown.extractabilityScore} / 20</span>
+                    </div>
+                    <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                      <div className="h-full bg-indigo-500" style={{ width: `${(currentAtsAnalysis.breakdown.extractabilityScore / 20) * 100}%` }} />
+                    </div>
+                    <p className="text-[10.5px] text-[#526078]">Clean plain-text parsing with Docling alignment</p>
+                  </div>
+
+                  <div className="p-4 bg-slate-50 rounded-2xl border border-[#DCE7F2] space-y-2">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="font-bold text-[#11183D]">Skills & Technical</span>
+                      <span className="font-mono text-blue-700 font-bold">{currentAtsAnalysis.breakdown.skillsScore} / 15</span>
+                    </div>
+                    <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                      <div className="h-full bg-blue-500" style={{ width: `${(currentAtsAnalysis.breakdown.skillsScore / 15) * 100}%` }} />
+                    </div>
+                    <p className="text-[10.5px] text-[#526078]">Explicit technical skills categorization</p>
+                  </div>
+
+                  <div className="p-4 bg-slate-50 rounded-2xl border border-[#DCE7F2] space-y-2">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="font-bold text-[#11183D]">Experience Quality</span>
+                      <span className="font-mono text-amber-700 font-bold">{currentAtsAnalysis.breakdown.experienceQualityScore} / 15</span>
+                    </div>
+                    <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                      <div className="h-full bg-amber-500" style={{ width: `${(currentAtsAnalysis.breakdown.experienceQualityScore / 15) * 100}%` }} />
+                    </div>
+                    <p className="text-[10.5px] text-[#526078]">Action verbs and measurable outcome metrics</p>
+                  </div>
+
+                  <div className="p-4 bg-slate-50 rounded-2xl border border-[#DCE7F2] space-y-2">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="font-bold text-[#11183D]">ATS Formatting</span>
+                      <span className="font-mono text-purple-700 font-bold">{currentAtsAnalysis.breakdown.formattingScore} / 10</span>
+                    </div>
+                    <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                      <div className="h-full bg-purple-500" style={{ width: `${(currentAtsAnalysis.breakdown.formattingScore / 10) * 100}%` }} />
+                    </div>
+                    <p className="text-[10.5px] text-[#526078]">Single column hierarchy and clean typography</p>
+                  </div>
+                </div>
+
+                {/* Bullet Audits */}
+                {currentAtsAnalysis.bulletsAudit.length > 0 && (
+                  <div className="space-y-3">
+                    <h4 className="text-sm font-bold text-[#11183D]">Bullet Point Quality Diagnostics</h4>
+                    <div className="space-y-2">
+                      {currentAtsAnalysis.bulletsAudit.slice(0, 5).map((bullet, idx) => (
+                        <div key={idx} className="p-3 bg-slate-50 rounded-xl border border-[#DCE7F2] text-xs space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className={bullet.hasStrongVerb ? 'text-emerald-600 font-bold' : 'text-amber-600'}>
+                              {bullet.hasStrongVerb ? `✓ Verb: ${bullet.detectedVerb || 'Strong'}` : '⚠ Weak verb'}
+                            </span>
+                            <span className="text-slate-300">•</span>
+                            <span className={bullet.hasMetrics ? 'text-emerald-600 font-bold' : 'text-amber-600'}>
+                              {bullet.hasMetrics ? '✓ Metric detected' : '⚠ Missing metric'}
+                            </span>
+                          </div>
+                          <p className="text-[#334155] italic">"{bullet.original}"</p>
+                          {bullet.suggestedRewrite && (
+                            <p className="text-[#2459A8] font-medium text-[11.5px]">
+                              💡 Suggestion: {bullet.suggestedRewrite}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* COMPETITIVE JOB ANALYSIS VIEW (BGE Matcher + Target JD) */}
+            {activeSection === 'COMPETITIVE_MATCH' && (
+              <div className="space-y-6">
+                <div>
+                  <span className="text-xs font-bold uppercase tracking-wider text-[#2459A8] font-mono">
+                    BAAI/bge-large-en-v1.5 Neural Matcher
+                  </span>
+                  <h3 className="text-xl font-bold font-display text-[#11183D]">
+                    Competitive Job Description Matching
+                  </h3>
+                  <p className="text-xs text-[#526078] mt-1">
+                    Evaluates resume semantic similarity, explicit skill overlap, experience relevance, and terminology alignment.
+                  </p>
+                </div>
+
+                <div className="p-5 bg-slate-50 rounded-2xl border border-[#DCE7F2] space-y-4 shadow-2xs">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-bold text-[#11183D] mb-1">Target Company</label>
+                      <input
+                        type="text"
+                        value={targetCompanyName}
+                        onChange={(e) => setTargetCompanyName(e.target.value)}
+                        placeholder="e.g. Stripe, Amazon"
+                        className="w-full p-2 bg-white border border-[#DCE7F2] rounded-xl text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-[#11183D] mb-1">Target Job Title</label>
+                      <input
+                        type="text"
+                        value={targetJobRole}
+                        onChange={(e) => setTargetJobRole(e.target.value)}
+                        placeholder="e.g. Senior Full Stack Software Engineer"
+                        className="w-full p-2 bg-white border border-[#DCE7F2] rounded-xl text-xs"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-[#11183D] mb-1">Target Job Description (JD)</label>
+                    <textarea
+                      rows={6}
+                      value={targetJdText}
+                      onChange={(e) => setTargetJdText(e.target.value)}
+                      placeholder="Paste target job responsibilities and qualifications..."
+                      className="w-full p-3 bg-white border border-[#DCE7F2] rounded-xl text-xs font-sans leading-relaxed"
+                    />
+                  </div>
+
+                  <button
+                    onClick={handleRunCompetitiveMatch}
+                    disabled={isMatching}
+                    className="w-full py-2.5 bg-[#2459A8] hover:bg-[#1d4787] text-white rounded-xl text-xs font-bold font-display flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer transition-colors"
+                  >
+                    <RefreshCw size={14} className={isMatching ? 'animate-spin' : ''} />
+                    <span>{isMatching ? 'Evaluating Neural Embeddings...' : 'Run Competitive Match Analysis'}</span>
+                  </button>
+                </div>
+
+                {/* Competitive Match Results Display */}
+                {competitiveResult && (
+                  <div className="p-6 bg-white rounded-3xl border border-[#DCE7F2] space-y-6 shadow-sm">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-[#DCE7F2]">
+                      <div>
+                        <span className="text-[10.5px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full font-mono bg-blue-50 text-[#2459A8] border border-blue-200">
+                          Competitive Score Verdict
+                        </span>
+                        <h4 className="text-lg font-bold text-[#11183D] mt-1">
+                          {competitiveResult.status === 'MATCHED' ? 'Job Match Established' : 'Role Relevancy Warning'}
+                        </h4>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        {competitiveResult.status === 'MATCHED' ? (
+                          <div className="px-4 py-2 bg-emerald-50 rounded-2xl border border-emerald-200 text-center">
+                            <span className="text-2xl font-black font-mono text-emerald-700">
+                              {competitiveResult.score}%
+                            </span>
+                            <p className="text-[10px] text-emerald-800 font-bold uppercase">Competitive Match</p>
+                          </div>
+                        ) : (
+                          <div className="px-4 py-2 bg-amber-50 rounded-2xl border border-amber-200 text-center">
+                            <span className="text-2xl font-black font-mono text-amber-700">N/A</span>
+                            <p className="text-[10px] text-amber-800 font-bold uppercase">Not Relevant</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Formula Component Breakdown */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                      <div className="p-3.5 bg-slate-50 rounded-2xl border border-[#DCE7F2] space-y-1.5">
+                        <div className="flex justify-between text-xs font-bold">
+                          <span className="text-[#11183D]">Semantic Match (45%)</span>
+                          <span className="font-mono text-[#2459A8]">{Math.round(competitiveResult.semanticSimilarity * 100)}%</span>
+                        </div>
+                        <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                          <div className="h-full bg-[#2459A8]" style={{ width: `${competitiveResult.semanticSimilarity * 100}%` }} />
+                        </div>
+                      </div>
+
+                      <div className="p-3.5 bg-slate-50 rounded-2xl border border-[#DCE7F2] space-y-1.5">
+                        <div className="flex justify-between text-xs font-bold">
+                          <span className="text-[#11183D]">Skill Overlap (25%)</span>
+                          <span className="font-mono text-emerald-700">{Math.round(competitiveResult.skillOverlap * 100)}%</span>
+                        </div>
+                        <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                          <div className="h-full bg-emerald-500" style={{ width: `${competitiveResult.skillOverlap * 100}%` }} />
+                        </div>
+                      </div>
+
+                      <div className="p-3.5 bg-slate-50 rounded-2xl border border-[#DCE7F2] space-y-1.5">
+                        <div className="flex justify-between text-xs font-bold">
+                          <span className="text-[#11183D]">Experience Relevance (15%)</span>
+                          <span className="font-mono text-purple-700">{Math.round(competitiveResult.experienceRelevance * 100)}%</span>
+                        </div>
+                        <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                          <div className="h-full bg-purple-600" style={{ width: `${competitiveResult.experienceRelevance * 100}%` }} />
+                        </div>
+                      </div>
+
+                      <div className="p-3.5 bg-slate-50 rounded-2xl border border-[#DCE7F2] space-y-1.5">
+                        <div className="flex justify-between text-xs font-bold">
+                          <span className="text-[#11183D]">Terminology Match (15%)</span>
+                          <span className="font-mono text-amber-700">{Math.round(competitiveResult.terminologyMatch * 100)}%</span>
+                        </div>
+                        <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                          <div className="h-full bg-amber-500" style={{ width: `${competitiveResult.terminologyMatch * 100}%` }} />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Matched and Missing Skills */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-200 space-y-2">
+                        <h5 className="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
+                          <CheckCircle2 size={14} className="text-emerald-600" />
+                          <span>Matched Skills ({competitiveResult.matchedSkills.length})</span>
+                        </h5>
+                        <div className="flex flex-wrap gap-1">
+                          {competitiveResult.matchedSkills.map((s, i) => (
+                            <span key={i} className="text-[10px] font-mono bg-white text-emerald-800 px-2 py-0.5 rounded border border-emerald-200">
+                              {s}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="p-4 bg-rose-50/50 rounded-2xl border border-rose-200 space-y-2">
+                        <h5 className="text-xs font-bold text-rose-900 flex items-center gap-1.5">
+                          <XCircle size={14} className="text-rose-600" />
+                          <span>Missing Keywords ({competitiveResult.missingSkills.length})</span>
+                        </h5>
+                        <div className="flex flex-wrap gap-1">
+                          {competitiveResult.missingSkills.map((s, i) => (
+                            <span key={i} className="text-[10px] font-mono bg-white text-rose-800 px-2 py-0.5 rounded border border-rose-200">
+                              {s}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* DESIGN TEMPLATES SECTION */}
             {activeSection === 'TEMPLATES' && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -1240,6 +2089,7 @@ export default function ResumeBuilderPage() {
                 </div>
               </div>
             )}
+
           </div>
         </div>
 

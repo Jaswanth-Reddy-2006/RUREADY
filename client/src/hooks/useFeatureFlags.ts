@@ -47,8 +47,8 @@ const DEFAULT_FEATURE_FLAGS: Record<string, FeatureFlag> = {
   },
   ai_resume_ats: {
     id: 'ai_resume_ats',
-    name: 'AI Resume & ATS',
-    description: 'Automated resume parser, keyword scoring, and ATS checker',
+    name: 'Resume',
+    description: 'Unified resume workspace with Docling extraction, ATS quality engine, and job matching',
     enabled: true,
     updatedAt: new Date().toISOString(),
   },

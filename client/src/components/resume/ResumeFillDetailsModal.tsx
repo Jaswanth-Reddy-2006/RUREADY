@@ -92,7 +92,8 @@ export default function ResumeFillDetailsModal({ isOpen, onClose }: ResumeFillDe
   };
 
   const handleRemoveSkill = (category: keyof typeof masterResume.skills, skill: string) => {
-    const updated = masterResume.skills[category].filter(s => s !== skill);
+    const list = masterResume.skills[category] || [];
+    const updated = list.filter(s => s !== skill);
     updateSkillsCategory(category, updated);
   };
 

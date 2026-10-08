@@ -106,8 +106,200 @@ exports.Prisma.CareerRoadmapScalarFieldEnum = {
   isOfficial: 'isOfficial',
   nodesData: 'nodesData',
   customTechStack: 'customTechStack',
+  visibility: 'visibility',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.RoadmapGoalScalarFieldEnum = {
+  id: 'id',
+  roadmapId: 'roadmapId',
+  targetRole: 'targetRole',
+  outcome: 'outcome',
+  targetCompany: 'targetCompany',
+  targetIndustry: 'targetIndustry',
+  deadline: 'deadline',
+  difficulty: 'difficulty',
+  estimatedWeeks: 'estimatedWeeks',
+  freeOnly: 'freeOnly',
+  budgetCents: 'budgetCents',
+  currency: 'currency',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SkillScalarFieldEnum = {
+  id: 'id',
+  slug: 'slug',
+  name: 'name',
+  category: 'category',
+  description: 'description',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SkillRelationshipScalarFieldEnum = {
+  id: 'id',
+  fromSkillId: 'fromSkillId',
+  toSkillId: 'toSkillId',
+  type: 'type',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.RoadmapPhaseScalarFieldEnum = {
+  id: 'id',
+  roadmapId: 'roadmapId',
+  title: 'title',
+  description: 'description',
+  orderIndex: 'orderIndex',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.RoadmapNodeScalarFieldEnum = {
+  id: 'id',
+  roadmapId: 'roadmapId',
+  phaseId: 'phaseId',
+  legacyNodeId: 'legacyNodeId',
+  title: 'title',
+  description: 'description',
+  category: 'category',
+  orderIndex: 'orderIndex',
+  estimatedMinutes: 'estimatedMinutes',
+  requiresEvidence: 'requiresEvidence',
+  requiresAssessment: 'requiresAssessment',
+  targetProficiency: 'targetProficiency',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.RoadmapNodeSkillScalarFieldEnum = {
+  nodeId: 'nodeId',
+  skillId: 'skillId',
+  targetProficiency: 'targetProficiency'
+};
+
+exports.Prisma.RoadmapNodeDependencyScalarFieldEnum = {
+  nodeId: 'nodeId',
+  prerequisiteNodeId: 'prerequisiteNodeId'
+};
+
+exports.Prisma.UserRoadmapScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  sourceRoadmapId: 'sourceRoadmapId',
+  status: 'status',
+  personalization: 'personalization',
+  planSnapshot: 'planSnapshot',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.RoadmapSprintScalarFieldEnum = {
+  id: 'id',
+  userRoadmapId: 'userRoadmapId',
+  sprintNumber: 'sprintNumber',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  objective: 'objective',
+  expectedMinutes: 'expectedMinutes',
+  status: 'status',
+  decision: 'decision',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.RoadmapSprintTaskScalarFieldEnum = {
+  id: 'id',
+  sprintId: 'sprintId',
+  roadmapNodeId: 'roadmapNodeId',
+  title: 'title',
+  description: 'description',
+  orderIndex: 'orderIndex',
+  estimatedMinutes: 'estimatedMinutes',
+  requiresEvidence: 'requiresEvidence',
+  requiresAssessment: 'requiresAssessment',
+  status: 'status',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SprintPerformanceScalarFieldEnum = {
+  id: 'id',
+  sprintId: 'sprintId',
+  taskCompletion: 'taskCompletion',
+  assessmentScore: 'assessmentScore',
+  practicalScore: 'practicalScore',
+  codingScore: 'codingScore',
+  interviewScore: 'interviewScore',
+  consistencyScore: 'consistencyScore',
+  notes: 'notes',
+  decision: 'decision',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.SkillEvidenceScalarFieldEnum = {
+  id: 'id',
+  userRoadmapId: 'userRoadmapId',
+  skillId: 'skillId',
+  source: 'source',
+  estimatedProficiency: 'estimatedProficiency',
+  demonstratedScore: 'demonstratedScore',
+  confidence: 'confidence',
+  externalReference: 'externalReference',
+  metadata: 'metadata',
+  assessedAt: 'assessedAt'
+};
+
+exports.Prisma.MicroAssessmentScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  roadmapNodeId: 'roadmapNodeId',
+  skillId: 'skillId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.MicroAssessmentQuestionScalarFieldEnum = {
+  id: 'id',
+  assessmentId: 'assessmentId',
+  questionText: 'questionText',
+  options: 'options',
+  correctOptionIndex: 'correctOptionIndex',
+  explanation: 'explanation',
+  orderIndex: 'orderIndex',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.MicroAssessmentAttemptScalarFieldEnum = {
+  id: 'id',
+  assessmentId: 'assessmentId',
+  userId: 'userId',
+  userRoadmapId: 'userRoadmapId',
+  sprintId: 'sprintId',
+  sprintTaskId: 'sprintTaskId',
+  skillId: 'skillId',
+  totalQuestions: 'totalQuestions',
+  correctAnswers: 'correctAnswers',
+  score: 'score',
+  passed: 'passed',
+  answers: 'answers',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.RoadmapAdaptationScalarFieldEnum = {
+  id: 'id',
+  userRoadmapId: 'userRoadmapId',
+  sprintId: 'sprintId',
+  action: 'action',
+  reason: 'reason',
+  evidence: 'evidence',
+  previousState: 'previousState',
+  newState: 'newState',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.DiscussionPostScalarFieldEnum = {
@@ -165,10 +357,89 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
+exports.RoadmapVisibility = exports.$Enums.RoadmapVisibility = {
+  PUBLIC: 'PUBLIC',
+  PRIVATE: 'PRIVATE',
+  UNLISTED: 'UNLISTED'
+};
 
+exports.RoadmapDifficulty = exports.$Enums.RoadmapDifficulty = {
+  BEGINNER: 'BEGINNER',
+  INTERMEDIATE: 'INTERMEDIATE',
+  ADVANCED: 'ADVANCED'
+};
+
+exports.SkillRelationType = exports.$Enums.SkillRelationType = {
+  PREREQUISITE: 'PREREQUISITE',
+  DEPENDENCY: 'DEPENDENCY',
+  RELATED: 'RELATED'
+};
+
+exports.UserRoadmapStatus = exports.$Enums.UserRoadmapStatus = {
+  ACTIVE: 'ACTIVE',
+  PAUSED: 'PAUSED',
+  COMPLETED: 'COMPLETED',
+  ARCHIVED: 'ARCHIVED'
+};
+
+exports.SprintStatus = exports.$Enums.SprintStatus = {
+  UPCOMING: 'UPCOMING',
+  ACTIVE: 'ACTIVE',
+  COMPLETED: 'COMPLETED',
+  EXTENDED: 'EXTENDED',
+  SKIPPED: 'SKIPPED',
+  CANCELLED: 'CANCELLED'
+};
+
+exports.SprintTaskStatus = exports.$Enums.SprintTaskStatus = {
+  TODO: 'TODO',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+  SKIPPED: 'SKIPPED'
+};
+
+exports.SprintDecision = exports.$Enums.SprintDecision = {
+  CONTINUE: 'CONTINUE',
+  ACCELERATE: 'ACCELERATE',
+  EXTEND: 'EXTEND',
+  REMEDIATE: 'REMEDIATE'
+};
+
+exports.SkillEvidenceSource = exports.$Enums.SkillEvidenceSource = {
+  SELF_REPORTED: 'SELF_REPORTED',
+  ASSESSMENT: 'ASSESSMENT',
+  CODING_INTERVIEW: 'CODING_INTERVIEW',
+  ORAL_INTERVIEW: 'ORAL_INTERVIEW',
+  PROJECT: 'PROJECT',
+  ROADMAP_SPRINT: 'ROADMAP_SPRINT'
+};
+
+exports.RoadmapAdaptationAction = exports.$Enums.RoadmapAdaptationAction = {
+  ACCELERATE_TASK: 'ACCELERATE_TASK',
+  INSERT_REINFORCEMENT: 'INSERT_REINFORCEMENT',
+  EXTEND_SPRINT: 'EXTEND_SPRINT',
+  REDUCE_WORKLOAD: 'REDUCE_WORKLOAD',
+  INCREASE_PRACTICE: 'INCREASE_PRACTICE'
+};
 
 exports.Prisma.ModelName = {
   CareerRoadmap: 'CareerRoadmap',
+  RoadmapGoal: 'RoadmapGoal',
+  Skill: 'Skill',
+  SkillRelationship: 'SkillRelationship',
+  RoadmapPhase: 'RoadmapPhase',
+  RoadmapNode: 'RoadmapNode',
+  RoadmapNodeSkill: 'RoadmapNodeSkill',
+  RoadmapNodeDependency: 'RoadmapNodeDependency',
+  UserRoadmap: 'UserRoadmap',
+  RoadmapSprint: 'RoadmapSprint',
+  RoadmapSprintTask: 'RoadmapSprintTask',
+  SprintPerformance: 'SprintPerformance',
+  SkillEvidence: 'SkillEvidence',
+  MicroAssessment: 'MicroAssessment',
+  MicroAssessmentQuestion: 'MicroAssessmentQuestion',
+  MicroAssessmentAttempt: 'MicroAssessmentAttempt',
+  RoadmapAdaptation: 'RoadmapAdaptation',
   DiscussionPost: 'DiscussionPost',
   DiscussionComment: 'DiscussionComment'
 };
@@ -219,13 +490,13 @@ const config = {
       }
     }
   },
-  "inlineSchema": "// ═══════════════════════════════════════════════════════════════\n// Career Roadmap & Discussion Hub Microservice — Prisma Schema\n// Data ownership: career_roadmaps, discussion_posts, discussion_comments\n// ═══════════════════════════════════════════════════════════════\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/client\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel CareerRoadmap {\n  id                String   @id @default(cuid())\n  userId            String\n  title             String?  @default(\"Career Roadmap\")\n  description       String?  @db.Text\n  rolePath          String\n  targetCompanyTier String   @default(\"FAANG\")\n  estimatedWeeks    Int      @default(8)\n  overallReadiness  Int      @default(0)\n  isPublic          Boolean  @default(false)\n  isOfficial        Boolean  @default(false)\n  nodesData         Json\n  customTechStack   Json?\n  createdAt         DateTime @default(now())\n  updatedAt         DateTime @updatedAt\n\n  @@index([userId])\n  @@index([rolePath])\n  @@map(\"career_roadmaps\")\n}\n\nmodel DiscussionPost {\n  id           String   @id @default(cuid())\n  userId       String\n  userName     String\n  userAvatar   String?\n  roleCategory String\n  title        String\n  content      String   @db.Text\n  tags         String[] @default([])\n  upvotes      Int      @default(0)\n  aiReply      String?  @db.Text\n  createdAt    DateTime @default(now())\n  updatedAt    DateTime @updatedAt\n\n  comments DiscussionComment[]\n\n  @@index([roleCategory])\n  @@map(\"discussion_posts\")\n}\n\nmodel DiscussionComment {\n  id         String         @id @default(cuid())\n  postId     String\n  post       DiscussionPost @relation(fields: [postId], references: [id], onDelete: Cascade)\n  userId     String\n  userName   String\n  userAvatar String?\n  content    String         @db.Text\n  upvotes    Int            @default(0)\n  createdAt  DateTime       @default(now())\n\n  @@index([postId])\n  @@map(\"discussion_comments\")\n}\n",
-  "inlineSchemaHash": "c1771a62758cedf90c69aa801c21829ec2cadf5fa0f1fedee985e02db9d0c503",
+  "inlineSchema": "// ═══════════════════════════════════════════════════════════════\n// Career Roadmap & Discussion Hub Microservice — Prisma Schema\n// Data ownership: career_roadmaps, discussion_posts, discussion_comments\n// ═══════════════════════════════════════════════════════════════\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/client\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel CareerRoadmap {\n  id                String            @id @default(cuid())\n  userId            String\n  title             String?           @default(\"Career Roadmap\")\n  description       String?           @db.Text\n  rolePath          String\n  targetCompanyTier String            @default(\"FAANG\")\n  estimatedWeeks    Int               @default(8)\n  overallReadiness  Int               @default(0)\n  isPublic          Boolean           @default(false)\n  isOfficial        Boolean           @default(false)\n  nodesData         Json\n  customTechStack   Json?\n  visibility        RoadmapVisibility @default(PUBLIC)\n  goal              RoadmapGoal?\n  phases            RoadmapPhase[]\n  nodes             RoadmapNode[]\n  followers         UserRoadmap[]     @relation(\"SourceRoadmap\")\n  createdAt         DateTime          @default(now())\n  updatedAt         DateTime          @updatedAt\n\n  @@index([userId, createdAt])\n  @@index([rolePath, visibility, updatedAt])\n  @@map(\"career_roadmaps\")\n}\n\nenum RoadmapVisibility {\n  PUBLIC\n  PRIVATE\n  UNLISTED\n}\n\nenum RoadmapDifficulty {\n  BEGINNER\n  INTERMEDIATE\n  ADVANCED\n}\n\nenum SkillRelationType {\n  PREREQUISITE\n  DEPENDENCY\n  RELATED\n}\n\nenum UserRoadmapStatus {\n  ACTIVE\n  PAUSED\n  COMPLETED\n  ARCHIVED\n}\n\nenum SprintStatus {\n  UPCOMING\n  ACTIVE\n  COMPLETED\n  EXTENDED\n  SKIPPED\n  CANCELLED\n}\n\nenum SprintTaskStatus {\n  TODO\n  IN_PROGRESS\n  COMPLETED\n  SKIPPED\n}\n\nenum SprintDecision {\n  CONTINUE\n  ACCELERATE\n  EXTEND\n  REMEDIATE\n}\n\nenum SkillEvidenceSource {\n  SELF_REPORTED\n  ASSESSMENT\n  CODING_INTERVIEW\n  ORAL_INTERVIEW\n  PROJECT\n  ROADMAP_SPRINT\n}\n\nenum RoadmapAdaptationAction {\n  ACCELERATE_TASK\n  INSERT_REINFORCEMENT\n  EXTEND_SPRINT\n  REDUCE_WORKLOAD\n  INCREASE_PRACTICE\n}\n\nmodel RoadmapGoal {\n  id             String            @id @default(cuid())\n  roadmapId      String            @unique\n  targetRole     String\n  outcome        String\n  targetCompany  String?\n  targetIndustry String?\n  deadline       DateTime?\n  difficulty     RoadmapDifficulty @default(INTERMEDIATE)\n  estimatedWeeks Int?\n  freeOnly       Boolean           @default(false)\n  budgetCents    Int?\n  currency       String            @default(\"INR\")\n  roadmap        CareerRoadmap     @relation(fields: [roadmapId], references: [id], onDelete: Cascade)\n  createdAt      DateTime          @default(now())\n  updatedAt      DateTime          @updatedAt\n\n  @@index([targetRole, updatedAt])\n  @@index([targetCompany])\n  @@map(\"roadmap_goals\")\n}\n\nmodel Skill {\n  id                 String                   @id @default(cuid())\n  slug               String                   @unique\n  name               String\n  category           String\n  description        String?                  @db.Text\n  nodeLinks          RoadmapNodeSkill[]\n  evidence           SkillEvidence[]\n  assessments        MicroAssessment[]\n  assessmentAttempts MicroAssessmentAttempt[]\n  outgoingLinks      SkillRelationship[]      @relation(\"SkillRelationshipFrom\")\n  incomingLinks      SkillRelationship[]      @relation(\"SkillRelationshipTo\")\n  createdAt          DateTime                 @default(now())\n  updatedAt          DateTime                 @updatedAt\n\n  @@index([category, name])\n  @@map(\"skills\")\n}\n\nmodel SkillRelationship {\n  id          String            @id @default(cuid())\n  fromSkillId String\n  toSkillId   String\n  type        SkillRelationType\n  fromSkill   Skill             @relation(\"SkillRelationshipFrom\", fields: [fromSkillId], references: [id], onDelete: Cascade)\n  toSkill     Skill             @relation(\"SkillRelationshipTo\", fields: [toSkillId], references: [id], onDelete: Cascade)\n  createdAt   DateTime          @default(now())\n\n  @@unique([fromSkillId, toSkillId, type])\n  @@index([toSkillId, type])\n  @@map(\"skill_relationships\")\n}\n\nmodel RoadmapPhase {\n  id          String        @id @default(cuid())\n  roadmapId   String\n  title       String\n  description String?       @db.Text\n  orderIndex  Int\n  roadmap     CareerRoadmap @relation(fields: [roadmapId], references: [id], onDelete: Cascade)\n  nodes       RoadmapNode[]\n  createdAt   DateTime      @default(now())\n  updatedAt   DateTime      @updatedAt\n\n  @@unique([roadmapId, orderIndex])\n  @@map(\"roadmap_phases\")\n}\n\nmodel RoadmapNode {\n  id                 String                  @id @default(cuid())\n  roadmapId          String\n  phaseId            String?\n  legacyNodeId       String?\n  title              String\n  description        String?                 @db.Text\n  category           String\n  orderIndex         Int\n  estimatedMinutes   Int                     @default(60)\n  requiresEvidence   Boolean                 @default(false)\n  requiresAssessment Boolean                 @default(false)\n  targetProficiency  Int?\n  roadmap            CareerRoadmap           @relation(fields: [roadmapId], references: [id], onDelete: Cascade)\n  phase              RoadmapPhase?           @relation(fields: [phaseId], references: [id], onDelete: SetNull)\n  skills             RoadmapNodeSkill[]\n  assessments        MicroAssessment[]\n  prerequisites      RoadmapNodeDependency[] @relation(\"DependentRoadmapNode\")\n  unlocks            RoadmapNodeDependency[] @relation(\"PrerequisiteRoadmapNode\")\n  sprintTasks        RoadmapSprintTask[]\n  createdAt          DateTime                @default(now())\n  updatedAt          DateTime                @updatedAt\n\n  @@unique([roadmapId, orderIndex])\n  @@index([roadmapId, phaseId])\n  @@map(\"roadmap_nodes\")\n}\n\nmodel RoadmapNodeSkill {\n  nodeId            String\n  skillId           String\n  targetProficiency Int?\n  node              RoadmapNode @relation(fields: [nodeId], references: [id], onDelete: Cascade)\n  skill             Skill       @relation(fields: [skillId], references: [id], onDelete: Cascade)\n\n  @@id([nodeId, skillId])\n  @@index([skillId])\n  @@map(\"roadmap_node_skills\")\n}\n\nmodel RoadmapNodeDependency {\n  nodeId             String\n  prerequisiteNodeId String\n  node               RoadmapNode @relation(\"DependentRoadmapNode\", fields: [nodeId], references: [id], onDelete: Cascade)\n  prerequisiteNode   RoadmapNode @relation(\"PrerequisiteRoadmapNode\", fields: [prerequisiteNodeId], references: [id], onDelete: Cascade)\n\n  @@id([nodeId, prerequisiteNodeId])\n  @@map(\"roadmap_node_dependencies\")\n}\n\nmodel UserRoadmap {\n  id                 String                   @id @default(cuid())\n  userId             String\n  sourceRoadmapId    String\n  status             UserRoadmapStatus        @default(ACTIVE)\n  personalization    Json\n  planSnapshot       Json?\n  sourceRoadmap      CareerRoadmap            @relation(\"SourceRoadmap\", fields: [sourceRoadmapId], references: [id], onDelete: Restrict)\n  sprints            RoadmapSprint[]\n  skillEvidence      SkillEvidence[]\n  assessmentAttempts MicroAssessmentAttempt[]\n  adaptations        RoadmapAdaptation[]\n  createdAt          DateTime                 @default(now())\n  updatedAt          DateTime                 @updatedAt\n\n  @@unique([userId, sourceRoadmapId])\n  @@index([userId, status, updatedAt])\n  @@map(\"user_roadmaps\")\n}\n\nmodel RoadmapSprint {\n  id                 String                   @id @default(cuid())\n  userRoadmapId      String\n  sprintNumber       Int\n  startDate          DateTime\n  endDate            DateTime\n  objective          String\n  expectedMinutes    Int                      @default(0)\n  status             SprintStatus             @default(UPCOMING)\n  decision           SprintDecision?\n  userRoadmap        UserRoadmap              @relation(fields: [userRoadmapId], references: [id], onDelete: Cascade)\n  tasks              RoadmapSprintTask[]\n  performance        SprintPerformance?\n  assessmentAttempts MicroAssessmentAttempt[]\n  adaptations        RoadmapAdaptation[]\n  createdAt          DateTime                 @default(now())\n  updatedAt          DateTime                 @updatedAt\n\n  @@unique([userRoadmapId, sprintNumber])\n  @@index([userRoadmapId, status, startDate])\n  @@map(\"roadmap_sprints\")\n}\n\nmodel RoadmapSprintTask {\n  id                 String                   @id @default(cuid())\n  sprintId           String\n  roadmapNodeId      String?\n  title              String\n  description        String?                  @db.Text\n  orderIndex         Int\n  estimatedMinutes   Int                      @default(60)\n  requiresEvidence   Boolean                  @default(false)\n  requiresAssessment Boolean                  @default(false)\n  status             SprintTaskStatus         @default(TODO)\n  completedAt        DateTime?\n  sprint             RoadmapSprint            @relation(fields: [sprintId], references: [id], onDelete: Cascade)\n  roadmapNode        RoadmapNode?             @relation(fields: [roadmapNodeId], references: [id], onDelete: SetNull)\n  assessmentAttempts MicroAssessmentAttempt[]\n  createdAt          DateTime                 @default(now())\n  updatedAt          DateTime                 @updatedAt\n\n  @@unique([sprintId, orderIndex])\n  @@index([roadmapNodeId])\n  @@map(\"roadmap_sprint_tasks\")\n}\n\nmodel SprintPerformance {\n  id               String         @id @default(cuid())\n  sprintId         String         @unique\n  taskCompletion   Int\n  assessmentScore  Int?\n  practicalScore   Int?\n  codingScore      Int?\n  interviewScore   Int?\n  consistencyScore Int?\n  notes            String?        @db.Text\n  decision         SprintDecision\n  sprint           RoadmapSprint  @relation(fields: [sprintId], references: [id], onDelete: Cascade)\n  createdAt        DateTime       @default(now())\n\n  @@map(\"sprint_performances\")\n}\n\nmodel SkillEvidence {\n  id                   String              @id @default(cuid())\n  userRoadmapId        String\n  skillId              String\n  source               SkillEvidenceSource\n  estimatedProficiency Int?\n  demonstratedScore    Int?\n  confidence           Int                 @default(20)\n  externalReference    String?\n  metadata             Json?\n  assessedAt           DateTime            @default(now())\n  userRoadmap          UserRoadmap         @relation(fields: [userRoadmapId], references: [id], onDelete: Cascade)\n  skill                Skill               @relation(fields: [skillId], references: [id], onDelete: Restrict)\n\n  @@index([userRoadmapId, skillId, assessedAt])\n  @@map(\"skill_evidence\")\n}\n\nmodel MicroAssessment {\n  id            String                    @id @default(cuid())\n  title         String\n  description   String?                   @db.Text\n  roadmapNodeId String?\n  skillId       String?\n  roadmapNode   RoadmapNode?              @relation(fields: [roadmapNodeId], references: [id], onDelete: SetNull)\n  skill         Skill?                    @relation(fields: [skillId], references: [id], onDelete: SetNull)\n  questions     MicroAssessmentQuestion[]\n  attempts      MicroAssessmentAttempt[]\n  createdAt     DateTime                  @default(now())\n  updatedAt     DateTime                  @updatedAt\n\n  @@index([roadmapNodeId])\n  @@index([skillId])\n  @@map(\"micro_assessments\")\n}\n\nmodel MicroAssessmentQuestion {\n  id                 String          @id @default(cuid())\n  assessmentId       String\n  assessment         MicroAssessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)\n  questionText       String          @db.Text\n  options            String[]\n  correctOptionIndex Int\n  explanation        String?         @db.Text\n  orderIndex         Int             @default(0)\n  createdAt          DateTime        @default(now())\n\n  @@index([assessmentId, orderIndex])\n  @@map(\"micro_assessment_questions\")\n}\n\nmodel MicroAssessmentAttempt {\n  id             String             @id @default(cuid())\n  assessmentId   String\n  assessment     MicroAssessment    @relation(fields: [assessmentId], references: [id], onDelete: Cascade)\n  userId         String\n  userRoadmapId  String?\n  userRoadmap    UserRoadmap?       @relation(fields: [userRoadmapId], references: [id], onDelete: SetNull)\n  sprintId       String?\n  sprint         RoadmapSprint?     @relation(fields: [sprintId], references: [id], onDelete: SetNull)\n  sprintTaskId   String?\n  sprintTask     RoadmapSprintTask? @relation(fields: [sprintTaskId], references: [id], onDelete: SetNull)\n  skillId        String?\n  skill          Skill?             @relation(fields: [skillId], references: [id], onDelete: SetNull)\n  totalQuestions Int\n  correctAnswers Int\n  score          Int\n  passed         Boolean            @default(false)\n  answers        Json\n  completedAt    DateTime           @default(now())\n  createdAt      DateTime           @default(now())\n\n  @@index([userId, assessmentId])\n  @@index([userRoadmapId, skillId])\n  @@map(\"micro_assessment_attempts\")\n}\n\nmodel RoadmapAdaptation {\n  id            String                  @id @default(cuid())\n  userRoadmapId String\n  sprintId      String?\n  action        RoadmapAdaptationAction\n  reason        String                  @db.Text\n  evidence      Json\n  previousState Json?\n  newState      Json?\n  userRoadmap   UserRoadmap             @relation(fields: [userRoadmapId], references: [id], onDelete: Cascade)\n  sprint        RoadmapSprint?          @relation(fields: [sprintId], references: [id], onDelete: SetNull)\n  createdAt     DateTime                @default(now())\n\n  @@index([userRoadmapId, createdAt])\n  @@map(\"roadmap_adaptations\")\n}\n\nmodel DiscussionPost {\n  id           String   @id @default(cuid())\n  userId       String\n  userName     String\n  userAvatar   String?\n  roleCategory String\n  title        String\n  content      String   @db.Text\n  tags         String[] @default([])\n  upvotes      Int      @default(0)\n  aiReply      String?  @db.Text\n  createdAt    DateTime @default(now())\n  updatedAt    DateTime @updatedAt\n\n  comments DiscussionComment[]\n\n  @@index([roleCategory])\n  @@map(\"discussion_posts\")\n}\n\nmodel DiscussionComment {\n  id         String         @id @default(cuid())\n  postId     String\n  post       DiscussionPost @relation(fields: [postId], references: [id], onDelete: Cascade)\n  userId     String\n  userName   String\n  userAvatar String?\n  content    String         @db.Text\n  upvotes    Int            @default(0)\n  createdAt  DateTime       @default(now())\n\n  @@index([postId])\n  @@map(\"discussion_comments\")\n}\n",
+  "inlineSchemaHash": "42e537ea9c70a3f24e35a4a63769dd601b83810fc4d11b731861333326d7572a",
   "copyEngine": true
 }
 config.dirname = '/'
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"CareerRoadmap\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"rolePath\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"targetCompanyTier\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"estimatedWeeks\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"overallReadiness\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"isPublic\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"isOfficial\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"nodesData\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"customTechStack\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"career_roadmaps\"},\"DiscussionPost\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userAvatar\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"roleCategory\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"content\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"tags\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"upvotes\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"aiReply\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"comments\",\"kind\":\"object\",\"type\":\"DiscussionComment\",\"relationName\":\"DiscussionCommentToDiscussionPost\"}],\"dbName\":\"discussion_posts\"},\"DiscussionComment\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"postId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"post\",\"kind\":\"object\",\"type\":\"DiscussionPost\",\"relationName\":\"DiscussionCommentToDiscussionPost\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userAvatar\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"content\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"upvotes\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"discussion_comments\"}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"CareerRoadmap\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"rolePath\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"targetCompanyTier\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"estimatedWeeks\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"overallReadiness\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"isPublic\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"isOfficial\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"nodesData\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"customTechStack\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"visibility\",\"kind\":\"enum\",\"type\":\"RoadmapVisibility\"},{\"name\":\"goal\",\"kind\":\"object\",\"type\":\"RoadmapGoal\",\"relationName\":\"CareerRoadmapToRoadmapGoal\"},{\"name\":\"phases\",\"kind\":\"object\",\"type\":\"RoadmapPhase\",\"relationName\":\"CareerRoadmapToRoadmapPhase\"},{\"name\":\"nodes\",\"kind\":\"object\",\"type\":\"RoadmapNode\",\"relationName\":\"CareerRoadmapToRoadmapNode\"},{\"name\":\"followers\",\"kind\":\"object\",\"type\":\"UserRoadmap\",\"relationName\":\"SourceRoadmap\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"career_roadmaps\"},\"RoadmapGoal\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"roadmapId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"targetRole\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"outcome\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"targetCompany\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"targetIndustry\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"deadline\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"difficulty\",\"kind\":\"enum\",\"type\":\"RoadmapDifficulty\"},{\"name\":\"estimatedWeeks\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"freeOnly\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"budgetCents\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"currency\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"roadmap\",\"kind\":\"object\",\"type\":\"CareerRoadmap\",\"relationName\":\"CareerRoadmapToRoadmapGoal\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"roadmap_goals\"},\"Skill\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"slug\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"category\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"nodeLinks\",\"kind\":\"object\",\"type\":\"RoadmapNodeSkill\",\"relationName\":\"RoadmapNodeSkillToSkill\"},{\"name\":\"evidence\",\"kind\":\"object\",\"type\":\"SkillEvidence\",\"relationName\":\"SkillToSkillEvidence\"},{\"name\":\"assessments\",\"kind\":\"object\",\"type\":\"MicroAssessment\",\"relationName\":\"MicroAssessmentToSkill\"},{\"name\":\"assessmentAttempts\",\"kind\":\"object\",\"type\":\"MicroAssessmentAttempt\",\"relationName\":\"MicroAssessmentAttemptToSkill\"},{\"name\":\"outgoingLinks\",\"kind\":\"object\",\"type\":\"SkillRelationship\",\"relationName\":\"SkillRelationshipFrom\"},{\"name\":\"incomingLinks\",\"kind\":\"object\",\"type\":\"SkillRelationship\",\"relationName\":\"SkillRelationshipTo\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"skills\"},\"SkillRelationship\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"fromSkillId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"toSkillId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"type\",\"kind\":\"enum\",\"type\":\"SkillRelationType\"},{\"name\":\"fromSkill\",\"kind\":\"object\",\"type\":\"Skill\",\"relationName\":\"SkillRelationshipFrom\"},{\"name\":\"toSkill\",\"kind\":\"object\",\"type\":\"Skill\",\"relationName\":\"SkillRelationshipTo\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"skill_relationships\"},\"RoadmapPhase\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"roadmapId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"orderIndex\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"roadmap\",\"kind\":\"object\",\"type\":\"CareerRoadmap\",\"relationName\":\"CareerRoadmapToRoadmapPhase\"},{\"name\":\"nodes\",\"kind\":\"object\",\"type\":\"RoadmapNode\",\"relationName\":\"RoadmapNodeToRoadmapPhase\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"roadmap_phases\"},\"RoadmapNode\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"roadmapId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"phaseId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"legacyNodeId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"category\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"orderIndex\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"estimatedMinutes\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"requiresEvidence\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"requiresAssessment\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"targetProficiency\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"roadmap\",\"kind\":\"object\",\"type\":\"CareerRoadmap\",\"relationName\":\"CareerRoadmapToRoadmapNode\"},{\"name\":\"phase\",\"kind\":\"object\",\"type\":\"RoadmapPhase\",\"relationName\":\"RoadmapNodeToRoadmapPhase\"},{\"name\":\"skills\",\"kind\":\"object\",\"type\":\"RoadmapNodeSkill\",\"relationName\":\"RoadmapNodeToRoadmapNodeSkill\"},{\"name\":\"assessments\",\"kind\":\"object\",\"type\":\"MicroAssessment\",\"relationName\":\"MicroAssessmentToRoadmapNode\"},{\"name\":\"prerequisites\",\"kind\":\"object\",\"type\":\"RoadmapNodeDependency\",\"relationName\":\"DependentRoadmapNode\"},{\"name\":\"unlocks\",\"kind\":\"object\",\"type\":\"RoadmapNodeDependency\",\"relationName\":\"PrerequisiteRoadmapNode\"},{\"name\":\"sprintTasks\",\"kind\":\"object\",\"type\":\"RoadmapSprintTask\",\"relationName\":\"RoadmapNodeToRoadmapSprintTask\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"roadmap_nodes\"},\"RoadmapNodeSkill\":{\"fields\":[{\"name\":\"nodeId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"skillId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"targetProficiency\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"node\",\"kind\":\"object\",\"type\":\"RoadmapNode\",\"relationName\":\"RoadmapNodeToRoadmapNodeSkill\"},{\"name\":\"skill\",\"kind\":\"object\",\"type\":\"Skill\",\"relationName\":\"RoadmapNodeSkillToSkill\"}],\"dbName\":\"roadmap_node_skills\"},\"RoadmapNodeDependency\":{\"fields\":[{\"name\":\"nodeId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"prerequisiteNodeId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"node\",\"kind\":\"object\",\"type\":\"RoadmapNode\",\"relationName\":\"DependentRoadmapNode\"},{\"name\":\"prerequisiteNode\",\"kind\":\"object\",\"type\":\"RoadmapNode\",\"relationName\":\"PrerequisiteRoadmapNode\"}],\"dbName\":\"roadmap_node_dependencies\"},\"UserRoadmap\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"sourceRoadmapId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"UserRoadmapStatus\"},{\"name\":\"personalization\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"planSnapshot\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"sourceRoadmap\",\"kind\":\"object\",\"type\":\"CareerRoadmap\",\"relationName\":\"SourceRoadmap\"},{\"name\":\"sprints\",\"kind\":\"object\",\"type\":\"RoadmapSprint\",\"relationName\":\"RoadmapSprintToUserRoadmap\"},{\"name\":\"skillEvidence\",\"kind\":\"object\",\"type\":\"SkillEvidence\",\"relationName\":\"SkillEvidenceToUserRoadmap\"},{\"name\":\"assessmentAttempts\",\"kind\":\"object\",\"type\":\"MicroAssessmentAttempt\",\"relationName\":\"MicroAssessmentAttemptToUserRoadmap\"},{\"name\":\"adaptations\",\"kind\":\"object\",\"type\":\"RoadmapAdaptation\",\"relationName\":\"RoadmapAdaptationToUserRoadmap\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"user_roadmaps\"},\"RoadmapSprint\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userRoadmapId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"sprintNumber\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"startDate\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"endDate\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"objective\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"expectedMinutes\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"SprintStatus\"},{\"name\":\"decision\",\"kind\":\"enum\",\"type\":\"SprintDecision\"},{\"name\":\"userRoadmap\",\"kind\":\"object\",\"type\":\"UserRoadmap\",\"relationName\":\"RoadmapSprintToUserRoadmap\"},{\"name\":\"tasks\",\"kind\":\"object\",\"type\":\"RoadmapSprintTask\",\"relationName\":\"RoadmapSprintToRoadmapSprintTask\"},{\"name\":\"performance\",\"kind\":\"object\",\"type\":\"SprintPerformance\",\"relationName\":\"RoadmapSprintToSprintPerformance\"},{\"name\":\"assessmentAttempts\",\"kind\":\"object\",\"type\":\"MicroAssessmentAttempt\",\"relationName\":\"MicroAssessmentAttemptToRoadmapSprint\"},{\"name\":\"adaptations\",\"kind\":\"object\",\"type\":\"RoadmapAdaptation\",\"relationName\":\"RoadmapAdaptationToRoadmapSprint\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"roadmap_sprints\"},\"RoadmapSprintTask\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"sprintId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"roadmapNodeId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"orderIndex\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"estimatedMinutes\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"requiresEvidence\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"requiresAssessment\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"SprintTaskStatus\"},{\"name\":\"completedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"sprint\",\"kind\":\"object\",\"type\":\"RoadmapSprint\",\"relationName\":\"RoadmapSprintToRoadmapSprintTask\"},{\"name\":\"roadmapNode\",\"kind\":\"object\",\"type\":\"RoadmapNode\",\"relationName\":\"RoadmapNodeToRoadmapSprintTask\"},{\"name\":\"assessmentAttempts\",\"kind\":\"object\",\"type\":\"MicroAssessmentAttempt\",\"relationName\":\"MicroAssessmentAttemptToRoadmapSprintTask\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"roadmap_sprint_tasks\"},\"SprintPerformance\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"sprintId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"taskCompletion\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"assessmentScore\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"practicalScore\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"codingScore\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"interviewScore\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"consistencyScore\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"notes\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"decision\",\"kind\":\"enum\",\"type\":\"SprintDecision\"},{\"name\":\"sprint\",\"kind\":\"object\",\"type\":\"RoadmapSprint\",\"relationName\":\"RoadmapSprintToSprintPerformance\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"sprint_performances\"},\"SkillEvidence\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userRoadmapId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"skillId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"source\",\"kind\":\"enum\",\"type\":\"SkillEvidenceSource\"},{\"name\":\"estimatedProficiency\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"demonstratedScore\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"confidence\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"externalReference\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"metadata\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"assessedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"userRoadmap\",\"kind\":\"object\",\"type\":\"UserRoadmap\",\"relationName\":\"SkillEvidenceToUserRoadmap\"},{\"name\":\"skill\",\"kind\":\"object\",\"type\":\"Skill\",\"relationName\":\"SkillToSkillEvidence\"}],\"dbName\":\"skill_evidence\"},\"MicroAssessment\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"roadmapNodeId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"skillId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"roadmapNode\",\"kind\":\"object\",\"type\":\"RoadmapNode\",\"relationName\":\"MicroAssessmentToRoadmapNode\"},{\"name\":\"skill\",\"kind\":\"object\",\"type\":\"Skill\",\"relationName\":\"MicroAssessmentToSkill\"},{\"name\":\"questions\",\"kind\":\"object\",\"type\":\"MicroAssessmentQuestion\",\"relationName\":\"MicroAssessmentToMicroAssessmentQuestion\"},{\"name\":\"attempts\",\"kind\":\"object\",\"type\":\"MicroAssessmentAttempt\",\"relationName\":\"MicroAssessmentToMicroAssessmentAttempt\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"micro_assessments\"},\"MicroAssessmentQuestion\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"assessmentId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"assessment\",\"kind\":\"object\",\"type\":\"MicroAssessment\",\"relationName\":\"MicroAssessmentToMicroAssessmentQuestion\"},{\"name\":\"questionText\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"options\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"correctOptionIndex\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"explanation\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"orderIndex\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"micro_assessment_questions\"},\"MicroAssessmentAttempt\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"assessmentId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"assessment\",\"kind\":\"object\",\"type\":\"MicroAssessment\",\"relationName\":\"MicroAssessmentToMicroAssessmentAttempt\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userRoadmapId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userRoadmap\",\"kind\":\"object\",\"type\":\"UserRoadmap\",\"relationName\":\"MicroAssessmentAttemptToUserRoadmap\"},{\"name\":\"sprintId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"sprint\",\"kind\":\"object\",\"type\":\"RoadmapSprint\",\"relationName\":\"MicroAssessmentAttemptToRoadmapSprint\"},{\"name\":\"sprintTaskId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"sprintTask\",\"kind\":\"object\",\"type\":\"RoadmapSprintTask\",\"relationName\":\"MicroAssessmentAttemptToRoadmapSprintTask\"},{\"name\":\"skillId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"skill\",\"kind\":\"object\",\"type\":\"Skill\",\"relationName\":\"MicroAssessmentAttemptToSkill\"},{\"name\":\"totalQuestions\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"correctAnswers\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"score\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"passed\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"answers\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"completedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"micro_assessment_attempts\"},\"RoadmapAdaptation\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userRoadmapId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"sprintId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"action\",\"kind\":\"enum\",\"type\":\"RoadmapAdaptationAction\"},{\"name\":\"reason\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"evidence\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"previousState\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"newState\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"userRoadmap\",\"kind\":\"object\",\"type\":\"UserRoadmap\",\"relationName\":\"RoadmapAdaptationToUserRoadmap\"},{\"name\":\"sprint\",\"kind\":\"object\",\"type\":\"RoadmapSprint\",\"relationName\":\"RoadmapAdaptationToRoadmapSprint\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"roadmap_adaptations\"},\"DiscussionPost\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userAvatar\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"roleCategory\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"content\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"tags\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"upvotes\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"aiReply\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"comments\",\"kind\":\"object\",\"type\":\"DiscussionComment\",\"relationName\":\"DiscussionCommentToDiscussionPost\"}],\"dbName\":\"discussion_posts\"},\"DiscussionComment\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"postId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"post\",\"kind\":\"object\",\"type\":\"DiscussionPost\",\"relationName\":\"DiscussionCommentToDiscussionPost\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userAvatar\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"content\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"upvotes\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"discussion_comments\"}},\"enums\":{},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.engineWasm = {
   getRuntime: async () => require('./query_engine_bg.js'),

@@ -6,6 +6,7 @@ import {
   competitiveMatchService,
   CompetitiveMatchError,
 } from '../services/competitiveMatch.service.js';
+import { structuredResumeMapperService } from '../services/structuredResumeMapper.service.js';
 
 export const resumeParserController = {
   /**
@@ -48,6 +49,24 @@ export const resumeParserController = {
       console.log(`[Resume Parser] Extraction completed`);
       console.log(`[Resume Parser] Characters extracted: ${characterCount}`);
 
+      // Map Docling output onto the ONE canonical StructuredResume consumed by
+      // the Resume workspace (editor + preview + ATS + competitive matcher).
+      // Pure consumer of Docling output — extraction itself is untouched.
+      const structuredResume = structuredResumeMapperService.mapDoclingToStructuredResume(parsed as any);
+
+      let atsScore = null;
+      try {
+        const plainText = parsed.plain_text || parsed.resumeText || '';
+        if (plainText.trim()) {
+          atsScore = await bgeAtsService.scoreResume({
+            resumeText: plainText,
+            structuredElements: parsed.structured_elements || [],
+          });
+        }
+      } catch (atsErr: any) {
+        console.warn('[Resume Parser] Initial ATS scoring warning:', atsErr?.message || atsErr);
+      }
+
       res.status(200).json({
         success: true,
         data: {
@@ -62,6 +81,8 @@ export const resumeParserController = {
           sections: parsed.sections || [],
           tables: parsed.tables || [],
           structuredContent: parsed.structured_elements || [],
+          structuredResume,
+          atsScore,
         },
       });
     } catch (err: any) {

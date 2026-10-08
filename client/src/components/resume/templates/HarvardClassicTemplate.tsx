@@ -17,13 +17,15 @@ export default function HarvardClassicTemplate({ data }: TemplateProps) {
         </h1>
 
         <div className="text-[11px] text-gray-800 flex flex-wrap justify-center items-center gap-x-2 gap-y-0.5">
-          <span>{data.personalInfo.location}</span>
-          <span>•</span>
-          <span>{data.personalInfo.phone}</span>
-          <span>•</span>
-          <a href={`mailto:${data.personalInfo.email}`} className="text-black hover:underline">
-            {data.personalInfo.email}
-          </a>
+          {data.personalInfo.location && <span>{data.personalInfo.location}</span>}
+          {data.personalInfo.location && (data.personalInfo.phone || data.personalInfo.email) && <span>•</span>}
+          {data.personalInfo.phone && <span>{data.personalInfo.phone}</span>}
+          {data.personalInfo.phone && data.personalInfo.email && <span>•</span>}
+          {data.personalInfo.email && (
+            <a href={`mailto:${data.personalInfo.email}`} className="text-black hover:underline">
+              {data.personalInfo.email}
+            </a>
+          )}
           {data.personalInfo.linkedin && (
             <>
               <span>•</span>
@@ -163,7 +165,7 @@ export default function HarvardClassicTemplate({ data }: TemplateProps) {
       {/* Technical Skills & Certifications */}
       <section>
         <h2 className="text-xs font-bold uppercase tracking-widest text-black border-b border-black pb-0.5 mb-1.5">
-          Skills & Certifications
+          {data.certifications && data.certifications.length > 0 ? 'Skills & Certifications' : 'Skills'}
         </h2>
 
         <div className="space-y-1 text-[11px] font-sans">
@@ -173,10 +175,10 @@ export default function HarvardClassicTemplate({ data }: TemplateProps) {
               <span>{data.skills.languages.join(', ')}</span>
             </div>
           )}
-          {data.skills.frameworks.length > 0 && (
+          {((data.skills.frameworks && data.skills.frameworks.length > 0) || (data.skills.libraries && data.skills.libraries.length > 0)) && (
             <div>
               <strong className="font-serif font-bold">Frameworks & Libraries: </strong>
-              <span>{data.skills.frameworks.join(', ')}</span>
+              <span>{[...(data.skills.frameworks || []), ...(data.skills.libraries || [])].join(', ')}</span>
             </div>
           )}
           {data.skills.databases.length > 0 && (
@@ -187,18 +189,114 @@ export default function HarvardClassicTemplate({ data }: TemplateProps) {
           )}
           {data.skills.cloudDevOps.length > 0 && (
             <div>
-              <strong className="font-serif font-bold">Cloud, Infrastructure & CI/CD: </strong>
+              <strong className="font-serif font-bold">Cloud & DevOps: </strong>
               <span>{data.skills.cloudDevOps.join(', ')}</span>
+            </div>
+          )}
+          {data.skills.tools && data.skills.tools.length > 0 && (
+            <div>
+              <strong className="font-serif font-bold">Developer Tools: </strong>
+              <span>{data.skills.tools.join(', ')}</span>
+            </div>
+          )}
+          {data.skills.security && data.skills.security.length > 0 && (
+            <div>
+              <strong className="font-serif font-bold">Security & Compliance: </strong>
+              <span>{data.skills.security.join(', ')}</span>
+            </div>
+          )}
+          {data.skills.other && data.skills.other.length > 0 && (
+            <div>
+              <strong className="font-serif font-bold">Other Skills: </strong>
+              <span>{data.skills.other.join(', ')}</span>
             </div>
           )}
           {data.certifications.length > 0 && (
             <div>
               <strong className="font-serif font-bold">Certifications: </strong>
-              <span>{data.certifications.map(c => `${c.title} (${c.issuer})`).join('; ')}</span>
+              <span>{data.certifications.map(c => `${c.title}${c.issuer ? ` (${c.issuer})` : ''}${c.date ? ` [${c.date}]` : ''}`).join('; ')}</span>
+            </div>
+          )}
+          {data.languages && data.languages.length > 0 && (
+            <div>
+              <strong className="font-serif font-bold">Languages: </strong>
+              <span>{data.languages.join(', ')}</span>
             </div>
           )}
         </div>
       </section>
+
+      {/* Publications */}
+      {data.publications && data.publications.length > 0 && (
+        <section className="mt-4">
+          <h2 className="text-xs font-bold uppercase tracking-widest text-black border-b border-black pb-0.5 mb-2">
+            Publications
+          </h2>
+          <div className="space-y-1.5 text-[11px] font-sans">
+            {data.publications.map((pub) => (
+              <div key={pub.id} className="flex justify-between items-baseline">
+                <div>
+                  <strong className="font-serif font-bold">{pub.title}</strong>
+                  {pub.venue && <span className="text-gray-700 italic ml-2">— {pub.venue}</span>}
+                </div>
+                {pub.date && <span className="text-gray-700 text-[10.5px] shrink-0">{pub.date}</span>}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Patents */}
+      {data.patents && data.patents.length > 0 && (
+        <section className="mt-4">
+          <h2 className="text-xs font-bold uppercase tracking-widest text-black border-b border-black pb-0.5 mb-2">
+            Patents
+          </h2>
+          <div className="space-y-1.5 text-[11px] font-sans">
+            {data.patents.map((pat) => (
+              <div key={pat.id} className="flex justify-between items-baseline">
+                <div>
+                  <strong className="font-serif font-bold">{pat.title}</strong>
+                  {pat.number && <span className="text-gray-700 ml-2">({pat.number})</span>}
+                </div>
+                {pat.date && <span className="text-gray-700 text-[10.5px] shrink-0">{pat.date}</span>}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Achievements / Honors */}
+      {data.achievements && data.achievements.length > 0 && (
+        <section className="mt-4">
+          <h2 className="text-xs font-bold uppercase tracking-widest text-black border-b border-black pb-0.5 mb-1.5">
+            Honors & Achievements
+          </h2>
+          <ul className="list-disc list-outside ml-4 space-y-0.5 text-[11px] text-gray-900 font-sans">
+            {data.achievements.map((ach, idx) => (
+              <li key={idx}>{ach}</li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {/* Custom Sections */}
+      {data.customSections && data.customSections.length > 0 && (
+        <div className="mt-4 space-y-4">
+          {data.customSections.map((sec) => (
+            <section key={sec.id}>
+              <h2 className="text-xs font-bold uppercase tracking-widest text-black border-b border-black pb-0.5 mb-1.5">
+                {sec.title}
+              </h2>
+              <ul className="list-disc list-outside ml-4 space-y-0.5 text-[11px] text-gray-900 font-sans">
+                {sec.items.map((item, idx) => (
+                  <li key={idx}>{item}</li>
+                ))}
+              </ul>
+            </section>
+          ))}
+        </div>
+      )}
 
     </div>
   );

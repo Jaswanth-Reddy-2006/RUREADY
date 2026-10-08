@@ -550,7 +550,7 @@ export default function PlacementCommandCenterPage() {
 
                 {/* Bottom Insight Lightbulb Callout */}
                 <div 
-                  onClick={() => navigate('/ats')}
+                  onClick={() => navigate('/resume')}
                   className="p-3 bg-[#FEF3C7]/60 border border-[#FDE68A] hover:bg-[#FEF3C7] rounded-2xl flex items-center justify-between gap-2 text-xs cursor-pointer transition-all"
                 >
                   <div className="flex items-center gap-2">

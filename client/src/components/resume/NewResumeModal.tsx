@@ -99,7 +99,7 @@ export default function NewResumeModal({ isOpen, onClose }: NewResumeModalProps)
     const newId = createResumeVersion(
       title,
       targetRole || normalized.personalInfo?.title || 'Software Engineer',
-      targetCompany || 'Imported Version',
+      targetCompany || 'General Tech',
       undefined,
       normalized
     );

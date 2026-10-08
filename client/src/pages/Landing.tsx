@@ -840,7 +840,7 @@ export default function Landing() {
                 </p>
               </div>
               <Link
-                to="/ats"
+                to="/resume"
                 className="pt-4 border-t border-[#DCE7F2] flex items-center justify-between text-xs font-bold text-[#A0006D] hover:text-[#780052] transition-colors group/btn"
               >
                 <span>Automated STAR Rewrites</span>

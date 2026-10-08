@@ -1227,7 +1227,9 @@ export default function AnalysisDashboard() {
                   <div key={q.id || idx} className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-xs text-blue-700 font-mono">Question {idx + 1} ({q.category || 'Technical'})</span>
-                      <span className="font-bold text-xs text-emerald-700 font-mono">{q.evalScore || 75}/100</span>
+                      <span className="font-bold text-xs text-emerald-700 font-mono">
+                        {q.evalScore !== undefined && q.evalScore !== null ? `${q.evalScore}/100` : '—'}
+                      </span>
                     </div>
                     <h4 className="text-sm font-bold text-slate-900">{q.questionText}</h4>
                     <div className="p-3 bg-white rounded-xl border border-slate-200 text-xs text-slate-700">

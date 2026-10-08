@@ -405,7 +405,7 @@ export default function SystemDesignHub() {
                   </span>
                   <div className="flex items-baseline gap-2">
                     <span className="text-2xl font-extrabold text-slate-900">
-                      {hasHistory ? `${avgScore || 82}%` : '—'}
+                      {hasHistory && avgScore !== null && avgScore !== undefined ? `${avgScore}%` : '—'}
                     </span>
                   </div>
                 </div>

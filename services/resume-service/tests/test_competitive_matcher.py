@@ -132,6 +132,41 @@ class TestChunks(unittest.TestCase):
         self.assertEqual(len(chunks), 1)
 
 
+class TestExperienceRelevanceStructured(unittest.TestCase):
+    """Experience relevance must consume Docling structured_elements, not just
+    flat text, and must never fabricate relevance that the content does not support."""
+
+    def setUp(self):
+        install_fake_model()
+
+    def test_elements_drive_chunks_over_flat_text(self):
+        chunks = cm.resume_chunks("ignored flat text",
+                                  [{"type": "paragraph", "text": "y" * 120}])
+        self.assertEqual(len(chunks), 1)
+        self.assertTrue(chunks[0].startswith("yyy"))
+
+    def test_experience_relevance_uses_structured_elements(self):
+        model = cm._MODEL_CACHE["model"]
+        # Flat resume text is domain-neutral filler; the real signal lives in the
+        # structured elements. Relevance must reflect the elements, proving the
+        # matcher forwards structure through to experience scoring.
+        flat = "Lorem ipsum dolor sit amet consectetur " * 12
+        software_elements = [{
+            "type": "paragraph",
+            "text": ("Architected distributed backend services in Python and Node.js "
+                     "with Docker, Kubernetes and PostgreSQL. " * 2),
+        }]
+        mechanical_elements = [{
+            "type": "paragraph",
+            "text": ("Designed turbine housings using SolidWorks and ANSYS simulation "
+                     "with thermodynamics and CFD geometry optimization. " * 2),
+        }]
+        rel_sw, _ = cm.experience_relevance(model, SOFTWARE_JD, flat, software_elements, None)
+        rel_mech, _ = cm.experience_relevance(model, SOFTWARE_JD, flat, mechanical_elements, None)
+        self.assertGreater(rel_sw, rel_mech)
+        self.assertGreater(rel_sw, 0.0)
+
+
 class TestComputeMatch(unittest.TestCase):
     def setUp(self):
         install_fake_model()

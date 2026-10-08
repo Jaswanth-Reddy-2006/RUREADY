@@ -34,6 +34,8 @@ export interface BgeAtsScoreResult {
     formatting: number;
   };
   extractedSkills: string[];
+  explicitlyDetectedSkills: string[];
+  inferredSkills: string[];
   quantification: {
     densityPercentage: number;
     actionVerbRatio: number;
