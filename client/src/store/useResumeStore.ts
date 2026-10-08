@@ -144,7 +144,41 @@ export interface ResumeStoreState {
   applyStarRewrite: (bulletAuditId: string, rewrittenBullet: string) => void;
 }
 
+/**
+ * Empty default resume skeleton.
+ * Sample candidate data lives exclusively in TEMPLATE_METADATA.samplePersona
+ * (used only for template preview thumbnails).
+ */
 export const DEFAULT_MASTER_RESUME: ResumeData = {
+  personalInfo: {
+    fullName: '',
+    title: '',
+    email: '',
+    phone: '',
+    location: '',
+    linkedin: '',
+    github: '',
+    portfolio: ''
+  },
+  summary: '',
+  experience: [],
+  education: [],
+  projects: [],
+  skills: {
+    languages: [],
+    frameworks: [],
+    databases: [],
+    cloudDevOps: [],
+    tools: []
+  },
+  certifications: []
+};
+
+/**
+ * Rich sample persona used ONLY for template preview thumbnails.
+ * Never loaded into the user's masterResume or any editing context.
+ */
+const SAMPLE_PERSONA_BASE: ResumeData = {
   personalInfo: {
     fullName: 'Alex Morgan',
     title: 'Senior Full Stack & Distributed Systems Engineer',
@@ -259,7 +293,7 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
     recommendedFor: 'Full-Stack Developers, Frontend Engineers, Cloud & DevOps Specialists',
     highlights: ['Single-page density', 'Tag-based skills matrix', 'STAR bullet metrics emphasis'],
     samplePersona: {
-      ...DEFAULT_MASTER_RESUME,
+      ...SAMPLE_PERSONA_BASE,
       personalInfo: {
         fullName: 'Alex Morgan',
         title: 'Senior Full Stack Software Engineer',
@@ -282,7 +316,7 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
     recommendedFor: 'Campus Graduates, Software Engineers, Quant Developers, Management Consultants',
     highlights: ['100% legacy ATS machine-readable', 'Conservative serif hierarchy', 'Clean academic date alignments'],
     samplePersona: {
-      ...DEFAULT_MASTER_RESUME,
+      ...SAMPLE_PERSONA_BASE,
       personalInfo: {
         fullName: 'Eleanor Vance',
         title: 'Systems Software Engineer & Algorithm Specialist',
@@ -305,7 +339,7 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
     recommendedFor: 'Staff Software Engineers, Tech Leads, Engineering Managers, Architects',
     highlights: ['Maximum bullet density', 'Subtle border dividers', 'Zero wasted whitespace'],
     samplePersona: {
-      ...DEFAULT_MASTER_RESUME,
+      ...SAMPLE_PERSONA_BASE,
       personalInfo: {
         fullName: 'David Chen',
         title: 'Principal Distributed Systems Architect',
@@ -328,7 +362,7 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
     recommendedFor: 'UI/UX Engineers, Product Engineers, Creative Technologists, Mobile Developers',
     highlights: ['Visual skill rating bars', 'Sidebar contact & links', 'Showcased repository links'],
     samplePersona: {
-      ...DEFAULT_MASTER_RESUME,
+      ...SAMPLE_PERSONA_BASE,
       personalInfo: {
         fullName: 'Sarah Jenkins',
         title: 'Lead Frontend & Design Systems Engineer',
@@ -351,7 +385,7 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
     recommendedFor: 'Targeting FAANG / Tier-1 Tech, High-Volume Job Applications, Backend Engineers',
     highlights: ['Single-page guaranteed', 'Metrics-first bold keywords', 'Tight line spacing'],
     samplePersona: {
-      ...DEFAULT_MASTER_RESUME,
+      ...SAMPLE_PERSONA_BASE,
       personalInfo: {
         fullName: 'Marcus Hayes',
         title: 'Infrastructure & Cloud Platform Engineer',
@@ -374,7 +408,7 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
     recommendedFor: 'MS/PhD Candidates, Research Scientists, Machine Learning Researchers, Interns',
     highlights: ['Education first hierarchy', 'Research grants & honors', 'Standard scholarly serif'],
     samplePersona: {
-      ...DEFAULT_MASTER_RESUME,
+      ...SAMPLE_PERSONA_BASE,
       personalInfo: {
         fullName: 'Dr. Maya Patel',
         title: 'Machine Learning Research Scientist',
@@ -397,7 +431,7 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
     recommendedFor: 'Founding Engineers, Early-Stage Hires, Hackathon Winners, Full-Stack Builders',
     highlights: ['0-to-1 impact metrics', 'Product launch badges', 'Modern indigo accents'],
     samplePersona: {
-      ...DEFAULT_MASTER_RESUME,
+      ...SAMPLE_PERSONA_BASE,
       personalInfo: {
         fullName: "Liam O'Connor",
         title: 'Founding Full Stack Engineer',
@@ -420,7 +454,7 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
     recommendedFor: 'VP of Engineering, CTO, Engineering Directors, Technical Product Leaders',
     highlights: ['Executive summary callout', 'Strategic P&L metrics', 'Leadership governance framing'],
     samplePersona: {
-      ...DEFAULT_MASTER_RESUME,
+      ...SAMPLE_PERSONA_BASE,
       personalInfo: {
         fullName: 'Sophia Sterling',
         title: 'VP of Engineering & Technology Strategy',
@@ -435,79 +469,19 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
   }
 ];
 
-export const DEFAULT_RESUME_VERSIONS: ResumeVersion[] = [
-  {
-    id: 'ver-master',
-    name: 'Software Engineer Base Resume',
-    targetRole: 'Full Stack Engineer',
-    targetCompany: 'General Tech',
-    resumeData: DEFAULT_MASTER_RESUME,
-    templateId: 'modern-tech',
-    atsScore: 92,
-    usedInApplicationsCount: 3,
-    lastUpdated: new Date().toISOString(),
-  },
-  {
-    id: 'ver-amazon',
-    name: 'Amazon SDE Intern Version',
-    targetRole: 'Software Development Engineer',
-    targetCompany: 'Amazon',
-    targetJd: 'Responsibilities: Build high-throughput microservices using TypeScript, Node.js, and AWS.',
-    resumeData: DEFAULT_MASTER_RESUME,
-    templateId: 'faang-compact',
-    atsScore: 88,
-    usedInApplicationsCount: 2,
-    lastUpdated: new Date(Date.now() - 86400000).toISOString(),
-  },
-  {
-    id: 'ver-tcs',
-    name: 'Full Stack Developer — TCS',
-    targetRole: 'SDE / Full Stack',
-    targetCompany: 'TCS Digital',
-    targetJd: 'Requirements: React, TypeScript, Node.js, SQL, and Agile delivery.',
-    resumeData: DEFAULT_MASTER_RESUME,
-    templateId: 'harvard-classic',
-    atsScore: 82,
-    usedInApplicationsCount: 1,
-    lastUpdated: new Date(Date.now() - 172800000).toISOString(),
-  },
-];
+export const DEFAULT_RESUME_VERSIONS: ResumeVersion[] = [];
 
 export const useResumeStore = create<ResumeStoreState>()(
   persist(
     (set, get) => ({
       masterResume: DEFAULT_MASTER_RESUME,
       resumeVersions: DEFAULT_RESUME_VERSIONS,
-      activityLogs: [
-        {
-          id: 'log-1',
-          type: 'ANALYSIS',
-          title: 'Resume Analyzed for Amazon SDE',
-          details: 'Scored 88% ATS match against SDE requirements.',
-          timestamp: new Date().toISOString(),
-        },
-        {
-          id: 'log-2',
-          type: 'VERSION',
-          title: 'Created TCS Digital Resume Version',
-          details: 'Tailored summary and skills for TCS recruitment drive.',
-          timestamp: new Date(Date.now() - 86400000).toISOString(),
-        },
-      ],
+      activityLogs: [],
       activeTemplate: 'modern-tech',
       isTailoringActive: false,
-      targetJobTitle: 'Senior Full Stack Software Engineer',
-      targetCompanyName: 'Stripe',
-      targetJobDescription: `Responsibilities:
-• Architect, build, and maintain high-throughput backend payment services in Node.js, TypeScript, and Go.
-• Build delightful, performant customer checkouts and dashboard UI components in React, TypeScript, and TailwindCSS.
-• Design schema migrations and optimize relational database query performance in PostgreSQL and Redis distributed caching.
-• Own end-to-end reliability, CI/CD deployment pipelines, and observability across microservices handling millions of events daily.
-
-Requirements:
-• 4+ years of professional full stack engineering experience.
-• Mastery of TypeScript/JavaScript, React, Node.js, and SQL (PostgreSQL).
-• Hands-on experience with Docker, Redis caching, microservices, and automated testing (Jest/Cypress).`,
+      targetJobTitle: '',
+      targetCompanyName: '',
+      targetJobDescription: '',
       tailoredResume: null,
 
       setTemplate: (templateId: ResumeTemplateId) => {
@@ -516,7 +490,7 @@ Requirements:
 
       createResumeVersion: (name, targetRole, targetCompany, targetJd, customData) => {
         const id = `ver_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
-        const dataToUse = normalizeResumeData(customData || JSON.parse(JSON.stringify(get().masterResume)));
+        const dataToUse = normalizeResumeData(customData || DEFAULT_MASTER_RESUME);
         const newVersion: ResumeVersion = {
           id,
           name,
@@ -1397,41 +1371,82 @@ Requirements:
       // Profile Sync
       syncFromProfile: (profile: any) => {
         if (!profile) return;
-        set((state) => {
-          const updated: ResumeData = {
-            ...state.masterResume,
-            personalInfo: {
-              ...state.masterResume.personalInfo,
-              fullName: profile.name || state.masterResume.personalInfo.fullName,
-              email: profile.email || state.masterResume.personalInfo.email,
-              phone: profile.phoneNumber || state.masterResume.personalInfo.phone,
-              location: profile.location || state.masterResume.personalInfo.location,
-              linkedin: profile.linkedinUrl || state.masterResume.personalInfo.linkedin,
-              github: profile.githubUrl || state.masterResume.personalInfo.github,
-              portfolio: profile.portfolioUrl || state.masterResume.personalInfo.portfolio,
-              title: profile.headline || profile.targetRole || state.masterResume.personalInfo.title
-            },
-            summary: profile.bio || state.masterResume.summary
-          };
 
-          if (profile.education && state.masterResume.education.length === 0) {
-            updated.education = [
+        let skillsObj: ResumeData['skills'] = {
+          languages: [],
+          frameworks: [],
+          databases: [],
+          cloudDevOps: [],
+          tools: []
+        };
+
+        if (profile.skills) {
+          if (Array.isArray(profile.skills)) {
+            const rawSkills = profile.skills
+              .map((s: any) => (typeof s === 'string' ? s : s?.name))
+              .filter(Boolean);
+            rawSkills.forEach((s: string) => {
+              const lower = s.toLowerCase();
+              if (/typescript|javascript|python|java|c\+\+|c#|ruby|go|rust|php|swift|kotlin|sql|html|css/i.test(lower)) {
+                skillsObj.languages.push(s);
+              } else if (/react|angular|vue|next|node|express|django|flask|spring|fastapi|tailwind/i.test(lower)) {
+                skillsObj.frameworks.push(s);
+              } else if (/postgres|mysql|mongo|redis|elasticsearch|cassandra|dynamodb|sqlite|supabase/i.test(lower)) {
+                skillsObj.databases.push(s);
+              } else if (/docker|kubernetes|aws|gcp|azure|ci\/cd|terraform|linux|git/i.test(lower)) {
+                skillsObj.cloudDevOps.push(s);
+              } else {
+                skillsObj.tools.push(s);
+              }
+            });
+          } else if (typeof profile.skills === 'object') {
+            skillsObj = {
+              languages: Array.isArray(profile.skills.languages) ? profile.skills.languages : [],
+              frameworks: Array.isArray(profile.skills.frameworks) ? profile.skills.frameworks : [],
+              databases: Array.isArray(profile.skills.databases) ? profile.skills.databases : [],
+              cloudDevOps: Array.isArray(profile.skills.cloudDevOps) ? profile.skills.cloudDevOps : [],
+              tools: Array.isArray(profile.skills.tools) ? profile.skills.tools : []
+            };
+          }
+        }
+
+        const educationList = profile.education
+          ? [
               {
                 id: `edu-${Date.now()}`,
-                degree: profile.education,
-                school: 'University',
+                degree: typeof profile.education === 'string' ? profile.education : (profile.education.degree || ''),
+                school: typeof profile.education === 'string' ? 'University' : (profile.education.school || 'University'),
                 location: profile.location || '',
                 startDate: '',
                 endDate: '',
                 gpa: ''
               }
-            ];
-          }
+            ]
+          : [];
 
-          return {
-            masterResume: normalizeResumeData(updated),
-            tailoredResume: state.tailoredResume ? updated : null
-          };
+        const freshResume: ResumeData = {
+          personalInfo: {
+            fullName: profile.name || profile.fullName || '',
+            title: profile.headline || profile.targetRole || profile.title || '',
+            email: profile.email || '',
+            phone: profile.phoneNumber || profile.phone || '',
+            location: profile.location || '',
+            linkedin: profile.linkedinUrl || profile.linkedin || '',
+            github: profile.githubUrl || profile.github || '',
+            portfolio: profile.portfolioUrl || profile.portfolio || ''
+          },
+          summary: profile.bio || profile.summary || '',
+          experience: [],
+          education: educationList,
+          projects: [],
+          skills: skillsObj,
+          certifications: []
+        };
+
+        set({
+          masterResume: normalizeResumeData(freshResume),
+          tailoredResume: null,
+          isTailoringActive: false
         });
       },
 
@@ -1538,7 +1553,26 @@ Requirements:
     }),
     {
       name: 'ru-ready-master-resume',
-      storage: createJSONStorage(() => localStorage)
+      storage: createJSONStorage(() => (typeof window !== 'undefined' && window.localStorage ? window.localStorage : (globalThis.localStorage || {
+        getItem: () => null,
+        setItem: () => {},
+        removeItem: () => {}
+      }))),
+      version: 2,
+      migrate: (persistedState: any, version: number) => {
+        if (version < 2 && persistedState) {
+          // If legacy persisted state contained the sample candidate, sanitize to empty default
+          if (persistedState.masterResume?.personalInfo?.fullName === 'Alex Morgan') {
+            persistedState.masterResume = DEFAULT_MASTER_RESUME;
+          }
+          if (Array.isArray(persistedState.resumeVersions)) {
+            persistedState.resumeVersions = persistedState.resumeVersions.filter(
+              (v: any) => v.resumeData?.personalInfo?.fullName !== 'Alex Morgan'
+            );
+          }
+        }
+        return persistedState;
+      }
     }
   )
 );

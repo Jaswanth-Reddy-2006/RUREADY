@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, UserCheck, Upload, FileCode2, ArrowRight, Sparkles, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useResumeStore } from '../../store/useResumeStore';
+import { useProfileStore } from '../../store/useProfileStore';
 import { parseResumeFile, normalizeResumeData, validateExtractionQuality } from '../../utils/resumeParser';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
@@ -13,7 +14,8 @@ interface NewResumeModalProps {
 
 export default function NewResumeModal({ isOpen, onClose }: NewResumeModalProps) {
   const navigate = useNavigate();
-  const { createResumeVersion, extractAndLoadResume, masterResume } = useResumeStore();
+  const { createResumeVersion, extractAndLoadResume, syncFromProfile } = useResumeStore();
+  const { profile } = useProfileStore();
 
   const [mode, setMode] = useState<'SELECT' | 'UPLOAD_REVIEW'>('SELECT');
   const [targetRole, setTargetRole] = useState('');
@@ -28,13 +30,15 @@ export default function NewResumeModal({ isOpen, onClose }: NewResumeModalProps)
   if (!isOpen) return null;
 
   const handleCreateFromProfile = () => {
-    const title = versionTitle.trim() || `${targetRole || 'Software Engineer'} Resume`;
+    syncFromProfile(profile);
+    const freshData = useResumeStore.getState().masterResume;
+    const title = versionTitle.trim() || `${targetRole || profile?.headline || profile?.targetRole || 'Software Engineer'} Resume`;
     const newId = createResumeVersion(
       title,
-      targetRole || 'Full Stack Engineer',
+      targetRole || profile?.headline || profile?.targetRole || 'Full Stack Engineer',
       targetCompany || 'General Applications',
       undefined,
-      masterResume
+      freshData
     );
     toast.success('Created new resume version from profile!');
     onClose();
