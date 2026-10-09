@@ -54,7 +54,7 @@ export type AtsAnalysisResult = Omit<z.infer<typeof AtsAnalysisSchema>, 'matchSc
   // NOT_RELEVANT — the UI must render "N/A" (never a fabricated number).
   matchScore: number | null;
   overallScore?: number | null;
-  status?: 'MATCHED' | 'NOT_RELEVANT';
+  status?: 'MATCHED' | 'NOT_RELEVANT' | 'INSUFFICIENT_JD';
 };
 
 const COMMON_TECH_KEYWORDS = [

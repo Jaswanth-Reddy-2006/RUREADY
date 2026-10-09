@@ -151,8 +151,38 @@ def normalize_cosine(cos: float, calibration: Optional[dict]) -> float:
 
 
 # ----------------------------------------------------------------------
-# Deterministic signals (no model, no inference of absent skills)
+# Job Description Sufficiency & Deterministic signals
 # ----------------------------------------------------------------------
+
+MIN_JD_WORDS = 10
+MIN_JD_CHARS = 50
+MIN_JD_TERMS = 3
+
+
+def is_insufficient_jd(jd_text: str) -> Tuple[bool, str]:
+    """
+    Validate whether the job description provides sufficient detail
+    (requirements, responsibilities, skills) for meaningful matching.
+    """
+    cleaned = jd_text.strip()
+    words = cleaned.split()
+    terms = salient_terms(cleaned)
+    skills = detect_skills(cleaned)
+
+    if len(words) < MIN_JD_WORDS or len(cleaned) < MIN_JD_CHARS:
+        return True, (
+            "The provided job description is too short (< 10 words) to evaluate "
+            "responsibilities and skill requirements accurately. Please provide a full job description."
+        )
+
+    if len(terms) < MIN_JD_TERMS and len(skills) == 0:
+        return True, (
+            "The provided job description lacks specific requirements, skills, or responsibilities. "
+            "Please provide a more detailed job posting."
+        )
+
+    return False, ""
+
 
 def detect_skills(text: str) -> Set[str]:
     """
@@ -176,17 +206,17 @@ def skill_overlap(resume_text: str, jd_text: str) -> Tuple[float, List[str], Lis
 
 
 def salient_terms(text: str) -> Set[str]:
-    tokens = re.findall(r"[a-z][a-z0-9+#.]{3,}", text.lower())
+    tokens = re.findall(r"[a-z][a-z0-9+#.]{2,}", text.lower())
     terms = {t for t in tokens if t not in STOPWORDS}
     return terms
 
 
 def terminology_match(resume_text: str, jd_text: str) -> float:
     """Fraction of salient JD terms (unigrams+bigrams) covered by the resume."""
-    jd_tokens = [t for t in re.findall(r"[a-z][a-z0-9+#]{3,}", jd_text.lower())
+    jd_tokens = [t for t in re.findall(r"[a-z][a-z0-9+#]{2,}", jd_text.lower())
                  if t not in STOPWORDS]
     resume_lower = resume_text.lower()
-    resume_tokens = set(re.findall(r"[a-z][a-z0-9+#]{3,}", resume_lower))
+    resume_tokens = set(re.findall(r"[a-z][a-z0-9+#]{2,}", resume_lower))
 
     unigrams = {t for t in jd_tokens}
     bigrams = {f"{a} {b}" for a, b in zip(jd_tokens, jd_tokens[1:])}
@@ -246,6 +276,34 @@ def experience_relevance(model, jd_text: str, resume_text: str,
 def compute_match(resume_text: str, job_description: str, role: Optional[str],
                   structured_elements: Optional[list]) -> Dict[str, Any]:
     model, calibration, source = resolve_model()
+    role_label = role or "Selected Role"
+
+    # Validate JD sufficiency before performing inference
+    insufficient, jd_reason = is_insufficient_jd(job_description)
+    if insufficient:
+        resume_skills = list(detect_skills(resume_text))
+        return {
+            "status": "INSUFFICIENT_JD",
+            "score": None,
+            "role": role_label,
+            "reason": jd_reason,
+            "model": BASE_MODEL_NAME,
+            "modelSource": source,
+            "weights": COMPETITIVE_WEIGHTS,
+            "gate": GATE,
+            "matchSignals": {
+                "semanticSimilarity": 0.0,
+                "skillOverlap": 0.0,
+                "experienceRelevance": 0.0,
+                "terminologyMatch": 0.0,
+            },
+            "signalsDetail": {
+                "rawCosine": 0.0,
+                "matchedSkills": [],
+                "missingSkills": [],
+                "resumeSkills": resume_skills,
+            },
+        }
 
     resume_input = resume_text.strip()[:12000]
     jd_input = job_description.strip()[:8000]

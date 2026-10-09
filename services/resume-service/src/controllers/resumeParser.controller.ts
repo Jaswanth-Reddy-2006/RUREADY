@@ -8,7 +8,54 @@ import {
 } from '../services/competitiveMatch.service.js';
 import { structuredResumeMapperService } from '../services/structuredResumeMapper.service.js';
 
+import { roleMatchingService } from '../services/roleMatching.service.js';
+
 export const resumeParserController = {
+  /**
+   * Return list of available standardized role profile metadata.
+   */
+  async getAvailableRoles(_req: Request, res: Response, next: NextFunction) {
+    try {
+      const roles = roleMatchingService.getAvailableRoles();
+      res.status(200).json({
+        success: true,
+        data: roles,
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /**
+   * Role-only matching: evaluates a resume against a standardized role profile.
+   * Body: { resumeText, role, structuredElements? }
+   */
+  async matchRole(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { resumeText, role, structuredElements } = req.body;
+      if (!resumeText || !resumeText.trim()) {
+        throw new BgeAtsScorerError('resumeText is required for role matching.', 400);
+      }
+      if (!role || !role.trim()) {
+        throw new CompetitiveMatchError('role is required for role matching.', 400);
+      }
+
+      console.log(`[Role Match] Evaluating resume (${resumeText.length} chars) against role "${role}"`);
+      const result = await roleMatchingService.matchRole({
+        resumeText,
+        role,
+        structuredElements,
+      });
+
+      res.status(200).json({
+        success: true,
+        data: result,
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
   /**
    * Dedicated endpoint for isolated resume extraction testing using Docling.
    */
@@ -120,10 +167,9 @@ export const resumeParserController = {
 
   /**
    * Combined evaluation: role-independent ATS Score (deterministic six-pillar
-   * engine) + Competitive Score (BGE-based resume/JD matcher). The two scores
-   * are computed independently and returned separately — never merged.
+   * engine) + Role/JD Match (standardized role profile or custom JD).
    *
-   * Body: { resumeText, structuredElements?, jobDescription, role? }
+   * Body: { resumeText, structuredElements?, role?, jobDescription? }
    * Response data: { ats: {...}, competitive: {...} }
    */
   async evaluateResume(req: Request, res: Response, next: NextFunction) {
@@ -132,20 +178,36 @@ export const resumeParserController = {
       if (!resumeText || !resumeText.trim()) {
         throw new BgeAtsScorerError('resumeText is required for evaluation.', 400);
       }
-      if (!jobDescription || !jobDescription.trim()) {
-        throw new CompetitiveMatchError('jobDescription is required for the Competitive Score.', 400);
+
+      console.log(`[Resume Evaluate] Scoring resume (${resumeText.length} chars): ATS + Role/JD Match`);
+
+      // ATS score is ALWAYS role-independent
+      const atsPromise = bgeAtsService.scoreResume({ resumeText, structuredElements });
+
+      // Competitive match: role-only against standardized profile OR specific JD
+      let competitivePromise: Promise<any>;
+      if (jobDescription && jobDescription.trim()) {
+        competitivePromise = competitiveMatchService.match({
+          resumeText,
+          jobDescription,
+          role,
+          structuredElements,
+        });
+      } else if (role && role.trim()) {
+        competitivePromise = roleMatchingService.matchRole({
+          resumeText,
+          role,
+          structuredElements,
+        });
+      } else {
+        throw new CompetitiveMatchError('Either role or jobDescription is required for evaluation.', 400);
       }
 
-      console.log(`[Resume Evaluate] Scoring resume (${resumeText.length} chars): ATS + Competitive`);
-
-      const [ats, competitive] = await Promise.all([
-        bgeAtsService.scoreResume({ resumeText, structuredElements }),
-        competitiveMatchService.match({ resumeText, jobDescription, role, structuredElements }),
-      ]);
+      const [ats, competitive] = await Promise.all([atsPromise, competitivePromise]);
 
       console.log(
-        `[Resume Evaluate] ATS ${ats.overallScore}/100 | Competitive ${
-          competitive.status === 'MATCHED' ? `${competitive.score}/100` : 'N/A'
+        `[Resume Evaluate] ATS ${ats.overallScore}/100 | Match ${
+          competitive.status === 'MATCHED' ? `${competitive.score}/100` : competitive.status
         } (${competitive.modelSource})`
       );
 

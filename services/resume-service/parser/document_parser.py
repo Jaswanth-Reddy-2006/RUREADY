@@ -32,7 +32,7 @@ class ResumeDocumentParser:
         self._pdf_ocr_converter = None
         self._docx_converter = None
 
-    def _get_converter(self, suffix: str, force_ocr: bool = False):
+    def _get_converter(self, suffix: str, force_ocr: bool = False, force_backend: Any = None):
         """Lazily initialize the Docling DocumentConverter with appropriate options per format."""
         if suffix == ".docx":
             if self._docx_converter is None:
@@ -45,8 +45,21 @@ class ResumeDocumentParser:
                     raise DocumentParsingException(f"Failed to initialize Docling engine: {str(e)}")
             return self._docx_converter
         else:
+            # Determine best available backend for PDF
+            selected_backend = force_backend
+            if selected_backend is None:
+                try:
+                    import docling_parse.pdf_parsers
+                    selected_backend = None
+                except Exception:
+                    try:
+                        from docling.backend.pypdfium2_backend import PyPdfiumDocumentBackend
+                        selected_backend = PyPdfiumDocumentBackend
+                    except Exception:
+                        selected_backend = None
+
             if force_ocr:
-                if self._pdf_ocr_converter is None:
+                if self._pdf_ocr_converter is None or force_backend is not None:
                     try:
                         from docling.document_converter import DocumentConverter, PdfFormatOption
                         from docling.datamodel.base_models import InputFormat
@@ -56,16 +69,20 @@ class ResumeDocumentParser:
                         pipeline_options.do_ocr = True
                         pipeline_options.do_table_structure = True
 
+                        backend_kw = {"backend": selected_backend} if selected_backend else {}
                         format_options = {
-                            InputFormat.PDF: PdfFormatOption(pipeline_options=pipeline_options)
+                            InputFormat.PDF: PdfFormatOption(pipeline_options=pipeline_options, **backend_kw)
                         }
-                        self._pdf_ocr_converter = DocumentConverter(format_options=format_options)
+                        converter = DocumentConverter(format_options=format_options)
+                        if force_backend is None:
+                            self._pdf_ocr_converter = converter
+                        return converter
                     except Exception as e:
                         logger.error(f"Failed to initialize Docling OCR PDF converter: {e}", exc_info=True)
                         raise DocumentParsingException(f"Failed to initialize Docling engine: {str(e)}")
                 return self._pdf_ocr_converter
             else:
-                if self._pdf_converter is None:
+                if self._pdf_converter is None or force_backend is not None:
                     try:
                         from docling.document_converter import DocumentConverter, PdfFormatOption
                         from docling.datamodel.base_models import InputFormat
@@ -75,15 +92,71 @@ class ResumeDocumentParser:
                         pipeline_options.do_ocr = False
                         pipeline_options.do_table_structure = True
 
+                        backend_kw = {"backend": selected_backend} if selected_backend else {}
                         format_options = {
-                            InputFormat.PDF: PdfFormatOption(pipeline_options=pipeline_options)
+                            InputFormat.PDF: PdfFormatOption(pipeline_options=pipeline_options, **backend_kw)
                         }
-                        self._pdf_converter = DocumentConverter(format_options=format_options)
-                        logger.info("Docling PDF DocumentConverter successfully initialized.")
+                        converter = DocumentConverter(format_options=format_options)
+                        logger.info(f"Docling PDF DocumentConverter initialized with backend={selected_backend}.")
+                        if force_backend is None:
+                            self._pdf_converter = converter
+                        return converter
                     except Exception as e:
                         logger.error(f"Failed to initialize Docling PDF converter: {e}", exc_info=True)
                         raise DocumentParsingException(f"Failed to initialize Docling engine: {str(e)}")
                 return self._pdf_converter
+
+    def _fallback_pdf_extract(self, temp_path: str, file_bytes: bytes, original_filename: str) -> Dict[str, Any]:
+        """Last-resort fallback parser using pypdfium2 / pypdf when Docling engine encounters native DLL / format errors."""
+        page_texts = []
+        try:
+            import pypdfium2 as pdfium
+            pdf = pdfium.PdfDocument(temp_path)
+            for page in pdf:
+                text_page = page.get_textpage()
+                page_texts.append(text_page.get_text_range())
+        except Exception:
+            try:
+                import pypdf
+                reader = pypdf.PdfReader(temp_path)
+                for page in reader.pages:
+                    page_texts.append(page.extract_text() or "")
+            except Exception as e:
+                raise DocumentParsingException(f"All PDF extraction engines failed: {str(e)}")
+
+        full_text = "\n\n".join(page_texts).strip()
+        lines = [line.strip() for line in full_text.splitlines() if line.strip()]
+        
+        # Simple heuristic section detection for fallback
+        known_headings = {
+            "education", "experience", "work experience", "skills", "technical skills",
+            "projects", "certifications", "summary", "professional summary", "contact"
+        }
+        sections = []
+        structured_elements = []
+        for line in lines:
+            normalized = line.lower().strip(":").strip()
+            if normalized in known_headings:
+                sections.append({"title": line, "level": 1, "page_no": 1})
+                structured_elements.append({"type": "section_header", "label": "section_header", "text": line, "level": 1, "page_no": 1})
+            else:
+                structured_elements.append({"type": "paragraph", "label": "paragraph", "text": line, "page_no": 1})
+
+        return {
+            "filename": original_filename,
+            "file_type": "application/pdf",
+            "file_size_bytes": len(file_bytes),
+            "page_count": max(1, len(page_texts)),
+            "character_count": len(full_text),
+            "table_count": 0,
+            "section_count": len(sections),
+            "sections": sections,
+            "tables": [],
+            "structured_elements": structured_elements,
+            "markdown": full_text,
+            "plain_text": full_text,
+            "resumeText": full_text,
+        }
 
     def parse_document(self, file_bytes: bytes, original_filename: str) -> Dict[str, Any]:
         """
@@ -122,11 +195,22 @@ class ResumeDocumentParser:
             temp_file.close()
 
             # Execute Docling conversion
+            conv_res = None
             try:
                 conv_res = converter.convert(temp_path)
             except Exception as e:
-                logger.error(f"Docling conversion failed for {original_filename}: {e}", exc_info=True)
-                raise DocumentParsingException(f"Docling extraction failed: {str(e)}")
+                logger.warning(f"Initial Docling conversion attempt failed: {e}")
+                if suffix == ".pdf":
+                    try:
+                        from docling.backend.pypdfium2_backend import PyPdfiumDocumentBackend
+                        fallback_converter = self._get_converter(".pdf", force_ocr=False, force_backend=PyPdfiumDocumentBackend)
+                        conv_res = fallback_converter.convert(temp_path)
+                        logger.info("Docling PDF conversion succeeded with PyPdfiumDocumentBackend fallback.")
+                    except Exception as retry_err:
+                        logger.error(f"PyPdfiumDocumentBackend fallback failed: {retry_err}", exc_info=True)
+                        return self._fallback_pdf_extract(temp_path, file_bytes, original_filename)
+                else:
+                    raise DocumentParsingException(f"Docling extraction failed: {str(e)}")
 
             if not conv_res or not hasattr(conv_res, "document") or conv_res.document is None:
                 raise DocumentParsingException("Docling finished conversion but returned no document model.")
@@ -237,9 +321,19 @@ class ResumeDocumentParser:
 
                         item_text = getattr(item, "text", "")
                         page_no = None
+                        bbox = None
                         if hasattr(item, "prov") and item.prov:
                             try:
                                 page_no = item.prov[0].page_no
+                                if hasattr(item.prov[0], "bbox"):
+                                    b = item.prov[0].bbox
+                                    bbox = {
+                                        "l": getattr(b, "l", None),
+                                        "t": getattr(b, "t", None),
+                                        "r": getattr(b, "r", None),
+                                        "b": getattr(b, "b", None),
+                                        "coord_origin": str(getattr(b, "coord_origin", "BOTTOMLEFT"))
+                                    }
                             except Exception:
                                 pass
 
@@ -249,6 +343,7 @@ class ResumeDocumentParser:
                                 "title": item_text.strip(),
                                 "level": level,
                                 "page_no": page_no,
+                                "bbox": bbox,
                             })
                             structured_elements.append({
                                 "type": "section_header",
@@ -256,6 +351,7 @@ class ResumeDocumentParser:
                                 "text": item_text,
                                 "level": level,
                                 "page_no": page_no,
+                                "bbox": bbox,
                             })
                         elif "table" in label_str:
                             tbl_md = ""

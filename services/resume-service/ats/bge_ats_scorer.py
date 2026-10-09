@@ -157,10 +157,27 @@ SKILL_NORMALIZATION_MAP = {
     "sem": ("SEM", "Marketing"),
     "google analytics": ("Google Analytics", "Marketing"),
     "crm": ("CRM", "Business"),
-    "salesforce": ("Salesforce", "Business"),
     "financial modeling": ("Financial Modeling", "Finance"),
     "project management": ("Project Management", "Management"),
     "figma": ("Figma", "Design"),
+
+    # Security & Scripting
+    "siem": ("SIEM", "Security"),
+    "splunk": ("Splunk", "Security"),
+    "wireshark": ("Wireshark", "Security"),
+    "firewalls": ("Firewalls", "Security"),
+    "firewall": ("Firewalls", "Security"),
+    "owasp": ("OWASP", "Security"),
+    "penetration testing": ("Penetration Testing", "Security"),
+    "incident response": ("Incident Response", "Security"),
+    "vulnerability assessment": ("Vulnerability Assessment", "Security"),
+    "threat intelligence": ("Threat Intelligence", "Security"),
+    "cryptography": ("Cryptography", "Security"),
+    "network security": ("Network Security", "Security"),
+    "bash": ("Bash", "Tools"),
+    "powershell": ("PowerShell", "Tools"),
+    "ids/ips": ("IDS/IPS", "Security"),
+    "edr": ("EDR", "Security"),
 }
 
 # 1. STRONG ACTION VERBS (Engineering, Systems, Security, Product, Transformation, Delivery)

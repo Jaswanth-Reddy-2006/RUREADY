@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useResumeStore, ResumeTemplateId, TEMPLATE_METADATA } from '../../store/useResumeStore';
+import { useProfileStore } from '../../store/useProfileStore';
 import ResumeRenderer from '../../components/resume/templates/ResumeRenderer';
 import ResumeCopilotDrawer from '../../components/resume/ResumeCopilotDrawer';
 import TemplateOverviewModal from '../../components/resume/TemplateOverviewModal';
@@ -11,7 +12,8 @@ import {
   User, FileText, Briefcase, GraduationCap, FolderGit2, Wrench, Award, Layout, 
   Sparkles, Download, ArrowLeft, Plus, Trash2, Check, ShieldCheck, ExternalLink,
   BookOpen, Lightbulb, Trophy, Languages, Layers, Target, UploadCloud, RefreshCw,
-  CheckCircle2, XCircle, AlertCircle
+  CheckCircle2, XCircle, AlertCircle, BookmarkCheck, ChevronDown, ChevronUp,
+  UserCheck, AlertTriangle, ArrowRight, HelpCircle
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -32,8 +34,38 @@ type SectionId =
   | 'COMPETITIVE_MATCH'
   | 'TEMPLATES';
 
-interface CompetitiveMatchData {
-  status: 'MATCHED' | 'NOT_RELEVANT';
+export const STANDARD_ROLE_SUGGESTIONS = [
+  'Frontend Developer',
+  'Full Stack Developer',
+  'Backend Developer',
+  'Cybersecurity Analyst',
+  'Data Scientist',
+  'DevOps Engineer',
+  'Mobile App Developer',
+  'Data Engineer'
+];
+
+export interface RoleMatchData {
+  role: string;
+  matchedRoleProfileTitle?: string;
+  status: 'MATCHED' | 'NOT_RELEVANT' | 'UNKNOWN_ROLE';
+  score: number | null;
+  semanticSimilarity: number;
+  skillOverlap: number;
+  experienceRelevance: number;
+  terminologyMatch: number;
+  matchedSkills: string[];
+  missingSkills: string[];
+  relevanceGate: {
+    passed: boolean;
+    reason?: string;
+  };
+  explanation?: string;
+  availableStandardRoles?: string[];
+}
+
+export interface CompetitiveMatchData {
+  status: 'MATCHED' | 'NOT_RELEVANT' | 'INSUFFICIENT_JD';
   score: number | null;
   semanticSimilarity: number;
   skillOverlap: number;
@@ -51,6 +83,8 @@ export default function ResumeBuilderPage() {
   const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const { profile } = useProfileStore();
 
   const {
     masterResume,
@@ -94,29 +128,35 @@ export default function ResumeBuilderPage() {
     extractAndLoadResume
   } = useResumeStore();
 
+  const [workspaceMode, setWorkspaceMode] = useState<'ANALYSIS' | 'EDITOR'>('ANALYSIS');
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState<SectionId>('PERSONAL');
   const [mobileTab, setMobileTab] = useState<'EDITOR' | 'PREVIEW'>('EDITOR');
   const [isCopilotOpen, setIsCopilotOpen] = useState(false);
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
-  // Competitive matching state
-  const [targetJdText, setTargetJdText] = useState(
-    `Responsibilities:
-• Architect, build, and maintain high-throughput backend services in Node.js, TypeScript, and Go.
-• Build performant web client interfaces in React, TypeScript, and modern CSS.
-• Design and optimize database schemas in PostgreSQL and Redis distributed caching.
-• Own end-to-end reliability, CI/CD pipelines, and observability.
+  // 1. Entered Target Role Matching State (Standardized Role Profile)
+  const [targetRoleInput, setTargetRoleInput] = useState('Frontend Developer');
+  const [enteredRoleResult, setEnteredRoleResult] = useState<RoleMatchData | null>(null);
+  const [isMatchingEnteredRole, setIsMatchingEnteredRole] = useState(false);
 
-Requirements:
-• 3+ years of professional full stack engineering experience.
-• Proficiency with TypeScript/JavaScript, React, Node.js, and SQL.
-• Hands-on experience with Docker, microservices, and automated testing.`
-  );
-  const [targetJobRole, setTargetJobRole] = useState('Senior Full Stack Engineer');
-  const [targetCompanyName, setTargetCompanyName] = useState('Stripe');
-  const [isMatching, setIsMatching] = useState(false);
-  const [competitiveResult, setCompetitiveResult] = useState<CompetitiveMatchData | null>(null);
+  // 2. Saved Account Target Role Matching State
+  const [savedRoleResult, setSavedRoleResult] = useState<RoleMatchData | null>(null);
+  const [isMatchingSavedRole, setIsMatchingSavedRole] = useState(false);
+
+  // 3. Optional Custom Job Description Comparison (Advanced Option)
+  const [isCustomJdOpen, setIsCustomJdOpen] = useState(false);
+  const [customJdText, setCustomJdText] = useState('');
+  const [customCompanyName, setCustomCompanyName] = useState('');
+  const [customJobRole, setCustomJobRole] = useState('');
+  const [isMatchingCustomJd, setIsMatchingCustomJd] = useState(false);
+  const [customJdResult, setCustomJdResult] = useState<CompetitiveMatchData | null>(null);
+
+  // Legacy compatibility bindings for targetJdText if referenced
+  const [targetJdTextLegacy, setTargetJdTextLegacy] = useState('');
+  const [isMatchingLegacy, setIsMatchingLegacy] = useState(false);
+  const [competitiveResultLegacy, setCompetitiveResultLegacy] = useState<CompetitiveMatchData | null>(null);
 
   // Find target version or default to master
   const currentVersion = id ? resumeVersions.find((v) => v.id === id) : null;
@@ -153,16 +193,20 @@ Requirements:
 
   useEffect(() => {
     let isMounted = true;
+    if (isUploading) {
+      return;
+    }
     const plainText = resumeToPlainText(activeResumeData);
     if (!plainText.trim() || plainText === prevPlainTextRef.current) return;
     prevPlainTextRef.current = plainText;
 
     const timer = setTimeout(async () => {
       try {
+        console.log(`[ATS Audit Sync] Debounced background scoring triggered (payload: ${plainText.length} chars, uploading: false)`);
         const res = await apiClient.post('/resume-parser/score', {
           resumeText: plainText,
         });
-        if (isMounted && res.data?.data) {
+        if (isMounted && !isUploading && res.data?.data) {
           const mapped = mapBackendAtsResultToUi(res.data.data, activeResumeData);
           setBackendAtsResult(mapped);
         }
@@ -175,7 +219,7 @@ Requirements:
       isMounted = false;
       clearTimeout(timer);
     };
-  }, [activeResumeData]);
+  }, [activeResumeData, isUploading]);
 
   // Realtime ATS Audit for Copilot & Diagnostics (Role-Independent 6-Pillar Model)
   const currentAtsAnalysis: AtsScoreResult = useMemo(() => {
@@ -601,6 +645,16 @@ Requirements:
     if (!file) return;
 
     setIsUploading(true);
+    setUploadedFileName(file.name);
+    // Immediately clear previous resume's displayed analysis to guarantee complete state isolation
+    setBackendAtsResult(null);
+    setEnteredRoleResult(null);
+    setSavedRoleResult(null);
+    setCustomJdResult(null);
+    setCompetitiveResultLegacy(null);
+    prevPlainTextRef.current = '';
+    console.log(`[Upload Pipeline] Upload started for file (${file.size} bytes). Stale analysis state cleared.`);
+
     const toastId = toast.loading(`Extracting resume with Docling: ${file.name}...`);
 
     try {
@@ -608,6 +662,7 @@ Requirements:
       const normalized = normalizeResumeData(parsedData);
 
       if ((parsedData as any)._atsScore) {
+        console.log(`[Upload Pipeline] Received authoritative ATS score from parse response.`);
         setBackendAtsResult(mapBackendAtsResultToUi((parsedData as any)._atsScore, normalized));
       }
       
@@ -620,7 +675,8 @@ Requirements:
         extractAndLoadResume(normalized);
       }
 
-      toast.success(`Successfully extracted resume! (${normalized.experience.length} experiences, ${normalized.education.length} degrees)`, { id: toastId });
+      setWorkspaceMode('ANALYSIS');
+      toast.success(`Successfully extracted resume! Authoritative ATS quality score generated.`, { id: toastId });
     } catch (err: any) {
       toast.error(`Extraction failed: ${err.message || 'Unknown error'}`, { id: toastId });
     } finally {
@@ -629,26 +685,135 @@ Requirements:
     }
   };
 
-  const handleRunCompetitiveMatch = async () => {
-    if (!targetJdText.trim()) {
-      toast.error('Please enter a target Job Description to run competitive analysis.');
+  const handleRunEnteredRoleMatch = async (roleToMatch?: string) => {
+    const role = (roleToMatch || targetRoleInput).trim();
+    if (!role) {
+      toast.error('Please enter or select a target role to evaluate.');
       return;
     }
 
-    setIsMatching(true);
-    const toastId = toast.loading('Running BGE Semantic Competitive Matching...');
+    setIsMatchingEnteredRole(true);
+    const toastId = toast.loading(`Evaluating against standardized ${role} profile...`);
 
     try {
       const resumeText = resumeToPlainText(activeResumeData);
+      console.log(`[Role Match] Triggering match-role endpoint for role '${role}' (resume: ${resumeText.length} chars)`);
+      const res = await apiClient.post('/resume-parser/match-role', {
+        resumeText,
+        role,
+      });
+
+      if (res.data?.data) {
+        const data = res.data.data;
+        const matchData: RoleMatchData = {
+          role: data.role,
+          matchedRoleProfileTitle: data.matchedRoleProfileTitle,
+          status: data.status,
+          score: data.score,
+          semanticSimilarity: data.matchSignals?.semanticSimilarity ?? 0,
+          skillOverlap: data.matchSignals?.skillOverlap ?? 0,
+          experienceRelevance: data.matchSignals?.experienceRelevance ?? 0,
+          terminologyMatch: data.matchSignals?.terminologyMatch ?? 0,
+          matchedSkills: data.signalsDetail?.matchedSkills ?? [],
+          missingSkills: data.signalsDetail?.missingSkills ?? [],
+          relevanceGate: data.relevanceGate || { passed: data.status === 'MATCHED' },
+          explanation: data.explanation,
+          availableStandardRoles: data.availableStandardRoles,
+        };
+        setEnteredRoleResult(matchData);
+
+        if (data.status === 'MATCHED') {
+          toast.success(`Job Role Match: ${data.score}% for ${data.matchedRoleProfileTitle || role}`, { id: toastId });
+        } else if (data.status === 'NOT_RELEVANT') {
+          toast.success(`Evaluation complete: Not relevant to ${role} (Score: N/A)`, { id: toastId });
+        } else {
+          toast.error(`Role '${role}' not recognized in standard profiles.`, { id: toastId });
+        }
+      } else {
+        throw new Error('Invalid response from role evaluation service.');
+      }
+    } catch (err: any) {
+      toast.error(`Role matching error: ${err.message || 'Check connection to resume service.'}`, { id: toastId });
+    } finally {
+      setIsMatchingEnteredRole(false);
+    }
+  };
+
+  const handleRunSavedRoleMatch = async () => {
+    const savedRole = profile?.targetRole?.trim();
+    if (!savedRole) {
+      toast.error('No target role saved in your account profile. Please configure your target role.');
+      return;
+    }
+
+    setIsMatchingSavedRole(true);
+    const toastId = toast.loading(`Evaluating against your saved role (${savedRole})...`);
+
+    try {
+      const resumeText = resumeToPlainText(activeResumeData);
+      console.log(`[Saved Role Match] Triggering match-role for saved role '${savedRole}' (resume: ${resumeText.length} chars)`);
+      const res = await apiClient.post('/resume-parser/match-role', {
+        resumeText,
+        role: savedRole,
+      });
+
+      if (res.data?.data) {
+        const data = res.data.data;
+        const matchData: RoleMatchData = {
+          role: data.role,
+          matchedRoleProfileTitle: data.matchedRoleProfileTitle,
+          status: data.status,
+          score: data.score,
+          semanticSimilarity: data.matchSignals?.semanticSimilarity ?? 0,
+          skillOverlap: data.matchSignals?.skillOverlap ?? 0,
+          experienceRelevance: data.matchSignals?.experienceRelevance ?? 0,
+          terminologyMatch: data.matchSignals?.terminologyMatch ?? 0,
+          matchedSkills: data.signalsDetail?.matchedSkills ?? [],
+          missingSkills: data.signalsDetail?.missingSkills ?? [],
+          relevanceGate: data.relevanceGate || { passed: data.status === 'MATCHED' },
+          explanation: data.explanation,
+          availableStandardRoles: data.availableStandardRoles,
+        };
+        setSavedRoleResult(matchData);
+
+        if (data.status === 'MATCHED') {
+          toast.success(`My Target Role Match: ${data.score}% (${data.matchedRoleProfileTitle || savedRole})`, { id: toastId });
+        } else if (data.status === 'NOT_RELEVANT') {
+          toast.success(`Evaluation complete: Not relevant to ${savedRole} (Score: N/A)`, { id: toastId });
+        } else {
+          toast.error(`Saved role '${savedRole}' not recognized in standard profiles.`, { id: toastId });
+        }
+      } else {
+        throw new Error('Invalid response from role evaluation service.');
+      }
+    } catch (err: any) {
+      toast.error(`Saved role matching error: ${err.message || 'Check connection to resume service.'}`, { id: toastId });
+    } finally {
+      setIsMatchingSavedRole(false);
+    }
+  };
+
+  const handleRunCustomJdMatch = async () => {
+    if (!customJdText.trim()) {
+      toast.error('Please enter a target Job Description to run custom vacancy evaluation.');
+      return;
+    }
+
+    setIsMatchingCustomJd(true);
+    const toastId = toast.loading('Running BGE Semantic Matching on Custom JD...');
+
+    try {
+      const resumeText = resumeToPlainText(activeResumeData);
+      console.log(`[Custom JD Match] Triggering evaluate endpoint with active canonical resume (${resumeText.length} chars)`);
       const res = await apiClient.post('/resume-parser/evaluate', {
         resumeText,
-        jobDescription: targetJdText,
-        role: targetJobRole || undefined,
+        jobDescription: customJdText,
+        role: customJobRole || undefined,
       });
 
       if (res.data?.data?.competitive) {
         const comp = res.data.data.competitive;
-        setCompetitiveResult({
+        setCustomJdResult({
           status: comp.status || 'MATCHED',
           score: comp.score !== undefined ? comp.score : null,
           semanticSimilarity: comp.matchSignals?.semanticSimilarity ?? comp.semanticSimilarity ?? 0,
@@ -661,7 +826,9 @@ Requirements:
         });
         toast.success(
           comp.status === 'MATCHED'
-            ? `Competitive Match Score: ${comp.score}/100`
+            ? `Custom JD Match Score: ${comp.score}/100`
+            : comp.status === 'INSUFFICIENT_JD'
+            ? 'Evaluation note: Job description is too short for reliable analysis'
             : 'Evaluation complete: Role not relevant (Score: N/A)',
           { id: toastId }
         );
@@ -669,10 +836,15 @@ Requirements:
         throw new Error('Invalid response from competitive evaluation service.');
       }
     } catch (err: any) {
-      toast.error(`Competitive matching error: ${err.message || 'Check connection to resume service.'}`, { id: toastId });
+      setCustomJdResult(null);
+      toast.error(`Custom JD matching error: ${err.message || 'Check connection to resume service.'}`, { id: toastId });
     } finally {
-      setIsMatching(false);
+      setIsMatchingCustomJd(false);
     }
+  };
+
+  const handleRunCompetitiveMatch = async () => {
+    await handleRunCustomJdMatch();
   };
 
   const handleSaveAsVersion = () => {
@@ -738,20 +910,26 @@ Requirements:
             <ArrowLeft size={18} />
           </button>
           <div className="min-w-0">
-            <h3 className="text-sm sm:text-base font-bold font-display text-[#11183D] truncate max-w-[200px] sm:max-w-xs md:max-w-md">
-              {currentVersion ? currentVersion.name : 'Master Candidate Resume'}
-            </h3>
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm sm:text-base font-bold font-display text-[#11183D] truncate max-w-[180px] sm:max-w-xs md:max-w-md">
+                {currentVersion ? currentVersion.name : 'Master Candidate Profile'}
+              </h3>
+              {uploadedFileName && (
+                <span className="hidden md:inline-flex text-[10px] font-mono font-bold bg-blue-50 text-[#2459A8] px-2 py-0.5 rounded border border-blue-200 truncate max-w-[140px]">
+                  {uploadedFileName}
+                </span>
+              )}
+            </div>
             <p className="text-[11px] sm:text-xs text-[#526078] truncate">
-              {currentVersion ? `Target: ${currentVersion.targetRole} (${currentVersion.targetCompany || 'General'})` : 'Canonical Resume Workspace'}
+              {currentVersion ? `Target: ${currentVersion.targetRole} (${currentVersion.targetCompany || 'General'})` : 'Authoritative Resume Workspace'}
             </p>
           </div>
 
           {/* Top ATS Score Badge */}
           <div className="hidden sm:flex items-center gap-2 pl-3 border-l border-[#DCE7F2]">
-            <button
-              onClick={() => setActiveSection('ATS_DIAGNOSTICS')}
-              className="flex items-center gap-1.5 bg-[#EFFAFD] hover:bg-blue-100 px-2.5 py-1 rounded-xl border border-[#DCE7F2] cursor-pointer transition-colors"
-              title="Click to view full ATS breakdown"
+            <div
+              className="flex items-center gap-1.5 bg-[#EFFAFD] px-2.5 py-1 rounded-xl border border-[#DCE7F2]"
+              title="Authoritative ATS Compatibility Score"
             >
               <ShieldCheck size={14} className="text-[#2459A8]" />
               <span className="text-xs font-bold font-mono text-[#11183D]">
@@ -768,29 +946,31 @@ Requirements:
               >
                 {currentAtsAnalysis.grade}
               </span>
-            </button>
+            </div>
           </div>
         </div>
 
-        {/* Action Controls */}
-        <div className="flex items-center gap-2 flex-wrap">
-          {/* Mobile View Toggle */}
-          <div className="flex lg:hidden bg-slate-100 p-1 rounded-xl border border-[#DCE7F2] text-xs font-bold">
+        {/* Mode Switcher Tabs & Actions */}
+        <div className="flex items-center gap-2.5 flex-wrap">
+          {/* Analysis vs Editor View Switcher */}
+          <div className="flex bg-slate-100 p-1 rounded-xl border border-[#DCE7F2] text-xs font-bold">
             <button
-              onClick={() => setMobileTab('EDITOR')}
-              className={`px-3 py-1 rounded-lg transition-colors ${
-                mobileTab === 'EDITOR' ? 'bg-white text-[#2459A8] shadow-2xs' : 'text-[#526078]'
+              onClick={() => setWorkspaceMode('ANALYSIS')}
+              className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer ${
+                workspaceMode === 'ANALYSIS' ? 'bg-white text-[#2459A8] shadow-2xs' : 'text-[#526078] hover:text-[#11183D]'
               }`}
             >
-              Editor
+              <ShieldCheck size={14} />
+              <span>ATS & Job Analysis</span>
             </button>
             <button
-              onClick={() => setMobileTab('PREVIEW')}
-              className={`px-3 py-1 rounded-lg transition-colors ${
-                mobileTab === 'PREVIEW' ? 'bg-white text-[#2459A8] shadow-2xs' : 'text-[#526078]'
+              onClick={() => setWorkspaceMode('EDITOR')}
+              className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer ${
+                workspaceMode === 'EDITOR' ? 'bg-white text-[#2459A8] shadow-2xs' : 'text-[#526078] hover:text-[#11183D]'
               }`}
             >
-              Preview
+              <Layout size={14} />
+              <span>Open Resume Builder</span>
             </button>
           </div>
 
@@ -805,15 +985,6 @@ Requirements:
           </button>
 
           <button
-            onClick={() => setActiveSection('COMPETITIVE_MATCH')}
-            className="px-3 py-2 bg-white hover:bg-slate-50 text-[#2459A8] border border-[#DCE7F2] rounded-xl text-xs font-bold font-display flex items-center gap-1.5 cursor-pointer transition-colors shadow-2xs"
-            title="Match resume against specific Job Description"
-          >
-            <Target size={14} />
-            <span className="hidden sm:inline">Job Match</span>
-          </button>
-
-          <button
             onClick={() => setIsCopilotOpen(true)}
             className="px-3 py-2 bg-[#EFFAFD] hover:bg-blue-100 text-[#2459A8] border border-[#DCE7F2] rounded-xl text-xs font-bold font-display flex items-center gap-1.5 cursor-pointer transition-colors shadow-2xs"
           >
@@ -821,80 +992,1125 @@ Requirements:
             <span className="hidden sm:inline">AI Copilot</span>
           </button>
 
-          <button
-            onClick={handleSaveAsVersion}
-            className="px-3.5 py-2 bg-[#2459A8] hover:bg-[#1d4787] text-white rounded-xl text-xs font-bold font-display flex items-center gap-1.5 cursor-pointer shadow-2xs transition-colors"
-          >
-            <Check size={14} />
-            <span className="hidden sm:inline">Save Version</span>
-          </button>
+          {workspaceMode === 'EDITOR' && (
+            <>
+              <button
+                onClick={handleSaveAsVersion}
+                className="px-3.5 py-2 bg-[#2459A8] hover:bg-[#1d4787] text-white rounded-xl text-xs font-bold font-display flex items-center gap-1.5 cursor-pointer shadow-2xs transition-colors"
+              >
+                <Check size={14} />
+                <span className="hidden sm:inline">Save Version</span>
+              </button>
 
-          <button
-            onClick={handlePrintDownload}
-            className="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold font-display flex items-center gap-1.5 cursor-pointer shadow-2xs transition-colors"
-          >
-            <Download size={14} />
-            <span className="hidden sm:inline">Export PDF</span>
-          </button>
+              <button
+                onClick={handlePrintDownload}
+                className="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold font-display flex items-center gap-1.5 cursor-pointer shadow-2xs transition-colors"
+              >
+                <Download size={14} />
+                <span className="hidden sm:inline">Export PDF</span>
+              </button>
+            </>
+          )}
         </div>
       </header>
 
-      {/* Main 3-Pane Body */}
-      <div className="flex-1 flex overflow-hidden min-h-0">
-        {/* PANE 1: Section Navigation (Left Column) */}
-        <div className={`w-60 lg:w-64 bg-white border-r border-[#DCE7F2] p-4 flex flex-col justify-between shrink-0 overflow-y-auto ${
-          mobileTab === 'EDITOR' ? 'hidden md:flex' : 'hidden md:flex'
-        }`}>
-          <div className="space-y-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#526078] px-3 mb-2 block font-mono">
-              Resume Sections
-            </span>
-            {sectionsList.map((sec) => (
-              <button
-                key={sec.id}
-                onClick={() => setActiveSection(sec.id)}
-                className={`w-full px-3 py-2 rounded-xl text-xs font-bold font-display flex items-center justify-between transition-all cursor-pointer ${
-                  activeSection === sec.id
-                    ? 'bg-[#EFFAFD] text-[#2459A8] border border-[#DCE7F2] shadow-2xs'
-                    : 'text-[#526078] hover:text-[#11183D] hover:bg-slate-50'
-                }`}
-              >
-                <div className="flex items-center gap-2.5 truncate">
-                  <span className={activeSection === sec.id ? 'text-[#2459A8]' : 'text-[#7B8799]'}>
-                    {sec.icon}
+      {/* ─── ANALYSIS DASHBOARD VIEW (Default on upload) ─── */}
+      {workspaceMode === 'ANALYSIS' ? (
+        <div className="flex-1 overflow-y-auto bg-[#F8FAFC] p-4 sm:p-6 lg:p-8">
+          <div className="max-w-6xl mx-auto space-y-8">
+            {/* Header Status Banner */}
+            <div className="p-6 rounded-3xl bg-linear-to-r from-[#EFFAFD] via-blue-50/60 to-indigo-50/40 border border-[#DCE7F2] shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10.5px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full font-mono bg-white text-[#2459A8] border border-[#DCE7F2]">
+                    Authoritative Analysis Engine
                   </span>
-                  <span className="truncate">{sec.label}</span>
+                  {uploadedFileName && (
+                    <span className="text-[10.5px] font-bold text-slate-700 bg-white/80 px-2 py-0.5 rounded-md border border-slate-200">
+                      📄 {uploadedFileName}
+                    </span>
+                  )}
                 </div>
-                {sec.count !== undefined && sec.count > 0 && (
-                  <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-100 text-[#526078]">
-                    {sec.count}
-                  </span>
-                )}
-              </button>
-            ))}
-          </div>
-
-          <div className="pt-4 border-t border-slate-100 space-y-2">
-            <button
-              onClick={() => setIsTemplateModalOpen(true)}
-              className="w-full p-2.5 rounded-2xl bg-linear-to-r from-blue-50 to-indigo-50 border border-blue-200 text-xs text-[#2459A8] font-bold flex items-center justify-between group cursor-pointer"
-            >
-              <div className="flex items-center gap-2">
-                <Layout size={15} />
-                <span>Switch Template</span>
+                <h2 className="text-xl sm:text-2xl font-bold font-display text-[#11183D]">
+                  Resume Compatibility & Competency Audit
+                </h2>
+                <p className="text-xs text-[#526078] max-w-2xl">
+                  Zero-fake-score evaluation featuring the authoritative 6-pillar ATS compatibility model and BGE neural job-match analysis.
+                </p>
               </div>
-              <span className="text-[10px] bg-white px-2 py-0.5 rounded border border-blue-200 font-mono">
-                {currentTemplate.replace('-', ' ')}
-              </span>
-            </button>
+
+              <div className="flex items-center gap-2.5">
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploading}
+                  className="px-4 py-2.5 bg-white hover:bg-slate-50 text-[#11183D] border border-[#DCE7F2] rounded-xl text-xs font-bold font-display flex items-center gap-1.5 cursor-pointer transition-colors shadow-2xs"
+                >
+                  <UploadCloud size={15} className={isUploading ? 'animate-bounce text-[#2459A8]' : 'text-[#2459A8]'} />
+                  <span>{isUploading ? 'Extracting...' : 'Upload New Resume'}</span>
+                </button>
+                <button
+                  onClick={() => setWorkspaceMode('EDITOR')}
+                  className="px-4 py-2.5 bg-[#2459A8] hover:bg-[#1d4787] text-white rounded-xl text-xs font-bold font-display flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
+                >
+                  <Layout size={15} />
+                  <span>Open Resume Builder</span>
+                </button>
+              </div>
+            </div>
+
+            {/* 1. High-Level Summary Score Cards (ATS Score + Job Match + Saved Target Role) */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {/* Score Card A: ATS Quality Score (Role-Independent) */}
+              <div className="p-5 sm:p-6 bg-white rounded-3xl border border-[#DCE7F2] shadow-xs space-y-4 flex flex-col justify-between">
+                {isUploading ? (
+                  <div className="py-12 flex flex-col items-center justify-center text-center space-y-3">
+                    <RefreshCw size={26} className="animate-spin text-[#2459A8]" />
+                    <h4 className="text-sm font-bold text-[#11183D]">Extracting Document...</h4>
+                    <p className="text-xs text-[#526078]">Generating authoritative 6-pillar ATS score.</p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="p-1 bg-[#EFFAFD] text-[#2459A8] rounded-lg border border-[#DCE7F2]">
+                            <ShieldCheck size={16} />
+                          </span>
+                          <span className="text-[11px] font-bold uppercase tracking-wider text-[#2459A8] font-mono">
+                            Independent Quality
+                          </span>
+                        </div>
+                        <h3 className="text-base font-bold text-[#11183D] mt-1">
+                          ATS Quality Score
+                        </h3>
+                        <p className="text-[11px] text-[#526078] mt-0.5">
+                          Role-independent 6-pillar authoritative benchmark.
+                        </p>
+                      </div>
+
+                      <div className="flex flex-col items-end">
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-3xl font-black font-mono text-[#11183D]">
+                            {currentAtsAnalysis.totalScore}
+                          </span>
+                          <span className="text-xs text-[#7B8799] font-mono">/100</span>
+                        </div>
+                        <span
+                          className={`text-[10px] font-bold px-2 py-0.5 rounded-lg border mt-1 ${
+                            currentAtsAnalysis.totalScore >= 80
+                              ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                              : currentAtsAnalysis.totalScore >= 65
+                              ? 'bg-amber-50 text-amber-800 border-amber-200'
+                              : 'bg-rose-50 text-rose-800 border-rose-200'
+                          }`}
+                        >
+                          {currentAtsAnalysis.grade}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* 6-Pillars Mini Meters */}
+                    <div className="grid grid-cols-3 gap-1.5 pt-2.5 border-t border-slate-100 text-[10px]">
+                      <div className="p-1.5 bg-slate-50 rounded-lg border border-slate-200/80">
+                        <div className="flex justify-between font-semibold text-slate-600">
+                          <span>Struct</span>
+                          <span className="font-mono text-[#2459A8]">{currentAtsAnalysis.breakdown.structureScore}</span>
+                        </div>
+                      </div>
+                      <div className="p-1.5 bg-slate-50 rounded-lg border border-slate-200/80">
+                        <div className="flex justify-between font-semibold text-slate-600">
+                          <span>Complete</span>
+                          <span className="font-mono text-emerald-700">{currentAtsAnalysis.breakdown.completenessScore}</span>
+                        </div>
+                      </div>
+                      <div className="p-1.5 bg-slate-50 rounded-lg border border-slate-200/80">
+                        <div className="flex justify-between font-semibold text-slate-600">
+                          <span>Extract</span>
+                          <span className="font-mono text-indigo-700">{currentAtsAnalysis.breakdown.extractabilityScore}</span>
+                        </div>
+                      </div>
+                      <div className="p-1.5 bg-slate-50 rounded-lg border border-slate-200/80">
+                        <div className="flex justify-between font-semibold text-slate-600">
+                          <span>Skills</span>
+                          <span className="font-mono text-blue-700">{currentAtsAnalysis.breakdown.skillsScore}</span>
+                        </div>
+                      </div>
+                      <div className="p-1.5 bg-slate-50 rounded-lg border border-slate-200/80">
+                        <div className="flex justify-between font-semibold text-slate-600">
+                          <span>Exp</span>
+                          <span className="font-mono text-amber-700">{currentAtsAnalysis.breakdown.experienceQualityScore}</span>
+                        </div>
+                      </div>
+                      <div className="p-1.5 bg-slate-50 rounded-lg border border-slate-200/80">
+                        <div className="flex justify-between font-semibold text-slate-600">
+                          <span>Format</span>
+                          <span className="font-mono text-purple-700">{currentAtsAnalysis.breakdown.formattingScore}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Score Card B: Target Role Match */}
+              <div className="p-5 sm:p-6 bg-white rounded-3xl border border-[#DCE7F2] shadow-xs space-y-4 flex flex-col justify-between">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="p-1 bg-[#EFFAFD] text-[#2459A8] rounded-lg border border-[#DCE7F2]">
+                        <Target size={16} />
+                      </span>
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-[#2459A8] font-mono">
+                        Standard Role Match
+                      </span>
+                    </div>
+                    <h3 className="text-base font-bold text-[#11183D] mt-1">
+                      {enteredRoleResult?.matchedRoleProfileTitle || targetRoleInput || 'Job Role Match'}
+                    </h3>
+                    <p className="text-[11px] text-[#526078] mt-0.5">
+                      Against industry-standard benchmark profiles.
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col items-end">
+                    {enteredRoleResult ? (
+                      enteredRoleResult.status === 'MATCHED' ? (
+                        <>
+                          <div className="flex items-baseline gap-1">
+                            <span className="text-3xl font-black font-mono text-emerald-700">
+                              {enteredRoleResult.score}%
+                            </span>
+                          </div>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg border bg-emerald-50 text-emerald-800 border-emerald-200 mt-1">
+                            Role Matched
+                          </span>
+                        </>
+                      ) : enteredRoleResult.status === 'NOT_RELEVANT' ? (
+                        <>
+                          <div className="flex items-baseline gap-1">
+                            <span className="text-3xl font-black font-mono text-amber-700">
+                              N/A
+                            </span>
+                          </div>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg border bg-amber-50 text-amber-800 border-amber-200 mt-1">
+                            Not Relevant
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <div className="flex items-baseline gap-1">
+                            <span className="text-3xl font-black font-mono text-slate-400">
+                              —
+                            </span>
+                          </div>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg border bg-slate-100 text-slate-700 border-slate-200 mt-1">
+                            Unknown Role
+                          </span>
+                        </>
+                      )
+                    ) : (
+                      <>
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-3xl font-black font-mono text-slate-400">
+                            —
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg border bg-slate-100 text-slate-700 border-slate-200 mt-1">
+                          Ready to Evaluate
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* Sub-signals or Prompt */}
+                <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200/80 text-[11px]">
+                  {enteredRoleResult ? (
+                    enteredRoleResult.status === 'MATCHED' ? (
+                      <div className="grid grid-cols-2 gap-1.5 text-[10.5px]">
+                        <div className="flex justify-between">
+                          <span className="text-[#526078]">Semantic:</span>
+                          <span className="font-mono font-bold text-[#2459A8]">{Math.round(enteredRoleResult.semanticSimilarity * 100)}%</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-[#526078]">Skills:</span>
+                          <span className="font-mono font-bold text-emerald-700">{Math.round(enteredRoleResult.skillOverlap * 100)}%</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-[#526078]">Experience:</span>
+                          <span className="font-mono font-bold text-purple-700">{Math.round(enteredRoleResult.experienceRelevance * 100)}%</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-[#526078]">Terminology:</span>
+                          <span className="font-mono font-bold text-amber-700">{Math.round(enteredRoleResult.terminologyMatch * 100)}%</span>
+                        </div>
+                      </div>
+                    ) : enteredRoleResult.status === 'NOT_RELEVANT' ? (
+                      <span className="text-amber-800 font-medium text-[11px] line-clamp-2">
+                        ⚠ {enteredRoleResult.relevanceGate?.reason || 'Baseline domain gate not passed.'}
+                      </span>
+                    ) : (
+                      <span className="text-slate-600 text-[11px]">
+                        Role profile not found. Select from standard catalog below.
+                      </span>
+                    )
+                  ) : (
+                    <div className="flex items-center justify-between text-[#526078]">
+                      <span>Role: {targetRoleInput}</span>
+                      <button
+                        onClick={() => handleRunEnteredRoleMatch()}
+                        disabled={isMatchingEnteredRole}
+                        className="text-[#2459A8] font-bold hover:underline cursor-pointer"
+                      >
+                        Evaluate now →
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Score Card C: My Saved Target Role Match */}
+              <div className="p-5 sm:p-6 bg-white rounded-3xl border border-[#DCE7F2] shadow-xs space-y-4 flex flex-col justify-between">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="p-1 bg-[#EFFAFD] text-[#2459A8] rounded-lg border border-[#DCE7F2]">
+                        <BookmarkCheck size={16} />
+                      </span>
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-[#2459A8] font-mono">
+                        Account Target Role
+                      </span>
+                    </div>
+                    <h3 className="text-base font-bold text-[#11183D] mt-1 truncate max-w-[180px]" title={profile?.targetRole || 'Not Configured'}>
+                      {profile?.targetRole || 'Not Configured'}
+                    </h3>
+                    <p className="text-[11px] text-[#526078] mt-0.5">
+                      Primary career target saved in account profile.
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col items-end">
+                    {savedRoleResult ? (
+                      savedRoleResult.status === 'MATCHED' ? (
+                        <>
+                          <div className="flex items-baseline gap-1">
+                            <span className="text-3xl font-black font-mono text-emerald-700">
+                              {savedRoleResult.score}%
+                            </span>
+                          </div>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg border bg-emerald-50 text-emerald-800 border-emerald-200 mt-1">
+                            Role Matched
+                          </span>
+                        </>
+                      ) : savedRoleResult.status === 'NOT_RELEVANT' ? (
+                        <>
+                          <div className="flex items-baseline gap-1">
+                            <span className="text-3xl font-black font-mono text-amber-700">
+                              N/A
+                            </span>
+                          </div>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg border bg-amber-50 text-amber-800 border-amber-200 mt-1">
+                            Not Relevant
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <div className="flex items-baseline gap-1">
+                            <span className="text-3xl font-black font-mono text-slate-400">
+                              —
+                            </span>
+                          </div>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg border bg-slate-100 text-slate-700 border-slate-200 mt-1">
+                            Unknown Role
+                          </span>
+                        </>
+                      )
+                    ) : (
+                      <>
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-3xl font-black font-mono text-slate-400">
+                            —
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg border bg-slate-100 text-slate-700 border-slate-200 mt-1">
+                          {profile?.targetRole ? 'Unchecked' : 'No Saved Role'}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* Sub-signals or Button */}
+                <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200/80 text-[11px]">
+                  {savedRoleResult ? (
+                    savedRoleResult.status === 'MATCHED' ? (
+                      <div className="grid grid-cols-2 gap-1.5 text-[10.5px]">
+                        <div className="flex justify-between">
+                          <span className="text-[#526078]">Semantic:</span>
+                          <span className="font-mono font-bold text-[#2459A8]">{Math.round(savedRoleResult.semanticSimilarity * 100)}%</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-[#526078]">Skills:</span>
+                          <span className="font-mono font-bold text-emerald-700">{Math.round(savedRoleResult.skillOverlap * 100)}%</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-[#526078]">Experience:</span>
+                          <span className="font-mono font-bold text-purple-700">{Math.round(savedRoleResult.experienceRelevance * 100)}%</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-[#526078]">Terminology:</span>
+                          <span className="font-mono font-bold text-amber-700">{Math.round(savedRoleResult.terminologyMatch * 100)}%</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <span className="text-amber-800 font-medium text-[11px]">
+                        ⚠ {savedRoleResult.relevanceGate?.reason || 'Baseline relevance gate not passed.'}
+                      </span>
+                    )
+                  ) : profile?.targetRole ? (
+                    <button
+                      onClick={handleRunSavedRoleMatch}
+                      disabled={isMatchingSavedRole}
+                      className="w-full text-center text-[#2459A8] font-bold hover:underline cursor-pointer flex items-center justify-center gap-1"
+                    >
+                      <RefreshCw size={12} className={isMatchingSavedRole ? 'animate-spin' : ''} />
+                      <span>{isMatchingSavedRole ? 'Evaluating...' : `Evaluate Against "${profile.targetRole}" →`}</span>
+                    </button>
+                  ) : (
+                    <div className="flex items-center justify-between text-[#526078]">
+                      <span>No saved target role</span>
+                      <button
+                        onClick={() => navigate('/settings')}
+                        className="text-[#2459A8] font-bold hover:underline cursor-pointer"
+                      >
+                        Set in Settings →
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* 2. ATS 6-Pillars Detailed Quality Audit */}
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-bold font-display text-[#11183D]">
+                  6-Pillar ATS Compatibility Breakdown
+                </h3>
+                <p className="text-xs text-[#526078]">
+                  Authoritative scoring across all critical ATS parsing and screening criteria.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {/* Pillar 1 */}
+                <div className="p-5 bg-white rounded-2xl border border-[#DCE7F2] shadow-2xs space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-sm text-[#11183D]">1. Structure</span>
+                    <span className="font-mono font-bold text-xs text-[#2459A8]">{currentAtsAnalysis.breakdown.structureScore} / 20</span>
+                  </div>
+                  <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-[#2459A8]" style={{ width: `${(currentAtsAnalysis.breakdown.structureScore / 20) * 100}%` }} />
+                  </div>
+                  <p className="text-xs text-[#526078]">
+                    Validates standard section titles, contact positioning, and clear resume layout hierarchy.
+                  </p>
+                </div>
+
+                {/* Pillar 2 */}
+                <div className="p-5 bg-white rounded-2xl border border-[#DCE7F2] shadow-2xs space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-sm text-[#11183D]">2. Content Completeness</span>
+                    <span className="font-mono font-bold text-xs text-emerald-700">{currentAtsAnalysis.breakdown.completenessScore} / 20</span>
+                  </div>
+                  <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-emerald-500" style={{ width: `${(currentAtsAnalysis.breakdown.completenessScore / 20) * 100}%` }} />
+                  </div>
+                  <p className="text-xs text-[#526078]">
+                    Audits required sections: contact info, summary, work history, education, and technical skills.
+                  </p>
+                </div>
+
+                {/* Pillar 3 */}
+                <div className="p-5 bg-white rounded-2xl border border-[#DCE7F2] shadow-2xs space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-sm text-[#11183D]">3. ATS Extractability</span>
+                    <span className="font-mono font-bold text-xs text-indigo-700">{currentAtsAnalysis.breakdown.extractabilityScore} / 20</span>
+                  </div>
+                  <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-indigo-500" style={{ width: `${(currentAtsAnalysis.breakdown.extractabilityScore / 20) * 100}%` }} />
+                  </div>
+                  <p className="text-xs text-[#526078]">
+                    Ensures Docling clean plain-text parsing without OCR artifacts or corrupted characters.
+                  </p>
+                </div>
+
+                {/* Pillar 4 */}
+                <div className="p-5 bg-white rounded-2xl border border-[#DCE7F2] shadow-2xs space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-sm text-[#11183D]">4. Skills & Technical Content</span>
+                    <span className="font-mono font-bold text-xs text-blue-700">{currentAtsAnalysis.breakdown.skillsScore} / 15</span>
+                  </div>
+                  <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-blue-500" style={{ width: `${(currentAtsAnalysis.breakdown.skillsScore / 15) * 100}%` }} />
+                  </div>
+                  <p className="text-xs text-[#526078]">
+                    Checks explicit categorization of languages, frameworks, developer tools, and libraries.
+                  </p>
+                </div>
+
+                {/* Pillar 5 */}
+                <div className="p-5 bg-white rounded-2xl border border-[#DCE7F2] shadow-2xs space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-sm text-[#11183D]">5. Experience & Achievement Quality</span>
+                    <span className="font-mono font-bold text-xs text-amber-700">{currentAtsAnalysis.breakdown.experienceQualityScore} / 15</span>
+                  </div>
+                  <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-amber-500" style={{ width: `${(currentAtsAnalysis.breakdown.experienceQualityScore / 15) * 100}%` }} />
+                  </div>
+                  <p className="text-xs text-[#526078]">
+                    Evaluates presence of strong action verbs and quantified impact metrics in bullet points.
+                  </p>
+                </div>
+
+                {/* Pillar 6 */}
+                <div className="p-5 bg-white rounded-2xl border border-[#DCE7F2] shadow-2xs space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-sm text-[#11183D]">6. Basic ATS Formatting</span>
+                    <span className="font-mono font-bold text-xs text-purple-700">{currentAtsAnalysis.breakdown.formattingScore} / 10</span>
+                  </div>
+                  <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-purple-500" style={{ width: `${(currentAtsAnalysis.breakdown.formattingScore / 10) * 100}%` }} />
+                  </div>
+                  <p className="text-xs text-[#526078]">
+                    Standard single-column flow, safe glyphs, standard fonts, and ATS-parseable dates.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* 3. Standardized Role Match Center */}
+            <div className="space-y-6">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-[#2459A8] font-mono">
+                    BGE Neural Role Match Engine
+                  </span>
+                </div>
+                <h3 className="text-xl font-bold font-display text-[#11183D] mt-1">
+                  Standardized Role Match Center
+                </h3>
+                <p className="text-xs text-[#526078]">
+                  Evaluate your resume directly against curated industry role profiles (responsibilities, required skills, and domain terminology) without requiring a long job description.
+                </p>
+              </div>
+
+              {/* Box 1: Role-Only Matching against Standardized Profile */}
+              <div className="p-6 bg-white rounded-3xl border border-[#DCE7F2] shadow-xs space-y-5">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h4 className="text-base font-bold text-[#11183D] flex items-center gap-2">
+                      <Target size={18} className="text-[#2459A8]" />
+                      <span>Target Role Evaluation</span>
+                    </h4>
+                    <p className="text-xs text-[#526078] mt-0.5">
+                      Select or type a target role to benchmark against its standardized curriculum and expectations.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Role Quick Selector Pills */}
+                <div className="space-y-2">
+                  <label className="block text-xs font-bold text-[#11183D]">Popular Standard Roles</label>
+                  <div className="flex flex-wrap gap-2">
+                    {STANDARD_ROLE_SUGGESTIONS.map((role) => {
+                      const isSelected = targetRoleInput.toLowerCase() === role.toLowerCase();
+                      return (
+                        <button
+                          key={role}
+                          type="button"
+                          onClick={() => {
+                            setTargetRoleInput(role);
+                            if (enteredRoleResult && enteredRoleResult.role.toLowerCase() !== role.toLowerCase()) {
+                              setEnteredRoleResult(null);
+                            }
+                          }}
+                          className={`px-3 py-1.5 rounded-xl text-xs font-medium border transition-all cursor-pointer ${
+                            isSelected
+                              ? 'bg-[#2459A8] text-white border-[#2459A8] shadow-2xs font-semibold'
+                              : 'bg-slate-50 text-slate-700 border-[#DCE7F2] hover:bg-slate-100 hover:border-slate-300'
+                          }`}
+                        >
+                          {role}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Role Input and Action */}
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
+                  <div className="sm:col-span-3">
+                    <label className="block text-xs font-bold text-[#11183D] mb-1">Target Role Title</label>
+                    <input
+                      type="text"
+                      value={targetRoleInput}
+                      onChange={(e) => {
+                        setTargetRoleInput(e.target.value);
+                        if (enteredRoleResult && enteredRoleResult.role.toLowerCase() !== e.target.value.toLowerCase()) {
+                          setEnteredRoleResult(null);
+                        }
+                      }}
+                      placeholder="e.g. Frontend Developer, Cybersecurity Analyst, Backend Developer..."
+                      className="w-full p-2.5 bg-slate-50 border border-[#DCE7F2] rounded-xl text-xs focus:outline-none focus:border-[#2459A8]"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-1">
+                    <button
+                      onClick={() => handleRunEnteredRoleMatch()}
+                      disabled={isMatchingEnteredRole || !targetRoleInput.trim()}
+                      className="w-full py-2.5 bg-[#2459A8] hover:bg-[#1d4787] disabled:opacity-50 text-white rounded-xl text-xs font-bold font-display flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer transition-colors"
+                    >
+                      <RefreshCw size={14} className={isMatchingEnteredRole ? 'animate-spin' : ''} />
+                      <span>{isMatchingEnteredRole ? 'Evaluating...' : 'Evaluate Role'}</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Evaluated Role Details Display */}
+                {enteredRoleResult && (
+                  <div className="pt-4 border-t border-slate-100 space-y-4">
+                    <div className="p-4 rounded-2xl border bg-slate-50 border-slate-200/80 space-y-3">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold uppercase tracking-wider text-[#2459A8] font-mono">
+                              Evaluated Profile:
+                            </span>
+                            <span className="text-sm font-bold text-[#11183D]">
+                              {enteredRoleResult.matchedRoleProfileTitle || enteredRoleResult.role}
+                            </span>
+                          </div>
+                          {enteredRoleResult.explanation && (
+                            <p className="text-xs text-[#526078] mt-1 leading-relaxed">
+                              {enteredRoleResult.explanation}
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="shrink-0">
+                          {enteredRoleResult.status === 'MATCHED' ? (
+                            <span className="inline-flex items-center gap-1 text-sm font-black font-mono text-emerald-800 bg-emerald-100/80 px-3 py-1 rounded-xl border border-emerald-300">
+                              <CheckCircle2 size={16} className="text-emerald-600" />
+                              <span>{enteredRoleResult.score}% Match</span>
+                            </span>
+                          ) : enteredRoleResult.status === 'NOT_RELEVANT' ? (
+                            <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-800 bg-amber-100/80 px-3 py-1 rounded-xl border border-amber-300">
+                              <AlertTriangle size={15} className="text-amber-600" />
+                              <span>Not Relevant (N/A)</span>
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 text-xs font-bold text-slate-700 bg-slate-200/80 px-3 py-1 rounded-xl border border-slate-300">
+                              <HelpCircle size={15} className="text-slate-500" />
+                              <span>Unknown Role Profile</span>
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Not Relevant Reason Notice */}
+                      {enteredRoleResult.status === 'NOT_RELEVANT' && (
+                        <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-900 flex items-start gap-2">
+                          <AlertTriangle size={16} className="text-amber-600 shrink-0 mt-0.5" />
+                          <div>
+                            <span className="font-bold">Relevance Gate: </span>
+                            <span>{enteredRoleResult.relevanceGate?.reason || 'The resume content does not have sufficient overlap with this role’s baseline domain requirements.'}</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Unknown Role Notice */}
+                      {enteredRoleResult.status === 'UNKNOWN_ROLE' && (
+                        <div className="p-3 bg-slate-100 rounded-xl border border-slate-300 text-xs text-slate-800 flex items-start gap-2">
+                          <HelpCircle size={16} className="text-slate-500 shrink-0 mt-0.5" />
+                          <div>
+                            <span className="font-bold">Role not in standard catalog: </span>
+                            <span>{enteredRoleResult.explanation || 'We do not have a curated profile for this exact title yet. Please select one of our standard roles above.'}</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Signal Breakdown if Matched */}
+                      {enteredRoleResult.status === 'MATCHED' && (
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-slate-200/60 text-xs">
+                          <div className="p-2.5 bg-white rounded-xl border border-slate-200">
+                            <span className="text-[10.5px] text-[#526078] block">Semantic Match (45%)</span>
+                            <span className="font-mono font-bold text-sm text-[#2459A8]">{Math.round(enteredRoleResult.semanticSimilarity * 100)}%</span>
+                          </div>
+                          <div className="p-2.5 bg-white rounded-xl border border-slate-200">
+                            <span className="text-[10.5px] text-[#526078] block">Skill Overlap (25%)</span>
+                            <span className="font-mono font-bold text-sm text-emerald-700">{Math.round(enteredRoleResult.skillOverlap * 100)}%</span>
+                          </div>
+                          <div className="p-2.5 bg-white rounded-xl border border-slate-200">
+                            <span className="text-[10.5px] text-[#526078] block">Experience Match (15%)</span>
+                            <span className="font-mono font-bold text-sm text-purple-700">{Math.round(enteredRoleResult.experienceRelevance * 100)}%</span>
+                          </div>
+                          <div className="p-2.5 bg-white rounded-xl border border-slate-200">
+                            <span className="text-[10.5px] text-[#526078] block">Terminology (15%)</span>
+                            <span className="font-mono font-bold text-sm text-amber-700">{Math.round(enteredRoleResult.terminologyMatch * 100)}%</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Skills Breakdown */}
+                      {(enteredRoleResult.matchedSkills.length > 0 || enteredRoleResult.missingSkills.length > 0) && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                          <div className="p-3 bg-emerald-50/60 rounded-xl border border-emerald-200 space-y-1.5">
+                            <h5 className="text-[11.5px] font-bold text-emerald-900 flex items-center gap-1.5">
+                              <CheckCircle2 size={14} className="text-emerald-600" />
+                              <span>Matching Skills ({enteredRoleResult.matchedSkills.length})</span>
+                            </h5>
+                            <div className="flex flex-wrap gap-1">
+                              {enteredRoleResult.matchedSkills.length > 0 ? (
+                                enteredRoleResult.matchedSkills.map((s, i) => (
+                                  <span key={i} className="text-[10px] font-mono bg-white text-emerald-800 px-2 py-0.5 rounded border border-emerald-200">
+                                    {s}
+                                  </span>
+                                ))
+                              ) : (
+                                <span className="text-[11px] text-slate-500 italic">No direct keyword overlap</span>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="p-3 bg-rose-50/60 rounded-xl border border-rose-200 space-y-1.5">
+                            <h5 className="text-[11.5px] font-bold text-rose-900 flex items-center gap-1.5">
+                              <XCircle size={14} className="text-rose-600" />
+                              <span>Missing Relevant Skills ({enteredRoleResult.missingSkills.length})</span>
+                            </h5>
+                            <div className="flex flex-wrap gap-1">
+                              {enteredRoleResult.missingSkills.length > 0 ? (
+                                enteredRoleResult.missingSkills.map((s, i) => (
+                                  <span key={i} className="text-[10px] font-mono bg-white text-rose-800 px-2 py-0.5 rounded border border-rose-200">
+                                    {s}
+                                  </span>
+                                ))
+                              ) : (
+                                <span className="text-[11px] text-slate-500 italic">All key benchmark skills present</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Box 2: Evaluate Against My Target Role (Account Saved Profile) */}
+              <div className="p-6 bg-white rounded-3xl border border-[#DCE7F2] shadow-xs space-y-5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <h4 className="text-base font-bold text-[#11183D] flex items-center gap-2">
+                      <BookmarkCheck size={18} className="text-[#2459A8]" />
+                      <span>Evaluate Against My Saved Target Role</span>
+                    </h4>
+                    <p className="text-xs text-[#526078] mt-0.5">
+                      Target role configured in your account profile: <strong className="text-[#11183D]">{profile?.targetRole || 'None configured'}</strong>
+                    </p>
+                  </div>
+
+                  {profile?.targetRole ? (
+                    <button
+                      onClick={handleRunSavedRoleMatch}
+                      disabled={isMatchingSavedRole}
+                      className="px-4 py-2.5 bg-[#2459A8] hover:bg-[#1d4787] disabled:opacity-50 text-white rounded-xl text-xs font-bold font-display flex items-center gap-1.5 shadow-2xs cursor-pointer transition-colors shrink-0"
+                    >
+                      <RefreshCw size={14} className={isMatchingSavedRole ? 'animate-spin' : ''} />
+                      <span>{isMatchingSavedRole ? 'Evaluating...' : `Evaluate Against "${profile.targetRole}"`}</span>
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => navigate('/settings')}
+                      className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors shrink-0 cursor-pointer"
+                    >
+                      <span>Set Target Role in Settings</span>
+                      <ArrowRight size={14} />
+                    </button>
+                  )}
+                </div>
+
+                {/* Saved Role Result Card */}
+                {savedRoleResult && (
+                  <div className="p-4 rounded-2xl border bg-slate-50 border-slate-200/80 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-xs font-bold uppercase tracking-wider text-[#2459A8] font-mono">
+                          Saved Account Target:
+                        </span>
+                        <h5 className="text-sm font-bold text-[#11183D] mt-0.5">
+                          {savedRoleResult.matchedRoleProfileTitle || savedRoleResult.role}
+                        </h5>
+                      </div>
+
+                      <div>
+                        {savedRoleResult.status === 'MATCHED' ? (
+                          <span className="inline-flex items-center gap-1 text-sm font-black font-mono text-emerald-800 bg-emerald-100/80 px-3 py-1 rounded-xl border border-emerald-300">
+                            <CheckCircle2 size={16} className="text-emerald-600" />
+                            <span>{savedRoleResult.score}% Match</span>
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-800 bg-amber-100/80 px-3 py-1 rounded-xl border border-amber-300">
+                            <AlertTriangle size={15} className="text-amber-600" />
+                            <span>Not Relevant (Score: N/A)</span>
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {savedRoleResult.explanation && (
+                      <p className="text-xs text-[#526078] leading-relaxed">
+                        {savedRoleResult.explanation}
+                      </p>
+                    )}
+
+                    {/* Skills Summary */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                      <div className="p-3 bg-emerald-50/60 rounded-xl border border-emerald-200 space-y-1.5">
+                        <span className="text-xs font-bold text-emerald-900 block">
+                          Matching Skills ({savedRoleResult.matchedSkills.length})
+                        </span>
+                        <div className="flex flex-wrap gap-1">
+                          {savedRoleResult.matchedSkills.map((s, i) => (
+                            <span key={i} className="text-[10px] font-mono bg-white text-emerald-800 px-2 py-0.5 rounded border border-emerald-200">
+                              {s}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="p-3 bg-rose-50/60 rounded-xl border border-rose-200 space-y-1.5">
+                        <span className="text-xs font-bold text-rose-900 block">
+                          Missing Relevant Skills ({savedRoleResult.missingSkills.length})
+                        </span>
+                        <div className="flex flex-wrap gap-1">
+                          {savedRoleResult.missingSkills.map((s, i) => (
+                            <span key={i} className="text-[10px] font-mono bg-white text-rose-800 px-2 py-0.5 rounded border border-rose-200">
+                              {s}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Box 3: Advanced Option - Custom Job Description Evaluation (Collapsible) */}
+              <div className="bg-white rounded-3xl border border-[#DCE7F2] shadow-xs overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => setIsCustomJdOpen(!isCustomJdOpen)}
+                  className="w-full p-6 text-left flex items-center justify-between hover:bg-slate-50/60 transition-colors cursor-pointer"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="p-2 bg-slate-100 text-slate-700 rounded-xl">
+                      <FileText size={18} />
+                    </span>
+                    <div>
+                      <h4 className="text-base font-bold text-[#11183D]">
+                        Evaluate Against Custom Job Description (Advanced Option)
+                      </h4>
+                      <p className="text-xs text-[#526078] mt-0.5">
+                        Optional: Match your resume against a specific employer vacancy posting instead of generic industry profiles.
+                      </p>
+                    </div>
+                  </div>
+
+                  <span className="text-slate-500 p-1">
+                    {isCustomJdOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                  </span>
+                </button>
+
+                {isCustomJdOpen && (
+                  <div className="p-6 pt-0 border-t border-slate-100 space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
+                      <div>
+                        <label className="block text-xs font-bold text-[#11183D] mb-1">Target Company (Optional)</label>
+                        <input
+                          type="text"
+                          value={customCompanyName}
+                          onChange={(e) => setCustomCompanyName(e.target.value)}
+                          placeholder="e.g. Google, Stripe, Microsoft"
+                          className="w-full p-2.5 bg-slate-50 border border-[#DCE7F2] rounded-xl text-xs focus:outline-none focus:border-[#2459A8]"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-[#11183D] mb-1">Target Role Title (Optional)</label>
+                        <input
+                          type="text"
+                          value={customJobRole}
+                          onChange={(e) => setCustomJobRole(e.target.value)}
+                          placeholder="e.g. Senior Software Engineer"
+                          className="w-full p-2.5 bg-slate-50 border border-[#DCE7F2] rounded-xl text-xs focus:outline-none focus:border-[#2459A8]"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-[#11183D] mb-1">Target Job Description (JD)</label>
+                      <textarea
+                        rows={5}
+                        value={customJdText}
+                        onChange={(e) => setCustomJdText(e.target.value)}
+                        placeholder="Paste employer job description requirements, responsibilities, and qualifications..."
+                        className="w-full p-3 bg-slate-50 border border-[#DCE7F2] rounded-xl text-xs font-sans leading-relaxed focus:outline-none focus:border-[#2459A8]"
+                      />
+                    </div>
+
+                    <button
+                      onClick={handleRunCustomJdMatch}
+                      disabled={isMatchingCustomJd || !customJdText.trim()}
+                      className="w-full py-3 bg-[#2459A8] hover:bg-[#1d4787] disabled:opacity-50 text-white rounded-xl text-xs font-bold font-display flex items-center justify-center gap-2 shadow-2xs cursor-pointer transition-colors"
+                    >
+                      <RefreshCw size={15} className={isMatchingCustomJd ? 'animate-spin' : ''} />
+                      <span>{isMatchingCustomJd ? 'Evaluating Custom JD Embeddings...' : 'Calculate Custom JD Match Score'}</span>
+                    </button>
+
+                    {/* Custom JD Result Display */}
+                    {customJdResult && (
+                      <div className="pt-4 border-t border-slate-100 space-y-4">
+                        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                          <div>
+                            <span className="text-xs font-bold uppercase tracking-wider text-[#2459A8] font-mono">
+                              Custom Vacancy Evaluation
+                            </span>
+                            <h5 className="text-sm font-bold text-[#11183D] mt-0.5">
+                              {customCompanyName ? `${customCompanyName} — ` : ''}{customJobRole || 'Job Description'}
+                            </h5>
+                          </div>
+
+                          <div>
+                            {customJdResult.status === 'MATCHED' ? (
+                              <span className="inline-flex items-center gap-1 text-sm font-black font-mono text-emerald-800 bg-emerald-100/80 px-3 py-1 rounded-xl border border-emerald-300">
+                                <CheckCircle2 size={16} className="text-emerald-600" />
+                                <span>{customJdResult.score}% Match</span>
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-800 bg-amber-100/80 px-3 py-1 rounded-xl border border-amber-300">
+                                <AlertTriangle size={15} className="text-amber-600" />
+                                <span>Not Relevant (Score: N/A)</span>
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {customJdResult.status === 'MATCHED' && (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="p-4 bg-emerald-50/60 rounded-2xl border border-emerald-200 space-y-2">
+                              <h5 className="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
+                                <CheckCircle2 size={14} className="text-emerald-600" />
+                                <span>Matched Keywords ({customJdResult.matchedSkills.length})</span>
+                              </h5>
+                              <div className="flex flex-wrap gap-1">
+                                {customJdResult.matchedSkills.map((s, i) => (
+                                  <span key={i} className="text-[10.5px] font-mono bg-white text-emerald-800 px-2 py-0.5 rounded border border-emerald-200">
+                                    {s}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+
+                            <div className="p-4 bg-rose-50/60 rounded-2xl border border-rose-200 space-y-2">
+                              <h5 className="text-xs font-bold text-rose-900 flex items-center gap-1.5">
+                                <XCircle size={14} className="text-rose-600" />
+                                <span>Missing Keywords ({customJdResult.missingSkills.length})</span>
+                              </h5>
+                              <div className="flex flex-wrap gap-1">
+                                {customJdResult.missingSkills.length > 0 ? (
+                                  customJdResult.missingSkills.map((s, i) => (
+                                    <span key={i} className="text-[10.5px] font-mono bg-white text-rose-800 px-2 py-0.5 rounded border border-rose-200">
+                                      {s}
+                                    </span>
+                                  ))
+                                ) : (
+                                  <span className="text-xs text-slate-500 italic">No critical keywords missing</span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* 4. Actionable Improvement Recommendations */}
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-bold font-display text-[#11183D]">
+                  Actionable Improvement Recommendations
+                </h3>
+                <p className="text-xs text-[#526078]">
+                  Prioritized feedback derived strictly from extracted findings. No fabricated qualifications.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {/* Definite Format Checks & Warnings */}
+                <div className="p-5 bg-white rounded-3xl border border-[#DCE7F2] shadow-2xs space-y-3">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#11183D] flex items-center gap-1.5">
+                    <ShieldCheck size={15} className="text-[#2459A8]" />
+                    <span>Definite Issues & Format Checks</span>
+                  </h4>
+                  <div className="space-y-2">
+                    {currentAtsAnalysis.formatChecks.map((chk, idx) => (
+                      <div
+                        key={idx}
+                        className={`p-3 rounded-xl border text-xs flex items-start gap-2.5 ${
+                          chk.passed
+                            ? 'bg-emerald-50/40 border-emerald-200 text-emerald-900'
+                            : 'bg-rose-50/40 border-rose-200 text-rose-900'
+                        }`}
+                      >
+                        {chk.passed ? (
+                          <CheckCircle2 size={15} className="text-emerald-600 shrink-0 mt-0.5" />
+                        ) : (
+                          <XCircle size={15} className="text-rose-600 shrink-0 mt-0.5" />
+                        )}
+                        <div>
+                          <span className="font-bold">{chk.title}: </span>
+                          <span className="text-slate-700">{chk.description}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Bullet Points Quality & Metrics Optimization */}
+                <div className="p-5 bg-white rounded-3xl border border-[#DCE7F2] shadow-2xs space-y-3">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#11183D] flex items-center gap-1.5">
+                    <Sparkles size={15} className="text-amber-600" />
+                    <span>Bullet Point Quality & Metrics Optimization</span>
+                  </h4>
+                  <div className="space-y-2.5">
+                    {currentAtsAnalysis.bulletsAudit.length > 0 ? (
+                      currentAtsAnalysis.bulletsAudit.slice(0, 4).map((bullet, idx) => (
+                        <div key={idx} className="p-3 bg-slate-50 rounded-xl border border-[#DCE7F2] text-xs space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className={bullet.hasStrongVerb ? 'text-emerald-600 font-bold' : 'text-amber-600 font-bold'}>
+                              {bullet.hasStrongVerb ? `✓ Verb: ${bullet.detectedVerb || 'Strong'}` : '⚠ Weak action verb'}
+                            </span>
+                            <span className="text-slate-300">•</span>
+                            <span className={bullet.hasMetrics ? 'text-emerald-600 font-bold' : 'text-amber-600 font-bold'}>
+                              {bullet.hasMetrics ? '✓ Metric detected' : '⚠ Missing metric'}
+                            </span>
+                          </div>
+                          <p className="text-slate-700 italic text-[11.5px]">"{bullet.original}"</p>
+                          {bullet.suggestedRewrite && (
+                            <p className="text-[#2459A8] font-medium text-[11px]">
+                              💡 Suggestion: {bullet.suggestedRewrite}
+                            </p>
+                          )}
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-xs text-slate-500 italic p-3 bg-slate-50 rounded-xl">
+                        All analyzed bullet points include strong action verbs and quantified impact.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 5. Footer Transition CTA */}
+            <div className="p-6 rounded-3xl bg-slate-900 text-white flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+              <div className="space-y-1 text-center sm:text-left">
+                <h4 className="text-base font-bold font-display">Ready to create or edit a resume from this analysis?</h4>
+                <p className="text-xs text-slate-400">
+                  Open the Resume Builder to customize sections, select from 8 ATS layouts, and export to PDF using retained canonical data.
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setIsCopilotOpen(true)}
+                  className="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-bold font-display flex items-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  <Sparkles size={14} />
+                  <span>AI Copilot</span>
+                </button>
+                <button
+                  onClick={() => setWorkspaceMode('EDITOR')}
+                  className="px-4 py-2.5 bg-[#4A8BDF] hover:bg-blue-600 text-white rounded-xl text-xs font-bold font-display flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+                >
+                  <Layout size={14} />
+                  <span>Create Resume / Open Builder</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
+      ) : (
+        /* ─── 3-PANE TEMPLATE STUDIO & RESUME EDITOR VIEW ─── */
+        <div className="flex-1 flex overflow-hidden min-h-0">
+          {/* PANE 1: Section Navigation (Left Column) */}
+          <div className={`w-60 lg:w-64 bg-white border-r border-[#DCE7F2] p-4 flex flex-col justify-between shrink-0 overflow-y-auto ${
+            mobileTab === 'EDITOR' ? 'hidden md:flex' : 'hidden md:flex'
+          }`}>
+            <div className="space-y-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#526078] px-3 mb-2 block font-mono">
+                Resume Sections
+              </span>
+              {sectionsList.map((sec) => (
+                <button
+                  key={sec.id}
+                  onClick={() => setActiveSection(sec.id)}
+                  className={`w-full px-3 py-2 rounded-xl text-xs font-bold font-display flex items-center justify-between transition-all cursor-pointer ${
+                    activeSection === sec.id
+                      ? 'bg-[#EFFAFD] text-[#2459A8] border border-[#DCE7F2] shadow-2xs'
+                      : 'text-[#526078] hover:text-[#11183D] hover:bg-slate-50'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 truncate">
+                    <span className={activeSection === sec.id ? 'text-[#2459A8]' : 'text-[#7B8799]'}>
+                      {sec.icon}
+                    </span>
+                    <span className="truncate">{sec.label}</span>
+                  </div>
+                  {sec.count !== undefined && sec.count > 0 && (
+                    <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-100 text-[#526078]">
+                      {sec.count}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
 
-        {/* PANE 2: Form Editor / Analysis (Center Column) */}
-        <div className={`flex-1 min-w-0 bg-white p-4 sm:p-6 lg:p-7 overflow-y-auto ${
-          mobileTab === 'EDITOR' ? 'block' : 'hidden lg:block'
-        }`}>
-          <div className="max-w-3xl mx-auto space-y-6 w-full">
+            <div className="pt-4 border-t border-slate-100 space-y-2">
+              <button
+                onClick={() => setIsTemplateModalOpen(true)}
+                className="w-full p-2.5 rounded-2xl bg-linear-to-r from-blue-50 to-indigo-50 border border-blue-200 text-xs text-[#2459A8] font-bold flex items-center justify-between group cursor-pointer"
+              >
+                <div className="flex items-center gap-2">
+                  <Layout size={15} />
+                  <span>Switch Template</span>
+                </div>
+                <span className="text-[10px] bg-white px-2 py-0.5 rounded border border-blue-200 font-mono">
+                  {currentTemplate.replace('-', ' ')}
+                </span>
+              </button>
+            </div>
+          </div>
+
+          {/* PANE 2: Form Editor (Center Column) */}
+          <div className={`flex-1 min-w-0 bg-white p-4 sm:p-6 lg:p-7 overflow-y-auto ${
+            mobileTab === 'EDITOR' ? 'block' : 'hidden lg:block'
+          }`}>
+            <div className="max-w-3xl mx-auto space-y-6 w-full">
 
             {/* 1. Personal Info Section */}
             {activeSection === 'PERSONAL' && (
@@ -1890,169 +3106,218 @@ Requirements:
               </div>
             )}
 
-            {/* COMPETITIVE JOB ANALYSIS VIEW (BGE Matcher + Target JD) */}
+            {/* ROLE MATCHING & BENCHMARKING VIEW (BGE Matcher + Standardized Profiles) */}
             {activeSection === 'COMPETITIVE_MATCH' && (
               <div className="space-y-6">
                 <div>
                   <span className="text-xs font-bold uppercase tracking-wider text-[#2459A8] font-mono">
-                    BAAI/bge-large-en-v1.5 Neural Matcher
+                    BGE Neural Match Engine
                   </span>
                   <h3 className="text-xl font-bold font-display text-[#11183D]">
-                    Competitive Job Description Matching
+                    Standardized Role Profile Matching
                   </h3>
                   <p className="text-xs text-[#526078] mt-1">
-                    Evaluates resume semantic similarity, explicit skill overlap, experience relevance, and terminology alignment.
+                    Evaluates resume semantic similarity, explicit skill overlap, experience relevance, and terminology against industry-standard role benchmarks.
                   </p>
                 </div>
 
+                {/* Role Selector Controls */}
                 <div className="p-5 bg-slate-50 rounded-2xl border border-[#DCE7F2] space-y-4 shadow-2xs">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs font-bold text-[#11183D] mb-1">Target Company</label>
-                      <input
-                        type="text"
-                        value={targetCompanyName}
-                        onChange={(e) => setTargetCompanyName(e.target.value)}
-                        placeholder="e.g. Stripe, Amazon"
-                        className="w-full p-2 bg-white border border-[#DCE7F2] rounded-xl text-xs"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-[#11183D] mb-1">Target Job Title</label>
-                      <input
-                        type="text"
-                        value={targetJobRole}
-                        onChange={(e) => setTargetJobRole(e.target.value)}
-                        placeholder="e.g. Senior Full Stack Software Engineer"
-                        className="w-full p-2 bg-white border border-[#DCE7F2] rounded-xl text-xs"
-                      />
+                  <div className="space-y-2">
+                    <label className="block text-xs font-bold text-[#11183D]">Standard Role Profiles</label>
+                    <div className="flex flex-wrap gap-1.5">
+                      {STANDARD_ROLE_SUGGESTIONS.map((role) => (
+                        <button
+                          key={role}
+                          type="button"
+                          onClick={() => {
+                            setTargetRoleInput(role);
+                            if (enteredRoleResult && enteredRoleResult.role.toLowerCase() !== role.toLowerCase()) {
+                              setEnteredRoleResult(null);
+                            }
+                          }}
+                          className={`px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-colors cursor-pointer ${
+                            targetRoleInput.toLowerCase() === role.toLowerCase()
+                              ? 'bg-[#2459A8] text-white border-[#2459A8]'
+                              : 'bg-white text-slate-700 border-[#DCE7F2] hover:bg-slate-100'
+                          }`}
+                        >
+                          {role}
+                        </button>
+                      ))}
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-xs font-bold text-[#11183D] mb-1">Target Job Description (JD)</label>
-                    <textarea
-                      rows={6}
-                      value={targetJdText}
-                      onChange={(e) => setTargetJdText(e.target.value)}
-                      placeholder="Paste target job responsibilities and qualifications..."
-                      className="w-full p-3 bg-white border border-[#DCE7F2] rounded-xl text-xs font-sans leading-relaxed"
-                    />
+                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
+                    <div className="sm:col-span-3">
+                      <label className="block text-xs font-bold text-[#11183D] mb-1">Target Role Title</label>
+                      <input
+                        type="text"
+                        value={targetRoleInput}
+                        onChange={(e) => {
+                          setTargetRoleInput(e.target.value);
+                          if (enteredRoleResult && enteredRoleResult.role.toLowerCase() !== e.target.value.toLowerCase()) {
+                            setEnteredRoleResult(null);
+                          }
+                        }}
+                        placeholder="e.g. Frontend Developer, Cybersecurity Analyst..."
+                        className="w-full p-2 bg-white border border-[#DCE7F2] rounded-xl text-xs"
+                      />
+                    </div>
+                    <div className="sm:col-span-1">
+                      <button
+                        onClick={() => handleRunEnteredRoleMatch()}
+                        disabled={isMatchingEnteredRole || !targetRoleInput.trim()}
+                        className="w-full py-2 bg-[#2459A8] hover:bg-[#1d4787] disabled:opacity-50 text-white rounded-xl text-xs font-bold font-display flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer transition-colors"
+                      >
+                        <RefreshCw size={13} className={isMatchingEnteredRole ? 'animate-spin' : ''} />
+                        <span>{isMatchingEnteredRole ? 'Evaluating...' : 'Evaluate Role'}</span>
+                      </button>
+                    </div>
                   </div>
 
-                  <button
-                    onClick={handleRunCompetitiveMatch}
-                    disabled={isMatching}
-                    className="w-full py-2.5 bg-[#2459A8] hover:bg-[#1d4787] text-white rounded-xl text-xs font-bold font-display flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer transition-colors"
-                  >
-                    <RefreshCw size={14} className={isMatching ? 'animate-spin' : ''} />
-                    <span>{isMatching ? 'Evaluating Neural Embeddings...' : 'Run Competitive Match Analysis'}</span>
-                  </button>
+                  {profile?.targetRole && (
+                    <div className="pt-2 border-t border-slate-200/60 flex items-center justify-between text-xs">
+                      <span className="text-[#526078]">
+                        Account Target Role: <strong className="text-[#11183D]">{profile.targetRole}</strong>
+                      </span>
+                      <button
+                        onClick={handleRunSavedRoleMatch}
+                        disabled={isMatchingSavedRole}
+                        className="text-[#2459A8] font-bold hover:underline cursor-pointer flex items-center gap-1"
+                      >
+                        <RefreshCw size={12} className={isMatchingSavedRole ? 'animate-spin' : ''} />
+                        <span>{isMatchingSavedRole ? 'Evaluating...' : 'Evaluate My Target Role →'}</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
 
-                {/* Competitive Match Results Display */}
-                {competitiveResult && (
+                {/* Role Match Results Display */}
+                {enteredRoleResult && (
                   <div className="p-6 bg-white rounded-3xl border border-[#DCE7F2] space-y-6 shadow-sm">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-[#DCE7F2]">
                       <div>
                         <span className="text-[10.5px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full font-mono bg-blue-50 text-[#2459A8] border border-blue-200">
-                          Competitive Score Verdict
+                          Role Profile Evaluation
                         </span>
                         <h4 className="text-lg font-bold text-[#11183D] mt-1">
-                          {competitiveResult.status === 'MATCHED' ? 'Job Match Established' : 'Role Relevancy Warning'}
+                          {enteredRoleResult.matchedRoleProfileTitle || enteredRoleResult.role}
                         </h4>
+                        {enteredRoleResult.explanation && (
+                          <p className="text-xs text-[#526078] mt-1">
+                            {enteredRoleResult.explanation}
+                          </p>
+                        )}
                       </div>
 
                       <div className="flex items-center gap-3">
-                        {competitiveResult.status === 'MATCHED' ? (
+                        {enteredRoleResult.status === 'MATCHED' ? (
                           <div className="px-4 py-2 bg-emerald-50 rounded-2xl border border-emerald-200 text-center">
                             <span className="text-2xl font-black font-mono text-emerald-700">
-                              {competitiveResult.score}%
+                              {enteredRoleResult.score}%
                             </span>
-                            <p className="text-[10px] text-emerald-800 font-bold uppercase">Competitive Match</p>
+                            <p className="text-[10px] text-emerald-800 font-bold uppercase">Role Matched</p>
                           </div>
-                        ) : (
+                        ) : enteredRoleResult.status === 'NOT_RELEVANT' ? (
                           <div className="px-4 py-2 bg-amber-50 rounded-2xl border border-amber-200 text-center">
                             <span className="text-2xl font-black font-mono text-amber-700">N/A</span>
                             <p className="text-[10px] text-amber-800 font-bold uppercase">Not Relevant</p>
+                          </div>
+                        ) : (
+                          <div className="px-4 py-2 bg-slate-100 rounded-2xl border border-slate-300 text-center">
+                            <span className="text-xl font-bold font-mono text-slate-700">Unknown</span>
+                            <p className="text-[10px] text-slate-600 font-bold uppercase">Profile Missing</p>
                           </div>
                         )}
                       </div>
                     </div>
 
-                    {/* Formula Component Breakdown */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                      <div className="p-3.5 bg-slate-50 rounded-2xl border border-[#DCE7F2] space-y-1.5">
-                        <div className="flex justify-between text-xs font-bold">
-                          <span className="text-[#11183D]">Semantic Match (45%)</span>
-                          <span className="font-mono text-[#2459A8]">{Math.round(competitiveResult.semanticSimilarity * 100)}%</span>
+                    {/* Formula Component Breakdown if MATCHED */}
+                    {enteredRoleResult.status === 'MATCHED' && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                        <div className="p-3.5 bg-slate-50 rounded-2xl border border-[#DCE7F2] space-y-1.5">
+                          <div className="flex justify-between text-xs font-bold">
+                            <span className="text-[#11183D]">Semantic Match (45%)</span>
+                            <span className="font-mono text-[#2459A8]">{Math.round(enteredRoleResult.semanticSimilarity * 100)}%</span>
+                          </div>
+                          <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                            <div className="h-full bg-[#2459A8]" style={{ width: `${enteredRoleResult.semanticSimilarity * 100}%` }} />
+                          </div>
                         </div>
-                        <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                          <div className="h-full bg-[#2459A8]" style={{ width: `${competitiveResult.semanticSimilarity * 100}%` }} />
-                        </div>
-                      </div>
 
-                      <div className="p-3.5 bg-slate-50 rounded-2xl border border-[#DCE7F2] space-y-1.5">
-                        <div className="flex justify-between text-xs font-bold">
-                          <span className="text-[#11183D]">Skill Overlap (25%)</span>
-                          <span className="font-mono text-emerald-700">{Math.round(competitiveResult.skillOverlap * 100)}%</span>
+                        <div className="p-3.5 bg-slate-50 rounded-2xl border border-[#DCE7F2] space-y-1.5">
+                          <div className="flex justify-between text-xs font-bold">
+                            <span className="text-[#11183D]">Skill Overlap (25%)</span>
+                            <span className="font-mono text-emerald-700">{Math.round(enteredRoleResult.skillOverlap * 100)}%</span>
+                          </div>
+                          <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                            <div className="h-full bg-emerald-500" style={{ width: `${enteredRoleResult.skillOverlap * 100}%` }} />
+                          </div>
                         </div>
-                        <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                          <div className="h-full bg-emerald-500" style={{ width: `${competitiveResult.skillOverlap * 100}%` }} />
-                        </div>
-                      </div>
 
-                      <div className="p-3.5 bg-slate-50 rounded-2xl border border-[#DCE7F2] space-y-1.5">
-                        <div className="flex justify-between text-xs font-bold">
-                          <span className="text-[#11183D]">Experience Relevance (15%)</span>
-                          <span className="font-mono text-purple-700">{Math.round(competitiveResult.experienceRelevance * 100)}%</span>
+                        <div className="p-3.5 bg-slate-50 rounded-2xl border border-[#DCE7F2] space-y-1.5">
+                          <div className="flex justify-between text-xs font-bold">
+                            <span className="text-[#11183D]">Experience Relevance (15%)</span>
+                            <span className="font-mono text-purple-700">{Math.round(enteredRoleResult.experienceRelevance * 100)}%</span>
+                          </div>
+                          <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                            <div className="h-full bg-purple-600" style={{ width: `${enteredRoleResult.experienceRelevance * 100}%` }} />
+                          </div>
                         </div>
-                        <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                          <div className="h-full bg-purple-600" style={{ width: `${competitiveResult.experienceRelevance * 100}%` }} />
-                        </div>
-                      </div>
 
-                      <div className="p-3.5 bg-slate-50 rounded-2xl border border-[#DCE7F2] space-y-1.5">
-                        <div className="flex justify-between text-xs font-bold">
-                          <span className="text-[#11183D]">Terminology Match (15%)</span>
-                          <span className="font-mono text-amber-700">{Math.round(competitiveResult.terminologyMatch * 100)}%</span>
-                        </div>
-                        <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                          <div className="h-full bg-amber-500" style={{ width: `${competitiveResult.terminologyMatch * 100}%` }} />
+                        <div className="p-3.5 bg-slate-50 rounded-2xl border border-[#DCE7F2] space-y-1.5">
+                          <div className="flex justify-between text-xs font-bold">
+                            <span className="text-[#11183D]">Terminology Match (15%)</span>
+                            <span className="font-mono text-amber-700">{Math.round(enteredRoleResult.terminologyMatch * 100)}%</span>
+                          </div>
+                          <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                            <div className="h-full bg-amber-500" style={{ width: `${enteredRoleResult.terminologyMatch * 100}%` }} />
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    )}
 
                     {/* Matched and Missing Skills */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-200 space-y-2">
-                        <h5 className="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
-                          <CheckCircle2 size={14} className="text-emerald-600" />
-                          <span>Matched Skills ({competitiveResult.matchedSkills.length})</span>
-                        </h5>
-                        <div className="flex flex-wrap gap-1">
-                          {competitiveResult.matchedSkills.map((s, i) => (
-                            <span key={i} className="text-[10px] font-mono bg-white text-emerald-800 px-2 py-0.5 rounded border border-emerald-200">
-                              {s}
-                            </span>
-                          ))}
+                    {(enteredRoleResult.matchedSkills.length > 0 || enteredRoleResult.missingSkills.length > 0) && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-200 space-y-2">
+                          <h5 className="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
+                            <CheckCircle2 size={14} className="text-emerald-600" />
+                            <span>Matched Skills ({enteredRoleResult.matchedSkills.length})</span>
+                          </h5>
+                          <div className="flex flex-wrap gap-1">
+                            {enteredRoleResult.matchedSkills.length > 0 ? (
+                              enteredRoleResult.matchedSkills.map((s, i) => (
+                                <span key={i} className="text-[10px] font-mono bg-white text-emerald-800 px-2 py-0.5 rounded border border-emerald-200">
+                                  {s}
+                                </span>
+                              ))
+                            ) : (
+                              <span className="text-xs text-slate-500 italic">No direct overlap</span>
+                            )}
+                          </div>
                         </div>
-                      </div>
 
-                      <div className="p-4 bg-rose-50/50 rounded-2xl border border-rose-200 space-y-2">
-                        <h5 className="text-xs font-bold text-rose-900 flex items-center gap-1.5">
-                          <XCircle size={14} className="text-rose-600" />
-                          <span>Missing Keywords ({competitiveResult.missingSkills.length})</span>
-                        </h5>
-                        <div className="flex flex-wrap gap-1">
-                          {competitiveResult.missingSkills.map((s, i) => (
-                            <span key={i} className="text-[10px] font-mono bg-white text-rose-800 px-2 py-0.5 rounded border border-rose-200">
-                              {s}
-                            </span>
-                          ))}
+                        <div className="p-4 bg-rose-50/50 rounded-2xl border border-rose-200 space-y-2">
+                          <h5 className="text-xs font-bold text-rose-900 flex items-center gap-1.5">
+                            <XCircle size={14} className="text-rose-600" />
+                            <span>Missing Relevant Skills ({enteredRoleResult.missingSkills.length})</span>
+                          </h5>
+                          <div className="flex flex-wrap gap-1">
+                            {enteredRoleResult.missingSkills.length > 0 ? (
+                              enteredRoleResult.missingSkills.map((s, i) => (
+                                <span key={i} className="text-[10px] font-mono bg-white text-rose-800 px-2 py-0.5 rounded border border-rose-200">
+                                  {s}
+                                </span>
+                              ))
+                            ) : (
+                              <span className="text-xs text-slate-500 italic">All key benchmark skills present</span>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -2102,6 +3367,7 @@ Requirements:
           </div>
         </div>
       </div>
+      )}
 
       {/* Copilot Drawer */}
       <ResumeCopilotDrawer

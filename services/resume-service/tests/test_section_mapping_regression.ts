@@ -341,5 +341,136 @@ if (mappedSynthetic.publications.length !== 0 || mappedSynthetic.patents.length 
 }
 console.log('✅ Non-existent optional sections (publications, patents) remain empty [].');
 
+// ── 4. Test Nested Headings, Compound Skills, Slash Tokens & Cert Integrity ───
+console.log('\n--- 4. Testing Nested Headings, Compound Skills & Slash Tokens ---');
+
+const nestedDoclingDoc = {
+  plain_text: '',
+  structured_elements: [
+    { type: 'title', text: 'Sarah Connor', level: 1 },
+    { type: 'paragraph', text: 'sarah.connor@example.com | +1 415-555-0144 | Los Angeles, CA | linkedin.com/in/sarahconnor | github.com/sarahconnor' },
+    
+    // Summary
+    { type: 'section_header', text: 'Professional Summary', level: 2 },
+    { type: 'paragraph', text: 'Senior Full Stack Cloud Engineer with 8+ years designing microservices, CI/CD pipelines, and high-volume data platforms.' },
+
+    // Technical Skills with Compound Categories and Slash-Containing Names
+    { type: 'section_header', text: 'Technical Skills', level: 2 },
+    { type: 'paragraph', text: 'Programming Languages: TypeScript, Python, Go, Java, PL/SQL' },
+    { type: 'paragraph', text: 'Frameworks & Developer Tools: React, Next.js, Node.js, Express, FastAPI, Vite' },
+    { type: 'paragraph', text: 'Databases & Storage: PostgreSQL, MongoDB, Redis, Elasticsearch' },
+    { type: 'paragraph', text: 'Cloud & DevOps: AWS, Docker, Kubernetes, Terraform, CI/CD, GitHub Actions' },
+    { type: 'paragraph', text: 'Specializations: UI/UX Design, TCP/IP Networking, Microservices' },
+
+    // Work Experience with Nested Section Headers (Level 3 headings for roles)
+    { type: 'section_header', text: 'Work Experience', level: 2 },
+    { type: 'section_header', text: 'Lead Cloud Architect | Cyberdyne Systems', level: 3 },
+    { type: 'paragraph', text: 'March 2022 – Present | Sunnyvale, CA' },
+    { type: 'list_item', text: '• Engineered automated CI/CD deployment workflows supporting 200+ microservices.' },
+    { type: 'list_item', text: '• Optimized PostgreSQL and Redis data layer, reducing p99 latency by 50%.' },
+
+    { type: 'section_header', text: 'Senior Software Engineer | Skynet Technologies', level: 3 },
+    { type: 'paragraph', text: 'June 2018 – February 2022 | Los Angeles, CA' },
+    { type: 'list_item', text: '• Designed event-driven Kafka stream processing pipelines handling 10M events/day.' },
+    { type: 'list_item', text: '• Implemented secure authentication with zero-trust networking protocols.' },
+
+    // Education with Nested Section Header (Level 3 heading for degree)
+    { type: 'section_header', text: 'Education', level: 2 },
+    { type: 'section_header', text: 'Bachelor of Science in Computer Science', level: 3 },
+    { type: 'paragraph', text: 'University of California, Los Angeles | 2014 – 2018 | GPA: 3.9 / 4.0' },
+    { type: 'paragraph', text: 'Relevant Coursework: Distributed Systems, Operating Systems, Database Management' },
+
+    // Projects with Nested Section Header (Level 3 heading for project)
+    { type: 'section_header', text: 'Projects', level: 2 },
+    { type: 'section_header', text: 'Automated CI/CD Pipeline Orchestrator | github.com/sarahconnor/pipeline-orch', level: 3 },
+    { type: 'list_item', text: '• Built distributed pipeline manager in Go, Docker, and Redis with webhook triggers.' },
+    { type: 'paragraph', text: 'Technologies: Go, Redis, Docker, CI/CD, gRPC' },
+
+    // Certifications with Hyphenated Title and Pipe Delimited Issuer
+    { type: 'section_header', text: 'Certifications', level: 2 },
+    { type: 'paragraph', text: 'AWS Certified Solutions Architect - Associate | Amazon Web Services | 2023' },
+    { type: 'paragraph', text: 'Google Cloud Certified - Professional Cloud Architect | Google Cloud | 2022' },
+
+    // Positions of Responsibility (Genuine Custom Section)
+    { type: 'section_header', text: 'Positions of Responsibility', level: 2 },
+    { type: 'list_item', text: '• Lead Organizer, Southern California Cloud & DevOps Meetup (2022 – Present)' },
+  ],
+};
+
+const mappedNested = structuredResumeMapperService.mapDoclingToStructuredResume(nestedDoclingDoc);
+
+// 1. Verify Experience count and details
+if (mappedNested.experience.length !== 2) {
+  throw new Error(`Expected 2 experience entries, got ${mappedNested.experience.length}: ${JSON.stringify(mappedNested.experience)}`);
+}
+if (mappedNested.experience[0].company !== 'Cyberdyne Systems' || mappedNested.experience[0].title !== 'Lead Cloud Architect') {
+  throw new Error(`Experience 0 role mismatch: ${JSON.stringify(mappedNested.experience[0])}`);
+}
+if (mappedNested.experience[1].company !== 'Skynet Technologies' || mappedNested.experience[1].title !== 'Senior Software Engineer') {
+  throw new Error(`Experience 1 role mismatch: ${JSON.stringify(mappedNested.experience[1])}`);
+}
+if (mappedNested.experience[0].bullets.length !== 2 || mappedNested.experience[1].bullets.length !== 2) {
+  throw new Error(`Experience bullets lost or corrupted: ${JSON.stringify(mappedNested.experience)}`);
+}
+console.log('✅ Experience: Nested level 3 headings preserved as entries with complete bullets and dates.');
+
+// 2. Verify Education count and details
+if (mappedNested.education.length !== 1) {
+  throw new Error(`Expected 1 education entry, got ${mappedNested.education.length}: ${JSON.stringify(mappedNested.education)}`);
+}
+if (!mappedNested.education[0].degree.includes('Bachelor of Science') || !mappedNested.education[0].school.includes('University of California')) {
+  throw new Error(`Education fields mismatch: ${JSON.stringify(mappedNested.education[0])}`);
+}
+if (mappedNested.education[0].gpa !== '3.9 / 4.0' || !mappedNested.education[0].coursework.includes('Distributed Systems')) {
+  throw new Error(`Education GPA/coursework mismatch: ${JSON.stringify(mappedNested.education[0])}`);
+}
+console.log('✅ Education: Nested degree header preserved with clean school, degree, GPA, and coursework.');
+
+// 3. Verify Projects count, techStack, and repoUrl
+if (mappedNested.projects.length !== 1) {
+  throw new Error(`Expected 1 project entry, got ${mappedNested.projects.length}: ${JSON.stringify(mappedNested.projects)}`);
+}
+if (!mappedNested.projects[0].name.includes('Automated CI/CD Pipeline Orchestrator')) {
+  throw new Error(`Project name mismatch: ${JSON.stringify(mappedNested.projects[0])}`);
+}
+if (!mappedNested.projects[0].techStack.includes('CI/CD') || !mappedNested.projects[0].techStack.includes('Go')) {
+  throw new Error(`Project techStack mismatch (CI/CD missing or split): ${JSON.stringify(mappedNested.projects[0].techStack)}`);
+}
+console.log('✅ Projects: Nested project header preserved with repoUrl, bullets, and intact techStack.');
+
+// 4. Verify Compound Skill Categories and Protected Slash Tokens
+if (!mappedNested.skills.databases.includes('PostgreSQL') || !mappedNested.skills.databases.includes('MongoDB')) {
+  throw new Error(`Databases & Storage failed to map to skills.databases: ${JSON.stringify(mappedNested.skills)}`);
+}
+if (!mappedNested.skills.frameworks.includes('React') || !mappedNested.skills.frameworks.includes('Next.js')) {
+  throw new Error(`Frameworks & Developer Tools failed to map to skills.frameworks: ${JSON.stringify(mappedNested.skills)}`);
+}
+if (!mappedNested.skills.cloudDevOps.includes('CI/CD') || !mappedNested.skills.languages.includes('PL/SQL')) {
+  throw new Error(`Protected slash tokens (CI/CD, PL/SQL) corrupted: ${JSON.stringify(mappedNested.skills)}`);
+}
+// Ensure frameworks are NOT duplicated into libraries
+if (mappedNested.skills.libraries.length > 0) {
+  throw new Error(`Frameworks duplicated into libraries: ${JSON.stringify(mappedNested.skills.libraries)}`);
+}
+console.log('✅ Skills: Compound categories (Databases & Storage, Frameworks & Developer Tools) mapped correctly with intact slash tokens (CI/CD, PL/SQL).');
+
+// 5. Verify Certification Title / Issuer Integrity
+if (mappedNested.certifications.length !== 2) {
+  throw new Error(`Expected 2 certifications, got ${mappedNested.certifications.length}: ${JSON.stringify(mappedNested.certifications)}`);
+}
+if (mappedNested.certifications[0].title !== 'AWS Certified Solutions Architect - Associate' || mappedNested.certifications[0].issuer !== 'Amazon Web Services') {
+  throw new Error(`Cert 0 title/issuer mismatch: ${JSON.stringify(mappedNested.certifications[0])}`);
+}
+if (mappedNested.certifications[1].title !== 'Google Cloud Certified - Professional Cloud Architect' || mappedNested.certifications[1].issuer !== 'Google Cloud') {
+  throw new Error(`Cert 1 title/issuer mismatch: ${JSON.stringify(mappedNested.certifications[1])}`);
+}
+console.log('✅ Certifications: Hyphenated titles and pipe-separated issuers preserved with 100% fidelity.');
+
+// 6. Verify Custom Sections only contains Positions of Responsibility (no leaked job/degree/project entries)
+if (mappedNested.customSections.length !== 1 || mappedNested.customSections[0].title !== 'Positions of Responsibility') {
+  throw new Error(`Custom sections contaminated: ${JSON.stringify(mappedNested.customSections)}`);
+}
+console.log('✅ Custom Sections: No core sections leaked; only genuine Positions of Responsibility section preserved.');
+
 console.log('\n🎉 ALL CANONICAL MAPPING REGRESSION TESTS PASSED WITH 100% ACCURACY!');
 

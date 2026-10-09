@@ -27,7 +27,7 @@ export interface CompetitiveMatchSignals {
 }
 
 export interface CompetitiveMatchResult {
-  status: 'MATCHED' | 'NOT_RELEVANT';
+  status: 'MATCHED' | 'NOT_RELEVANT' | 'INSUFFICIENT_JD';
   score: number | null;
   role: string;
   reason?: string;
@@ -54,22 +54,34 @@ export class CompetitiveMatchError extends Error {
   }
 }
 
+interface QueueItem {
+  payload: any;
+  startTime: number;
+  queueTimer: NodeJS.Timeout | null;
+  inferenceTimeoutMs: number;
+  resolve: (val: CompetitiveMatchResult) => void;
+  reject: (err: Error) => void;
+}
+
+interface PendingItem {
+  startTime: number;
+  inferenceTimer: NodeJS.Timeout;
+  resolve: (val: CompetitiveMatchResult) => void;
+  reject: (err: Error) => void;
+}
+
 // ── Persistent Python worker manager ──────────────────────────────────────────
 class BgeWorkerManager {
   private worker: ChildProcess | null = null;
   private isReady = false;
-  private queue: Array<{
-    payload: any;
-    startTime: number;
-    resolve: (val: CompetitiveMatchResult) => void;
-    reject: (err: Error) => void;
-  }> = [];
-  private currentPending: {
-    startTime: number;
-    resolve: (val: CompetitiveMatchResult) => void;
-    reject: (err: Error) => void;
-  } | null = null;
+  private readyTimer: NodeJS.Timeout | null = null;
+  private queue: QueueItem[] = [];
+  private currentPending: PendingItem | null = null;
   private buffer = '';
+
+  private readonly READY_TIMEOUT_MS = 120_000;            // 2 minutes for cold-start model load
+  private readonly DEFAULT_INFERENCE_TIMEOUT_MS = 60_000; // 60 seconds per active inference
+  private readonly QUEUE_TIMEOUT_MS = 120_000;            // 2 minutes max queue wait time
 
   private getPythonCmd(): string {
     return process.env.PYTHON_PATH || 'python';
@@ -90,6 +102,15 @@ class BgeWorkerManager {
       this.buffer = '';
       this.isReady = false;
 
+      // Dedicated timer for cold model loading
+      if (this.readyTimer) clearTimeout(this.readyTimer);
+      this.readyTimer = setTimeout(() => {
+        if (!this.isReady) {
+          console.error('[BGE Worker] worker failure: ready timeout exceeded during model initialization');
+          this.shutdown();
+        }
+      }, this.READY_TIMEOUT_MS);
+
       this.worker.stdout?.on('data', (chunk) => {
         this.buffer += chunk.toString('utf-8');
         const lines = this.buffer.split('\n');
@@ -102,6 +123,10 @@ class BgeWorkerManager {
           try {
             const parsed = JSON.parse(trimmed);
             if (parsed.ready !== undefined) {
+              if (this.readyTimer) {
+                clearTimeout(this.readyTimer);
+                this.readyTimer = null;
+              }
               this.isReady = Boolean(parsed.ready);
               console.log('[BGE Worker] model loaded');
               console.log(`[BGE Worker] worker ready (${parsed.model || 'BGE'})`);
@@ -110,26 +135,28 @@ class BgeWorkerManager {
             }
 
             if (this.currentPending) {
-              const { resolve, reject, startTime } = this.currentPending;
+              const pending = this.currentPending;
               this.currentPending = null;
-              const duration = Date.now() - startTime;
+              clearTimeout(pending.inferenceTimer);
+              const duration = Date.now() - pending.startTime;
 
               if (parsed.success && parsed.data) {
                 console.log(`[BGE Worker] inference completed in ${duration}ms`);
-                resolve(parsed.data as CompetitiveMatchResult);
+                pending.resolve(parsed.data as CompetitiveMatchResult);
               } else {
                 console.error('[BGE Worker] worker failure:', parsed.error || 'Competitive match failed');
-                reject(new CompetitiveMatchError(parsed.error || 'Competitive match failed', 500));
+                pending.reject(new CompetitiveMatchError(parsed.error || 'Competitive match failed', 500));
               }
 
               this.processNextInQueue();
             }
           } catch (e: any) {
             if (this.currentPending) {
-              const { reject } = this.currentPending;
+              const pending = this.currentPending;
               this.currentPending = null;
+              clearTimeout(pending.inferenceTimer);
               console.error('[BGE Worker] worker failure (parse error):', e.message);
-              reject(new CompetitiveMatchError(`Invalid JSON from BGE worker: ${e.message}`, 500));
+              pending.reject(new CompetitiveMatchError(`Invalid JSON from BGE worker: ${e.message}`, 500));
               this.processNextInQueue();
             }
           }
@@ -159,11 +186,16 @@ class BgeWorkerManager {
 
   private cleanup(): void {
     this.isReady = false;
+    if (this.readyTimer) {
+      clearTimeout(this.readyTimer);
+      this.readyTimer = null;
+    }
     this.worker = null;
     if (this.currentPending) {
-      const { reject } = this.currentPending;
+      const pending = this.currentPending;
       this.currentPending = null;
-      reject(new CompetitiveMatchError('BGE Worker process exited unexpectedly', 500));
+      clearTimeout(pending.inferenceTimer);
+      pending.reject(new CompetitiveMatchError('BGE Worker process exited unexpectedly', 500));
     }
   }
 
@@ -175,14 +207,45 @@ class BgeWorkerManager {
     const item = this.queue.shift();
     if (!item) return;
 
-    this.currentPending = { resolve: item.resolve, reject: item.reject, startTime: Date.now() };
+    if (item.queueTimer) {
+      clearTimeout(item.queueTimer);
+      item.queueTimer = null;
+    }
+
+    const inferenceTimer = setTimeout(() => {
+      console.error('[BGE Worker] worker failure: operation timed out');
+      if (this.currentPending) {
+        const pending = this.currentPending;
+        this.currentPending = null;
+        pending.reject(new Error('BGE worker timeout'));
+      }
+      // Kill desynchronized worker process so no stale response leaks to future requests
+      if (this.worker && !this.worker.killed) {
+        try {
+          this.worker.kill();
+        } catch {
+          // ignore
+        }
+      }
+      this.cleanup();
+    }, item.inferenceTimeoutMs);
+
+    this.currentPending = {
+      resolve: item.resolve,
+      reject: item.reject,
+      startTime: Date.now(),
+      inferenceTimer,
+    };
+
     try {
       console.log('[BGE Worker] inference requested');
       this.worker.stdin?.write(JSON.stringify(item.payload) + '\n');
     } catch (err: any) {
+      clearTimeout(inferenceTimer);
       this.currentPending = null;
       console.error('[BGE Worker] worker failure (write error):', err.message);
       item.reject(new CompetitiveMatchError(`Failed to write to BGE worker: ${err.message}`, 500));
+      this.processNextInQueue();
     }
   }
 
@@ -197,28 +260,29 @@ class BgeWorkerManager {
     this.cleanup();
   }
 
-  public async execute(payload: any, timeoutMs = 60000): Promise<CompetitiveMatchResult> {
+  public async execute(payload: any, timeoutMs = this.DEFAULT_INFERENCE_TIMEOUT_MS): Promise<CompetitiveMatchResult> {
     this.ensureWorkerStarted();
 
     return new Promise((resolve, reject) => {
-      const timer = setTimeout(() => {
-        console.error('[BGE Worker] worker failure: operation timed out');
-        reject(new Error('BGE worker timeout'));
-      }, timeoutMs);
-
-      this.queue.push({
+      const queueItem: QueueItem = {
         payload,
         startTime: Date.now(),
-        resolve: (res) => {
-          clearTimeout(timer);
-          resolve(res);
-        },
-        reject: (err) => {
-          clearTimeout(timer);
-          reject(err);
-        },
-      });
+        queueTimer: null,
+        inferenceTimeoutMs: timeoutMs,
+        resolve,
+        reject,
+      };
 
+      queueItem.queueTimer = setTimeout(() => {
+        const idx = this.queue.indexOf(queueItem);
+        if (idx !== -1) {
+          this.queue.splice(idx, 1);
+          console.error('[BGE Worker] worker failure: queue wait timeout exceeded');
+          reject(new CompetitiveMatchError('BGE worker queue timeout', 504));
+        }
+      }, this.QUEUE_TIMEOUT_MS);
+
+      this.queue.push(queueItem);
       this.processNextInQueue();
     });
   }

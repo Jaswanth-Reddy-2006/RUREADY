@@ -9,6 +9,8 @@ const upload = multer({
 
 const router: Router = Router();
 
+router.get('/roles', resumeParserController.getAvailableRoles);
+router.post('/match-role', resumeParserController.matchRole);
 router.post('/parse', upload.any(), resumeParserController.parseResume);
 router.post('/score', resumeParserController.scoreResumeWithBge);
 router.post('/evaluate', resumeParserController.evaluateResume);

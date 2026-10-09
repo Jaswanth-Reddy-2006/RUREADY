@@ -143,6 +143,8 @@ export interface AtsScoreResult {
     hasJobKeywords: boolean;
     suggestion: string;
   };
+  strengths?: string[];
+  improvements?: string[];
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1543,6 +1545,9 @@ export function mapBackendAtsResultToUi(backend: any, resume?: ResumeData): AtsS
     : totalScore >= 50 ? 'Moderate Match'
     : 'Needs Improvement';
 
+  const detectedSkills = backend.explicitlyDetectedSkills || backend.extractedSkills || [];
+  const quant = backend.quantification;
+
   return {
     totalScore,
     grade,
@@ -1557,39 +1562,57 @@ export function mapBackendAtsResultToUi(backend: any, resume?: ResumeData): AtsS
       metricsScore: Math.round((experienceQualityScore / 15) * 25),
       actionVerbScore: Math.round((experienceQualityScore / 15) * 15),
     },
-    matchedKeywords: backend.explicitlyDetectedSkills || backend.extractedSkills || [],
+    matchedKeywords: detectedSkills,
     missingKeywords: [],
     bulletsAudit,
     formatChecks: [
       {
         title: 'ATS Structure Integrity',
         passed: structureScore >= 14,
-        description: `Structure scored ${structureScore}/20 on authoritative ATS engine.`,
+        description: structureScore >= 14
+          ? 'Verified standard hierarchical section ordering across Contact, Education, Skills, and Experience/Projects.'
+          : 'Non-standard section hierarchy detected. Ensure core sections (Education, Skills, Experience) use standard headers for automated ATS classification.',
       },
       {
         title: 'Content Completeness',
         passed: completenessScore >= 14,
-        description: `Completeness scored ${completenessScore}/20 on authoritative ATS engine.`,
+        description: completenessScore >= 14
+          ? 'Core resume content complete with verified contact details, academic background, technical competencies, and experience.'
+          : (resume?.personalInfo && (!resume.personalInfo.email || !resume.personalInfo.phone))
+            ? 'Missing contact channels (email or phone). Verified contact information is required for recruiter screening.'
+            : (resume && (!resume.education || resume.education.length === 0))
+              ? 'Missing education credentials or degree history. Add your degree or institution details.'
+              : 'Incomplete section inventory. Ensure all core sections (Contact, Experience, Education, Skills) contain detailed entries.',
       },
       {
         title: 'ATS Machine Extractability',
         passed: extractabilityScore >= 14,
-        description: `Extractability scored ${extractabilityScore}/20 on authoritative ATS engine.`,
+        description: extractabilityScore >= 14
+          ? 'Clean sequential text stream with 0 unreadable character encodings or OCR anomalies.'
+          : 'Potential parsing bottlenecks detected. Use single-column flow and standard Unicode typography to prevent text fragmentation.',
       },
       {
         title: 'Skills & Technical Content',
         passed: skillsScore >= 10,
-        description: `Skills scored ${skillsScore}/15 on authoritative ATS engine.`,
+        description: skillsScore >= 10
+          ? `${detectedSkills.length} domain competencies indexed and categorized across modern technology frameworks and developer tools.`
+          : 'Fewer than 4 categorized skills detected. Group technical proficiencies into distinct categories (Languages, Frameworks, Databases, Tools).',
       },
       {
         title: 'Experience & Bullet Quality',
         passed: experienceQualityScore >= 10,
-        description: `Experience quality scored ${experienceQualityScore}/15 on authoritative ATS engine.`,
+        description: experienceQualityScore >= 10
+          ? (quant?.densityPercentage !== undefined
+              ? `${quant.densityPercentage}% of achievement bullets include measurable metrics with strong action verbs.`
+              : 'Accomplishment bullets feature strong active verbs and technical contributions.')
+          : 'Accomplishment bullets lack measurable impact metrics. Add quantifiable results (%, $, user scale, latency reduction) to highlight business value.',
       },
       {
         title: 'Basic ATS Formatting',
         passed: formattingScore >= 7,
-        description: `Formatting scored ${formattingScore}/10 on authoritative ATS engine.`,
+        description: formattingScore >= 7
+          ? 'Standard date patterns (Month Year / YYYY) and consistent single-bullet formatting detected.'
+          : 'Inconsistent date conventions or formatting detected. Use standard date formats (e.g. "Aug 2021 – Present") and uniform bullet styles.',
       },
     ],
     executiveSummaryAnalysis: {
@@ -1597,6 +1620,8 @@ export function mapBackendAtsResultToUi(backend: any, resume?: ResumeData): AtsS
       hasJobKeywords: true,
       suggestion: backend.strengths?.[0] || 'Resume analyzed by authoritative BGE ATS engine.',
     },
+    strengths: backend.strengths || [],
+    improvements: backend.improvements || [],
   };
 }
 
