@@ -1,14 +1,20 @@
 import assert from 'node:assert';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { roleMatchingService } from '../src/services/roleMatching.service.js';
 import { bgeAtsService } from '../src/services/bgeAts.service.js';
-import { documentParserService } from '../src/services/documentParser.service.js';
 import { structuredResumeMapperService } from '../src/services/structuredResumeMapper.service.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 async function runTests() {
   console.log('🧪 [Test] Running Standardized Role-Only Matching Test Suite...\n');
 
-  const pdfPath = 'C:/Users/rafey/Downloads/Jaswanth_Reddy_Resume.pdf';
-  const doclingData = await documentParserService.parseFilePath(pdfPath, 'Jaswanth_Reddy_Resume.pdf');
+  const fixturePath = path.resolve(__dirname, 'fixtures/jaswanth_docling_utf8.json');
+  const fixtureRaw = JSON.parse(fs.readFileSync(fixturePath, 'utf-8'));
+  const doclingData = fixtureRaw.data;
   const canonical = structuredResumeMapperService.mapDoclingToStructuredResume(doclingData);
   const resumeText = doclingData.plain_text || doclingData.resumeText || '';
 

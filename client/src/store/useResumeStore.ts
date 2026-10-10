@@ -18,7 +18,7 @@ export interface TemplateMetadata {
   tag: string;
   badge: string;
   desc: string;
-  atsRating: number;
+  layoutStyle: string;
   recommendedFor: string;
   highlights: string[];
   samplePersona: ResumeData;
@@ -289,7 +289,7 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
     tag: 'Silicon Valley Standard',
     badge: 'Popular',
     desc: 'High-contrast typography with colored technical badges, clean horizontal rules, and modern headers.',
-    atsRating: 99,
+    layoutStyle: 'Modern',
     recommendedFor: 'Full-Stack Developers, Frontend Engineers, Cloud & DevOps Specialists',
     highlights: ['Single-page density', 'Tag-based skills matrix', 'STAR bullet metrics emphasis'],
     samplePersona: {
@@ -310,11 +310,11 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
     id: 'harvard-classic',
     name: 'Harvard Classic',
     tag: 'Ivy League Traditional',
-    badge: 'ATS 100%',
+    badge: 'Traditional',
     desc: 'Timeless single-column serif formatting favored by Fortune 500 recruiters and academic institutions.',
-    atsRating: 100,
+    layoutStyle: 'Traditional',
     recommendedFor: 'Campus Graduates, Software Engineers, Quant Developers, Management Consultants',
-    highlights: ['100% legacy ATS machine-readable', 'Conservative serif hierarchy', 'Clean academic date alignments'],
+    highlights: ['Legacy ATS machine-readable format', 'Conservative serif hierarchy', 'Clean academic date alignments'],
     samplePersona: {
       ...SAMPLE_PERSONA_BASE,
       personalInfo: {
@@ -335,7 +335,7 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
     tag: 'Staff & Principal Lead',
     badge: 'High Density',
     desc: 'Crisp typographic layout engineered for maximum information density without visual clutter.',
-    atsRating: 98,
+    layoutStyle: 'Minimal',
     recommendedFor: 'Staff Software Engineers, Tech Leads, Engineering Managers, Architects',
     highlights: ['Maximum bullet density', 'Subtle border dividers', 'Zero wasted whitespace'],
     samplePersona: {
@@ -358,7 +358,7 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
     tag: 'Brand Accent & Portfolio',
     badge: 'Two-Column',
     desc: 'Two-column structured layout highlighting a persistent skills matrix and highlighted production projects.',
-    atsRating: 96,
+    layoutStyle: 'Two-column',
     recommendedFor: 'UI/UX Engineers, Product Engineers, Creative Technologists, Mobile Developers',
     highlights: ['Visual skill rating bars', 'Sidebar contact & links', 'Showcased repository links'],
     samplePersona: {
@@ -381,7 +381,7 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
     tag: 'Big Tech Engineering',
     badge: 'Recruiter Favorite',
     desc: 'Ultra-dense single-page engineering layout favored by recruiters at Google, Meta, and Amazon.',
-    atsRating: 100,
+    layoutStyle: 'Compact',
     recommendedFor: 'Targeting FAANG / Tier-1 Tech, High-Volume Job Applications, Backend Engineers',
     highlights: ['Single-page guaranteed', 'Metrics-first bold keywords', 'Tight line spacing'],
     samplePersona: {
@@ -404,7 +404,7 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
     tag: 'Research & Scholarly CV',
     badge: 'Academic Standard',
     desc: 'Formal scholarly layout prioritizing university distinctions, research papers, GPA, and coursework.',
-    atsRating: 99,
+    layoutStyle: 'Academic',
     recommendedFor: 'MS/PhD Candidates, Research Scientists, Machine Learning Researchers, Interns',
     highlights: ['Education first hierarchy', 'Research grants & honors', 'Standard scholarly serif'],
     samplePersona: {
@@ -427,7 +427,7 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
     tag: 'Venture & High-Growth',
     badge: 'Modern Accent',
     desc: 'Dynamic, modern format designed for agile engineers who build 0-to-1 products and ship fast.',
-    atsRating: 97,
+    layoutStyle: 'Modern',
     recommendedFor: 'Founding Engineers, Early-Stage Hires, Hackathon Winners, Full-Stack Builders',
     highlights: ['0-to-1 impact metrics', 'Product launch badges', 'Modern indigo accents'],
     samplePersona: {
@@ -450,7 +450,7 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
     tag: 'Leadership & Director',
     badge: 'Executive',
     desc: 'Sophisticated corporate design featuring centered header, strategic milestone banner, and governance points.',
-    atsRating: 98,
+    layoutStyle: 'Executive',
     recommendedFor: 'VP of Engineering, CTO, Engineering Directors, Technical Product Leaders',
     highlights: ['Executive summary callout', 'Strategic P&L metrics', 'Leadership governance framing'],
     samplePersona: {

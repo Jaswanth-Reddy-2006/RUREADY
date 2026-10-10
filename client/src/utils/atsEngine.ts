@@ -114,6 +114,13 @@ export interface BulletAudit {
   improvementReason: string;
 }
 
+import {
+  auditResumeBullets,
+  RecommendationGroup,
+  RecommendationSummary
+} from './bulletRecommendationEngine';
+export * from './bulletRecommendationEngine';
+
 export interface AtsScoreResult {
   totalScore: number; // 0 - 100 (deterministic ATS-readiness preview only)
   hasTargetJd?: boolean;
@@ -133,6 +140,8 @@ export interface AtsScoreResult {
   matchedKeywords: string[];
   missingKeywords: string[];
   bulletsAudit: BulletAudit[];
+  recommendationGroups?: RecommendationGroup[];
+  recommendationSummary?: RecommendationSummary;
   formatChecks: Array<{
     title: string;
     passed: boolean;
@@ -1475,6 +1484,8 @@ export function calculateAtsScore(
   else if (totalScore >= 75) grade = 'Competitive Match';
   else if (totalScore >= 60) grade = 'Moderate Match';
 
+  const bulletAnalysis = auditResumeBullets(resume);
+
   return {
     totalScore,
     hasTargetJd,
@@ -1494,6 +1505,8 @@ export function calculateAtsScore(
     matchedKeywords,
     missingKeywords,
     bulletsAudit,
+    recommendationGroups: bulletAnalysis.recommendationGroups,
+    recommendationSummary: bulletAnalysis.summary,
     formatChecks,
     executiveSummaryAnalysis: {
       wordCount: summaryWords,
@@ -1539,6 +1552,15 @@ export function mapBackendAtsResultToUi(backend: any, resume?: ResumeData): AtsS
     improvementReason: b.improvementReason || b.feedback || '',
   }));
 
+  let recommendationGroups: RecommendationGroup[] = backend.recommendationGroups || [];
+  let recommendationSummary: RecommendationSummary | undefined = backend.recommendationSummary;
+
+  if ((!recommendationGroups || recommendationGroups.length === 0) && resume) {
+    const analysis = auditResumeBullets(resume);
+    recommendationGroups = analysis.recommendationGroups;
+    recommendationSummary = analysis.summary;
+  }
+
   const grade: AtsScoreResult['grade'] =
     totalScore >= 80 ? 'Exceptional Match'
     : totalScore >= 65 ? 'Competitive Match'
@@ -1565,6 +1587,8 @@ export function mapBackendAtsResultToUi(backend: any, resume?: ResumeData): AtsS
     matchedKeywords: detectedSkills,
     missingKeywords: [],
     bulletsAudit,
+    recommendationGroups,
+    recommendationSummary,
     formatChecks: [
       {
         title: 'ATS Structure Integrity',

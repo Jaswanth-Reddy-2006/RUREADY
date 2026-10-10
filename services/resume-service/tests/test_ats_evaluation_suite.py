@@ -3,7 +3,7 @@ import os
 import json
 import re
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'services', 'resume-service'))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from ats.bge_ats_scorer import RoleIndependentAtsScorer, SKILL_NORMALIZATION_MAP
 
 scorer = RoleIndependentAtsScorer()
@@ -54,9 +54,9 @@ E-Commerce Website - Online shopping platform
 
 # 3. Strong Student Resume
 strong_student_resume = """
-Jaswanth Reddy
-Hyderabad, Telangana, India | +91 8008154808 | jaswanthre9@gmail.com
-https://linkedin.com/in/jasreaug | https://github.com/Jaswanth-Reddy-2006
+Alex Morgan
+San Francisco, CA | +1 (555) 234-5678 | alex.morgan@example.com
+https://linkedin.com/in/alexmorgan-dev | https://github.com/alexmorgan-tech
 
 EDUCATION
 Bachelor of Technology in Computer Science & Engineering

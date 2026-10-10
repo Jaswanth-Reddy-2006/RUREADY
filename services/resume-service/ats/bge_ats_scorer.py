@@ -857,6 +857,45 @@ class RoleIndependentAtsScorer:
                 return True
         return False
 
+    @staticmethod
+    def is_corrupted_bullet(text: str) -> Tuple[bool, str]:
+        """
+        Validates text for potential extraction corruption (encoding errors, mojibake,
+        replacement chars, control chars, fragmented characters, clustered symbols).
+        """
+        if not text or not text.strip():
+            return False, ""
+        trimmed = text.strip()
+
+        # 1. Replacement characters or null bytes
+        if '\ufffd' in trimmed or '\x00' in trimmed:
+            return True, "Contains null or unmapped unicode replacement characters (\\uFFFD)"
+
+        # 2. Mojibake encoding artifacts (UTF-8 bytes misinterpreted as Windows-1252/Latin-1)
+        if re.search(r'(?:â€™|â€œ|â€|â€"|â€˜|Ã©|Ã¢|Ã¯|Ã¼|Ã±|Ã¨)', trimmed):
+            return True, "Contains mojibake encoding artifacts from corrupted document decoding"
+
+        # 3. Unprintable control characters (excluding newline, carriage return, and tab)
+        if re.search(r'[\x01-\x08\x0B\x0C\x0E-\x1F]', trimmed):
+            return True, "Contains unprintable control characters"
+
+        # 4. Broken spaced character tokens (e.g. "t h i s   i s   c o r r u p t e d")
+        if re.search(r'(?:\b[a-zA-Z]\s+){4,}[a-zA-Z]\b', trimmed):
+            return True, "Contains fragmented, single-spaced character artifacts from PDF extraction"
+
+        # 5. Clustered nonsense symbols
+        if re.search(r'[\^~`|\\<>{}\[\]@#$%\*]{4,}', trimmed):
+            return True, "Contains clustered unreadable symbols"
+
+        # 6. High symbol density check (> 25% unusual non-alphanumeric chars for text > 25 chars)
+        if len(trimmed) > 25:
+            alphanumeric_and_space = re.sub(r'[^a-zA-Z0-9\s.,;:\'"()\-–—/&]', '', trimmed)
+            unusual_symbol_count = len(trimmed) - len(alphanumeric_and_space)
+            if unusual_symbol_count / len(trimmed) > 0.25:
+                return True, "High density of unreadable non-alphanumeric characters"
+
+        return False, ""
+
     def audit_experience_and_project_bullets(self, sections_map: Dict[str, List[str]], structured_elements: Optional[List[Dict[str, Any]]] = None) -> Dict[str, Any]:
         """
         CONTENT-TYPE FILTER & 8-SIGNAL CONTEXTUAL BULLET AUDITOR:
@@ -958,7 +997,16 @@ class RoleIndependentAtsScorer:
                 "fillerRatio": 0,
                 "impactRatio": 0,
                 "specificityRatio": 0,
-                "audits": []
+                "audits": [],
+                "recommendationGroups": [],
+                "recommendationSummary": {
+                    "bulletsEvaluated": 0,
+                    "bulletsWithIssues": 0,
+                    "uniqueRecommendationsCount": 0,
+                    "issueFreeBullets": 0,
+                    "healthPercentage": 100,
+                    "issuePercentage": 0
+                }
             }
 
         quantified_count = 0
@@ -971,6 +1019,25 @@ class RoleIndependentAtsScorer:
         for idx, (clean_b, c_type, sec) in enumerate(actionable_bullets):
             words = clean_b.split()
             if not words:
+                continue
+
+            # Check text corruption (Priority 0)
+            is_corrupt, corrupt_reason = self.is_corrupted_bullet(clean_b)
+            if is_corrupt:
+                corrupt_feedback = "Flagged for Review: Potential Text Extraction Corruption. This entry contains unreadable or fragmented characters from document parsing. Verify and edit the source text directly."
+                raw_audits.append({
+                    "priority": 0,
+                    "category": "Text Corruption",
+                    "category_key": "TEXT_CORRUPTION",
+                    "context": f"{sec.capitalize()} Bullet",
+                    "original": clean_b[:180],
+                    "hasMetric": False,
+                    "hasActionVerb": False,
+                    "isCorrupted": True,
+                    "title": "Flagged for Review: Potential Text Extraction Corruption",
+                    "feedback": corrupt_feedback,
+                    "actionableGuidance": "Inspect this bullet in your source document and re-enter or correct the text. Automated rewrites are disabled for corrupted text to preserve data integrity."
+                })
                 continue
 
             # When a subsection label precedes the verb, e.g.
@@ -1053,18 +1120,23 @@ class RoleIndependentAtsScorer:
             # -------------------------------------------------------------
             if c_type == "PROJECT_DESCRIPTION":
                 # NEVER flag for missing action verb
-                # If project description already contains scale/metrics (e.g. 1 billion rows, 1200+ developers, 10,000 users), it is STRONG!
+                # If project description already contains scale/metrics, it is STRONG!
                 if has_metric or (has_domain_tools and has_outcome and len(words) >= 8):
-                    continue # Strong project description -> Exclude from suggestions
+                    continue
 
                 # If missing outcome and missing scale, suggest clarifying contribution or measurable impact
                 raw_audits.append({
                     "priority": 3,
                     "category": "Measurable Outcome",
+                    "category_key": "MISSING_OUTCOME",
+                    "context": "Project Overview",
                     "original": clean_b[:180],
                     "hasMetric": False,
                     "hasActionVerb": True,
-                    "feedback": "Clarify your specific technical contribution or measurable performance outcome, if available."
+                    "isCorrupted": False,
+                    "title": "Clarify Technical Scope or Measurable Outcome",
+                    "feedback": "Clarify your specific technical contribution or measurable performance outcome, if available.",
+                    "actionableGuidance": "Incorporate verified quantitative metrics or business outcomes from your actual experience. Never invent numbers or achievements."
                 })
                 continue
 
@@ -1079,7 +1151,7 @@ class RoleIndependentAtsScorer:
             # 2. VAGUE RESPONSIBILITY / OWNERSHIP ISSUE
             if has_weak_opening or (re.search(r'\b(?:participated in|contributed to|helped with|assisted in|assisted the team)\b', clean_b, re.IGNORECASE) and not has_ownership):
                 if re.search(r'\b(?:participated in|contributed to)\b.*?\b(?:agile|scrum|sprint|standups?|meetings?|cycles?|releases?)\b', clean_b, re.IGNORECASE):
-                    feedback = "Make your individual contribution more specific by stating what you delivered during the sprint rather than only describing participation."
+                    feedback = "Clarify what feature, module, or fix you personally delivered during these sprint cycles rather than describing passive participation."
                 elif re.search(r'\b(?:responsible for|duties included|was responsible for)\b', clean_b, re.IGNORECASE):
                     feedback = "Shift focus from assigned job duties to the specific accomplishments, features, or solutions you directly executed."
                 elif re.search(r'\b(?:helped with|assisted in|assisted the team|tasked with)\b', clean_b, re.IGNORECASE):
@@ -1092,10 +1164,15 @@ class RoleIndependentAtsScorer:
                 raw_audits.append({
                     "priority": 1,
                     "category": "Vague Responsibility",
+                    "category_key": "VAGUE_OWNERSHIP",
+                    "context": f"{sec.capitalize()} Bullet",
                     "original": clean_b[:180],
                     "hasMetric": has_metric,
                     "hasActionVerb": is_verb_form,
-                    "feedback": feedback
+                    "isCorrupted": False,
+                    "title": "Clarify Individual Ownership on Collaborative Tasks",
+                    "feedback": feedback,
+                    "actionableGuidance": "Use active ownership language: \"[Strong Verb] [specific feature/module] using [technologies], delivering [verified outcome]\"."
                 })
             # 1. WEAK / MISSING ACTION VERB (CRITICAL: NEVER flag if bullet starts with any verb form!)
             elif not is_verb_form:
@@ -1117,46 +1194,62 @@ class RoleIndependentAtsScorer:
                 raw_audits.append({
                     "priority": 2,
                     "category": "Weak Action Verb",
+                    "category_key": "WEAK_ACTION_VERB",
+                    "context": f"{sec.capitalize()} Bullet",
                     "original": clean_b[:180],
                     "hasMetric": has_metric,
                     "hasActionVerb": False,
-                    "feedback": feedback
+                    "isCorrupted": False,
+                    "title": "Strengthen Opening Action Verbs",
+                    "feedback": feedback,
+                    "actionableGuidance": "Replace passive openers or noun headings with a strong, domain-aligned past-tense action verb asserting your direct execution."
                 })
-            # 3. MISSING MEASURABLE OUTCOME (Context-specific, non-prescriptive 'if available' guidance)
+            # 3. MISSING MEASURABLE OUTCOME (Conditional metrics guidance)
             elif not has_outcome and not has_metric:
-                if has_security and has_android:
-                    feedback = "Add measurable impact, such as the number of security checks supported, Android versions covered, detection coverage, or scan-time improvement, if available."
-                elif has_security:
-                    feedback = "Add measurable scale or outcome, such as the number of vulnerabilities/apps analyzed, threat detection coverage %, or scan-time improvement, if available."
-                elif has_android:
-                    feedback = "Add measurable impact, such as the number of features/checks supported, target Android versions, device footprint, or a measurable performance improvement, if available."
-                elif has_api:
-                    feedback = "Add a measurable outcome of the API work, if available, such as API/endpoint count, request throughput, latency reduction, error reduction %, or team adoption."
-                elif has_ui:
-                    feedback = "Add a measurable user or performance outcome, if available, such as active user count, page load speedup %, responsiveness, accessibility score, or conversion lift."
-                elif has_db:
-                    feedback = "Add a measurable database outcome, if available, such as query latency reduction, record volume managed, throughput, or reliability improvement."
-                elif has_cloud:
-                    feedback = "Add a measurable infrastructure outcome, if available, such as deployment cycle time reduction, build speedup %, uptime %, or infrastructure scale."
-                elif has_ml:
-                    feedback = "Add a measurable outcome of the AI feature, if available, such as inference speed, detection accuracy, dataset scale, or user adoption."
-                elif has_auto:
-                    feedback = "Add measurable efficiency gained, if available, such as processing time reduced, volume of tasks/records handled, or hours saved."
-                elif has_mkt:
-                    feedback = "Add a measurable business outcome, if available, such as conversion rate %, lead volume growth, customer retention lift, or revenue impact."
+                benefits_from_metric = bool(re.search(
+                    r'\b(?:optimiz|reduc|increas|accelerat|improv|decreas|boost|enhanc|scal|speed|minimiz|streamlin|cut|sav|generat|handl|process|load|latenc|throughput|concurr|uptime)\w*\b',
+                    clean_b,
+                    re.IGNORECASE
+                ))
+                if benefits_from_metric:
+                    if has_security:
+                        feedback = "Add a verified security outcome if available from your results (e.g., threat detection coverage % or scan-time improvement)."
+                    elif has_android:
+                        feedback = "Add a verified mobile outcome if available from your results (e.g., crash-free sessions % or app launch time reduction)."
+                    elif has_api:
+                        feedback = "Add a verified API outcome if available from your results (e.g., p99 latency reduction ms, throughput QPS, or error rate reduction)."
+                    elif has_ui:
+                        feedback = "Add a verified user or performance outcome if available from your results (e.g., page load reduction % or Lighthouse score)."
+                    elif has_db:
+                        feedback = "Add a verified database outcome if available from your results (e.g., query latency reduction ms or record volume handled)."
+                    elif has_cloud:
+                        feedback = "Add a verified infrastructure outcome if available from your results (e.g., deployment cycle speedup % or CI build time reduction)."
+                    elif has_ml:
+                        feedback = "Add a verified model outcome if available from your results (e.g., model accuracy % or inference latency ms)."
+                    elif has_auto:
+                        feedback = "Add a verified efficiency outcome if available from your results (e.g., processing time saved, error reduction %, or volume handled)."
+                    elif has_mkt:
+                        feedback = "Add a verified business outcome if available from your results (e.g., conversion rate % or customer retention lift)."
+                    else:
+                        feedback = "Add a verified efficiency outcome if available from your results (e.g., processing time saved, error reduction %, or volume handled)."
                 else:
-                    feedback = "Add measurable scale or outcome of this achievement, if available, such as efficiency gained, user adoption, time saved, or process improvement."
+                    feedback = "Clarify the operational impact or user adoption achieved by this deliverable, if available from your actual experience."
 
                 raw_audits.append({
                     "priority": 3,
                     "category": "Measurable Outcome",
+                    "category_key": "MISSING_OUTCOME",
+                    "context": f"{sec.capitalize()} Bullet",
                     "original": clean_b[:180],
                     "hasMetric": False,
                     "hasActionVerb": True,
-                    "feedback": feedback
+                    "isCorrupted": False,
+                    "title": "Add Verified Outcomes to Accomplishments",
+                    "feedback": feedback,
+                    "actionableGuidance": "Incorporate verified quantitative metrics or business outcomes from your actual experience. Never invent numbers or achievements."
                 })
             # 4. MISSING TECHNICAL IMPLEMENTATION DETAIL
-            elif not has_domain_tools:
+            elif not has_domain_tools and len(words) >= 5:
                 if has_android:
                     feedback = "Specify the key Android libraries, architecture components, or Jetpack modules used (e.g., Room, Coroutines, ViewModel, Hilt)."
                 elif has_security:
@@ -1169,10 +1262,15 @@ class RoleIndependentAtsScorer:
                 raw_audits.append({
                     "priority": 4,
                     "category": "Technical Implementation",
+                    "category_key": "UNCLEAR_TECH",
+                    "context": f"{sec.capitalize()} Bullet",
                     "original": clean_b[:180],
                     "hasMetric": has_metric,
                     "hasActionVerb": True,
-                    "feedback": feedback
+                    "isCorrupted": False,
+                    "title": "Specify Technologies & Architecture Used",
+                    "feedback": feedback,
+                    "actionableGuidance": "Name the concrete languages, frameworks, libraries, or architectural patterns used so technical screeners can assess depth."
                 })
             # 5. MISSING SCALE / CONTEXT
             elif len(words) < 8:
@@ -1188,11 +1286,63 @@ class RoleIndependentAtsScorer:
                 raw_audits.append({
                     "priority": 5,
                     "category": "Scale & Context",
+                    "category_key": "MISSING_OUTCOME",
+                    "context": f"{sec.capitalize()} Bullet",
                     "original": clean_b[:180],
                     "hasMetric": has_metric,
                     "hasActionVerb": True,
-                    "feedback": feedback
+                    "isCorrupted": False,
+                    "title": "Clarify Project Scope & Context",
+                    "feedback": feedback,
+                    "actionableGuidance": "Detail the concrete problem solved and environment scope based on your verified experience."
                 })
+
+        # Build deduplicated recommendation groups
+        group_map = {}
+        bullets_with_issues_set = set()
+
+        for idx, audit in enumerate(raw_audits):
+            bullet_id = f"bullet-{idx + 1}"
+            bullets_with_issues_set.add(audit["original"])
+            cat = audit.get("category_key", audit["category"])
+            feedback = audit["feedback"]
+            group_key = f"{cat}:::{feedback}"
+
+            if group_key not in group_map:
+                group_map[group_key] = {
+                    "id": f"rec-{len(group_map) + 1}",
+                    "category": cat,
+                    "title": audit.get("title", audit["category"]),
+                    "feedback": feedback,
+                    "actionableGuidance": audit.get("actionableGuidance", "Strengthen this bullet with specific, verified details from your experience."),
+                    "affectedBullets": [],
+                    "isFlaggedForReview": audit.get("isCorrupted", False)
+                }
+
+            group_map[group_key]["affectedBullets"].append({
+                "id": bullet_id,
+                "context": audit.get("context", "Experience / Project"),
+                "original": audit["original"],
+                "hasMetric": audit["hasMetric"],
+                "hasActionVerb": audit["hasActionVerb"],
+                "isCorrupted": audit.get("isCorrupted", False)
+            })
+
+        recommendation_groups = list(group_map.values())
+        bullets_evaluated = len(actionable_bullets)
+        bullets_with_issues = len(bullets_with_issues_set)
+        issue_free_bullets = max(0, bullets_evaluated - bullets_with_issues)
+        health_pct = round((issue_free_bullets / bullets_evaluated) * 100) if bullets_evaluated > 0 else 100
+        issue_pct = round((bullets_with_issues / bullets_evaluated) * 100) if bullets_evaluated > 0 else 0
+
+        recommendation_summary = {
+            "bulletsEvaluated": bullets_evaluated,
+            "bulletsWithIssues": bullets_with_issues,
+            "uniqueRecommendationsCount": len(recommendation_groups),
+            "issueFreeBullets": issue_free_bullets,
+            "healthPercentage": health_pct,
+            "issuePercentage": issue_pct,
+        }
 
         # Deduplicate similar suggestions and limit to TOP 3-5 improvements
         seen_feedback = set()
@@ -1209,7 +1359,8 @@ class RoleIndependentAtsScorer:
                     "original": audit["original"],
                     "hasMetric": audit["hasMetric"],
                     "hasActionVerb": audit["hasActionVerb"],
-                    "feedback": audit["feedback"]
+                    "feedback": audit["feedback"],
+                    "isCorrupted": audit.get("isCorrupted", False)
                 })
             if len(final_audits) >= 4: # Top 3-5 limit
                 break
@@ -1233,7 +1384,9 @@ class RoleIndependentAtsScorer:
             "fillerRatio": filler_ratio_pct,
             "impactRatio": impact_ratio_pct,
             "specificityRatio": specificity_ratio_pct,
-            "audits": final_audits
+            "audits": final_audits,
+            "recommendationGroups": recommendation_groups,
+            "recommendationSummary": recommendation_summary
         }
 
     def score_resume(self, resume_text: str, structured_elements: Optional[List[Dict[str, Any]]] = None) -> Dict[str, Any]:
@@ -1627,6 +1780,8 @@ class RoleIndependentAtsScorer:
                 "totalBullets": bullet_audit_data["totalBullets"]
             },
             "bulletAudits": bullet_audit_data["audits"],
+            "recommendationGroups": bullet_audit_data.get("recommendationGroups", []),
+            "recommendationSummary": bullet_audit_data.get("recommendationSummary", {}),
             "strengths": strengths[:4],
             "improvements": improvements[:4]
         }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Check, Sparkles, ShieldCheck, ArrowRight, Eye, LayoutTemplate } from 'lucide-react';
+import { X, Check, Sparkles, LayoutTemplate } from 'lucide-react';
 import { TemplateMetadata, ResumeTemplateId } from '../../store/useResumeStore';
 import ResumeRenderer from './templates/ResumeRenderer';
 import Button from '../ui/Button';
@@ -56,8 +56,8 @@ export default function TemplateOverviewModal({
                 <Badge variant="teal" size="sm">
                   {template.tag}
                 </Badge>
-                <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 font-mono">
-                  <ShieldCheck size={13} /> ATS {template.atsRating}%
+                <span className="inline-flex items-center gap-1 text-xs font-semibold text-slate-700 bg-slate-100 px-2.5 py-0.5 rounded-full border border-slate-200">
+                  {template.layoutStyle}
                 </span>
               </div>
               <p className="text-xs text-slate-600 max-w-2xl">

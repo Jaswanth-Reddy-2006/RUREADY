@@ -385,7 +385,7 @@ export function parseRawResumeToData(rawText: string): Partial<ResumeData> {
   const emailMatch = cleanFull.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
   const email = emailMatch ? emailMatch[0] : '';
 
-  // 2. Phone extraction (international support e.g. +91 8008154808, +1 (555) 234-5678, (555) 987-6543, 8008154808)
+  // 2. Phone extraction (international support e.g. +91 98765 43210, +1 (555) 234-5678, (555) 987-6543, 9876543210)
   const phoneMatch = cleanFull.match(/(?:\+?\d{1,4}[-.\s]?)?(?:\(?\d{2,5}\)?[-.\s]?)?\d{3,5}[-.\s]?\d{3,5}(?:[-.\s]?\d{1,4})?/);
   const phone = phoneMatch && phoneMatch[0].replace(/\D/g, '').length >= 7 ? phoneMatch[0].trim() : '';
 

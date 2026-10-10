@@ -1,12 +1,12 @@
 import { bgeAtsService } from '../src/services/bgeAts.service.js';
 
 async function runTest() {
-  console.log('--- Testing Role-Independent ATS Scoring Engine on Jaswanth Reddy Resume ---');
+  console.log('--- Testing Role-Independent ATS Scoring Engine on Synthetic Student Resume ---');
   
-  const jaswanthResume = `
-JASWANTH REDDY
-Hyderabad, Telangana, India | +91 8008154808 | jaswanthre9@gmail.com
-linkedin.com/in/jasreaug | github.com/Jaswanth-Reddy-2006
+  const studentResume = `
+ALEX MORGAN
+San Francisco, CA | +1 (555) 234-5678 | alex.morgan@example.com
+linkedin.com/in/alexmorgan-dev | github.com/alexmorgan-tech
 
 EDUCATION
 Bachelor of Technology — Computer Science & Engineering
@@ -28,7 +28,7 @@ Smart Health Analytics Platform | React, Node.js, MongoDB
 
   try {
     const result = await bgeAtsService.scoreResume({
-      resumeText: jaswanthResume,
+      resumeText: studentResume,
     });
 
     console.log(`\nModel: ${result.model}`);

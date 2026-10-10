@@ -1991,35 +1991,113 @@ export default function ResumeBuilderPage() {
                 </div>
 
                 {/* Bullet Points Quality & Metrics Optimization */}
-                <div className="p-5 bg-white rounded-3xl border border-[#DCE7F2] shadow-2xs space-y-3">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#11183D] flex items-center gap-1.5">
-                    <Sparkles size={15} className="text-amber-600" />
-                    <span>Bullet Point Quality & Metrics Optimization</span>
-                  </h4>
+                <div className="p-5 bg-white rounded-3xl border border-[#DCE7F2] shadow-2xs space-y-3.5">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#11183D] flex items-center gap-1.5">
+                      <Sparkles size={15} className="text-amber-600" />
+                      <span>Bullet Point Quality & Metrics Optimization</span>
+                    </h4>
+                    {currentAtsAnalysis.recommendationSummary && (
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        {currentAtsAnalysis.recommendationSummary.healthPercentage}% Clean Quality
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Summary Stats */}
+                  {currentAtsAnalysis.recommendationSummary && (
+                    <div className="grid grid-cols-4 gap-2 p-2.5 bg-slate-50 border border-[#DCE7F2] rounded-2xl text-center">
+                      <div>
+                        <span className="text-[9.5px] uppercase font-bold text-[#526078] block">Evaluated</span>
+                        <span className="text-xs font-bold text-[#11183D] font-mono">{currentAtsAnalysis.recommendationSummary.bulletsEvaluated}</span>
+                      </div>
+                      <div>
+                        <span className="text-[9.5px] uppercase font-bold text-[#526078] block">With Issues</span>
+                        <span className="text-xs font-bold text-amber-600 font-mono">{currentAtsAnalysis.recommendationSummary.bulletsWithIssues}</span>
+                      </div>
+                      <div>
+                        <span className="text-[9.5px] uppercase font-bold text-[#526078] block">Unique Recs</span>
+                        <span className="text-xs font-bold text-[#2459A8] font-mono">{currentAtsAnalysis.recommendationSummary.uniqueRecommendationsCount}</span>
+                      </div>
+                      <div>
+                        <span className="text-[9.5px] uppercase font-bold text-[#526078] block">Issue Rate</span>
+                        <span className="text-xs font-bold text-[#526078] font-mono">{currentAtsAnalysis.recommendationSummary.issuePercentage}%</span>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="space-y-2.5">
-                    {currentAtsAnalysis.bulletsAudit.length > 0 ? (
-                      currentAtsAnalysis.bulletsAudit.slice(0, 4).map((bullet, idx) => (
-                        <div key={idx} className="p-3 bg-slate-50 rounded-xl border border-[#DCE7F2] text-xs space-y-1">
-                          <div className="flex items-center gap-2">
-                            <span className={bullet.hasStrongVerb ? 'text-emerald-600 font-bold' : 'text-amber-600 font-bold'}>
-                              {bullet.hasStrongVerb ? `✓ Verb: ${bullet.detectedVerb || 'Strong'}` : '⚠ Weak action verb'}
-                            </span>
-                            <span className="text-slate-300">•</span>
-                            <span className={bullet.hasMetrics ? 'text-emerald-600 font-bold' : 'text-amber-600 font-bold'}>
-                              {bullet.hasMetrics ? '✓ Metric detected' : '⚠ Missing metric'}
-                            </span>
+                    {(currentAtsAnalysis.recommendationGroups && currentAtsAnalysis.recommendationGroups.length > 0) ? (
+                      currentAtsAnalysis.recommendationGroups.map((group) => {
+                        const isCorrupt = group.isFlaggedForReview || group.category === 'TEXT_CORRUPTION';
+                        return (
+                          <div
+                            key={group.id}
+                            className={`p-3 rounded-xl border text-xs space-y-2 ${
+                              isCorrupt
+                                ? 'bg-rose-50/70 border-rose-200'
+                                : 'bg-slate-50 border-[#DCE7F2]'
+                            }`}
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="space-y-0.5">
+                                <span
+                                  className={`text-[10px] font-bold px-2 py-0.5 rounded-full inline-block ${
+                                    isCorrupt
+                                      ? 'bg-rose-100 text-rose-800'
+                                      : group.category === 'VAGUE_OWNERSHIP'
+                                      ? 'bg-amber-100 text-amber-800'
+                                      : group.category === 'WEAK_ACTION_VERB'
+                                      ? 'bg-blue-100 text-blue-800'
+                                      : group.category === 'UNCLEAR_TECH'
+                                      ? 'bg-purple-100 text-purple-800'
+                                      : 'bg-indigo-100 text-indigo-800'
+                                  }`}
+                                >
+                                  {group.title}
+                                </span>
+                                <p className="text-[#11183D] font-medium text-[11.5px] mt-1">
+                                  {group.feedback}
+                                </p>
+                              </div>
+                              <span className="text-[10px] font-bold text-[#526078] bg-white border border-[#DCE7F2] px-2 py-0.5 rounded-full shrink-0">
+                                {group.affectedBullets.length} {group.affectedBullets.length === 1 ? 'bullet' : 'bullets'}
+                              </span>
+                            </div>
+
+                            {isCorrupt && (
+                              <div className="p-2 bg-rose-100/80 border border-rose-200 rounded-lg text-[10.5px] text-rose-900 flex items-start gap-1.5">
+                                <AlertTriangle size={13} className="text-rose-600 shrink-0 mt-0.5" />
+                                <span>Flagged for Review: Potential text corruption detected. Verify source text directly.</span>
+                              </div>
+                            )}
+
+                            <div className="space-y-1">
+                              <span className="text-[10px] font-bold text-[#526078] uppercase tracking-wider block">
+                                Affected Entries:
+                              </span>
+                              <div className="space-y-1">
+                                {group.affectedBullets.slice(0, 3).map((b) => (
+                                  <div key={b.id} className="p-1.5 bg-white rounded-lg border border-slate-200 text-[11px]">
+                                    <span className="font-mono text-[9.5px] text-[#526078] block">{b.context}</span>
+                                    <p className="text-slate-700 italic truncate">"{b.original}"</p>
+                                  </div>
+                                ))}
+                                {group.affectedBullets.length > 3 && (
+                                  <p className="text-[10px] text-[#526078] italic">
+                                    + {group.affectedBullets.length - 3} more affected bullets
+                                  </p>
+                                )}
+                              </div>
+                            </div>
                           </div>
-                          <p className="text-slate-700 italic text-[11.5px]">"{bullet.original}"</p>
-                          {bullet.suggestedRewrite && (
-                            <p className="text-[#2459A8] font-medium text-[11px]">
-                              💡 Suggestion: {bullet.suggestedRewrite}
-                            </p>
-                          )}
-                        </div>
-                      ))
+                        );
+                      })
                     ) : (
                       <p className="text-xs text-slate-500 italic p-3 bg-slate-50 rounded-xl">
-                        All analyzed bullet points include strong action verbs and quantified impact.
+                        {(currentAtsAnalysis.recommendationSummary?.bulletsEvaluated ?? 0) === 0
+                          ? 'No experience or project bullets found in this resume version.'
+                          : 'All analyzed bullet points feature strong action verbs, clear technical scope, and validated impact.'}
                       </p>
                     )}
                   </div>
@@ -3076,33 +3154,118 @@ export default function ResumeBuilderPage() {
                   </div>
                 </div>
 
-                {/* Bullet Audits */}
-                {currentAtsAnalysis.bulletsAudit.length > 0 && (
-                  <div className="space-y-3">
+                {/* Bullet Quality Diagnostics */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
                     <h4 className="text-sm font-bold text-[#11183D]">Bullet Point Quality Diagnostics</h4>
-                    <div className="space-y-2">
-                      {currentAtsAnalysis.bulletsAudit.slice(0, 5).map((bullet, idx) => (
-                        <div key={idx} className="p-3 bg-slate-50 rounded-xl border border-[#DCE7F2] text-xs space-y-1">
-                          <div className="flex items-center gap-2">
-                            <span className={bullet.hasStrongVerb ? 'text-emerald-600 font-bold' : 'text-amber-600'}>
-                              {bullet.hasStrongVerb ? `✓ Verb: ${bullet.detectedVerb || 'Strong'}` : '⚠ Weak verb'}
-                            </span>
-                            <span className="text-slate-300">•</span>
-                            <span className={bullet.hasMetrics ? 'text-emerald-600 font-bold' : 'text-amber-600'}>
-                              {bullet.hasMetrics ? '✓ Metric detected' : '⚠ Missing metric'}
-                            </span>
-                          </div>
-                          <p className="text-[#334155] italic">"{bullet.original}"</p>
-                          {bullet.suggestedRewrite && (
-                            <p className="text-[#2459A8] font-medium text-[11.5px]">
-                              💡 Suggestion: {bullet.suggestedRewrite}
-                            </p>
-                          )}
-                        </div>
-                      ))}
-                    </div>
+                    {currentAtsAnalysis.recommendationSummary && (
+                      <span className="text-xs font-bold text-[#2459A8] font-mono">
+                        {currentAtsAnalysis.recommendationSummary.bulletsEvaluated} Bullets Evaluated • {currentAtsAnalysis.recommendationSummary.healthPercentage}% Clean Health
+                      </span>
+                    )}
                   </div>
-                )}
+
+                  {/* Summary Bar */}
+                  {currentAtsAnalysis.recommendationSummary && (
+                    <div className="grid grid-cols-4 gap-2.5 p-3 bg-slate-50 border border-[#DCE7F2] rounded-2xl text-center">
+                      <div>
+                        <span className="text-[10px] uppercase font-bold text-[#526078] block">Evaluated</span>
+                        <span className="text-sm font-bold text-[#11183D] font-mono">{currentAtsAnalysis.recommendationSummary.bulletsEvaluated}</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] uppercase font-bold text-[#526078] block">With Issues</span>
+                        <span className="text-sm font-bold text-amber-600 font-mono">{currentAtsAnalysis.recommendationSummary.bulletsWithIssues}</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] uppercase font-bold text-[#526078] block">Unique Actions</span>
+                        <span className="text-sm font-bold text-[#2459A8] font-mono">{currentAtsAnalysis.recommendationSummary.uniqueRecommendationsCount}</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] uppercase font-bold text-[#526078] block">Clean Quality</span>
+                        <span className="text-sm font-bold text-emerald-600 font-mono">{currentAtsAnalysis.recommendationSummary.healthPercentage}%</span>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="space-y-2.5">
+                    {(currentAtsAnalysis.recommendationGroups && currentAtsAnalysis.recommendationGroups.length > 0) ? (
+                      currentAtsAnalysis.recommendationGroups.map((group) => {
+                        const isCorrupt = group.isFlaggedForReview || group.category === 'TEXT_CORRUPTION';
+                        return (
+                          <div
+                            key={group.id}
+                            className={`p-3.5 rounded-2xl border text-xs space-y-2.5 ${
+                              isCorrupt
+                                ? 'bg-rose-50/70 border-rose-200'
+                                : 'bg-white border-[#DCE7F2] shadow-2xs'
+                            }`}
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="space-y-0.5">
+                                <span
+                                  className={`text-[10px] font-bold px-2 py-0.5 rounded-full inline-block ${
+                                    isCorrupt
+                                      ? 'bg-rose-100 text-rose-800'
+                                      : group.category === 'VAGUE_OWNERSHIP'
+                                      ? 'bg-amber-100 text-amber-800'
+                                      : group.category === 'WEAK_ACTION_VERB'
+                                      ? 'bg-blue-100 text-blue-800'
+                                      : group.category === 'UNCLEAR_TECH'
+                                      ? 'bg-purple-100 text-purple-800'
+                                      : 'bg-indigo-100 text-indigo-800'
+                                  }`}
+                                >
+                                  {group.title}
+                                </span>
+                                <p className="text-[#11183D] font-medium text-xs mt-1">
+                                  {group.feedback}
+                                </p>
+                              </div>
+                              <span className="text-[10px] font-bold text-[#526078] bg-slate-100 px-2 py-0.5 rounded-full shrink-0">
+                                {group.affectedBullets.length} {group.affectedBullets.length === 1 ? 'bullet' : 'bullets'}
+                              </span>
+                            </div>
+
+                            <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-[11px] text-[#334155]">
+                              <span className="font-bold text-[#2459A8] block mb-0.5">Actionable Guidance:</span>
+                              <p>{group.actionableGuidance}</p>
+                            </div>
+
+                            {isCorrupt && (
+                              <div className="p-2.5 bg-rose-100/80 border border-rose-200 rounded-xl text-[11px] text-rose-900 flex items-start gap-2">
+                                <AlertTriangle size={14} className="text-rose-600 shrink-0 mt-0.5" />
+                                <span>Flagged for Review: Potential text extraction corruption detected. Verify and correct source document.</span>
+                              </div>
+                            )}
+
+                            <div className="space-y-1">
+                              <span className="text-[10px] font-bold text-[#526078] uppercase tracking-wider block">
+                                Affected Bullet Entries ({group.affectedBullets.length}):
+                              </span>
+                              <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+                                {group.affectedBullets.map((b) => (
+                                  <div key={b.id} className="p-2 bg-slate-50/80 rounded-lg border border-slate-200 text-[11px]">
+                                    <div className="flex items-center justify-between text-[10px] text-[#526078] font-mono">
+                                      <span>{b.context}</span>
+                                      <span>{b.id}</span>
+                                    </div>
+                                    <p className="text-slate-700 italic mt-0.5">"{b.original}"</p>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <p className="text-xs text-slate-500 italic p-3 bg-slate-50 rounded-xl">
+                        {(currentAtsAnalysis.recommendationSummary?.bulletsEvaluated ?? 0) === 0
+                          ? 'No experience or project bullets found in this resume version.'
+                          : 'All analyzed bullet points feature strong action verbs, clear technical scope, and validated impact.'}
+                      </p>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
 
@@ -3344,8 +3507,8 @@ export default function ResumeBuilderPage() {
                     >
                       <div className="flex items-center justify-between mb-1">
                         <span className="font-bold text-xs text-[#11183D]">{tmpl.name}</span>
-                        <span className="text-[10px] font-mono font-bold bg-white px-2 py-0.5 rounded border border-[#DCE7F2]">
-                          ATS {tmpl.atsRating}%
+                        <span className="text-[10px] font-semibold text-slate-600 bg-white px-2 py-0.5 rounded border border-[#DCE7F2]">
+                          {tmpl.layoutStyle}
                         </span>
                       </div>
                       <p className="text-[11px] text-[#526078] line-clamp-2">{tmpl.desc}</p>
@@ -3374,6 +3537,8 @@ export default function ResumeBuilderPage() {
         isOpen={isCopilotOpen}
         onClose={() => setIsCopilotOpen(false)}
         bulletsAudit={currentAtsAnalysis.bulletsAudit}
+        recommendationGroups={currentAtsAnalysis.recommendationGroups}
+        recommendationSummary={currentAtsAnalysis.recommendationSummary}
       />
 
       {/* Template Selection Modal */}

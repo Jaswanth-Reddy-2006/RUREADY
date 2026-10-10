@@ -43,11 +43,11 @@ Recipe Finder Web App
 • Implemented user login and favorite recipe storage.
 `;
 
-  // 3. High-Quality Concise Student Resume (Jaswanth Reddy)
-  const jaswanthResume = `
-JASWANTH REDDY
-Hyderabad, Telangana, India | +91 8008154808 | jaswanthre9@gmail.com
-linkedin.com/in/jasreaug | github.com/Jaswanth-Reddy-2006
+  // 3. High-Quality Concise Student Resume
+  const studentResume = `
+ALEX MORGAN
+San Francisco, CA | +1 (555) 234-5678 | alex.morgan@example.com
+linkedin.com/in/alexmorgan-dev | github.com/alexmorgan-tech
 
 EDUCATION
 Bachelor of Technology — Computer Science & Engineering
@@ -155,7 +155,7 @@ Methodologies & Tools: Agile Methodology, Scrum, Jira, Financial Modeling
   const resumes = [
     { name: '1. Weak / Bare-bones Resume', text: weakResume, expectedRange: [25, 45] },
     { name: '2. Average Student Resume (Unquantified)', text: averageResume, expectedRange: [50, 70] },
-    { name: '3. Jaswanth Reddy Resume (Concise, High-Quality)', text: jaswanthResume, expectedRange: [85, 93] },
+    { name: '3. Student Resume (Concise, High-Quality)', text: studentResume, expectedRange: [85, 93] },
     { name: '4. Senior Staff Engineer Resume (Top-Tier)', text: seniorResume, expectedRange: [90, 98] },
     { name: '5. Bloated & Repetitive Resume (Filler Phrases)', text: bloatedResume, expectedRange: [40, 65] },
     { name: '6. Non-Software Marketing Lead Resume', text: marketingResume, expectedRange: [80, 95] },
@@ -203,17 +203,17 @@ Methodologies & Tools: Agile Methodology, Scrum, Jira, Financial Modeling
   // Verify meaningful score distribution
   const weakScore = results[0].score;
   const avgScore = results[1].score;
-  const jaswanthScore = results[2].score;
+  const studentScore = results[2].score;
   const seniorScore = results[3].score;
   const bloatedScore = results[4].score;
   const marketingScore = results[5].score;
 
-  if (!(weakScore < avgScore && avgScore < jaswanthScore && jaswanthScore <= seniorScore)) {
-    throw new Error(`FAIL: Expected weak (${weakScore}) < avg (${avgScore}) < jaswanth (${jaswanthScore}) <= senior (${seniorScore})`);
+  if (!(weakScore < avgScore && avgScore < studentScore && studentScore <= seniorScore)) {
+    throw new Error(`FAIL: Expected weak (${weakScore}) < avg (${avgScore}) < student (${studentScore}) <= senior (${seniorScore})`);
   }
 
-  if (bloatedScore >= jaswanthScore) {
-    throw new Error(`FAIL: Bloated resume (${bloatedScore}) should score lower than high quality resume (${jaswanthScore})`);
+  if (bloatedScore >= studentScore) {
+    throw new Error(`FAIL: Bloated resume (${bloatedScore}) should score lower than high quality resume (${studentScore})`);
   }
 
   console.log('\nALL DIFFERENTIATION ASSERTIONS PASSED SUCCESSFULLY!');

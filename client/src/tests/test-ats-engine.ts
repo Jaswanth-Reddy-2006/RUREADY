@@ -258,9 +258,9 @@ console.log(`  ✅ PASSED No fabricated semantic score and no ATS+semantic blend
 // Test 4: Strict Data Integrity Verification (No Fake Data Injected)
 console.log('[TEST 8] Strict Data Integrity & Zero Fake Defaults Verification');
 const studentResumeRaw = `
-JASWANTH REDDY
-Hyderabad, Telangana, India | +91 8008154808 | jaswanthre9@gmail.com
-linkedin.com/in/jasreaug | github.com/Jaswanth-Reddy-2006
+ALEX MORGAN
+San Francisco, CA | +1 (555) 234-5678 | alex.morgan@example.com
+linkedin.com/in/alexmorgan-dev | github.com/alexmorgan-tech
 
 EDUCATION
 Bachelor of Technology — Computer Science & Engineering
@@ -292,22 +292,22 @@ console.log(`  Parsed Education Count: ${studentParsed.education.length}`);
 console.log(`  Education 1: ${studentParsed.education[0]?.school} | ${studentParsed.education[0]?.degree} | GPA: ${studentParsed.education[0]?.gpa} | End: ${studentParsed.education[0]?.endDate}`);
 console.log(`  Parsed Experience Count: ${studentParsed.experience.length}`);
 
-if (studentParsed.personalInfo.fullName !== 'JASWANTH REDDY') {
+if (studentParsed.personalInfo.fullName !== 'ALEX MORGAN') {
   throw new Error(`Data Integrity Error: Name mismatch! Got "${studentParsed.personalInfo.fullName}"`);
 }
-if (!studentParsed.personalInfo.location.includes('Hyderabad')) {
+if (!studentParsed.personalInfo.location.includes('San Francisco')) {
   throw new Error(`Data Integrity Error: Location mismatch! Got "${studentParsed.personalInfo.location}"`);
 }
-if (studentParsed.personalInfo.phone !== '+91 8008154808') {
+if (studentParsed.personalInfo.phone !== '+1 (555) 234-5678') {
   throw new Error(`Data Integrity Error: Phone mismatch! Got "${studentParsed.personalInfo.phone}"`);
 }
-if (studentParsed.personalInfo.email !== 'jaswanthre9@gmail.com') {
+if (studentParsed.personalInfo.email !== 'alex.morgan@example.com') {
   throw new Error(`Data Integrity Error: Email mismatch! Got "${studentParsed.personalInfo.email}"`);
 }
-if (!studentParsed.personalInfo.linkedin.includes('jasreaug')) {
+if (!studentParsed.personalInfo.linkedin.includes('alexmorgan-dev')) {
   throw new Error(`Data Integrity Error: LinkedIn mismatch! Got "${studentParsed.personalInfo.linkedin}"`);
 }
-if (!studentParsed.personalInfo.github.includes('Jaswanth-Reddy-2006')) {
+if (!studentParsed.personalInfo.github.includes('alexmorgan-tech')) {
   throw new Error(`Data Integrity Error: GitHub mismatch! Got "${studentParsed.personalInfo.github}"`);
 }
 if (studentParsed.experience.length !== 0) {
@@ -335,9 +335,9 @@ const docxSample = new Document({
   sections: [
     {
       children: [
-        new Paragraph({ text: 'JASWANTH REDDY', heading: HeadingLevel.HEADING_1 }),
-        new Paragraph({ text: 'Hyderabad, Telangana, India | +91 8008154808 | jaswanthre9@gmail.com' }),
-        new Paragraph({ text: 'https://linkedin.com/in/jasreaug | https://github.com/Jaswanth-Reddy-2006' }),
+        new Paragraph({ text: 'ALEX MORGAN', heading: HeadingLevel.HEADING_1 }),
+        new Paragraph({ text: 'San Francisco, CA | +1 (555) 234-5678 | alex.morgan@example.com' }),
+        new Paragraph({ text: 'https://linkedin.com/in/alexmorgan-dev | https://github.com/alexmorgan-tech' }),
         new Paragraph({ text: 'EDUCATION', heading: HeadingLevel.HEADING_2 }),
         new Paragraph({ text: 'Bachelor of Technology — Computer Science & Engineering' }),
         new Paragraph({ text: 'Vidya Jyothi Institute of Technology, Hyderabad' }),
@@ -373,10 +373,10 @@ console.log(`  DOCX Extracted Phone: "${parsedFromDocx.personalInfo.phone}"`);
 console.log(`  DOCX Extracted Education Count: ${parsedFromDocx.education.length}`);
 console.log(`  DOCX Extracted Projects Count: ${parsedFromDocx.projects.length}`);
 
-if (parsedFromDocx.personalInfo.fullName !== 'JASWANTH REDDY') {
+if (parsedFromDocx.personalInfo.fullName !== 'ALEX MORGAN') {
   throw new Error(`DOCX Parser Error: Name mismatch! Got "${parsedFromDocx.personalInfo.fullName}"`);
 }
-if (!parsedFromDocx.personalInfo.location.includes('Hyderabad')) {
+if (!parsedFromDocx.personalInfo.location.includes('San Francisco')) {
   throw new Error(`DOCX Parser Error: Location mismatch! Got "${parsedFromDocx.personalInfo.location}"`);
 }
 if (parsedFromDocx.education.length !== 2) {
@@ -411,9 +411,9 @@ console.log('[TEST 11] PDF vs DOCX Canonical Pipeline Parity & ATS Equivalence T
 
 // Simulated rawText from PDF extractor (with PDF linebreaks)
 const pdfExtractedRaw = `
-JASWANTH REDDY
-Hyderabad, Telangana, India
-+91 8008154808 | jaswanthre9@gmail.com | linkedin.com/in/jasreaug | github.com/Jaswanth-Reddy-2006
+ALEX MORGAN
+San Francisco, CA
++1 (555) 234-5678 | alex.morgan@example.com | linkedin.com/in/alexmorgan-dev | github.com/alexmorgan-tech
 
 EDUCATION
 Bachelor of Technology — Computer Science & Engineering
@@ -435,9 +435,9 @@ Smart Health Analytics Platform | React, Node.js, MongoDB
 
 // Simulated rawText from DOCX extractor (with table/paragraph formatting)
 const docxExtractedRaw = `
-JASWANTH REDDY
-Hyderabad, Telangana, India | +91 8008154808 | jaswanthre9@gmail.com
-https://linkedin.com/in/jasreaug | https://github.com/Jaswanth-Reddy-2006
+ALEX MORGAN
+San Francisco, CA | +1 (555) 234-5678 | alex.morgan@example.com
+https://linkedin.com/in/alexmorgan-dev | https://github.com/alexmorgan-tech
 
 EDUCATION
 Bachelor of Technology — Computer Science & Engineering

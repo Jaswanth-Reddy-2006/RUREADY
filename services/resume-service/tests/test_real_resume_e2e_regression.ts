@@ -56,8 +56,8 @@ async function runActualDocumentE2ERegression() {
     execSync(`python -c "
 import docx, os
 d = docx.Document()
-d.add_heading('JASWANTH REDDY', level=0)
-d.add_paragraph('Hyderabad, Telangana, India | +91 8008154808 | jaswanthre9@gmail.com | linkedin.com/in/jasreaug | github.com/Jaswanth-Reddy-2006')
+d.add_heading('ALEX MORGAN', level=0)
+d.add_paragraph('San Francisco, CA | +1 (555) 234-5678 | alex.morgan@example.com | linkedin.com/in/alexmorgan-dev | github.com/alexmorgan-tech')
 d.add_heading('EDUCATION', level=1)
 d.add_paragraph('Bachelor of Technology — Computer Science & Engineering\\nVidya Jyothi Institute of Technology, Hyderabad\\nGPA: 8.76 / 10 | 2028 Expected')
 d.add_paragraph('Intermediate\\nNarayana Junior College, Hyderabad\\n2022 - 2024')

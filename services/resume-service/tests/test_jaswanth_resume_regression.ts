@@ -1,11 +1,17 @@
 import assert from 'node:assert';
-import { documentParserService } from '../src/services/documentParser.service.js';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { structuredResumeMapperService } from '../src/services/structuredResumeMapper.service.js';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 async function runTest() {
-  console.log('--- Testing Jaswanth Reddy Resume Regression ---');
-  const pdfPath = 'C:/Users/rafey/Downloads/Jaswanth_Reddy_Resume.pdf';
-  const doclingData = await documentParserService.parseFilePath(pdfPath, 'Jaswanth_Reddy_Resume.pdf');
+  console.log('--- Testing Student Resume Regression (Synthetic Fixture) ---');
+  const fixturePath = path.resolve(__dirname, 'fixtures/jaswanth_docling_utf8.json');
+  const fixtureRaw = JSON.parse(fs.readFileSync(fixturePath, 'utf-8'));
+  const doclingData = fixtureRaw.data;
   
   assert.ok(doclingData.character_count > 3000, `Docling extracted ${doclingData.character_count} chars`);
   assert.ok(doclingData.structured_elements.length >= 50, `Extracted ${doclingData.structured_elements.length} elements`);
@@ -13,11 +19,11 @@ async function runTest() {
   const resume = structuredResumeMapperService.mapDoclingToStructuredResume(doclingData);
 
   // 1. Personal Info
-  assert.strictEqual(resume.personalInfo.fullName, 'R JASWANTH REDDY');
-  assert.strictEqual(resume.personalInfo.email, 'jaswanthre9@gmail.com');
-  assert.ok(resume.personalInfo.phone.includes('80081'), `Phone ${resume.personalInfo.phone}`);
-  assert.strictEqual(resume.personalInfo.linkedin, 'https://linkedin.com/in/jasreaug');
-  assert.strictEqual(resume.personalInfo.github, 'https://github.com/Jaswanth-Reddy-2006');
+  assert.strictEqual(resume.personalInfo.fullName, 'ALEX MORGAN');
+  assert.strictEqual(resume.personalInfo.email, 'alex.morgan@example.com');
+  assert.ok(resume.personalInfo.phone.includes('234-5678'), `Phone ${resume.personalInfo.phone}`);
+  assert.strictEqual(resume.personalInfo.linkedin, 'https://linkedin.com/in/alexmorgan-dev');
+  assert.strictEqual(resume.personalInfo.github, 'https://github.com/alexmorgan-tech');
 
   // 2. Summary
   assert.ok(resume.summary.includes('Computer Science undergraduate'), 'Summary preserved');
@@ -93,7 +99,7 @@ async function runTest() {
   assert.ok(declaration, 'Declaration custom section preserved');
   assert.ok(declaration.items.some((i) => i.includes('authenticity of the details')), 'Declaration text');
 
-  console.log('PASS: All assertions verified for Jaswanth Reddy Resume Regression!');
+  console.log('PASS: All assertions verified for Student Resume Regression!');
 }
 
 runTest().catch((err) => {
