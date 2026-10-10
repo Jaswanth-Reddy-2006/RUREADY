@@ -15,6 +15,11 @@ export default function HarvardClassicTemplate({ data }: TemplateProps) {
         <h1 className="text-2xl font-bold uppercase tracking-wider text-black">
           {data.personalInfo.fullName}
         </h1>
+        {data.personalInfo.title && (
+          <p className="text-xs font-semibold uppercase tracking-wider text-gray-800 font-sans">
+            {data.personalInfo.title}
+          </p>
+        )}
 
         <div className="text-[11px] text-gray-800 flex flex-wrap justify-center items-center gap-x-2 gap-y-0.5">
           {data.personalInfo.location && <span>{data.personalInfo.location}</span>}

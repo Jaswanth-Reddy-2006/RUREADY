@@ -473,7 +473,12 @@ export function parseRawResumeToData(rawText: string): Partial<ResumeData> {
   let location = '';
   for (let i = 0; i < Math.min(10, lines.length); i++) {
     const line = lines[i].trim();
-    if (line === fullName || line === title || /^(?:education|experience|skills|summary|projects)/i.test(line)) continue;
+    // Stop preamble location scan immediately if any main body section heading is encountered
+    if (/^(?:education|experience|work\s+experience|professional\s+experience|skills|technical\s+skills|summary|projects|certifications)\b/i.test(line)) {
+      break;
+    }
+    // Skip candidate name, title, or lines starting with bullet markers
+    if (line === fullName || line === title || /^[•\-*‣·◦▪●]|\d+\.\s+/.test(line)) continue;
 
     // Check if line contains pipe/separator with location
     const parts = line.split(/[|•–—\n]/).map((p) => p.trim());
@@ -485,6 +490,7 @@ export function parseRawResumeToData(rawText: string): Partial<ResumeData> {
         !/\.(?:com|org|net|io|dev|app)\b/i.test(part) &&
         !/university|college|institute|school|technologies|solutions/i.test(part) &&
         !/^(?:phone|email|portfolio|github|linkedin|website)/i.test(part) &&
+        !/tailwind|css|html|react|javascript|typescript|redux|node|material\s*ui|vue|angular/i.test(part) &&
         /\b(?:[A-Z][a-zA-Z.\-]+(?:\s+[A-Z][a-zA-Z.\-]+)*,\s*[A-Z][a-zA-Z.\-]+(?:\s+[A-Z][a-zA-Z.\-]+)*(?:,\s*[A-Z][a-zA-Z.\-]+)?|Remote|Hybrid|On-site)\b/i.test(part)
       ) {
         location = part.replace(/^Location\s*[:\-]\s*/i, '').trim();
@@ -648,28 +654,31 @@ function extractSectionContent(text: string, headerRegex: RegExp): string {
 
       // Check if line is a metadata line for current experience (company | dates)
       if (!isBullet && currentExp && isDateLine && (line.includes('|') || line.includes('-') || line.includes('–') || line.includes(','))) {
-        const parts = line.split(/[|–—]|\s+-\s+/).map((p) => p.trim());
-        if (parts.length >= 2) {
+        const parts = line.split(/[|–—]|\s+[-–—]\s+/).map((p) => p.trim());
+        const isFirstPartDate = /\b(19\d\d|20\d\d|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|present)\b/i.test(parts[0]);
+        if (parts.length >= 2 && !isFirstPartDate) {
           currentExp.company = parts[0] || currentExp.company;
-          const datePart = parts[1] || '';
-          const years = datePart.match(/\b(19\d\d|20\d\d|Present)\b/gi);
-          if (years && years.length >= 2) {
-            currentExp.startDate = years[0];
-            currentExp.endDate = years[1];
-            currentExp.current = /present/i.test(years[1]);
-          } else if (years) {
-            currentExp.endDate = years[0];
-          }
+        }
+        const datePart = isFirstPartDate ? line : (parts[1] || '');
+        const years = datePart.match(/\b(?:(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s*)?(?:19\d\d|20\d\d)\b|\bPresent\b/gi);
+        if (years && years.length >= 2) {
+          currentExp.startDate = years[0];
+          currentExp.endDate = years[1];
+          currentExp.current = /present/i.test(years[1]);
+        } else if (years && years.length === 1) {
+          currentExp.startDate = years[0];
+          currentExp.endDate = /present/i.test(datePart) ? 'Present' : years[0];
+          currentExp.current = /present/i.test(datePart);
         }
         return;
       }
 
       const isRoleTitle = !isBullet && !isDateLine && (
         /designer|engineer|developer|lead|architect|intern|manager|analyst|scientist|director|researcher|consultant|specialist|strategist|coordinator|officer|associate|executive|recruiter|writer|accountant|technician|representative|instructor|educator|practitioner|auditor|administrator/i.test(line) ||
-        line.includes(' at ') || line.includes(' @ ')
+        line.includes(' at ') || line.includes(' @ ') || /\s+[-–—|]\s+/.test(line)
       );
 
-      if (isRoleTitle && line.length < 80) {
+      if (isRoleTitle && line.length < 90) {
         if (currentExp) experience.push(currentExp);
         let titlePart = line;
         let companyPart = '';
@@ -682,6 +691,20 @@ function extractSectionContent(text: string, headerRegex: RegExp): string {
           const atParts = line.split(' @ ');
           titlePart = atParts[0].trim();
           companyPart = atParts[1].trim();
+        } else if (/\s+[-–—|]\s+/.test(line)) {
+          const hyphenParts = line.split(/\s+[-–—|]\s+/).map((p) => p.trim());
+          if (hyphenParts.length >= 2) {
+            const roleRegex = /designer|engineer|developer|lead|architect|intern|manager|analyst|scientist|director|researcher|consultant|specialist|strategist|coordinator|officer|associate|executive|recruiter|writer|accountant|technician|representative|instructor|educator|practitioner|auditor|administrator/i;
+            if (roleRegex.test(hyphenParts[1]) && !roleRegex.test(hyphenParts[0])) {
+              // Company - Title format
+              companyPart = hyphenParts[0];
+              titlePart = hyphenParts[1];
+            } else if (roleRegex.test(hyphenParts[0])) {
+              // Title - Company format
+              titlePart = hyphenParts[0];
+              companyPart = hyphenParts[1];
+            }
+          }
         }
 
         currentExp = {

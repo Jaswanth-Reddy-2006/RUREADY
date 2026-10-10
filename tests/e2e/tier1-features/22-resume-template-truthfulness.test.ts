@@ -12,6 +12,23 @@ describe('Resume ATS Template Layout Truthfulness & Authoritative Score Integrit
     'stanford-academic',
     'startup-innovator',
     'executive-suite',
+    'swiss-precision',
+    'executive-blackline',
+    'harvard-professional',
+    'modern-editorial',
+    'career-pivot',
+    'graduate-launch',
+    'compact-professional',
+    'principal-engineer',
+    'fullstack-architect',
+    'cloud-devops',
+    'cybersecurity-specialist',
+    'data-ai-research',
+    'product-engineering',
+    'product-manager',
+    'ux-case-study',
+    'academic-researcher',
+    'consulting-strategy',
   ];
 
   const ALLOWED_LAYOUT_STYLES = [
@@ -22,13 +39,17 @@ describe('Resume ATS Template Layout Truthfulness & Authoritative Score Integrit
     'Compact',
     'Academic',
     'Executive',
+    'Technical',
   ];
 
   describe('1. Truthful Template Metadata Verification', () => {
-    it('defines exactly the 8 expected ATS design templates', () => {
-      expect(TEMPLATE_METADATA).toHaveLength(8);
+    it('defines exactly the 25 expected ATS design templates', () => {
+      expect(TEMPLATE_METADATA).toHaveLength(25);
       const ids = TEMPLATE_METADATA.map((t) => t.id);
       expect(ids).toEqual(EXPECTED_TEMPLATE_IDS);
+      // Ensure no duplicate IDs
+      const uniqueIds = new Set(ids);
+      expect(uniqueIds.size).toBe(25);
     });
 
     it('assigns truthful, descriptive layoutStyle labels to every template', () => {
@@ -84,6 +105,23 @@ describe('Resume ATS Template Layout Truthfulness & Authoritative Score Integrit
       'stanford-academic': 'Academic',
       'startup-innovator': 'Modern',
       'executive-suite': 'Executive',
+      'swiss-precision': 'Minimal',
+      'executive-blackline': 'Executive',
+      'harvard-professional': 'Traditional',
+      'modern-editorial': 'Modern',
+      'career-pivot': 'Modern',
+      'graduate-launch': 'Modern',
+      'compact-professional': 'Compact',
+      'principal-engineer': 'Technical',
+      'fullstack-architect': 'Technical',
+      'cloud-devops': 'Technical',
+      'cybersecurity-specialist': 'Technical',
+      'data-ai-research': 'Academic',
+      'product-engineering': 'Modern',
+      'product-manager': 'Modern',
+      'ux-case-study': 'Two-column',
+      'academic-researcher': 'Academic',
+      'consulting-strategy': 'Executive',
     };
 
     it('maps every template ID to its designated truthful layout style', () => {
@@ -131,7 +169,7 @@ describe('Resume ATS Template Layout Truthfulness & Authoritative Score Integrit
       expect(baselineAnalysis.totalScore).toBe(calculatedSum);
     });
 
-    it('switching across all eight templates does NOT change the authoritative ATS score', () => {
+    it('switching across all 25 templates does NOT change the authoritative ATS score', () => {
       const initialScore = calculateAtsScore(sampleResume);
 
       for (const templateId of EXPECTED_TEMPLATE_IDS) {

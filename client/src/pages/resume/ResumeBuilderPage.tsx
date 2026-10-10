@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useResumeStore, ResumeTemplateId, TEMPLATE_METADATA } from '../../store/useResumeStore';
+import { useResumeStore, ResumeTemplateId, TEMPLATE_METADATA, TemplateMetadata } from '../../store/useResumeStore';
 import { useProfileStore } from '../../store/useProfileStore';
 import ResumeRenderer from '../../components/resume/templates/ResumeRenderer';
 import ResumeCopilotDrawer from '../../components/resume/ResumeCopilotDrawer';
@@ -13,7 +13,7 @@ import {
   Sparkles, Download, ArrowLeft, Plus, Trash2, Check, ShieldCheck, ExternalLink,
   BookOpen, Lightbulb, Trophy, Languages, Layers, Target, UploadCloud, RefreshCw,
   CheckCircle2, XCircle, AlertCircle, BookmarkCheck, ChevronDown, ChevronUp,
-  UserCheck, AlertTriangle, ArrowRight, HelpCircle
+  UserCheck, AlertTriangle, ArrowRight, HelpCircle, Search, Eye, Filter
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -134,6 +134,9 @@ export default function ResumeBuilderPage() {
   const [mobileTab, setMobileTab] = useState<'EDITOR' | 'PREVIEW'>('EDITOR');
   const [isCopilotOpen, setIsCopilotOpen] = useState(false);
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
+  const [previewingTemplate, setPreviewingTemplate] = useState<TemplateMetadata | null>(null);
+  const [templateSearchQuery, setTemplateSearchQuery] = useState('');
+  const [templateCategoryFilter, setTemplateCategoryFilter] = useState<string>('ALL');
   const [isUploading, setIsUploading] = useState(false);
 
   // 1. Entered Target Role Matching State (Standardized Role Profile)
@@ -3489,31 +3492,171 @@ export default function ResumeBuilderPage() {
             {/* DESIGN TEMPLATES SECTION */}
             {activeSection === 'TEMPLATES' && (
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-bold font-display text-[#11183D]">Select ATS Design Layout</h3>
-                  <span className="text-xs font-mono text-[#526078]">8 ATS Layouts Available</span>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#DCE7F2] pb-3">
+                  <div>
+                    <h3 className="text-lg font-bold font-display text-[#11183D]">Select Resume Design Layout</h3>
+                    <p className="text-xs text-[#526078]">
+                      25 professional templates tailored for modern recruiters and ATS scanners
+                    </p>
+                  </div>
+                  <span className="text-xs font-mono font-semibold text-[#2459A8] bg-[#EFFAFD] px-2.5 py-1 rounded-full border border-[#DCE7F2] shrink-0 self-start sm:self-auto">
+                    {TEMPLATE_METADATA.filter(tmpl => {
+                      const matchesSearch =
+                        templateSearchQuery.trim() === '' ||
+                        tmpl.name.toLowerCase().includes(templateSearchQuery.toLowerCase()) ||
+                        tmpl.desc.toLowerCase().includes(templateSearchQuery.toLowerCase()) ||
+                        tmpl.recommendedFor.toLowerCase().includes(templateSearchQuery.toLowerCase()) ||
+                        tmpl.layoutStyle.toLowerCase().includes(templateSearchQuery.toLowerCase());
+                      const matchesCategory =
+                        templateCategoryFilter === 'ALL' || tmpl.category === templateCategoryFilter;
+                      return matchesSearch && matchesCategory;
+                    }).length} of {TEMPLATE_METADATA.length} Available
+                  </span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {TEMPLATE_METADATA.map((tmpl) => (
-                    <div
-                      key={tmpl.id}
-                      onClick={() => handleSelectTemplate(tmpl.id)}
-                      className={`p-4 rounded-2xl border text-left cursor-pointer transition-all ${
-                        currentTemplate === tmpl.id
-                          ? 'border-[#2459A8] bg-[#EFFAFD] shadow-xs ring-2 ring-[#2459A8]/20'
-                          : 'border-[#DCE7F2] bg-slate-50 hover:bg-slate-100'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-bold text-xs text-[#11183D]">{tmpl.name}</span>
-                        <span className="text-[10px] font-semibold text-slate-600 bg-white px-2 py-0.5 rounded border border-[#DCE7F2]">
-                          {tmpl.layoutStyle}
-                        </span>
+                {/* Search & Category Filter Controls */}
+                <div className="space-y-2.5">
+                  <div className="relative">
+                    <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="text"
+                      value={templateSearchQuery}
+                      onChange={(e) => setTemplateSearchQuery(e.target.value)}
+                      placeholder="Search templates by role, style, or industry..."
+                      className="w-full pl-9 pr-8 py-2 bg-white rounded-xl border border-[#DCE7F2] text-xs text-[#11183D] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#2459A8]/20 focus:border-[#2459A8]"
+                    />
+                    {templateSearchQuery && (
+                      <button
+                        onClick={() => setTemplateSearchQuery('')}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-600 font-bold"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Category Filter Tabs */}
+                  <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
+                    {[
+                      { id: 'ALL', label: `All (${TEMPLATE_METADATA.length})` },
+                      { id: 'ATS-friendly', label: 'ATS-Friendly' },
+                      { id: 'Modern professional', label: 'Modern Professional' },
+                      { id: 'Technical specialist', label: 'Technical Specialist' },
+                      { id: 'Academic and research', label: 'Academic & Research' },
+                      { id: 'Creative and visual', label: 'Creative & Visual' },
+                    ].map((cat) => (
+                      <button
+                        key={cat.id}
+                        onClick={() => setTemplateCategoryFilter(cat.id)}
+                        className={`px-3 py-1.5 rounded-xl font-medium text-xs whitespace-nowrap transition-colors cursor-pointer ${
+                          templateCategoryFilter === cat.id
+                            ? 'bg-[#2459A8] text-white shadow-2xs font-semibold'
+                            : 'bg-white text-slate-600 hover:bg-slate-100 border border-[#DCE7F2]'
+                        }`}
+                      >
+                        {cat.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 25 Templates Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[600px] overflow-y-auto pr-1">
+                  {TEMPLATE_METADATA.filter(tmpl => {
+                    const matchesSearch =
+                      templateSearchQuery.trim() === '' ||
+                      tmpl.name.toLowerCase().includes(templateSearchQuery.toLowerCase()) ||
+                      tmpl.desc.toLowerCase().includes(templateSearchQuery.toLowerCase()) ||
+                      tmpl.recommendedFor.toLowerCase().includes(templateSearchQuery.toLowerCase()) ||
+                      tmpl.layoutStyle.toLowerCase().includes(templateSearchQuery.toLowerCase());
+                    const matchesCategory =
+                      templateCategoryFilter === 'ALL' || tmpl.category === templateCategoryFilter;
+                    return matchesSearch && matchesCategory;
+                  }).map((tmpl) => {
+                    const isSelected = currentTemplate === tmpl.id;
+                    return (
+                      <div
+                        key={tmpl.id}
+                        className={`p-3.5 rounded-2xl border text-left transition-all flex flex-col justify-between gap-2.5 ${
+                          isSelected
+                            ? 'border-[#2459A8] bg-[#EFFAFD] shadow-xs ring-2 ring-[#2459A8]/20'
+                            : 'border-[#DCE7F2] bg-white hover:bg-slate-50'
+                        }`}
+                      >
+                        <div className="space-y-1">
+                          <div className="flex items-start justify-between gap-1.5">
+                            <div>
+                              <h4 className="font-bold text-xs text-[#11183D] flex items-center gap-1">
+                                {tmpl.name}
+                                {isSelected && (
+                                  <span className="p-0.5 rounded-full bg-[#2459A8] text-white">
+                                    <Check size={9} />
+                                  </span>
+                                )}
+                              </h4>
+                              <span className="text-[10px] text-slate-500 font-medium">
+                                {tmpl.category}
+                              </span>
+                            </div>
+
+                            <div className="flex flex-col items-end gap-0.5 shrink-0">
+                              <span className={`text-[9.5px] font-semibold px-1.5 py-0.2 rounded-full border ${
+                                tmpl.isAtsOptimized
+                                  ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                                  : 'bg-amber-50 text-amber-800 border-amber-200'
+                              }`}>
+                                {tmpl.isAtsOptimized ? 'ATS-Safe' : 'Visual'}
+                              </span>
+                              <span className="text-[9.5px] font-medium text-slate-600 bg-slate-100 px-1.5 py-0.2 rounded border border-slate-200">
+                                {tmpl.layoutStyle}
+                              </span>
+                            </div>
+                          </div>
+
+                          <p className="text-[11px] text-[#526078] line-clamp-2 leading-relaxed">
+                            {tmpl.desc}
+                          </p>
+
+                          <p className="text-[10px] text-slate-600 line-clamp-1 pt-0.5">
+                            <strong className="text-slate-800 font-semibold">Best for: </strong>
+                            {tmpl.recommendedFor}
+                          </p>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex items-center gap-2 pt-2 border-t border-[#DCE7F2]/60">
+                          <button
+                            onClick={() => handleSelectTemplate(tmpl.id)}
+                            className={`flex-1 py-1.5 px-2.5 rounded-xl text-xs font-bold transition-colors cursor-pointer flex items-center justify-center gap-1 ${
+                              isSelected
+                                ? 'bg-[#2459A8] text-white shadow-2xs'
+                                : 'bg-slate-100 text-[#11183D] hover:bg-slate-200'
+                            }`}
+                          >
+                            {isSelected ? (
+                              <>
+                                <Check size={12} />
+                                <span>Active Layout</span>
+                              </>
+                            ) : (
+                              <span>Use Template</span>
+                            )}
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              setPreviewingTemplate(tmpl);
+                              setIsTemplateModalOpen(true);
+                            }}
+                            title="Full Document Preview"
+                            className="p-1.5 rounded-xl border border-[#DCE7F2] bg-white text-[#526078] hover:text-[#11183D] hover:bg-slate-100 transition-colors cursor-pointer"
+                          >
+                            <Eye size={14} />
+                          </button>
+                        </div>
                       </div>
-                      <p className="text-[11px] text-[#526078] line-clamp-2">{tmpl.desc}</p>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -3544,10 +3687,13 @@ export default function ResumeBuilderPage() {
       {/* Template Selection Modal */}
       <TemplateOverviewModal
         isOpen={isTemplateModalOpen}
-        onClose={() => setIsTemplateModalOpen(false)}
-        template={TEMPLATE_METADATA.find(t => t.id === currentTemplate) || TEMPLATE_METADATA[0]}
+        onClose={() => {
+          setIsTemplateModalOpen(false);
+          setPreviewingTemplate(null);
+        }}
+        template={previewingTemplate || TEMPLATE_METADATA.find(t => t.id === currentTemplate) || TEMPLATE_METADATA[0]}
         onSelect={handleSelectTemplate}
-        isSelected={true}
+        isSelected={previewingTemplate ? previewingTemplate.id === currentTemplate : true}
       />
     </div>
   );

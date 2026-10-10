@@ -2,6 +2,13 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { ResumeData, calculateAtsScore, AtsScoreResult, extractKeywordsFromJd, normalizeResumeData } from '../utils/atsEngine';
 
+export type TemplateCategory =
+  | 'ATS-friendly'
+  | 'Modern professional'
+  | 'Technical specialist'
+  | 'Academic and research'
+  | 'Creative and visual';
+
 export type ResumeTemplateId =
   | 'modern-tech'
   | 'harvard-classic'
@@ -10,17 +17,36 @@ export type ResumeTemplateId =
   | 'faang-compact'
   | 'stanford-academic'
   | 'startup-innovator'
-  | 'executive-suite';
+  | 'executive-suite'
+  | 'swiss-precision'
+  | 'executive-blackline'
+  | 'harvard-professional'
+  | 'modern-editorial'
+  | 'career-pivot'
+  | 'graduate-launch'
+  | 'compact-professional'
+  | 'principal-engineer'
+  | 'fullstack-architect'
+  | 'cloud-devops'
+  | 'cybersecurity-specialist'
+  | 'data-ai-research'
+  | 'product-engineering'
+  | 'product-manager'
+  | 'ux-case-study'
+  | 'academic-researcher'
+  | 'consulting-strategy';
 
 export interface TemplateMetadata {
   id: ResumeTemplateId;
   name: string;
+  category: TemplateCategory;
   tag: string;
   badge: string;
   desc: string;
   layoutStyle: string;
   recommendedFor: string;
   highlights: string[];
+  isAtsOptimized: boolean;
   samplePersona: ResumeData;
 }
 
@@ -281,15 +307,17 @@ const SAMPLE_PERSONA_BASE: ResumeData = {
   ]
 };
 
-// ─── 8 Diverse Templates with Distinct Random Personas (NO user-specific names) ───
+// ─── 25 Distinct Premium Templates (NO user-specific names) ───
 export const TEMPLATE_METADATA: TemplateMetadata[] = [
   {
     id: 'modern-tech',
     name: 'Modern Tech',
+    category: 'Modern professional',
     tag: 'Silicon Valley Standard',
     badge: 'Popular',
     desc: 'High-contrast typography with colored technical badges, clean horizontal rules, and modern headers.',
     layoutStyle: 'Modern',
+    isAtsOptimized: true,
     recommendedFor: 'Full-Stack Developers, Frontend Engineers, Cloud & DevOps Specialists',
     highlights: ['Single-page density', 'Tag-based skills matrix', 'STAR bullet metrics emphasis'],
     samplePersona: {
@@ -309,10 +337,12 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
   {
     id: 'harvard-classic',
     name: 'Harvard Classic',
+    category: 'ATS-friendly',
     tag: 'Ivy League Traditional',
     badge: 'Traditional',
     desc: 'Timeless single-column serif formatting favored by Fortune 500 recruiters and academic institutions.',
     layoutStyle: 'Traditional',
+    isAtsOptimized: true,
     recommendedFor: 'Campus Graduates, Software Engineers, Quant Developers, Management Consultants',
     highlights: ['Legacy ATS machine-readable format', 'Conservative serif hierarchy', 'Clean academic date alignments'],
     samplePersona: {
@@ -332,10 +362,12 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
   {
     id: 'minimal-executive',
     name: 'Minimalist Executive',
+    category: 'Modern professional',
     tag: 'Staff & Principal Lead',
     badge: 'High Density',
     desc: 'Crisp typographic layout engineered for maximum information density without visual clutter.',
     layoutStyle: 'Minimal',
+    isAtsOptimized: true,
     recommendedFor: 'Staff Software Engineers, Tech Leads, Engineering Managers, Architects',
     highlights: ['Maximum bullet density', 'Subtle border dividers', 'Zero wasted whitespace'],
     samplePersona: {
@@ -355,10 +387,12 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
   {
     id: 'creative-fullstack',
     name: 'Creative Fullstack',
+    category: 'Creative and visual',
     tag: 'Brand Accent & Portfolio',
     badge: 'Two-Column',
     desc: 'Two-column structured layout highlighting a persistent skills matrix and highlighted production projects.',
     layoutStyle: 'Two-column',
+    isAtsOptimized: false,
     recommendedFor: 'UI/UX Engineers, Product Engineers, Creative Technologists, Mobile Developers',
     highlights: ['Visual skill rating bars', 'Sidebar contact & links', 'Showcased repository links'],
     samplePersona: {
@@ -378,10 +412,12 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
   {
     id: 'faang-compact',
     name: 'FAANG High-Yield',
+    category: 'ATS-friendly',
     tag: 'Big Tech Engineering',
     badge: 'Recruiter Favorite',
     desc: 'Ultra-dense single-page engineering layout favored by recruiters at Google, Meta, and Amazon.',
     layoutStyle: 'Compact',
+    isAtsOptimized: true,
     recommendedFor: 'Targeting FAANG / Tier-1 Tech, High-Volume Job Applications, Backend Engineers',
     highlights: ['Single-page guaranteed', 'Metrics-first bold keywords', 'Tight line spacing'],
     samplePersona: {
@@ -401,10 +437,12 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
   {
     id: 'stanford-academic',
     name: 'Stanford Academic',
+    category: 'Academic and research',
     tag: 'Research & Scholarly CV',
     badge: 'Academic Standard',
     desc: 'Formal scholarly layout prioritizing university distinctions, research papers, GPA, and coursework.',
     layoutStyle: 'Academic',
+    isAtsOptimized: true,
     recommendedFor: 'MS/PhD Candidates, Research Scientists, Machine Learning Researchers, Interns',
     highlights: ['Education first hierarchy', 'Research grants & honors', 'Standard scholarly serif'],
     samplePersona: {
@@ -424,10 +462,12 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
   {
     id: 'startup-innovator',
     name: 'Startup Innovator',
+    category: 'Modern professional',
     tag: 'Venture & High-Growth',
     badge: 'Modern Accent',
     desc: 'Dynamic, modern format designed for agile engineers who build 0-to-1 products and ship fast.',
     layoutStyle: 'Modern',
+    isAtsOptimized: true,
     recommendedFor: 'Founding Engineers, Early-Stage Hires, Hackathon Winners, Full-Stack Builders',
     highlights: ['0-to-1 impact metrics', 'Product launch badges', 'Modern indigo accents'],
     samplePersona: {
@@ -447,10 +487,12 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
   {
     id: 'executive-suite',
     name: 'Executive Suite',
+    category: 'Modern professional',
     tag: 'Leadership & Director',
     badge: 'Executive',
     desc: 'Sophisticated corporate design featuring centered header, strategic milestone banner, and governance points.',
     layoutStyle: 'Executive',
+    isAtsOptimized: true,
     recommendedFor: 'VP of Engineering, CTO, Engineering Directors, Technical Product Leaders',
     highlights: ['Executive summary callout', 'Strategic P&L metrics', 'Leadership governance framing'],
     samplePersona: {
@@ -464,6 +506,526 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
         linkedin: 'https://linkedin.com/in/sophiasterling-exec',
         github: 'https://github.com/ssterling-lead',
         portfolio: 'https://sophiasterling.com'
+      }
+    }
+  },
+  {
+    id: 'swiss-precision',
+    name: 'Swiss Precision',
+    category: 'ATS-friendly',
+    tag: 'Disciplined Grid & Whitespace',
+    badge: 'Monochrome',
+    desc: 'Minimal Swiss-inspired typography, disciplined grid, elegant whitespace, and crisp monochrome hierarchy.',
+    layoutStyle: 'Minimal',
+    isAtsOptimized: true,
+    recommendedFor: 'Systems Engineers, Quantitative Analysts, Architects, Precision-Focused Professionals',
+    highlights: ['Strict architectural grid', 'High-contrast typography', 'Tabular alignment'],
+    samplePersona: {
+      ...SAMPLE_PERSONA_BASE,
+      personalInfo: {
+        fullName: 'Julian Meier',
+        title: 'Principal Systems & Performance Engineer',
+        email: 'julian.meier@zurich-tech.ch',
+        phone: '+41 44 632 11 11',
+        location: 'Zurich, Switzerland',
+        linkedin: 'https://linkedin.com/in/julian-meier-systems',
+        github: 'https://github.com/jmeier-swiss',
+        portfolio: 'https://julianmeier.design'
+      }
+    }
+  },
+  {
+    id: 'executive-blackline',
+    name: 'Executive Blackline',
+    category: 'Modern professional',
+    tag: 'Director & C-Suite Authority',
+    badge: 'Leadership',
+    desc: 'Senior professional and director-level resume with a strong nameplate, leadership summary, and executive experience hierarchy.',
+    layoutStyle: 'Executive',
+    isAtsOptimized: true,
+    recommendedFor: 'Directors, VPs, Heads of Engineering, Senior Enterprise Leaders',
+    highlights: ['Authoritative nameplate bar', 'Leadership scope callout', 'Governance & board milestones'],
+    samplePersona: {
+      ...SAMPLE_PERSONA_BASE,
+      personalInfo: {
+        fullName: 'Richard Vance Thorne',
+        title: 'Chief Technology Officer & Engineering Director',
+        email: 'richard.thorne@executive-advisory.io',
+        phone: '+1 (202) 555-0188',
+        location: 'Washington, DC / New York',
+        linkedin: 'https://linkedin.com/in/richardvthorne',
+        github: 'https://github.com/rvthorne-exec',
+        portfolio: 'https://richardthorne.io'
+      }
+    }
+  },
+  {
+    id: 'harvard-professional',
+    name: 'Harvard Professional',
+    category: 'ATS-friendly',
+    tag: 'Consulting & Legal Gold Standard',
+    badge: 'Traditional',
+    desc: 'Traditional single-column, serif-inspired academic and consulting format with refined classical rules.',
+    layoutStyle: 'Traditional',
+    isAtsOptimized: true,
+    recommendedFor: 'Strategy Consultants, Corporate Lawyers, Investment Bankers, Senior Economists',
+    highlights: ['Flawless parsing layout', 'Classical serif typography', 'Flush-right aligned chronologies'],
+    samplePersona: {
+      ...SAMPLE_PERSONA_BASE,
+      personalInfo: {
+        fullName: 'Arthur Kensington III',
+        title: 'Principal Strategy & Management Consultant',
+        email: 'arthur.kensington@alumni.harvard.edu',
+        phone: '+1 (617) 555-0143',
+        location: 'Boston, MA',
+        linkedin: 'https://linkedin.com/in/arthur-kensington',
+        github: 'https://github.com/akensington-consult',
+        portfolio: 'https://kensingtonadvisory.com'
+      }
+    }
+  },
+  {
+    id: 'modern-editorial',
+    name: 'Modern Editorial',
+    category: 'Modern professional',
+    tag: 'Refined Typography & Rules',
+    badge: 'Editorial',
+    desc: 'Refined editorial typography, subtle rules, carefully spaced headings, and a premium document feel.',
+    layoutStyle: 'Modern',
+    isAtsOptimized: true,
+    recommendedFor: 'Technical Writers, Strategists, Communications Leads, Senior Analysts',
+    highlights: ['Balanced editorial leading', 'Subtle dividing rules', 'Sophisticated typographic contrast'],
+    samplePersona: {
+      ...SAMPLE_PERSONA_BASE,
+      personalInfo: {
+        fullName: 'Camille Laurent',
+        title: 'Staff Technical Communications & Product Strategist',
+        email: 'camille.laurent@editorial-tech.fr',
+        phone: '+33 1 42 68 55 00',
+        location: 'Paris, France / Remote',
+        linkedin: 'https://linkedin.com/in/camille-laurent-editorial',
+        github: 'https://github.com/claurent-writings',
+        portfolio: 'https://camillelaurent.press'
+      }
+    }
+  },
+  {
+    id: 'career-pivot',
+    name: 'Career Pivot',
+    category: 'Modern professional',
+    tag: 'Transferable Competencies',
+    badge: 'Skills-Forward',
+    desc: 'Skills-forward layout that highlights transferable capabilities, selected achievements, and relevant projects.',
+    layoutStyle: 'Modern',
+    isAtsOptimized: true,
+    recommendedFor: 'Career Changers, Industry Switchers, Boot Camp Graduates, Returning Professionals',
+    highlights: ['Prominent transferable matrix', 'Selected transition achievements', 'Hybrid functional chronology'],
+    samplePersona: {
+      ...SAMPLE_PERSONA_BASE,
+      personalInfo: {
+        fullName: 'Elena Rostova',
+        title: 'Software Engineer & Former Operations Lead',
+        email: 'elena.rostova@career-transition.dev',
+        phone: '+1 (415) 555-0177',
+        location: 'San Francisco, CA',
+        linkedin: 'https://linkedin.com/in/elena-rostova-pivot',
+        github: 'https://github.com/erostova-builds',
+        portfolio: 'https://elenarostova.dev'
+      }
+    }
+  },
+  {
+    id: 'graduate-launch',
+    name: 'Graduate Launch',
+    category: 'ATS-friendly',
+    tag: 'Education-First & Internships',
+    badge: 'Campus',
+    desc: 'Designed for fresh graduates, internships, academic projects, certifications, and education-first presentation.',
+    layoutStyle: 'Modern',
+    isAtsOptimized: true,
+    recommendedFor: 'University Graduates, Interns, Entry-Level Engineers, Fellowship Applicants',
+    highlights: ['Education-first hierarchy', 'Showcased capstone projects', 'Coursework & honors callouts'],
+    samplePersona: {
+      ...SAMPLE_PERSONA_BASE,
+      personalInfo: {
+        fullName: 'Ethan Zhang',
+        title: 'Incoming Associate Software Engineer',
+        email: 'ethan.zhang@university-grad.edu',
+        phone: '+1 (206) 555-0165',
+        location: 'Seattle, WA',
+        linkedin: 'https://linkedin.com/in/ethan-zhang-cs',
+        github: 'https://github.com/ezhang-launch',
+        portfolio: 'https://ethanzhang.me'
+      }
+    }
+  },
+  {
+    id: 'compact-professional',
+    name: 'Compact Professional',
+    category: 'ATS-friendly',
+    tag: 'Space-Efficient Chronology',
+    badge: 'Compact',
+    desc: 'Space-efficient layout for experienced candidates with substantial work history, without sacrificing readability.',
+    layoutStyle: 'Compact',
+    isAtsOptimized: true,
+    recommendedFor: 'Senior Engineers with 10+ Years History, Contractors, Multi-Role Professionals',
+    highlights: ['Condensed vertical rhythm', 'Inline contact coordinates', 'Maximized content density'],
+    samplePersona: {
+      ...SAMPLE_PERSONA_BASE,
+      personalInfo: {
+        fullName: 'Thomas Bradley',
+        title: 'Lead Software Architect & Senior Consultant',
+        email: 't.bradley@tech-consultancy.co.uk',
+        phone: '+44 20 7946 0912',
+        location: 'London, UK',
+        linkedin: 'https://linkedin.com/in/thomasbradley-lead',
+        github: 'https://github.com/tbradley-arch',
+        portfolio: 'https://thomasbradley.net'
+      }
+    }
+  },
+  {
+    id: 'principal-engineer',
+    name: 'Principal Engineer',
+    category: 'Technical specialist',
+    tag: 'Architecture & System Scale',
+    badge: 'Technical',
+    desc: 'Architecture, technical leadership, engineering impact, distributed systems design, and mentoring.',
+    layoutStyle: 'Technical',
+    isAtsOptimized: true,
+    recommendedFor: 'Principal Engineers, Staff Engineers, Chief Architects, Systems Fellows',
+    highlights: ['Systems scale callouts', 'Architectural milestone bullets', 'Mentorship & patents section'],
+    samplePersona: {
+      ...SAMPLE_PERSONA_BASE,
+      personalInfo: {
+        fullName: 'Dr. Raymond Scott',
+        title: 'Principal Systems Architect & Technical Director',
+        email: 'raymond.scott@distributed-systems.org',
+        phone: '+1 (408) 555-0131',
+        location: 'Santa Clara, CA',
+        linkedin: 'https://linkedin.com/in/raymond-scott-principal',
+        github: 'https://github.com/rscott-distributed',
+        portfolio: 'https://raymondscott.systems'
+      }
+    }
+  },
+  {
+    id: 'fullstack-architect',
+    name: 'Full-Stack Architect',
+    category: 'Technical specialist',
+    tag: 'End-to-End Stack & Delivery',
+    badge: 'Technical',
+    desc: 'Technical stack, production projects, architecture decisions, and software delivery experience.',
+    layoutStyle: 'Technical',
+    isAtsOptimized: true,
+    recommendedFor: 'Full-Stack Architects, Lead Developers, Solutions Engineers',
+    highlights: ['4-tier tech taxonomy', 'Production systems showcase', 'Delivery lifecycle metrics'],
+    samplePersona: {
+      ...SAMPLE_PERSONA_BASE,
+      personalInfo: {
+        fullName: 'Lucas Vasquez',
+        title: 'Staff Full-Stack & Solutions Architect',
+        email: 'lucas.vasquez@fullstack-arch.io',
+        phone: '+1 (512) 555-0129',
+        location: 'Austin, TX',
+        linkedin: 'https://linkedin.com/in/lucasvasquez-arch',
+        github: 'https://github.com/lvasquez-code',
+        portfolio: 'https://lucasvasquez.dev'
+      }
+    }
+  },
+  {
+    id: 'cloud-devops',
+    name: 'Cloud & DevOps',
+    category: 'Technical specialist',
+    tag: 'Infrastructure, SRE & CI/CD',
+    badge: 'Technical',
+    desc: 'Cloud platforms, infrastructure, CI/CD, automation, observability, and certifications.',
+    layoutStyle: 'Technical',
+    isAtsOptimized: true,
+    recommendedFor: 'DevOps Engineers, SREs, Cloud Architects, Platform Engineers',
+    highlights: ['Dedicated cloud certs banner', 'IaC & CI/CD pipeline focus', 'SLA & uptime reliability metrics'],
+    samplePersona: {
+      ...SAMPLE_PERSONA_BASE,
+      personalInfo: {
+        fullName: 'Kavita Sundaram',
+        title: 'Staff Cloud Infrastructure & SRE Platform Lead',
+        email: 'kavita.sundaram@cloud-platform.net',
+        phone: '+1 (206) 555-0199',
+        location: 'Seattle, WA',
+        linkedin: 'https://linkedin.com/in/kavita-sundaram-sre',
+        github: 'https://github.com/ksundaram-infra',
+        portfolio: 'https://kavitasundaram.cloud'
+      }
+    }
+  },
+  {
+    id: 'cybersecurity-specialist',
+    name: 'Cybersecurity Specialist',
+    category: 'Technical specialist',
+    tag: 'Security, PenTesting & GRC',
+    badge: 'Technical',
+    desc: 'Security tools, authorized labs, defensive experience, certifications, and security projects.',
+    layoutStyle: 'Technical',
+    isAtsOptimized: true,
+    recommendedFor: 'Security Engineers, Penetration Testers, SOC Analysts, AppSec Leads',
+    highlights: ['Security clearances & certs', 'Threat modeling competencies', 'Defensive infrastructure bullets'],
+    samplePersona: {
+      ...SAMPLE_PERSONA_BASE,
+      personalInfo: {
+        fullName: 'Nathaniel Drake',
+        title: 'Senior Information Security & DevSecOps Engineer',
+        email: 'nathaniel.drake@infosec-defense.org',
+        phone: '+1 (703) 555-0182',
+        location: 'Reston, VA',
+        linkedin: 'https://linkedin.com/in/nathaniel-drake-sec',
+        github: 'https://github.com/ndrake-security',
+        portfolio: 'https://nathanieldrake.sec'
+      },
+      summary: 'Information Security and DevSecOps Engineer with 6+ years specializing in SIEM monitoring, vulnerability management, threat intelligence, and zero-trust cloud architecture. Proven track record mitigating 150+ critical CVEs across hybrid enterprise infrastructures.',
+      skills: {
+        languages: ['Python', 'Bash', 'PowerShell', 'Go', 'SQL'],
+        frameworks: ['Threat Intelligence', 'MITRE ATT&CK', 'NIST CSF', 'OWASP Top 10', 'Zero Trust Architecture'],
+        databases: ['PostgreSQL', 'Elasticsearch', 'Redis', 'BigQuery'],
+        cloudDevOps: ['AWS Security Hub', 'Terraform', 'Docker', 'Kubernetes', 'GuardDuty'],
+        tools: ['Splunk', 'Wireshark', 'Burp Suite', 'Tenable Nessus', 'CrowdStrike Falcon', 'Snort', 'Git']
+      },
+      projects: [
+        {
+          id: 'proj-cyber-1',
+          name: 'SentinelGuard — Automated Threat Intelligence & SIEM Pipeline',
+          description: 'Automated real-time log ingestion and threat correlation system integrating Splunk alerts with MITRE ATT&CK taxonomy.',
+          techStack: ['Python', 'Splunk', 'Elasticsearch', 'Docker', 'Bash'],
+          repoUrl: 'https://github.com/ndrake-security/sentinelguard',
+          bullets: [
+            'Engineered automated SIEM ingestion pipelines processing 50M+ security events daily with sub-second alert dispatch.',
+            'Developed custom threat detection rules eliminating 45% of false positive alerts across enterprise endpoints.'
+          ]
+        },
+        {
+          id: 'proj-cyber-2',
+          name: 'VulnSweep — Continuous CI/CD Vulnerability Scanner',
+          description: 'DevSecOps automated container and dependency security audit gate integrated with GitHub Actions.',
+          techStack: ['Go', 'Tenable Nessus', 'Docker', 'GitHub Actions'],
+          repoUrl: 'https://github.com/ndrake-security/vulnsweep',
+          bullets: [
+            'Automated CVE scanning blocking high-severity container image vulnerabilities before production deployment.',
+            'Reduced vulnerability resolution turnaround time from 14 days to 48 hours across 24 microservices.'
+          ]
+        }
+      ],
+      certifications: [
+        {
+          id: 'cert-cyber-1',
+          title: 'Certified Information Systems Security Professional (CISSP)',
+          issuer: '(ISC)²',
+          date: '2023-05'
+        },
+        {
+          id: 'cert-cyber-2',
+          title: 'Certified Ethical Hacker (CEH)',
+          issuer: 'EC-Council',
+          date: '2022-08'
+        }
+      ]
+    }
+  },
+  {
+    id: 'data-ai-research',
+    name: 'Data & AI Research',
+    category: 'Academic and research',
+    tag: 'Machine Learning & Neural Models',
+    badge: 'Academic',
+    desc: 'Data science, machine learning, research, technical publications, models, and measurable experimental findings.',
+    layoutStyle: 'Academic',
+    isAtsOptimized: true,
+    recommendedFor: 'Machine Learning Engineers, AI Researchers, Data Scientists, Quant Modelers',
+    highlights: ['Model architecture matrix', 'Experimental benchmark metrics', 'Peer-reviewed research links'],
+    samplePersona: {
+      ...SAMPLE_PERSONA_BASE,
+      personalInfo: {
+        fullName: 'Dr. Aaron Levinson',
+        title: 'Staff AI Research Scientist & Deep Learning Lead',
+        email: 'aaron.levinson@ai-research-labs.org',
+        phone: '+1 (617) 555-0193',
+        location: 'Cambridge, MA',
+        linkedin: 'https://linkedin.com/in/aaron-levinson-ai',
+        github: 'https://github.com/alevinson-models',
+        portfolio: 'https://aaronlevinson.ai'
+      },
+      summary: 'AI Research Scientist with a Ph.D. in Computer Science and 5+ years of experience leading deep learning architecture design, multimodal representation learning, and distributed LLM fine-tuning. First-author on 4 NeurIPS/ICLR publications with 1,200+ citations.',
+      skills: {
+        languages: ['Python', 'C++', 'CUDA', 'Julia', 'SQL'],
+        frameworks: ['PyTorch', 'JAX', 'Hugging Face Transformers', 'TensorFlow', 'DeepSpeed', 'vLLM'],
+        databases: ['Pinecone', 'Milvus', 'ChromaDB', 'PostgreSQL (pgvector)'],
+        cloudDevOps: ['NVIDIA Slurm', 'AWS EC2 (H100/A100)', 'Docker', 'Kubernetes (KubeFlow)', 'Ray'],
+        tools: ['Weights & Biases', 'Git', 'MLflow', 'Triton Inference Server', 'ONNX']
+      },
+      projects: [
+        {
+          id: 'proj-ai-1',
+          name: 'NovaAlign — Parameter-Efficient Fine-Tuning for Multimodal LLMs',
+          description: 'Open-source distributed framework for low-rank adaptation and alignment of 70B parameter multimodal architectures.',
+          techStack: ['Python', 'PyTorch', 'DeepSpeed', 'Hugging Face', 'CUDA'],
+          repoUrl: 'https://github.com/alevinson-models/nova-align',
+          bullets: [
+            'Architected distributed FP8 training pipelines scaling to 64 NVIDIA H100 GPUs with 94.2% linear scaling efficiency.',
+            'Achieved 14% higher inference throughput and 3.2x memory savings compared to baseline LoRA implementations.'
+          ]
+        },
+        {
+          id: 'proj-ai-2',
+          name: 'VectorSense — High-Dimensional Retrieval & Re-Ranking Engine',
+          description: 'Sub-millisecond dense retrieval pipeline combining approximate nearest neighbors with cross-encoder re-ranking.',
+          techStack: ['Python', 'C++', 'pgvector', 'Milvus', 'Triton'],
+          repoUrl: 'https://github.com/alevinson-models/vector-sense',
+          bullets: [
+            'Built vector indexing architecture indexing 20M+ text embeddings with 98.7% recall at k=10 in 18ms latency.',
+            'Deployed production microservice handling 4,000 queries per second with automated fallback caches.'
+          ]
+        }
+      ],
+      publications: [
+        {
+          id: 'pub-ai-1',
+          title: 'Scaling Laws for Parameter-Efficient Multimodal Representation Learning',
+          venue: 'Conference on Neural Information Processing Systems (NeurIPS)',
+          date: '2024',
+          url: 'https://doi.org/10.48550/arXiv.2405.00001'
+        },
+        {
+          id: 'pub-ai-2',
+          title: 'Sub-quadratic Attention Routing for Long-Context Sequence Modeling',
+          venue: 'International Conference on Learning Representations (ICLR)',
+          date: '2023',
+          url: 'https://doi.org/10.48550/arXiv.2305.00002'
+        }
+      ],
+      certifications: []
+    }
+  },
+  {
+    id: 'product-engineering',
+    name: 'Product & Engineering',
+    category: 'Technical specialist',
+    tag: 'Feature Delivery & UX Impact',
+    badge: 'Technical',
+    desc: 'Product engineering, cross-functional collaboration, shipped features, and product outcomes.',
+    layoutStyle: 'Modern',
+    isAtsOptimized: true,
+    recommendedFor: 'Product Engineers, Growth Engineers, Frontend Architects, Startup Builders',
+    highlights: ['User impact metrics', 'Shipped product callouts', 'Cross-functional scope framing'],
+    samplePersona: {
+      ...SAMPLE_PERSONA_BASE,
+      personalInfo: {
+        fullName: 'Clara Oswald',
+        title: 'Lead Product Software Engineer',
+        email: 'clara.oswald@shipped-product.io',
+        phone: '+1 (347) 555-0158',
+        location: 'Brooklyn, NY',
+        linkedin: 'https://linkedin.com/in/clara-oswald-prod',
+        github: 'https://github.com/coswald-product',
+        portfolio: 'https://claraoswald.io'
+      }
+    }
+  },
+  {
+    id: 'product-manager',
+    name: 'Product Manager',
+    category: 'Modern professional',
+    tag: 'Launches, Prioritization & Growth',
+    badge: 'Modern',
+    desc: 'Product summary, product launches, ownership, prioritization, and verified business outcomes.',
+    layoutStyle: 'Modern',
+    isAtsOptimized: true,
+    recommendedFor: 'Product Managers, Technical PMs, Group PMs, VP of Product',
+    highlights: ['Problem-Solution-Impact format', 'User growth & retention numbers', 'Product methodology skills'],
+    samplePersona: {
+      ...SAMPLE_PERSONA_BASE,
+      personalInfo: {
+        fullName: 'Priya Sharma',
+        title: 'Lead Technical Product Manager',
+        email: 'priya.sharma@product-leadership.com',
+        phone: '+1 (415) 555-0149',
+        location: 'San Francisco, CA',
+        linkedin: 'https://linkedin.com/in/priyasharma-pm',
+        github: 'https://github.com/psharma-pm',
+        portfolio: 'https://priyasharma.pm'
+      }
+    }
+  },
+  {
+    id: 'ux-case-study',
+    name: 'UX Case Study',
+    category: 'Creative and visual',
+    tag: 'Design Systems & Case Studies',
+    badge: 'Two-Column',
+    desc: 'Product design, research, case studies, design systems, and portfolio links, with a carefully controlled visual layout.',
+    layoutStyle: 'Two-column',
+    isAtsOptimized: false,
+    recommendedFor: 'Product Designers, UX Researchers, Design System Leads, UI Specialists',
+    highlights: ['Controlled two-column canvas', 'Dedicated design toolkit', 'Case study narrative highlights'],
+    samplePersona: {
+      ...SAMPLE_PERSONA_BASE,
+      personalInfo: {
+        fullName: 'Mia Lindqvist',
+        title: 'Staff Product Designer & Design Systems Lead',
+        email: 'mia.lindqvist@design-systems.se',
+        phone: '+46 8 123 45 67',
+        location: 'Stockholm, Sweden / Remote',
+        linkedin: 'https://linkedin.com/in/mialindqvist-ux',
+        github: 'https://github.com/mlindqvist-design',
+        portfolio: 'https://mialindqvist.design'
+      }
+    }
+  },
+  {
+    id: 'academic-researcher',
+    name: 'Academic Researcher',
+    category: 'Academic and research',
+    tag: 'Publications, Grants & Teaching',
+    badge: 'Academic',
+    desc: 'Education, research experience, publications, presentations, grants, teaching, and academic achievements.',
+    layoutStyle: 'Academic',
+    isAtsOptimized: true,
+    recommendedFor: 'Postdocs, Professors, PhD Fellows, University Lecturers, Grant Researchers',
+    highlights: ['Comprehensive scholarly CV format', 'Formatted publication bibliographies', 'Grants, fellowships & teaching'],
+    samplePersona: {
+      ...SAMPLE_PERSONA_BASE,
+      personalInfo: {
+        fullName: 'Dr. Gregory Houseman',
+        title: 'Associate Professor of Computer Science & Research Director',
+        email: 'g.houseman@university-research.edu',
+        phone: '+1 (312) 555-0196',
+        location: 'Chicago, IL',
+        linkedin: 'https://linkedin.com/in/ghouseman-academic',
+        github: 'https://github.com/ghouseman-lab',
+        portfolio: 'https://housemanlab.edu'
+      }
+    }
+  },
+  {
+    id: 'consulting-strategy',
+    name: 'Consulting & Strategy',
+    category: 'Modern professional',
+    tag: 'Executive Impact & Client Advisory',
+    badge: 'Executive',
+    desc: 'Structured executive summary, selected impact, analytical projects, leadership, and client-facing experience.',
+    layoutStyle: 'Executive',
+    isAtsOptimized: true,
+    recommendedFor: 'Management Consultants, Corporate Strategy Managers, Engagement Managers',
+    highlights: ['Executive engagement framing', 'Structured impact quantification', 'Practice area competencies'],
+    samplePersona: {
+      ...SAMPLE_PERSONA_BASE,
+      personalInfo: {
+        fullName: 'Victoria Sterling Chase',
+        title: 'Engagement Manager & Strategy Practice Lead',
+        email: 'victoria.chase@global-advisory-partners.com',
+        phone: '+1 (212) 555-0144',
+        location: 'New York, NY',
+        linkedin: 'https://linkedin.com/in/victoriachase-strategy',
+        github: 'https://github.com/vchase-consulting',
+        portfolio: 'https://victoriachase.consulting'
       }
     }
   }
