@@ -138,10 +138,10 @@ const SECTION_PATTERNS: Array<[Category, RegExp]> = [
   ['publications', /^(?:publications?|papers?|articles?|conference\s+proceedings|journal\s+publications|refereed\s+papers?|theses|thesis)$/i],
   ['certifications', /^(?:certifications?|professional\s+certifications?|licenses?\s*(?:&|and)\s*certifications?|certifications?\s*(?:&|and)\s*licenses?)$/i],
   ['education', /^(?:education|academics?|educational\s+qualifications|educational\s+background|academic\s+background|academic\s+qualifications|academic\s+history|qualifications?|degrees?)$/i],
-  ['skills', /^(?:technical\s+(?:skills?|competencies|expertise|proficiencies)|skills?\s*(?:&|and|\/)\s*(?:abilities|tools|competencies)|skills?|technologies|tech\s+stack|competenc(?:y|ies)|proficienc(?:y|ies)|areas?\s+of\s+expertise|programming\s+languages?\s*(?:&|and|\/)\s*tools?|computational\s+skills)$/i],
+  ['skills', /^(?:technical\s+(?:skills?|competencies|expertise|proficiencies)|skills?\s*(?:&|and|\/)\s*(?:abilities|tools|competencies|technologies)|skills?|tools?\s*(?:&|and|\/)\s*technologies?|software\s+tools?|design\s+tools?|design\s+skills?|core\s+competencies?|technologies|tech\s+stack|competenc(?:y|ies)|proficienc(?:y|ies)|areas?\s+of\s+expertise|programming\s+languages?\s*(?:&|and|\/)\s*tools?|computational\s+skills|tools)$/i],
   ['programming_languages', /^(?:programming\s+languages?|coding\s+languages?|technical\s+languages?|computer\s+languages?)$/i],
   ['spoken_languages', /^(?:spoken\s+languages?|language\s+proficiency|foreign\s+languages?|natural\s+languages?|languages?\s+known|languages?\s+spoken|known\s+languages?)$/i],
-  ['projects', /^(?:projects?|personal\s+projects|academic\s+projects|key\s+projects|technical\s+projects|selected\s+projects|capstone\s+projects?)$/i],
+  ['projects', /^(?:projects?|personal\s+projects|academic\s+projects|key\s+projects|technical\s+projects|selected\s+projects|featured\s+projects?|recent\s+projects?|capstone\s+projects?|case\s+studies?|selected\s+case\s+studies?|key\s+case\s+studies?|portfolio|selected\s+work)$/i],
   ['experience', /^(?:professional\s+experience|work\s+experience|experience|employment|work\s+history|career\s+history|professional\s+background|industry\s+experience|internship\s+experience|internships?|internship)$/i],
   ['summary', /^(?:summary|executive\s+summary|professional\s+summary|profile|about\s+me|career\s+objective|objective|personal\s+statement)$/i],
   ['personal_info', /^(?:personal\s+(?:information|details|data)|contact\s+(?:information|details|info)|contact)$/i],
@@ -219,6 +219,10 @@ const GPA_RE = /\b(?:gpa|cgpa|percentage|score)\s*[:\-]?\s*([0-9]+(?:\.[0-9]+)?(
 const GPA_BARE_RE = /\b([0-9]\.\d{1,2})\s*\/\s*(?:4(?:\.0+)?|10(?:\.0+)?)\b/i;
 const PLACE_RE = /\b([A-Z][a-zA-Z.\-]+(?:\s+[A-Z][a-zA-Z.\-]+)*(?:,\s*[A-Z][a-zA-Z.\-]+)+|Remote|Hybrid|Bangalore|Chennai|Hyderabad|Mumbai|Delhi|Seattle|Mountain View|San Francisco|New York|London|Boston|Austin)\b/i;
 const COMPANY_SUFFIX_RE = /\b(inc|llc|ltd|limited|corp|corporation|company|co|technologies|technology|labs|lab|systems|solutions|services|group|consulting|studios|works|gmbh|pvt|private|google|meta|amazon|microsoft|apple|netflix|uber|stripe|adobe)\b\.?$/i;
+const SECTION_HEADING_WORDS = /^(?:resume|curriculum\s+vitae|cv|experience|work\s+experience|education|skills|technical\s+skills|projects|summary|profile|contact|contact\s+info|certifications|achievements|courses|publications|patents)$/i;
+const TITLE_OR_ROLE_PATTERN = /\b(?:software|frontend|backend|full\s*stack|devops|cloud|data|ml|ai|cybersecurity|security|ui\/ux|product|web|mobile|ios|android|system|engineer|developer|designer|architect|manager|specialist|analyst|scientist|consultant|researcher|assistant|fellow|associate|instructor|technician|administrator|officer|coordinator|lead|intern|student|curriculum\s+vitae|resume)\b/i;
+const INSTITUTION_OR_COMPANY_WORD = /\b(?:university|college|institute|school|academy|technologies|technology|systems|solutions|services|corp|corporation|inc|llc|ltd|gmbh|foundation|lab|labs|department|polytechnic|campus|faculty|board|center|centre)\b/i;
+const CONTACT_INDICATORS_RE = /(?:[📧📱💼🌐✉📞]|\b(?:email|mail|phone|tel|mobile|linkedin|github|portfolio|website|location|address|city|country)\b\s*[:\-])/i;
 
 const KNOWN_PROGRAMMING_LANGUAGES = new Set([
   'c', 'c++', 'c#', 'python', 'java', 'javascript', 'typescript', 'go', 'golang', 'rust',
@@ -423,10 +427,21 @@ function groupSections(blocks: Block[]): { preamble: Block[]; sections: Section[
 
       // An unrecognized header is ONLY treated as a custom top-level section if it's explicitly
       // a header-type, not a deeper heading level, and does not look like an entry/role/subheading.
+      // Crucially, entry-bearing sections (projects, experience, education, skills, research, publications)
+      // contain entries with bold/sub-headings that must NOT be split into orphan top-level custom sections.
+      const isEntryBearingSection =
+        current.category === 'projects' ||
+        current.category === 'experience' ||
+        current.category === 'education' ||
+        current.category === 'skills' ||
+        current.category === 'research_experience' ||
+        current.category === 'teaching_experience';
+
       const isTopLevelCustomSection =
         isHeaderType &&
         !isDeeperLevel &&
         !looksLikeNestedEntry &&
+        !isEntryBearingSection &&
         words.length >= 1 &&
         words.length <= 6;
 
@@ -447,12 +462,22 @@ function groupSections(blocks: Block[]): { preamble: Block[]; sections: Section[
       const cleanText = cleanMarkdownDecorators(b.text).trim();
       const words = cleanText.split(/\s+/).filter(Boolean);
 
+      const isCandidateName = looksLikeName(cleanText);
+      const isCandidateRole = TITLE_OR_ROLE_PATTERN.test(cleanText);
+      const isContactOrLocation =
+        EMAIL_RE.test(cleanText) ||
+        PHONE_RE.test(cleanText) ||
+        URL_RE.test(cleanText) ||
+        CONTACT_INDICATORS_RE.test(cleanText) ||
+        PLACE_RE.test(cleanText);
+
+      // In the preamble, candidate name, role/title, and contact/location lines
+      // must remain in preamble and NEVER start a top-level section.
       if (
         isHeaderType &&
-        !looksLikeName(cleanText) &&
-        !EMAIL_RE.test(cleanText) &&
-        !PHONE_RE.test(cleanText) &&
-        !URL_RE.test(cleanText) &&
+        !isCandidateName &&
+        !isCandidateRole &&
+        !isContactOrLocation &&
         words.length >= 1 &&
         words.length <= 6
       ) {
@@ -477,9 +502,6 @@ function sectionTextLines(sec: Section): string[] {
 }
 
 // ── Personal info ─────────────────────────────────────────────────────────
-const SECTION_HEADING_WORDS = /^(?:resume|curriculum\s+vitae|cv|experience|work\s+experience|education|skills|technical\s+skills|projects|summary|profile|contact|contact\s+info|certifications|achievements|courses|publications|patents)$/i;
-const TITLE_OR_ROLE_PATTERN = /\b(?:software|frontend|backend|full\s*stack|devops|cloud|data|ml|ai|cybersecurity|security|ui\/ux|product|web|mobile|ios|android|system|engineer|developer|designer|architect|manager|specialist|analyst|scientist|consultant|researcher|assistant|fellow|associate|instructor|technician|administrator|officer|coordinator|lead|intern|student|curriculum\s+vitae|resume)\b/i;
-const INSTITUTION_OR_COMPANY_WORD = /\b(?:university|college|institute|school|academy|technologies|technology|systems|solutions|services|corp|corporation|inc|llc|ltd|gmbh|foundation|lab|labs|department|polytechnic|campus|faculty|board|center|centre)\b/i;
 
 function looksLikeName(line: string): boolean {
   const clean = cleanMarkdownDecorators(line);
@@ -990,7 +1012,7 @@ export function splitSkillList(value: string): string[] {
 
 function mapSkills(sec: Section): StructuredResume['skills'] {
   const lines = sectionTextLines(sec);
-  const result = technologyDictionaryService.extractSkillsFromSection(lines);
+  const result = technologyDictionaryService.extractSkillsFromSection(lines, sec.header);
   return result.skills;
 }
 
@@ -1300,7 +1322,7 @@ export function mapDoclingToStructuredResume(input: DoclingInput): StructuredRes
         break;
       case 'skills': {
         const lines = sectionTextLines(sec);
-        const { skills: s, spokenLanguages } = technologyDictionaryService.extractSkillsFromSection(lines);
+        const { skills: s, spokenLanguages } = technologyDictionaryService.extractSkillsFromSection(lines, sec.header);
         (Object.keys(s) as Array<keyof StructuredResume['skills']>).forEach((k) => {
           (resume.skills[k] as string[]).push(...((s[k] as string[]) || []));
         });

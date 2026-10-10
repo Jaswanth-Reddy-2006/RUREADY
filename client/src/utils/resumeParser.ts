@@ -115,7 +115,7 @@ export async function extractTextFromDocxArrayBuffer(arrayBuffer: ArrayBuffer): 
     const relsFile = zip.file('word/_rels/document.xml.rels');
     if (relsFile) {
       const relsXml = await relsFile.async('text');
-      const targetMatches = relsXml.matchAll(/Target="(https?:\/\/[^"]+)"/g);
+      const targetMatches = relsXml.matchAll(/Target="((?:https?:\/\/|mailto:)[^"]+)"/g);
       for (const match of targetMatches) {
         if (match[1] && !urls.includes(match[1])) {
           urls.push(match[1]);

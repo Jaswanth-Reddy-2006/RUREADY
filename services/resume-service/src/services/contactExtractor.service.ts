@@ -48,7 +48,7 @@ const US_INTL_PHONE_RE = /(?:\+?1[\s.-]?)?(?:\(\d{3}\)|\d{3})[\s.-]?\d{3}[\s.-]?
 const GENERAL_INTL_PHONE_RE = /\+\d{1,4}[\s.-]?(?:\(?\d{1,4}\)?[\s.-]?)?\d{2,4}[\s.-]?\d{2,4}[\s.-]?\d{2,4}\b/g;
 
 // ── URL & Social Patterns ──────────────────────────────────────────────────
-const MARKDOWN_LINK_RE = /\[([^\]]*)\]\((https?:\/\/[^\s\)]+|www\.[^\s\)]+|[a-zA-Z0-9_.\-]+\.[a-zA-Z]{2,}[^\s\)]*)\)/gi;
+const MARKDOWN_LINK_RE = /\[([^\]]*)\]\(((?:https?:\/\/|www\.|mailto:|[a-zA-Z0-9_.\-]+\.[a-zA-Z]{2,})[^\s\)]*)\)/gi;
 const RAW_URL_RE = /\b(?:https?:\/\/)?(?:www\.)?([a-zA-Z0-9\-]+(?:\.[a-zA-Z0-9\-]+)+)(?:\/[^\s,|<>"'\]\)]*)?/gi;
 
 // Documentation / Library / Third-Party Domains to ignore for portfolio
@@ -596,10 +596,10 @@ export class ContactExtractorService {
     email?: string,
     phone?: string
   ): string {
-    const titleRegex = /\b(?:software\s+(?:engineer|developer)|full\s*stack|frontend|backend|data\s+(?:scientist|analyst|engineer)|machine\s+learning|ai\s+engineer|devops\s+engineer|cloud\s+architect|product\s+manager|ui\s*\/\s*ux\s+designer|system\s+architect|research\s+assistant)\b/i;
+    const titleRegex = /\b(?:software\s+(?:engineer|developer)|full\s*stack(?:\s+(?:developer|engineer))?|frontend(?:\s+(?:developer|engineer))?|backend(?:\s+(?:developer|engineer))?|data\s+(?:scientist|analyst|engineer)|machine\s+learning(?:\s+engineer)?|ai\s+engineer|devops\s+engineer|cloud\s+architect|product\s+(?:manager|designer)|ui\s*\/\s*ux(?:\s*(?:&|and|\/)\s*product)?\s*designer|ui\s*\/\s*ux\s+designer|ux\s+designer|ui\s+designer|graphic\s+designer|product\s+designer|designer|system\s+architect|research\s+assistant)\b/i;
 
     for (const block of preamble.slice(0, 8)) {
-      const clean = block.text.replace(/^[#*_\s]+|[#*_\s]+$/g, '').trim();
+      const clean = block.text.replace(/^[#*_\s]+|[#*_\s]+$/g, '').replace(/&amp;/g, '&').trim();
       if (!clean || clean === fullName) continue;
       if (email && clean.includes(email)) continue;
       if (phone && clean.includes(phone)) continue;
@@ -644,6 +644,9 @@ export class ContactExtractorService {
 
   private normalizeUrl(url: string): string {
     let clean = url.trim().replace(/[)\]'",;]+$/, '');
+    if (clean.toLowerCase().startsWith('mailto:') || clean.toLowerCase().startsWith('tel:')) {
+      return clean;
+    }
     if (!clean.startsWith('http://') && !clean.startsWith('https://')) {
       clean = `https://${clean}`;
     }

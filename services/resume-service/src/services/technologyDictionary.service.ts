@@ -209,12 +209,20 @@ export const TECHNOLOGY_REGISTRY: TechnologyDefinition[] = [
   { canonicalName: 'Penetration Testing', category: 'security', aliases: ['penetration testing', 'pen testing', 'burp suite', 'metasploit', 'wireshark', 'nmap', 'kali linux'] },
   { canonicalName: 'Identity & Access Management (IAM)', category: 'security', aliases: ['iam', 'rbac', 'saml', 'single sign-on', 'sso'] },
 
-  // ── Design & Other ──
-  { canonicalName: 'UI/UX Design', category: 'other', aliases: ['ui/ux', 'ux/ui', 'ui design', 'ux design', 'user experience', 'user interface', 'wireframing', 'prototyping', 'design systems'] },
-  { canonicalName: 'Figma', category: 'other', aliases: ['figma'] },
-  { canonicalName: 'Adobe XD', category: 'other', aliases: ['adobe xd', 'xd'] },
-  { canonicalName: 'Adobe Photoshop', category: 'other', aliases: ['photoshop', 'illustrator', 'after effects', 'premiere pro'] },
-  { canonicalName: 'Canva', category: 'other', aliases: ['canva'] },
+  // ── Design & Creative Tools ──
+  { canonicalName: 'Figma', category: 'tools', aliases: ['figma'] },
+  { canonicalName: 'FigJam', category: 'tools', aliases: ['figjam', 'fig jam'] },
+  { canonicalName: 'Canva', category: 'tools', aliases: ['canva'] },
+  { canonicalName: 'Adobe XD', category: 'tools', aliases: ['adobe xd', 'xd'] },
+  { canonicalName: 'Sketch', category: 'tools', aliases: ['sketch app', 'sketch'] },
+  { canonicalName: 'InVision', category: 'tools', aliases: ['invision', 'invisionapp'] },
+  { canonicalName: 'Adobe Photoshop', category: 'tools', aliases: ['photoshop', 'illustrator', 'after effects', 'premiere pro'] },
+  { canonicalName: 'Auto Layout', category: 'tools', aliases: ['auto layout', 'autolayout'] },
+  { canonicalName: 'Prototyping', category: 'tools', aliases: ['prototyping', 'interactive prototypes', 'hi-fi prototyping'] },
+  { canonicalName: 'Wireframing', category: 'tools', aliases: ['wireframing', 'wireframes', 'lo-fi wireframing'] },
+
+  // ── Design Systems & Other ──
+  { canonicalName: 'UI/UX Design', category: 'other', aliases: ['ui/ux', 'ux/ui', 'ui design', 'ux design', 'user experience', 'user interface', 'design systems'] },
   { canonicalName: 'RESTful APIs', category: 'other', aliases: ['rest', 'restful', 'rest apis', 'restful apis', 'api design'] },
   { canonicalName: 'Microservices', category: 'other', aliases: ['microservices', 'microservice architecture', 'distributed systems'] },
   { canonicalName: 'Data Structures & Algorithms', category: 'other', aliases: ['dsa', 'data structures', 'algorithms', 'problem solving'] },
@@ -282,7 +290,7 @@ export class TechnologyDictionaryService {
    * Extract and normalize skills from a dedicated Skills section.
    * Preserves explicit categorization (e.g. Languages: Python, C++ | Frameworks: React, Express).
    */
-  public extractSkillsFromSection(lines: string[]): {
+  public extractSkillsFromSection(lines: string[], sectionHeader?: string): {
     skills: {
       languages: string[];
       frameworks: string[];
@@ -310,7 +318,7 @@ export class TechnologyDictionaryService {
     // Expand lines if multiple inline category headers exist on a single line
     // E.g. "Languages: Python, C++ Frontend: React, Tailwind Backend: Node.js"
     const expandedLines: string[] = [];
-    const inlineCategoryRegex = /(?:^|\s+)(Languages|Programming Languages|Frontend|Backend|Databases?|Data Stores?|Cloud(?:\s*&\s*Deployment)?|Cloud(?:\s*&\s*DevOps)?|Cloud|DevOps|Tools|Developer Tools|Frameworks(?:\s*&\s*Libraries)?|Frameworks|Libraries|Security|Concepts|Core Competencies|Other(?:\s+Skills)?)[:\-–—]\s*/gi;
+    const inlineCategoryRegex = /(?:^|\s+)(Languages|Programming Languages|Frontend|Backend|Databases?|Data Stores?|Cloud(?:\s*&\s*Deployment)?|Cloud(?:\s*&\s*DevOps)?|Cloud|DevOps|Tools|Developer Tools|Design Tools|Frameworks(?:\s*&\s*Libraries)?|Frameworks|Libraries|Security|Concepts|Core Competencies|Other(?:\s+Skills)?)[:\-–—]\s*/gi;
 
     for (const rawLine of lines) {
       const line = rawLine.trim();
@@ -328,7 +336,34 @@ export class TechnologyDictionaryService {
       }
     }
 
-    for (const line of expandedLines) {
+    // Stitch lines that wrap across soft breaks inside a skills block only if boundary tokens form a registered technology (e.g. "Auto" + "Layout" -> "Auto Layout")
+    const stitchedLines: string[] = [];
+    for (let i = 0; i < expandedLines.length; i++) {
+      let cur = expandedLines[i];
+      while (i + 1 < expandedLines.length) {
+        const next = expandedLines[i + 1];
+        const curTokens = this.splitSkillTokens(cur);
+        const nextTokens = this.splitSkillTokens(next);
+        const lastToken = curTokens[curTokens.length - 1] || '';
+        const firstToken = nextTokens[0] || '';
+
+        if (lastToken && firstToken) {
+          const candidate = `${lastToken} ${firstToken}`;
+          if (this.lookup(candidate)) {
+            // Found a wrapped technology: join cur and next across the break
+            cur = `${cur.trim()} ${next.trim()}`;
+            i++;
+            continue;
+          }
+        }
+        break;
+      }
+      stitchedLines.push(cur);
+    }
+
+    const isToolsSection = sectionHeader ? /^(?:tools|developer\s+tools|design\s+tools|software\s+tools)/i.test(sectionHeader.trim()) : false;
+
+    for (const line of stitchedLines) {
       const cleanLine = line.replace(/^[*_~`\s•‣·◦▪●+\-–—]+|[*_~`\s]+$/g, '').replace(/^#+\s+/, '').trim();
       if (!cleanLine) continue;
 
@@ -363,8 +398,8 @@ export class TechnologyDictionaryService {
             const bucket = targetBucket || matched.category;
             skills[bucket].push(matched.canonicalName);
           } else {
-            // Unregistered item - place in target bucket or other
-            const bucket = targetBucket || 'other';
+            // Unregistered item - place in target bucket or default
+            const bucket = targetBucket || (isToolsSection ? 'tools' : 'other');
             skills[bucket].push(val);
           }
         }
@@ -383,7 +418,8 @@ export class TechnologyDictionaryService {
         if (matched) {
           skills[matched.category].push(matched.canonicalName);
         } else {
-          skills.other.push(token);
+          const defaultBucket = isToolsSection ? 'tools' : 'other';
+          skills[defaultBucket].push(token);
         }
       }
     }
@@ -559,7 +595,7 @@ export class TechnologyDictionaryService {
     if (/databases?|storage|data\s*stores?|sql|nosql/i.test(label)) return 'databases';
     if (/cloud|devops|infrastructure|ci\/cd|platforms?|deployment/i.test(label)) return 'cloudDevOps';
     if (/security|infosec|cybersecurity/i.test(label)) return 'security';
-    if (/tools?|developer\s+tools|ides?|software|environments?/i.test(label)) return 'tools';
+    if (/tools?|developer\s+tools|design\s+tools|ides?|software|environments?/i.test(label)) return 'tools';
     if (/concepts?|methodologies|architecture|general/i.test(label)) return 'other';
     return null;
   }

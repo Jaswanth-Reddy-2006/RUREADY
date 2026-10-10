@@ -9,7 +9,7 @@
     "start": "node dist/index.js",
     "db:generate": "npx prisma generate --schema=src/prisma/schema.prisma",
     "typecheck": "tsc --noEmit",
-    "test": "tsx tests/test_architecture_a_contacts.ts && tsx tests/test_architecture_a_skills.ts && tsx tests/test_architecture_a_e2e_benchmark.ts && tsx tests/test_section_mapping_regression.ts",
+    "test": "tsx tests/test_architecture_a_contacts.ts && tsx tests/test_architecture_a_skills.ts && tsx tests/test_architecture_a_e2e_benchmark.ts && tsx tests/test_section_mapping_regression.ts && tsx tests/test_extraction_truthfulness_regression.ts",
     "test:all": "tsx tests/test_node_bridge.ts && tsx tests/test_section_mapping_regression.ts && tsx tests/test_real_resume_e2e_regression.ts && tsx tests/test_resume_state_isolation.ts && tsx tests/test_architecture_a_contacts.ts && tsx tests/test_architecture_a_skills.ts && tsx tests/test_architecture_a_e2e_benchmark.ts && tsx tests/test_ats_backend_frontend_parity.ts && tsx tests/test_score_differentiation.ts && tsx tests/test_ats_service_competitive.ts",
     "test:bridge": "tsx tests/test_node_bridge.ts",
     "test:parser": "tsx tests/test_resume_parser_endpoint.ts",
