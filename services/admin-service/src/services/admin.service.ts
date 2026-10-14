@@ -68,8 +68,8 @@ const systemState = {
     },
     ai_resume_ats: {
       id: 'ai_resume_ats',
-      name: 'AI Resume & ATS Scanner',
-      description: 'Automated resume parser, keyword match, and JD gap analyzer',
+      name: 'Resume Workspace',
+      description: 'Unified resume workspace with Docling extraction, ATS diagnostics, and job matching',
       enabled: true,
       allowedTiers: ['ALL'],
       updatedAt: new Date().toISOString(),

@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Check, Sparkles, ShieldCheck, ArrowRight, Eye, LayoutTemplate } from 'lucide-react';
+import { X, Check, Sparkles, LayoutTemplate } from 'lucide-react';
 import { TemplateMetadata, ResumeTemplateId } from '../../store/useResumeStore';
 import ResumeRenderer from './templates/ResumeRenderer';
 import Button from '../ui/Button';
@@ -46,7 +46,7 @@ export default function TemplateOverviewModal({
           {/* Top Bar Header */}
           <div className="p-4 sm:p-6 border-b border-slate-200 bg-slate-50/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
             <div className="space-y-1">
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="p-1.5 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200">
                   <LayoutTemplate size={18} />
                 </span>
@@ -54,10 +54,17 @@ export default function TemplateOverviewModal({
                   {template.name}
                 </h2>
                 <Badge variant="teal" size="sm">
-                  {template.tag}
+                  {template.category}
                 </Badge>
-                <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 font-mono">
-                  <ShieldCheck size={13} /> ATS {template.atsRating}%
+                <span className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full border ${
+                  template.isAtsOptimized
+                    ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                    : 'bg-amber-50 text-amber-800 border-amber-200'
+                }`}>
+                  {template.isAtsOptimized ? '✓ ATS-Friendly' : 'Visual Layout'}
+                </span>
+                <span className="inline-flex items-center gap-1 text-xs font-semibold text-slate-700 bg-slate-100 px-2.5 py-0.5 rounded-full border border-slate-200">
+                  {template.layoutStyle}
                 </span>
               </div>
               <p className="text-xs text-slate-600 max-w-2xl">

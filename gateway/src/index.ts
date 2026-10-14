@@ -227,6 +227,19 @@ app.use(
 );
 
 app.use(
+  '/api/resume-parser',
+  createProxyMiddleware({
+    target: RESUME_SERVICE_URL,
+    changeOrigin: true,
+    pathRewrite: (path: string) => {
+      const clean = path.startsWith('/') ? path : `/${path}`;
+      return `/api/resume-parser${clean === '/' ? '' : clean}`;
+    },
+    ws: true,
+  }),
+);
+
+app.use(
   '/api/roadmap',
   createProxyMiddleware({
     target: ROADMAP_SERVICE_URL,

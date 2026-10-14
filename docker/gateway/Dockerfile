@@ -1,6 +1,6 @@
 FROM node:18-alpine AS builder
 WORKDIR /app
-COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json tsconfig.base.json ./
 COPY packages/shared ./packages/shared
 COPY gateway ./gateway
 RUN npm install -g pnpm && pnpm install --frozen-lockfile

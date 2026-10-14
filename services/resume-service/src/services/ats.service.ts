@@ -6,11 +6,25 @@ import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { aiProviderManager } from '../lib/ai-provider-manager.js';
 import { NotFoundError, BadRequestError } from '../lib/errors.js';
+import {
+  competitiveMatchService,
+  CompetitiveMatchError,
+  CompetitiveMatchResult,
+} from './competitiveMatch.service.js';
 
 export const AtsAnalysisSchema = z.object({
   jobTitle: z.string().min(1),
   companyName: z.string().optional(),
-  matchScore: z.number().min(0).max(100),
+  // The numeric matchScore is NOT taken from the LLM — it is produced solely by
+  // the BGE competitive matcher below. Kept optional so a missing/extra LLM
+  // value never forces the qualitative analysis into the failure path.
+  matchScore: z.number().min(0).max(100).optional(),
+  semanticScore: z.number().min(0).max(100).optional(),
+  keywordScore: z.number().optional(),
+  metricsScore: z.number().optional(),
+  completenessScore: z.number().optional(),
+  actionVerbScore: z.number().optional(),
+  overallScore: z.number().optional(),
   summary: z.string().min(1),
   matchedSkills: z.array(z.string()),
   missingSkills: z.array(z.string()),
@@ -33,7 +47,15 @@ export const AtsAnalysisSchema = z.object({
   ),
 });
 
-export type AtsAnalysisResult = z.infer<typeof AtsAnalysisSchema> & { id?: string };
+export type AtsAnalysisResult = Omit<z.infer<typeof AtsAnalysisSchema>, 'matchScore' | 'overallScore'> & {
+  id?: string;
+  competitive?: CompetitiveMatchResult;
+  // matchScore/overallScore are null when the role-match gate returns
+  // NOT_RELEVANT — the UI must render "N/A" (never a fabricated number).
+  matchScore: number | null;
+  overallScore?: number | null;
+  status?: 'MATCHED' | 'NOT_RELEVANT' | 'INSUFFICIENT_JD';
+};
 
 const COMMON_TECH_KEYWORDS = [
   'TypeScript', 'JavaScript', 'React', 'Next.js', 'Vue', 'Angular', 'Node.js',
@@ -50,7 +72,8 @@ export const atsService = {
     resumeText: string,
     jobDescription: string,
     jobTitleInput?: string,
-    companyNameInput?: string
+    companyNameInput?: string,
+    structuredElements?: any[]
   ): Promise<AtsAnalysisResult> {
     if (!resumeText || !resumeText.trim()) {
       throw new BadRequestError('Resume text or document content is required for ATS analysis.');
@@ -79,7 +102,6 @@ Perform a comprehensive ATS audit and output ONLY valid JSON adhering strictly t
 {
   "jobTitle": "${jobTitleInput || 'Target Software Engineer'}",
   "companyName": "${companyNameInput || 'Target Company'}",
-  "matchScore": 82,
   "summary": "Detailed 2-3 sentence executive overview of candidate alignment, core strengths, and readiness.",
   "matchedSkills": ["TypeScript", "Node.js", "System Design"],
   "missingSkills": ["Kubernetes", "Redis", "Kafka"],
@@ -130,12 +152,17 @@ Perform a comprehensive ATS audit and output ONLY valid JSON adhering strictly t
       const jsonEnd = responseText.lastIndexOf('}');
       if (jsonStart !== -1 && jsonEnd !== -1) {
         const rawJson = JSON.parse(responseText.substring(jsonStart, jsonEnd + 1));
-        parsedResult = AtsAnalysisSchema.parse(rawJson);
+        const validated = AtsAnalysisSchema.parse(rawJson);
+        // The authoritative numeric score comes from the competitive matcher
+        // below; the LLM value (if any) is discarded here.
+        parsedResult = { ...validated, matchScore: null };
       } else {
         throw new Error('Failed to locate JSON response block');
       }
     } catch {
-      // Robust Fallback Heuristics Engine
+      // Qualitative-only fallback for when the LLM is unavailable. This branch
+      // NEVER produces a numeric match/competitive score — the Competitive
+      // Score is computed exclusively by the BGE matcher further below.
       const jdUpper = cleanJD.toUpperCase();
       const resumeUpper = cleanResume.toUpperCase();
 
@@ -147,18 +174,14 @@ Perform a comprehensive ATS audit and output ONLY valid JSON adhering strictly t
       const finalMatched = matched.length > 0 ? matched : ['JavaScript', 'REST APIs', 'Git', 'Agile'];
       const finalMissing = missing.length > 0 ? missing : ['Redis Caching', 'Kubernetes', 'System Design'];
 
-      const calculatedScore = requiredSkills.length > 0
-        ? Math.min(95, Math.max(55, Math.round((finalMatched.length / (finalMatched.length + finalMissing.length)) * 100)))
-        : 78;
-
       parsedResult = {
         jobTitle: jobTitleInput || 'Senior Software Engineer',
         companyName: companyNameInput || 'Target Company',
-        matchScore: calculatedScore,
+        matchScore: null,
         summary: `The candidate demonstrates strong alignment with core competencies (${finalMatched.slice(0, 4).join(', ')}), with key opportunities to highlight distributed systems and infrastructure capabilities (${finalMissing.slice(0, 3).join(', ')}) required for the role.`,
         matchedSkills: finalMatched,
         missingSkills: finalMissing,
-        experienceMatch: calculatedScore >= 75 ? 'Strong Mid-Senior Developer Alignment' : 'Moderate Developer Alignment with Targeted Gaps',
+        experienceMatch: 'Qualitative alignment pending competitive match evaluation.',
         atsWarnings: [
           'Ensure bullet points lead with strong active action verbs (e.g., "Architected", "Engineered", "Spearheaded").',
           'Include explicit quantifiable business metrics (e.g., latency %, throughput, cost savings, user scale).',
@@ -199,13 +222,57 @@ Perform a comprehensive ATS audit and output ONLY valid JSON adhering strictly t
       };
     }
 
+    // ── Competitive Score (MODEL 3: BGE-based resume↔JD matcher) ─────────
+    // The single authoritative source of the numeric Competitive Score. It is
+    // computed independently of the ATS Quality Score and never blended with it:
+    //   0.45·semanticSimilarity + 0.25·skillOverlap + 0.15·experienceRelevance
+    //   + 0.15·terminologyMatch, gated by a multi-signal role-match check.
+    // MATCHED   → real score in 0–100
+    // NOT_RELEVANT → null (surfaced end-to-end as "N/A")
+    // Engine failure → honest 503; NO fabricated/heuristic fallback score.
+    const role = jobTitleInput || parsedResult.jobTitle || 'Selected Role';
+    let competitive: CompetitiveMatchResult;
+
+    try {
+      competitive = await competitiveMatchService.match({
+        resumeText,
+        jobDescription,
+        role,
+        structuredElements,
+      });
+    } catch (err) {
+      console.error('[ATS] Competitive matcher failed — no score will be fabricated:', err);
+      const detail = err instanceof Error ? err.message : 'Unknown error';
+      throw new CompetitiveMatchError(
+        `Competitive Score engine unavailable; no match score was produced. ${detail}`,
+        503
+      );
+    }
+
+    const isMatched = competitive.status === 'MATCHED';
+    // MATCHED carries a real 0–100 score; NOT_RELEVANT stays null end-to-end.
+    const finalMatchScore: number | null = isMatched ? competitive.score : null;
+    // semanticScore is a genuine matcher signal (not a fabricated fallback).
+    const semanticScore = Math.round(competitive.matchSignals.semanticSimilarity * 100);
+
+    parsedResult.matchScore = finalMatchScore;
+    parsedResult.semanticScore = semanticScore;
+    parsedResult.overallScore = finalMatchScore;
+    parsedResult.matchedSkills = competitive.signalsDetail.matchedSkills.length
+      ? competitive.signalsDetail.matchedSkills
+      : parsedResult.matchedSkills;
+    parsedResult.missingSkills = competitive.signalsDetail.missingSkills.length
+      ? competitive.signalsDetail.missingSkills
+      : parsedResult.missingSkills;
+
     // Save ATS Match Record to database
     const dbRecord = await prisma.atsMatch.create({
       data: {
         userId,
         jobTitle: jobTitleInput || parsedResult.jobTitle || 'Software Engineer',
         companyName: companyNameInput || parsedResult.companyName || null,
-        matchScore: parsedResult.matchScore,
+        matchScore: finalMatchScore,
+        semanticScore: parsedResult.semanticScore,
         summary: parsedResult.summary,
         matchedSkills: parsedResult.matchedSkills,
         missingSkills: parsedResult.missingSkills,
@@ -219,6 +286,10 @@ Perform a comprehensive ATS audit and output ONLY valid JSON adhering strictly t
     return {
       id: dbRecord.id,
       ...parsedResult,
+      matchScore: finalMatchScore,
+      overallScore: finalMatchScore,
+      status: competitive.status,
+      competitive,
     };
   },
 
@@ -231,11 +302,19 @@ Perform a comprehensive ATS audit and output ONLY valid JSON adhering strictly t
       throw new NotFoundError('ATS Analysis report not found');
     }
 
+    // A null matchScore is the single, authoritative NOT_RELEVANT signal — the
+    // role-match gate produced no Competitive Score. No string-prefix decoding.
+    const isNotRelevant = record.matchScore === null;
+    const status: 'MATCHED' | 'NOT_RELEVANT' = isNotRelevant ? 'NOT_RELEVANT' : 'MATCHED';
+
     return {
       id: record.id,
       jobTitle: record.jobTitle,
       companyName: record.companyName || undefined,
       matchScore: record.matchScore,
+      semanticScore: record.semanticScore ?? undefined,
+      overallScore: record.matchScore,
+      status,
       summary: record.summary,
       matchedSkills: record.matchedSkills,
       missingSkills: record.missingSkills,

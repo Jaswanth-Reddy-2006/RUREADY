@@ -5,6 +5,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import atsRoutes from './routes/ats.routes.js';
+import resumeParserRoutes from './routes/resumeParser.routes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -24,6 +25,8 @@ app.get('/health', (_req, res) => {
 
 app.use('/api/ats', atsRoutes);
 app.use('/ats', atsRoutes);
+app.use('/api/resume-parser', resumeParserRoutes);
+app.use('/resume-parser', resumeParserRoutes);
 
 app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error('[ResumeService Error]:', err);

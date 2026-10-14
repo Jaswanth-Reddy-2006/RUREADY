@@ -127,6 +127,7 @@ exports.Prisma.AtsMatchScalarFieldEnum = {
   jobTitle: 'jobTitle',
   companyName: 'companyName',
   matchScore: 'matchScore',
+  semanticScore: 'semanticScore',
   summary: 'summary',
   matchedSkills: 'matchedSkills',
   missingSkills: 'missingSkills',

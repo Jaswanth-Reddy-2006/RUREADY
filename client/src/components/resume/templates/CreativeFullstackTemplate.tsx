@@ -108,59 +108,113 @@ export default function CreativeFullstackTemplate({ data, highlightKeywords = []
                 </div>
               </div>
 
-              <div>
-                <strong className="block text-[#11183D] text-[10px] uppercase font-bold mb-1">Frameworks</strong>
-                <div className="flex flex-wrap gap-1">
-                  {data.skills.frameworks.map((s, i) => (
-                    <span
-                      key={i}
-                      className={`px-1.5 py-0.5 rounded text-[10px] ${
-                        isKeyword(s)
-                          ? 'bg-[#E8F5F0] text-[#168A62] font-bold'
-                          : 'bg-white text-[#2459A8] border border-[#DCE7F2]'
-                      }`}
-                    >
-                      {s}
-                    </span>
-                  ))}
+              {((data.skills.frameworks && data.skills.frameworks.length > 0) || (data.skills.libraries && data.skills.libraries.length > 0)) && (
+                <div>
+                  <strong className="block text-[#11183D] text-[10px] uppercase font-bold mb-1">Frameworks & Libraries</strong>
+                  <div className="flex flex-wrap gap-1">
+                    {[...(data.skills.frameworks || []), ...(data.skills.libraries || [])].map((s, i) => (
+                      <span
+                        key={i}
+                        className={`px-1.5 py-0.5 rounded text-[10px] ${
+                          isKeyword(s)
+                            ? 'bg-[#E8F5F0] text-[#168A62] font-bold'
+                            : 'bg-white text-[#2459A8] border border-[#DCE7F2]'
+                        }`}
+                      >
+                        {s}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
-              <div>
-                <strong className="block text-[#11183D] text-[10px] uppercase font-bold mb-1">Databases</strong>
-                <div className="flex flex-wrap gap-1">
-                  {data.skills.databases.map((s, i) => (
-                    <span
-                      key={i}
-                      className={`px-1.5 py-0.5 rounded text-[10px] ${
-                        isKeyword(s)
-                          ? 'bg-[#E8F5F0] text-[#168A62] font-bold'
-                          : 'bg-white text-[#2459A8] border border-[#DCE7F2]'
-                      }`}
-                    >
-                      {s}
-                    </span>
-                  ))}
+              {data.skills.databases && data.skills.databases.length > 0 && (
+                <div>
+                  <strong className="block text-[#11183D] text-[10px] uppercase font-bold mb-1">Databases</strong>
+                  <div className="flex flex-wrap gap-1">
+                    {data.skills.databases.map((s, i) => (
+                      <span
+                        key={i}
+                        className={`px-1.5 py-0.5 rounded text-[10px] ${
+                          isKeyword(s)
+                            ? 'bg-[#E8F5F0] text-[#168A62] font-bold'
+                            : 'bg-white text-[#2459A8] border border-[#DCE7F2]'
+                        }`}
+                      >
+                        {s}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
-              <div>
-                <strong className="block text-[#11183D] text-[10px] uppercase font-bold mb-1">DevOps & Cloud</strong>
-                <div className="flex flex-wrap gap-1">
-                  {data.skills.cloudDevOps.map((s, i) => (
-                    <span
-                      key={i}
-                      className={`px-1.5 py-0.5 rounded text-[10px] ${
-                        isKeyword(s)
-                          ? 'bg-[#E8F5F0] text-[#168A62] font-bold'
-                          : 'bg-white text-[#2459A8] border border-[#DCE7F2]'
-                      }`}
-                    >
-                      {s}
-                    </span>
-                  ))}
+              {data.skills.cloudDevOps && data.skills.cloudDevOps.length > 0 && (
+                <div>
+                  <strong className="block text-[#11183D] text-[10px] uppercase font-bold mb-1">DevOps & Cloud</strong>
+                  <div className="flex flex-wrap gap-1">
+                    {data.skills.cloudDevOps.map((s, i) => (
+                      <span
+                        key={i}
+                        className={`px-1.5 py-0.5 rounded text-[10px] ${
+                          isKeyword(s)
+                            ? 'bg-[#E8F5F0] text-[#168A62] font-bold'
+                            : 'bg-white text-[#2459A8] border border-[#DCE7F2]'
+                        }`}
+                      >
+                        {s}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
+
+              {data.skills.tools && data.skills.tools.length > 0 && (
+                <div>
+                  <strong className="block text-[#11183D] text-[10px] uppercase font-bold mb-1">Developer Tools</strong>
+                  <div className="flex flex-wrap gap-1">
+                    {data.skills.tools.map((s, i) => (
+                      <span
+                        key={i}
+                        className="px-1.5 py-0.5 rounded text-[10px] bg-white text-[#2459A8] border border-[#DCE7F2]"
+                      >
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {data.skills.security && data.skills.security.length > 0 && (
+                <div>
+                  <strong className="block text-[#11183D] text-[10px] uppercase font-bold mb-1">Security</strong>
+                  <div className="flex flex-wrap gap-1">
+                    {data.skills.security.map((s, i) => (
+                      <span
+                        key={i}
+                        className="px-1.5 py-0.5 rounded text-[10px] bg-white text-[#2459A8] border border-[#DCE7F2]"
+                      >
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {data.skills.other && data.skills.other.length > 0 && (
+                <div>
+                  <strong className="block text-[#11183D] text-[10px] uppercase font-bold mb-1">Other Skills</strong>
+                  <div className="flex flex-wrap gap-1">
+                    {data.skills.other.map((s, i) => (
+                      <span
+                        key={i}
+                        className="px-1.5 py-0.5 rounded text-[10px] bg-white text-[#526078] border border-gray-200"
+                      >
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -292,6 +346,99 @@ export default function CreativeFullstackTemplate({ data, highlightKeywords = []
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Publications */}
+          {data.publications && data.publications.length > 0 && (
+            <div className="space-y-2">
+              <h3 className="text-xs font-extrabold uppercase tracking-wider text-[#2459A8] flex items-center gap-2">
+                <span>Publications</span>
+                <div className="h-[1px] bg-[#DCE7F2] flex-1" />
+              </h3>
+              <div className="space-y-1.5 text-[11px]">
+                {data.publications.map((pub) => (
+                  <div key={pub.id} className="flex justify-between items-baseline">
+                    <div>
+                      <strong className="text-[#11183D]">{pub.title}</strong>
+                      {pub.venue && <span className="text-[#526078] ml-1.5">— {pub.venue}</span>}
+                    </div>
+                    {pub.date && <span className="text-[10px] font-mono text-[#526078]">{pub.date}</span>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Patents */}
+          {data.patents && data.patents.length > 0 && (
+            <div className="space-y-2">
+              <h3 className="text-xs font-extrabold uppercase tracking-wider text-[#2459A8] flex items-center gap-2">
+                <span>Patents</span>
+                <div className="h-[1px] bg-[#DCE7F2] flex-1" />
+              </h3>
+              <div className="space-y-1.5 text-[11px]">
+                {data.patents.map((pat) => (
+                  <div key={pat.id} className="flex justify-between items-baseline">
+                    <div>
+                      <strong className="text-[#11183D]">{pat.title}</strong>
+                      {pat.number && <span className="text-[#526078] ml-1.5">({pat.number})</span>}
+                    </div>
+                    {pat.date && <span className="text-[10px] font-mono text-[#526078]">{pat.date}</span>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Achievements */}
+          {data.achievements && data.achievements.length > 0 && (
+            <div className="space-y-2">
+              <h3 className="text-xs font-extrabold uppercase tracking-wider text-[#2459A8] flex items-center gap-2">
+                <span>Achievements & Honors</span>
+                <div className="h-[1px] bg-[#DCE7F2] flex-1" />
+              </h3>
+              <ul className="list-disc list-outside ml-4 space-y-0.5 text-[10.5px] text-[#334155]">
+                {data.achievements.map((ach, idx) => (
+                  <li key={idx}>{ach}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Languages */}
+          {data.languages && data.languages.length > 0 && (
+            <div className="space-y-1.5">
+              <h3 className="text-xs font-extrabold uppercase tracking-wider text-[#2459A8] flex items-center gap-2">
+                <span>Languages</span>
+                <div className="h-[1px] bg-[#DCE7F2] flex-1" />
+              </h3>
+              <div className="flex flex-wrap gap-1.5 text-[10.5px]">
+                {data.languages.map((lang, idx) => (
+                  <span key={idx} className="bg-slate-100 text-[#11183D] px-2 py-0.5 rounded">
+                    {lang}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Custom Sections */}
+          {data.customSections && data.customSections.length > 0 && (
+            <div className="space-y-3">
+              {data.customSections.map((sec) => (
+                <div key={sec.id} className="space-y-1.5">
+                  <h3 className="text-xs font-extrabold uppercase tracking-wider text-[#2459A8] flex items-center gap-2">
+                    <span>{sec.title}</span>
+                    <div className="h-[1px] bg-[#DCE7F2] flex-1" />
+                  </h3>
+                  <ul className="list-disc list-outside ml-4 space-y-0.5 text-[10.5px] text-[#334155]">
+                    {sec.items.map((item, idx) => (
+                      <li key={idx}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </div>
           )}
 

@@ -1007,9 +1007,19 @@ export namespace Prisma {
     userId: string | null
     name: string | null
     email: string | null
+    phoneNumber: string | null
     avatarUrl: string | null
+    headline: string | null
     bio: string | null
     title: string | null
+    targetRole: string | null
+    targetCompany: string | null
+    seniority: string | null
+    location: string | null
+    education: string | null
+    githubUrl: string | null
+    linkedinUrl: string | null
+    portfolioUrl: string | null
     experienceYears: number | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -1020,9 +1030,19 @@ export namespace Prisma {
     userId: string | null
     name: string | null
     email: string | null
+    phoneNumber: string | null
     avatarUrl: string | null
+    headline: string | null
     bio: string | null
     title: string | null
+    targetRole: string | null
+    targetCompany: string | null
+    seniority: string | null
+    location: string | null
+    education: string | null
+    githubUrl: string | null
+    linkedinUrl: string | null
+    portfolioUrl: string | null
     experienceYears: number | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -1033,9 +1053,19 @@ export namespace Prisma {
     userId: number
     name: number
     email: number
+    phoneNumber: number
     avatarUrl: number
+    headline: number
     bio: number
     title: number
+    targetRole: number
+    targetCompany: number
+    seniority: number
+    location: number
+    education: number
+    githubUrl: number
+    linkedinUrl: number
+    portfolioUrl: number
     experienceYears: number
     targetRoles: number
     createdAt: number
@@ -1057,9 +1087,19 @@ export namespace Prisma {
     userId?: true
     name?: true
     email?: true
+    phoneNumber?: true
     avatarUrl?: true
+    headline?: true
     bio?: true
     title?: true
+    targetRole?: true
+    targetCompany?: true
+    seniority?: true
+    location?: true
+    education?: true
+    githubUrl?: true
+    linkedinUrl?: true
+    portfolioUrl?: true
     experienceYears?: true
     createdAt?: true
     updatedAt?: true
@@ -1070,9 +1110,19 @@ export namespace Prisma {
     userId?: true
     name?: true
     email?: true
+    phoneNumber?: true
     avatarUrl?: true
+    headline?: true
     bio?: true
     title?: true
+    targetRole?: true
+    targetCompany?: true
+    seniority?: true
+    location?: true
+    education?: true
+    githubUrl?: true
+    linkedinUrl?: true
+    portfolioUrl?: true
     experienceYears?: true
     createdAt?: true
     updatedAt?: true
@@ -1083,9 +1133,19 @@ export namespace Prisma {
     userId?: true
     name?: true
     email?: true
+    phoneNumber?: true
     avatarUrl?: true
+    headline?: true
     bio?: true
     title?: true
+    targetRole?: true
+    targetCompany?: true
+    seniority?: true
+    location?: true
+    education?: true
+    githubUrl?: true
+    linkedinUrl?: true
+    portfolioUrl?: true
     experienceYears?: true
     targetRoles?: true
     createdAt?: true
@@ -1184,9 +1244,19 @@ export namespace Prisma {
     userId: string
     name: string
     email: string
+    phoneNumber: string | null
     avatarUrl: string | null
+    headline: string | null
     bio: string | null
     title: string | null
+    targetRole: string | null
+    targetCompany: string | null
+    seniority: string | null
+    location: string | null
+    education: string | null
+    githubUrl: string | null
+    linkedinUrl: string | null
+    portfolioUrl: string | null
     experienceYears: number | null
     targetRoles: string[]
     createdAt: Date
@@ -1217,9 +1287,19 @@ export namespace Prisma {
     userId?: boolean
     name?: boolean
     email?: boolean
+    phoneNumber?: boolean
     avatarUrl?: boolean
+    headline?: boolean
     bio?: boolean
     title?: boolean
+    targetRole?: boolean
+    targetCompany?: boolean
+    seniority?: boolean
+    location?: boolean
+    education?: boolean
+    githubUrl?: boolean
+    linkedinUrl?: boolean
+    portfolioUrl?: boolean
     experienceYears?: boolean
     targetRoles?: boolean
     createdAt?: boolean
@@ -1233,9 +1313,19 @@ export namespace Prisma {
     userId?: boolean
     name?: boolean
     email?: boolean
+    phoneNumber?: boolean
     avatarUrl?: boolean
+    headline?: boolean
     bio?: boolean
     title?: boolean
+    targetRole?: boolean
+    targetCompany?: boolean
+    seniority?: boolean
+    location?: boolean
+    education?: boolean
+    githubUrl?: boolean
+    linkedinUrl?: boolean
+    portfolioUrl?: boolean
     experienceYears?: boolean
     targetRoles?: boolean
     createdAt?: boolean
@@ -1247,9 +1337,19 @@ export namespace Prisma {
     userId?: boolean
     name?: boolean
     email?: boolean
+    phoneNumber?: boolean
     avatarUrl?: boolean
+    headline?: boolean
     bio?: boolean
     title?: boolean
+    targetRole?: boolean
+    targetCompany?: boolean
+    seniority?: boolean
+    location?: boolean
+    education?: boolean
+    githubUrl?: boolean
+    linkedinUrl?: boolean
+    portfolioUrl?: boolean
     experienceYears?: boolean
     targetRoles?: boolean
     createdAt?: boolean
@@ -1261,16 +1361,26 @@ export namespace Prisma {
     userId?: boolean
     name?: boolean
     email?: boolean
+    phoneNumber?: boolean
     avatarUrl?: boolean
+    headline?: boolean
     bio?: boolean
     title?: boolean
+    targetRole?: boolean
+    targetCompany?: boolean
+    seniority?: boolean
+    location?: boolean
+    education?: boolean
+    githubUrl?: boolean
+    linkedinUrl?: boolean
+    portfolioUrl?: boolean
     experienceYears?: boolean
     targetRoles?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type UserProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "name" | "email" | "avatarUrl" | "bio" | "title" | "experienceYears" | "targetRoles" | "createdAt" | "updatedAt", ExtArgs["result"]["userProfile"]>
+  export type UserProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "name" | "email" | "phoneNumber" | "avatarUrl" | "headline" | "bio" | "title" | "targetRole" | "targetCompany" | "seniority" | "location" | "education" | "githubUrl" | "linkedinUrl" | "portfolioUrl" | "experienceYears" | "targetRoles" | "createdAt" | "updatedAt", ExtArgs["result"]["userProfile"]>
   export type UserProfileInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     resumes?: boolean | UserProfile$resumesArgs<ExtArgs>
     _count?: boolean | UserProfileCountOutputTypeDefaultArgs<ExtArgs>
@@ -1288,9 +1398,19 @@ export namespace Prisma {
       userId: string
       name: string
       email: string
+      phoneNumber: string | null
       avatarUrl: string | null
+      headline: string | null
       bio: string | null
       title: string | null
+      targetRole: string | null
+      targetCompany: string | null
+      seniority: string | null
+      location: string | null
+      education: string | null
+      githubUrl: string | null
+      linkedinUrl: string | null
+      portfolioUrl: string | null
       experienceYears: number | null
       targetRoles: string[]
       createdAt: Date
@@ -1723,9 +1843,19 @@ export namespace Prisma {
     readonly userId: FieldRef<"UserProfile", 'String'>
     readonly name: FieldRef<"UserProfile", 'String'>
     readonly email: FieldRef<"UserProfile", 'String'>
+    readonly phoneNumber: FieldRef<"UserProfile", 'String'>
     readonly avatarUrl: FieldRef<"UserProfile", 'String'>
+    readonly headline: FieldRef<"UserProfile", 'String'>
     readonly bio: FieldRef<"UserProfile", 'String'>
     readonly title: FieldRef<"UserProfile", 'String'>
+    readonly targetRole: FieldRef<"UserProfile", 'String'>
+    readonly targetCompany: FieldRef<"UserProfile", 'String'>
+    readonly seniority: FieldRef<"UserProfile", 'String'>
+    readonly location: FieldRef<"UserProfile", 'String'>
+    readonly education: FieldRef<"UserProfile", 'String'>
+    readonly githubUrl: FieldRef<"UserProfile", 'String'>
+    readonly linkedinUrl: FieldRef<"UserProfile", 'String'>
+    readonly portfolioUrl: FieldRef<"UserProfile", 'String'>
     readonly experienceYears: FieldRef<"UserProfile", 'Int'>
     readonly targetRoles: FieldRef<"UserProfile", 'String[]'>
     readonly createdAt: FieldRef<"UserProfile", 'DateTime'>
@@ -3259,9 +3389,19 @@ export namespace Prisma {
     userId: 'userId',
     name: 'name',
     email: 'email',
+    phoneNumber: 'phoneNumber',
     avatarUrl: 'avatarUrl',
+    headline: 'headline',
     bio: 'bio',
     title: 'title',
+    targetRole: 'targetRole',
+    targetCompany: 'targetCompany',
+    seniority: 'seniority',
+    location: 'location',
+    education: 'education',
+    githubUrl: 'githubUrl',
+    linkedinUrl: 'linkedinUrl',
+    portfolioUrl: 'portfolioUrl',
     experienceYears: 'experienceYears',
     targetRoles: 'targetRoles',
     createdAt: 'createdAt',
@@ -3380,9 +3520,19 @@ export namespace Prisma {
     userId?: StringFilter<"UserProfile"> | string
     name?: StringFilter<"UserProfile"> | string
     email?: StringFilter<"UserProfile"> | string
+    phoneNumber?: StringNullableFilter<"UserProfile"> | string | null
     avatarUrl?: StringNullableFilter<"UserProfile"> | string | null
+    headline?: StringNullableFilter<"UserProfile"> | string | null
     bio?: StringNullableFilter<"UserProfile"> | string | null
     title?: StringNullableFilter<"UserProfile"> | string | null
+    targetRole?: StringNullableFilter<"UserProfile"> | string | null
+    targetCompany?: StringNullableFilter<"UserProfile"> | string | null
+    seniority?: StringNullableFilter<"UserProfile"> | string | null
+    location?: StringNullableFilter<"UserProfile"> | string | null
+    education?: StringNullableFilter<"UserProfile"> | string | null
+    githubUrl?: StringNullableFilter<"UserProfile"> | string | null
+    linkedinUrl?: StringNullableFilter<"UserProfile"> | string | null
+    portfolioUrl?: StringNullableFilter<"UserProfile"> | string | null
     experienceYears?: IntNullableFilter<"UserProfile"> | number | null
     targetRoles?: StringNullableListFilter<"UserProfile">
     createdAt?: DateTimeFilter<"UserProfile"> | Date | string
@@ -3395,9 +3545,19 @@ export namespace Prisma {
     userId?: SortOrder
     name?: SortOrder
     email?: SortOrder
+    phoneNumber?: SortOrderInput | SortOrder
     avatarUrl?: SortOrderInput | SortOrder
+    headline?: SortOrderInput | SortOrder
     bio?: SortOrderInput | SortOrder
     title?: SortOrderInput | SortOrder
+    targetRole?: SortOrderInput | SortOrder
+    targetCompany?: SortOrderInput | SortOrder
+    seniority?: SortOrderInput | SortOrder
+    location?: SortOrderInput | SortOrder
+    education?: SortOrderInput | SortOrder
+    githubUrl?: SortOrderInput | SortOrder
+    linkedinUrl?: SortOrderInput | SortOrder
+    portfolioUrl?: SortOrderInput | SortOrder
     experienceYears?: SortOrderInput | SortOrder
     targetRoles?: SortOrder
     createdAt?: SortOrder
@@ -3413,9 +3573,19 @@ export namespace Prisma {
     NOT?: UserProfileWhereInput | UserProfileWhereInput[]
     name?: StringFilter<"UserProfile"> | string
     email?: StringFilter<"UserProfile"> | string
+    phoneNumber?: StringNullableFilter<"UserProfile"> | string | null
     avatarUrl?: StringNullableFilter<"UserProfile"> | string | null
+    headline?: StringNullableFilter<"UserProfile"> | string | null
     bio?: StringNullableFilter<"UserProfile"> | string | null
     title?: StringNullableFilter<"UserProfile"> | string | null
+    targetRole?: StringNullableFilter<"UserProfile"> | string | null
+    targetCompany?: StringNullableFilter<"UserProfile"> | string | null
+    seniority?: StringNullableFilter<"UserProfile"> | string | null
+    location?: StringNullableFilter<"UserProfile"> | string | null
+    education?: StringNullableFilter<"UserProfile"> | string | null
+    githubUrl?: StringNullableFilter<"UserProfile"> | string | null
+    linkedinUrl?: StringNullableFilter<"UserProfile"> | string | null
+    portfolioUrl?: StringNullableFilter<"UserProfile"> | string | null
     experienceYears?: IntNullableFilter<"UserProfile"> | number | null
     targetRoles?: StringNullableListFilter<"UserProfile">
     createdAt?: DateTimeFilter<"UserProfile"> | Date | string
@@ -3428,9 +3598,19 @@ export namespace Prisma {
     userId?: SortOrder
     name?: SortOrder
     email?: SortOrder
+    phoneNumber?: SortOrderInput | SortOrder
     avatarUrl?: SortOrderInput | SortOrder
+    headline?: SortOrderInput | SortOrder
     bio?: SortOrderInput | SortOrder
     title?: SortOrderInput | SortOrder
+    targetRole?: SortOrderInput | SortOrder
+    targetCompany?: SortOrderInput | SortOrder
+    seniority?: SortOrderInput | SortOrder
+    location?: SortOrderInput | SortOrder
+    education?: SortOrderInput | SortOrder
+    githubUrl?: SortOrderInput | SortOrder
+    linkedinUrl?: SortOrderInput | SortOrder
+    portfolioUrl?: SortOrderInput | SortOrder
     experienceYears?: SortOrderInput | SortOrder
     targetRoles?: SortOrder
     createdAt?: SortOrder
@@ -3450,9 +3630,19 @@ export namespace Prisma {
     userId?: StringWithAggregatesFilter<"UserProfile"> | string
     name?: StringWithAggregatesFilter<"UserProfile"> | string
     email?: StringWithAggregatesFilter<"UserProfile"> | string
+    phoneNumber?: StringNullableWithAggregatesFilter<"UserProfile"> | string | null
     avatarUrl?: StringNullableWithAggregatesFilter<"UserProfile"> | string | null
+    headline?: StringNullableWithAggregatesFilter<"UserProfile"> | string | null
     bio?: StringNullableWithAggregatesFilter<"UserProfile"> | string | null
     title?: StringNullableWithAggregatesFilter<"UserProfile"> | string | null
+    targetRole?: StringNullableWithAggregatesFilter<"UserProfile"> | string | null
+    targetCompany?: StringNullableWithAggregatesFilter<"UserProfile"> | string | null
+    seniority?: StringNullableWithAggregatesFilter<"UserProfile"> | string | null
+    location?: StringNullableWithAggregatesFilter<"UserProfile"> | string | null
+    education?: StringNullableWithAggregatesFilter<"UserProfile"> | string | null
+    githubUrl?: StringNullableWithAggregatesFilter<"UserProfile"> | string | null
+    linkedinUrl?: StringNullableWithAggregatesFilter<"UserProfile"> | string | null
+    portfolioUrl?: StringNullableWithAggregatesFilter<"UserProfile"> | string | null
     experienceYears?: IntNullableWithAggregatesFilter<"UserProfile"> | number | null
     targetRoles?: StringNullableListFilter<"UserProfile">
     createdAt?: DateTimeWithAggregatesFilter<"UserProfile"> | Date | string
@@ -3529,9 +3719,19 @@ export namespace Prisma {
     userId: string
     name: string
     email: string
+    phoneNumber?: string | null
     avatarUrl?: string | null
+    headline?: string | null
     bio?: string | null
     title?: string | null
+    targetRole?: string | null
+    targetCompany?: string | null
+    seniority?: string | null
+    location?: string | null
+    education?: string | null
+    githubUrl?: string | null
+    linkedinUrl?: string | null
+    portfolioUrl?: string | null
     experienceYears?: number | null
     targetRoles?: UserProfileCreatetargetRolesInput | string[]
     createdAt?: Date | string
@@ -3544,9 +3744,19 @@ export namespace Prisma {
     userId: string
     name: string
     email: string
+    phoneNumber?: string | null
     avatarUrl?: string | null
+    headline?: string | null
     bio?: string | null
     title?: string | null
+    targetRole?: string | null
+    targetCompany?: string | null
+    seniority?: string | null
+    location?: string | null
+    education?: string | null
+    githubUrl?: string | null
+    linkedinUrl?: string | null
+    portfolioUrl?: string | null
     experienceYears?: number | null
     targetRoles?: UserProfileCreatetargetRolesInput | string[]
     createdAt?: Date | string
@@ -3559,9 +3769,19 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    headline?: NullableStringFieldUpdateOperationsInput | string | null
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
+    targetRole?: NullableStringFieldUpdateOperationsInput | string | null
+    targetCompany?: NullableStringFieldUpdateOperationsInput | string | null
+    seniority?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    education?: NullableStringFieldUpdateOperationsInput | string | null
+    githubUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    linkedinUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    portfolioUrl?: NullableStringFieldUpdateOperationsInput | string | null
     experienceYears?: NullableIntFieldUpdateOperationsInput | number | null
     targetRoles?: UserProfileUpdatetargetRolesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -3574,9 +3794,19 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    headline?: NullableStringFieldUpdateOperationsInput | string | null
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
+    targetRole?: NullableStringFieldUpdateOperationsInput | string | null
+    targetCompany?: NullableStringFieldUpdateOperationsInput | string | null
+    seniority?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    education?: NullableStringFieldUpdateOperationsInput | string | null
+    githubUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    linkedinUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    portfolioUrl?: NullableStringFieldUpdateOperationsInput | string | null
     experienceYears?: NullableIntFieldUpdateOperationsInput | number | null
     targetRoles?: UserProfileUpdatetargetRolesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -3589,9 +3819,19 @@ export namespace Prisma {
     userId: string
     name: string
     email: string
+    phoneNumber?: string | null
     avatarUrl?: string | null
+    headline?: string | null
     bio?: string | null
     title?: string | null
+    targetRole?: string | null
+    targetCompany?: string | null
+    seniority?: string | null
+    location?: string | null
+    education?: string | null
+    githubUrl?: string | null
+    linkedinUrl?: string | null
+    portfolioUrl?: string | null
     experienceYears?: number | null
     targetRoles?: UserProfileCreatetargetRolesInput | string[]
     createdAt?: Date | string
@@ -3603,9 +3843,19 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    headline?: NullableStringFieldUpdateOperationsInput | string | null
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
+    targetRole?: NullableStringFieldUpdateOperationsInput | string | null
+    targetCompany?: NullableStringFieldUpdateOperationsInput | string | null
+    seniority?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    education?: NullableStringFieldUpdateOperationsInput | string | null
+    githubUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    linkedinUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    portfolioUrl?: NullableStringFieldUpdateOperationsInput | string | null
     experienceYears?: NullableIntFieldUpdateOperationsInput | number | null
     targetRoles?: UserProfileUpdatetargetRolesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -3617,9 +3867,19 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    headline?: NullableStringFieldUpdateOperationsInput | string | null
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
+    targetRole?: NullableStringFieldUpdateOperationsInput | string | null
+    targetCompany?: NullableStringFieldUpdateOperationsInput | string | null
+    seniority?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    education?: NullableStringFieldUpdateOperationsInput | string | null
+    githubUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    linkedinUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    portfolioUrl?: NullableStringFieldUpdateOperationsInput | string | null
     experienceYears?: NullableIntFieldUpdateOperationsInput | number | null
     targetRoles?: UserProfileUpdatetargetRolesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -3775,9 +4035,19 @@ export namespace Prisma {
     userId?: SortOrder
     name?: SortOrder
     email?: SortOrder
+    phoneNumber?: SortOrder
     avatarUrl?: SortOrder
+    headline?: SortOrder
     bio?: SortOrder
     title?: SortOrder
+    targetRole?: SortOrder
+    targetCompany?: SortOrder
+    seniority?: SortOrder
+    location?: SortOrder
+    education?: SortOrder
+    githubUrl?: SortOrder
+    linkedinUrl?: SortOrder
+    portfolioUrl?: SortOrder
     experienceYears?: SortOrder
     targetRoles?: SortOrder
     createdAt?: SortOrder
@@ -3793,9 +4063,19 @@ export namespace Prisma {
     userId?: SortOrder
     name?: SortOrder
     email?: SortOrder
+    phoneNumber?: SortOrder
     avatarUrl?: SortOrder
+    headline?: SortOrder
     bio?: SortOrder
     title?: SortOrder
+    targetRole?: SortOrder
+    targetCompany?: SortOrder
+    seniority?: SortOrder
+    location?: SortOrder
+    education?: SortOrder
+    githubUrl?: SortOrder
+    linkedinUrl?: SortOrder
+    portfolioUrl?: SortOrder
     experienceYears?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -3806,9 +4086,19 @@ export namespace Prisma {
     userId?: SortOrder
     name?: SortOrder
     email?: SortOrder
+    phoneNumber?: SortOrder
     avatarUrl?: SortOrder
+    headline?: SortOrder
     bio?: SortOrder
     title?: SortOrder
+    targetRole?: SortOrder
+    targetCompany?: SortOrder
+    seniority?: SortOrder
+    location?: SortOrder
+    education?: SortOrder
+    githubUrl?: SortOrder
+    linkedinUrl?: SortOrder
+    portfolioUrl?: SortOrder
     experienceYears?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -4209,9 +4499,19 @@ export namespace Prisma {
     userId: string
     name: string
     email: string
+    phoneNumber?: string | null
     avatarUrl?: string | null
+    headline?: string | null
     bio?: string | null
     title?: string | null
+    targetRole?: string | null
+    targetCompany?: string | null
+    seniority?: string | null
+    location?: string | null
+    education?: string | null
+    githubUrl?: string | null
+    linkedinUrl?: string | null
+    portfolioUrl?: string | null
     experienceYears?: number | null
     targetRoles?: UserProfileCreatetargetRolesInput | string[]
     createdAt?: Date | string
@@ -4223,9 +4523,19 @@ export namespace Prisma {
     userId: string
     name: string
     email: string
+    phoneNumber?: string | null
     avatarUrl?: string | null
+    headline?: string | null
     bio?: string | null
     title?: string | null
+    targetRole?: string | null
+    targetCompany?: string | null
+    seniority?: string | null
+    location?: string | null
+    education?: string | null
+    githubUrl?: string | null
+    linkedinUrl?: string | null
+    portfolioUrl?: string | null
     experienceYears?: number | null
     targetRoles?: UserProfileCreatetargetRolesInput | string[]
     createdAt?: Date | string
@@ -4253,9 +4563,19 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    headline?: NullableStringFieldUpdateOperationsInput | string | null
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
+    targetRole?: NullableStringFieldUpdateOperationsInput | string | null
+    targetCompany?: NullableStringFieldUpdateOperationsInput | string | null
+    seniority?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    education?: NullableStringFieldUpdateOperationsInput | string | null
+    githubUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    linkedinUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    portfolioUrl?: NullableStringFieldUpdateOperationsInput | string | null
     experienceYears?: NullableIntFieldUpdateOperationsInput | number | null
     targetRoles?: UserProfileUpdatetargetRolesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -4267,9 +4587,19 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    headline?: NullableStringFieldUpdateOperationsInput | string | null
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
+    targetRole?: NullableStringFieldUpdateOperationsInput | string | null
+    targetCompany?: NullableStringFieldUpdateOperationsInput | string | null
+    seniority?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    education?: NullableStringFieldUpdateOperationsInput | string | null
+    githubUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    linkedinUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    portfolioUrl?: NullableStringFieldUpdateOperationsInput | string | null
     experienceYears?: NullableIntFieldUpdateOperationsInput | number | null
     targetRoles?: UserProfileUpdatetargetRolesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string

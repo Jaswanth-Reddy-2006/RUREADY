@@ -8,7 +8,7 @@ const footerLinks = [
     links: [
       { label: 'Oral Interview', href: '/interview/new' },
       { label: 'Coding Playground', href: '/interview/coding/new' },
-      { label: 'ATS Resume Match', href: '/ats' },
+      { label: 'Resume Workspace', href: '/resume' },
       { label: 'Career Roadmaps', href: '/roadmap' },
       { label: 'Role Communities', href: '/discuss' },
     ],

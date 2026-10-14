@@ -886,8 +886,8 @@ export default function Dashboard() {
                 desc: 'End-to-end production systems & ATS resume optimization.',
                 status: 'Up Next',
                 progress: 15,
-                href: '/ats',
-                actionText: 'ATS Resume Scan',
+                href: '/resume',
+                actionText: 'Resume Workspace',
               },
               {
                 num: 6,

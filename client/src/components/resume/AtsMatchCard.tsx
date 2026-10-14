@@ -75,8 +75,8 @@ export default function AtsMatchCard({ analysis, versionTitle, targetRole, targe
         </div>
       </div>
 
-      {/* 4 Factor Score Progress Bars */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* 4 Deterministic ATS-Readiness Factors */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
         {/* Factor 1: Keywords */}
         <div className="p-4 rounded-2xl bg-slate-50 border border-[#DCE7F2] space-y-2">
           <div className="flex justify-between items-center text-xs">
@@ -89,7 +89,7 @@ export default function AtsMatchCard({ analysis, versionTitle, targetRole, targe
               style={{ width: `${(breakdown.keywordScore / 40) * 100}%` }}
             />
           </div>
-          <p className="text-[10px] text-[#526078]">Matches JD specific hard tech terms</p>
+          <p className="text-[10px] text-[#526078]">Matches JD specific tech terms</p>
         </div>
 
         {/* Factor 2: Quantified Metrics */}
@@ -104,7 +104,7 @@ export default function AtsMatchCard({ analysis, versionTitle, targetRole, targe
               style={{ width: `${(breakdown.metricsScore / 25) * 100}%` }}
             />
           </div>
-          <p className="text-[10px] text-[#526078]">STAR bullet points with %, $, numbers</p>
+          <p className="text-[10px] text-[#526078]">STAR bullets with %, $, numbers</p>
         </div>
 
         {/* Factor 3: Completeness */}
@@ -119,7 +119,7 @@ export default function AtsMatchCard({ analysis, versionTitle, targetRole, targe
               style={{ width: `${(breakdown.completenessScore / 20) * 100}%` }}
             />
           </div>
-          <p className="text-[10px] text-[#526078]">Links, education, project details</p>
+          <p className="text-[10px] text-[#526078]">Links, education, projects</p>
         </div>
 
         {/* Factor 4: Action Verbs */}
@@ -134,7 +134,7 @@ export default function AtsMatchCard({ analysis, versionTitle, targetRole, targe
               style={{ width: `${(breakdown.actionVerbScore / 15) * 100}%` }}
             />
           </div>
-          <p className="text-[10px] text-[#526078]">Strong active verbs vs passive verbs</p>
+          <p className="text-[10px] text-[#526078]">Strong active verbs vs passive</p>
         </div>
       </div>
 

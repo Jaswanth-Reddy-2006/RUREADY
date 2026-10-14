@@ -125,10 +125,16 @@ exports.Prisma.CodingSessionScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   targetRole: 'targetRole',
+  focusTrack: 'focusTrack',
+  problemId: 'problemId',
   difficulty: 'difficulty',
   selectedLanguage: 'selectedLanguage',
+  durationMins: 'durationMins',
   status: 'status',
   testCasesPassed: 'testCasesPassed',
+  totalTestCases: 'totalTestCases',
+  overallScore: 'overallScore',
+  feedbackSummary: 'feedbackSummary',
   startedAt: 'startedAt',
   completedAt: 'completedAt'
 };
@@ -138,12 +144,15 @@ exports.Prisma.PreDefinedProblemScalarFieldEnum = {
   title: 'title',
   difficulty: 'difficulty',
   pattern: 'pattern',
+  category: 'category',
+  topicTags: 'topicTags',
   description: 'description',
   starterCode: 'starterCode',
   testCases: 'testCases',
   optimalSolution: 'optimalSolution',
   optimalTime: 'optimalTime',
-  optimalSpace: 'optimalSpace'
+  optimalSpace: 'optimalSpace',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.CodeExecutionDeltaScalarFieldEnum = {

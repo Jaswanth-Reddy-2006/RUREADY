@@ -79,6 +79,21 @@ export type SprintPerformance = $Result.DefaultSelection<Prisma.$SprintPerforman
  */
 export type SkillEvidence = $Result.DefaultSelection<Prisma.$SkillEvidencePayload>
 /**
+ * Model MicroAssessment
+ * 
+ */
+export type MicroAssessment = $Result.DefaultSelection<Prisma.$MicroAssessmentPayload>
+/**
+ * Model MicroAssessmentQuestion
+ * 
+ */
+export type MicroAssessmentQuestion = $Result.DefaultSelection<Prisma.$MicroAssessmentQuestionPayload>
+/**
+ * Model MicroAssessmentAttempt
+ * 
+ */
+export type MicroAssessmentAttempt = $Result.DefaultSelection<Prisma.$MicroAssessmentAttemptPayload>
+/**
  * Model RoadmapAdaptation
  * 
  */
@@ -88,6 +103,11 @@ export type RoadmapAdaptation = $Result.DefaultSelection<Prisma.$RoadmapAdaptati
  * 
  */
 export type DiscussionPost = $Result.DefaultSelection<Prisma.$DiscussionPostPayload>
+/**
+ * Model DiscussionComment
+ * 
+ */
+export type DiscussionComment = $Result.DefaultSelection<Prisma.$DiscussionCommentPayload>
 
 /**
  * Enums
@@ -471,6 +491,36 @@ export class PrismaClient<
   get skillEvidence(): Prisma.SkillEvidenceDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.microAssessment`: Exposes CRUD operations for the **MicroAssessment** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more MicroAssessments
+    * const microAssessments = await prisma.microAssessment.findMany()
+    * ```
+    */
+  get microAssessment(): Prisma.MicroAssessmentDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.microAssessmentQuestion`: Exposes CRUD operations for the **MicroAssessmentQuestion** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more MicroAssessmentQuestions
+    * const microAssessmentQuestions = await prisma.microAssessmentQuestion.findMany()
+    * ```
+    */
+  get microAssessmentQuestion(): Prisma.MicroAssessmentQuestionDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.microAssessmentAttempt`: Exposes CRUD operations for the **MicroAssessmentAttempt** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more MicroAssessmentAttempts
+    * const microAssessmentAttempts = await prisma.microAssessmentAttempt.findMany()
+    * ```
+    */
+  get microAssessmentAttempt(): Prisma.MicroAssessmentAttemptDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.roadmapAdaptation`: Exposes CRUD operations for the **RoadmapAdaptation** model.
     * Example usage:
     * ```ts
@@ -489,6 +539,16 @@ export class PrismaClient<
     * ```
     */
   get discussionPost(): Prisma.DiscussionPostDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.discussionComment`: Exposes CRUD operations for the **DiscussionComment** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more DiscussionComments
+    * const discussionComments = await prisma.discussionComment.findMany()
+    * ```
+    */
+  get discussionComment(): Prisma.DiscussionCommentDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -943,8 +1003,12 @@ export namespace Prisma {
     RoadmapSprintTask: 'RoadmapSprintTask',
     SprintPerformance: 'SprintPerformance',
     SkillEvidence: 'SkillEvidence',
+    MicroAssessment: 'MicroAssessment',
+    MicroAssessmentQuestion: 'MicroAssessmentQuestion',
+    MicroAssessmentAttempt: 'MicroAssessmentAttempt',
     RoadmapAdaptation: 'RoadmapAdaptation',
-    DiscussionPost: 'DiscussionPost'
+    DiscussionPost: 'DiscussionPost',
+    DiscussionComment: 'DiscussionComment'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -963,7 +1027,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "careerRoadmap" | "roadmapGoal" | "skill" | "skillRelationship" | "roadmapPhase" | "roadmapNode" | "roadmapNodeSkill" | "roadmapNodeDependency" | "userRoadmap" | "roadmapSprint" | "roadmapSprintTask" | "sprintPerformance" | "skillEvidence" | "roadmapAdaptation" | "discussionPost"
+      modelProps: "careerRoadmap" | "roadmapGoal" | "skill" | "skillRelationship" | "roadmapPhase" | "roadmapNode" | "roadmapNodeSkill" | "roadmapNodeDependency" | "userRoadmap" | "roadmapSprint" | "roadmapSprintTask" | "sprintPerformance" | "skillEvidence" | "microAssessment" | "microAssessmentQuestion" | "microAssessmentAttempt" | "roadmapAdaptation" | "discussionPost" | "discussionComment"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1929,6 +1993,228 @@ export namespace Prisma {
           }
         }
       }
+      MicroAssessment: {
+        payload: Prisma.$MicroAssessmentPayload<ExtArgs>
+        fields: Prisma.MicroAssessmentFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.MicroAssessmentFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MicroAssessmentPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.MicroAssessmentFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MicroAssessmentPayload>
+          }
+          findFirst: {
+            args: Prisma.MicroAssessmentFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MicroAssessmentPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.MicroAssessmentFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MicroAssessmentPayload>
+          }
+          findMany: {
+            args: Prisma.MicroAssessmentFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MicroAssessmentPayload>[]
+          }
+          create: {
+            args: Prisma.MicroAssessmentCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MicroAssessmentPayload>
+          }
+          createMany: {
+            args: Prisma.MicroAssessmentCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.MicroAssessmentCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MicroAssessmentPayload>[]
+          }
+          delete: {
+            args: Prisma.MicroAssessmentDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MicroAssessmentPayload>
+          }
+          update: {
+            args: Prisma.MicroAssessmentUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MicroAssessmentPayload>
+          }
+          deleteMany: {
+            args: Prisma.MicroAssessmentDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.MicroAssessmentUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.MicroAssessmentUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MicroAssessmentPayload>[]
+          }
+          upsert: {
+            args: Prisma.MicroAssessmentUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MicroAssessmentPayload>
+          }
+          aggregate: {
+            args: Prisma.MicroAssessmentAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateMicroAssessment>
+          }
+          groupBy: {
+            args: Prisma.MicroAssessmentGroupByArgs<ExtArgs>
+            result: $Utils.Optional<MicroAssessmentGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.MicroAssessmentCountArgs<ExtArgs>
+            result: $Utils.Optional<MicroAssessmentCountAggregateOutputType> | number
+          }
+        }
+      }
+      MicroAssessmentQuestion: {
+        payload: Prisma.$MicroAssessmentQuestionPayload<ExtArgs>
+        fields: Prisma.MicroAssessmentQuestionFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.MicroAssessmentQuestionFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MicroAssessmentQuestionPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.MicroAssessmentQuestionFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MicroAssessmentQuestionPayload>
+          }
+          findFirst: {
+            args: Prisma.MicroAssessmentQuestionFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MicroAssessmentQuestionPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.MicroAssessmentQuestionFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MicroAssessmentQuestionPayload>
+          }
+          findMany: {
+            args: Prisma.MicroAssessmentQuestionFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MicroAssessmentQuestionPayload>[]
+          }
+          create: {
+            args: Prisma.MicroAssessmentQuestionCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MicroAssessmentQuestionPayload>
+          }
+          createMany: {
+            args: Prisma.MicroAssessmentQuestionCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.MicroAssessmentQuestionCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MicroAssessmentQuestionPayload>[]
+          }
+          delete: {
+            args: Prisma.MicroAssessmentQuestionDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MicroAssessmentQuestionPayload>
+          }
+          update: {
+            args: Prisma.MicroAssessmentQuestionUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MicroAssessmentQuestionPayload>
+          }
+          deleteMany: {
+            args: Prisma.MicroAssessmentQuestionDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.MicroAssessmentQuestionUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.MicroAssessmentQuestionUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MicroAssessmentQuestionPayload>[]
+          }
+          upsert: {
+            args: Prisma.MicroAssessmentQuestionUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MicroAssessmentQuestionPayload>
+          }
+          aggregate: {
+            args: Prisma.MicroAssessmentQuestionAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateMicroAssessmentQuestion>
+          }
+          groupBy: {
+            args: Prisma.MicroAssessmentQuestionGroupByArgs<ExtArgs>
+            result: $Utils.Optional<MicroAssessmentQuestionGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.MicroAssessmentQuestionCountArgs<ExtArgs>
+            result: $Utils.Optional<MicroAssessmentQuestionCountAggregateOutputType> | number
+          }
+        }
+      }
+      MicroAssessmentAttempt: {
+        payload: Prisma.$MicroAssessmentAttemptPayload<ExtArgs>
+        fields: Prisma.MicroAssessmentAttemptFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.MicroAssessmentAttemptFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MicroAssessmentAttemptPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.MicroAssessmentAttemptFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MicroAssessmentAttemptPayload>
+          }
+          findFirst: {
+            args: Prisma.MicroAssessmentAttemptFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MicroAssessmentAttemptPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.MicroAssessmentAttemptFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MicroAssessmentAttemptPayload>
+          }
+          findMany: {
+            args: Prisma.MicroAssessmentAttemptFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MicroAssessmentAttemptPayload>[]
+          }
+          create: {
+            args: Prisma.MicroAssessmentAttemptCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MicroAssessmentAttemptPayload>
+          }
+          createMany: {
+            args: Prisma.MicroAssessmentAttemptCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.MicroAssessmentAttemptCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MicroAssessmentAttemptPayload>[]
+          }
+          delete: {
+            args: Prisma.MicroAssessmentAttemptDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MicroAssessmentAttemptPayload>
+          }
+          update: {
+            args: Prisma.MicroAssessmentAttemptUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MicroAssessmentAttemptPayload>
+          }
+          deleteMany: {
+            args: Prisma.MicroAssessmentAttemptDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.MicroAssessmentAttemptUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.MicroAssessmentAttemptUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MicroAssessmentAttemptPayload>[]
+          }
+          upsert: {
+            args: Prisma.MicroAssessmentAttemptUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MicroAssessmentAttemptPayload>
+          }
+          aggregate: {
+            args: Prisma.MicroAssessmentAttemptAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateMicroAssessmentAttempt>
+          }
+          groupBy: {
+            args: Prisma.MicroAssessmentAttemptGroupByArgs<ExtArgs>
+            result: $Utils.Optional<MicroAssessmentAttemptGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.MicroAssessmentAttemptCountArgs<ExtArgs>
+            result: $Utils.Optional<MicroAssessmentAttemptCountAggregateOutputType> | number
+          }
+        }
+      }
       RoadmapAdaptation: {
         payload: Prisma.$RoadmapAdaptationPayload<ExtArgs>
         fields: Prisma.RoadmapAdaptationFieldRefs
@@ -2077,6 +2363,80 @@ export namespace Prisma {
           }
         }
       }
+      DiscussionComment: {
+        payload: Prisma.$DiscussionCommentPayload<ExtArgs>
+        fields: Prisma.DiscussionCommentFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.DiscussionCommentFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscussionCommentPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.DiscussionCommentFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscussionCommentPayload>
+          }
+          findFirst: {
+            args: Prisma.DiscussionCommentFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscussionCommentPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.DiscussionCommentFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscussionCommentPayload>
+          }
+          findMany: {
+            args: Prisma.DiscussionCommentFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscussionCommentPayload>[]
+          }
+          create: {
+            args: Prisma.DiscussionCommentCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscussionCommentPayload>
+          }
+          createMany: {
+            args: Prisma.DiscussionCommentCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.DiscussionCommentCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscussionCommentPayload>[]
+          }
+          delete: {
+            args: Prisma.DiscussionCommentDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscussionCommentPayload>
+          }
+          update: {
+            args: Prisma.DiscussionCommentUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscussionCommentPayload>
+          }
+          deleteMany: {
+            args: Prisma.DiscussionCommentDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.DiscussionCommentUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.DiscussionCommentUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscussionCommentPayload>[]
+          }
+          upsert: {
+            args: Prisma.DiscussionCommentUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscussionCommentPayload>
+          }
+          aggregate: {
+            args: Prisma.DiscussionCommentAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateDiscussionComment>
+          }
+          groupBy: {
+            args: Prisma.DiscussionCommentGroupByArgs<ExtArgs>
+            result: $Utils.Optional<DiscussionCommentGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.DiscussionCommentCountArgs<ExtArgs>
+            result: $Utils.Optional<DiscussionCommentCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -2186,8 +2546,12 @@ export namespace Prisma {
     roadmapSprintTask?: RoadmapSprintTaskOmit
     sprintPerformance?: SprintPerformanceOmit
     skillEvidence?: SkillEvidenceOmit
+    microAssessment?: MicroAssessmentOmit
+    microAssessmentQuestion?: MicroAssessmentQuestionOmit
+    microAssessmentAttempt?: MicroAssessmentAttemptOmit
     roadmapAdaptation?: RoadmapAdaptationOmit
     discussionPost?: DiscussionPostOmit
+    discussionComment?: DiscussionCommentOmit
   }
 
   /* Types for Logging */
@@ -2319,6 +2683,8 @@ export namespace Prisma {
   export type SkillCountOutputType = {
     nodeLinks: number
     evidence: number
+    assessments: number
+    assessmentAttempts: number
     outgoingLinks: number
     incomingLinks: number
   }
@@ -2326,6 +2692,8 @@ export namespace Prisma {
   export type SkillCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     nodeLinks?: boolean | SkillCountOutputTypeCountNodeLinksArgs
     evidence?: boolean | SkillCountOutputTypeCountEvidenceArgs
+    assessments?: boolean | SkillCountOutputTypeCountAssessmentsArgs
+    assessmentAttempts?: boolean | SkillCountOutputTypeCountAssessmentAttemptsArgs
     outgoingLinks?: boolean | SkillCountOutputTypeCountOutgoingLinksArgs
     incomingLinks?: boolean | SkillCountOutputTypeCountIncomingLinksArgs
   }
@@ -2353,6 +2721,20 @@ export namespace Prisma {
    */
   export type SkillCountOutputTypeCountEvidenceArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: SkillEvidenceWhereInput
+  }
+
+  /**
+   * SkillCountOutputType without action
+   */
+  export type SkillCountOutputTypeCountAssessmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MicroAssessmentWhereInput
+  }
+
+  /**
+   * SkillCountOutputType without action
+   */
+  export type SkillCountOutputTypeCountAssessmentAttemptsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MicroAssessmentAttemptWhereInput
   }
 
   /**
@@ -2407,6 +2789,7 @@ export namespace Prisma {
 
   export type RoadmapNodeCountOutputType = {
     skills: number
+    assessments: number
     prerequisites: number
     unlocks: number
     sprintTasks: number
@@ -2414,6 +2797,7 @@ export namespace Prisma {
 
   export type RoadmapNodeCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     skills?: boolean | RoadmapNodeCountOutputTypeCountSkillsArgs
+    assessments?: boolean | RoadmapNodeCountOutputTypeCountAssessmentsArgs
     prerequisites?: boolean | RoadmapNodeCountOutputTypeCountPrerequisitesArgs
     unlocks?: boolean | RoadmapNodeCountOutputTypeCountUnlocksArgs
     sprintTasks?: boolean | RoadmapNodeCountOutputTypeCountSprintTasksArgs
@@ -2435,6 +2819,13 @@ export namespace Prisma {
    */
   export type RoadmapNodeCountOutputTypeCountSkillsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: RoadmapNodeSkillWhereInput
+  }
+
+  /**
+   * RoadmapNodeCountOutputType without action
+   */
+  export type RoadmapNodeCountOutputTypeCountAssessmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MicroAssessmentWhereInput
   }
 
   /**
@@ -2466,12 +2857,14 @@ export namespace Prisma {
   export type UserRoadmapCountOutputType = {
     sprints: number
     skillEvidence: number
+    assessmentAttempts: number
     adaptations: number
   }
 
   export type UserRoadmapCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     sprints?: boolean | UserRoadmapCountOutputTypeCountSprintsArgs
     skillEvidence?: boolean | UserRoadmapCountOutputTypeCountSkillEvidenceArgs
+    assessmentAttempts?: boolean | UserRoadmapCountOutputTypeCountAssessmentAttemptsArgs
     adaptations?: boolean | UserRoadmapCountOutputTypeCountAdaptationsArgs
   }
 
@@ -2503,6 +2896,13 @@ export namespace Prisma {
   /**
    * UserRoadmapCountOutputType without action
    */
+  export type UserRoadmapCountOutputTypeCountAssessmentAttemptsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MicroAssessmentAttemptWhereInput
+  }
+
+  /**
+   * UserRoadmapCountOutputType without action
+   */
   export type UserRoadmapCountOutputTypeCountAdaptationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: RoadmapAdaptationWhereInput
   }
@@ -2514,11 +2914,13 @@ export namespace Prisma {
 
   export type RoadmapSprintCountOutputType = {
     tasks: number
+    assessmentAttempts: number
     adaptations: number
   }
 
   export type RoadmapSprintCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     tasks?: boolean | RoadmapSprintCountOutputTypeCountTasksArgs
+    assessmentAttempts?: boolean | RoadmapSprintCountOutputTypeCountAssessmentAttemptsArgs
     adaptations?: boolean | RoadmapSprintCountOutputTypeCountAdaptationsArgs
   }
 
@@ -2543,8 +2945,117 @@ export namespace Prisma {
   /**
    * RoadmapSprintCountOutputType without action
    */
+  export type RoadmapSprintCountOutputTypeCountAssessmentAttemptsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MicroAssessmentAttemptWhereInput
+  }
+
+  /**
+   * RoadmapSprintCountOutputType without action
+   */
   export type RoadmapSprintCountOutputTypeCountAdaptationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: RoadmapAdaptationWhereInput
+  }
+
+
+  /**
+   * Count Type RoadmapSprintTaskCountOutputType
+   */
+
+  export type RoadmapSprintTaskCountOutputType = {
+    assessmentAttempts: number
+  }
+
+  export type RoadmapSprintTaskCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    assessmentAttempts?: boolean | RoadmapSprintTaskCountOutputTypeCountAssessmentAttemptsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * RoadmapSprintTaskCountOutputType without action
+   */
+  export type RoadmapSprintTaskCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoadmapSprintTaskCountOutputType
+     */
+    select?: RoadmapSprintTaskCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * RoadmapSprintTaskCountOutputType without action
+   */
+  export type RoadmapSprintTaskCountOutputTypeCountAssessmentAttemptsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MicroAssessmentAttemptWhereInput
+  }
+
+
+  /**
+   * Count Type MicroAssessmentCountOutputType
+   */
+
+  export type MicroAssessmentCountOutputType = {
+    questions: number
+    attempts: number
+  }
+
+  export type MicroAssessmentCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    questions?: boolean | MicroAssessmentCountOutputTypeCountQuestionsArgs
+    attempts?: boolean | MicroAssessmentCountOutputTypeCountAttemptsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * MicroAssessmentCountOutputType without action
+   */
+  export type MicroAssessmentCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessmentCountOutputType
+     */
+    select?: MicroAssessmentCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * MicroAssessmentCountOutputType without action
+   */
+  export type MicroAssessmentCountOutputTypeCountQuestionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MicroAssessmentQuestionWhereInput
+  }
+
+  /**
+   * MicroAssessmentCountOutputType without action
+   */
+  export type MicroAssessmentCountOutputTypeCountAttemptsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MicroAssessmentAttemptWhereInput
+  }
+
+
+  /**
+   * Count Type DiscussionPostCountOutputType
+   */
+
+  export type DiscussionPostCountOutputType = {
+    comments: number
+  }
+
+  export type DiscussionPostCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    comments?: boolean | DiscussionPostCountOutputTypeCountCommentsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * DiscussionPostCountOutputType without action
+   */
+  export type DiscussionPostCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionPostCountOutputType
+     */
+    select?: DiscussionPostCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * DiscussionPostCountOutputType without action
+   */
+  export type DiscussionPostCountOutputTypeCountCommentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DiscussionCommentWhereInput
   }
 
 
@@ -2565,21 +3076,26 @@ export namespace Prisma {
   }
 
   export type CareerRoadmapAvgAggregateOutputType = {
+    estimatedWeeks: number | null
     overallReadiness: number | null
   }
 
   export type CareerRoadmapSumAggregateOutputType = {
+    estimatedWeeks: number | null
     overallReadiness: number | null
   }
 
   export type CareerRoadmapMinAggregateOutputType = {
     id: string | null
     userId: string | null
-    rolePath: string | null
-    targetCompanyTier: string | null
-    overallReadiness: number | null
     title: string | null
     description: string | null
+    rolePath: string | null
+    targetCompanyTier: string | null
+    estimatedWeeks: number | null
+    overallReadiness: number | null
+    isPublic: boolean | null
+    isOfficial: boolean | null
     visibility: $Enums.RoadmapVisibility | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -2588,11 +3104,14 @@ export namespace Prisma {
   export type CareerRoadmapMaxAggregateOutputType = {
     id: string | null
     userId: string | null
-    rolePath: string | null
-    targetCompanyTier: string | null
-    overallReadiness: number | null
     title: string | null
     description: string | null
+    rolePath: string | null
+    targetCompanyTier: string | null
+    estimatedWeeks: number | null
+    overallReadiness: number | null
+    isPublic: boolean | null
+    isOfficial: boolean | null
     visibility: $Enums.RoadmapVisibility | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -2601,13 +3120,16 @@ export namespace Prisma {
   export type CareerRoadmapCountAggregateOutputType = {
     id: number
     userId: number
-    rolePath: number
-    targetCompanyTier: number
-    overallReadiness: number
-    nodesData: number
-    customTechStack: number
     title: number
     description: number
+    rolePath: number
+    targetCompanyTier: number
+    estimatedWeeks: number
+    overallReadiness: number
+    isPublic: number
+    isOfficial: number
+    nodesData: number
+    customTechStack: number
     visibility: number
     createdAt: number
     updatedAt: number
@@ -2616,21 +3138,26 @@ export namespace Prisma {
 
 
   export type CareerRoadmapAvgAggregateInputType = {
+    estimatedWeeks?: true
     overallReadiness?: true
   }
 
   export type CareerRoadmapSumAggregateInputType = {
+    estimatedWeeks?: true
     overallReadiness?: true
   }
 
   export type CareerRoadmapMinAggregateInputType = {
     id?: true
     userId?: true
-    rolePath?: true
-    targetCompanyTier?: true
-    overallReadiness?: true
     title?: true
     description?: true
+    rolePath?: true
+    targetCompanyTier?: true
+    estimatedWeeks?: true
+    overallReadiness?: true
+    isPublic?: true
+    isOfficial?: true
     visibility?: true
     createdAt?: true
     updatedAt?: true
@@ -2639,11 +3166,14 @@ export namespace Prisma {
   export type CareerRoadmapMaxAggregateInputType = {
     id?: true
     userId?: true
-    rolePath?: true
-    targetCompanyTier?: true
-    overallReadiness?: true
     title?: true
     description?: true
+    rolePath?: true
+    targetCompanyTier?: true
+    estimatedWeeks?: true
+    overallReadiness?: true
+    isPublic?: true
+    isOfficial?: true
     visibility?: true
     createdAt?: true
     updatedAt?: true
@@ -2652,13 +3182,16 @@ export namespace Prisma {
   export type CareerRoadmapCountAggregateInputType = {
     id?: true
     userId?: true
-    rolePath?: true
-    targetCompanyTier?: true
-    overallReadiness?: true
-    nodesData?: true
-    customTechStack?: true
     title?: true
     description?: true
+    rolePath?: true
+    targetCompanyTier?: true
+    estimatedWeeks?: true
+    overallReadiness?: true
+    isPublic?: true
+    isOfficial?: true
+    nodesData?: true
+    customTechStack?: true
     visibility?: true
     createdAt?: true
     updatedAt?: true
@@ -2754,13 +3287,16 @@ export namespace Prisma {
   export type CareerRoadmapGroupByOutputType = {
     id: string
     userId: string
-    rolePath: string
-    targetCompanyTier: string
-    overallReadiness: number
-    nodesData: JsonValue
-    customTechStack: JsonValue | null
     title: string | null
     description: string | null
+    rolePath: string
+    targetCompanyTier: string
+    estimatedWeeks: number
+    overallReadiness: number
+    isPublic: boolean
+    isOfficial: boolean
+    nodesData: JsonValue
+    customTechStack: JsonValue | null
     visibility: $Enums.RoadmapVisibility
     createdAt: Date
     updatedAt: Date
@@ -2788,13 +3324,16 @@ export namespace Prisma {
   export type CareerRoadmapSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
-    rolePath?: boolean
-    targetCompanyTier?: boolean
-    overallReadiness?: boolean
-    nodesData?: boolean
-    customTechStack?: boolean
     title?: boolean
     description?: boolean
+    rolePath?: boolean
+    targetCompanyTier?: boolean
+    estimatedWeeks?: boolean
+    overallReadiness?: boolean
+    isPublic?: boolean
+    isOfficial?: boolean
+    nodesData?: boolean
+    customTechStack?: boolean
     visibility?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -2808,13 +3347,16 @@ export namespace Prisma {
   export type CareerRoadmapSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
-    rolePath?: boolean
-    targetCompanyTier?: boolean
-    overallReadiness?: boolean
-    nodesData?: boolean
-    customTechStack?: boolean
     title?: boolean
     description?: boolean
+    rolePath?: boolean
+    targetCompanyTier?: boolean
+    estimatedWeeks?: boolean
+    overallReadiness?: boolean
+    isPublic?: boolean
+    isOfficial?: boolean
+    nodesData?: boolean
+    customTechStack?: boolean
     visibility?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -2823,13 +3365,16 @@ export namespace Prisma {
   export type CareerRoadmapSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
-    rolePath?: boolean
-    targetCompanyTier?: boolean
-    overallReadiness?: boolean
-    nodesData?: boolean
-    customTechStack?: boolean
     title?: boolean
     description?: boolean
+    rolePath?: boolean
+    targetCompanyTier?: boolean
+    estimatedWeeks?: boolean
+    overallReadiness?: boolean
+    isPublic?: boolean
+    isOfficial?: boolean
+    nodesData?: boolean
+    customTechStack?: boolean
     visibility?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -2838,19 +3383,22 @@ export namespace Prisma {
   export type CareerRoadmapSelectScalar = {
     id?: boolean
     userId?: boolean
-    rolePath?: boolean
-    targetCompanyTier?: boolean
-    overallReadiness?: boolean
-    nodesData?: boolean
-    customTechStack?: boolean
     title?: boolean
     description?: boolean
+    rolePath?: boolean
+    targetCompanyTier?: boolean
+    estimatedWeeks?: boolean
+    overallReadiness?: boolean
+    isPublic?: boolean
+    isOfficial?: boolean
+    nodesData?: boolean
+    customTechStack?: boolean
     visibility?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type CareerRoadmapOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "rolePath" | "targetCompanyTier" | "overallReadiness" | "nodesData" | "customTechStack" | "title" | "description" | "visibility" | "createdAt" | "updatedAt", ExtArgs["result"]["careerRoadmap"]>
+  export type CareerRoadmapOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "title" | "description" | "rolePath" | "targetCompanyTier" | "estimatedWeeks" | "overallReadiness" | "isPublic" | "isOfficial" | "nodesData" | "customTechStack" | "visibility" | "createdAt" | "updatedAt", ExtArgs["result"]["careerRoadmap"]>
   export type CareerRoadmapInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     goal?: boolean | CareerRoadmap$goalArgs<ExtArgs>
     phases?: boolean | CareerRoadmap$phasesArgs<ExtArgs>
@@ -2872,13 +3420,16 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: string
       userId: string
-      rolePath: string
-      targetCompanyTier: string
-      overallReadiness: number
-      nodesData: Prisma.JsonValue
-      customTechStack: Prisma.JsonValue | null
       title: string | null
       description: string | null
+      rolePath: string
+      targetCompanyTier: string
+      estimatedWeeks: number
+      overallReadiness: number
+      isPublic: boolean
+      isOfficial: boolean
+      nodesData: Prisma.JsonValue
+      customTechStack: Prisma.JsonValue | null
       visibility: $Enums.RoadmapVisibility
       createdAt: Date
       updatedAt: Date
@@ -3311,13 +3862,16 @@ export namespace Prisma {
   interface CareerRoadmapFieldRefs {
     readonly id: FieldRef<"CareerRoadmap", 'String'>
     readonly userId: FieldRef<"CareerRoadmap", 'String'>
-    readonly rolePath: FieldRef<"CareerRoadmap", 'String'>
-    readonly targetCompanyTier: FieldRef<"CareerRoadmap", 'String'>
-    readonly overallReadiness: FieldRef<"CareerRoadmap", 'Int'>
-    readonly nodesData: FieldRef<"CareerRoadmap", 'Json'>
-    readonly customTechStack: FieldRef<"CareerRoadmap", 'Json'>
     readonly title: FieldRef<"CareerRoadmap", 'String'>
     readonly description: FieldRef<"CareerRoadmap", 'String'>
+    readonly rolePath: FieldRef<"CareerRoadmap", 'String'>
+    readonly targetCompanyTier: FieldRef<"CareerRoadmap", 'String'>
+    readonly estimatedWeeks: FieldRef<"CareerRoadmap", 'Int'>
+    readonly overallReadiness: FieldRef<"CareerRoadmap", 'Int'>
+    readonly isPublic: FieldRef<"CareerRoadmap", 'Boolean'>
+    readonly isOfficial: FieldRef<"CareerRoadmap", 'Boolean'>
+    readonly nodesData: FieldRef<"CareerRoadmap", 'Json'>
+    readonly customTechStack: FieldRef<"CareerRoadmap", 'Json'>
     readonly visibility: FieldRef<"CareerRoadmap", 'RoadmapVisibility'>
     readonly createdAt: FieldRef<"CareerRoadmap", 'DateTime'>
     readonly updatedAt: FieldRef<"CareerRoadmap", 'DateTime'>
@@ -5213,6 +5767,8 @@ export namespace Prisma {
     updatedAt?: boolean
     nodeLinks?: boolean | Skill$nodeLinksArgs<ExtArgs>
     evidence?: boolean | Skill$evidenceArgs<ExtArgs>
+    assessments?: boolean | Skill$assessmentsArgs<ExtArgs>
+    assessmentAttempts?: boolean | Skill$assessmentAttemptsArgs<ExtArgs>
     outgoingLinks?: boolean | Skill$outgoingLinksArgs<ExtArgs>
     incomingLinks?: boolean | Skill$incomingLinksArgs<ExtArgs>
     _count?: boolean | SkillCountOutputTypeDefaultArgs<ExtArgs>
@@ -5252,6 +5808,8 @@ export namespace Prisma {
   export type SkillInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     nodeLinks?: boolean | Skill$nodeLinksArgs<ExtArgs>
     evidence?: boolean | Skill$evidenceArgs<ExtArgs>
+    assessments?: boolean | Skill$assessmentsArgs<ExtArgs>
+    assessmentAttempts?: boolean | Skill$assessmentAttemptsArgs<ExtArgs>
     outgoingLinks?: boolean | Skill$outgoingLinksArgs<ExtArgs>
     incomingLinks?: boolean | Skill$incomingLinksArgs<ExtArgs>
     _count?: boolean | SkillCountOutputTypeDefaultArgs<ExtArgs>
@@ -5264,6 +5822,8 @@ export namespace Prisma {
     objects: {
       nodeLinks: Prisma.$RoadmapNodeSkillPayload<ExtArgs>[]
       evidence: Prisma.$SkillEvidencePayload<ExtArgs>[]
+      assessments: Prisma.$MicroAssessmentPayload<ExtArgs>[]
+      assessmentAttempts: Prisma.$MicroAssessmentAttemptPayload<ExtArgs>[]
       outgoingLinks: Prisma.$SkillRelationshipPayload<ExtArgs>[]
       incomingLinks: Prisma.$SkillRelationshipPayload<ExtArgs>[]
     }
@@ -5671,6 +6231,8 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     nodeLinks<T extends Skill$nodeLinksArgs<ExtArgs> = {}>(args?: Subset<T, Skill$nodeLinksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RoadmapNodeSkillPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     evidence<T extends Skill$evidenceArgs<ExtArgs> = {}>(args?: Subset<T, Skill$evidenceArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SkillEvidencePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    assessments<T extends Skill$assessmentsArgs<ExtArgs> = {}>(args?: Subset<T, Skill$assessmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MicroAssessmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    assessmentAttempts<T extends Skill$assessmentAttemptsArgs<ExtArgs> = {}>(args?: Subset<T, Skill$assessmentAttemptsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MicroAssessmentAttemptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     outgoingLinks<T extends Skill$outgoingLinksArgs<ExtArgs> = {}>(args?: Subset<T, Skill$outgoingLinksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SkillRelationshipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     incomingLinks<T extends Skill$incomingLinksArgs<ExtArgs> = {}>(args?: Subset<T, Skill$incomingLinksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SkillRelationshipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
@@ -6142,6 +6704,54 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: SkillEvidenceScalarFieldEnum | SkillEvidenceScalarFieldEnum[]
+  }
+
+  /**
+   * Skill.assessments
+   */
+  export type Skill$assessmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessment
+     */
+    select?: MicroAssessmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessment
+     */
+    omit?: MicroAssessmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentInclude<ExtArgs> | null
+    where?: MicroAssessmentWhereInput
+    orderBy?: MicroAssessmentOrderByWithRelationInput | MicroAssessmentOrderByWithRelationInput[]
+    cursor?: MicroAssessmentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: MicroAssessmentScalarFieldEnum | MicroAssessmentScalarFieldEnum[]
+  }
+
+  /**
+   * Skill.assessmentAttempts
+   */
+  export type Skill$assessmentAttemptsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessmentAttempt
+     */
+    select?: MicroAssessmentAttemptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessmentAttempt
+     */
+    omit?: MicroAssessmentAttemptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentAttemptInclude<ExtArgs> | null
+    where?: MicroAssessmentAttemptWhereInput
+    orderBy?: MicroAssessmentAttemptOrderByWithRelationInput | MicroAssessmentAttemptOrderByWithRelationInput[]
+    cursor?: MicroAssessmentAttemptWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: MicroAssessmentAttemptScalarFieldEnum | MicroAssessmentAttemptScalarFieldEnum[]
   }
 
   /**
@@ -8460,6 +9070,7 @@ export namespace Prisma {
     orderIndex: number | null
     estimatedMinutes: number | null
     requiresEvidence: boolean | null
+    requiresAssessment: boolean | null
     targetProficiency: number | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -8476,6 +9087,7 @@ export namespace Prisma {
     orderIndex: number | null
     estimatedMinutes: number | null
     requiresEvidence: boolean | null
+    requiresAssessment: boolean | null
     targetProficiency: number | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -8492,6 +9104,7 @@ export namespace Prisma {
     orderIndex: number
     estimatedMinutes: number
     requiresEvidence: number
+    requiresAssessment: number
     targetProficiency: number
     createdAt: number
     updatedAt: number
@@ -8522,6 +9135,7 @@ export namespace Prisma {
     orderIndex?: true
     estimatedMinutes?: true
     requiresEvidence?: true
+    requiresAssessment?: true
     targetProficiency?: true
     createdAt?: true
     updatedAt?: true
@@ -8538,6 +9152,7 @@ export namespace Prisma {
     orderIndex?: true
     estimatedMinutes?: true
     requiresEvidence?: true
+    requiresAssessment?: true
     targetProficiency?: true
     createdAt?: true
     updatedAt?: true
@@ -8554,6 +9169,7 @@ export namespace Prisma {
     orderIndex?: true
     estimatedMinutes?: true
     requiresEvidence?: true
+    requiresAssessment?: true
     targetProficiency?: true
     createdAt?: true
     updatedAt?: true
@@ -8657,6 +9273,7 @@ export namespace Prisma {
     orderIndex: number
     estimatedMinutes: number
     requiresEvidence: boolean
+    requiresAssessment: boolean
     targetProficiency: number | null
     createdAt: Date
     updatedAt: Date
@@ -8692,12 +9309,14 @@ export namespace Prisma {
     orderIndex?: boolean
     estimatedMinutes?: boolean
     requiresEvidence?: boolean
+    requiresAssessment?: boolean
     targetProficiency?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     roadmap?: boolean | CareerRoadmapDefaultArgs<ExtArgs>
     phase?: boolean | RoadmapNode$phaseArgs<ExtArgs>
     skills?: boolean | RoadmapNode$skillsArgs<ExtArgs>
+    assessments?: boolean | RoadmapNode$assessmentsArgs<ExtArgs>
     prerequisites?: boolean | RoadmapNode$prerequisitesArgs<ExtArgs>
     unlocks?: boolean | RoadmapNode$unlocksArgs<ExtArgs>
     sprintTasks?: boolean | RoadmapNode$sprintTasksArgs<ExtArgs>
@@ -8715,6 +9334,7 @@ export namespace Prisma {
     orderIndex?: boolean
     estimatedMinutes?: boolean
     requiresEvidence?: boolean
+    requiresAssessment?: boolean
     targetProficiency?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -8733,6 +9353,7 @@ export namespace Prisma {
     orderIndex?: boolean
     estimatedMinutes?: boolean
     requiresEvidence?: boolean
+    requiresAssessment?: boolean
     targetProficiency?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -8751,16 +9372,18 @@ export namespace Prisma {
     orderIndex?: boolean
     estimatedMinutes?: boolean
     requiresEvidence?: boolean
+    requiresAssessment?: boolean
     targetProficiency?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type RoadmapNodeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "roadmapId" | "phaseId" | "legacyNodeId" | "title" | "description" | "category" | "orderIndex" | "estimatedMinutes" | "requiresEvidence" | "targetProficiency" | "createdAt" | "updatedAt", ExtArgs["result"]["roadmapNode"]>
+  export type RoadmapNodeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "roadmapId" | "phaseId" | "legacyNodeId" | "title" | "description" | "category" | "orderIndex" | "estimatedMinutes" | "requiresEvidence" | "requiresAssessment" | "targetProficiency" | "createdAt" | "updatedAt", ExtArgs["result"]["roadmapNode"]>
   export type RoadmapNodeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     roadmap?: boolean | CareerRoadmapDefaultArgs<ExtArgs>
     phase?: boolean | RoadmapNode$phaseArgs<ExtArgs>
     skills?: boolean | RoadmapNode$skillsArgs<ExtArgs>
+    assessments?: boolean | RoadmapNode$assessmentsArgs<ExtArgs>
     prerequisites?: boolean | RoadmapNode$prerequisitesArgs<ExtArgs>
     unlocks?: boolean | RoadmapNode$unlocksArgs<ExtArgs>
     sprintTasks?: boolean | RoadmapNode$sprintTasksArgs<ExtArgs>
@@ -8781,6 +9404,7 @@ export namespace Prisma {
       roadmap: Prisma.$CareerRoadmapPayload<ExtArgs>
       phase: Prisma.$RoadmapPhasePayload<ExtArgs> | null
       skills: Prisma.$RoadmapNodeSkillPayload<ExtArgs>[]
+      assessments: Prisma.$MicroAssessmentPayload<ExtArgs>[]
       prerequisites: Prisma.$RoadmapNodeDependencyPayload<ExtArgs>[]
       unlocks: Prisma.$RoadmapNodeDependencyPayload<ExtArgs>[]
       sprintTasks: Prisma.$RoadmapSprintTaskPayload<ExtArgs>[]
@@ -8796,6 +9420,7 @@ export namespace Prisma {
       orderIndex: number
       estimatedMinutes: number
       requiresEvidence: boolean
+      requiresAssessment: boolean
       targetProficiency: number | null
       createdAt: Date
       updatedAt: Date
@@ -9196,6 +9821,7 @@ export namespace Prisma {
     roadmap<T extends CareerRoadmapDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CareerRoadmapDefaultArgs<ExtArgs>>): Prisma__CareerRoadmapClient<$Result.GetResult<Prisma.$CareerRoadmapPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     phase<T extends RoadmapNode$phaseArgs<ExtArgs> = {}>(args?: Subset<T, RoadmapNode$phaseArgs<ExtArgs>>): Prisma__RoadmapPhaseClient<$Result.GetResult<Prisma.$RoadmapPhasePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     skills<T extends RoadmapNode$skillsArgs<ExtArgs> = {}>(args?: Subset<T, RoadmapNode$skillsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RoadmapNodeSkillPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    assessments<T extends RoadmapNode$assessmentsArgs<ExtArgs> = {}>(args?: Subset<T, RoadmapNode$assessmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MicroAssessmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     prerequisites<T extends RoadmapNode$prerequisitesArgs<ExtArgs> = {}>(args?: Subset<T, RoadmapNode$prerequisitesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RoadmapNodeDependencyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     unlocks<T extends RoadmapNode$unlocksArgs<ExtArgs> = {}>(args?: Subset<T, RoadmapNode$unlocksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RoadmapNodeDependencyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     sprintTasks<T extends RoadmapNode$sprintTasksArgs<ExtArgs> = {}>(args?: Subset<T, RoadmapNode$sprintTasksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RoadmapSprintTaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -9238,6 +9864,7 @@ export namespace Prisma {
     readonly orderIndex: FieldRef<"RoadmapNode", 'Int'>
     readonly estimatedMinutes: FieldRef<"RoadmapNode", 'Int'>
     readonly requiresEvidence: FieldRef<"RoadmapNode", 'Boolean'>
+    readonly requiresAssessment: FieldRef<"RoadmapNode", 'Boolean'>
     readonly targetProficiency: FieldRef<"RoadmapNode", 'Int'>
     readonly createdAt: FieldRef<"RoadmapNode", 'DateTime'>
     readonly updatedAt: FieldRef<"RoadmapNode", 'DateTime'>
@@ -9677,6 +10304,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: RoadmapNodeSkillScalarFieldEnum | RoadmapNodeSkillScalarFieldEnum[]
+  }
+
+  /**
+   * RoadmapNode.assessments
+   */
+  export type RoadmapNode$assessmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessment
+     */
+    select?: MicroAssessmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessment
+     */
+    omit?: MicroAssessmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentInclude<ExtArgs> | null
+    where?: MicroAssessmentWhereInput
+    orderBy?: MicroAssessmentOrderByWithRelationInput | MicroAssessmentOrderByWithRelationInput[]
+    cursor?: MicroAssessmentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: MicroAssessmentScalarFieldEnum | MicroAssessmentScalarFieldEnum[]
   }
 
   /**
@@ -12054,6 +12705,7 @@ export namespace Prisma {
     sourceRoadmap?: boolean | CareerRoadmapDefaultArgs<ExtArgs>
     sprints?: boolean | UserRoadmap$sprintsArgs<ExtArgs>
     skillEvidence?: boolean | UserRoadmap$skillEvidenceArgs<ExtArgs>
+    assessmentAttempts?: boolean | UserRoadmap$assessmentAttemptsArgs<ExtArgs>
     adaptations?: boolean | UserRoadmap$adaptationsArgs<ExtArgs>
     _count?: boolean | UserRoadmapCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["userRoadmap"]>
@@ -12098,6 +12750,7 @@ export namespace Prisma {
     sourceRoadmap?: boolean | CareerRoadmapDefaultArgs<ExtArgs>
     sprints?: boolean | UserRoadmap$sprintsArgs<ExtArgs>
     skillEvidence?: boolean | UserRoadmap$skillEvidenceArgs<ExtArgs>
+    assessmentAttempts?: boolean | UserRoadmap$assessmentAttemptsArgs<ExtArgs>
     adaptations?: boolean | UserRoadmap$adaptationsArgs<ExtArgs>
     _count?: boolean | UserRoadmapCountOutputTypeDefaultArgs<ExtArgs>
   }
@@ -12114,6 +12767,7 @@ export namespace Prisma {
       sourceRoadmap: Prisma.$CareerRoadmapPayload<ExtArgs>
       sprints: Prisma.$RoadmapSprintPayload<ExtArgs>[]
       skillEvidence: Prisma.$SkillEvidencePayload<ExtArgs>[]
+      assessmentAttempts: Prisma.$MicroAssessmentAttemptPayload<ExtArgs>[]
       adaptations: Prisma.$RoadmapAdaptationPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -12522,6 +13176,7 @@ export namespace Prisma {
     sourceRoadmap<T extends CareerRoadmapDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CareerRoadmapDefaultArgs<ExtArgs>>): Prisma__CareerRoadmapClient<$Result.GetResult<Prisma.$CareerRoadmapPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     sprints<T extends UserRoadmap$sprintsArgs<ExtArgs> = {}>(args?: Subset<T, UserRoadmap$sprintsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RoadmapSprintPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     skillEvidence<T extends UserRoadmap$skillEvidenceArgs<ExtArgs> = {}>(args?: Subset<T, UserRoadmap$skillEvidenceArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SkillEvidencePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    assessmentAttempts<T extends UserRoadmap$assessmentAttemptsArgs<ExtArgs> = {}>(args?: Subset<T, UserRoadmap$assessmentAttemptsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MicroAssessmentAttemptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     adaptations<T extends UserRoadmap$adaptationsArgs<ExtArgs> = {}>(args?: Subset<T, UserRoadmap$adaptationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RoadmapAdaptationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -13004,6 +13659,30 @@ export namespace Prisma {
   }
 
   /**
+   * UserRoadmap.assessmentAttempts
+   */
+  export type UserRoadmap$assessmentAttemptsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessmentAttempt
+     */
+    select?: MicroAssessmentAttemptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessmentAttempt
+     */
+    omit?: MicroAssessmentAttemptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentAttemptInclude<ExtArgs> | null
+    where?: MicroAssessmentAttemptWhereInput
+    orderBy?: MicroAssessmentAttemptOrderByWithRelationInput | MicroAssessmentAttemptOrderByWithRelationInput[]
+    cursor?: MicroAssessmentAttemptWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: MicroAssessmentAttemptScalarFieldEnum | MicroAssessmentAttemptScalarFieldEnum[]
+  }
+
+  /**
    * UserRoadmap.adaptations
    */
   export type UserRoadmap$adaptationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -13299,6 +13978,7 @@ export namespace Prisma {
     userRoadmap?: boolean | UserRoadmapDefaultArgs<ExtArgs>
     tasks?: boolean | RoadmapSprint$tasksArgs<ExtArgs>
     performance?: boolean | RoadmapSprint$performanceArgs<ExtArgs>
+    assessmentAttempts?: boolean | RoadmapSprint$assessmentAttemptsArgs<ExtArgs>
     adaptations?: boolean | RoadmapSprint$adaptationsArgs<ExtArgs>
     _count?: boolean | RoadmapSprintCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["roadmapSprint"]>
@@ -13352,6 +14032,7 @@ export namespace Prisma {
     userRoadmap?: boolean | UserRoadmapDefaultArgs<ExtArgs>
     tasks?: boolean | RoadmapSprint$tasksArgs<ExtArgs>
     performance?: boolean | RoadmapSprint$performanceArgs<ExtArgs>
+    assessmentAttempts?: boolean | RoadmapSprint$assessmentAttemptsArgs<ExtArgs>
     adaptations?: boolean | RoadmapSprint$adaptationsArgs<ExtArgs>
     _count?: boolean | RoadmapSprintCountOutputTypeDefaultArgs<ExtArgs>
   }
@@ -13368,6 +14049,7 @@ export namespace Prisma {
       userRoadmap: Prisma.$UserRoadmapPayload<ExtArgs>
       tasks: Prisma.$RoadmapSprintTaskPayload<ExtArgs>[]
       performance: Prisma.$SprintPerformancePayload<ExtArgs> | null
+      assessmentAttempts: Prisma.$MicroAssessmentAttemptPayload<ExtArgs>[]
       adaptations: Prisma.$RoadmapAdaptationPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -13779,6 +14461,7 @@ export namespace Prisma {
     userRoadmap<T extends UserRoadmapDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserRoadmapDefaultArgs<ExtArgs>>): Prisma__UserRoadmapClient<$Result.GetResult<Prisma.$UserRoadmapPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     tasks<T extends RoadmapSprint$tasksArgs<ExtArgs> = {}>(args?: Subset<T, RoadmapSprint$tasksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RoadmapSprintTaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     performance<T extends RoadmapSprint$performanceArgs<ExtArgs> = {}>(args?: Subset<T, RoadmapSprint$performanceArgs<ExtArgs>>): Prisma__SprintPerformanceClient<$Result.GetResult<Prisma.$SprintPerformancePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    assessmentAttempts<T extends RoadmapSprint$assessmentAttemptsArgs<ExtArgs> = {}>(args?: Subset<T, RoadmapSprint$assessmentAttemptsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MicroAssessmentAttemptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     adaptations<T extends RoadmapSprint$adaptationsArgs<ExtArgs> = {}>(args?: Subset<T, RoadmapSprint$adaptationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RoadmapAdaptationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -14259,6 +14942,30 @@ export namespace Prisma {
   }
 
   /**
+   * RoadmapSprint.assessmentAttempts
+   */
+  export type RoadmapSprint$assessmentAttemptsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessmentAttempt
+     */
+    select?: MicroAssessmentAttemptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessmentAttempt
+     */
+    omit?: MicroAssessmentAttemptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentAttemptInclude<ExtArgs> | null
+    where?: MicroAssessmentAttemptWhereInput
+    orderBy?: MicroAssessmentAttemptOrderByWithRelationInput | MicroAssessmentAttemptOrderByWithRelationInput[]
+    cursor?: MicroAssessmentAttemptWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: MicroAssessmentAttemptScalarFieldEnum | MicroAssessmentAttemptScalarFieldEnum[]
+  }
+
+  /**
    * RoadmapSprint.adaptations
    */
   export type RoadmapSprint$adaptationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -14332,6 +15039,7 @@ export namespace Prisma {
     orderIndex: number | null
     estimatedMinutes: number | null
     requiresEvidence: boolean | null
+    requiresAssessment: boolean | null
     status: $Enums.SprintTaskStatus | null
     completedAt: Date | null
     createdAt: Date | null
@@ -14347,6 +15055,7 @@ export namespace Prisma {
     orderIndex: number | null
     estimatedMinutes: number | null
     requiresEvidence: boolean | null
+    requiresAssessment: boolean | null
     status: $Enums.SprintTaskStatus | null
     completedAt: Date | null
     createdAt: Date | null
@@ -14362,6 +15071,7 @@ export namespace Prisma {
     orderIndex: number
     estimatedMinutes: number
     requiresEvidence: number
+    requiresAssessment: number
     status: number
     completedAt: number
     createdAt: number
@@ -14389,6 +15099,7 @@ export namespace Prisma {
     orderIndex?: true
     estimatedMinutes?: true
     requiresEvidence?: true
+    requiresAssessment?: true
     status?: true
     completedAt?: true
     createdAt?: true
@@ -14404,6 +15115,7 @@ export namespace Prisma {
     orderIndex?: true
     estimatedMinutes?: true
     requiresEvidence?: true
+    requiresAssessment?: true
     status?: true
     completedAt?: true
     createdAt?: true
@@ -14419,6 +15131,7 @@ export namespace Prisma {
     orderIndex?: true
     estimatedMinutes?: true
     requiresEvidence?: true
+    requiresAssessment?: true
     status?: true
     completedAt?: true
     createdAt?: true
@@ -14521,6 +15234,7 @@ export namespace Prisma {
     orderIndex: number
     estimatedMinutes: number
     requiresEvidence: boolean
+    requiresAssessment: boolean
     status: $Enums.SprintTaskStatus
     completedAt: Date | null
     createdAt: Date
@@ -14555,12 +15269,15 @@ export namespace Prisma {
     orderIndex?: boolean
     estimatedMinutes?: boolean
     requiresEvidence?: boolean
+    requiresAssessment?: boolean
     status?: boolean
     completedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     sprint?: boolean | RoadmapSprintDefaultArgs<ExtArgs>
     roadmapNode?: boolean | RoadmapSprintTask$roadmapNodeArgs<ExtArgs>
+    assessmentAttempts?: boolean | RoadmapSprintTask$assessmentAttemptsArgs<ExtArgs>
+    _count?: boolean | RoadmapSprintTaskCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["roadmapSprintTask"]>
 
   export type RoadmapSprintTaskSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -14572,6 +15289,7 @@ export namespace Prisma {
     orderIndex?: boolean
     estimatedMinutes?: boolean
     requiresEvidence?: boolean
+    requiresAssessment?: boolean
     status?: boolean
     completedAt?: boolean
     createdAt?: boolean
@@ -14589,6 +15307,7 @@ export namespace Prisma {
     orderIndex?: boolean
     estimatedMinutes?: boolean
     requiresEvidence?: boolean
+    requiresAssessment?: boolean
     status?: boolean
     completedAt?: boolean
     createdAt?: boolean
@@ -14606,16 +15325,19 @@ export namespace Prisma {
     orderIndex?: boolean
     estimatedMinutes?: boolean
     requiresEvidence?: boolean
+    requiresAssessment?: boolean
     status?: boolean
     completedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type RoadmapSprintTaskOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "sprintId" | "roadmapNodeId" | "title" | "description" | "orderIndex" | "estimatedMinutes" | "requiresEvidence" | "status" | "completedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["roadmapSprintTask"]>
+  export type RoadmapSprintTaskOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "sprintId" | "roadmapNodeId" | "title" | "description" | "orderIndex" | "estimatedMinutes" | "requiresEvidence" | "requiresAssessment" | "status" | "completedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["roadmapSprintTask"]>
   export type RoadmapSprintTaskInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     sprint?: boolean | RoadmapSprintDefaultArgs<ExtArgs>
     roadmapNode?: boolean | RoadmapSprintTask$roadmapNodeArgs<ExtArgs>
+    assessmentAttempts?: boolean | RoadmapSprintTask$assessmentAttemptsArgs<ExtArgs>
+    _count?: boolean | RoadmapSprintTaskCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type RoadmapSprintTaskIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     sprint?: boolean | RoadmapSprintDefaultArgs<ExtArgs>
@@ -14631,6 +15353,7 @@ export namespace Prisma {
     objects: {
       sprint: Prisma.$RoadmapSprintPayload<ExtArgs>
       roadmapNode: Prisma.$RoadmapNodePayload<ExtArgs> | null
+      assessmentAttempts: Prisma.$MicroAssessmentAttemptPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -14641,6 +15364,7 @@ export namespace Prisma {
       orderIndex: number
       estimatedMinutes: number
       requiresEvidence: boolean
+      requiresAssessment: boolean
       status: $Enums.SprintTaskStatus
       completedAt: Date | null
       createdAt: Date
@@ -15041,6 +15765,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     sprint<T extends RoadmapSprintDefaultArgs<ExtArgs> = {}>(args?: Subset<T, RoadmapSprintDefaultArgs<ExtArgs>>): Prisma__RoadmapSprintClient<$Result.GetResult<Prisma.$RoadmapSprintPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     roadmapNode<T extends RoadmapSprintTask$roadmapNodeArgs<ExtArgs> = {}>(args?: Subset<T, RoadmapSprintTask$roadmapNodeArgs<ExtArgs>>): Prisma__RoadmapNodeClient<$Result.GetResult<Prisma.$RoadmapNodePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    assessmentAttempts<T extends RoadmapSprintTask$assessmentAttemptsArgs<ExtArgs> = {}>(args?: Subset<T, RoadmapSprintTask$assessmentAttemptsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MicroAssessmentAttemptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -15078,6 +15803,7 @@ export namespace Prisma {
     readonly orderIndex: FieldRef<"RoadmapSprintTask", 'Int'>
     readonly estimatedMinutes: FieldRef<"RoadmapSprintTask", 'Int'>
     readonly requiresEvidence: FieldRef<"RoadmapSprintTask", 'Boolean'>
+    readonly requiresAssessment: FieldRef<"RoadmapSprintTask", 'Boolean'>
     readonly status: FieldRef<"RoadmapSprintTask", 'SprintTaskStatus'>
     readonly completedAt: FieldRef<"RoadmapSprintTask", 'DateTime'>
     readonly createdAt: FieldRef<"RoadmapSprintTask", 'DateTime'>
@@ -15494,6 +16220,30 @@ export namespace Prisma {
      */
     include?: RoadmapNodeInclude<ExtArgs> | null
     where?: RoadmapNodeWhereInput
+  }
+
+  /**
+   * RoadmapSprintTask.assessmentAttempts
+   */
+  export type RoadmapSprintTask$assessmentAttemptsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessmentAttempt
+     */
+    select?: MicroAssessmentAttemptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessmentAttempt
+     */
+    omit?: MicroAssessmentAttemptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentAttemptInclude<ExtArgs> | null
+    where?: MicroAssessmentAttemptWhereInput
+    orderBy?: MicroAssessmentAttemptOrderByWithRelationInput | MicroAssessmentAttemptOrderByWithRelationInput[]
+    cursor?: MicroAssessmentAttemptWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: MicroAssessmentAttemptScalarFieldEnum | MicroAssessmentAttemptScalarFieldEnum[]
   }
 
   /**
@@ -17875,6 +18625,3646 @@ export namespace Prisma {
 
 
   /**
+   * Model MicroAssessment
+   */
+
+  export type AggregateMicroAssessment = {
+    _count: MicroAssessmentCountAggregateOutputType | null
+    _min: MicroAssessmentMinAggregateOutputType | null
+    _max: MicroAssessmentMaxAggregateOutputType | null
+  }
+
+  export type MicroAssessmentMinAggregateOutputType = {
+    id: string | null
+    title: string | null
+    description: string | null
+    roadmapNodeId: string | null
+    skillId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type MicroAssessmentMaxAggregateOutputType = {
+    id: string | null
+    title: string | null
+    description: string | null
+    roadmapNodeId: string | null
+    skillId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type MicroAssessmentCountAggregateOutputType = {
+    id: number
+    title: number
+    description: number
+    roadmapNodeId: number
+    skillId: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type MicroAssessmentMinAggregateInputType = {
+    id?: true
+    title?: true
+    description?: true
+    roadmapNodeId?: true
+    skillId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type MicroAssessmentMaxAggregateInputType = {
+    id?: true
+    title?: true
+    description?: true
+    roadmapNodeId?: true
+    skillId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type MicroAssessmentCountAggregateInputType = {
+    id?: true
+    title?: true
+    description?: true
+    roadmapNodeId?: true
+    skillId?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type MicroAssessmentAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MicroAssessment to aggregate.
+     */
+    where?: MicroAssessmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MicroAssessments to fetch.
+     */
+    orderBy?: MicroAssessmentOrderByWithRelationInput | MicroAssessmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: MicroAssessmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MicroAssessments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MicroAssessments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned MicroAssessments
+    **/
+    _count?: true | MicroAssessmentCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: MicroAssessmentMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: MicroAssessmentMaxAggregateInputType
+  }
+
+  export type GetMicroAssessmentAggregateType<T extends MicroAssessmentAggregateArgs> = {
+        [P in keyof T & keyof AggregateMicroAssessment]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateMicroAssessment[P]>
+      : GetScalarType<T[P], AggregateMicroAssessment[P]>
+  }
+
+
+
+
+  export type MicroAssessmentGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MicroAssessmentWhereInput
+    orderBy?: MicroAssessmentOrderByWithAggregationInput | MicroAssessmentOrderByWithAggregationInput[]
+    by: MicroAssessmentScalarFieldEnum[] | MicroAssessmentScalarFieldEnum
+    having?: MicroAssessmentScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: MicroAssessmentCountAggregateInputType | true
+    _min?: MicroAssessmentMinAggregateInputType
+    _max?: MicroAssessmentMaxAggregateInputType
+  }
+
+  export type MicroAssessmentGroupByOutputType = {
+    id: string
+    title: string
+    description: string | null
+    roadmapNodeId: string | null
+    skillId: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: MicroAssessmentCountAggregateOutputType | null
+    _min: MicroAssessmentMinAggregateOutputType | null
+    _max: MicroAssessmentMaxAggregateOutputType | null
+  }
+
+  type GetMicroAssessmentGroupByPayload<T extends MicroAssessmentGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<MicroAssessmentGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof MicroAssessmentGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], MicroAssessmentGroupByOutputType[P]>
+            : GetScalarType<T[P], MicroAssessmentGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type MicroAssessmentSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    title?: boolean
+    description?: boolean
+    roadmapNodeId?: boolean
+    skillId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    roadmapNode?: boolean | MicroAssessment$roadmapNodeArgs<ExtArgs>
+    skill?: boolean | MicroAssessment$skillArgs<ExtArgs>
+    questions?: boolean | MicroAssessment$questionsArgs<ExtArgs>
+    attempts?: boolean | MicroAssessment$attemptsArgs<ExtArgs>
+    _count?: boolean | MicroAssessmentCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["microAssessment"]>
+
+  export type MicroAssessmentSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    title?: boolean
+    description?: boolean
+    roadmapNodeId?: boolean
+    skillId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    roadmapNode?: boolean | MicroAssessment$roadmapNodeArgs<ExtArgs>
+    skill?: boolean | MicroAssessment$skillArgs<ExtArgs>
+  }, ExtArgs["result"]["microAssessment"]>
+
+  export type MicroAssessmentSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    title?: boolean
+    description?: boolean
+    roadmapNodeId?: boolean
+    skillId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    roadmapNode?: boolean | MicroAssessment$roadmapNodeArgs<ExtArgs>
+    skill?: boolean | MicroAssessment$skillArgs<ExtArgs>
+  }, ExtArgs["result"]["microAssessment"]>
+
+  export type MicroAssessmentSelectScalar = {
+    id?: boolean
+    title?: boolean
+    description?: boolean
+    roadmapNodeId?: boolean
+    skillId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type MicroAssessmentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "description" | "roadmapNodeId" | "skillId" | "createdAt" | "updatedAt", ExtArgs["result"]["microAssessment"]>
+  export type MicroAssessmentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    roadmapNode?: boolean | MicroAssessment$roadmapNodeArgs<ExtArgs>
+    skill?: boolean | MicroAssessment$skillArgs<ExtArgs>
+    questions?: boolean | MicroAssessment$questionsArgs<ExtArgs>
+    attempts?: boolean | MicroAssessment$attemptsArgs<ExtArgs>
+    _count?: boolean | MicroAssessmentCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type MicroAssessmentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    roadmapNode?: boolean | MicroAssessment$roadmapNodeArgs<ExtArgs>
+    skill?: boolean | MicroAssessment$skillArgs<ExtArgs>
+  }
+  export type MicroAssessmentIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    roadmapNode?: boolean | MicroAssessment$roadmapNodeArgs<ExtArgs>
+    skill?: boolean | MicroAssessment$skillArgs<ExtArgs>
+  }
+
+  export type $MicroAssessmentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "MicroAssessment"
+    objects: {
+      roadmapNode: Prisma.$RoadmapNodePayload<ExtArgs> | null
+      skill: Prisma.$SkillPayload<ExtArgs> | null
+      questions: Prisma.$MicroAssessmentQuestionPayload<ExtArgs>[]
+      attempts: Prisma.$MicroAssessmentAttemptPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      title: string
+      description: string | null
+      roadmapNodeId: string | null
+      skillId: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["microAssessment"]>
+    composites: {}
+  }
+
+  type MicroAssessmentGetPayload<S extends boolean | null | undefined | MicroAssessmentDefaultArgs> = $Result.GetResult<Prisma.$MicroAssessmentPayload, S>
+
+  type MicroAssessmentCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<MicroAssessmentFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: MicroAssessmentCountAggregateInputType | true
+    }
+
+  export interface MicroAssessmentDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['MicroAssessment'], meta: { name: 'MicroAssessment' } }
+    /**
+     * Find zero or one MicroAssessment that matches the filter.
+     * @param {MicroAssessmentFindUniqueArgs} args - Arguments to find a MicroAssessment
+     * @example
+     * // Get one MicroAssessment
+     * const microAssessment = await prisma.microAssessment.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends MicroAssessmentFindUniqueArgs>(args: SelectSubset<T, MicroAssessmentFindUniqueArgs<ExtArgs>>): Prisma__MicroAssessmentClient<$Result.GetResult<Prisma.$MicroAssessmentPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one MicroAssessment that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {MicroAssessmentFindUniqueOrThrowArgs} args - Arguments to find a MicroAssessment
+     * @example
+     * // Get one MicroAssessment
+     * const microAssessment = await prisma.microAssessment.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends MicroAssessmentFindUniqueOrThrowArgs>(args: SelectSubset<T, MicroAssessmentFindUniqueOrThrowArgs<ExtArgs>>): Prisma__MicroAssessmentClient<$Result.GetResult<Prisma.$MicroAssessmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MicroAssessment that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MicroAssessmentFindFirstArgs} args - Arguments to find a MicroAssessment
+     * @example
+     * // Get one MicroAssessment
+     * const microAssessment = await prisma.microAssessment.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends MicroAssessmentFindFirstArgs>(args?: SelectSubset<T, MicroAssessmentFindFirstArgs<ExtArgs>>): Prisma__MicroAssessmentClient<$Result.GetResult<Prisma.$MicroAssessmentPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MicroAssessment that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MicroAssessmentFindFirstOrThrowArgs} args - Arguments to find a MicroAssessment
+     * @example
+     * // Get one MicroAssessment
+     * const microAssessment = await prisma.microAssessment.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends MicroAssessmentFindFirstOrThrowArgs>(args?: SelectSubset<T, MicroAssessmentFindFirstOrThrowArgs<ExtArgs>>): Prisma__MicroAssessmentClient<$Result.GetResult<Prisma.$MicroAssessmentPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more MicroAssessments that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MicroAssessmentFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all MicroAssessments
+     * const microAssessments = await prisma.microAssessment.findMany()
+     * 
+     * // Get first 10 MicroAssessments
+     * const microAssessments = await prisma.microAssessment.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const microAssessmentWithIdOnly = await prisma.microAssessment.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends MicroAssessmentFindManyArgs>(args?: SelectSubset<T, MicroAssessmentFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MicroAssessmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a MicroAssessment.
+     * @param {MicroAssessmentCreateArgs} args - Arguments to create a MicroAssessment.
+     * @example
+     * // Create one MicroAssessment
+     * const MicroAssessment = await prisma.microAssessment.create({
+     *   data: {
+     *     // ... data to create a MicroAssessment
+     *   }
+     * })
+     * 
+     */
+    create<T extends MicroAssessmentCreateArgs>(args: SelectSubset<T, MicroAssessmentCreateArgs<ExtArgs>>): Prisma__MicroAssessmentClient<$Result.GetResult<Prisma.$MicroAssessmentPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many MicroAssessments.
+     * @param {MicroAssessmentCreateManyArgs} args - Arguments to create many MicroAssessments.
+     * @example
+     * // Create many MicroAssessments
+     * const microAssessment = await prisma.microAssessment.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends MicroAssessmentCreateManyArgs>(args?: SelectSubset<T, MicroAssessmentCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many MicroAssessments and returns the data saved in the database.
+     * @param {MicroAssessmentCreateManyAndReturnArgs} args - Arguments to create many MicroAssessments.
+     * @example
+     * // Create many MicroAssessments
+     * const microAssessment = await prisma.microAssessment.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many MicroAssessments and only return the `id`
+     * const microAssessmentWithIdOnly = await prisma.microAssessment.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends MicroAssessmentCreateManyAndReturnArgs>(args?: SelectSubset<T, MicroAssessmentCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MicroAssessmentPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a MicroAssessment.
+     * @param {MicroAssessmentDeleteArgs} args - Arguments to delete one MicroAssessment.
+     * @example
+     * // Delete one MicroAssessment
+     * const MicroAssessment = await prisma.microAssessment.delete({
+     *   where: {
+     *     // ... filter to delete one MicroAssessment
+     *   }
+     * })
+     * 
+     */
+    delete<T extends MicroAssessmentDeleteArgs>(args: SelectSubset<T, MicroAssessmentDeleteArgs<ExtArgs>>): Prisma__MicroAssessmentClient<$Result.GetResult<Prisma.$MicroAssessmentPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one MicroAssessment.
+     * @param {MicroAssessmentUpdateArgs} args - Arguments to update one MicroAssessment.
+     * @example
+     * // Update one MicroAssessment
+     * const microAssessment = await prisma.microAssessment.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends MicroAssessmentUpdateArgs>(args: SelectSubset<T, MicroAssessmentUpdateArgs<ExtArgs>>): Prisma__MicroAssessmentClient<$Result.GetResult<Prisma.$MicroAssessmentPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more MicroAssessments.
+     * @param {MicroAssessmentDeleteManyArgs} args - Arguments to filter MicroAssessments to delete.
+     * @example
+     * // Delete a few MicroAssessments
+     * const { count } = await prisma.microAssessment.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends MicroAssessmentDeleteManyArgs>(args?: SelectSubset<T, MicroAssessmentDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MicroAssessments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MicroAssessmentUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many MicroAssessments
+     * const microAssessment = await prisma.microAssessment.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends MicroAssessmentUpdateManyArgs>(args: SelectSubset<T, MicroAssessmentUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MicroAssessments and returns the data updated in the database.
+     * @param {MicroAssessmentUpdateManyAndReturnArgs} args - Arguments to update many MicroAssessments.
+     * @example
+     * // Update many MicroAssessments
+     * const microAssessment = await prisma.microAssessment.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more MicroAssessments and only return the `id`
+     * const microAssessmentWithIdOnly = await prisma.microAssessment.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends MicroAssessmentUpdateManyAndReturnArgs>(args: SelectSubset<T, MicroAssessmentUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MicroAssessmentPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one MicroAssessment.
+     * @param {MicroAssessmentUpsertArgs} args - Arguments to update or create a MicroAssessment.
+     * @example
+     * // Update or create a MicroAssessment
+     * const microAssessment = await prisma.microAssessment.upsert({
+     *   create: {
+     *     // ... data to create a MicroAssessment
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the MicroAssessment we want to update
+     *   }
+     * })
+     */
+    upsert<T extends MicroAssessmentUpsertArgs>(args: SelectSubset<T, MicroAssessmentUpsertArgs<ExtArgs>>): Prisma__MicroAssessmentClient<$Result.GetResult<Prisma.$MicroAssessmentPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of MicroAssessments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MicroAssessmentCountArgs} args - Arguments to filter MicroAssessments to count.
+     * @example
+     * // Count the number of MicroAssessments
+     * const count = await prisma.microAssessment.count({
+     *   where: {
+     *     // ... the filter for the MicroAssessments we want to count
+     *   }
+     * })
+    **/
+    count<T extends MicroAssessmentCountArgs>(
+      args?: Subset<T, MicroAssessmentCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], MicroAssessmentCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a MicroAssessment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MicroAssessmentAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends MicroAssessmentAggregateArgs>(args: Subset<T, MicroAssessmentAggregateArgs>): Prisma.PrismaPromise<GetMicroAssessmentAggregateType<T>>
+
+    /**
+     * Group by MicroAssessment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MicroAssessmentGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends MicroAssessmentGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: MicroAssessmentGroupByArgs['orderBy'] }
+        : { orderBy?: MicroAssessmentGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, MicroAssessmentGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMicroAssessmentGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the MicroAssessment model
+   */
+  readonly fields: MicroAssessmentFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for MicroAssessment.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__MicroAssessmentClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    roadmapNode<T extends MicroAssessment$roadmapNodeArgs<ExtArgs> = {}>(args?: Subset<T, MicroAssessment$roadmapNodeArgs<ExtArgs>>): Prisma__RoadmapNodeClient<$Result.GetResult<Prisma.$RoadmapNodePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    skill<T extends MicroAssessment$skillArgs<ExtArgs> = {}>(args?: Subset<T, MicroAssessment$skillArgs<ExtArgs>>): Prisma__SkillClient<$Result.GetResult<Prisma.$SkillPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    questions<T extends MicroAssessment$questionsArgs<ExtArgs> = {}>(args?: Subset<T, MicroAssessment$questionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MicroAssessmentQuestionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    attempts<T extends MicroAssessment$attemptsArgs<ExtArgs> = {}>(args?: Subset<T, MicroAssessment$attemptsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MicroAssessmentAttemptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the MicroAssessment model
+   */
+  interface MicroAssessmentFieldRefs {
+    readonly id: FieldRef<"MicroAssessment", 'String'>
+    readonly title: FieldRef<"MicroAssessment", 'String'>
+    readonly description: FieldRef<"MicroAssessment", 'String'>
+    readonly roadmapNodeId: FieldRef<"MicroAssessment", 'String'>
+    readonly skillId: FieldRef<"MicroAssessment", 'String'>
+    readonly createdAt: FieldRef<"MicroAssessment", 'DateTime'>
+    readonly updatedAt: FieldRef<"MicroAssessment", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * MicroAssessment findUnique
+   */
+  export type MicroAssessmentFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessment
+     */
+    select?: MicroAssessmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessment
+     */
+    omit?: MicroAssessmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentInclude<ExtArgs> | null
+    /**
+     * Filter, which MicroAssessment to fetch.
+     */
+    where: MicroAssessmentWhereUniqueInput
+  }
+
+  /**
+   * MicroAssessment findUniqueOrThrow
+   */
+  export type MicroAssessmentFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessment
+     */
+    select?: MicroAssessmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessment
+     */
+    omit?: MicroAssessmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentInclude<ExtArgs> | null
+    /**
+     * Filter, which MicroAssessment to fetch.
+     */
+    where: MicroAssessmentWhereUniqueInput
+  }
+
+  /**
+   * MicroAssessment findFirst
+   */
+  export type MicroAssessmentFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessment
+     */
+    select?: MicroAssessmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessment
+     */
+    omit?: MicroAssessmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentInclude<ExtArgs> | null
+    /**
+     * Filter, which MicroAssessment to fetch.
+     */
+    where?: MicroAssessmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MicroAssessments to fetch.
+     */
+    orderBy?: MicroAssessmentOrderByWithRelationInput | MicroAssessmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MicroAssessments.
+     */
+    cursor?: MicroAssessmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MicroAssessments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MicroAssessments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MicroAssessments.
+     */
+    distinct?: MicroAssessmentScalarFieldEnum | MicroAssessmentScalarFieldEnum[]
+  }
+
+  /**
+   * MicroAssessment findFirstOrThrow
+   */
+  export type MicroAssessmentFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessment
+     */
+    select?: MicroAssessmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessment
+     */
+    omit?: MicroAssessmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentInclude<ExtArgs> | null
+    /**
+     * Filter, which MicroAssessment to fetch.
+     */
+    where?: MicroAssessmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MicroAssessments to fetch.
+     */
+    orderBy?: MicroAssessmentOrderByWithRelationInput | MicroAssessmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MicroAssessments.
+     */
+    cursor?: MicroAssessmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MicroAssessments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MicroAssessments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MicroAssessments.
+     */
+    distinct?: MicroAssessmentScalarFieldEnum | MicroAssessmentScalarFieldEnum[]
+  }
+
+  /**
+   * MicroAssessment findMany
+   */
+  export type MicroAssessmentFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessment
+     */
+    select?: MicroAssessmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessment
+     */
+    omit?: MicroAssessmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentInclude<ExtArgs> | null
+    /**
+     * Filter, which MicroAssessments to fetch.
+     */
+    where?: MicroAssessmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MicroAssessments to fetch.
+     */
+    orderBy?: MicroAssessmentOrderByWithRelationInput | MicroAssessmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing MicroAssessments.
+     */
+    cursor?: MicroAssessmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MicroAssessments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MicroAssessments.
+     */
+    skip?: number
+    distinct?: MicroAssessmentScalarFieldEnum | MicroAssessmentScalarFieldEnum[]
+  }
+
+  /**
+   * MicroAssessment create
+   */
+  export type MicroAssessmentCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessment
+     */
+    select?: MicroAssessmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessment
+     */
+    omit?: MicroAssessmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentInclude<ExtArgs> | null
+    /**
+     * The data needed to create a MicroAssessment.
+     */
+    data: XOR<MicroAssessmentCreateInput, MicroAssessmentUncheckedCreateInput>
+  }
+
+  /**
+   * MicroAssessment createMany
+   */
+  export type MicroAssessmentCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many MicroAssessments.
+     */
+    data: MicroAssessmentCreateManyInput | MicroAssessmentCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * MicroAssessment createManyAndReturn
+   */
+  export type MicroAssessmentCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessment
+     */
+    select?: MicroAssessmentSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessment
+     */
+    omit?: MicroAssessmentOmit<ExtArgs> | null
+    /**
+     * The data used to create many MicroAssessments.
+     */
+    data: MicroAssessmentCreateManyInput | MicroAssessmentCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * MicroAssessment update
+   */
+  export type MicroAssessmentUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessment
+     */
+    select?: MicroAssessmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessment
+     */
+    omit?: MicroAssessmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentInclude<ExtArgs> | null
+    /**
+     * The data needed to update a MicroAssessment.
+     */
+    data: XOR<MicroAssessmentUpdateInput, MicroAssessmentUncheckedUpdateInput>
+    /**
+     * Choose, which MicroAssessment to update.
+     */
+    where: MicroAssessmentWhereUniqueInput
+  }
+
+  /**
+   * MicroAssessment updateMany
+   */
+  export type MicroAssessmentUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update MicroAssessments.
+     */
+    data: XOR<MicroAssessmentUpdateManyMutationInput, MicroAssessmentUncheckedUpdateManyInput>
+    /**
+     * Filter which MicroAssessments to update
+     */
+    where?: MicroAssessmentWhereInput
+    /**
+     * Limit how many MicroAssessments to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * MicroAssessment updateManyAndReturn
+   */
+  export type MicroAssessmentUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessment
+     */
+    select?: MicroAssessmentSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessment
+     */
+    omit?: MicroAssessmentOmit<ExtArgs> | null
+    /**
+     * The data used to update MicroAssessments.
+     */
+    data: XOR<MicroAssessmentUpdateManyMutationInput, MicroAssessmentUncheckedUpdateManyInput>
+    /**
+     * Filter which MicroAssessments to update
+     */
+    where?: MicroAssessmentWhereInput
+    /**
+     * Limit how many MicroAssessments to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * MicroAssessment upsert
+   */
+  export type MicroAssessmentUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessment
+     */
+    select?: MicroAssessmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessment
+     */
+    omit?: MicroAssessmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentInclude<ExtArgs> | null
+    /**
+     * The filter to search for the MicroAssessment to update in case it exists.
+     */
+    where: MicroAssessmentWhereUniqueInput
+    /**
+     * In case the MicroAssessment found by the `where` argument doesn't exist, create a new MicroAssessment with this data.
+     */
+    create: XOR<MicroAssessmentCreateInput, MicroAssessmentUncheckedCreateInput>
+    /**
+     * In case the MicroAssessment was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<MicroAssessmentUpdateInput, MicroAssessmentUncheckedUpdateInput>
+  }
+
+  /**
+   * MicroAssessment delete
+   */
+  export type MicroAssessmentDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessment
+     */
+    select?: MicroAssessmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessment
+     */
+    omit?: MicroAssessmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentInclude<ExtArgs> | null
+    /**
+     * Filter which MicroAssessment to delete.
+     */
+    where: MicroAssessmentWhereUniqueInput
+  }
+
+  /**
+   * MicroAssessment deleteMany
+   */
+  export type MicroAssessmentDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MicroAssessments to delete
+     */
+    where?: MicroAssessmentWhereInput
+    /**
+     * Limit how many MicroAssessments to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * MicroAssessment.roadmapNode
+   */
+  export type MicroAssessment$roadmapNodeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoadmapNode
+     */
+    select?: RoadmapNodeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoadmapNode
+     */
+    omit?: RoadmapNodeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoadmapNodeInclude<ExtArgs> | null
+    where?: RoadmapNodeWhereInput
+  }
+
+  /**
+   * MicroAssessment.skill
+   */
+  export type MicroAssessment$skillArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Skill
+     */
+    select?: SkillSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Skill
+     */
+    omit?: SkillOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SkillInclude<ExtArgs> | null
+    where?: SkillWhereInput
+  }
+
+  /**
+   * MicroAssessment.questions
+   */
+  export type MicroAssessment$questionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessmentQuestion
+     */
+    select?: MicroAssessmentQuestionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessmentQuestion
+     */
+    omit?: MicroAssessmentQuestionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentQuestionInclude<ExtArgs> | null
+    where?: MicroAssessmentQuestionWhereInput
+    orderBy?: MicroAssessmentQuestionOrderByWithRelationInput | MicroAssessmentQuestionOrderByWithRelationInput[]
+    cursor?: MicroAssessmentQuestionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: MicroAssessmentQuestionScalarFieldEnum | MicroAssessmentQuestionScalarFieldEnum[]
+  }
+
+  /**
+   * MicroAssessment.attempts
+   */
+  export type MicroAssessment$attemptsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessmentAttempt
+     */
+    select?: MicroAssessmentAttemptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessmentAttempt
+     */
+    omit?: MicroAssessmentAttemptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentAttemptInclude<ExtArgs> | null
+    where?: MicroAssessmentAttemptWhereInput
+    orderBy?: MicroAssessmentAttemptOrderByWithRelationInput | MicroAssessmentAttemptOrderByWithRelationInput[]
+    cursor?: MicroAssessmentAttemptWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: MicroAssessmentAttemptScalarFieldEnum | MicroAssessmentAttemptScalarFieldEnum[]
+  }
+
+  /**
+   * MicroAssessment without action
+   */
+  export type MicroAssessmentDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessment
+     */
+    select?: MicroAssessmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessment
+     */
+    omit?: MicroAssessmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model MicroAssessmentQuestion
+   */
+
+  export type AggregateMicroAssessmentQuestion = {
+    _count: MicroAssessmentQuestionCountAggregateOutputType | null
+    _avg: MicroAssessmentQuestionAvgAggregateOutputType | null
+    _sum: MicroAssessmentQuestionSumAggregateOutputType | null
+    _min: MicroAssessmentQuestionMinAggregateOutputType | null
+    _max: MicroAssessmentQuestionMaxAggregateOutputType | null
+  }
+
+  export type MicroAssessmentQuestionAvgAggregateOutputType = {
+    correctOptionIndex: number | null
+    orderIndex: number | null
+  }
+
+  export type MicroAssessmentQuestionSumAggregateOutputType = {
+    correctOptionIndex: number | null
+    orderIndex: number | null
+  }
+
+  export type MicroAssessmentQuestionMinAggregateOutputType = {
+    id: string | null
+    assessmentId: string | null
+    questionText: string | null
+    correctOptionIndex: number | null
+    explanation: string | null
+    orderIndex: number | null
+    createdAt: Date | null
+  }
+
+  export type MicroAssessmentQuestionMaxAggregateOutputType = {
+    id: string | null
+    assessmentId: string | null
+    questionText: string | null
+    correctOptionIndex: number | null
+    explanation: string | null
+    orderIndex: number | null
+    createdAt: Date | null
+  }
+
+  export type MicroAssessmentQuestionCountAggregateOutputType = {
+    id: number
+    assessmentId: number
+    questionText: number
+    options: number
+    correctOptionIndex: number
+    explanation: number
+    orderIndex: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type MicroAssessmentQuestionAvgAggregateInputType = {
+    correctOptionIndex?: true
+    orderIndex?: true
+  }
+
+  export type MicroAssessmentQuestionSumAggregateInputType = {
+    correctOptionIndex?: true
+    orderIndex?: true
+  }
+
+  export type MicroAssessmentQuestionMinAggregateInputType = {
+    id?: true
+    assessmentId?: true
+    questionText?: true
+    correctOptionIndex?: true
+    explanation?: true
+    orderIndex?: true
+    createdAt?: true
+  }
+
+  export type MicroAssessmentQuestionMaxAggregateInputType = {
+    id?: true
+    assessmentId?: true
+    questionText?: true
+    correctOptionIndex?: true
+    explanation?: true
+    orderIndex?: true
+    createdAt?: true
+  }
+
+  export type MicroAssessmentQuestionCountAggregateInputType = {
+    id?: true
+    assessmentId?: true
+    questionText?: true
+    options?: true
+    correctOptionIndex?: true
+    explanation?: true
+    orderIndex?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type MicroAssessmentQuestionAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MicroAssessmentQuestion to aggregate.
+     */
+    where?: MicroAssessmentQuestionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MicroAssessmentQuestions to fetch.
+     */
+    orderBy?: MicroAssessmentQuestionOrderByWithRelationInput | MicroAssessmentQuestionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: MicroAssessmentQuestionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MicroAssessmentQuestions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MicroAssessmentQuestions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned MicroAssessmentQuestions
+    **/
+    _count?: true | MicroAssessmentQuestionCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: MicroAssessmentQuestionAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: MicroAssessmentQuestionSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: MicroAssessmentQuestionMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: MicroAssessmentQuestionMaxAggregateInputType
+  }
+
+  export type GetMicroAssessmentQuestionAggregateType<T extends MicroAssessmentQuestionAggregateArgs> = {
+        [P in keyof T & keyof AggregateMicroAssessmentQuestion]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateMicroAssessmentQuestion[P]>
+      : GetScalarType<T[P], AggregateMicroAssessmentQuestion[P]>
+  }
+
+
+
+
+  export type MicroAssessmentQuestionGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MicroAssessmentQuestionWhereInput
+    orderBy?: MicroAssessmentQuestionOrderByWithAggregationInput | MicroAssessmentQuestionOrderByWithAggregationInput[]
+    by: MicroAssessmentQuestionScalarFieldEnum[] | MicroAssessmentQuestionScalarFieldEnum
+    having?: MicroAssessmentQuestionScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: MicroAssessmentQuestionCountAggregateInputType | true
+    _avg?: MicroAssessmentQuestionAvgAggregateInputType
+    _sum?: MicroAssessmentQuestionSumAggregateInputType
+    _min?: MicroAssessmentQuestionMinAggregateInputType
+    _max?: MicroAssessmentQuestionMaxAggregateInputType
+  }
+
+  export type MicroAssessmentQuestionGroupByOutputType = {
+    id: string
+    assessmentId: string
+    questionText: string
+    options: string[]
+    correctOptionIndex: number
+    explanation: string | null
+    orderIndex: number
+    createdAt: Date
+    _count: MicroAssessmentQuestionCountAggregateOutputType | null
+    _avg: MicroAssessmentQuestionAvgAggregateOutputType | null
+    _sum: MicroAssessmentQuestionSumAggregateOutputType | null
+    _min: MicroAssessmentQuestionMinAggregateOutputType | null
+    _max: MicroAssessmentQuestionMaxAggregateOutputType | null
+  }
+
+  type GetMicroAssessmentQuestionGroupByPayload<T extends MicroAssessmentQuestionGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<MicroAssessmentQuestionGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof MicroAssessmentQuestionGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], MicroAssessmentQuestionGroupByOutputType[P]>
+            : GetScalarType<T[P], MicroAssessmentQuestionGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type MicroAssessmentQuestionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    assessmentId?: boolean
+    questionText?: boolean
+    options?: boolean
+    correctOptionIndex?: boolean
+    explanation?: boolean
+    orderIndex?: boolean
+    createdAt?: boolean
+    assessment?: boolean | MicroAssessmentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["microAssessmentQuestion"]>
+
+  export type MicroAssessmentQuestionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    assessmentId?: boolean
+    questionText?: boolean
+    options?: boolean
+    correctOptionIndex?: boolean
+    explanation?: boolean
+    orderIndex?: boolean
+    createdAt?: boolean
+    assessment?: boolean | MicroAssessmentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["microAssessmentQuestion"]>
+
+  export type MicroAssessmentQuestionSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    assessmentId?: boolean
+    questionText?: boolean
+    options?: boolean
+    correctOptionIndex?: boolean
+    explanation?: boolean
+    orderIndex?: boolean
+    createdAt?: boolean
+    assessment?: boolean | MicroAssessmentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["microAssessmentQuestion"]>
+
+  export type MicroAssessmentQuestionSelectScalar = {
+    id?: boolean
+    assessmentId?: boolean
+    questionText?: boolean
+    options?: boolean
+    correctOptionIndex?: boolean
+    explanation?: boolean
+    orderIndex?: boolean
+    createdAt?: boolean
+  }
+
+  export type MicroAssessmentQuestionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "assessmentId" | "questionText" | "options" | "correctOptionIndex" | "explanation" | "orderIndex" | "createdAt", ExtArgs["result"]["microAssessmentQuestion"]>
+  export type MicroAssessmentQuestionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    assessment?: boolean | MicroAssessmentDefaultArgs<ExtArgs>
+  }
+  export type MicroAssessmentQuestionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    assessment?: boolean | MicroAssessmentDefaultArgs<ExtArgs>
+  }
+  export type MicroAssessmentQuestionIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    assessment?: boolean | MicroAssessmentDefaultArgs<ExtArgs>
+  }
+
+  export type $MicroAssessmentQuestionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "MicroAssessmentQuestion"
+    objects: {
+      assessment: Prisma.$MicroAssessmentPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      assessmentId: string
+      questionText: string
+      options: string[]
+      correctOptionIndex: number
+      explanation: string | null
+      orderIndex: number
+      createdAt: Date
+    }, ExtArgs["result"]["microAssessmentQuestion"]>
+    composites: {}
+  }
+
+  type MicroAssessmentQuestionGetPayload<S extends boolean | null | undefined | MicroAssessmentQuestionDefaultArgs> = $Result.GetResult<Prisma.$MicroAssessmentQuestionPayload, S>
+
+  type MicroAssessmentQuestionCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<MicroAssessmentQuestionFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: MicroAssessmentQuestionCountAggregateInputType | true
+    }
+
+  export interface MicroAssessmentQuestionDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['MicroAssessmentQuestion'], meta: { name: 'MicroAssessmentQuestion' } }
+    /**
+     * Find zero or one MicroAssessmentQuestion that matches the filter.
+     * @param {MicroAssessmentQuestionFindUniqueArgs} args - Arguments to find a MicroAssessmentQuestion
+     * @example
+     * // Get one MicroAssessmentQuestion
+     * const microAssessmentQuestion = await prisma.microAssessmentQuestion.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends MicroAssessmentQuestionFindUniqueArgs>(args: SelectSubset<T, MicroAssessmentQuestionFindUniqueArgs<ExtArgs>>): Prisma__MicroAssessmentQuestionClient<$Result.GetResult<Prisma.$MicroAssessmentQuestionPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one MicroAssessmentQuestion that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {MicroAssessmentQuestionFindUniqueOrThrowArgs} args - Arguments to find a MicroAssessmentQuestion
+     * @example
+     * // Get one MicroAssessmentQuestion
+     * const microAssessmentQuestion = await prisma.microAssessmentQuestion.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends MicroAssessmentQuestionFindUniqueOrThrowArgs>(args: SelectSubset<T, MicroAssessmentQuestionFindUniqueOrThrowArgs<ExtArgs>>): Prisma__MicroAssessmentQuestionClient<$Result.GetResult<Prisma.$MicroAssessmentQuestionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MicroAssessmentQuestion that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MicroAssessmentQuestionFindFirstArgs} args - Arguments to find a MicroAssessmentQuestion
+     * @example
+     * // Get one MicroAssessmentQuestion
+     * const microAssessmentQuestion = await prisma.microAssessmentQuestion.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends MicroAssessmentQuestionFindFirstArgs>(args?: SelectSubset<T, MicroAssessmentQuestionFindFirstArgs<ExtArgs>>): Prisma__MicroAssessmentQuestionClient<$Result.GetResult<Prisma.$MicroAssessmentQuestionPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MicroAssessmentQuestion that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MicroAssessmentQuestionFindFirstOrThrowArgs} args - Arguments to find a MicroAssessmentQuestion
+     * @example
+     * // Get one MicroAssessmentQuestion
+     * const microAssessmentQuestion = await prisma.microAssessmentQuestion.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends MicroAssessmentQuestionFindFirstOrThrowArgs>(args?: SelectSubset<T, MicroAssessmentQuestionFindFirstOrThrowArgs<ExtArgs>>): Prisma__MicroAssessmentQuestionClient<$Result.GetResult<Prisma.$MicroAssessmentQuestionPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more MicroAssessmentQuestions that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MicroAssessmentQuestionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all MicroAssessmentQuestions
+     * const microAssessmentQuestions = await prisma.microAssessmentQuestion.findMany()
+     * 
+     * // Get first 10 MicroAssessmentQuestions
+     * const microAssessmentQuestions = await prisma.microAssessmentQuestion.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const microAssessmentQuestionWithIdOnly = await prisma.microAssessmentQuestion.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends MicroAssessmentQuestionFindManyArgs>(args?: SelectSubset<T, MicroAssessmentQuestionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MicroAssessmentQuestionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a MicroAssessmentQuestion.
+     * @param {MicroAssessmentQuestionCreateArgs} args - Arguments to create a MicroAssessmentQuestion.
+     * @example
+     * // Create one MicroAssessmentQuestion
+     * const MicroAssessmentQuestion = await prisma.microAssessmentQuestion.create({
+     *   data: {
+     *     // ... data to create a MicroAssessmentQuestion
+     *   }
+     * })
+     * 
+     */
+    create<T extends MicroAssessmentQuestionCreateArgs>(args: SelectSubset<T, MicroAssessmentQuestionCreateArgs<ExtArgs>>): Prisma__MicroAssessmentQuestionClient<$Result.GetResult<Prisma.$MicroAssessmentQuestionPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many MicroAssessmentQuestions.
+     * @param {MicroAssessmentQuestionCreateManyArgs} args - Arguments to create many MicroAssessmentQuestions.
+     * @example
+     * // Create many MicroAssessmentQuestions
+     * const microAssessmentQuestion = await prisma.microAssessmentQuestion.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends MicroAssessmentQuestionCreateManyArgs>(args?: SelectSubset<T, MicroAssessmentQuestionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many MicroAssessmentQuestions and returns the data saved in the database.
+     * @param {MicroAssessmentQuestionCreateManyAndReturnArgs} args - Arguments to create many MicroAssessmentQuestions.
+     * @example
+     * // Create many MicroAssessmentQuestions
+     * const microAssessmentQuestion = await prisma.microAssessmentQuestion.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many MicroAssessmentQuestions and only return the `id`
+     * const microAssessmentQuestionWithIdOnly = await prisma.microAssessmentQuestion.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends MicroAssessmentQuestionCreateManyAndReturnArgs>(args?: SelectSubset<T, MicroAssessmentQuestionCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MicroAssessmentQuestionPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a MicroAssessmentQuestion.
+     * @param {MicroAssessmentQuestionDeleteArgs} args - Arguments to delete one MicroAssessmentQuestion.
+     * @example
+     * // Delete one MicroAssessmentQuestion
+     * const MicroAssessmentQuestion = await prisma.microAssessmentQuestion.delete({
+     *   where: {
+     *     // ... filter to delete one MicroAssessmentQuestion
+     *   }
+     * })
+     * 
+     */
+    delete<T extends MicroAssessmentQuestionDeleteArgs>(args: SelectSubset<T, MicroAssessmentQuestionDeleteArgs<ExtArgs>>): Prisma__MicroAssessmentQuestionClient<$Result.GetResult<Prisma.$MicroAssessmentQuestionPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one MicroAssessmentQuestion.
+     * @param {MicroAssessmentQuestionUpdateArgs} args - Arguments to update one MicroAssessmentQuestion.
+     * @example
+     * // Update one MicroAssessmentQuestion
+     * const microAssessmentQuestion = await prisma.microAssessmentQuestion.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends MicroAssessmentQuestionUpdateArgs>(args: SelectSubset<T, MicroAssessmentQuestionUpdateArgs<ExtArgs>>): Prisma__MicroAssessmentQuestionClient<$Result.GetResult<Prisma.$MicroAssessmentQuestionPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more MicroAssessmentQuestions.
+     * @param {MicroAssessmentQuestionDeleteManyArgs} args - Arguments to filter MicroAssessmentQuestions to delete.
+     * @example
+     * // Delete a few MicroAssessmentQuestions
+     * const { count } = await prisma.microAssessmentQuestion.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends MicroAssessmentQuestionDeleteManyArgs>(args?: SelectSubset<T, MicroAssessmentQuestionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MicroAssessmentQuestions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MicroAssessmentQuestionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many MicroAssessmentQuestions
+     * const microAssessmentQuestion = await prisma.microAssessmentQuestion.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends MicroAssessmentQuestionUpdateManyArgs>(args: SelectSubset<T, MicroAssessmentQuestionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MicroAssessmentQuestions and returns the data updated in the database.
+     * @param {MicroAssessmentQuestionUpdateManyAndReturnArgs} args - Arguments to update many MicroAssessmentQuestions.
+     * @example
+     * // Update many MicroAssessmentQuestions
+     * const microAssessmentQuestion = await prisma.microAssessmentQuestion.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more MicroAssessmentQuestions and only return the `id`
+     * const microAssessmentQuestionWithIdOnly = await prisma.microAssessmentQuestion.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends MicroAssessmentQuestionUpdateManyAndReturnArgs>(args: SelectSubset<T, MicroAssessmentQuestionUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MicroAssessmentQuestionPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one MicroAssessmentQuestion.
+     * @param {MicroAssessmentQuestionUpsertArgs} args - Arguments to update or create a MicroAssessmentQuestion.
+     * @example
+     * // Update or create a MicroAssessmentQuestion
+     * const microAssessmentQuestion = await prisma.microAssessmentQuestion.upsert({
+     *   create: {
+     *     // ... data to create a MicroAssessmentQuestion
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the MicroAssessmentQuestion we want to update
+     *   }
+     * })
+     */
+    upsert<T extends MicroAssessmentQuestionUpsertArgs>(args: SelectSubset<T, MicroAssessmentQuestionUpsertArgs<ExtArgs>>): Prisma__MicroAssessmentQuestionClient<$Result.GetResult<Prisma.$MicroAssessmentQuestionPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of MicroAssessmentQuestions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MicroAssessmentQuestionCountArgs} args - Arguments to filter MicroAssessmentQuestions to count.
+     * @example
+     * // Count the number of MicroAssessmentQuestions
+     * const count = await prisma.microAssessmentQuestion.count({
+     *   where: {
+     *     // ... the filter for the MicroAssessmentQuestions we want to count
+     *   }
+     * })
+    **/
+    count<T extends MicroAssessmentQuestionCountArgs>(
+      args?: Subset<T, MicroAssessmentQuestionCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], MicroAssessmentQuestionCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a MicroAssessmentQuestion.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MicroAssessmentQuestionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends MicroAssessmentQuestionAggregateArgs>(args: Subset<T, MicroAssessmentQuestionAggregateArgs>): Prisma.PrismaPromise<GetMicroAssessmentQuestionAggregateType<T>>
+
+    /**
+     * Group by MicroAssessmentQuestion.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MicroAssessmentQuestionGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends MicroAssessmentQuestionGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: MicroAssessmentQuestionGroupByArgs['orderBy'] }
+        : { orderBy?: MicroAssessmentQuestionGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, MicroAssessmentQuestionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMicroAssessmentQuestionGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the MicroAssessmentQuestion model
+   */
+  readonly fields: MicroAssessmentQuestionFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for MicroAssessmentQuestion.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__MicroAssessmentQuestionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    assessment<T extends MicroAssessmentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, MicroAssessmentDefaultArgs<ExtArgs>>): Prisma__MicroAssessmentClient<$Result.GetResult<Prisma.$MicroAssessmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the MicroAssessmentQuestion model
+   */
+  interface MicroAssessmentQuestionFieldRefs {
+    readonly id: FieldRef<"MicroAssessmentQuestion", 'String'>
+    readonly assessmentId: FieldRef<"MicroAssessmentQuestion", 'String'>
+    readonly questionText: FieldRef<"MicroAssessmentQuestion", 'String'>
+    readonly options: FieldRef<"MicroAssessmentQuestion", 'String[]'>
+    readonly correctOptionIndex: FieldRef<"MicroAssessmentQuestion", 'Int'>
+    readonly explanation: FieldRef<"MicroAssessmentQuestion", 'String'>
+    readonly orderIndex: FieldRef<"MicroAssessmentQuestion", 'Int'>
+    readonly createdAt: FieldRef<"MicroAssessmentQuestion", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * MicroAssessmentQuestion findUnique
+   */
+  export type MicroAssessmentQuestionFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessmentQuestion
+     */
+    select?: MicroAssessmentQuestionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessmentQuestion
+     */
+    omit?: MicroAssessmentQuestionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentQuestionInclude<ExtArgs> | null
+    /**
+     * Filter, which MicroAssessmentQuestion to fetch.
+     */
+    where: MicroAssessmentQuestionWhereUniqueInput
+  }
+
+  /**
+   * MicroAssessmentQuestion findUniqueOrThrow
+   */
+  export type MicroAssessmentQuestionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessmentQuestion
+     */
+    select?: MicroAssessmentQuestionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessmentQuestion
+     */
+    omit?: MicroAssessmentQuestionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentQuestionInclude<ExtArgs> | null
+    /**
+     * Filter, which MicroAssessmentQuestion to fetch.
+     */
+    where: MicroAssessmentQuestionWhereUniqueInput
+  }
+
+  /**
+   * MicroAssessmentQuestion findFirst
+   */
+  export type MicroAssessmentQuestionFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessmentQuestion
+     */
+    select?: MicroAssessmentQuestionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessmentQuestion
+     */
+    omit?: MicroAssessmentQuestionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentQuestionInclude<ExtArgs> | null
+    /**
+     * Filter, which MicroAssessmentQuestion to fetch.
+     */
+    where?: MicroAssessmentQuestionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MicroAssessmentQuestions to fetch.
+     */
+    orderBy?: MicroAssessmentQuestionOrderByWithRelationInput | MicroAssessmentQuestionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MicroAssessmentQuestions.
+     */
+    cursor?: MicroAssessmentQuestionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MicroAssessmentQuestions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MicroAssessmentQuestions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MicroAssessmentQuestions.
+     */
+    distinct?: MicroAssessmentQuestionScalarFieldEnum | MicroAssessmentQuestionScalarFieldEnum[]
+  }
+
+  /**
+   * MicroAssessmentQuestion findFirstOrThrow
+   */
+  export type MicroAssessmentQuestionFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessmentQuestion
+     */
+    select?: MicroAssessmentQuestionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessmentQuestion
+     */
+    omit?: MicroAssessmentQuestionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentQuestionInclude<ExtArgs> | null
+    /**
+     * Filter, which MicroAssessmentQuestion to fetch.
+     */
+    where?: MicroAssessmentQuestionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MicroAssessmentQuestions to fetch.
+     */
+    orderBy?: MicroAssessmentQuestionOrderByWithRelationInput | MicroAssessmentQuestionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MicroAssessmentQuestions.
+     */
+    cursor?: MicroAssessmentQuestionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MicroAssessmentQuestions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MicroAssessmentQuestions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MicroAssessmentQuestions.
+     */
+    distinct?: MicroAssessmentQuestionScalarFieldEnum | MicroAssessmentQuestionScalarFieldEnum[]
+  }
+
+  /**
+   * MicroAssessmentQuestion findMany
+   */
+  export type MicroAssessmentQuestionFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessmentQuestion
+     */
+    select?: MicroAssessmentQuestionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessmentQuestion
+     */
+    omit?: MicroAssessmentQuestionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentQuestionInclude<ExtArgs> | null
+    /**
+     * Filter, which MicroAssessmentQuestions to fetch.
+     */
+    where?: MicroAssessmentQuestionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MicroAssessmentQuestions to fetch.
+     */
+    orderBy?: MicroAssessmentQuestionOrderByWithRelationInput | MicroAssessmentQuestionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing MicroAssessmentQuestions.
+     */
+    cursor?: MicroAssessmentQuestionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MicroAssessmentQuestions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MicroAssessmentQuestions.
+     */
+    skip?: number
+    distinct?: MicroAssessmentQuestionScalarFieldEnum | MicroAssessmentQuestionScalarFieldEnum[]
+  }
+
+  /**
+   * MicroAssessmentQuestion create
+   */
+  export type MicroAssessmentQuestionCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessmentQuestion
+     */
+    select?: MicroAssessmentQuestionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessmentQuestion
+     */
+    omit?: MicroAssessmentQuestionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentQuestionInclude<ExtArgs> | null
+    /**
+     * The data needed to create a MicroAssessmentQuestion.
+     */
+    data: XOR<MicroAssessmentQuestionCreateInput, MicroAssessmentQuestionUncheckedCreateInput>
+  }
+
+  /**
+   * MicroAssessmentQuestion createMany
+   */
+  export type MicroAssessmentQuestionCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many MicroAssessmentQuestions.
+     */
+    data: MicroAssessmentQuestionCreateManyInput | MicroAssessmentQuestionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * MicroAssessmentQuestion createManyAndReturn
+   */
+  export type MicroAssessmentQuestionCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessmentQuestion
+     */
+    select?: MicroAssessmentQuestionSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessmentQuestion
+     */
+    omit?: MicroAssessmentQuestionOmit<ExtArgs> | null
+    /**
+     * The data used to create many MicroAssessmentQuestions.
+     */
+    data: MicroAssessmentQuestionCreateManyInput | MicroAssessmentQuestionCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentQuestionIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * MicroAssessmentQuestion update
+   */
+  export type MicroAssessmentQuestionUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessmentQuestion
+     */
+    select?: MicroAssessmentQuestionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessmentQuestion
+     */
+    omit?: MicroAssessmentQuestionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentQuestionInclude<ExtArgs> | null
+    /**
+     * The data needed to update a MicroAssessmentQuestion.
+     */
+    data: XOR<MicroAssessmentQuestionUpdateInput, MicroAssessmentQuestionUncheckedUpdateInput>
+    /**
+     * Choose, which MicroAssessmentQuestion to update.
+     */
+    where: MicroAssessmentQuestionWhereUniqueInput
+  }
+
+  /**
+   * MicroAssessmentQuestion updateMany
+   */
+  export type MicroAssessmentQuestionUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update MicroAssessmentQuestions.
+     */
+    data: XOR<MicroAssessmentQuestionUpdateManyMutationInput, MicroAssessmentQuestionUncheckedUpdateManyInput>
+    /**
+     * Filter which MicroAssessmentQuestions to update
+     */
+    where?: MicroAssessmentQuestionWhereInput
+    /**
+     * Limit how many MicroAssessmentQuestions to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * MicroAssessmentQuestion updateManyAndReturn
+   */
+  export type MicroAssessmentQuestionUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessmentQuestion
+     */
+    select?: MicroAssessmentQuestionSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessmentQuestion
+     */
+    omit?: MicroAssessmentQuestionOmit<ExtArgs> | null
+    /**
+     * The data used to update MicroAssessmentQuestions.
+     */
+    data: XOR<MicroAssessmentQuestionUpdateManyMutationInput, MicroAssessmentQuestionUncheckedUpdateManyInput>
+    /**
+     * Filter which MicroAssessmentQuestions to update
+     */
+    where?: MicroAssessmentQuestionWhereInput
+    /**
+     * Limit how many MicroAssessmentQuestions to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentQuestionIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * MicroAssessmentQuestion upsert
+   */
+  export type MicroAssessmentQuestionUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessmentQuestion
+     */
+    select?: MicroAssessmentQuestionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessmentQuestion
+     */
+    omit?: MicroAssessmentQuestionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentQuestionInclude<ExtArgs> | null
+    /**
+     * The filter to search for the MicroAssessmentQuestion to update in case it exists.
+     */
+    where: MicroAssessmentQuestionWhereUniqueInput
+    /**
+     * In case the MicroAssessmentQuestion found by the `where` argument doesn't exist, create a new MicroAssessmentQuestion with this data.
+     */
+    create: XOR<MicroAssessmentQuestionCreateInput, MicroAssessmentQuestionUncheckedCreateInput>
+    /**
+     * In case the MicroAssessmentQuestion was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<MicroAssessmentQuestionUpdateInput, MicroAssessmentQuestionUncheckedUpdateInput>
+  }
+
+  /**
+   * MicroAssessmentQuestion delete
+   */
+  export type MicroAssessmentQuestionDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessmentQuestion
+     */
+    select?: MicroAssessmentQuestionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessmentQuestion
+     */
+    omit?: MicroAssessmentQuestionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentQuestionInclude<ExtArgs> | null
+    /**
+     * Filter which MicroAssessmentQuestion to delete.
+     */
+    where: MicroAssessmentQuestionWhereUniqueInput
+  }
+
+  /**
+   * MicroAssessmentQuestion deleteMany
+   */
+  export type MicroAssessmentQuestionDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MicroAssessmentQuestions to delete
+     */
+    where?: MicroAssessmentQuestionWhereInput
+    /**
+     * Limit how many MicroAssessmentQuestions to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * MicroAssessmentQuestion without action
+   */
+  export type MicroAssessmentQuestionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessmentQuestion
+     */
+    select?: MicroAssessmentQuestionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessmentQuestion
+     */
+    omit?: MicroAssessmentQuestionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentQuestionInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model MicroAssessmentAttempt
+   */
+
+  export type AggregateMicroAssessmentAttempt = {
+    _count: MicroAssessmentAttemptCountAggregateOutputType | null
+    _avg: MicroAssessmentAttemptAvgAggregateOutputType | null
+    _sum: MicroAssessmentAttemptSumAggregateOutputType | null
+    _min: MicroAssessmentAttemptMinAggregateOutputType | null
+    _max: MicroAssessmentAttemptMaxAggregateOutputType | null
+  }
+
+  export type MicroAssessmentAttemptAvgAggregateOutputType = {
+    totalQuestions: number | null
+    correctAnswers: number | null
+    score: number | null
+  }
+
+  export type MicroAssessmentAttemptSumAggregateOutputType = {
+    totalQuestions: number | null
+    correctAnswers: number | null
+    score: number | null
+  }
+
+  export type MicroAssessmentAttemptMinAggregateOutputType = {
+    id: string | null
+    assessmentId: string | null
+    userId: string | null
+    userRoadmapId: string | null
+    sprintId: string | null
+    sprintTaskId: string | null
+    skillId: string | null
+    totalQuestions: number | null
+    correctAnswers: number | null
+    score: number | null
+    passed: boolean | null
+    completedAt: Date | null
+    createdAt: Date | null
+  }
+
+  export type MicroAssessmentAttemptMaxAggregateOutputType = {
+    id: string | null
+    assessmentId: string | null
+    userId: string | null
+    userRoadmapId: string | null
+    sprintId: string | null
+    sprintTaskId: string | null
+    skillId: string | null
+    totalQuestions: number | null
+    correctAnswers: number | null
+    score: number | null
+    passed: boolean | null
+    completedAt: Date | null
+    createdAt: Date | null
+  }
+
+  export type MicroAssessmentAttemptCountAggregateOutputType = {
+    id: number
+    assessmentId: number
+    userId: number
+    userRoadmapId: number
+    sprintId: number
+    sprintTaskId: number
+    skillId: number
+    totalQuestions: number
+    correctAnswers: number
+    score: number
+    passed: number
+    answers: number
+    completedAt: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type MicroAssessmentAttemptAvgAggregateInputType = {
+    totalQuestions?: true
+    correctAnswers?: true
+    score?: true
+  }
+
+  export type MicroAssessmentAttemptSumAggregateInputType = {
+    totalQuestions?: true
+    correctAnswers?: true
+    score?: true
+  }
+
+  export type MicroAssessmentAttemptMinAggregateInputType = {
+    id?: true
+    assessmentId?: true
+    userId?: true
+    userRoadmapId?: true
+    sprintId?: true
+    sprintTaskId?: true
+    skillId?: true
+    totalQuestions?: true
+    correctAnswers?: true
+    score?: true
+    passed?: true
+    completedAt?: true
+    createdAt?: true
+  }
+
+  export type MicroAssessmentAttemptMaxAggregateInputType = {
+    id?: true
+    assessmentId?: true
+    userId?: true
+    userRoadmapId?: true
+    sprintId?: true
+    sprintTaskId?: true
+    skillId?: true
+    totalQuestions?: true
+    correctAnswers?: true
+    score?: true
+    passed?: true
+    completedAt?: true
+    createdAt?: true
+  }
+
+  export type MicroAssessmentAttemptCountAggregateInputType = {
+    id?: true
+    assessmentId?: true
+    userId?: true
+    userRoadmapId?: true
+    sprintId?: true
+    sprintTaskId?: true
+    skillId?: true
+    totalQuestions?: true
+    correctAnswers?: true
+    score?: true
+    passed?: true
+    answers?: true
+    completedAt?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type MicroAssessmentAttemptAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MicroAssessmentAttempt to aggregate.
+     */
+    where?: MicroAssessmentAttemptWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MicroAssessmentAttempts to fetch.
+     */
+    orderBy?: MicroAssessmentAttemptOrderByWithRelationInput | MicroAssessmentAttemptOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: MicroAssessmentAttemptWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MicroAssessmentAttempts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MicroAssessmentAttempts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned MicroAssessmentAttempts
+    **/
+    _count?: true | MicroAssessmentAttemptCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: MicroAssessmentAttemptAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: MicroAssessmentAttemptSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: MicroAssessmentAttemptMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: MicroAssessmentAttemptMaxAggregateInputType
+  }
+
+  export type GetMicroAssessmentAttemptAggregateType<T extends MicroAssessmentAttemptAggregateArgs> = {
+        [P in keyof T & keyof AggregateMicroAssessmentAttempt]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateMicroAssessmentAttempt[P]>
+      : GetScalarType<T[P], AggregateMicroAssessmentAttempt[P]>
+  }
+
+
+
+
+  export type MicroAssessmentAttemptGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MicroAssessmentAttemptWhereInput
+    orderBy?: MicroAssessmentAttemptOrderByWithAggregationInput | MicroAssessmentAttemptOrderByWithAggregationInput[]
+    by: MicroAssessmentAttemptScalarFieldEnum[] | MicroAssessmentAttemptScalarFieldEnum
+    having?: MicroAssessmentAttemptScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: MicroAssessmentAttemptCountAggregateInputType | true
+    _avg?: MicroAssessmentAttemptAvgAggregateInputType
+    _sum?: MicroAssessmentAttemptSumAggregateInputType
+    _min?: MicroAssessmentAttemptMinAggregateInputType
+    _max?: MicroAssessmentAttemptMaxAggregateInputType
+  }
+
+  export type MicroAssessmentAttemptGroupByOutputType = {
+    id: string
+    assessmentId: string
+    userId: string
+    userRoadmapId: string | null
+    sprintId: string | null
+    sprintTaskId: string | null
+    skillId: string | null
+    totalQuestions: number
+    correctAnswers: number
+    score: number
+    passed: boolean
+    answers: JsonValue
+    completedAt: Date
+    createdAt: Date
+    _count: MicroAssessmentAttemptCountAggregateOutputType | null
+    _avg: MicroAssessmentAttemptAvgAggregateOutputType | null
+    _sum: MicroAssessmentAttemptSumAggregateOutputType | null
+    _min: MicroAssessmentAttemptMinAggregateOutputType | null
+    _max: MicroAssessmentAttemptMaxAggregateOutputType | null
+  }
+
+  type GetMicroAssessmentAttemptGroupByPayload<T extends MicroAssessmentAttemptGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<MicroAssessmentAttemptGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof MicroAssessmentAttemptGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], MicroAssessmentAttemptGroupByOutputType[P]>
+            : GetScalarType<T[P], MicroAssessmentAttemptGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type MicroAssessmentAttemptSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    assessmentId?: boolean
+    userId?: boolean
+    userRoadmapId?: boolean
+    sprintId?: boolean
+    sprintTaskId?: boolean
+    skillId?: boolean
+    totalQuestions?: boolean
+    correctAnswers?: boolean
+    score?: boolean
+    passed?: boolean
+    answers?: boolean
+    completedAt?: boolean
+    createdAt?: boolean
+    assessment?: boolean | MicroAssessmentDefaultArgs<ExtArgs>
+    userRoadmap?: boolean | MicroAssessmentAttempt$userRoadmapArgs<ExtArgs>
+    sprint?: boolean | MicroAssessmentAttempt$sprintArgs<ExtArgs>
+    sprintTask?: boolean | MicroAssessmentAttempt$sprintTaskArgs<ExtArgs>
+    skill?: boolean | MicroAssessmentAttempt$skillArgs<ExtArgs>
+  }, ExtArgs["result"]["microAssessmentAttempt"]>
+
+  export type MicroAssessmentAttemptSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    assessmentId?: boolean
+    userId?: boolean
+    userRoadmapId?: boolean
+    sprintId?: boolean
+    sprintTaskId?: boolean
+    skillId?: boolean
+    totalQuestions?: boolean
+    correctAnswers?: boolean
+    score?: boolean
+    passed?: boolean
+    answers?: boolean
+    completedAt?: boolean
+    createdAt?: boolean
+    assessment?: boolean | MicroAssessmentDefaultArgs<ExtArgs>
+    userRoadmap?: boolean | MicroAssessmentAttempt$userRoadmapArgs<ExtArgs>
+    sprint?: boolean | MicroAssessmentAttempt$sprintArgs<ExtArgs>
+    sprintTask?: boolean | MicroAssessmentAttempt$sprintTaskArgs<ExtArgs>
+    skill?: boolean | MicroAssessmentAttempt$skillArgs<ExtArgs>
+  }, ExtArgs["result"]["microAssessmentAttempt"]>
+
+  export type MicroAssessmentAttemptSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    assessmentId?: boolean
+    userId?: boolean
+    userRoadmapId?: boolean
+    sprintId?: boolean
+    sprintTaskId?: boolean
+    skillId?: boolean
+    totalQuestions?: boolean
+    correctAnswers?: boolean
+    score?: boolean
+    passed?: boolean
+    answers?: boolean
+    completedAt?: boolean
+    createdAt?: boolean
+    assessment?: boolean | MicroAssessmentDefaultArgs<ExtArgs>
+    userRoadmap?: boolean | MicroAssessmentAttempt$userRoadmapArgs<ExtArgs>
+    sprint?: boolean | MicroAssessmentAttempt$sprintArgs<ExtArgs>
+    sprintTask?: boolean | MicroAssessmentAttempt$sprintTaskArgs<ExtArgs>
+    skill?: boolean | MicroAssessmentAttempt$skillArgs<ExtArgs>
+  }, ExtArgs["result"]["microAssessmentAttempt"]>
+
+  export type MicroAssessmentAttemptSelectScalar = {
+    id?: boolean
+    assessmentId?: boolean
+    userId?: boolean
+    userRoadmapId?: boolean
+    sprintId?: boolean
+    sprintTaskId?: boolean
+    skillId?: boolean
+    totalQuestions?: boolean
+    correctAnswers?: boolean
+    score?: boolean
+    passed?: boolean
+    answers?: boolean
+    completedAt?: boolean
+    createdAt?: boolean
+  }
+
+  export type MicroAssessmentAttemptOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "assessmentId" | "userId" | "userRoadmapId" | "sprintId" | "sprintTaskId" | "skillId" | "totalQuestions" | "correctAnswers" | "score" | "passed" | "answers" | "completedAt" | "createdAt", ExtArgs["result"]["microAssessmentAttempt"]>
+  export type MicroAssessmentAttemptInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    assessment?: boolean | MicroAssessmentDefaultArgs<ExtArgs>
+    userRoadmap?: boolean | MicroAssessmentAttempt$userRoadmapArgs<ExtArgs>
+    sprint?: boolean | MicroAssessmentAttempt$sprintArgs<ExtArgs>
+    sprintTask?: boolean | MicroAssessmentAttempt$sprintTaskArgs<ExtArgs>
+    skill?: boolean | MicroAssessmentAttempt$skillArgs<ExtArgs>
+  }
+  export type MicroAssessmentAttemptIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    assessment?: boolean | MicroAssessmentDefaultArgs<ExtArgs>
+    userRoadmap?: boolean | MicroAssessmentAttempt$userRoadmapArgs<ExtArgs>
+    sprint?: boolean | MicroAssessmentAttempt$sprintArgs<ExtArgs>
+    sprintTask?: boolean | MicroAssessmentAttempt$sprintTaskArgs<ExtArgs>
+    skill?: boolean | MicroAssessmentAttempt$skillArgs<ExtArgs>
+  }
+  export type MicroAssessmentAttemptIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    assessment?: boolean | MicroAssessmentDefaultArgs<ExtArgs>
+    userRoadmap?: boolean | MicroAssessmentAttempt$userRoadmapArgs<ExtArgs>
+    sprint?: boolean | MicroAssessmentAttempt$sprintArgs<ExtArgs>
+    sprintTask?: boolean | MicroAssessmentAttempt$sprintTaskArgs<ExtArgs>
+    skill?: boolean | MicroAssessmentAttempt$skillArgs<ExtArgs>
+  }
+
+  export type $MicroAssessmentAttemptPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "MicroAssessmentAttempt"
+    objects: {
+      assessment: Prisma.$MicroAssessmentPayload<ExtArgs>
+      userRoadmap: Prisma.$UserRoadmapPayload<ExtArgs> | null
+      sprint: Prisma.$RoadmapSprintPayload<ExtArgs> | null
+      sprintTask: Prisma.$RoadmapSprintTaskPayload<ExtArgs> | null
+      skill: Prisma.$SkillPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      assessmentId: string
+      userId: string
+      userRoadmapId: string | null
+      sprintId: string | null
+      sprintTaskId: string | null
+      skillId: string | null
+      totalQuestions: number
+      correctAnswers: number
+      score: number
+      passed: boolean
+      answers: Prisma.JsonValue
+      completedAt: Date
+      createdAt: Date
+    }, ExtArgs["result"]["microAssessmentAttempt"]>
+    composites: {}
+  }
+
+  type MicroAssessmentAttemptGetPayload<S extends boolean | null | undefined | MicroAssessmentAttemptDefaultArgs> = $Result.GetResult<Prisma.$MicroAssessmentAttemptPayload, S>
+
+  type MicroAssessmentAttemptCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<MicroAssessmentAttemptFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: MicroAssessmentAttemptCountAggregateInputType | true
+    }
+
+  export interface MicroAssessmentAttemptDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['MicroAssessmentAttempt'], meta: { name: 'MicroAssessmentAttempt' } }
+    /**
+     * Find zero or one MicroAssessmentAttempt that matches the filter.
+     * @param {MicroAssessmentAttemptFindUniqueArgs} args - Arguments to find a MicroAssessmentAttempt
+     * @example
+     * // Get one MicroAssessmentAttempt
+     * const microAssessmentAttempt = await prisma.microAssessmentAttempt.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends MicroAssessmentAttemptFindUniqueArgs>(args: SelectSubset<T, MicroAssessmentAttemptFindUniqueArgs<ExtArgs>>): Prisma__MicroAssessmentAttemptClient<$Result.GetResult<Prisma.$MicroAssessmentAttemptPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one MicroAssessmentAttempt that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {MicroAssessmentAttemptFindUniqueOrThrowArgs} args - Arguments to find a MicroAssessmentAttempt
+     * @example
+     * // Get one MicroAssessmentAttempt
+     * const microAssessmentAttempt = await prisma.microAssessmentAttempt.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends MicroAssessmentAttemptFindUniqueOrThrowArgs>(args: SelectSubset<T, MicroAssessmentAttemptFindUniqueOrThrowArgs<ExtArgs>>): Prisma__MicroAssessmentAttemptClient<$Result.GetResult<Prisma.$MicroAssessmentAttemptPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MicroAssessmentAttempt that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MicroAssessmentAttemptFindFirstArgs} args - Arguments to find a MicroAssessmentAttempt
+     * @example
+     * // Get one MicroAssessmentAttempt
+     * const microAssessmentAttempt = await prisma.microAssessmentAttempt.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends MicroAssessmentAttemptFindFirstArgs>(args?: SelectSubset<T, MicroAssessmentAttemptFindFirstArgs<ExtArgs>>): Prisma__MicroAssessmentAttemptClient<$Result.GetResult<Prisma.$MicroAssessmentAttemptPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MicroAssessmentAttempt that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MicroAssessmentAttemptFindFirstOrThrowArgs} args - Arguments to find a MicroAssessmentAttempt
+     * @example
+     * // Get one MicroAssessmentAttempt
+     * const microAssessmentAttempt = await prisma.microAssessmentAttempt.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends MicroAssessmentAttemptFindFirstOrThrowArgs>(args?: SelectSubset<T, MicroAssessmentAttemptFindFirstOrThrowArgs<ExtArgs>>): Prisma__MicroAssessmentAttemptClient<$Result.GetResult<Prisma.$MicroAssessmentAttemptPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more MicroAssessmentAttempts that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MicroAssessmentAttemptFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all MicroAssessmentAttempts
+     * const microAssessmentAttempts = await prisma.microAssessmentAttempt.findMany()
+     * 
+     * // Get first 10 MicroAssessmentAttempts
+     * const microAssessmentAttempts = await prisma.microAssessmentAttempt.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const microAssessmentAttemptWithIdOnly = await prisma.microAssessmentAttempt.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends MicroAssessmentAttemptFindManyArgs>(args?: SelectSubset<T, MicroAssessmentAttemptFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MicroAssessmentAttemptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a MicroAssessmentAttempt.
+     * @param {MicroAssessmentAttemptCreateArgs} args - Arguments to create a MicroAssessmentAttempt.
+     * @example
+     * // Create one MicroAssessmentAttempt
+     * const MicroAssessmentAttempt = await prisma.microAssessmentAttempt.create({
+     *   data: {
+     *     // ... data to create a MicroAssessmentAttempt
+     *   }
+     * })
+     * 
+     */
+    create<T extends MicroAssessmentAttemptCreateArgs>(args: SelectSubset<T, MicroAssessmentAttemptCreateArgs<ExtArgs>>): Prisma__MicroAssessmentAttemptClient<$Result.GetResult<Prisma.$MicroAssessmentAttemptPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many MicroAssessmentAttempts.
+     * @param {MicroAssessmentAttemptCreateManyArgs} args - Arguments to create many MicroAssessmentAttempts.
+     * @example
+     * // Create many MicroAssessmentAttempts
+     * const microAssessmentAttempt = await prisma.microAssessmentAttempt.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends MicroAssessmentAttemptCreateManyArgs>(args?: SelectSubset<T, MicroAssessmentAttemptCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many MicroAssessmentAttempts and returns the data saved in the database.
+     * @param {MicroAssessmentAttemptCreateManyAndReturnArgs} args - Arguments to create many MicroAssessmentAttempts.
+     * @example
+     * // Create many MicroAssessmentAttempts
+     * const microAssessmentAttempt = await prisma.microAssessmentAttempt.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many MicroAssessmentAttempts and only return the `id`
+     * const microAssessmentAttemptWithIdOnly = await prisma.microAssessmentAttempt.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends MicroAssessmentAttemptCreateManyAndReturnArgs>(args?: SelectSubset<T, MicroAssessmentAttemptCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MicroAssessmentAttemptPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a MicroAssessmentAttempt.
+     * @param {MicroAssessmentAttemptDeleteArgs} args - Arguments to delete one MicroAssessmentAttempt.
+     * @example
+     * // Delete one MicroAssessmentAttempt
+     * const MicroAssessmentAttempt = await prisma.microAssessmentAttempt.delete({
+     *   where: {
+     *     // ... filter to delete one MicroAssessmentAttempt
+     *   }
+     * })
+     * 
+     */
+    delete<T extends MicroAssessmentAttemptDeleteArgs>(args: SelectSubset<T, MicroAssessmentAttemptDeleteArgs<ExtArgs>>): Prisma__MicroAssessmentAttemptClient<$Result.GetResult<Prisma.$MicroAssessmentAttemptPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one MicroAssessmentAttempt.
+     * @param {MicroAssessmentAttemptUpdateArgs} args - Arguments to update one MicroAssessmentAttempt.
+     * @example
+     * // Update one MicroAssessmentAttempt
+     * const microAssessmentAttempt = await prisma.microAssessmentAttempt.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends MicroAssessmentAttemptUpdateArgs>(args: SelectSubset<T, MicroAssessmentAttemptUpdateArgs<ExtArgs>>): Prisma__MicroAssessmentAttemptClient<$Result.GetResult<Prisma.$MicroAssessmentAttemptPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more MicroAssessmentAttempts.
+     * @param {MicroAssessmentAttemptDeleteManyArgs} args - Arguments to filter MicroAssessmentAttempts to delete.
+     * @example
+     * // Delete a few MicroAssessmentAttempts
+     * const { count } = await prisma.microAssessmentAttempt.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends MicroAssessmentAttemptDeleteManyArgs>(args?: SelectSubset<T, MicroAssessmentAttemptDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MicroAssessmentAttempts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MicroAssessmentAttemptUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many MicroAssessmentAttempts
+     * const microAssessmentAttempt = await prisma.microAssessmentAttempt.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends MicroAssessmentAttemptUpdateManyArgs>(args: SelectSubset<T, MicroAssessmentAttemptUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MicroAssessmentAttempts and returns the data updated in the database.
+     * @param {MicroAssessmentAttemptUpdateManyAndReturnArgs} args - Arguments to update many MicroAssessmentAttempts.
+     * @example
+     * // Update many MicroAssessmentAttempts
+     * const microAssessmentAttempt = await prisma.microAssessmentAttempt.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more MicroAssessmentAttempts and only return the `id`
+     * const microAssessmentAttemptWithIdOnly = await prisma.microAssessmentAttempt.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends MicroAssessmentAttemptUpdateManyAndReturnArgs>(args: SelectSubset<T, MicroAssessmentAttemptUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MicroAssessmentAttemptPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one MicroAssessmentAttempt.
+     * @param {MicroAssessmentAttemptUpsertArgs} args - Arguments to update or create a MicroAssessmentAttempt.
+     * @example
+     * // Update or create a MicroAssessmentAttempt
+     * const microAssessmentAttempt = await prisma.microAssessmentAttempt.upsert({
+     *   create: {
+     *     // ... data to create a MicroAssessmentAttempt
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the MicroAssessmentAttempt we want to update
+     *   }
+     * })
+     */
+    upsert<T extends MicroAssessmentAttemptUpsertArgs>(args: SelectSubset<T, MicroAssessmentAttemptUpsertArgs<ExtArgs>>): Prisma__MicroAssessmentAttemptClient<$Result.GetResult<Prisma.$MicroAssessmentAttemptPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of MicroAssessmentAttempts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MicroAssessmentAttemptCountArgs} args - Arguments to filter MicroAssessmentAttempts to count.
+     * @example
+     * // Count the number of MicroAssessmentAttempts
+     * const count = await prisma.microAssessmentAttempt.count({
+     *   where: {
+     *     // ... the filter for the MicroAssessmentAttempts we want to count
+     *   }
+     * })
+    **/
+    count<T extends MicroAssessmentAttemptCountArgs>(
+      args?: Subset<T, MicroAssessmentAttemptCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], MicroAssessmentAttemptCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a MicroAssessmentAttempt.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MicroAssessmentAttemptAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends MicroAssessmentAttemptAggregateArgs>(args: Subset<T, MicroAssessmentAttemptAggregateArgs>): Prisma.PrismaPromise<GetMicroAssessmentAttemptAggregateType<T>>
+
+    /**
+     * Group by MicroAssessmentAttempt.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MicroAssessmentAttemptGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends MicroAssessmentAttemptGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: MicroAssessmentAttemptGroupByArgs['orderBy'] }
+        : { orderBy?: MicroAssessmentAttemptGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, MicroAssessmentAttemptGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMicroAssessmentAttemptGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the MicroAssessmentAttempt model
+   */
+  readonly fields: MicroAssessmentAttemptFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for MicroAssessmentAttempt.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__MicroAssessmentAttemptClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    assessment<T extends MicroAssessmentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, MicroAssessmentDefaultArgs<ExtArgs>>): Prisma__MicroAssessmentClient<$Result.GetResult<Prisma.$MicroAssessmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    userRoadmap<T extends MicroAssessmentAttempt$userRoadmapArgs<ExtArgs> = {}>(args?: Subset<T, MicroAssessmentAttempt$userRoadmapArgs<ExtArgs>>): Prisma__UserRoadmapClient<$Result.GetResult<Prisma.$UserRoadmapPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    sprint<T extends MicroAssessmentAttempt$sprintArgs<ExtArgs> = {}>(args?: Subset<T, MicroAssessmentAttempt$sprintArgs<ExtArgs>>): Prisma__RoadmapSprintClient<$Result.GetResult<Prisma.$RoadmapSprintPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    sprintTask<T extends MicroAssessmentAttempt$sprintTaskArgs<ExtArgs> = {}>(args?: Subset<T, MicroAssessmentAttempt$sprintTaskArgs<ExtArgs>>): Prisma__RoadmapSprintTaskClient<$Result.GetResult<Prisma.$RoadmapSprintTaskPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    skill<T extends MicroAssessmentAttempt$skillArgs<ExtArgs> = {}>(args?: Subset<T, MicroAssessmentAttempt$skillArgs<ExtArgs>>): Prisma__SkillClient<$Result.GetResult<Prisma.$SkillPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the MicroAssessmentAttempt model
+   */
+  interface MicroAssessmentAttemptFieldRefs {
+    readonly id: FieldRef<"MicroAssessmentAttempt", 'String'>
+    readonly assessmentId: FieldRef<"MicroAssessmentAttempt", 'String'>
+    readonly userId: FieldRef<"MicroAssessmentAttempt", 'String'>
+    readonly userRoadmapId: FieldRef<"MicroAssessmentAttempt", 'String'>
+    readonly sprintId: FieldRef<"MicroAssessmentAttempt", 'String'>
+    readonly sprintTaskId: FieldRef<"MicroAssessmentAttempt", 'String'>
+    readonly skillId: FieldRef<"MicroAssessmentAttempt", 'String'>
+    readonly totalQuestions: FieldRef<"MicroAssessmentAttempt", 'Int'>
+    readonly correctAnswers: FieldRef<"MicroAssessmentAttempt", 'Int'>
+    readonly score: FieldRef<"MicroAssessmentAttempt", 'Int'>
+    readonly passed: FieldRef<"MicroAssessmentAttempt", 'Boolean'>
+    readonly answers: FieldRef<"MicroAssessmentAttempt", 'Json'>
+    readonly completedAt: FieldRef<"MicroAssessmentAttempt", 'DateTime'>
+    readonly createdAt: FieldRef<"MicroAssessmentAttempt", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * MicroAssessmentAttempt findUnique
+   */
+  export type MicroAssessmentAttemptFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessmentAttempt
+     */
+    select?: MicroAssessmentAttemptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessmentAttempt
+     */
+    omit?: MicroAssessmentAttemptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentAttemptInclude<ExtArgs> | null
+    /**
+     * Filter, which MicroAssessmentAttempt to fetch.
+     */
+    where: MicroAssessmentAttemptWhereUniqueInput
+  }
+
+  /**
+   * MicroAssessmentAttempt findUniqueOrThrow
+   */
+  export type MicroAssessmentAttemptFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessmentAttempt
+     */
+    select?: MicroAssessmentAttemptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessmentAttempt
+     */
+    omit?: MicroAssessmentAttemptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentAttemptInclude<ExtArgs> | null
+    /**
+     * Filter, which MicroAssessmentAttempt to fetch.
+     */
+    where: MicroAssessmentAttemptWhereUniqueInput
+  }
+
+  /**
+   * MicroAssessmentAttempt findFirst
+   */
+  export type MicroAssessmentAttemptFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessmentAttempt
+     */
+    select?: MicroAssessmentAttemptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessmentAttempt
+     */
+    omit?: MicroAssessmentAttemptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentAttemptInclude<ExtArgs> | null
+    /**
+     * Filter, which MicroAssessmentAttempt to fetch.
+     */
+    where?: MicroAssessmentAttemptWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MicroAssessmentAttempts to fetch.
+     */
+    orderBy?: MicroAssessmentAttemptOrderByWithRelationInput | MicroAssessmentAttemptOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MicroAssessmentAttempts.
+     */
+    cursor?: MicroAssessmentAttemptWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MicroAssessmentAttempts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MicroAssessmentAttempts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MicroAssessmentAttempts.
+     */
+    distinct?: MicroAssessmentAttemptScalarFieldEnum | MicroAssessmentAttemptScalarFieldEnum[]
+  }
+
+  /**
+   * MicroAssessmentAttempt findFirstOrThrow
+   */
+  export type MicroAssessmentAttemptFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessmentAttempt
+     */
+    select?: MicroAssessmentAttemptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessmentAttempt
+     */
+    omit?: MicroAssessmentAttemptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentAttemptInclude<ExtArgs> | null
+    /**
+     * Filter, which MicroAssessmentAttempt to fetch.
+     */
+    where?: MicroAssessmentAttemptWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MicroAssessmentAttempts to fetch.
+     */
+    orderBy?: MicroAssessmentAttemptOrderByWithRelationInput | MicroAssessmentAttemptOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MicroAssessmentAttempts.
+     */
+    cursor?: MicroAssessmentAttemptWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MicroAssessmentAttempts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MicroAssessmentAttempts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MicroAssessmentAttempts.
+     */
+    distinct?: MicroAssessmentAttemptScalarFieldEnum | MicroAssessmentAttemptScalarFieldEnum[]
+  }
+
+  /**
+   * MicroAssessmentAttempt findMany
+   */
+  export type MicroAssessmentAttemptFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessmentAttempt
+     */
+    select?: MicroAssessmentAttemptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessmentAttempt
+     */
+    omit?: MicroAssessmentAttemptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentAttemptInclude<ExtArgs> | null
+    /**
+     * Filter, which MicroAssessmentAttempts to fetch.
+     */
+    where?: MicroAssessmentAttemptWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MicroAssessmentAttempts to fetch.
+     */
+    orderBy?: MicroAssessmentAttemptOrderByWithRelationInput | MicroAssessmentAttemptOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing MicroAssessmentAttempts.
+     */
+    cursor?: MicroAssessmentAttemptWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MicroAssessmentAttempts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MicroAssessmentAttempts.
+     */
+    skip?: number
+    distinct?: MicroAssessmentAttemptScalarFieldEnum | MicroAssessmentAttemptScalarFieldEnum[]
+  }
+
+  /**
+   * MicroAssessmentAttempt create
+   */
+  export type MicroAssessmentAttemptCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessmentAttempt
+     */
+    select?: MicroAssessmentAttemptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessmentAttempt
+     */
+    omit?: MicroAssessmentAttemptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentAttemptInclude<ExtArgs> | null
+    /**
+     * The data needed to create a MicroAssessmentAttempt.
+     */
+    data: XOR<MicroAssessmentAttemptCreateInput, MicroAssessmentAttemptUncheckedCreateInput>
+  }
+
+  /**
+   * MicroAssessmentAttempt createMany
+   */
+  export type MicroAssessmentAttemptCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many MicroAssessmentAttempts.
+     */
+    data: MicroAssessmentAttemptCreateManyInput | MicroAssessmentAttemptCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * MicroAssessmentAttempt createManyAndReturn
+   */
+  export type MicroAssessmentAttemptCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessmentAttempt
+     */
+    select?: MicroAssessmentAttemptSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessmentAttempt
+     */
+    omit?: MicroAssessmentAttemptOmit<ExtArgs> | null
+    /**
+     * The data used to create many MicroAssessmentAttempts.
+     */
+    data: MicroAssessmentAttemptCreateManyInput | MicroAssessmentAttemptCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentAttemptIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * MicroAssessmentAttempt update
+   */
+  export type MicroAssessmentAttemptUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessmentAttempt
+     */
+    select?: MicroAssessmentAttemptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessmentAttempt
+     */
+    omit?: MicroAssessmentAttemptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentAttemptInclude<ExtArgs> | null
+    /**
+     * The data needed to update a MicroAssessmentAttempt.
+     */
+    data: XOR<MicroAssessmentAttemptUpdateInput, MicroAssessmentAttemptUncheckedUpdateInput>
+    /**
+     * Choose, which MicroAssessmentAttempt to update.
+     */
+    where: MicroAssessmentAttemptWhereUniqueInput
+  }
+
+  /**
+   * MicroAssessmentAttempt updateMany
+   */
+  export type MicroAssessmentAttemptUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update MicroAssessmentAttempts.
+     */
+    data: XOR<MicroAssessmentAttemptUpdateManyMutationInput, MicroAssessmentAttemptUncheckedUpdateManyInput>
+    /**
+     * Filter which MicroAssessmentAttempts to update
+     */
+    where?: MicroAssessmentAttemptWhereInput
+    /**
+     * Limit how many MicroAssessmentAttempts to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * MicroAssessmentAttempt updateManyAndReturn
+   */
+  export type MicroAssessmentAttemptUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessmentAttempt
+     */
+    select?: MicroAssessmentAttemptSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessmentAttempt
+     */
+    omit?: MicroAssessmentAttemptOmit<ExtArgs> | null
+    /**
+     * The data used to update MicroAssessmentAttempts.
+     */
+    data: XOR<MicroAssessmentAttemptUpdateManyMutationInput, MicroAssessmentAttemptUncheckedUpdateManyInput>
+    /**
+     * Filter which MicroAssessmentAttempts to update
+     */
+    where?: MicroAssessmentAttemptWhereInput
+    /**
+     * Limit how many MicroAssessmentAttempts to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentAttemptIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * MicroAssessmentAttempt upsert
+   */
+  export type MicroAssessmentAttemptUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessmentAttempt
+     */
+    select?: MicroAssessmentAttemptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessmentAttempt
+     */
+    omit?: MicroAssessmentAttemptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentAttemptInclude<ExtArgs> | null
+    /**
+     * The filter to search for the MicroAssessmentAttempt to update in case it exists.
+     */
+    where: MicroAssessmentAttemptWhereUniqueInput
+    /**
+     * In case the MicroAssessmentAttempt found by the `where` argument doesn't exist, create a new MicroAssessmentAttempt with this data.
+     */
+    create: XOR<MicroAssessmentAttemptCreateInput, MicroAssessmentAttemptUncheckedCreateInput>
+    /**
+     * In case the MicroAssessmentAttempt was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<MicroAssessmentAttemptUpdateInput, MicroAssessmentAttemptUncheckedUpdateInput>
+  }
+
+  /**
+   * MicroAssessmentAttempt delete
+   */
+  export type MicroAssessmentAttemptDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessmentAttempt
+     */
+    select?: MicroAssessmentAttemptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessmentAttempt
+     */
+    omit?: MicroAssessmentAttemptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentAttemptInclude<ExtArgs> | null
+    /**
+     * Filter which MicroAssessmentAttempt to delete.
+     */
+    where: MicroAssessmentAttemptWhereUniqueInput
+  }
+
+  /**
+   * MicroAssessmentAttempt deleteMany
+   */
+  export type MicroAssessmentAttemptDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MicroAssessmentAttempts to delete
+     */
+    where?: MicroAssessmentAttemptWhereInput
+    /**
+     * Limit how many MicroAssessmentAttempts to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * MicroAssessmentAttempt.userRoadmap
+   */
+  export type MicroAssessmentAttempt$userRoadmapArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserRoadmap
+     */
+    select?: UserRoadmapSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserRoadmap
+     */
+    omit?: UserRoadmapOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserRoadmapInclude<ExtArgs> | null
+    where?: UserRoadmapWhereInput
+  }
+
+  /**
+   * MicroAssessmentAttempt.sprint
+   */
+  export type MicroAssessmentAttempt$sprintArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoadmapSprint
+     */
+    select?: RoadmapSprintSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoadmapSprint
+     */
+    omit?: RoadmapSprintOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoadmapSprintInclude<ExtArgs> | null
+    where?: RoadmapSprintWhereInput
+  }
+
+  /**
+   * MicroAssessmentAttempt.sprintTask
+   */
+  export type MicroAssessmentAttempt$sprintTaskArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoadmapSprintTask
+     */
+    select?: RoadmapSprintTaskSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoadmapSprintTask
+     */
+    omit?: RoadmapSprintTaskOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoadmapSprintTaskInclude<ExtArgs> | null
+    where?: RoadmapSprintTaskWhereInput
+  }
+
+  /**
+   * MicroAssessmentAttempt.skill
+   */
+  export type MicroAssessmentAttempt$skillArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Skill
+     */
+    select?: SkillSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Skill
+     */
+    omit?: SkillOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SkillInclude<ExtArgs> | null
+    where?: SkillWhereInput
+  }
+
+  /**
+   * MicroAssessmentAttempt without action
+   */
+  export type MicroAssessmentAttemptDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MicroAssessmentAttempt
+     */
+    select?: MicroAssessmentAttemptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MicroAssessmentAttempt
+     */
+    omit?: MicroAssessmentAttemptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MicroAssessmentAttemptInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Model RoadmapAdaptation
    */
 
@@ -19023,30 +23413,35 @@ export namespace Prisma {
     id: string | null
     userId: string | null
     userName: string | null
+    userAvatar: string | null
     roleCategory: string | null
     title: string | null
     content: string | null
     upvotes: number | null
     aiReply: string | null
     createdAt: Date | null
+    updatedAt: Date | null
   }
 
   export type DiscussionPostMaxAggregateOutputType = {
     id: string | null
     userId: string | null
     userName: string | null
+    userAvatar: string | null
     roleCategory: string | null
     title: string | null
     content: string | null
     upvotes: number | null
     aiReply: string | null
     createdAt: Date | null
+    updatedAt: Date | null
   }
 
   export type DiscussionPostCountAggregateOutputType = {
     id: number
     userId: number
     userName: number
+    userAvatar: number
     roleCategory: number
     title: number
     content: number
@@ -19054,6 +23449,7 @@ export namespace Prisma {
     upvotes: number
     aiReply: number
     createdAt: number
+    updatedAt: number
     _all: number
   }
 
@@ -19070,30 +23466,35 @@ export namespace Prisma {
     id?: true
     userId?: true
     userName?: true
+    userAvatar?: true
     roleCategory?: true
     title?: true
     content?: true
     upvotes?: true
     aiReply?: true
     createdAt?: true
+    updatedAt?: true
   }
 
   export type DiscussionPostMaxAggregateInputType = {
     id?: true
     userId?: true
     userName?: true
+    userAvatar?: true
     roleCategory?: true
     title?: true
     content?: true
     upvotes?: true
     aiReply?: true
     createdAt?: true
+    updatedAt?: true
   }
 
   export type DiscussionPostCountAggregateInputType = {
     id?: true
     userId?: true
     userName?: true
+    userAvatar?: true
     roleCategory?: true
     title?: true
     content?: true
@@ -19101,6 +23502,7 @@ export namespace Prisma {
     upvotes?: true
     aiReply?: true
     createdAt?: true
+    updatedAt?: true
     _all?: true
   }
 
@@ -19194,6 +23596,7 @@ export namespace Prisma {
     id: string
     userId: string
     userName: string
+    userAvatar: string | null
     roleCategory: string
     title: string
     content: string
@@ -19201,6 +23604,7 @@ export namespace Prisma {
     upvotes: number
     aiReply: string | null
     createdAt: Date
+    updatedAt: Date
     _count: DiscussionPostCountAggregateOutputType | null
     _avg: DiscussionPostAvgAggregateOutputType | null
     _sum: DiscussionPostSumAggregateOutputType | null
@@ -19226,6 +23630,7 @@ export namespace Prisma {
     id?: boolean
     userId?: boolean
     userName?: boolean
+    userAvatar?: boolean
     roleCategory?: boolean
     title?: boolean
     content?: boolean
@@ -19233,12 +23638,16 @@ export namespace Prisma {
     upvotes?: boolean
     aiReply?: boolean
     createdAt?: boolean
+    updatedAt?: boolean
+    comments?: boolean | DiscussionPost$commentsArgs<ExtArgs>
+    _count?: boolean | DiscussionPostCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["discussionPost"]>
 
   export type DiscussionPostSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
     userName?: boolean
+    userAvatar?: boolean
     roleCategory?: boolean
     title?: boolean
     content?: boolean
@@ -19246,12 +23655,14 @@ export namespace Prisma {
     upvotes?: boolean
     aiReply?: boolean
     createdAt?: boolean
+    updatedAt?: boolean
   }, ExtArgs["result"]["discussionPost"]>
 
   export type DiscussionPostSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
     userName?: boolean
+    userAvatar?: boolean
     roleCategory?: boolean
     title?: boolean
     content?: boolean
@@ -19259,12 +23670,14 @@ export namespace Prisma {
     upvotes?: boolean
     aiReply?: boolean
     createdAt?: boolean
+    updatedAt?: boolean
   }, ExtArgs["result"]["discussionPost"]>
 
   export type DiscussionPostSelectScalar = {
     id?: boolean
     userId?: boolean
     userName?: boolean
+    userAvatar?: boolean
     roleCategory?: boolean
     title?: boolean
     content?: boolean
@@ -19272,17 +23685,27 @@ export namespace Prisma {
     upvotes?: boolean
     aiReply?: boolean
     createdAt?: boolean
+    updatedAt?: boolean
   }
 
-  export type DiscussionPostOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "userName" | "roleCategory" | "title" | "content" | "tags" | "upvotes" | "aiReply" | "createdAt", ExtArgs["result"]["discussionPost"]>
+  export type DiscussionPostOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "userName" | "userAvatar" | "roleCategory" | "title" | "content" | "tags" | "upvotes" | "aiReply" | "createdAt" | "updatedAt", ExtArgs["result"]["discussionPost"]>
+  export type DiscussionPostInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    comments?: boolean | DiscussionPost$commentsArgs<ExtArgs>
+    _count?: boolean | DiscussionPostCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type DiscussionPostIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type DiscussionPostIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
 
   export type $DiscussionPostPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "DiscussionPost"
-    objects: {}
+    objects: {
+      comments: Prisma.$DiscussionCommentPayload<ExtArgs>[]
+    }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       userId: string
       userName: string
+      userAvatar: string | null
       roleCategory: string
       title: string
       content: string
@@ -19290,6 +23713,7 @@ export namespace Prisma {
       upvotes: number
       aiReply: string | null
       createdAt: Date
+      updatedAt: Date
     }, ExtArgs["result"]["discussionPost"]>
     composites: {}
   }
@@ -19684,6 +24108,7 @@ export namespace Prisma {
    */
   export interface Prisma__DiscussionPostClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    comments<T extends DiscussionPost$commentsArgs<ExtArgs> = {}>(args?: Subset<T, DiscussionPost$commentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DiscussionCommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -19716,6 +24141,7 @@ export namespace Prisma {
     readonly id: FieldRef<"DiscussionPost", 'String'>
     readonly userId: FieldRef<"DiscussionPost", 'String'>
     readonly userName: FieldRef<"DiscussionPost", 'String'>
+    readonly userAvatar: FieldRef<"DiscussionPost", 'String'>
     readonly roleCategory: FieldRef<"DiscussionPost", 'String'>
     readonly title: FieldRef<"DiscussionPost", 'String'>
     readonly content: FieldRef<"DiscussionPost", 'String'>
@@ -19723,6 +24149,7 @@ export namespace Prisma {
     readonly upvotes: FieldRef<"DiscussionPost", 'Int'>
     readonly aiReply: FieldRef<"DiscussionPost", 'String'>
     readonly createdAt: FieldRef<"DiscussionPost", 'DateTime'>
+    readonly updatedAt: FieldRef<"DiscussionPost", 'DateTime'>
   }
     
 
@@ -19739,6 +24166,10 @@ export namespace Prisma {
      * Omit specific fields from the DiscussionPost
      */
     omit?: DiscussionPostOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionPostInclude<ExtArgs> | null
     /**
      * Filter, which DiscussionPost to fetch.
      */
@@ -19758,6 +24189,10 @@ export namespace Prisma {
      */
     omit?: DiscussionPostOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionPostInclude<ExtArgs> | null
+    /**
      * Filter, which DiscussionPost to fetch.
      */
     where: DiscussionPostWhereUniqueInput
@@ -19775,6 +24210,10 @@ export namespace Prisma {
      * Omit specific fields from the DiscussionPost
      */
     omit?: DiscussionPostOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionPostInclude<ExtArgs> | null
     /**
      * Filter, which DiscussionPost to fetch.
      */
@@ -19824,6 +24263,10 @@ export namespace Prisma {
      */
     omit?: DiscussionPostOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionPostInclude<ExtArgs> | null
+    /**
      * Filter, which DiscussionPost to fetch.
      */
     where?: DiscussionPostWhereInput
@@ -19872,6 +24315,10 @@ export namespace Prisma {
      */
     omit?: DiscussionPostOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionPostInclude<ExtArgs> | null
+    /**
      * Filter, which DiscussionPosts to fetch.
      */
     where?: DiscussionPostWhereInput
@@ -19914,6 +24361,10 @@ export namespace Prisma {
      * Omit specific fields from the DiscussionPost
      */
     omit?: DiscussionPostOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionPostInclude<ExtArgs> | null
     /**
      * The data needed to create a DiscussionPost.
      */
@@ -19962,6 +24413,10 @@ export namespace Prisma {
      * Omit specific fields from the DiscussionPost
      */
     omit?: DiscussionPostOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionPostInclude<ExtArgs> | null
     /**
      * The data needed to update a DiscussionPost.
      */
@@ -20029,6 +24484,10 @@ export namespace Prisma {
      */
     omit?: DiscussionPostOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionPostInclude<ExtArgs> | null
+    /**
      * The filter to search for the DiscussionPost to update in case it exists.
      */
     where: DiscussionPostWhereUniqueInput
@@ -20055,6 +24514,10 @@ export namespace Prisma {
      */
     omit?: DiscussionPostOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionPostInclude<ExtArgs> | null
+    /**
      * Filter which DiscussionPost to delete.
      */
     where: DiscussionPostWhereUniqueInput
@@ -20075,6 +24538,30 @@ export namespace Prisma {
   }
 
   /**
+   * DiscussionPost.comments
+   */
+  export type DiscussionPost$commentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionComment
+     */
+    select?: DiscussionCommentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionComment
+     */
+    omit?: DiscussionCommentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionCommentInclude<ExtArgs> | null
+    where?: DiscussionCommentWhereInput
+    orderBy?: DiscussionCommentOrderByWithRelationInput | DiscussionCommentOrderByWithRelationInput[]
+    cursor?: DiscussionCommentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DiscussionCommentScalarFieldEnum | DiscussionCommentScalarFieldEnum[]
+  }
+
+  /**
    * DiscussionPost without action
    */
   export type DiscussionPostDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -20086,6 +24573,1141 @@ export namespace Prisma {
      * Omit specific fields from the DiscussionPost
      */
     omit?: DiscussionPostOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionPostInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model DiscussionComment
+   */
+
+  export type AggregateDiscussionComment = {
+    _count: DiscussionCommentCountAggregateOutputType | null
+    _avg: DiscussionCommentAvgAggregateOutputType | null
+    _sum: DiscussionCommentSumAggregateOutputType | null
+    _min: DiscussionCommentMinAggregateOutputType | null
+    _max: DiscussionCommentMaxAggregateOutputType | null
+  }
+
+  export type DiscussionCommentAvgAggregateOutputType = {
+    upvotes: number | null
+  }
+
+  export type DiscussionCommentSumAggregateOutputType = {
+    upvotes: number | null
+  }
+
+  export type DiscussionCommentMinAggregateOutputType = {
+    id: string | null
+    postId: string | null
+    userId: string | null
+    userName: string | null
+    userAvatar: string | null
+    content: string | null
+    upvotes: number | null
+    createdAt: Date | null
+  }
+
+  export type DiscussionCommentMaxAggregateOutputType = {
+    id: string | null
+    postId: string | null
+    userId: string | null
+    userName: string | null
+    userAvatar: string | null
+    content: string | null
+    upvotes: number | null
+    createdAt: Date | null
+  }
+
+  export type DiscussionCommentCountAggregateOutputType = {
+    id: number
+    postId: number
+    userId: number
+    userName: number
+    userAvatar: number
+    content: number
+    upvotes: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type DiscussionCommentAvgAggregateInputType = {
+    upvotes?: true
+  }
+
+  export type DiscussionCommentSumAggregateInputType = {
+    upvotes?: true
+  }
+
+  export type DiscussionCommentMinAggregateInputType = {
+    id?: true
+    postId?: true
+    userId?: true
+    userName?: true
+    userAvatar?: true
+    content?: true
+    upvotes?: true
+    createdAt?: true
+  }
+
+  export type DiscussionCommentMaxAggregateInputType = {
+    id?: true
+    postId?: true
+    userId?: true
+    userName?: true
+    userAvatar?: true
+    content?: true
+    upvotes?: true
+    createdAt?: true
+  }
+
+  export type DiscussionCommentCountAggregateInputType = {
+    id?: true
+    postId?: true
+    userId?: true
+    userName?: true
+    userAvatar?: true
+    content?: true
+    upvotes?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type DiscussionCommentAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DiscussionComment to aggregate.
+     */
+    where?: DiscussionCommentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DiscussionComments to fetch.
+     */
+    orderBy?: DiscussionCommentOrderByWithRelationInput | DiscussionCommentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: DiscussionCommentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DiscussionComments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DiscussionComments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned DiscussionComments
+    **/
+    _count?: true | DiscussionCommentCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: DiscussionCommentAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: DiscussionCommentSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: DiscussionCommentMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: DiscussionCommentMaxAggregateInputType
+  }
+
+  export type GetDiscussionCommentAggregateType<T extends DiscussionCommentAggregateArgs> = {
+        [P in keyof T & keyof AggregateDiscussionComment]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateDiscussionComment[P]>
+      : GetScalarType<T[P], AggregateDiscussionComment[P]>
+  }
+
+
+
+
+  export type DiscussionCommentGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DiscussionCommentWhereInput
+    orderBy?: DiscussionCommentOrderByWithAggregationInput | DiscussionCommentOrderByWithAggregationInput[]
+    by: DiscussionCommentScalarFieldEnum[] | DiscussionCommentScalarFieldEnum
+    having?: DiscussionCommentScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: DiscussionCommentCountAggregateInputType | true
+    _avg?: DiscussionCommentAvgAggregateInputType
+    _sum?: DiscussionCommentSumAggregateInputType
+    _min?: DiscussionCommentMinAggregateInputType
+    _max?: DiscussionCommentMaxAggregateInputType
+  }
+
+  export type DiscussionCommentGroupByOutputType = {
+    id: string
+    postId: string
+    userId: string
+    userName: string
+    userAvatar: string | null
+    content: string
+    upvotes: number
+    createdAt: Date
+    _count: DiscussionCommentCountAggregateOutputType | null
+    _avg: DiscussionCommentAvgAggregateOutputType | null
+    _sum: DiscussionCommentSumAggregateOutputType | null
+    _min: DiscussionCommentMinAggregateOutputType | null
+    _max: DiscussionCommentMaxAggregateOutputType | null
+  }
+
+  type GetDiscussionCommentGroupByPayload<T extends DiscussionCommentGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<DiscussionCommentGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof DiscussionCommentGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], DiscussionCommentGroupByOutputType[P]>
+            : GetScalarType<T[P], DiscussionCommentGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type DiscussionCommentSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    postId?: boolean
+    userId?: boolean
+    userName?: boolean
+    userAvatar?: boolean
+    content?: boolean
+    upvotes?: boolean
+    createdAt?: boolean
+    post?: boolean | DiscussionPostDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["discussionComment"]>
+
+  export type DiscussionCommentSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    postId?: boolean
+    userId?: boolean
+    userName?: boolean
+    userAvatar?: boolean
+    content?: boolean
+    upvotes?: boolean
+    createdAt?: boolean
+    post?: boolean | DiscussionPostDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["discussionComment"]>
+
+  export type DiscussionCommentSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    postId?: boolean
+    userId?: boolean
+    userName?: boolean
+    userAvatar?: boolean
+    content?: boolean
+    upvotes?: boolean
+    createdAt?: boolean
+    post?: boolean | DiscussionPostDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["discussionComment"]>
+
+  export type DiscussionCommentSelectScalar = {
+    id?: boolean
+    postId?: boolean
+    userId?: boolean
+    userName?: boolean
+    userAvatar?: boolean
+    content?: boolean
+    upvotes?: boolean
+    createdAt?: boolean
+  }
+
+  export type DiscussionCommentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "postId" | "userId" | "userName" | "userAvatar" | "content" | "upvotes" | "createdAt", ExtArgs["result"]["discussionComment"]>
+  export type DiscussionCommentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    post?: boolean | DiscussionPostDefaultArgs<ExtArgs>
+  }
+  export type DiscussionCommentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    post?: boolean | DiscussionPostDefaultArgs<ExtArgs>
+  }
+  export type DiscussionCommentIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    post?: boolean | DiscussionPostDefaultArgs<ExtArgs>
+  }
+
+  export type $DiscussionCommentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "DiscussionComment"
+    objects: {
+      post: Prisma.$DiscussionPostPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      postId: string
+      userId: string
+      userName: string
+      userAvatar: string | null
+      content: string
+      upvotes: number
+      createdAt: Date
+    }, ExtArgs["result"]["discussionComment"]>
+    composites: {}
+  }
+
+  type DiscussionCommentGetPayload<S extends boolean | null | undefined | DiscussionCommentDefaultArgs> = $Result.GetResult<Prisma.$DiscussionCommentPayload, S>
+
+  type DiscussionCommentCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<DiscussionCommentFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: DiscussionCommentCountAggregateInputType | true
+    }
+
+  export interface DiscussionCommentDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['DiscussionComment'], meta: { name: 'DiscussionComment' } }
+    /**
+     * Find zero or one DiscussionComment that matches the filter.
+     * @param {DiscussionCommentFindUniqueArgs} args - Arguments to find a DiscussionComment
+     * @example
+     * // Get one DiscussionComment
+     * const discussionComment = await prisma.discussionComment.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends DiscussionCommentFindUniqueArgs>(args: SelectSubset<T, DiscussionCommentFindUniqueArgs<ExtArgs>>): Prisma__DiscussionCommentClient<$Result.GetResult<Prisma.$DiscussionCommentPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one DiscussionComment that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {DiscussionCommentFindUniqueOrThrowArgs} args - Arguments to find a DiscussionComment
+     * @example
+     * // Get one DiscussionComment
+     * const discussionComment = await prisma.discussionComment.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends DiscussionCommentFindUniqueOrThrowArgs>(args: SelectSubset<T, DiscussionCommentFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DiscussionCommentClient<$Result.GetResult<Prisma.$DiscussionCommentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DiscussionComment that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DiscussionCommentFindFirstArgs} args - Arguments to find a DiscussionComment
+     * @example
+     * // Get one DiscussionComment
+     * const discussionComment = await prisma.discussionComment.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends DiscussionCommentFindFirstArgs>(args?: SelectSubset<T, DiscussionCommentFindFirstArgs<ExtArgs>>): Prisma__DiscussionCommentClient<$Result.GetResult<Prisma.$DiscussionCommentPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DiscussionComment that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DiscussionCommentFindFirstOrThrowArgs} args - Arguments to find a DiscussionComment
+     * @example
+     * // Get one DiscussionComment
+     * const discussionComment = await prisma.discussionComment.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends DiscussionCommentFindFirstOrThrowArgs>(args?: SelectSubset<T, DiscussionCommentFindFirstOrThrowArgs<ExtArgs>>): Prisma__DiscussionCommentClient<$Result.GetResult<Prisma.$DiscussionCommentPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more DiscussionComments that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DiscussionCommentFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all DiscussionComments
+     * const discussionComments = await prisma.discussionComment.findMany()
+     * 
+     * // Get first 10 DiscussionComments
+     * const discussionComments = await prisma.discussionComment.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const discussionCommentWithIdOnly = await prisma.discussionComment.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends DiscussionCommentFindManyArgs>(args?: SelectSubset<T, DiscussionCommentFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DiscussionCommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a DiscussionComment.
+     * @param {DiscussionCommentCreateArgs} args - Arguments to create a DiscussionComment.
+     * @example
+     * // Create one DiscussionComment
+     * const DiscussionComment = await prisma.discussionComment.create({
+     *   data: {
+     *     // ... data to create a DiscussionComment
+     *   }
+     * })
+     * 
+     */
+    create<T extends DiscussionCommentCreateArgs>(args: SelectSubset<T, DiscussionCommentCreateArgs<ExtArgs>>): Prisma__DiscussionCommentClient<$Result.GetResult<Prisma.$DiscussionCommentPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many DiscussionComments.
+     * @param {DiscussionCommentCreateManyArgs} args - Arguments to create many DiscussionComments.
+     * @example
+     * // Create many DiscussionComments
+     * const discussionComment = await prisma.discussionComment.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends DiscussionCommentCreateManyArgs>(args?: SelectSubset<T, DiscussionCommentCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many DiscussionComments and returns the data saved in the database.
+     * @param {DiscussionCommentCreateManyAndReturnArgs} args - Arguments to create many DiscussionComments.
+     * @example
+     * // Create many DiscussionComments
+     * const discussionComment = await prisma.discussionComment.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many DiscussionComments and only return the `id`
+     * const discussionCommentWithIdOnly = await prisma.discussionComment.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends DiscussionCommentCreateManyAndReturnArgs>(args?: SelectSubset<T, DiscussionCommentCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DiscussionCommentPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a DiscussionComment.
+     * @param {DiscussionCommentDeleteArgs} args - Arguments to delete one DiscussionComment.
+     * @example
+     * // Delete one DiscussionComment
+     * const DiscussionComment = await prisma.discussionComment.delete({
+     *   where: {
+     *     // ... filter to delete one DiscussionComment
+     *   }
+     * })
+     * 
+     */
+    delete<T extends DiscussionCommentDeleteArgs>(args: SelectSubset<T, DiscussionCommentDeleteArgs<ExtArgs>>): Prisma__DiscussionCommentClient<$Result.GetResult<Prisma.$DiscussionCommentPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one DiscussionComment.
+     * @param {DiscussionCommentUpdateArgs} args - Arguments to update one DiscussionComment.
+     * @example
+     * // Update one DiscussionComment
+     * const discussionComment = await prisma.discussionComment.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends DiscussionCommentUpdateArgs>(args: SelectSubset<T, DiscussionCommentUpdateArgs<ExtArgs>>): Prisma__DiscussionCommentClient<$Result.GetResult<Prisma.$DiscussionCommentPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more DiscussionComments.
+     * @param {DiscussionCommentDeleteManyArgs} args - Arguments to filter DiscussionComments to delete.
+     * @example
+     * // Delete a few DiscussionComments
+     * const { count } = await prisma.discussionComment.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends DiscussionCommentDeleteManyArgs>(args?: SelectSubset<T, DiscussionCommentDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DiscussionComments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DiscussionCommentUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many DiscussionComments
+     * const discussionComment = await prisma.discussionComment.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends DiscussionCommentUpdateManyArgs>(args: SelectSubset<T, DiscussionCommentUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DiscussionComments and returns the data updated in the database.
+     * @param {DiscussionCommentUpdateManyAndReturnArgs} args - Arguments to update many DiscussionComments.
+     * @example
+     * // Update many DiscussionComments
+     * const discussionComment = await prisma.discussionComment.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more DiscussionComments and only return the `id`
+     * const discussionCommentWithIdOnly = await prisma.discussionComment.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends DiscussionCommentUpdateManyAndReturnArgs>(args: SelectSubset<T, DiscussionCommentUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DiscussionCommentPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one DiscussionComment.
+     * @param {DiscussionCommentUpsertArgs} args - Arguments to update or create a DiscussionComment.
+     * @example
+     * // Update or create a DiscussionComment
+     * const discussionComment = await prisma.discussionComment.upsert({
+     *   create: {
+     *     // ... data to create a DiscussionComment
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the DiscussionComment we want to update
+     *   }
+     * })
+     */
+    upsert<T extends DiscussionCommentUpsertArgs>(args: SelectSubset<T, DiscussionCommentUpsertArgs<ExtArgs>>): Prisma__DiscussionCommentClient<$Result.GetResult<Prisma.$DiscussionCommentPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of DiscussionComments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DiscussionCommentCountArgs} args - Arguments to filter DiscussionComments to count.
+     * @example
+     * // Count the number of DiscussionComments
+     * const count = await prisma.discussionComment.count({
+     *   where: {
+     *     // ... the filter for the DiscussionComments we want to count
+     *   }
+     * })
+    **/
+    count<T extends DiscussionCommentCountArgs>(
+      args?: Subset<T, DiscussionCommentCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], DiscussionCommentCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a DiscussionComment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DiscussionCommentAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends DiscussionCommentAggregateArgs>(args: Subset<T, DiscussionCommentAggregateArgs>): Prisma.PrismaPromise<GetDiscussionCommentAggregateType<T>>
+
+    /**
+     * Group by DiscussionComment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DiscussionCommentGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends DiscussionCommentGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: DiscussionCommentGroupByArgs['orderBy'] }
+        : { orderBy?: DiscussionCommentGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, DiscussionCommentGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDiscussionCommentGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the DiscussionComment model
+   */
+  readonly fields: DiscussionCommentFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for DiscussionComment.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__DiscussionCommentClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    post<T extends DiscussionPostDefaultArgs<ExtArgs> = {}>(args?: Subset<T, DiscussionPostDefaultArgs<ExtArgs>>): Prisma__DiscussionPostClient<$Result.GetResult<Prisma.$DiscussionPostPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the DiscussionComment model
+   */
+  interface DiscussionCommentFieldRefs {
+    readonly id: FieldRef<"DiscussionComment", 'String'>
+    readonly postId: FieldRef<"DiscussionComment", 'String'>
+    readonly userId: FieldRef<"DiscussionComment", 'String'>
+    readonly userName: FieldRef<"DiscussionComment", 'String'>
+    readonly userAvatar: FieldRef<"DiscussionComment", 'String'>
+    readonly content: FieldRef<"DiscussionComment", 'String'>
+    readonly upvotes: FieldRef<"DiscussionComment", 'Int'>
+    readonly createdAt: FieldRef<"DiscussionComment", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * DiscussionComment findUnique
+   */
+  export type DiscussionCommentFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionComment
+     */
+    select?: DiscussionCommentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionComment
+     */
+    omit?: DiscussionCommentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionCommentInclude<ExtArgs> | null
+    /**
+     * Filter, which DiscussionComment to fetch.
+     */
+    where: DiscussionCommentWhereUniqueInput
+  }
+
+  /**
+   * DiscussionComment findUniqueOrThrow
+   */
+  export type DiscussionCommentFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionComment
+     */
+    select?: DiscussionCommentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionComment
+     */
+    omit?: DiscussionCommentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionCommentInclude<ExtArgs> | null
+    /**
+     * Filter, which DiscussionComment to fetch.
+     */
+    where: DiscussionCommentWhereUniqueInput
+  }
+
+  /**
+   * DiscussionComment findFirst
+   */
+  export type DiscussionCommentFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionComment
+     */
+    select?: DiscussionCommentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionComment
+     */
+    omit?: DiscussionCommentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionCommentInclude<ExtArgs> | null
+    /**
+     * Filter, which DiscussionComment to fetch.
+     */
+    where?: DiscussionCommentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DiscussionComments to fetch.
+     */
+    orderBy?: DiscussionCommentOrderByWithRelationInput | DiscussionCommentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DiscussionComments.
+     */
+    cursor?: DiscussionCommentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DiscussionComments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DiscussionComments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DiscussionComments.
+     */
+    distinct?: DiscussionCommentScalarFieldEnum | DiscussionCommentScalarFieldEnum[]
+  }
+
+  /**
+   * DiscussionComment findFirstOrThrow
+   */
+  export type DiscussionCommentFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionComment
+     */
+    select?: DiscussionCommentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionComment
+     */
+    omit?: DiscussionCommentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionCommentInclude<ExtArgs> | null
+    /**
+     * Filter, which DiscussionComment to fetch.
+     */
+    where?: DiscussionCommentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DiscussionComments to fetch.
+     */
+    orderBy?: DiscussionCommentOrderByWithRelationInput | DiscussionCommentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DiscussionComments.
+     */
+    cursor?: DiscussionCommentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DiscussionComments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DiscussionComments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DiscussionComments.
+     */
+    distinct?: DiscussionCommentScalarFieldEnum | DiscussionCommentScalarFieldEnum[]
+  }
+
+  /**
+   * DiscussionComment findMany
+   */
+  export type DiscussionCommentFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionComment
+     */
+    select?: DiscussionCommentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionComment
+     */
+    omit?: DiscussionCommentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionCommentInclude<ExtArgs> | null
+    /**
+     * Filter, which DiscussionComments to fetch.
+     */
+    where?: DiscussionCommentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DiscussionComments to fetch.
+     */
+    orderBy?: DiscussionCommentOrderByWithRelationInput | DiscussionCommentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing DiscussionComments.
+     */
+    cursor?: DiscussionCommentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DiscussionComments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DiscussionComments.
+     */
+    skip?: number
+    distinct?: DiscussionCommentScalarFieldEnum | DiscussionCommentScalarFieldEnum[]
+  }
+
+  /**
+   * DiscussionComment create
+   */
+  export type DiscussionCommentCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionComment
+     */
+    select?: DiscussionCommentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionComment
+     */
+    omit?: DiscussionCommentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionCommentInclude<ExtArgs> | null
+    /**
+     * The data needed to create a DiscussionComment.
+     */
+    data: XOR<DiscussionCommentCreateInput, DiscussionCommentUncheckedCreateInput>
+  }
+
+  /**
+   * DiscussionComment createMany
+   */
+  export type DiscussionCommentCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many DiscussionComments.
+     */
+    data: DiscussionCommentCreateManyInput | DiscussionCommentCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * DiscussionComment createManyAndReturn
+   */
+  export type DiscussionCommentCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionComment
+     */
+    select?: DiscussionCommentSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionComment
+     */
+    omit?: DiscussionCommentOmit<ExtArgs> | null
+    /**
+     * The data used to create many DiscussionComments.
+     */
+    data: DiscussionCommentCreateManyInput | DiscussionCommentCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionCommentIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * DiscussionComment update
+   */
+  export type DiscussionCommentUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionComment
+     */
+    select?: DiscussionCommentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionComment
+     */
+    omit?: DiscussionCommentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionCommentInclude<ExtArgs> | null
+    /**
+     * The data needed to update a DiscussionComment.
+     */
+    data: XOR<DiscussionCommentUpdateInput, DiscussionCommentUncheckedUpdateInput>
+    /**
+     * Choose, which DiscussionComment to update.
+     */
+    where: DiscussionCommentWhereUniqueInput
+  }
+
+  /**
+   * DiscussionComment updateMany
+   */
+  export type DiscussionCommentUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update DiscussionComments.
+     */
+    data: XOR<DiscussionCommentUpdateManyMutationInput, DiscussionCommentUncheckedUpdateManyInput>
+    /**
+     * Filter which DiscussionComments to update
+     */
+    where?: DiscussionCommentWhereInput
+    /**
+     * Limit how many DiscussionComments to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * DiscussionComment updateManyAndReturn
+   */
+  export type DiscussionCommentUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionComment
+     */
+    select?: DiscussionCommentSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionComment
+     */
+    omit?: DiscussionCommentOmit<ExtArgs> | null
+    /**
+     * The data used to update DiscussionComments.
+     */
+    data: XOR<DiscussionCommentUpdateManyMutationInput, DiscussionCommentUncheckedUpdateManyInput>
+    /**
+     * Filter which DiscussionComments to update
+     */
+    where?: DiscussionCommentWhereInput
+    /**
+     * Limit how many DiscussionComments to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionCommentIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * DiscussionComment upsert
+   */
+  export type DiscussionCommentUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionComment
+     */
+    select?: DiscussionCommentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionComment
+     */
+    omit?: DiscussionCommentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionCommentInclude<ExtArgs> | null
+    /**
+     * The filter to search for the DiscussionComment to update in case it exists.
+     */
+    where: DiscussionCommentWhereUniqueInput
+    /**
+     * In case the DiscussionComment found by the `where` argument doesn't exist, create a new DiscussionComment with this data.
+     */
+    create: XOR<DiscussionCommentCreateInput, DiscussionCommentUncheckedCreateInput>
+    /**
+     * In case the DiscussionComment was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<DiscussionCommentUpdateInput, DiscussionCommentUncheckedUpdateInput>
+  }
+
+  /**
+   * DiscussionComment delete
+   */
+  export type DiscussionCommentDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionComment
+     */
+    select?: DiscussionCommentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionComment
+     */
+    omit?: DiscussionCommentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionCommentInclude<ExtArgs> | null
+    /**
+     * Filter which DiscussionComment to delete.
+     */
+    where: DiscussionCommentWhereUniqueInput
+  }
+
+  /**
+   * DiscussionComment deleteMany
+   */
+  export type DiscussionCommentDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DiscussionComments to delete
+     */
+    where?: DiscussionCommentWhereInput
+    /**
+     * Limit how many DiscussionComments to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * DiscussionComment without action
+   */
+  export type DiscussionCommentDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiscussionComment
+     */
+    select?: DiscussionCommentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiscussionComment
+     */
+    omit?: DiscussionCommentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiscussionCommentInclude<ExtArgs> | null
   }
 
 
@@ -20106,13 +25728,16 @@ export namespace Prisma {
   export const CareerRoadmapScalarFieldEnum: {
     id: 'id',
     userId: 'userId',
-    rolePath: 'rolePath',
-    targetCompanyTier: 'targetCompanyTier',
-    overallReadiness: 'overallReadiness',
-    nodesData: 'nodesData',
-    customTechStack: 'customTechStack',
     title: 'title',
     description: 'description',
+    rolePath: 'rolePath',
+    targetCompanyTier: 'targetCompanyTier',
+    estimatedWeeks: 'estimatedWeeks',
+    overallReadiness: 'overallReadiness',
+    isPublic: 'isPublic',
+    isOfficial: 'isOfficial',
+    nodesData: 'nodesData',
+    customTechStack: 'customTechStack',
     visibility: 'visibility',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -20189,6 +25814,7 @@ export namespace Prisma {
     orderIndex: 'orderIndex',
     estimatedMinutes: 'estimatedMinutes',
     requiresEvidence: 'requiresEvidence',
+    requiresAssessment: 'requiresAssessment',
     targetProficiency: 'targetProficiency',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -20254,6 +25880,7 @@ export namespace Prisma {
     orderIndex: 'orderIndex',
     estimatedMinutes: 'estimatedMinutes',
     requiresEvidence: 'requiresEvidence',
+    requiresAssessment: 'requiresAssessment',
     status: 'status',
     completedAt: 'completedAt',
     createdAt: 'createdAt',
@@ -20296,6 +25923,53 @@ export namespace Prisma {
   export type SkillEvidenceScalarFieldEnum = (typeof SkillEvidenceScalarFieldEnum)[keyof typeof SkillEvidenceScalarFieldEnum]
 
 
+  export const MicroAssessmentScalarFieldEnum: {
+    id: 'id',
+    title: 'title',
+    description: 'description',
+    roadmapNodeId: 'roadmapNodeId',
+    skillId: 'skillId',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type MicroAssessmentScalarFieldEnum = (typeof MicroAssessmentScalarFieldEnum)[keyof typeof MicroAssessmentScalarFieldEnum]
+
+
+  export const MicroAssessmentQuestionScalarFieldEnum: {
+    id: 'id',
+    assessmentId: 'assessmentId',
+    questionText: 'questionText',
+    options: 'options',
+    correctOptionIndex: 'correctOptionIndex',
+    explanation: 'explanation',
+    orderIndex: 'orderIndex',
+    createdAt: 'createdAt'
+  };
+
+  export type MicroAssessmentQuestionScalarFieldEnum = (typeof MicroAssessmentQuestionScalarFieldEnum)[keyof typeof MicroAssessmentQuestionScalarFieldEnum]
+
+
+  export const MicroAssessmentAttemptScalarFieldEnum: {
+    id: 'id',
+    assessmentId: 'assessmentId',
+    userId: 'userId',
+    userRoadmapId: 'userRoadmapId',
+    sprintId: 'sprintId',
+    sprintTaskId: 'sprintTaskId',
+    skillId: 'skillId',
+    totalQuestions: 'totalQuestions',
+    correctAnswers: 'correctAnswers',
+    score: 'score',
+    passed: 'passed',
+    answers: 'answers',
+    completedAt: 'completedAt',
+    createdAt: 'createdAt'
+  };
+
+  export type MicroAssessmentAttemptScalarFieldEnum = (typeof MicroAssessmentAttemptScalarFieldEnum)[keyof typeof MicroAssessmentAttemptScalarFieldEnum]
+
+
   export const RoadmapAdaptationScalarFieldEnum: {
     id: 'id',
     userRoadmapId: 'userRoadmapId',
@@ -20315,16 +25989,32 @@ export namespace Prisma {
     id: 'id',
     userId: 'userId',
     userName: 'userName',
+    userAvatar: 'userAvatar',
     roleCategory: 'roleCategory',
     title: 'title',
     content: 'content',
     tags: 'tags',
     upvotes: 'upvotes',
     aiReply: 'aiReply',
-    createdAt: 'createdAt'
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
   };
 
   export type DiscussionPostScalarFieldEnum = (typeof DiscussionPostScalarFieldEnum)[keyof typeof DiscussionPostScalarFieldEnum]
+
+
+  export const DiscussionCommentScalarFieldEnum: {
+    id: 'id',
+    postId: 'postId',
+    userId: 'userId',
+    userName: 'userName',
+    userAvatar: 'userAvatar',
+    content: 'content',
+    upvotes: 'upvotes',
+    createdAt: 'createdAt'
+  };
+
+  export type DiscussionCommentScalarFieldEnum = (typeof DiscussionCommentScalarFieldEnum)[keyof typeof DiscussionCommentScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -20409,6 +26099,13 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'Boolean'
+   */
+  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+  /**
    * Reference to a field of type 'Json'
    */
   export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
@@ -20461,13 +26158,6 @@ export namespace Prisma {
    * Reference to a field of type 'RoadmapDifficulty[]'
    */
   export type ListEnumRoadmapDifficultyFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RoadmapDifficulty[]'>
-    
-
-
-  /**
-   * Reference to a field of type 'Boolean'
-   */
-  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
@@ -20592,13 +26282,16 @@ export namespace Prisma {
     NOT?: CareerRoadmapWhereInput | CareerRoadmapWhereInput[]
     id?: StringFilter<"CareerRoadmap"> | string
     userId?: StringFilter<"CareerRoadmap"> | string
-    rolePath?: StringFilter<"CareerRoadmap"> | string
-    targetCompanyTier?: StringFilter<"CareerRoadmap"> | string
-    overallReadiness?: IntFilter<"CareerRoadmap"> | number
-    nodesData?: JsonFilter<"CareerRoadmap">
-    customTechStack?: JsonNullableFilter<"CareerRoadmap">
     title?: StringNullableFilter<"CareerRoadmap"> | string | null
     description?: StringNullableFilter<"CareerRoadmap"> | string | null
+    rolePath?: StringFilter<"CareerRoadmap"> | string
+    targetCompanyTier?: StringFilter<"CareerRoadmap"> | string
+    estimatedWeeks?: IntFilter<"CareerRoadmap"> | number
+    overallReadiness?: IntFilter<"CareerRoadmap"> | number
+    isPublic?: BoolFilter<"CareerRoadmap"> | boolean
+    isOfficial?: BoolFilter<"CareerRoadmap"> | boolean
+    nodesData?: JsonFilter<"CareerRoadmap">
+    customTechStack?: JsonNullableFilter<"CareerRoadmap">
     visibility?: EnumRoadmapVisibilityFilter<"CareerRoadmap"> | $Enums.RoadmapVisibility
     createdAt?: DateTimeFilter<"CareerRoadmap"> | Date | string
     updatedAt?: DateTimeFilter<"CareerRoadmap"> | Date | string
@@ -20611,13 +26304,16 @@ export namespace Prisma {
   export type CareerRoadmapOrderByWithRelationInput = {
     id?: SortOrder
     userId?: SortOrder
-    rolePath?: SortOrder
-    targetCompanyTier?: SortOrder
-    overallReadiness?: SortOrder
-    nodesData?: SortOrder
-    customTechStack?: SortOrderInput | SortOrder
     title?: SortOrderInput | SortOrder
     description?: SortOrderInput | SortOrder
+    rolePath?: SortOrder
+    targetCompanyTier?: SortOrder
+    estimatedWeeks?: SortOrder
+    overallReadiness?: SortOrder
+    isPublic?: SortOrder
+    isOfficial?: SortOrder
+    nodesData?: SortOrder
+    customTechStack?: SortOrderInput | SortOrder
     visibility?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -20633,13 +26329,16 @@ export namespace Prisma {
     OR?: CareerRoadmapWhereInput[]
     NOT?: CareerRoadmapWhereInput | CareerRoadmapWhereInput[]
     userId?: StringFilter<"CareerRoadmap"> | string
-    rolePath?: StringFilter<"CareerRoadmap"> | string
-    targetCompanyTier?: StringFilter<"CareerRoadmap"> | string
-    overallReadiness?: IntFilter<"CareerRoadmap"> | number
-    nodesData?: JsonFilter<"CareerRoadmap">
-    customTechStack?: JsonNullableFilter<"CareerRoadmap">
     title?: StringNullableFilter<"CareerRoadmap"> | string | null
     description?: StringNullableFilter<"CareerRoadmap"> | string | null
+    rolePath?: StringFilter<"CareerRoadmap"> | string
+    targetCompanyTier?: StringFilter<"CareerRoadmap"> | string
+    estimatedWeeks?: IntFilter<"CareerRoadmap"> | number
+    overallReadiness?: IntFilter<"CareerRoadmap"> | number
+    isPublic?: BoolFilter<"CareerRoadmap"> | boolean
+    isOfficial?: BoolFilter<"CareerRoadmap"> | boolean
+    nodesData?: JsonFilter<"CareerRoadmap">
+    customTechStack?: JsonNullableFilter<"CareerRoadmap">
     visibility?: EnumRoadmapVisibilityFilter<"CareerRoadmap"> | $Enums.RoadmapVisibility
     createdAt?: DateTimeFilter<"CareerRoadmap"> | Date | string
     updatedAt?: DateTimeFilter<"CareerRoadmap"> | Date | string
@@ -20652,13 +26351,16 @@ export namespace Prisma {
   export type CareerRoadmapOrderByWithAggregationInput = {
     id?: SortOrder
     userId?: SortOrder
-    rolePath?: SortOrder
-    targetCompanyTier?: SortOrder
-    overallReadiness?: SortOrder
-    nodesData?: SortOrder
-    customTechStack?: SortOrderInput | SortOrder
     title?: SortOrderInput | SortOrder
     description?: SortOrderInput | SortOrder
+    rolePath?: SortOrder
+    targetCompanyTier?: SortOrder
+    estimatedWeeks?: SortOrder
+    overallReadiness?: SortOrder
+    isPublic?: SortOrder
+    isOfficial?: SortOrder
+    nodesData?: SortOrder
+    customTechStack?: SortOrderInput | SortOrder
     visibility?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -20675,13 +26377,16 @@ export namespace Prisma {
     NOT?: CareerRoadmapScalarWhereWithAggregatesInput | CareerRoadmapScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"CareerRoadmap"> | string
     userId?: StringWithAggregatesFilter<"CareerRoadmap"> | string
-    rolePath?: StringWithAggregatesFilter<"CareerRoadmap"> | string
-    targetCompanyTier?: StringWithAggregatesFilter<"CareerRoadmap"> | string
-    overallReadiness?: IntWithAggregatesFilter<"CareerRoadmap"> | number
-    nodesData?: JsonWithAggregatesFilter<"CareerRoadmap">
-    customTechStack?: JsonNullableWithAggregatesFilter<"CareerRoadmap">
     title?: StringNullableWithAggregatesFilter<"CareerRoadmap"> | string | null
     description?: StringNullableWithAggregatesFilter<"CareerRoadmap"> | string | null
+    rolePath?: StringWithAggregatesFilter<"CareerRoadmap"> | string
+    targetCompanyTier?: StringWithAggregatesFilter<"CareerRoadmap"> | string
+    estimatedWeeks?: IntWithAggregatesFilter<"CareerRoadmap"> | number
+    overallReadiness?: IntWithAggregatesFilter<"CareerRoadmap"> | number
+    isPublic?: BoolWithAggregatesFilter<"CareerRoadmap"> | boolean
+    isOfficial?: BoolWithAggregatesFilter<"CareerRoadmap"> | boolean
+    nodesData?: JsonWithAggregatesFilter<"CareerRoadmap">
+    customTechStack?: JsonNullableWithAggregatesFilter<"CareerRoadmap">
     visibility?: EnumRoadmapVisibilityWithAggregatesFilter<"CareerRoadmap"> | $Enums.RoadmapVisibility
     createdAt?: DateTimeWithAggregatesFilter<"CareerRoadmap"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"CareerRoadmap"> | Date | string
@@ -20802,6 +26507,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Skill"> | Date | string
     nodeLinks?: RoadmapNodeSkillListRelationFilter
     evidence?: SkillEvidenceListRelationFilter
+    assessments?: MicroAssessmentListRelationFilter
+    assessmentAttempts?: MicroAssessmentAttemptListRelationFilter
     outgoingLinks?: SkillRelationshipListRelationFilter
     incomingLinks?: SkillRelationshipListRelationFilter
   }
@@ -20816,6 +26523,8 @@ export namespace Prisma {
     updatedAt?: SortOrder
     nodeLinks?: RoadmapNodeSkillOrderByRelationAggregateInput
     evidence?: SkillEvidenceOrderByRelationAggregateInput
+    assessments?: MicroAssessmentOrderByRelationAggregateInput
+    assessmentAttempts?: MicroAssessmentAttemptOrderByRelationAggregateInput
     outgoingLinks?: SkillRelationshipOrderByRelationAggregateInput
     incomingLinks?: SkillRelationshipOrderByRelationAggregateInput
   }
@@ -20833,6 +26542,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Skill"> | Date | string
     nodeLinks?: RoadmapNodeSkillListRelationFilter
     evidence?: SkillEvidenceListRelationFilter
+    assessments?: MicroAssessmentListRelationFilter
+    assessmentAttempts?: MicroAssessmentAttemptListRelationFilter
     outgoingLinks?: SkillRelationshipListRelationFilter
     incomingLinks?: SkillRelationshipListRelationFilter
   }, "id" | "slug">
@@ -21007,12 +26718,14 @@ export namespace Prisma {
     orderIndex?: IntFilter<"RoadmapNode"> | number
     estimatedMinutes?: IntFilter<"RoadmapNode"> | number
     requiresEvidence?: BoolFilter<"RoadmapNode"> | boolean
+    requiresAssessment?: BoolFilter<"RoadmapNode"> | boolean
     targetProficiency?: IntNullableFilter<"RoadmapNode"> | number | null
     createdAt?: DateTimeFilter<"RoadmapNode"> | Date | string
     updatedAt?: DateTimeFilter<"RoadmapNode"> | Date | string
     roadmap?: XOR<CareerRoadmapScalarRelationFilter, CareerRoadmapWhereInput>
     phase?: XOR<RoadmapPhaseNullableScalarRelationFilter, RoadmapPhaseWhereInput> | null
     skills?: RoadmapNodeSkillListRelationFilter
+    assessments?: MicroAssessmentListRelationFilter
     prerequisites?: RoadmapNodeDependencyListRelationFilter
     unlocks?: RoadmapNodeDependencyListRelationFilter
     sprintTasks?: RoadmapSprintTaskListRelationFilter
@@ -21029,12 +26742,14 @@ export namespace Prisma {
     orderIndex?: SortOrder
     estimatedMinutes?: SortOrder
     requiresEvidence?: SortOrder
+    requiresAssessment?: SortOrder
     targetProficiency?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     roadmap?: CareerRoadmapOrderByWithRelationInput
     phase?: RoadmapPhaseOrderByWithRelationInput
     skills?: RoadmapNodeSkillOrderByRelationAggregateInput
+    assessments?: MicroAssessmentOrderByRelationAggregateInput
     prerequisites?: RoadmapNodeDependencyOrderByRelationAggregateInput
     unlocks?: RoadmapNodeDependencyOrderByRelationAggregateInput
     sprintTasks?: RoadmapSprintTaskOrderByRelationAggregateInput
@@ -21055,12 +26770,14 @@ export namespace Prisma {
     orderIndex?: IntFilter<"RoadmapNode"> | number
     estimatedMinutes?: IntFilter<"RoadmapNode"> | number
     requiresEvidence?: BoolFilter<"RoadmapNode"> | boolean
+    requiresAssessment?: BoolFilter<"RoadmapNode"> | boolean
     targetProficiency?: IntNullableFilter<"RoadmapNode"> | number | null
     createdAt?: DateTimeFilter<"RoadmapNode"> | Date | string
     updatedAt?: DateTimeFilter<"RoadmapNode"> | Date | string
     roadmap?: XOR<CareerRoadmapScalarRelationFilter, CareerRoadmapWhereInput>
     phase?: XOR<RoadmapPhaseNullableScalarRelationFilter, RoadmapPhaseWhereInput> | null
     skills?: RoadmapNodeSkillListRelationFilter
+    assessments?: MicroAssessmentListRelationFilter
     prerequisites?: RoadmapNodeDependencyListRelationFilter
     unlocks?: RoadmapNodeDependencyListRelationFilter
     sprintTasks?: RoadmapSprintTaskListRelationFilter
@@ -21077,6 +26794,7 @@ export namespace Prisma {
     orderIndex?: SortOrder
     estimatedMinutes?: SortOrder
     requiresEvidence?: SortOrder
+    requiresAssessment?: SortOrder
     targetProficiency?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -21101,6 +26819,7 @@ export namespace Prisma {
     orderIndex?: IntWithAggregatesFilter<"RoadmapNode"> | number
     estimatedMinutes?: IntWithAggregatesFilter<"RoadmapNode"> | number
     requiresEvidence?: BoolWithAggregatesFilter<"RoadmapNode"> | boolean
+    requiresAssessment?: BoolWithAggregatesFilter<"RoadmapNode"> | boolean
     targetProficiency?: IntNullableWithAggregatesFilter<"RoadmapNode"> | number | null
     createdAt?: DateTimeWithAggregatesFilter<"RoadmapNode"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"RoadmapNode"> | Date | string
@@ -21216,6 +26935,7 @@ export namespace Prisma {
     sourceRoadmap?: XOR<CareerRoadmapScalarRelationFilter, CareerRoadmapWhereInput>
     sprints?: RoadmapSprintListRelationFilter
     skillEvidence?: SkillEvidenceListRelationFilter
+    assessmentAttempts?: MicroAssessmentAttemptListRelationFilter
     adaptations?: RoadmapAdaptationListRelationFilter
   }
 
@@ -21231,6 +26951,7 @@ export namespace Prisma {
     sourceRoadmap?: CareerRoadmapOrderByWithRelationInput
     sprints?: RoadmapSprintOrderByRelationAggregateInput
     skillEvidence?: SkillEvidenceOrderByRelationAggregateInput
+    assessmentAttempts?: MicroAssessmentAttemptOrderByRelationAggregateInput
     adaptations?: RoadmapAdaptationOrderByRelationAggregateInput
   }
 
@@ -21250,6 +26971,7 @@ export namespace Prisma {
     sourceRoadmap?: XOR<CareerRoadmapScalarRelationFilter, CareerRoadmapWhereInput>
     sprints?: RoadmapSprintListRelationFilter
     skillEvidence?: SkillEvidenceListRelationFilter
+    assessmentAttempts?: MicroAssessmentAttemptListRelationFilter
     adaptations?: RoadmapAdaptationListRelationFilter
   }, "id" | "userId_sourceRoadmapId">
 
@@ -21299,6 +27021,7 @@ export namespace Prisma {
     userRoadmap?: XOR<UserRoadmapScalarRelationFilter, UserRoadmapWhereInput>
     tasks?: RoadmapSprintTaskListRelationFilter
     performance?: XOR<SprintPerformanceNullableScalarRelationFilter, SprintPerformanceWhereInput> | null
+    assessmentAttempts?: MicroAssessmentAttemptListRelationFilter
     adaptations?: RoadmapAdaptationListRelationFilter
   }
 
@@ -21317,6 +27040,7 @@ export namespace Prisma {
     userRoadmap?: UserRoadmapOrderByWithRelationInput
     tasks?: RoadmapSprintTaskOrderByRelationAggregateInput
     performance?: SprintPerformanceOrderByWithRelationInput
+    assessmentAttempts?: MicroAssessmentAttemptOrderByRelationAggregateInput
     adaptations?: RoadmapAdaptationOrderByRelationAggregateInput
   }
 
@@ -21339,6 +27063,7 @@ export namespace Prisma {
     userRoadmap?: XOR<UserRoadmapScalarRelationFilter, UserRoadmapWhereInput>
     tasks?: RoadmapSprintTaskListRelationFilter
     performance?: XOR<SprintPerformanceNullableScalarRelationFilter, SprintPerformanceWhereInput> | null
+    assessmentAttempts?: MicroAssessmentAttemptListRelationFilter
     adaptations?: RoadmapAdaptationListRelationFilter
   }, "id" | "userRoadmapId_sprintNumber">
 
@@ -21390,12 +27115,14 @@ export namespace Prisma {
     orderIndex?: IntFilter<"RoadmapSprintTask"> | number
     estimatedMinutes?: IntFilter<"RoadmapSprintTask"> | number
     requiresEvidence?: BoolFilter<"RoadmapSprintTask"> | boolean
+    requiresAssessment?: BoolFilter<"RoadmapSprintTask"> | boolean
     status?: EnumSprintTaskStatusFilter<"RoadmapSprintTask"> | $Enums.SprintTaskStatus
     completedAt?: DateTimeNullableFilter<"RoadmapSprintTask"> | Date | string | null
     createdAt?: DateTimeFilter<"RoadmapSprintTask"> | Date | string
     updatedAt?: DateTimeFilter<"RoadmapSprintTask"> | Date | string
     sprint?: XOR<RoadmapSprintScalarRelationFilter, RoadmapSprintWhereInput>
     roadmapNode?: XOR<RoadmapNodeNullableScalarRelationFilter, RoadmapNodeWhereInput> | null
+    assessmentAttempts?: MicroAssessmentAttemptListRelationFilter
   }
 
   export type RoadmapSprintTaskOrderByWithRelationInput = {
@@ -21407,12 +27134,14 @@ export namespace Prisma {
     orderIndex?: SortOrder
     estimatedMinutes?: SortOrder
     requiresEvidence?: SortOrder
+    requiresAssessment?: SortOrder
     status?: SortOrder
     completedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     sprint?: RoadmapSprintOrderByWithRelationInput
     roadmapNode?: RoadmapNodeOrderByWithRelationInput
+    assessmentAttempts?: MicroAssessmentAttemptOrderByRelationAggregateInput
   }
 
   export type RoadmapSprintTaskWhereUniqueInput = Prisma.AtLeast<{
@@ -21428,12 +27157,14 @@ export namespace Prisma {
     orderIndex?: IntFilter<"RoadmapSprintTask"> | number
     estimatedMinutes?: IntFilter<"RoadmapSprintTask"> | number
     requiresEvidence?: BoolFilter<"RoadmapSprintTask"> | boolean
+    requiresAssessment?: BoolFilter<"RoadmapSprintTask"> | boolean
     status?: EnumSprintTaskStatusFilter<"RoadmapSprintTask"> | $Enums.SprintTaskStatus
     completedAt?: DateTimeNullableFilter<"RoadmapSprintTask"> | Date | string | null
     createdAt?: DateTimeFilter<"RoadmapSprintTask"> | Date | string
     updatedAt?: DateTimeFilter<"RoadmapSprintTask"> | Date | string
     sprint?: XOR<RoadmapSprintScalarRelationFilter, RoadmapSprintWhereInput>
     roadmapNode?: XOR<RoadmapNodeNullableScalarRelationFilter, RoadmapNodeWhereInput> | null
+    assessmentAttempts?: MicroAssessmentAttemptListRelationFilter
   }, "id" | "sprintId_orderIndex">
 
   export type RoadmapSprintTaskOrderByWithAggregationInput = {
@@ -21445,6 +27176,7 @@ export namespace Prisma {
     orderIndex?: SortOrder
     estimatedMinutes?: SortOrder
     requiresEvidence?: SortOrder
+    requiresAssessment?: SortOrder
     status?: SortOrder
     completedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -21468,6 +27200,7 @@ export namespace Prisma {
     orderIndex?: IntWithAggregatesFilter<"RoadmapSprintTask"> | number
     estimatedMinutes?: IntWithAggregatesFilter<"RoadmapSprintTask"> | number
     requiresEvidence?: BoolWithAggregatesFilter<"RoadmapSprintTask"> | boolean
+    requiresAssessment?: BoolWithAggregatesFilter<"RoadmapSprintTask"> | boolean
     status?: EnumSprintTaskStatusWithAggregatesFilter<"RoadmapSprintTask"> | $Enums.SprintTaskStatus
     completedAt?: DateTimeNullableWithAggregatesFilter<"RoadmapSprintTask"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"RoadmapSprintTask"> | Date | string
@@ -21646,6 +27379,266 @@ export namespace Prisma {
     assessedAt?: DateTimeWithAggregatesFilter<"SkillEvidence"> | Date | string
   }
 
+  export type MicroAssessmentWhereInput = {
+    AND?: MicroAssessmentWhereInput | MicroAssessmentWhereInput[]
+    OR?: MicroAssessmentWhereInput[]
+    NOT?: MicroAssessmentWhereInput | MicroAssessmentWhereInput[]
+    id?: StringFilter<"MicroAssessment"> | string
+    title?: StringFilter<"MicroAssessment"> | string
+    description?: StringNullableFilter<"MicroAssessment"> | string | null
+    roadmapNodeId?: StringNullableFilter<"MicroAssessment"> | string | null
+    skillId?: StringNullableFilter<"MicroAssessment"> | string | null
+    createdAt?: DateTimeFilter<"MicroAssessment"> | Date | string
+    updatedAt?: DateTimeFilter<"MicroAssessment"> | Date | string
+    roadmapNode?: XOR<RoadmapNodeNullableScalarRelationFilter, RoadmapNodeWhereInput> | null
+    skill?: XOR<SkillNullableScalarRelationFilter, SkillWhereInput> | null
+    questions?: MicroAssessmentQuestionListRelationFilter
+    attempts?: MicroAssessmentAttemptListRelationFilter
+  }
+
+  export type MicroAssessmentOrderByWithRelationInput = {
+    id?: SortOrder
+    title?: SortOrder
+    description?: SortOrderInput | SortOrder
+    roadmapNodeId?: SortOrderInput | SortOrder
+    skillId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    roadmapNode?: RoadmapNodeOrderByWithRelationInput
+    skill?: SkillOrderByWithRelationInput
+    questions?: MicroAssessmentQuestionOrderByRelationAggregateInput
+    attempts?: MicroAssessmentAttemptOrderByRelationAggregateInput
+  }
+
+  export type MicroAssessmentWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: MicroAssessmentWhereInput | MicroAssessmentWhereInput[]
+    OR?: MicroAssessmentWhereInput[]
+    NOT?: MicroAssessmentWhereInput | MicroAssessmentWhereInput[]
+    title?: StringFilter<"MicroAssessment"> | string
+    description?: StringNullableFilter<"MicroAssessment"> | string | null
+    roadmapNodeId?: StringNullableFilter<"MicroAssessment"> | string | null
+    skillId?: StringNullableFilter<"MicroAssessment"> | string | null
+    createdAt?: DateTimeFilter<"MicroAssessment"> | Date | string
+    updatedAt?: DateTimeFilter<"MicroAssessment"> | Date | string
+    roadmapNode?: XOR<RoadmapNodeNullableScalarRelationFilter, RoadmapNodeWhereInput> | null
+    skill?: XOR<SkillNullableScalarRelationFilter, SkillWhereInput> | null
+    questions?: MicroAssessmentQuestionListRelationFilter
+    attempts?: MicroAssessmentAttemptListRelationFilter
+  }, "id">
+
+  export type MicroAssessmentOrderByWithAggregationInput = {
+    id?: SortOrder
+    title?: SortOrder
+    description?: SortOrderInput | SortOrder
+    roadmapNodeId?: SortOrderInput | SortOrder
+    skillId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: MicroAssessmentCountOrderByAggregateInput
+    _max?: MicroAssessmentMaxOrderByAggregateInput
+    _min?: MicroAssessmentMinOrderByAggregateInput
+  }
+
+  export type MicroAssessmentScalarWhereWithAggregatesInput = {
+    AND?: MicroAssessmentScalarWhereWithAggregatesInput | MicroAssessmentScalarWhereWithAggregatesInput[]
+    OR?: MicroAssessmentScalarWhereWithAggregatesInput[]
+    NOT?: MicroAssessmentScalarWhereWithAggregatesInput | MicroAssessmentScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"MicroAssessment"> | string
+    title?: StringWithAggregatesFilter<"MicroAssessment"> | string
+    description?: StringNullableWithAggregatesFilter<"MicroAssessment"> | string | null
+    roadmapNodeId?: StringNullableWithAggregatesFilter<"MicroAssessment"> | string | null
+    skillId?: StringNullableWithAggregatesFilter<"MicroAssessment"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"MicroAssessment"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"MicroAssessment"> | Date | string
+  }
+
+  export type MicroAssessmentQuestionWhereInput = {
+    AND?: MicroAssessmentQuestionWhereInput | MicroAssessmentQuestionWhereInput[]
+    OR?: MicroAssessmentQuestionWhereInput[]
+    NOT?: MicroAssessmentQuestionWhereInput | MicroAssessmentQuestionWhereInput[]
+    id?: StringFilter<"MicroAssessmentQuestion"> | string
+    assessmentId?: StringFilter<"MicroAssessmentQuestion"> | string
+    questionText?: StringFilter<"MicroAssessmentQuestion"> | string
+    options?: StringNullableListFilter<"MicroAssessmentQuestion">
+    correctOptionIndex?: IntFilter<"MicroAssessmentQuestion"> | number
+    explanation?: StringNullableFilter<"MicroAssessmentQuestion"> | string | null
+    orderIndex?: IntFilter<"MicroAssessmentQuestion"> | number
+    createdAt?: DateTimeFilter<"MicroAssessmentQuestion"> | Date | string
+    assessment?: XOR<MicroAssessmentScalarRelationFilter, MicroAssessmentWhereInput>
+  }
+
+  export type MicroAssessmentQuestionOrderByWithRelationInput = {
+    id?: SortOrder
+    assessmentId?: SortOrder
+    questionText?: SortOrder
+    options?: SortOrder
+    correctOptionIndex?: SortOrder
+    explanation?: SortOrderInput | SortOrder
+    orderIndex?: SortOrder
+    createdAt?: SortOrder
+    assessment?: MicroAssessmentOrderByWithRelationInput
+  }
+
+  export type MicroAssessmentQuestionWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: MicroAssessmentQuestionWhereInput | MicroAssessmentQuestionWhereInput[]
+    OR?: MicroAssessmentQuestionWhereInput[]
+    NOT?: MicroAssessmentQuestionWhereInput | MicroAssessmentQuestionWhereInput[]
+    assessmentId?: StringFilter<"MicroAssessmentQuestion"> | string
+    questionText?: StringFilter<"MicroAssessmentQuestion"> | string
+    options?: StringNullableListFilter<"MicroAssessmentQuestion">
+    correctOptionIndex?: IntFilter<"MicroAssessmentQuestion"> | number
+    explanation?: StringNullableFilter<"MicroAssessmentQuestion"> | string | null
+    orderIndex?: IntFilter<"MicroAssessmentQuestion"> | number
+    createdAt?: DateTimeFilter<"MicroAssessmentQuestion"> | Date | string
+    assessment?: XOR<MicroAssessmentScalarRelationFilter, MicroAssessmentWhereInput>
+  }, "id">
+
+  export type MicroAssessmentQuestionOrderByWithAggregationInput = {
+    id?: SortOrder
+    assessmentId?: SortOrder
+    questionText?: SortOrder
+    options?: SortOrder
+    correctOptionIndex?: SortOrder
+    explanation?: SortOrderInput | SortOrder
+    orderIndex?: SortOrder
+    createdAt?: SortOrder
+    _count?: MicroAssessmentQuestionCountOrderByAggregateInput
+    _avg?: MicroAssessmentQuestionAvgOrderByAggregateInput
+    _max?: MicroAssessmentQuestionMaxOrderByAggregateInput
+    _min?: MicroAssessmentQuestionMinOrderByAggregateInput
+    _sum?: MicroAssessmentQuestionSumOrderByAggregateInput
+  }
+
+  export type MicroAssessmentQuestionScalarWhereWithAggregatesInput = {
+    AND?: MicroAssessmentQuestionScalarWhereWithAggregatesInput | MicroAssessmentQuestionScalarWhereWithAggregatesInput[]
+    OR?: MicroAssessmentQuestionScalarWhereWithAggregatesInput[]
+    NOT?: MicroAssessmentQuestionScalarWhereWithAggregatesInput | MicroAssessmentQuestionScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"MicroAssessmentQuestion"> | string
+    assessmentId?: StringWithAggregatesFilter<"MicroAssessmentQuestion"> | string
+    questionText?: StringWithAggregatesFilter<"MicroAssessmentQuestion"> | string
+    options?: StringNullableListFilter<"MicroAssessmentQuestion">
+    correctOptionIndex?: IntWithAggregatesFilter<"MicroAssessmentQuestion"> | number
+    explanation?: StringNullableWithAggregatesFilter<"MicroAssessmentQuestion"> | string | null
+    orderIndex?: IntWithAggregatesFilter<"MicroAssessmentQuestion"> | number
+    createdAt?: DateTimeWithAggregatesFilter<"MicroAssessmentQuestion"> | Date | string
+  }
+
+  export type MicroAssessmentAttemptWhereInput = {
+    AND?: MicroAssessmentAttemptWhereInput | MicroAssessmentAttemptWhereInput[]
+    OR?: MicroAssessmentAttemptWhereInput[]
+    NOT?: MicroAssessmentAttemptWhereInput | MicroAssessmentAttemptWhereInput[]
+    id?: StringFilter<"MicroAssessmentAttempt"> | string
+    assessmentId?: StringFilter<"MicroAssessmentAttempt"> | string
+    userId?: StringFilter<"MicroAssessmentAttempt"> | string
+    userRoadmapId?: StringNullableFilter<"MicroAssessmentAttempt"> | string | null
+    sprintId?: StringNullableFilter<"MicroAssessmentAttempt"> | string | null
+    sprintTaskId?: StringNullableFilter<"MicroAssessmentAttempt"> | string | null
+    skillId?: StringNullableFilter<"MicroAssessmentAttempt"> | string | null
+    totalQuestions?: IntFilter<"MicroAssessmentAttempt"> | number
+    correctAnswers?: IntFilter<"MicroAssessmentAttempt"> | number
+    score?: IntFilter<"MicroAssessmentAttempt"> | number
+    passed?: BoolFilter<"MicroAssessmentAttempt"> | boolean
+    answers?: JsonFilter<"MicroAssessmentAttempt">
+    completedAt?: DateTimeFilter<"MicroAssessmentAttempt"> | Date | string
+    createdAt?: DateTimeFilter<"MicroAssessmentAttempt"> | Date | string
+    assessment?: XOR<MicroAssessmentScalarRelationFilter, MicroAssessmentWhereInput>
+    userRoadmap?: XOR<UserRoadmapNullableScalarRelationFilter, UserRoadmapWhereInput> | null
+    sprint?: XOR<RoadmapSprintNullableScalarRelationFilter, RoadmapSprintWhereInput> | null
+    sprintTask?: XOR<RoadmapSprintTaskNullableScalarRelationFilter, RoadmapSprintTaskWhereInput> | null
+    skill?: XOR<SkillNullableScalarRelationFilter, SkillWhereInput> | null
+  }
+
+  export type MicroAssessmentAttemptOrderByWithRelationInput = {
+    id?: SortOrder
+    assessmentId?: SortOrder
+    userId?: SortOrder
+    userRoadmapId?: SortOrderInput | SortOrder
+    sprintId?: SortOrderInput | SortOrder
+    sprintTaskId?: SortOrderInput | SortOrder
+    skillId?: SortOrderInput | SortOrder
+    totalQuestions?: SortOrder
+    correctAnswers?: SortOrder
+    score?: SortOrder
+    passed?: SortOrder
+    answers?: SortOrder
+    completedAt?: SortOrder
+    createdAt?: SortOrder
+    assessment?: MicroAssessmentOrderByWithRelationInput
+    userRoadmap?: UserRoadmapOrderByWithRelationInput
+    sprint?: RoadmapSprintOrderByWithRelationInput
+    sprintTask?: RoadmapSprintTaskOrderByWithRelationInput
+    skill?: SkillOrderByWithRelationInput
+  }
+
+  export type MicroAssessmentAttemptWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: MicroAssessmentAttemptWhereInput | MicroAssessmentAttemptWhereInput[]
+    OR?: MicroAssessmentAttemptWhereInput[]
+    NOT?: MicroAssessmentAttemptWhereInput | MicroAssessmentAttemptWhereInput[]
+    assessmentId?: StringFilter<"MicroAssessmentAttempt"> | string
+    userId?: StringFilter<"MicroAssessmentAttempt"> | string
+    userRoadmapId?: StringNullableFilter<"MicroAssessmentAttempt"> | string | null
+    sprintId?: StringNullableFilter<"MicroAssessmentAttempt"> | string | null
+    sprintTaskId?: StringNullableFilter<"MicroAssessmentAttempt"> | string | null
+    skillId?: StringNullableFilter<"MicroAssessmentAttempt"> | string | null
+    totalQuestions?: IntFilter<"MicroAssessmentAttempt"> | number
+    correctAnswers?: IntFilter<"MicroAssessmentAttempt"> | number
+    score?: IntFilter<"MicroAssessmentAttempt"> | number
+    passed?: BoolFilter<"MicroAssessmentAttempt"> | boolean
+    answers?: JsonFilter<"MicroAssessmentAttempt">
+    completedAt?: DateTimeFilter<"MicroAssessmentAttempt"> | Date | string
+    createdAt?: DateTimeFilter<"MicroAssessmentAttempt"> | Date | string
+    assessment?: XOR<MicroAssessmentScalarRelationFilter, MicroAssessmentWhereInput>
+    userRoadmap?: XOR<UserRoadmapNullableScalarRelationFilter, UserRoadmapWhereInput> | null
+    sprint?: XOR<RoadmapSprintNullableScalarRelationFilter, RoadmapSprintWhereInput> | null
+    sprintTask?: XOR<RoadmapSprintTaskNullableScalarRelationFilter, RoadmapSprintTaskWhereInput> | null
+    skill?: XOR<SkillNullableScalarRelationFilter, SkillWhereInput> | null
+  }, "id">
+
+  export type MicroAssessmentAttemptOrderByWithAggregationInput = {
+    id?: SortOrder
+    assessmentId?: SortOrder
+    userId?: SortOrder
+    userRoadmapId?: SortOrderInput | SortOrder
+    sprintId?: SortOrderInput | SortOrder
+    sprintTaskId?: SortOrderInput | SortOrder
+    skillId?: SortOrderInput | SortOrder
+    totalQuestions?: SortOrder
+    correctAnswers?: SortOrder
+    score?: SortOrder
+    passed?: SortOrder
+    answers?: SortOrder
+    completedAt?: SortOrder
+    createdAt?: SortOrder
+    _count?: MicroAssessmentAttemptCountOrderByAggregateInput
+    _avg?: MicroAssessmentAttemptAvgOrderByAggregateInput
+    _max?: MicroAssessmentAttemptMaxOrderByAggregateInput
+    _min?: MicroAssessmentAttemptMinOrderByAggregateInput
+    _sum?: MicroAssessmentAttemptSumOrderByAggregateInput
+  }
+
+  export type MicroAssessmentAttemptScalarWhereWithAggregatesInput = {
+    AND?: MicroAssessmentAttemptScalarWhereWithAggregatesInput | MicroAssessmentAttemptScalarWhereWithAggregatesInput[]
+    OR?: MicroAssessmentAttemptScalarWhereWithAggregatesInput[]
+    NOT?: MicroAssessmentAttemptScalarWhereWithAggregatesInput | MicroAssessmentAttemptScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"MicroAssessmentAttempt"> | string
+    assessmentId?: StringWithAggregatesFilter<"MicroAssessmentAttempt"> | string
+    userId?: StringWithAggregatesFilter<"MicroAssessmentAttempt"> | string
+    userRoadmapId?: StringNullableWithAggregatesFilter<"MicroAssessmentAttempt"> | string | null
+    sprintId?: StringNullableWithAggregatesFilter<"MicroAssessmentAttempt"> | string | null
+    sprintTaskId?: StringNullableWithAggregatesFilter<"MicroAssessmentAttempt"> | string | null
+    skillId?: StringNullableWithAggregatesFilter<"MicroAssessmentAttempt"> | string | null
+    totalQuestions?: IntWithAggregatesFilter<"MicroAssessmentAttempt"> | number
+    correctAnswers?: IntWithAggregatesFilter<"MicroAssessmentAttempt"> | number
+    score?: IntWithAggregatesFilter<"MicroAssessmentAttempt"> | number
+    passed?: BoolWithAggregatesFilter<"MicroAssessmentAttempt"> | boolean
+    answers?: JsonWithAggregatesFilter<"MicroAssessmentAttempt">
+    completedAt?: DateTimeWithAggregatesFilter<"MicroAssessmentAttempt"> | Date | string
+    createdAt?: DateTimeWithAggregatesFilter<"MicroAssessmentAttempt"> | Date | string
+  }
+
   export type RoadmapAdaptationWhereInput = {
     AND?: RoadmapAdaptationWhereInput | RoadmapAdaptationWhereInput[]
     OR?: RoadmapAdaptationWhereInput[]
@@ -21731,6 +27724,7 @@ export namespace Prisma {
     id?: StringFilter<"DiscussionPost"> | string
     userId?: StringFilter<"DiscussionPost"> | string
     userName?: StringFilter<"DiscussionPost"> | string
+    userAvatar?: StringNullableFilter<"DiscussionPost"> | string | null
     roleCategory?: StringFilter<"DiscussionPost"> | string
     title?: StringFilter<"DiscussionPost"> | string
     content?: StringFilter<"DiscussionPost"> | string
@@ -21738,12 +27732,15 @@ export namespace Prisma {
     upvotes?: IntFilter<"DiscussionPost"> | number
     aiReply?: StringNullableFilter<"DiscussionPost"> | string | null
     createdAt?: DateTimeFilter<"DiscussionPost"> | Date | string
+    updatedAt?: DateTimeFilter<"DiscussionPost"> | Date | string
+    comments?: DiscussionCommentListRelationFilter
   }
 
   export type DiscussionPostOrderByWithRelationInput = {
     id?: SortOrder
     userId?: SortOrder
     userName?: SortOrder
+    userAvatar?: SortOrderInput | SortOrder
     roleCategory?: SortOrder
     title?: SortOrder
     content?: SortOrder
@@ -21751,6 +27748,8 @@ export namespace Prisma {
     upvotes?: SortOrder
     aiReply?: SortOrderInput | SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
+    comments?: DiscussionCommentOrderByRelationAggregateInput
   }
 
   export type DiscussionPostWhereUniqueInput = Prisma.AtLeast<{
@@ -21760,6 +27759,7 @@ export namespace Prisma {
     NOT?: DiscussionPostWhereInput | DiscussionPostWhereInput[]
     userId?: StringFilter<"DiscussionPost"> | string
     userName?: StringFilter<"DiscussionPost"> | string
+    userAvatar?: StringNullableFilter<"DiscussionPost"> | string | null
     roleCategory?: StringFilter<"DiscussionPost"> | string
     title?: StringFilter<"DiscussionPost"> | string
     content?: StringFilter<"DiscussionPost"> | string
@@ -21767,12 +27767,15 @@ export namespace Prisma {
     upvotes?: IntFilter<"DiscussionPost"> | number
     aiReply?: StringNullableFilter<"DiscussionPost"> | string | null
     createdAt?: DateTimeFilter<"DiscussionPost"> | Date | string
+    updatedAt?: DateTimeFilter<"DiscussionPost"> | Date | string
+    comments?: DiscussionCommentListRelationFilter
   }, "id">
 
   export type DiscussionPostOrderByWithAggregationInput = {
     id?: SortOrder
     userId?: SortOrder
     userName?: SortOrder
+    userAvatar?: SortOrderInput | SortOrder
     roleCategory?: SortOrder
     title?: SortOrder
     content?: SortOrder
@@ -21780,6 +27783,7 @@ export namespace Prisma {
     upvotes?: SortOrder
     aiReply?: SortOrderInput | SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
     _count?: DiscussionPostCountOrderByAggregateInput
     _avg?: DiscussionPostAvgOrderByAggregateInput
     _max?: DiscussionPostMaxOrderByAggregateInput
@@ -21794,6 +27798,7 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"DiscussionPost"> | string
     userId?: StringWithAggregatesFilter<"DiscussionPost"> | string
     userName?: StringWithAggregatesFilter<"DiscussionPost"> | string
+    userAvatar?: StringNullableWithAggregatesFilter<"DiscussionPost"> | string | null
     roleCategory?: StringWithAggregatesFilter<"DiscussionPost"> | string
     title?: StringWithAggregatesFilter<"DiscussionPost"> | string
     content?: StringWithAggregatesFilter<"DiscussionPost"> | string
@@ -21801,18 +27806,94 @@ export namespace Prisma {
     upvotes?: IntWithAggregatesFilter<"DiscussionPost"> | number
     aiReply?: StringNullableWithAggregatesFilter<"DiscussionPost"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"DiscussionPost"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"DiscussionPost"> | Date | string
+  }
+
+  export type DiscussionCommentWhereInput = {
+    AND?: DiscussionCommentWhereInput | DiscussionCommentWhereInput[]
+    OR?: DiscussionCommentWhereInput[]
+    NOT?: DiscussionCommentWhereInput | DiscussionCommentWhereInput[]
+    id?: StringFilter<"DiscussionComment"> | string
+    postId?: StringFilter<"DiscussionComment"> | string
+    userId?: StringFilter<"DiscussionComment"> | string
+    userName?: StringFilter<"DiscussionComment"> | string
+    userAvatar?: StringNullableFilter<"DiscussionComment"> | string | null
+    content?: StringFilter<"DiscussionComment"> | string
+    upvotes?: IntFilter<"DiscussionComment"> | number
+    createdAt?: DateTimeFilter<"DiscussionComment"> | Date | string
+    post?: XOR<DiscussionPostScalarRelationFilter, DiscussionPostWhereInput>
+  }
+
+  export type DiscussionCommentOrderByWithRelationInput = {
+    id?: SortOrder
+    postId?: SortOrder
+    userId?: SortOrder
+    userName?: SortOrder
+    userAvatar?: SortOrderInput | SortOrder
+    content?: SortOrder
+    upvotes?: SortOrder
+    createdAt?: SortOrder
+    post?: DiscussionPostOrderByWithRelationInput
+  }
+
+  export type DiscussionCommentWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: DiscussionCommentWhereInput | DiscussionCommentWhereInput[]
+    OR?: DiscussionCommentWhereInput[]
+    NOT?: DiscussionCommentWhereInput | DiscussionCommentWhereInput[]
+    postId?: StringFilter<"DiscussionComment"> | string
+    userId?: StringFilter<"DiscussionComment"> | string
+    userName?: StringFilter<"DiscussionComment"> | string
+    userAvatar?: StringNullableFilter<"DiscussionComment"> | string | null
+    content?: StringFilter<"DiscussionComment"> | string
+    upvotes?: IntFilter<"DiscussionComment"> | number
+    createdAt?: DateTimeFilter<"DiscussionComment"> | Date | string
+    post?: XOR<DiscussionPostScalarRelationFilter, DiscussionPostWhereInput>
+  }, "id">
+
+  export type DiscussionCommentOrderByWithAggregationInput = {
+    id?: SortOrder
+    postId?: SortOrder
+    userId?: SortOrder
+    userName?: SortOrder
+    userAvatar?: SortOrderInput | SortOrder
+    content?: SortOrder
+    upvotes?: SortOrder
+    createdAt?: SortOrder
+    _count?: DiscussionCommentCountOrderByAggregateInput
+    _avg?: DiscussionCommentAvgOrderByAggregateInput
+    _max?: DiscussionCommentMaxOrderByAggregateInput
+    _min?: DiscussionCommentMinOrderByAggregateInput
+    _sum?: DiscussionCommentSumOrderByAggregateInput
+  }
+
+  export type DiscussionCommentScalarWhereWithAggregatesInput = {
+    AND?: DiscussionCommentScalarWhereWithAggregatesInput | DiscussionCommentScalarWhereWithAggregatesInput[]
+    OR?: DiscussionCommentScalarWhereWithAggregatesInput[]
+    NOT?: DiscussionCommentScalarWhereWithAggregatesInput | DiscussionCommentScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"DiscussionComment"> | string
+    postId?: StringWithAggregatesFilter<"DiscussionComment"> | string
+    userId?: StringWithAggregatesFilter<"DiscussionComment"> | string
+    userName?: StringWithAggregatesFilter<"DiscussionComment"> | string
+    userAvatar?: StringNullableWithAggregatesFilter<"DiscussionComment"> | string | null
+    content?: StringWithAggregatesFilter<"DiscussionComment"> | string
+    upvotes?: IntWithAggregatesFilter<"DiscussionComment"> | number
+    createdAt?: DateTimeWithAggregatesFilter<"DiscussionComment"> | Date | string
   }
 
   export type CareerRoadmapCreateInput = {
     id?: string
     userId: string
-    rolePath: string
-    targetCompanyTier?: string
-    overallReadiness?: number
-    nodesData: JsonNullValueInput | InputJsonValue
-    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     title?: string | null
     description?: string | null
+    rolePath: string
+    targetCompanyTier?: string
+    estimatedWeeks?: number
+    overallReadiness?: number
+    isPublic?: boolean
+    isOfficial?: boolean
+    nodesData: JsonNullValueInput | InputJsonValue
+    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     visibility?: $Enums.RoadmapVisibility
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -21825,13 +27906,16 @@ export namespace Prisma {
   export type CareerRoadmapUncheckedCreateInput = {
     id?: string
     userId: string
-    rolePath: string
-    targetCompanyTier?: string
-    overallReadiness?: number
-    nodesData: JsonNullValueInput | InputJsonValue
-    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     title?: string | null
     description?: string | null
+    rolePath: string
+    targetCompanyTier?: string
+    estimatedWeeks?: number
+    overallReadiness?: number
+    isPublic?: boolean
+    isOfficial?: boolean
+    nodesData: JsonNullValueInput | InputJsonValue
+    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     visibility?: $Enums.RoadmapVisibility
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -21844,13 +27928,16 @@ export namespace Prisma {
   export type CareerRoadmapUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    rolePath?: StringFieldUpdateOperationsInput | string
-    targetCompanyTier?: StringFieldUpdateOperationsInput | string
-    overallReadiness?: IntFieldUpdateOperationsInput | number
-    nodesData?: JsonNullValueInput | InputJsonValue
-    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     title?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    rolePath?: StringFieldUpdateOperationsInput | string
+    targetCompanyTier?: StringFieldUpdateOperationsInput | string
+    estimatedWeeks?: IntFieldUpdateOperationsInput | number
+    overallReadiness?: IntFieldUpdateOperationsInput | number
+    isPublic?: BoolFieldUpdateOperationsInput | boolean
+    isOfficial?: BoolFieldUpdateOperationsInput | boolean
+    nodesData?: JsonNullValueInput | InputJsonValue
+    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     visibility?: EnumRoadmapVisibilityFieldUpdateOperationsInput | $Enums.RoadmapVisibility
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -21863,13 +27950,16 @@ export namespace Prisma {
   export type CareerRoadmapUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    rolePath?: StringFieldUpdateOperationsInput | string
-    targetCompanyTier?: StringFieldUpdateOperationsInput | string
-    overallReadiness?: IntFieldUpdateOperationsInput | number
-    nodesData?: JsonNullValueInput | InputJsonValue
-    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     title?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    rolePath?: StringFieldUpdateOperationsInput | string
+    targetCompanyTier?: StringFieldUpdateOperationsInput | string
+    estimatedWeeks?: IntFieldUpdateOperationsInput | number
+    overallReadiness?: IntFieldUpdateOperationsInput | number
+    isPublic?: BoolFieldUpdateOperationsInput | boolean
+    isOfficial?: BoolFieldUpdateOperationsInput | boolean
+    nodesData?: JsonNullValueInput | InputJsonValue
+    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     visibility?: EnumRoadmapVisibilityFieldUpdateOperationsInput | $Enums.RoadmapVisibility
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -21882,13 +27972,16 @@ export namespace Prisma {
   export type CareerRoadmapCreateManyInput = {
     id?: string
     userId: string
-    rolePath: string
-    targetCompanyTier?: string
-    overallReadiness?: number
-    nodesData: JsonNullValueInput | InputJsonValue
-    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     title?: string | null
     description?: string | null
+    rolePath: string
+    targetCompanyTier?: string
+    estimatedWeeks?: number
+    overallReadiness?: number
+    isPublic?: boolean
+    isOfficial?: boolean
+    nodesData: JsonNullValueInput | InputJsonValue
+    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     visibility?: $Enums.RoadmapVisibility
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -21897,13 +27990,16 @@ export namespace Prisma {
   export type CareerRoadmapUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    rolePath?: StringFieldUpdateOperationsInput | string
-    targetCompanyTier?: StringFieldUpdateOperationsInput | string
-    overallReadiness?: IntFieldUpdateOperationsInput | number
-    nodesData?: JsonNullValueInput | InputJsonValue
-    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     title?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    rolePath?: StringFieldUpdateOperationsInput | string
+    targetCompanyTier?: StringFieldUpdateOperationsInput | string
+    estimatedWeeks?: IntFieldUpdateOperationsInput | number
+    overallReadiness?: IntFieldUpdateOperationsInput | number
+    isPublic?: BoolFieldUpdateOperationsInput | boolean
+    isOfficial?: BoolFieldUpdateOperationsInput | boolean
+    nodesData?: JsonNullValueInput | InputJsonValue
+    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     visibility?: EnumRoadmapVisibilityFieldUpdateOperationsInput | $Enums.RoadmapVisibility
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -21912,13 +28008,16 @@ export namespace Prisma {
   export type CareerRoadmapUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    rolePath?: StringFieldUpdateOperationsInput | string
-    targetCompanyTier?: StringFieldUpdateOperationsInput | string
-    overallReadiness?: IntFieldUpdateOperationsInput | number
-    nodesData?: JsonNullValueInput | InputJsonValue
-    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     title?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    rolePath?: StringFieldUpdateOperationsInput | string
+    targetCompanyTier?: StringFieldUpdateOperationsInput | string
+    estimatedWeeks?: IntFieldUpdateOperationsInput | number
+    overallReadiness?: IntFieldUpdateOperationsInput | number
+    isPublic?: BoolFieldUpdateOperationsInput | boolean
+    isOfficial?: BoolFieldUpdateOperationsInput | boolean
+    nodesData?: JsonNullValueInput | InputJsonValue
+    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     visibility?: EnumRoadmapVisibilityFieldUpdateOperationsInput | $Enums.RoadmapVisibility
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -22052,6 +28151,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     nodeLinks?: RoadmapNodeSkillCreateNestedManyWithoutSkillInput
     evidence?: SkillEvidenceCreateNestedManyWithoutSkillInput
+    assessments?: MicroAssessmentCreateNestedManyWithoutSkillInput
+    assessmentAttempts?: MicroAssessmentAttemptCreateNestedManyWithoutSkillInput
     outgoingLinks?: SkillRelationshipCreateNestedManyWithoutFromSkillInput
     incomingLinks?: SkillRelationshipCreateNestedManyWithoutToSkillInput
   }
@@ -22066,6 +28167,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     nodeLinks?: RoadmapNodeSkillUncheckedCreateNestedManyWithoutSkillInput
     evidence?: SkillEvidenceUncheckedCreateNestedManyWithoutSkillInput
+    assessments?: MicroAssessmentUncheckedCreateNestedManyWithoutSkillInput
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedCreateNestedManyWithoutSkillInput
     outgoingLinks?: SkillRelationshipUncheckedCreateNestedManyWithoutFromSkillInput
     incomingLinks?: SkillRelationshipUncheckedCreateNestedManyWithoutToSkillInput
   }
@@ -22080,6 +28183,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     nodeLinks?: RoadmapNodeSkillUpdateManyWithoutSkillNestedInput
     evidence?: SkillEvidenceUpdateManyWithoutSkillNestedInput
+    assessments?: MicroAssessmentUpdateManyWithoutSkillNestedInput
+    assessmentAttempts?: MicroAssessmentAttemptUpdateManyWithoutSkillNestedInput
     outgoingLinks?: SkillRelationshipUpdateManyWithoutFromSkillNestedInput
     incomingLinks?: SkillRelationshipUpdateManyWithoutToSkillNestedInput
   }
@@ -22094,6 +28199,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     nodeLinks?: RoadmapNodeSkillUncheckedUpdateManyWithoutSkillNestedInput
     evidence?: SkillEvidenceUncheckedUpdateManyWithoutSkillNestedInput
+    assessments?: MicroAssessmentUncheckedUpdateManyWithoutSkillNestedInput
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedUpdateManyWithoutSkillNestedInput
     outgoingLinks?: SkillRelationshipUncheckedUpdateManyWithoutFromSkillNestedInput
     incomingLinks?: SkillRelationshipUncheckedUpdateManyWithoutToSkillNestedInput
   }
@@ -22264,12 +28371,14 @@ export namespace Prisma {
     orderIndex: number
     estimatedMinutes?: number
     requiresEvidence?: boolean
+    requiresAssessment?: boolean
     targetProficiency?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
     roadmap: CareerRoadmapCreateNestedOneWithoutNodesInput
     phase?: RoadmapPhaseCreateNestedOneWithoutNodesInput
     skills?: RoadmapNodeSkillCreateNestedManyWithoutNodeInput
+    assessments?: MicroAssessmentCreateNestedManyWithoutRoadmapNodeInput
     prerequisites?: RoadmapNodeDependencyCreateNestedManyWithoutNodeInput
     unlocks?: RoadmapNodeDependencyCreateNestedManyWithoutPrerequisiteNodeInput
     sprintTasks?: RoadmapSprintTaskCreateNestedManyWithoutRoadmapNodeInput
@@ -22286,10 +28395,12 @@ export namespace Prisma {
     orderIndex: number
     estimatedMinutes?: number
     requiresEvidence?: boolean
+    requiresAssessment?: boolean
     targetProficiency?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
     skills?: RoadmapNodeSkillUncheckedCreateNestedManyWithoutNodeInput
+    assessments?: MicroAssessmentUncheckedCreateNestedManyWithoutRoadmapNodeInput
     prerequisites?: RoadmapNodeDependencyUncheckedCreateNestedManyWithoutNodeInput
     unlocks?: RoadmapNodeDependencyUncheckedCreateNestedManyWithoutPrerequisiteNodeInput
     sprintTasks?: RoadmapSprintTaskUncheckedCreateNestedManyWithoutRoadmapNodeInput
@@ -22304,12 +28415,14 @@ export namespace Prisma {
     orderIndex?: IntFieldUpdateOperationsInput | number
     estimatedMinutes?: IntFieldUpdateOperationsInput | number
     requiresEvidence?: BoolFieldUpdateOperationsInput | boolean
+    requiresAssessment?: BoolFieldUpdateOperationsInput | boolean
     targetProficiency?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     roadmap?: CareerRoadmapUpdateOneRequiredWithoutNodesNestedInput
     phase?: RoadmapPhaseUpdateOneWithoutNodesNestedInput
     skills?: RoadmapNodeSkillUpdateManyWithoutNodeNestedInput
+    assessments?: MicroAssessmentUpdateManyWithoutRoadmapNodeNestedInput
     prerequisites?: RoadmapNodeDependencyUpdateManyWithoutNodeNestedInput
     unlocks?: RoadmapNodeDependencyUpdateManyWithoutPrerequisiteNodeNestedInput
     sprintTasks?: RoadmapSprintTaskUpdateManyWithoutRoadmapNodeNestedInput
@@ -22326,10 +28439,12 @@ export namespace Prisma {
     orderIndex?: IntFieldUpdateOperationsInput | number
     estimatedMinutes?: IntFieldUpdateOperationsInput | number
     requiresEvidence?: BoolFieldUpdateOperationsInput | boolean
+    requiresAssessment?: BoolFieldUpdateOperationsInput | boolean
     targetProficiency?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     skills?: RoadmapNodeSkillUncheckedUpdateManyWithoutNodeNestedInput
+    assessments?: MicroAssessmentUncheckedUpdateManyWithoutRoadmapNodeNestedInput
     prerequisites?: RoadmapNodeDependencyUncheckedUpdateManyWithoutNodeNestedInput
     unlocks?: RoadmapNodeDependencyUncheckedUpdateManyWithoutPrerequisiteNodeNestedInput
     sprintTasks?: RoadmapSprintTaskUncheckedUpdateManyWithoutRoadmapNodeNestedInput
@@ -22346,6 +28461,7 @@ export namespace Prisma {
     orderIndex: number
     estimatedMinutes?: number
     requiresEvidence?: boolean
+    requiresAssessment?: boolean
     targetProficiency?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -22360,6 +28476,7 @@ export namespace Prisma {
     orderIndex?: IntFieldUpdateOperationsInput | number
     estimatedMinutes?: IntFieldUpdateOperationsInput | number
     requiresEvidence?: BoolFieldUpdateOperationsInput | boolean
+    requiresAssessment?: BoolFieldUpdateOperationsInput | boolean
     targetProficiency?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -22376,6 +28493,7 @@ export namespace Prisma {
     orderIndex?: IntFieldUpdateOperationsInput | number
     estimatedMinutes?: IntFieldUpdateOperationsInput | number
     requiresEvidence?: BoolFieldUpdateOperationsInput | boolean
+    requiresAssessment?: BoolFieldUpdateOperationsInput | boolean
     targetProficiency?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -22466,6 +28584,7 @@ export namespace Prisma {
     sourceRoadmap: CareerRoadmapCreateNestedOneWithoutFollowersInput
     sprints?: RoadmapSprintCreateNestedManyWithoutUserRoadmapInput
     skillEvidence?: SkillEvidenceCreateNestedManyWithoutUserRoadmapInput
+    assessmentAttempts?: MicroAssessmentAttemptCreateNestedManyWithoutUserRoadmapInput
     adaptations?: RoadmapAdaptationCreateNestedManyWithoutUserRoadmapInput
   }
 
@@ -22480,6 +28599,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     sprints?: RoadmapSprintUncheckedCreateNestedManyWithoutUserRoadmapInput
     skillEvidence?: SkillEvidenceUncheckedCreateNestedManyWithoutUserRoadmapInput
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedCreateNestedManyWithoutUserRoadmapInput
     adaptations?: RoadmapAdaptationUncheckedCreateNestedManyWithoutUserRoadmapInput
   }
 
@@ -22494,6 +28614,7 @@ export namespace Prisma {
     sourceRoadmap?: CareerRoadmapUpdateOneRequiredWithoutFollowersNestedInput
     sprints?: RoadmapSprintUpdateManyWithoutUserRoadmapNestedInput
     skillEvidence?: SkillEvidenceUpdateManyWithoutUserRoadmapNestedInput
+    assessmentAttempts?: MicroAssessmentAttemptUpdateManyWithoutUserRoadmapNestedInput
     adaptations?: RoadmapAdaptationUpdateManyWithoutUserRoadmapNestedInput
   }
 
@@ -22508,6 +28629,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sprints?: RoadmapSprintUncheckedUpdateManyWithoutUserRoadmapNestedInput
     skillEvidence?: SkillEvidenceUncheckedUpdateManyWithoutUserRoadmapNestedInput
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedUpdateManyWithoutUserRoadmapNestedInput
     adaptations?: RoadmapAdaptationUncheckedUpdateManyWithoutUserRoadmapNestedInput
   }
 
@@ -22557,6 +28679,7 @@ export namespace Prisma {
     userRoadmap: UserRoadmapCreateNestedOneWithoutSprintsInput
     tasks?: RoadmapSprintTaskCreateNestedManyWithoutSprintInput
     performance?: SprintPerformanceCreateNestedOneWithoutSprintInput
+    assessmentAttempts?: MicroAssessmentAttemptCreateNestedManyWithoutSprintInput
     adaptations?: RoadmapAdaptationCreateNestedManyWithoutSprintInput
   }
 
@@ -22574,6 +28697,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     tasks?: RoadmapSprintTaskUncheckedCreateNestedManyWithoutSprintInput
     performance?: SprintPerformanceUncheckedCreateNestedOneWithoutSprintInput
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedCreateNestedManyWithoutSprintInput
     adaptations?: RoadmapAdaptationUncheckedCreateNestedManyWithoutSprintInput
   }
 
@@ -22591,6 +28715,7 @@ export namespace Prisma {
     userRoadmap?: UserRoadmapUpdateOneRequiredWithoutSprintsNestedInput
     tasks?: RoadmapSprintTaskUpdateManyWithoutSprintNestedInput
     performance?: SprintPerformanceUpdateOneWithoutSprintNestedInput
+    assessmentAttempts?: MicroAssessmentAttemptUpdateManyWithoutSprintNestedInput
     adaptations?: RoadmapAdaptationUpdateManyWithoutSprintNestedInput
   }
 
@@ -22608,6 +28733,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     tasks?: RoadmapSprintTaskUncheckedUpdateManyWithoutSprintNestedInput
     performance?: SprintPerformanceUncheckedUpdateOneWithoutSprintNestedInput
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedUpdateManyWithoutSprintNestedInput
     adaptations?: RoadmapAdaptationUncheckedUpdateManyWithoutSprintNestedInput
   }
 
@@ -22659,12 +28785,14 @@ export namespace Prisma {
     orderIndex: number
     estimatedMinutes?: number
     requiresEvidence?: boolean
+    requiresAssessment?: boolean
     status?: $Enums.SprintTaskStatus
     completedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     sprint: RoadmapSprintCreateNestedOneWithoutTasksInput
     roadmapNode?: RoadmapNodeCreateNestedOneWithoutSprintTasksInput
+    assessmentAttempts?: MicroAssessmentAttemptCreateNestedManyWithoutSprintTaskInput
   }
 
   export type RoadmapSprintTaskUncheckedCreateInput = {
@@ -22676,10 +28804,12 @@ export namespace Prisma {
     orderIndex: number
     estimatedMinutes?: number
     requiresEvidence?: boolean
+    requiresAssessment?: boolean
     status?: $Enums.SprintTaskStatus
     completedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedCreateNestedManyWithoutSprintTaskInput
   }
 
   export type RoadmapSprintTaskUpdateInput = {
@@ -22689,12 +28819,14 @@ export namespace Prisma {
     orderIndex?: IntFieldUpdateOperationsInput | number
     estimatedMinutes?: IntFieldUpdateOperationsInput | number
     requiresEvidence?: BoolFieldUpdateOperationsInput | boolean
+    requiresAssessment?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumSprintTaskStatusFieldUpdateOperationsInput | $Enums.SprintTaskStatus
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sprint?: RoadmapSprintUpdateOneRequiredWithoutTasksNestedInput
     roadmapNode?: RoadmapNodeUpdateOneWithoutSprintTasksNestedInput
+    assessmentAttempts?: MicroAssessmentAttemptUpdateManyWithoutSprintTaskNestedInput
   }
 
   export type RoadmapSprintTaskUncheckedUpdateInput = {
@@ -22706,10 +28838,12 @@ export namespace Prisma {
     orderIndex?: IntFieldUpdateOperationsInput | number
     estimatedMinutes?: IntFieldUpdateOperationsInput | number
     requiresEvidence?: BoolFieldUpdateOperationsInput | boolean
+    requiresAssessment?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumSprintTaskStatusFieldUpdateOperationsInput | $Enums.SprintTaskStatus
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedUpdateManyWithoutSprintTaskNestedInput
   }
 
   export type RoadmapSprintTaskCreateManyInput = {
@@ -22721,6 +28855,7 @@ export namespace Prisma {
     orderIndex: number
     estimatedMinutes?: number
     requiresEvidence?: boolean
+    requiresAssessment?: boolean
     status?: $Enums.SprintTaskStatus
     completedAt?: Date | string | null
     createdAt?: Date | string
@@ -22734,6 +28869,7 @@ export namespace Prisma {
     orderIndex?: IntFieldUpdateOperationsInput | number
     estimatedMinutes?: IntFieldUpdateOperationsInput | number
     requiresEvidence?: BoolFieldUpdateOperationsInput | boolean
+    requiresAssessment?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumSprintTaskStatusFieldUpdateOperationsInput | $Enums.SprintTaskStatus
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -22749,6 +28885,7 @@ export namespace Prisma {
     orderIndex?: IntFieldUpdateOperationsInput | number
     estimatedMinutes?: IntFieldUpdateOperationsInput | number
     requiresEvidence?: BoolFieldUpdateOperationsInput | boolean
+    requiresAssessment?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumSprintTaskStatusFieldUpdateOperationsInput | $Enums.SprintTaskStatus
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -22941,6 +29078,272 @@ export namespace Prisma {
     assessedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type MicroAssessmentCreateInput = {
+    id?: string
+    title: string
+    description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    roadmapNode?: RoadmapNodeCreateNestedOneWithoutAssessmentsInput
+    skill?: SkillCreateNestedOneWithoutAssessmentsInput
+    questions?: MicroAssessmentQuestionCreateNestedManyWithoutAssessmentInput
+    attempts?: MicroAssessmentAttemptCreateNestedManyWithoutAssessmentInput
+  }
+
+  export type MicroAssessmentUncheckedCreateInput = {
+    id?: string
+    title: string
+    description?: string | null
+    roadmapNodeId?: string | null
+    skillId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    questions?: MicroAssessmentQuestionUncheckedCreateNestedManyWithoutAssessmentInput
+    attempts?: MicroAssessmentAttemptUncheckedCreateNestedManyWithoutAssessmentInput
+  }
+
+  export type MicroAssessmentUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    roadmapNode?: RoadmapNodeUpdateOneWithoutAssessmentsNestedInput
+    skill?: SkillUpdateOneWithoutAssessmentsNestedInput
+    questions?: MicroAssessmentQuestionUpdateManyWithoutAssessmentNestedInput
+    attempts?: MicroAssessmentAttemptUpdateManyWithoutAssessmentNestedInput
+  }
+
+  export type MicroAssessmentUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    roadmapNodeId?: NullableStringFieldUpdateOperationsInput | string | null
+    skillId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    questions?: MicroAssessmentQuestionUncheckedUpdateManyWithoutAssessmentNestedInput
+    attempts?: MicroAssessmentAttemptUncheckedUpdateManyWithoutAssessmentNestedInput
+  }
+
+  export type MicroAssessmentCreateManyInput = {
+    id?: string
+    title: string
+    description?: string | null
+    roadmapNodeId?: string | null
+    skillId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MicroAssessmentUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MicroAssessmentUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    roadmapNodeId?: NullableStringFieldUpdateOperationsInput | string | null
+    skillId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MicroAssessmentQuestionCreateInput = {
+    id?: string
+    questionText: string
+    options?: MicroAssessmentQuestionCreateoptionsInput | string[]
+    correctOptionIndex: number
+    explanation?: string | null
+    orderIndex?: number
+    createdAt?: Date | string
+    assessment: MicroAssessmentCreateNestedOneWithoutQuestionsInput
+  }
+
+  export type MicroAssessmentQuestionUncheckedCreateInput = {
+    id?: string
+    assessmentId: string
+    questionText: string
+    options?: MicroAssessmentQuestionCreateoptionsInput | string[]
+    correctOptionIndex: number
+    explanation?: string | null
+    orderIndex?: number
+    createdAt?: Date | string
+  }
+
+  export type MicroAssessmentQuestionUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    questionText?: StringFieldUpdateOperationsInput | string
+    options?: MicroAssessmentQuestionUpdateoptionsInput | string[]
+    correctOptionIndex?: IntFieldUpdateOperationsInput | number
+    explanation?: NullableStringFieldUpdateOperationsInput | string | null
+    orderIndex?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assessment?: MicroAssessmentUpdateOneRequiredWithoutQuestionsNestedInput
+  }
+
+  export type MicroAssessmentQuestionUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    assessmentId?: StringFieldUpdateOperationsInput | string
+    questionText?: StringFieldUpdateOperationsInput | string
+    options?: MicroAssessmentQuestionUpdateoptionsInput | string[]
+    correctOptionIndex?: IntFieldUpdateOperationsInput | number
+    explanation?: NullableStringFieldUpdateOperationsInput | string | null
+    orderIndex?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MicroAssessmentQuestionCreateManyInput = {
+    id?: string
+    assessmentId: string
+    questionText: string
+    options?: MicroAssessmentQuestionCreateoptionsInput | string[]
+    correctOptionIndex: number
+    explanation?: string | null
+    orderIndex?: number
+    createdAt?: Date | string
+  }
+
+  export type MicroAssessmentQuestionUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    questionText?: StringFieldUpdateOperationsInput | string
+    options?: MicroAssessmentQuestionUpdateoptionsInput | string[]
+    correctOptionIndex?: IntFieldUpdateOperationsInput | number
+    explanation?: NullableStringFieldUpdateOperationsInput | string | null
+    orderIndex?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MicroAssessmentQuestionUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    assessmentId?: StringFieldUpdateOperationsInput | string
+    questionText?: StringFieldUpdateOperationsInput | string
+    options?: MicroAssessmentQuestionUpdateoptionsInput | string[]
+    correctOptionIndex?: IntFieldUpdateOperationsInput | number
+    explanation?: NullableStringFieldUpdateOperationsInput | string | null
+    orderIndex?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MicroAssessmentAttemptCreateInput = {
+    id?: string
+    userId: string
+    totalQuestions: number
+    correctAnswers: number
+    score: number
+    passed?: boolean
+    answers: JsonNullValueInput | InputJsonValue
+    completedAt?: Date | string
+    createdAt?: Date | string
+    assessment: MicroAssessmentCreateNestedOneWithoutAttemptsInput
+    userRoadmap?: UserRoadmapCreateNestedOneWithoutAssessmentAttemptsInput
+    sprint?: RoadmapSprintCreateNestedOneWithoutAssessmentAttemptsInput
+    sprintTask?: RoadmapSprintTaskCreateNestedOneWithoutAssessmentAttemptsInput
+    skill?: SkillCreateNestedOneWithoutAssessmentAttemptsInput
+  }
+
+  export type MicroAssessmentAttemptUncheckedCreateInput = {
+    id?: string
+    assessmentId: string
+    userId: string
+    userRoadmapId?: string | null
+    sprintId?: string | null
+    sprintTaskId?: string | null
+    skillId?: string | null
+    totalQuestions: number
+    correctAnswers: number
+    score: number
+    passed?: boolean
+    answers: JsonNullValueInput | InputJsonValue
+    completedAt?: Date | string
+    createdAt?: Date | string
+  }
+
+  export type MicroAssessmentAttemptUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    totalQuestions?: IntFieldUpdateOperationsInput | number
+    correctAnswers?: IntFieldUpdateOperationsInput | number
+    score?: IntFieldUpdateOperationsInput | number
+    passed?: BoolFieldUpdateOperationsInput | boolean
+    answers?: JsonNullValueInput | InputJsonValue
+    completedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assessment?: MicroAssessmentUpdateOneRequiredWithoutAttemptsNestedInput
+    userRoadmap?: UserRoadmapUpdateOneWithoutAssessmentAttemptsNestedInput
+    sprint?: RoadmapSprintUpdateOneWithoutAssessmentAttemptsNestedInput
+    sprintTask?: RoadmapSprintTaskUpdateOneWithoutAssessmentAttemptsNestedInput
+    skill?: SkillUpdateOneWithoutAssessmentAttemptsNestedInput
+  }
+
+  export type MicroAssessmentAttemptUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    assessmentId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    userRoadmapId?: NullableStringFieldUpdateOperationsInput | string | null
+    sprintId?: NullableStringFieldUpdateOperationsInput | string | null
+    sprintTaskId?: NullableStringFieldUpdateOperationsInput | string | null
+    skillId?: NullableStringFieldUpdateOperationsInput | string | null
+    totalQuestions?: IntFieldUpdateOperationsInput | number
+    correctAnswers?: IntFieldUpdateOperationsInput | number
+    score?: IntFieldUpdateOperationsInput | number
+    passed?: BoolFieldUpdateOperationsInput | boolean
+    answers?: JsonNullValueInput | InputJsonValue
+    completedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MicroAssessmentAttemptCreateManyInput = {
+    id?: string
+    assessmentId: string
+    userId: string
+    userRoadmapId?: string | null
+    sprintId?: string | null
+    sprintTaskId?: string | null
+    skillId?: string | null
+    totalQuestions: number
+    correctAnswers: number
+    score: number
+    passed?: boolean
+    answers: JsonNullValueInput | InputJsonValue
+    completedAt?: Date | string
+    createdAt?: Date | string
+  }
+
+  export type MicroAssessmentAttemptUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    totalQuestions?: IntFieldUpdateOperationsInput | number
+    correctAnswers?: IntFieldUpdateOperationsInput | number
+    score?: IntFieldUpdateOperationsInput | number
+    passed?: BoolFieldUpdateOperationsInput | boolean
+    answers?: JsonNullValueInput | InputJsonValue
+    completedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MicroAssessmentAttemptUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    assessmentId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    userRoadmapId?: NullableStringFieldUpdateOperationsInput | string | null
+    sprintId?: NullableStringFieldUpdateOperationsInput | string | null
+    sprintTaskId?: NullableStringFieldUpdateOperationsInput | string | null
+    skillId?: NullableStringFieldUpdateOperationsInput | string | null
+    totalQuestions?: IntFieldUpdateOperationsInput | number
+    correctAnswers?: IntFieldUpdateOperationsInput | number
+    score?: IntFieldUpdateOperationsInput | number
+    passed?: BoolFieldUpdateOperationsInput | boolean
+    answers?: JsonNullValueInput | InputJsonValue
+    completedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type RoadmapAdaptationCreateInput = {
     id?: string
     action: $Enums.RoadmapAdaptationAction
@@ -23027,6 +29430,7 @@ export namespace Prisma {
     id?: string
     userId: string
     userName: string
+    userAvatar?: string | null
     roleCategory: string
     title: string
     content: string
@@ -23034,12 +29438,15 @@ export namespace Prisma {
     upvotes?: number
     aiReply?: string | null
     createdAt?: Date | string
+    updatedAt?: Date | string
+    comments?: DiscussionCommentCreateNestedManyWithoutPostInput
   }
 
   export type DiscussionPostUncheckedCreateInput = {
     id?: string
     userId: string
     userName: string
+    userAvatar?: string | null
     roleCategory: string
     title: string
     content: string
@@ -23047,12 +29454,15 @@ export namespace Prisma {
     upvotes?: number
     aiReply?: string | null
     createdAt?: Date | string
+    updatedAt?: Date | string
+    comments?: DiscussionCommentUncheckedCreateNestedManyWithoutPostInput
   }
 
   export type DiscussionPostUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     userName?: StringFieldUpdateOperationsInput | string
+    userAvatar?: NullableStringFieldUpdateOperationsInput | string | null
     roleCategory?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
@@ -23060,12 +29470,15 @@ export namespace Prisma {
     upvotes?: IntFieldUpdateOperationsInput | number
     aiReply?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    comments?: DiscussionCommentUpdateManyWithoutPostNestedInput
   }
 
   export type DiscussionPostUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     userName?: StringFieldUpdateOperationsInput | string
+    userAvatar?: NullableStringFieldUpdateOperationsInput | string | null
     roleCategory?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
@@ -23073,12 +29486,15 @@ export namespace Prisma {
     upvotes?: IntFieldUpdateOperationsInput | number
     aiReply?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    comments?: DiscussionCommentUncheckedUpdateManyWithoutPostNestedInput
   }
 
   export type DiscussionPostCreateManyInput = {
     id?: string
     userId: string
     userName: string
+    userAvatar?: string | null
     roleCategory: string
     title: string
     content: string
@@ -23086,12 +29502,14 @@ export namespace Prisma {
     upvotes?: number
     aiReply?: string | null
     createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type DiscussionPostUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     userName?: StringFieldUpdateOperationsInput | string
+    userAvatar?: NullableStringFieldUpdateOperationsInput | string | null
     roleCategory?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
@@ -23099,18 +29517,97 @@ export namespace Prisma {
     upvotes?: IntFieldUpdateOperationsInput | number
     aiReply?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type DiscussionPostUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     userName?: StringFieldUpdateOperationsInput | string
+    userAvatar?: NullableStringFieldUpdateOperationsInput | string | null
     roleCategory?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
     tags?: DiscussionPostUpdatetagsInput | string[]
     upvotes?: IntFieldUpdateOperationsInput | number
     aiReply?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DiscussionCommentCreateInput = {
+    id?: string
+    userId: string
+    userName: string
+    userAvatar?: string | null
+    content: string
+    upvotes?: number
+    createdAt?: Date | string
+    post: DiscussionPostCreateNestedOneWithoutCommentsInput
+  }
+
+  export type DiscussionCommentUncheckedCreateInput = {
+    id?: string
+    postId: string
+    userId: string
+    userName: string
+    userAvatar?: string | null
+    content: string
+    upvotes?: number
+    createdAt?: Date | string
+  }
+
+  export type DiscussionCommentUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    userName?: StringFieldUpdateOperationsInput | string
+    userAvatar?: NullableStringFieldUpdateOperationsInput | string | null
+    content?: StringFieldUpdateOperationsInput | string
+    upvotes?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    post?: DiscussionPostUpdateOneRequiredWithoutCommentsNestedInput
+  }
+
+  export type DiscussionCommentUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    postId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    userName?: StringFieldUpdateOperationsInput | string
+    userAvatar?: NullableStringFieldUpdateOperationsInput | string | null
+    content?: StringFieldUpdateOperationsInput | string
+    upvotes?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DiscussionCommentCreateManyInput = {
+    id?: string
+    postId: string
+    userId: string
+    userName: string
+    userAvatar?: string | null
+    content: string
+    upvotes?: number
+    createdAt?: Date | string
+  }
+
+  export type DiscussionCommentUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    userName?: StringFieldUpdateOperationsInput | string
+    userAvatar?: NullableStringFieldUpdateOperationsInput | string | null
+    content?: StringFieldUpdateOperationsInput | string
+    upvotes?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DiscussionCommentUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    postId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    userName?: StringFieldUpdateOperationsInput | string
+    userAvatar?: NullableStringFieldUpdateOperationsInput | string | null
+    content?: StringFieldUpdateOperationsInput | string
+    upvotes?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -23129,6 +29626,21 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
+  export type StringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -23138,6 +29650,11 @@ export namespace Prisma {
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntFilter<$PrismaModel> | number
+  }
+
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
   }
   export type JsonFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -23184,21 +29701,6 @@ export namespace Prisma {
     gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-  }
-
-  export type StringNullableFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
   export type EnumRoadmapVisibilityFilter<$PrismaModel = never> = {
@@ -23262,30 +29764,37 @@ export namespace Prisma {
   export type CareerRoadmapCountOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
-    rolePath?: SortOrder
-    targetCompanyTier?: SortOrder
-    overallReadiness?: SortOrder
-    nodesData?: SortOrder
-    customTechStack?: SortOrder
     title?: SortOrder
     description?: SortOrder
+    rolePath?: SortOrder
+    targetCompanyTier?: SortOrder
+    estimatedWeeks?: SortOrder
+    overallReadiness?: SortOrder
+    isPublic?: SortOrder
+    isOfficial?: SortOrder
+    nodesData?: SortOrder
+    customTechStack?: SortOrder
     visibility?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type CareerRoadmapAvgOrderByAggregateInput = {
+    estimatedWeeks?: SortOrder
     overallReadiness?: SortOrder
   }
 
   export type CareerRoadmapMaxOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
-    rolePath?: SortOrder
-    targetCompanyTier?: SortOrder
-    overallReadiness?: SortOrder
     title?: SortOrder
     description?: SortOrder
+    rolePath?: SortOrder
+    targetCompanyTier?: SortOrder
+    estimatedWeeks?: SortOrder
+    overallReadiness?: SortOrder
+    isPublic?: SortOrder
+    isOfficial?: SortOrder
     visibility?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -23294,17 +29803,21 @@ export namespace Prisma {
   export type CareerRoadmapMinOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
-    rolePath?: SortOrder
-    targetCompanyTier?: SortOrder
-    overallReadiness?: SortOrder
     title?: SortOrder
     description?: SortOrder
+    rolePath?: SortOrder
+    targetCompanyTier?: SortOrder
+    estimatedWeeks?: SortOrder
+    overallReadiness?: SortOrder
+    isPublic?: SortOrder
+    isOfficial?: SortOrder
     visibility?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type CareerRoadmapSumOrderByAggregateInput = {
+    estimatedWeeks?: SortOrder
     overallReadiness?: SortOrder
   }
 
@@ -23326,6 +29839,24 @@ export namespace Prisma {
     _max?: NestedStringFilter<$PrismaModel>
   }
 
+  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
   export type IntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -23340,6 +29871,14 @@ export namespace Prisma {
     _sum?: NestedIntFilter<$PrismaModel>
     _min?: NestedIntFilter<$PrismaModel>
     _max?: NestedIntFilter<$PrismaModel>
+  }
+
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
   }
   export type JsonWithAggregatesFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -23394,24 +29933,6 @@ export namespace Prisma {
     _max?: NestedJsonNullableFilter<$PrismaModel>
   }
 
-  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
-  }
-
   export type EnumRoadmapVisibilityWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.RoadmapVisibility | EnumRoadmapVisibilityFieldRefInput<$PrismaModel>
     in?: $Enums.RoadmapVisibility[] | ListEnumRoadmapVisibilityFieldRefInput<$PrismaModel>
@@ -23463,11 +29984,6 @@ export namespace Prisma {
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
-  }
-
-  export type BoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
   export type CareerRoadmapScalarRelationFilter = {
@@ -23576,14 +30092,6 @@ export namespace Prisma {
     _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
-  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
-  }
-
   export type RoadmapNodeSkillListRelationFilter = {
     every?: RoadmapNodeSkillWhereInput
     some?: RoadmapNodeSkillWhereInput
@@ -23594,6 +30102,18 @@ export namespace Prisma {
     every?: SkillEvidenceWhereInput
     some?: SkillEvidenceWhereInput
     none?: SkillEvidenceWhereInput
+  }
+
+  export type MicroAssessmentListRelationFilter = {
+    every?: MicroAssessmentWhereInput
+    some?: MicroAssessmentWhereInput
+    none?: MicroAssessmentWhereInput
+  }
+
+  export type MicroAssessmentAttemptListRelationFilter = {
+    every?: MicroAssessmentAttemptWhereInput
+    some?: MicroAssessmentAttemptWhereInput
+    none?: MicroAssessmentAttemptWhereInput
   }
 
   export type SkillRelationshipListRelationFilter = {
@@ -23607,6 +30127,14 @@ export namespace Prisma {
   }
 
   export type SkillEvidenceOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type MicroAssessmentOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type MicroAssessmentAttemptOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -23780,6 +30308,7 @@ export namespace Prisma {
     orderIndex?: SortOrder
     estimatedMinutes?: SortOrder
     requiresEvidence?: SortOrder
+    requiresAssessment?: SortOrder
     targetProficiency?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -23802,6 +30331,7 @@ export namespace Prisma {
     orderIndex?: SortOrder
     estimatedMinutes?: SortOrder
     requiresEvidence?: SortOrder
+    requiresAssessment?: SortOrder
     targetProficiency?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -23818,6 +30348,7 @@ export namespace Prisma {
     orderIndex?: SortOrder
     estimatedMinutes?: SortOrder
     requiresEvidence?: SortOrder
+    requiresAssessment?: SortOrder
     targetProficiency?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -24088,6 +30619,7 @@ export namespace Prisma {
     orderIndex?: SortOrder
     estimatedMinutes?: SortOrder
     requiresEvidence?: SortOrder
+    requiresAssessment?: SortOrder
     status?: SortOrder
     completedAt?: SortOrder
     createdAt?: SortOrder
@@ -24108,6 +30640,7 @@ export namespace Prisma {
     orderIndex?: SortOrder
     estimatedMinutes?: SortOrder
     requiresEvidence?: SortOrder
+    requiresAssessment?: SortOrder
     status?: SortOrder
     completedAt?: SortOrder
     createdAt?: SortOrder
@@ -24123,6 +30656,7 @@ export namespace Prisma {
     orderIndex?: SortOrder
     estimatedMinutes?: SortOrder
     requiresEvidence?: SortOrder
+    requiresAssessment?: SortOrder
     status?: SortOrder
     completedAt?: SortOrder
     createdAt?: SortOrder
@@ -24287,16 +30821,186 @@ export namespace Prisma {
     _max?: NestedEnumSkillEvidenceSourceFilter<$PrismaModel>
   }
 
-  export type EnumRoadmapAdaptationActionFilter<$PrismaModel = never> = {
-    equals?: $Enums.RoadmapAdaptationAction | EnumRoadmapAdaptationActionFieldRefInput<$PrismaModel>
-    in?: $Enums.RoadmapAdaptationAction[] | ListEnumRoadmapAdaptationActionFieldRefInput<$PrismaModel>
-    notIn?: $Enums.RoadmapAdaptationAction[] | ListEnumRoadmapAdaptationActionFieldRefInput<$PrismaModel>
-    not?: NestedEnumRoadmapAdaptationActionFilter<$PrismaModel> | $Enums.RoadmapAdaptationAction
+  export type SkillNullableScalarRelationFilter = {
+    is?: SkillWhereInput | null
+    isNot?: SkillWhereInput | null
+  }
+
+  export type MicroAssessmentQuestionListRelationFilter = {
+    every?: MicroAssessmentQuestionWhereInput
+    some?: MicroAssessmentQuestionWhereInput
+    none?: MicroAssessmentQuestionWhereInput
+  }
+
+  export type MicroAssessmentQuestionOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type MicroAssessmentCountOrderByAggregateInput = {
+    id?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
+    roadmapNodeId?: SortOrder
+    skillId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type MicroAssessmentMaxOrderByAggregateInput = {
+    id?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
+    roadmapNodeId?: SortOrder
+    skillId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type MicroAssessmentMinOrderByAggregateInput = {
+    id?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
+    roadmapNodeId?: SortOrder
+    skillId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type StringNullableListFilter<$PrismaModel = never> = {
+    equals?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    has?: string | StringFieldRefInput<$PrismaModel> | null
+    hasEvery?: string[] | ListStringFieldRefInput<$PrismaModel>
+    hasSome?: string[] | ListStringFieldRefInput<$PrismaModel>
+    isEmpty?: boolean
+  }
+
+  export type MicroAssessmentScalarRelationFilter = {
+    is?: MicroAssessmentWhereInput
+    isNot?: MicroAssessmentWhereInput
+  }
+
+  export type MicroAssessmentQuestionCountOrderByAggregateInput = {
+    id?: SortOrder
+    assessmentId?: SortOrder
+    questionText?: SortOrder
+    options?: SortOrder
+    correctOptionIndex?: SortOrder
+    explanation?: SortOrder
+    orderIndex?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type MicroAssessmentQuestionAvgOrderByAggregateInput = {
+    correctOptionIndex?: SortOrder
+    orderIndex?: SortOrder
+  }
+
+  export type MicroAssessmentQuestionMaxOrderByAggregateInput = {
+    id?: SortOrder
+    assessmentId?: SortOrder
+    questionText?: SortOrder
+    correctOptionIndex?: SortOrder
+    explanation?: SortOrder
+    orderIndex?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type MicroAssessmentQuestionMinOrderByAggregateInput = {
+    id?: SortOrder
+    assessmentId?: SortOrder
+    questionText?: SortOrder
+    correctOptionIndex?: SortOrder
+    explanation?: SortOrder
+    orderIndex?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type MicroAssessmentQuestionSumOrderByAggregateInput = {
+    correctOptionIndex?: SortOrder
+    orderIndex?: SortOrder
+  }
+
+  export type UserRoadmapNullableScalarRelationFilter = {
+    is?: UserRoadmapWhereInput | null
+    isNot?: UserRoadmapWhereInput | null
   }
 
   export type RoadmapSprintNullableScalarRelationFilter = {
     is?: RoadmapSprintWhereInput | null
     isNot?: RoadmapSprintWhereInput | null
+  }
+
+  export type RoadmapSprintTaskNullableScalarRelationFilter = {
+    is?: RoadmapSprintTaskWhereInput | null
+    isNot?: RoadmapSprintTaskWhereInput | null
+  }
+
+  export type MicroAssessmentAttemptCountOrderByAggregateInput = {
+    id?: SortOrder
+    assessmentId?: SortOrder
+    userId?: SortOrder
+    userRoadmapId?: SortOrder
+    sprintId?: SortOrder
+    sprintTaskId?: SortOrder
+    skillId?: SortOrder
+    totalQuestions?: SortOrder
+    correctAnswers?: SortOrder
+    score?: SortOrder
+    passed?: SortOrder
+    answers?: SortOrder
+    completedAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type MicroAssessmentAttemptAvgOrderByAggregateInput = {
+    totalQuestions?: SortOrder
+    correctAnswers?: SortOrder
+    score?: SortOrder
+  }
+
+  export type MicroAssessmentAttemptMaxOrderByAggregateInput = {
+    id?: SortOrder
+    assessmentId?: SortOrder
+    userId?: SortOrder
+    userRoadmapId?: SortOrder
+    sprintId?: SortOrder
+    sprintTaskId?: SortOrder
+    skillId?: SortOrder
+    totalQuestions?: SortOrder
+    correctAnswers?: SortOrder
+    score?: SortOrder
+    passed?: SortOrder
+    completedAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type MicroAssessmentAttemptMinOrderByAggregateInput = {
+    id?: SortOrder
+    assessmentId?: SortOrder
+    userId?: SortOrder
+    userRoadmapId?: SortOrder
+    sprintId?: SortOrder
+    sprintTaskId?: SortOrder
+    skillId?: SortOrder
+    totalQuestions?: SortOrder
+    correctAnswers?: SortOrder
+    score?: SortOrder
+    passed?: SortOrder
+    completedAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type MicroAssessmentAttemptSumOrderByAggregateInput = {
+    totalQuestions?: SortOrder
+    correctAnswers?: SortOrder
+    score?: SortOrder
+  }
+
+  export type EnumRoadmapAdaptationActionFilter<$PrismaModel = never> = {
+    equals?: $Enums.RoadmapAdaptationAction | EnumRoadmapAdaptationActionFieldRefInput<$PrismaModel>
+    in?: $Enums.RoadmapAdaptationAction[] | ListEnumRoadmapAdaptationActionFieldRefInput<$PrismaModel>
+    notIn?: $Enums.RoadmapAdaptationAction[] | ListEnumRoadmapAdaptationActionFieldRefInput<$PrismaModel>
+    not?: NestedEnumRoadmapAdaptationActionFilter<$PrismaModel> | $Enums.RoadmapAdaptationAction
   }
 
   export type RoadmapAdaptationCountOrderByAggregateInput = {
@@ -24339,18 +31043,21 @@ export namespace Prisma {
     _max?: NestedEnumRoadmapAdaptationActionFilter<$PrismaModel>
   }
 
-  export type StringNullableListFilter<$PrismaModel = never> = {
-    equals?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    has?: string | StringFieldRefInput<$PrismaModel> | null
-    hasEvery?: string[] | ListStringFieldRefInput<$PrismaModel>
-    hasSome?: string[] | ListStringFieldRefInput<$PrismaModel>
-    isEmpty?: boolean
+  export type DiscussionCommentListRelationFilter = {
+    every?: DiscussionCommentWhereInput
+    some?: DiscussionCommentWhereInput
+    none?: DiscussionCommentWhereInput
+  }
+
+  export type DiscussionCommentOrderByRelationAggregateInput = {
+    _count?: SortOrder
   }
 
   export type DiscussionPostCountOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
     userName?: SortOrder
+    userAvatar?: SortOrder
     roleCategory?: SortOrder
     title?: SortOrder
     content?: SortOrder
@@ -24358,6 +31065,7 @@ export namespace Prisma {
     upvotes?: SortOrder
     aiReply?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type DiscussionPostAvgOrderByAggregateInput = {
@@ -24368,27 +31076,77 @@ export namespace Prisma {
     id?: SortOrder
     userId?: SortOrder
     userName?: SortOrder
+    userAvatar?: SortOrder
     roleCategory?: SortOrder
     title?: SortOrder
     content?: SortOrder
     upvotes?: SortOrder
     aiReply?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type DiscussionPostMinOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
     userName?: SortOrder
+    userAvatar?: SortOrder
     roleCategory?: SortOrder
     title?: SortOrder
     content?: SortOrder
     upvotes?: SortOrder
     aiReply?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type DiscussionPostSumOrderByAggregateInput = {
+    upvotes?: SortOrder
+  }
+
+  export type DiscussionPostScalarRelationFilter = {
+    is?: DiscussionPostWhereInput
+    isNot?: DiscussionPostWhereInput
+  }
+
+  export type DiscussionCommentCountOrderByAggregateInput = {
+    id?: SortOrder
+    postId?: SortOrder
+    userId?: SortOrder
+    userName?: SortOrder
+    userAvatar?: SortOrder
+    content?: SortOrder
+    upvotes?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type DiscussionCommentAvgOrderByAggregateInput = {
+    upvotes?: SortOrder
+  }
+
+  export type DiscussionCommentMaxOrderByAggregateInput = {
+    id?: SortOrder
+    postId?: SortOrder
+    userId?: SortOrder
+    userName?: SortOrder
+    userAvatar?: SortOrder
+    content?: SortOrder
+    upvotes?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type DiscussionCommentMinOrderByAggregateInput = {
+    id?: SortOrder
+    postId?: SortOrder
+    userId?: SortOrder
+    userName?: SortOrder
+    userAvatar?: SortOrder
+    content?: SortOrder
+    upvotes?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type DiscussionCommentSumOrderByAggregateInput = {
     upvotes?: SortOrder
   }
 
@@ -24450,6 +31208,10 @@ export namespace Prisma {
     set?: string
   }
 
+  export type NullableStringFieldUpdateOperationsInput = {
+    set?: string | null
+  }
+
   export type IntFieldUpdateOperationsInput = {
     set?: number
     increment?: number
@@ -24458,8 +31220,8 @@ export namespace Prisma {
     divide?: number
   }
 
-  export type NullableStringFieldUpdateOperationsInput = {
-    set?: string | null
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
   }
 
   export type EnumRoadmapVisibilityFieldUpdateOperationsInput = {
@@ -24596,10 +31358,6 @@ export namespace Prisma {
     divide?: number
   }
 
-  export type BoolFieldUpdateOperationsInput = {
-    set?: boolean
-  }
-
   export type CareerRoadmapUpdateOneRequiredWithoutGoalNestedInput = {
     create?: XOR<CareerRoadmapCreateWithoutGoalInput, CareerRoadmapUncheckedCreateWithoutGoalInput>
     connectOrCreate?: CareerRoadmapCreateOrConnectWithoutGoalInput
@@ -24620,6 +31378,20 @@ export namespace Prisma {
     connectOrCreate?: SkillEvidenceCreateOrConnectWithoutSkillInput | SkillEvidenceCreateOrConnectWithoutSkillInput[]
     createMany?: SkillEvidenceCreateManySkillInputEnvelope
     connect?: SkillEvidenceWhereUniqueInput | SkillEvidenceWhereUniqueInput[]
+  }
+
+  export type MicroAssessmentCreateNestedManyWithoutSkillInput = {
+    create?: XOR<MicroAssessmentCreateWithoutSkillInput, MicroAssessmentUncheckedCreateWithoutSkillInput> | MicroAssessmentCreateWithoutSkillInput[] | MicroAssessmentUncheckedCreateWithoutSkillInput[]
+    connectOrCreate?: MicroAssessmentCreateOrConnectWithoutSkillInput | MicroAssessmentCreateOrConnectWithoutSkillInput[]
+    createMany?: MicroAssessmentCreateManySkillInputEnvelope
+    connect?: MicroAssessmentWhereUniqueInput | MicroAssessmentWhereUniqueInput[]
+  }
+
+  export type MicroAssessmentAttemptCreateNestedManyWithoutSkillInput = {
+    create?: XOR<MicroAssessmentAttemptCreateWithoutSkillInput, MicroAssessmentAttemptUncheckedCreateWithoutSkillInput> | MicroAssessmentAttemptCreateWithoutSkillInput[] | MicroAssessmentAttemptUncheckedCreateWithoutSkillInput[]
+    connectOrCreate?: MicroAssessmentAttemptCreateOrConnectWithoutSkillInput | MicroAssessmentAttemptCreateOrConnectWithoutSkillInput[]
+    createMany?: MicroAssessmentAttemptCreateManySkillInputEnvelope
+    connect?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
   }
 
   export type SkillRelationshipCreateNestedManyWithoutFromSkillInput = {
@@ -24648,6 +31420,20 @@ export namespace Prisma {
     connectOrCreate?: SkillEvidenceCreateOrConnectWithoutSkillInput | SkillEvidenceCreateOrConnectWithoutSkillInput[]
     createMany?: SkillEvidenceCreateManySkillInputEnvelope
     connect?: SkillEvidenceWhereUniqueInput | SkillEvidenceWhereUniqueInput[]
+  }
+
+  export type MicroAssessmentUncheckedCreateNestedManyWithoutSkillInput = {
+    create?: XOR<MicroAssessmentCreateWithoutSkillInput, MicroAssessmentUncheckedCreateWithoutSkillInput> | MicroAssessmentCreateWithoutSkillInput[] | MicroAssessmentUncheckedCreateWithoutSkillInput[]
+    connectOrCreate?: MicroAssessmentCreateOrConnectWithoutSkillInput | MicroAssessmentCreateOrConnectWithoutSkillInput[]
+    createMany?: MicroAssessmentCreateManySkillInputEnvelope
+    connect?: MicroAssessmentWhereUniqueInput | MicroAssessmentWhereUniqueInput[]
+  }
+
+  export type MicroAssessmentAttemptUncheckedCreateNestedManyWithoutSkillInput = {
+    create?: XOR<MicroAssessmentAttemptCreateWithoutSkillInput, MicroAssessmentAttemptUncheckedCreateWithoutSkillInput> | MicroAssessmentAttemptCreateWithoutSkillInput[] | MicroAssessmentAttemptUncheckedCreateWithoutSkillInput[]
+    connectOrCreate?: MicroAssessmentAttemptCreateOrConnectWithoutSkillInput | MicroAssessmentAttemptCreateOrConnectWithoutSkillInput[]
+    createMany?: MicroAssessmentAttemptCreateManySkillInputEnvelope
+    connect?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
   }
 
   export type SkillRelationshipUncheckedCreateNestedManyWithoutFromSkillInput = {
@@ -24690,6 +31476,34 @@ export namespace Prisma {
     update?: SkillEvidenceUpdateWithWhereUniqueWithoutSkillInput | SkillEvidenceUpdateWithWhereUniqueWithoutSkillInput[]
     updateMany?: SkillEvidenceUpdateManyWithWhereWithoutSkillInput | SkillEvidenceUpdateManyWithWhereWithoutSkillInput[]
     deleteMany?: SkillEvidenceScalarWhereInput | SkillEvidenceScalarWhereInput[]
+  }
+
+  export type MicroAssessmentUpdateManyWithoutSkillNestedInput = {
+    create?: XOR<MicroAssessmentCreateWithoutSkillInput, MicroAssessmentUncheckedCreateWithoutSkillInput> | MicroAssessmentCreateWithoutSkillInput[] | MicroAssessmentUncheckedCreateWithoutSkillInput[]
+    connectOrCreate?: MicroAssessmentCreateOrConnectWithoutSkillInput | MicroAssessmentCreateOrConnectWithoutSkillInput[]
+    upsert?: MicroAssessmentUpsertWithWhereUniqueWithoutSkillInput | MicroAssessmentUpsertWithWhereUniqueWithoutSkillInput[]
+    createMany?: MicroAssessmentCreateManySkillInputEnvelope
+    set?: MicroAssessmentWhereUniqueInput | MicroAssessmentWhereUniqueInput[]
+    disconnect?: MicroAssessmentWhereUniqueInput | MicroAssessmentWhereUniqueInput[]
+    delete?: MicroAssessmentWhereUniqueInput | MicroAssessmentWhereUniqueInput[]
+    connect?: MicroAssessmentWhereUniqueInput | MicroAssessmentWhereUniqueInput[]
+    update?: MicroAssessmentUpdateWithWhereUniqueWithoutSkillInput | MicroAssessmentUpdateWithWhereUniqueWithoutSkillInput[]
+    updateMany?: MicroAssessmentUpdateManyWithWhereWithoutSkillInput | MicroAssessmentUpdateManyWithWhereWithoutSkillInput[]
+    deleteMany?: MicroAssessmentScalarWhereInput | MicroAssessmentScalarWhereInput[]
+  }
+
+  export type MicroAssessmentAttemptUpdateManyWithoutSkillNestedInput = {
+    create?: XOR<MicroAssessmentAttemptCreateWithoutSkillInput, MicroAssessmentAttemptUncheckedCreateWithoutSkillInput> | MicroAssessmentAttemptCreateWithoutSkillInput[] | MicroAssessmentAttemptUncheckedCreateWithoutSkillInput[]
+    connectOrCreate?: MicroAssessmentAttemptCreateOrConnectWithoutSkillInput | MicroAssessmentAttemptCreateOrConnectWithoutSkillInput[]
+    upsert?: MicroAssessmentAttemptUpsertWithWhereUniqueWithoutSkillInput | MicroAssessmentAttemptUpsertWithWhereUniqueWithoutSkillInput[]
+    createMany?: MicroAssessmentAttemptCreateManySkillInputEnvelope
+    set?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    disconnect?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    delete?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    connect?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    update?: MicroAssessmentAttemptUpdateWithWhereUniqueWithoutSkillInput | MicroAssessmentAttemptUpdateWithWhereUniqueWithoutSkillInput[]
+    updateMany?: MicroAssessmentAttemptUpdateManyWithWhereWithoutSkillInput | MicroAssessmentAttemptUpdateManyWithWhereWithoutSkillInput[]
+    deleteMany?: MicroAssessmentAttemptScalarWhereInput | MicroAssessmentAttemptScalarWhereInput[]
   }
 
   export type SkillRelationshipUpdateManyWithoutFromSkillNestedInput = {
@@ -24746,6 +31560,34 @@ export namespace Prisma {
     update?: SkillEvidenceUpdateWithWhereUniqueWithoutSkillInput | SkillEvidenceUpdateWithWhereUniqueWithoutSkillInput[]
     updateMany?: SkillEvidenceUpdateManyWithWhereWithoutSkillInput | SkillEvidenceUpdateManyWithWhereWithoutSkillInput[]
     deleteMany?: SkillEvidenceScalarWhereInput | SkillEvidenceScalarWhereInput[]
+  }
+
+  export type MicroAssessmentUncheckedUpdateManyWithoutSkillNestedInput = {
+    create?: XOR<MicroAssessmentCreateWithoutSkillInput, MicroAssessmentUncheckedCreateWithoutSkillInput> | MicroAssessmentCreateWithoutSkillInput[] | MicroAssessmentUncheckedCreateWithoutSkillInput[]
+    connectOrCreate?: MicroAssessmentCreateOrConnectWithoutSkillInput | MicroAssessmentCreateOrConnectWithoutSkillInput[]
+    upsert?: MicroAssessmentUpsertWithWhereUniqueWithoutSkillInput | MicroAssessmentUpsertWithWhereUniqueWithoutSkillInput[]
+    createMany?: MicroAssessmentCreateManySkillInputEnvelope
+    set?: MicroAssessmentWhereUniqueInput | MicroAssessmentWhereUniqueInput[]
+    disconnect?: MicroAssessmentWhereUniqueInput | MicroAssessmentWhereUniqueInput[]
+    delete?: MicroAssessmentWhereUniqueInput | MicroAssessmentWhereUniqueInput[]
+    connect?: MicroAssessmentWhereUniqueInput | MicroAssessmentWhereUniqueInput[]
+    update?: MicroAssessmentUpdateWithWhereUniqueWithoutSkillInput | MicroAssessmentUpdateWithWhereUniqueWithoutSkillInput[]
+    updateMany?: MicroAssessmentUpdateManyWithWhereWithoutSkillInput | MicroAssessmentUpdateManyWithWhereWithoutSkillInput[]
+    deleteMany?: MicroAssessmentScalarWhereInput | MicroAssessmentScalarWhereInput[]
+  }
+
+  export type MicroAssessmentAttemptUncheckedUpdateManyWithoutSkillNestedInput = {
+    create?: XOR<MicroAssessmentAttemptCreateWithoutSkillInput, MicroAssessmentAttemptUncheckedCreateWithoutSkillInput> | MicroAssessmentAttemptCreateWithoutSkillInput[] | MicroAssessmentAttemptUncheckedCreateWithoutSkillInput[]
+    connectOrCreate?: MicroAssessmentAttemptCreateOrConnectWithoutSkillInput | MicroAssessmentAttemptCreateOrConnectWithoutSkillInput[]
+    upsert?: MicroAssessmentAttemptUpsertWithWhereUniqueWithoutSkillInput | MicroAssessmentAttemptUpsertWithWhereUniqueWithoutSkillInput[]
+    createMany?: MicroAssessmentAttemptCreateManySkillInputEnvelope
+    set?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    disconnect?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    delete?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    connect?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    update?: MicroAssessmentAttemptUpdateWithWhereUniqueWithoutSkillInput | MicroAssessmentAttemptUpdateWithWhereUniqueWithoutSkillInput[]
+    updateMany?: MicroAssessmentAttemptUpdateManyWithWhereWithoutSkillInput | MicroAssessmentAttemptUpdateManyWithWhereWithoutSkillInput[]
+    deleteMany?: MicroAssessmentAttemptScalarWhereInput | MicroAssessmentAttemptScalarWhereInput[]
   }
 
   export type SkillRelationshipUncheckedUpdateManyWithoutFromSkillNestedInput = {
@@ -24883,6 +31725,13 @@ export namespace Prisma {
     connect?: RoadmapNodeSkillWhereUniqueInput | RoadmapNodeSkillWhereUniqueInput[]
   }
 
+  export type MicroAssessmentCreateNestedManyWithoutRoadmapNodeInput = {
+    create?: XOR<MicroAssessmentCreateWithoutRoadmapNodeInput, MicroAssessmentUncheckedCreateWithoutRoadmapNodeInput> | MicroAssessmentCreateWithoutRoadmapNodeInput[] | MicroAssessmentUncheckedCreateWithoutRoadmapNodeInput[]
+    connectOrCreate?: MicroAssessmentCreateOrConnectWithoutRoadmapNodeInput | MicroAssessmentCreateOrConnectWithoutRoadmapNodeInput[]
+    createMany?: MicroAssessmentCreateManyRoadmapNodeInputEnvelope
+    connect?: MicroAssessmentWhereUniqueInput | MicroAssessmentWhereUniqueInput[]
+  }
+
   export type RoadmapNodeDependencyCreateNestedManyWithoutNodeInput = {
     create?: XOR<RoadmapNodeDependencyCreateWithoutNodeInput, RoadmapNodeDependencyUncheckedCreateWithoutNodeInput> | RoadmapNodeDependencyCreateWithoutNodeInput[] | RoadmapNodeDependencyUncheckedCreateWithoutNodeInput[]
     connectOrCreate?: RoadmapNodeDependencyCreateOrConnectWithoutNodeInput | RoadmapNodeDependencyCreateOrConnectWithoutNodeInput[]
@@ -24909,6 +31758,13 @@ export namespace Prisma {
     connectOrCreate?: RoadmapNodeSkillCreateOrConnectWithoutNodeInput | RoadmapNodeSkillCreateOrConnectWithoutNodeInput[]
     createMany?: RoadmapNodeSkillCreateManyNodeInputEnvelope
     connect?: RoadmapNodeSkillWhereUniqueInput | RoadmapNodeSkillWhereUniqueInput[]
+  }
+
+  export type MicroAssessmentUncheckedCreateNestedManyWithoutRoadmapNodeInput = {
+    create?: XOR<MicroAssessmentCreateWithoutRoadmapNodeInput, MicroAssessmentUncheckedCreateWithoutRoadmapNodeInput> | MicroAssessmentCreateWithoutRoadmapNodeInput[] | MicroAssessmentUncheckedCreateWithoutRoadmapNodeInput[]
+    connectOrCreate?: MicroAssessmentCreateOrConnectWithoutRoadmapNodeInput | MicroAssessmentCreateOrConnectWithoutRoadmapNodeInput[]
+    createMany?: MicroAssessmentCreateManyRoadmapNodeInputEnvelope
+    connect?: MicroAssessmentWhereUniqueInput | MicroAssessmentWhereUniqueInput[]
   }
 
   export type RoadmapNodeDependencyUncheckedCreateNestedManyWithoutNodeInput = {
@@ -24962,6 +31818,20 @@ export namespace Prisma {
     update?: RoadmapNodeSkillUpdateWithWhereUniqueWithoutNodeInput | RoadmapNodeSkillUpdateWithWhereUniqueWithoutNodeInput[]
     updateMany?: RoadmapNodeSkillUpdateManyWithWhereWithoutNodeInput | RoadmapNodeSkillUpdateManyWithWhereWithoutNodeInput[]
     deleteMany?: RoadmapNodeSkillScalarWhereInput | RoadmapNodeSkillScalarWhereInput[]
+  }
+
+  export type MicroAssessmentUpdateManyWithoutRoadmapNodeNestedInput = {
+    create?: XOR<MicroAssessmentCreateWithoutRoadmapNodeInput, MicroAssessmentUncheckedCreateWithoutRoadmapNodeInput> | MicroAssessmentCreateWithoutRoadmapNodeInput[] | MicroAssessmentUncheckedCreateWithoutRoadmapNodeInput[]
+    connectOrCreate?: MicroAssessmentCreateOrConnectWithoutRoadmapNodeInput | MicroAssessmentCreateOrConnectWithoutRoadmapNodeInput[]
+    upsert?: MicroAssessmentUpsertWithWhereUniqueWithoutRoadmapNodeInput | MicroAssessmentUpsertWithWhereUniqueWithoutRoadmapNodeInput[]
+    createMany?: MicroAssessmentCreateManyRoadmapNodeInputEnvelope
+    set?: MicroAssessmentWhereUniqueInput | MicroAssessmentWhereUniqueInput[]
+    disconnect?: MicroAssessmentWhereUniqueInput | MicroAssessmentWhereUniqueInput[]
+    delete?: MicroAssessmentWhereUniqueInput | MicroAssessmentWhereUniqueInput[]
+    connect?: MicroAssessmentWhereUniqueInput | MicroAssessmentWhereUniqueInput[]
+    update?: MicroAssessmentUpdateWithWhereUniqueWithoutRoadmapNodeInput | MicroAssessmentUpdateWithWhereUniqueWithoutRoadmapNodeInput[]
+    updateMany?: MicroAssessmentUpdateManyWithWhereWithoutRoadmapNodeInput | MicroAssessmentUpdateManyWithWhereWithoutRoadmapNodeInput[]
+    deleteMany?: MicroAssessmentScalarWhereInput | MicroAssessmentScalarWhereInput[]
   }
 
   export type RoadmapNodeDependencyUpdateManyWithoutNodeNestedInput = {
@@ -25018,6 +31888,20 @@ export namespace Prisma {
     update?: RoadmapNodeSkillUpdateWithWhereUniqueWithoutNodeInput | RoadmapNodeSkillUpdateWithWhereUniqueWithoutNodeInput[]
     updateMany?: RoadmapNodeSkillUpdateManyWithWhereWithoutNodeInput | RoadmapNodeSkillUpdateManyWithWhereWithoutNodeInput[]
     deleteMany?: RoadmapNodeSkillScalarWhereInput | RoadmapNodeSkillScalarWhereInput[]
+  }
+
+  export type MicroAssessmentUncheckedUpdateManyWithoutRoadmapNodeNestedInput = {
+    create?: XOR<MicroAssessmentCreateWithoutRoadmapNodeInput, MicroAssessmentUncheckedCreateWithoutRoadmapNodeInput> | MicroAssessmentCreateWithoutRoadmapNodeInput[] | MicroAssessmentUncheckedCreateWithoutRoadmapNodeInput[]
+    connectOrCreate?: MicroAssessmentCreateOrConnectWithoutRoadmapNodeInput | MicroAssessmentCreateOrConnectWithoutRoadmapNodeInput[]
+    upsert?: MicroAssessmentUpsertWithWhereUniqueWithoutRoadmapNodeInput | MicroAssessmentUpsertWithWhereUniqueWithoutRoadmapNodeInput[]
+    createMany?: MicroAssessmentCreateManyRoadmapNodeInputEnvelope
+    set?: MicroAssessmentWhereUniqueInput | MicroAssessmentWhereUniqueInput[]
+    disconnect?: MicroAssessmentWhereUniqueInput | MicroAssessmentWhereUniqueInput[]
+    delete?: MicroAssessmentWhereUniqueInput | MicroAssessmentWhereUniqueInput[]
+    connect?: MicroAssessmentWhereUniqueInput | MicroAssessmentWhereUniqueInput[]
+    update?: MicroAssessmentUpdateWithWhereUniqueWithoutRoadmapNodeInput | MicroAssessmentUpdateWithWhereUniqueWithoutRoadmapNodeInput[]
+    updateMany?: MicroAssessmentUpdateManyWithWhereWithoutRoadmapNodeInput | MicroAssessmentUpdateManyWithWhereWithoutRoadmapNodeInput[]
+    deleteMany?: MicroAssessmentScalarWhereInput | MicroAssessmentScalarWhereInput[]
   }
 
   export type RoadmapNodeDependencyUncheckedUpdateManyWithoutNodeNestedInput = {
@@ -25138,6 +32022,13 @@ export namespace Prisma {
     connect?: SkillEvidenceWhereUniqueInput | SkillEvidenceWhereUniqueInput[]
   }
 
+  export type MicroAssessmentAttemptCreateNestedManyWithoutUserRoadmapInput = {
+    create?: XOR<MicroAssessmentAttemptCreateWithoutUserRoadmapInput, MicroAssessmentAttemptUncheckedCreateWithoutUserRoadmapInput> | MicroAssessmentAttemptCreateWithoutUserRoadmapInput[] | MicroAssessmentAttemptUncheckedCreateWithoutUserRoadmapInput[]
+    connectOrCreate?: MicroAssessmentAttemptCreateOrConnectWithoutUserRoadmapInput | MicroAssessmentAttemptCreateOrConnectWithoutUserRoadmapInput[]
+    createMany?: MicroAssessmentAttemptCreateManyUserRoadmapInputEnvelope
+    connect?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+  }
+
   export type RoadmapAdaptationCreateNestedManyWithoutUserRoadmapInput = {
     create?: XOR<RoadmapAdaptationCreateWithoutUserRoadmapInput, RoadmapAdaptationUncheckedCreateWithoutUserRoadmapInput> | RoadmapAdaptationCreateWithoutUserRoadmapInput[] | RoadmapAdaptationUncheckedCreateWithoutUserRoadmapInput[]
     connectOrCreate?: RoadmapAdaptationCreateOrConnectWithoutUserRoadmapInput | RoadmapAdaptationCreateOrConnectWithoutUserRoadmapInput[]
@@ -25157,6 +32048,13 @@ export namespace Prisma {
     connectOrCreate?: SkillEvidenceCreateOrConnectWithoutUserRoadmapInput | SkillEvidenceCreateOrConnectWithoutUserRoadmapInput[]
     createMany?: SkillEvidenceCreateManyUserRoadmapInputEnvelope
     connect?: SkillEvidenceWhereUniqueInput | SkillEvidenceWhereUniqueInput[]
+  }
+
+  export type MicroAssessmentAttemptUncheckedCreateNestedManyWithoutUserRoadmapInput = {
+    create?: XOR<MicroAssessmentAttemptCreateWithoutUserRoadmapInput, MicroAssessmentAttemptUncheckedCreateWithoutUserRoadmapInput> | MicroAssessmentAttemptCreateWithoutUserRoadmapInput[] | MicroAssessmentAttemptUncheckedCreateWithoutUserRoadmapInput[]
+    connectOrCreate?: MicroAssessmentAttemptCreateOrConnectWithoutUserRoadmapInput | MicroAssessmentAttemptCreateOrConnectWithoutUserRoadmapInput[]
+    createMany?: MicroAssessmentAttemptCreateManyUserRoadmapInputEnvelope
+    connect?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
   }
 
   export type RoadmapAdaptationUncheckedCreateNestedManyWithoutUserRoadmapInput = {
@@ -25206,6 +32104,20 @@ export namespace Prisma {
     deleteMany?: SkillEvidenceScalarWhereInput | SkillEvidenceScalarWhereInput[]
   }
 
+  export type MicroAssessmentAttemptUpdateManyWithoutUserRoadmapNestedInput = {
+    create?: XOR<MicroAssessmentAttemptCreateWithoutUserRoadmapInput, MicroAssessmentAttemptUncheckedCreateWithoutUserRoadmapInput> | MicroAssessmentAttemptCreateWithoutUserRoadmapInput[] | MicroAssessmentAttemptUncheckedCreateWithoutUserRoadmapInput[]
+    connectOrCreate?: MicroAssessmentAttemptCreateOrConnectWithoutUserRoadmapInput | MicroAssessmentAttemptCreateOrConnectWithoutUserRoadmapInput[]
+    upsert?: MicroAssessmentAttemptUpsertWithWhereUniqueWithoutUserRoadmapInput | MicroAssessmentAttemptUpsertWithWhereUniqueWithoutUserRoadmapInput[]
+    createMany?: MicroAssessmentAttemptCreateManyUserRoadmapInputEnvelope
+    set?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    disconnect?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    delete?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    connect?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    update?: MicroAssessmentAttemptUpdateWithWhereUniqueWithoutUserRoadmapInput | MicroAssessmentAttemptUpdateWithWhereUniqueWithoutUserRoadmapInput[]
+    updateMany?: MicroAssessmentAttemptUpdateManyWithWhereWithoutUserRoadmapInput | MicroAssessmentAttemptUpdateManyWithWhereWithoutUserRoadmapInput[]
+    deleteMany?: MicroAssessmentAttemptScalarWhereInput | MicroAssessmentAttemptScalarWhereInput[]
+  }
+
   export type RoadmapAdaptationUpdateManyWithoutUserRoadmapNestedInput = {
     create?: XOR<RoadmapAdaptationCreateWithoutUserRoadmapInput, RoadmapAdaptationUncheckedCreateWithoutUserRoadmapInput> | RoadmapAdaptationCreateWithoutUserRoadmapInput[] | RoadmapAdaptationUncheckedCreateWithoutUserRoadmapInput[]
     connectOrCreate?: RoadmapAdaptationCreateOrConnectWithoutUserRoadmapInput | RoadmapAdaptationCreateOrConnectWithoutUserRoadmapInput[]
@@ -25248,6 +32160,20 @@ export namespace Prisma {
     deleteMany?: SkillEvidenceScalarWhereInput | SkillEvidenceScalarWhereInput[]
   }
 
+  export type MicroAssessmentAttemptUncheckedUpdateManyWithoutUserRoadmapNestedInput = {
+    create?: XOR<MicroAssessmentAttemptCreateWithoutUserRoadmapInput, MicroAssessmentAttemptUncheckedCreateWithoutUserRoadmapInput> | MicroAssessmentAttemptCreateWithoutUserRoadmapInput[] | MicroAssessmentAttemptUncheckedCreateWithoutUserRoadmapInput[]
+    connectOrCreate?: MicroAssessmentAttemptCreateOrConnectWithoutUserRoadmapInput | MicroAssessmentAttemptCreateOrConnectWithoutUserRoadmapInput[]
+    upsert?: MicroAssessmentAttemptUpsertWithWhereUniqueWithoutUserRoadmapInput | MicroAssessmentAttemptUpsertWithWhereUniqueWithoutUserRoadmapInput[]
+    createMany?: MicroAssessmentAttemptCreateManyUserRoadmapInputEnvelope
+    set?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    disconnect?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    delete?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    connect?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    update?: MicroAssessmentAttemptUpdateWithWhereUniqueWithoutUserRoadmapInput | MicroAssessmentAttemptUpdateWithWhereUniqueWithoutUserRoadmapInput[]
+    updateMany?: MicroAssessmentAttemptUpdateManyWithWhereWithoutUserRoadmapInput | MicroAssessmentAttemptUpdateManyWithWhereWithoutUserRoadmapInput[]
+    deleteMany?: MicroAssessmentAttemptScalarWhereInput | MicroAssessmentAttemptScalarWhereInput[]
+  }
+
   export type RoadmapAdaptationUncheckedUpdateManyWithoutUserRoadmapNestedInput = {
     create?: XOR<RoadmapAdaptationCreateWithoutUserRoadmapInput, RoadmapAdaptationUncheckedCreateWithoutUserRoadmapInput> | RoadmapAdaptationCreateWithoutUserRoadmapInput[] | RoadmapAdaptationUncheckedCreateWithoutUserRoadmapInput[]
     connectOrCreate?: RoadmapAdaptationCreateOrConnectWithoutUserRoadmapInput | RoadmapAdaptationCreateOrConnectWithoutUserRoadmapInput[]
@@ -25281,6 +32207,13 @@ export namespace Prisma {
     connect?: SprintPerformanceWhereUniqueInput
   }
 
+  export type MicroAssessmentAttemptCreateNestedManyWithoutSprintInput = {
+    create?: XOR<MicroAssessmentAttemptCreateWithoutSprintInput, MicroAssessmentAttemptUncheckedCreateWithoutSprintInput> | MicroAssessmentAttemptCreateWithoutSprintInput[] | MicroAssessmentAttemptUncheckedCreateWithoutSprintInput[]
+    connectOrCreate?: MicroAssessmentAttemptCreateOrConnectWithoutSprintInput | MicroAssessmentAttemptCreateOrConnectWithoutSprintInput[]
+    createMany?: MicroAssessmentAttemptCreateManySprintInputEnvelope
+    connect?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+  }
+
   export type RoadmapAdaptationCreateNestedManyWithoutSprintInput = {
     create?: XOR<RoadmapAdaptationCreateWithoutSprintInput, RoadmapAdaptationUncheckedCreateWithoutSprintInput> | RoadmapAdaptationCreateWithoutSprintInput[] | RoadmapAdaptationUncheckedCreateWithoutSprintInput[]
     connectOrCreate?: RoadmapAdaptationCreateOrConnectWithoutSprintInput | RoadmapAdaptationCreateOrConnectWithoutSprintInput[]
@@ -25299,6 +32232,13 @@ export namespace Prisma {
     create?: XOR<SprintPerformanceCreateWithoutSprintInput, SprintPerformanceUncheckedCreateWithoutSprintInput>
     connectOrCreate?: SprintPerformanceCreateOrConnectWithoutSprintInput
     connect?: SprintPerformanceWhereUniqueInput
+  }
+
+  export type MicroAssessmentAttemptUncheckedCreateNestedManyWithoutSprintInput = {
+    create?: XOR<MicroAssessmentAttemptCreateWithoutSprintInput, MicroAssessmentAttemptUncheckedCreateWithoutSprintInput> | MicroAssessmentAttemptCreateWithoutSprintInput[] | MicroAssessmentAttemptUncheckedCreateWithoutSprintInput[]
+    connectOrCreate?: MicroAssessmentAttemptCreateOrConnectWithoutSprintInput | MicroAssessmentAttemptCreateOrConnectWithoutSprintInput[]
+    createMany?: MicroAssessmentAttemptCreateManySprintInputEnvelope
+    connect?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
   }
 
   export type RoadmapAdaptationUncheckedCreateNestedManyWithoutSprintInput = {
@@ -25348,6 +32288,20 @@ export namespace Prisma {
     update?: XOR<XOR<SprintPerformanceUpdateToOneWithWhereWithoutSprintInput, SprintPerformanceUpdateWithoutSprintInput>, SprintPerformanceUncheckedUpdateWithoutSprintInput>
   }
 
+  export type MicroAssessmentAttemptUpdateManyWithoutSprintNestedInput = {
+    create?: XOR<MicroAssessmentAttemptCreateWithoutSprintInput, MicroAssessmentAttemptUncheckedCreateWithoutSprintInput> | MicroAssessmentAttemptCreateWithoutSprintInput[] | MicroAssessmentAttemptUncheckedCreateWithoutSprintInput[]
+    connectOrCreate?: MicroAssessmentAttemptCreateOrConnectWithoutSprintInput | MicroAssessmentAttemptCreateOrConnectWithoutSprintInput[]
+    upsert?: MicroAssessmentAttemptUpsertWithWhereUniqueWithoutSprintInput | MicroAssessmentAttemptUpsertWithWhereUniqueWithoutSprintInput[]
+    createMany?: MicroAssessmentAttemptCreateManySprintInputEnvelope
+    set?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    disconnect?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    delete?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    connect?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    update?: MicroAssessmentAttemptUpdateWithWhereUniqueWithoutSprintInput | MicroAssessmentAttemptUpdateWithWhereUniqueWithoutSprintInput[]
+    updateMany?: MicroAssessmentAttemptUpdateManyWithWhereWithoutSprintInput | MicroAssessmentAttemptUpdateManyWithWhereWithoutSprintInput[]
+    deleteMany?: MicroAssessmentAttemptScalarWhereInput | MicroAssessmentAttemptScalarWhereInput[]
+  }
+
   export type RoadmapAdaptationUpdateManyWithoutSprintNestedInput = {
     create?: XOR<RoadmapAdaptationCreateWithoutSprintInput, RoadmapAdaptationUncheckedCreateWithoutSprintInput> | RoadmapAdaptationCreateWithoutSprintInput[] | RoadmapAdaptationUncheckedCreateWithoutSprintInput[]
     connectOrCreate?: RoadmapAdaptationCreateOrConnectWithoutSprintInput | RoadmapAdaptationCreateOrConnectWithoutSprintInput[]
@@ -25386,6 +32340,20 @@ export namespace Prisma {
     update?: XOR<XOR<SprintPerformanceUpdateToOneWithWhereWithoutSprintInput, SprintPerformanceUpdateWithoutSprintInput>, SprintPerformanceUncheckedUpdateWithoutSprintInput>
   }
 
+  export type MicroAssessmentAttemptUncheckedUpdateManyWithoutSprintNestedInput = {
+    create?: XOR<MicroAssessmentAttemptCreateWithoutSprintInput, MicroAssessmentAttemptUncheckedCreateWithoutSprintInput> | MicroAssessmentAttemptCreateWithoutSprintInput[] | MicroAssessmentAttemptUncheckedCreateWithoutSprintInput[]
+    connectOrCreate?: MicroAssessmentAttemptCreateOrConnectWithoutSprintInput | MicroAssessmentAttemptCreateOrConnectWithoutSprintInput[]
+    upsert?: MicroAssessmentAttemptUpsertWithWhereUniqueWithoutSprintInput | MicroAssessmentAttemptUpsertWithWhereUniqueWithoutSprintInput[]
+    createMany?: MicroAssessmentAttemptCreateManySprintInputEnvelope
+    set?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    disconnect?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    delete?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    connect?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    update?: MicroAssessmentAttemptUpdateWithWhereUniqueWithoutSprintInput | MicroAssessmentAttemptUpdateWithWhereUniqueWithoutSprintInput[]
+    updateMany?: MicroAssessmentAttemptUpdateManyWithWhereWithoutSprintInput | MicroAssessmentAttemptUpdateManyWithWhereWithoutSprintInput[]
+    deleteMany?: MicroAssessmentAttemptScalarWhereInput | MicroAssessmentAttemptScalarWhereInput[]
+  }
+
   export type RoadmapAdaptationUncheckedUpdateManyWithoutSprintNestedInput = {
     create?: XOR<RoadmapAdaptationCreateWithoutSprintInput, RoadmapAdaptationUncheckedCreateWithoutSprintInput> | RoadmapAdaptationCreateWithoutSprintInput[] | RoadmapAdaptationUncheckedCreateWithoutSprintInput[]
     connectOrCreate?: RoadmapAdaptationCreateOrConnectWithoutSprintInput | RoadmapAdaptationCreateOrConnectWithoutSprintInput[]
@@ -25412,6 +32380,20 @@ export namespace Prisma {
     connect?: RoadmapNodeWhereUniqueInput
   }
 
+  export type MicroAssessmentAttemptCreateNestedManyWithoutSprintTaskInput = {
+    create?: XOR<MicroAssessmentAttemptCreateWithoutSprintTaskInput, MicroAssessmentAttemptUncheckedCreateWithoutSprintTaskInput> | MicroAssessmentAttemptCreateWithoutSprintTaskInput[] | MicroAssessmentAttemptUncheckedCreateWithoutSprintTaskInput[]
+    connectOrCreate?: MicroAssessmentAttemptCreateOrConnectWithoutSprintTaskInput | MicroAssessmentAttemptCreateOrConnectWithoutSprintTaskInput[]
+    createMany?: MicroAssessmentAttemptCreateManySprintTaskInputEnvelope
+    connect?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+  }
+
+  export type MicroAssessmentAttemptUncheckedCreateNestedManyWithoutSprintTaskInput = {
+    create?: XOR<MicroAssessmentAttemptCreateWithoutSprintTaskInput, MicroAssessmentAttemptUncheckedCreateWithoutSprintTaskInput> | MicroAssessmentAttemptCreateWithoutSprintTaskInput[] | MicroAssessmentAttemptUncheckedCreateWithoutSprintTaskInput[]
+    connectOrCreate?: MicroAssessmentAttemptCreateOrConnectWithoutSprintTaskInput | MicroAssessmentAttemptCreateOrConnectWithoutSprintTaskInput[]
+    createMany?: MicroAssessmentAttemptCreateManySprintTaskInputEnvelope
+    connect?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+  }
+
   export type EnumSprintTaskStatusFieldUpdateOperationsInput = {
     set?: $Enums.SprintTaskStatus
   }
@@ -25432,6 +32414,34 @@ export namespace Prisma {
     delete?: RoadmapNodeWhereInput | boolean
     connect?: RoadmapNodeWhereUniqueInput
     update?: XOR<XOR<RoadmapNodeUpdateToOneWithWhereWithoutSprintTasksInput, RoadmapNodeUpdateWithoutSprintTasksInput>, RoadmapNodeUncheckedUpdateWithoutSprintTasksInput>
+  }
+
+  export type MicroAssessmentAttemptUpdateManyWithoutSprintTaskNestedInput = {
+    create?: XOR<MicroAssessmentAttemptCreateWithoutSprintTaskInput, MicroAssessmentAttemptUncheckedCreateWithoutSprintTaskInput> | MicroAssessmentAttemptCreateWithoutSprintTaskInput[] | MicroAssessmentAttemptUncheckedCreateWithoutSprintTaskInput[]
+    connectOrCreate?: MicroAssessmentAttemptCreateOrConnectWithoutSprintTaskInput | MicroAssessmentAttemptCreateOrConnectWithoutSprintTaskInput[]
+    upsert?: MicroAssessmentAttemptUpsertWithWhereUniqueWithoutSprintTaskInput | MicroAssessmentAttemptUpsertWithWhereUniqueWithoutSprintTaskInput[]
+    createMany?: MicroAssessmentAttemptCreateManySprintTaskInputEnvelope
+    set?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    disconnect?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    delete?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    connect?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    update?: MicroAssessmentAttemptUpdateWithWhereUniqueWithoutSprintTaskInput | MicroAssessmentAttemptUpdateWithWhereUniqueWithoutSprintTaskInput[]
+    updateMany?: MicroAssessmentAttemptUpdateManyWithWhereWithoutSprintTaskInput | MicroAssessmentAttemptUpdateManyWithWhereWithoutSprintTaskInput[]
+    deleteMany?: MicroAssessmentAttemptScalarWhereInput | MicroAssessmentAttemptScalarWhereInput[]
+  }
+
+  export type MicroAssessmentAttemptUncheckedUpdateManyWithoutSprintTaskNestedInput = {
+    create?: XOR<MicroAssessmentAttemptCreateWithoutSprintTaskInput, MicroAssessmentAttemptUncheckedCreateWithoutSprintTaskInput> | MicroAssessmentAttemptCreateWithoutSprintTaskInput[] | MicroAssessmentAttemptUncheckedCreateWithoutSprintTaskInput[]
+    connectOrCreate?: MicroAssessmentAttemptCreateOrConnectWithoutSprintTaskInput | MicroAssessmentAttemptCreateOrConnectWithoutSprintTaskInput[]
+    upsert?: MicroAssessmentAttemptUpsertWithWhereUniqueWithoutSprintTaskInput | MicroAssessmentAttemptUpsertWithWhereUniqueWithoutSprintTaskInput[]
+    createMany?: MicroAssessmentAttemptCreateManySprintTaskInputEnvelope
+    set?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    disconnect?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    delete?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    connect?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    update?: MicroAssessmentAttemptUpdateWithWhereUniqueWithoutSprintTaskInput | MicroAssessmentAttemptUpdateWithWhereUniqueWithoutSprintTaskInput[]
+    updateMany?: MicroAssessmentAttemptUpdateManyWithWhereWithoutSprintTaskInput | MicroAssessmentAttemptUpdateManyWithWhereWithoutSprintTaskInput[]
+    deleteMany?: MicroAssessmentAttemptScalarWhereInput | MicroAssessmentAttemptScalarWhereInput[]
   }
 
   export type RoadmapSprintCreateNestedOneWithoutPerformanceInput = {
@@ -25484,6 +32494,223 @@ export namespace Prisma {
     update?: XOR<XOR<SkillUpdateToOneWithWhereWithoutEvidenceInput, SkillUpdateWithoutEvidenceInput>, SkillUncheckedUpdateWithoutEvidenceInput>
   }
 
+  export type RoadmapNodeCreateNestedOneWithoutAssessmentsInput = {
+    create?: XOR<RoadmapNodeCreateWithoutAssessmentsInput, RoadmapNodeUncheckedCreateWithoutAssessmentsInput>
+    connectOrCreate?: RoadmapNodeCreateOrConnectWithoutAssessmentsInput
+    connect?: RoadmapNodeWhereUniqueInput
+  }
+
+  export type SkillCreateNestedOneWithoutAssessmentsInput = {
+    create?: XOR<SkillCreateWithoutAssessmentsInput, SkillUncheckedCreateWithoutAssessmentsInput>
+    connectOrCreate?: SkillCreateOrConnectWithoutAssessmentsInput
+    connect?: SkillWhereUniqueInput
+  }
+
+  export type MicroAssessmentQuestionCreateNestedManyWithoutAssessmentInput = {
+    create?: XOR<MicroAssessmentQuestionCreateWithoutAssessmentInput, MicroAssessmentQuestionUncheckedCreateWithoutAssessmentInput> | MicroAssessmentQuestionCreateWithoutAssessmentInput[] | MicroAssessmentQuestionUncheckedCreateWithoutAssessmentInput[]
+    connectOrCreate?: MicroAssessmentQuestionCreateOrConnectWithoutAssessmentInput | MicroAssessmentQuestionCreateOrConnectWithoutAssessmentInput[]
+    createMany?: MicroAssessmentQuestionCreateManyAssessmentInputEnvelope
+    connect?: MicroAssessmentQuestionWhereUniqueInput | MicroAssessmentQuestionWhereUniqueInput[]
+  }
+
+  export type MicroAssessmentAttemptCreateNestedManyWithoutAssessmentInput = {
+    create?: XOR<MicroAssessmentAttemptCreateWithoutAssessmentInput, MicroAssessmentAttemptUncheckedCreateWithoutAssessmentInput> | MicroAssessmentAttemptCreateWithoutAssessmentInput[] | MicroAssessmentAttemptUncheckedCreateWithoutAssessmentInput[]
+    connectOrCreate?: MicroAssessmentAttemptCreateOrConnectWithoutAssessmentInput | MicroAssessmentAttemptCreateOrConnectWithoutAssessmentInput[]
+    createMany?: MicroAssessmentAttemptCreateManyAssessmentInputEnvelope
+    connect?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+  }
+
+  export type MicroAssessmentQuestionUncheckedCreateNestedManyWithoutAssessmentInput = {
+    create?: XOR<MicroAssessmentQuestionCreateWithoutAssessmentInput, MicroAssessmentQuestionUncheckedCreateWithoutAssessmentInput> | MicroAssessmentQuestionCreateWithoutAssessmentInput[] | MicroAssessmentQuestionUncheckedCreateWithoutAssessmentInput[]
+    connectOrCreate?: MicroAssessmentQuestionCreateOrConnectWithoutAssessmentInput | MicroAssessmentQuestionCreateOrConnectWithoutAssessmentInput[]
+    createMany?: MicroAssessmentQuestionCreateManyAssessmentInputEnvelope
+    connect?: MicroAssessmentQuestionWhereUniqueInput | MicroAssessmentQuestionWhereUniqueInput[]
+  }
+
+  export type MicroAssessmentAttemptUncheckedCreateNestedManyWithoutAssessmentInput = {
+    create?: XOR<MicroAssessmentAttemptCreateWithoutAssessmentInput, MicroAssessmentAttemptUncheckedCreateWithoutAssessmentInput> | MicroAssessmentAttemptCreateWithoutAssessmentInput[] | MicroAssessmentAttemptUncheckedCreateWithoutAssessmentInput[]
+    connectOrCreate?: MicroAssessmentAttemptCreateOrConnectWithoutAssessmentInput | MicroAssessmentAttemptCreateOrConnectWithoutAssessmentInput[]
+    createMany?: MicroAssessmentAttemptCreateManyAssessmentInputEnvelope
+    connect?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+  }
+
+  export type RoadmapNodeUpdateOneWithoutAssessmentsNestedInput = {
+    create?: XOR<RoadmapNodeCreateWithoutAssessmentsInput, RoadmapNodeUncheckedCreateWithoutAssessmentsInput>
+    connectOrCreate?: RoadmapNodeCreateOrConnectWithoutAssessmentsInput
+    upsert?: RoadmapNodeUpsertWithoutAssessmentsInput
+    disconnect?: RoadmapNodeWhereInput | boolean
+    delete?: RoadmapNodeWhereInput | boolean
+    connect?: RoadmapNodeWhereUniqueInput
+    update?: XOR<XOR<RoadmapNodeUpdateToOneWithWhereWithoutAssessmentsInput, RoadmapNodeUpdateWithoutAssessmentsInput>, RoadmapNodeUncheckedUpdateWithoutAssessmentsInput>
+  }
+
+  export type SkillUpdateOneWithoutAssessmentsNestedInput = {
+    create?: XOR<SkillCreateWithoutAssessmentsInput, SkillUncheckedCreateWithoutAssessmentsInput>
+    connectOrCreate?: SkillCreateOrConnectWithoutAssessmentsInput
+    upsert?: SkillUpsertWithoutAssessmentsInput
+    disconnect?: SkillWhereInput | boolean
+    delete?: SkillWhereInput | boolean
+    connect?: SkillWhereUniqueInput
+    update?: XOR<XOR<SkillUpdateToOneWithWhereWithoutAssessmentsInput, SkillUpdateWithoutAssessmentsInput>, SkillUncheckedUpdateWithoutAssessmentsInput>
+  }
+
+  export type MicroAssessmentQuestionUpdateManyWithoutAssessmentNestedInput = {
+    create?: XOR<MicroAssessmentQuestionCreateWithoutAssessmentInput, MicroAssessmentQuestionUncheckedCreateWithoutAssessmentInput> | MicroAssessmentQuestionCreateWithoutAssessmentInput[] | MicroAssessmentQuestionUncheckedCreateWithoutAssessmentInput[]
+    connectOrCreate?: MicroAssessmentQuestionCreateOrConnectWithoutAssessmentInput | MicroAssessmentQuestionCreateOrConnectWithoutAssessmentInput[]
+    upsert?: MicroAssessmentQuestionUpsertWithWhereUniqueWithoutAssessmentInput | MicroAssessmentQuestionUpsertWithWhereUniqueWithoutAssessmentInput[]
+    createMany?: MicroAssessmentQuestionCreateManyAssessmentInputEnvelope
+    set?: MicroAssessmentQuestionWhereUniqueInput | MicroAssessmentQuestionWhereUniqueInput[]
+    disconnect?: MicroAssessmentQuestionWhereUniqueInput | MicroAssessmentQuestionWhereUniqueInput[]
+    delete?: MicroAssessmentQuestionWhereUniqueInput | MicroAssessmentQuestionWhereUniqueInput[]
+    connect?: MicroAssessmentQuestionWhereUniqueInput | MicroAssessmentQuestionWhereUniqueInput[]
+    update?: MicroAssessmentQuestionUpdateWithWhereUniqueWithoutAssessmentInput | MicroAssessmentQuestionUpdateWithWhereUniqueWithoutAssessmentInput[]
+    updateMany?: MicroAssessmentQuestionUpdateManyWithWhereWithoutAssessmentInput | MicroAssessmentQuestionUpdateManyWithWhereWithoutAssessmentInput[]
+    deleteMany?: MicroAssessmentQuestionScalarWhereInput | MicroAssessmentQuestionScalarWhereInput[]
+  }
+
+  export type MicroAssessmentAttemptUpdateManyWithoutAssessmentNestedInput = {
+    create?: XOR<MicroAssessmentAttemptCreateWithoutAssessmentInput, MicroAssessmentAttemptUncheckedCreateWithoutAssessmentInput> | MicroAssessmentAttemptCreateWithoutAssessmentInput[] | MicroAssessmentAttemptUncheckedCreateWithoutAssessmentInput[]
+    connectOrCreate?: MicroAssessmentAttemptCreateOrConnectWithoutAssessmentInput | MicroAssessmentAttemptCreateOrConnectWithoutAssessmentInput[]
+    upsert?: MicroAssessmentAttemptUpsertWithWhereUniqueWithoutAssessmentInput | MicroAssessmentAttemptUpsertWithWhereUniqueWithoutAssessmentInput[]
+    createMany?: MicroAssessmentAttemptCreateManyAssessmentInputEnvelope
+    set?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    disconnect?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    delete?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    connect?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    update?: MicroAssessmentAttemptUpdateWithWhereUniqueWithoutAssessmentInput | MicroAssessmentAttemptUpdateWithWhereUniqueWithoutAssessmentInput[]
+    updateMany?: MicroAssessmentAttemptUpdateManyWithWhereWithoutAssessmentInput | MicroAssessmentAttemptUpdateManyWithWhereWithoutAssessmentInput[]
+    deleteMany?: MicroAssessmentAttemptScalarWhereInput | MicroAssessmentAttemptScalarWhereInput[]
+  }
+
+  export type MicroAssessmentQuestionUncheckedUpdateManyWithoutAssessmentNestedInput = {
+    create?: XOR<MicroAssessmentQuestionCreateWithoutAssessmentInput, MicroAssessmentQuestionUncheckedCreateWithoutAssessmentInput> | MicroAssessmentQuestionCreateWithoutAssessmentInput[] | MicroAssessmentQuestionUncheckedCreateWithoutAssessmentInput[]
+    connectOrCreate?: MicroAssessmentQuestionCreateOrConnectWithoutAssessmentInput | MicroAssessmentQuestionCreateOrConnectWithoutAssessmentInput[]
+    upsert?: MicroAssessmentQuestionUpsertWithWhereUniqueWithoutAssessmentInput | MicroAssessmentQuestionUpsertWithWhereUniqueWithoutAssessmentInput[]
+    createMany?: MicroAssessmentQuestionCreateManyAssessmentInputEnvelope
+    set?: MicroAssessmentQuestionWhereUniqueInput | MicroAssessmentQuestionWhereUniqueInput[]
+    disconnect?: MicroAssessmentQuestionWhereUniqueInput | MicroAssessmentQuestionWhereUniqueInput[]
+    delete?: MicroAssessmentQuestionWhereUniqueInput | MicroAssessmentQuestionWhereUniqueInput[]
+    connect?: MicroAssessmentQuestionWhereUniqueInput | MicroAssessmentQuestionWhereUniqueInput[]
+    update?: MicroAssessmentQuestionUpdateWithWhereUniqueWithoutAssessmentInput | MicroAssessmentQuestionUpdateWithWhereUniqueWithoutAssessmentInput[]
+    updateMany?: MicroAssessmentQuestionUpdateManyWithWhereWithoutAssessmentInput | MicroAssessmentQuestionUpdateManyWithWhereWithoutAssessmentInput[]
+    deleteMany?: MicroAssessmentQuestionScalarWhereInput | MicroAssessmentQuestionScalarWhereInput[]
+  }
+
+  export type MicroAssessmentAttemptUncheckedUpdateManyWithoutAssessmentNestedInput = {
+    create?: XOR<MicroAssessmentAttemptCreateWithoutAssessmentInput, MicroAssessmentAttemptUncheckedCreateWithoutAssessmentInput> | MicroAssessmentAttemptCreateWithoutAssessmentInput[] | MicroAssessmentAttemptUncheckedCreateWithoutAssessmentInput[]
+    connectOrCreate?: MicroAssessmentAttemptCreateOrConnectWithoutAssessmentInput | MicroAssessmentAttemptCreateOrConnectWithoutAssessmentInput[]
+    upsert?: MicroAssessmentAttemptUpsertWithWhereUniqueWithoutAssessmentInput | MicroAssessmentAttemptUpsertWithWhereUniqueWithoutAssessmentInput[]
+    createMany?: MicroAssessmentAttemptCreateManyAssessmentInputEnvelope
+    set?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    disconnect?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    delete?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    connect?: MicroAssessmentAttemptWhereUniqueInput | MicroAssessmentAttemptWhereUniqueInput[]
+    update?: MicroAssessmentAttemptUpdateWithWhereUniqueWithoutAssessmentInput | MicroAssessmentAttemptUpdateWithWhereUniqueWithoutAssessmentInput[]
+    updateMany?: MicroAssessmentAttemptUpdateManyWithWhereWithoutAssessmentInput | MicroAssessmentAttemptUpdateManyWithWhereWithoutAssessmentInput[]
+    deleteMany?: MicroAssessmentAttemptScalarWhereInput | MicroAssessmentAttemptScalarWhereInput[]
+  }
+
+  export type MicroAssessmentQuestionCreateoptionsInput = {
+    set: string[]
+  }
+
+  export type MicroAssessmentCreateNestedOneWithoutQuestionsInput = {
+    create?: XOR<MicroAssessmentCreateWithoutQuestionsInput, MicroAssessmentUncheckedCreateWithoutQuestionsInput>
+    connectOrCreate?: MicroAssessmentCreateOrConnectWithoutQuestionsInput
+    connect?: MicroAssessmentWhereUniqueInput
+  }
+
+  export type MicroAssessmentQuestionUpdateoptionsInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type MicroAssessmentUpdateOneRequiredWithoutQuestionsNestedInput = {
+    create?: XOR<MicroAssessmentCreateWithoutQuestionsInput, MicroAssessmentUncheckedCreateWithoutQuestionsInput>
+    connectOrCreate?: MicroAssessmentCreateOrConnectWithoutQuestionsInput
+    upsert?: MicroAssessmentUpsertWithoutQuestionsInput
+    connect?: MicroAssessmentWhereUniqueInput
+    update?: XOR<XOR<MicroAssessmentUpdateToOneWithWhereWithoutQuestionsInput, MicroAssessmentUpdateWithoutQuestionsInput>, MicroAssessmentUncheckedUpdateWithoutQuestionsInput>
+  }
+
+  export type MicroAssessmentCreateNestedOneWithoutAttemptsInput = {
+    create?: XOR<MicroAssessmentCreateWithoutAttemptsInput, MicroAssessmentUncheckedCreateWithoutAttemptsInput>
+    connectOrCreate?: MicroAssessmentCreateOrConnectWithoutAttemptsInput
+    connect?: MicroAssessmentWhereUniqueInput
+  }
+
+  export type UserRoadmapCreateNestedOneWithoutAssessmentAttemptsInput = {
+    create?: XOR<UserRoadmapCreateWithoutAssessmentAttemptsInput, UserRoadmapUncheckedCreateWithoutAssessmentAttemptsInput>
+    connectOrCreate?: UserRoadmapCreateOrConnectWithoutAssessmentAttemptsInput
+    connect?: UserRoadmapWhereUniqueInput
+  }
+
+  export type RoadmapSprintCreateNestedOneWithoutAssessmentAttemptsInput = {
+    create?: XOR<RoadmapSprintCreateWithoutAssessmentAttemptsInput, RoadmapSprintUncheckedCreateWithoutAssessmentAttemptsInput>
+    connectOrCreate?: RoadmapSprintCreateOrConnectWithoutAssessmentAttemptsInput
+    connect?: RoadmapSprintWhereUniqueInput
+  }
+
+  export type RoadmapSprintTaskCreateNestedOneWithoutAssessmentAttemptsInput = {
+    create?: XOR<RoadmapSprintTaskCreateWithoutAssessmentAttemptsInput, RoadmapSprintTaskUncheckedCreateWithoutAssessmentAttemptsInput>
+    connectOrCreate?: RoadmapSprintTaskCreateOrConnectWithoutAssessmentAttemptsInput
+    connect?: RoadmapSprintTaskWhereUniqueInput
+  }
+
+  export type SkillCreateNestedOneWithoutAssessmentAttemptsInput = {
+    create?: XOR<SkillCreateWithoutAssessmentAttemptsInput, SkillUncheckedCreateWithoutAssessmentAttemptsInput>
+    connectOrCreate?: SkillCreateOrConnectWithoutAssessmentAttemptsInput
+    connect?: SkillWhereUniqueInput
+  }
+
+  export type MicroAssessmentUpdateOneRequiredWithoutAttemptsNestedInput = {
+    create?: XOR<MicroAssessmentCreateWithoutAttemptsInput, MicroAssessmentUncheckedCreateWithoutAttemptsInput>
+    connectOrCreate?: MicroAssessmentCreateOrConnectWithoutAttemptsInput
+    upsert?: MicroAssessmentUpsertWithoutAttemptsInput
+    connect?: MicroAssessmentWhereUniqueInput
+    update?: XOR<XOR<MicroAssessmentUpdateToOneWithWhereWithoutAttemptsInput, MicroAssessmentUpdateWithoutAttemptsInput>, MicroAssessmentUncheckedUpdateWithoutAttemptsInput>
+  }
+
+  export type UserRoadmapUpdateOneWithoutAssessmentAttemptsNestedInput = {
+    create?: XOR<UserRoadmapCreateWithoutAssessmentAttemptsInput, UserRoadmapUncheckedCreateWithoutAssessmentAttemptsInput>
+    connectOrCreate?: UserRoadmapCreateOrConnectWithoutAssessmentAttemptsInput
+    upsert?: UserRoadmapUpsertWithoutAssessmentAttemptsInput
+    disconnect?: UserRoadmapWhereInput | boolean
+    delete?: UserRoadmapWhereInput | boolean
+    connect?: UserRoadmapWhereUniqueInput
+    update?: XOR<XOR<UserRoadmapUpdateToOneWithWhereWithoutAssessmentAttemptsInput, UserRoadmapUpdateWithoutAssessmentAttemptsInput>, UserRoadmapUncheckedUpdateWithoutAssessmentAttemptsInput>
+  }
+
+  export type RoadmapSprintUpdateOneWithoutAssessmentAttemptsNestedInput = {
+    create?: XOR<RoadmapSprintCreateWithoutAssessmentAttemptsInput, RoadmapSprintUncheckedCreateWithoutAssessmentAttemptsInput>
+    connectOrCreate?: RoadmapSprintCreateOrConnectWithoutAssessmentAttemptsInput
+    upsert?: RoadmapSprintUpsertWithoutAssessmentAttemptsInput
+    disconnect?: RoadmapSprintWhereInput | boolean
+    delete?: RoadmapSprintWhereInput | boolean
+    connect?: RoadmapSprintWhereUniqueInput
+    update?: XOR<XOR<RoadmapSprintUpdateToOneWithWhereWithoutAssessmentAttemptsInput, RoadmapSprintUpdateWithoutAssessmentAttemptsInput>, RoadmapSprintUncheckedUpdateWithoutAssessmentAttemptsInput>
+  }
+
+  export type RoadmapSprintTaskUpdateOneWithoutAssessmentAttemptsNestedInput = {
+    create?: XOR<RoadmapSprintTaskCreateWithoutAssessmentAttemptsInput, RoadmapSprintTaskUncheckedCreateWithoutAssessmentAttemptsInput>
+    connectOrCreate?: RoadmapSprintTaskCreateOrConnectWithoutAssessmentAttemptsInput
+    upsert?: RoadmapSprintTaskUpsertWithoutAssessmentAttemptsInput
+    disconnect?: RoadmapSprintTaskWhereInput | boolean
+    delete?: RoadmapSprintTaskWhereInput | boolean
+    connect?: RoadmapSprintTaskWhereUniqueInput
+    update?: XOR<XOR<RoadmapSprintTaskUpdateToOneWithWhereWithoutAssessmentAttemptsInput, RoadmapSprintTaskUpdateWithoutAssessmentAttemptsInput>, RoadmapSprintTaskUncheckedUpdateWithoutAssessmentAttemptsInput>
+  }
+
+  export type SkillUpdateOneWithoutAssessmentAttemptsNestedInput = {
+    create?: XOR<SkillCreateWithoutAssessmentAttemptsInput, SkillUncheckedCreateWithoutAssessmentAttemptsInput>
+    connectOrCreate?: SkillCreateOrConnectWithoutAssessmentAttemptsInput
+    upsert?: SkillUpsertWithoutAssessmentAttemptsInput
+    disconnect?: SkillWhereInput | boolean
+    delete?: SkillWhereInput | boolean
+    connect?: SkillWhereUniqueInput
+    update?: XOR<XOR<SkillUpdateToOneWithWhereWithoutAssessmentAttemptsInput, SkillUpdateWithoutAssessmentAttemptsInput>, SkillUncheckedUpdateWithoutAssessmentAttemptsInput>
+  }
+
   export type UserRoadmapCreateNestedOneWithoutAdaptationsInput = {
     create?: XOR<UserRoadmapCreateWithoutAdaptationsInput, UserRoadmapUncheckedCreateWithoutAdaptationsInput>
     connectOrCreate?: UserRoadmapCreateOrConnectWithoutAdaptationsInput
@@ -25522,9 +32749,65 @@ export namespace Prisma {
     set: string[]
   }
 
+  export type DiscussionCommentCreateNestedManyWithoutPostInput = {
+    create?: XOR<DiscussionCommentCreateWithoutPostInput, DiscussionCommentUncheckedCreateWithoutPostInput> | DiscussionCommentCreateWithoutPostInput[] | DiscussionCommentUncheckedCreateWithoutPostInput[]
+    connectOrCreate?: DiscussionCommentCreateOrConnectWithoutPostInput | DiscussionCommentCreateOrConnectWithoutPostInput[]
+    createMany?: DiscussionCommentCreateManyPostInputEnvelope
+    connect?: DiscussionCommentWhereUniqueInput | DiscussionCommentWhereUniqueInput[]
+  }
+
+  export type DiscussionCommentUncheckedCreateNestedManyWithoutPostInput = {
+    create?: XOR<DiscussionCommentCreateWithoutPostInput, DiscussionCommentUncheckedCreateWithoutPostInput> | DiscussionCommentCreateWithoutPostInput[] | DiscussionCommentUncheckedCreateWithoutPostInput[]
+    connectOrCreate?: DiscussionCommentCreateOrConnectWithoutPostInput | DiscussionCommentCreateOrConnectWithoutPostInput[]
+    createMany?: DiscussionCommentCreateManyPostInputEnvelope
+    connect?: DiscussionCommentWhereUniqueInput | DiscussionCommentWhereUniqueInput[]
+  }
+
   export type DiscussionPostUpdatetagsInput = {
     set?: string[]
     push?: string | string[]
+  }
+
+  export type DiscussionCommentUpdateManyWithoutPostNestedInput = {
+    create?: XOR<DiscussionCommentCreateWithoutPostInput, DiscussionCommentUncheckedCreateWithoutPostInput> | DiscussionCommentCreateWithoutPostInput[] | DiscussionCommentUncheckedCreateWithoutPostInput[]
+    connectOrCreate?: DiscussionCommentCreateOrConnectWithoutPostInput | DiscussionCommentCreateOrConnectWithoutPostInput[]
+    upsert?: DiscussionCommentUpsertWithWhereUniqueWithoutPostInput | DiscussionCommentUpsertWithWhereUniqueWithoutPostInput[]
+    createMany?: DiscussionCommentCreateManyPostInputEnvelope
+    set?: DiscussionCommentWhereUniqueInput | DiscussionCommentWhereUniqueInput[]
+    disconnect?: DiscussionCommentWhereUniqueInput | DiscussionCommentWhereUniqueInput[]
+    delete?: DiscussionCommentWhereUniqueInput | DiscussionCommentWhereUniqueInput[]
+    connect?: DiscussionCommentWhereUniqueInput | DiscussionCommentWhereUniqueInput[]
+    update?: DiscussionCommentUpdateWithWhereUniqueWithoutPostInput | DiscussionCommentUpdateWithWhereUniqueWithoutPostInput[]
+    updateMany?: DiscussionCommentUpdateManyWithWhereWithoutPostInput | DiscussionCommentUpdateManyWithWhereWithoutPostInput[]
+    deleteMany?: DiscussionCommentScalarWhereInput | DiscussionCommentScalarWhereInput[]
+  }
+
+  export type DiscussionCommentUncheckedUpdateManyWithoutPostNestedInput = {
+    create?: XOR<DiscussionCommentCreateWithoutPostInput, DiscussionCommentUncheckedCreateWithoutPostInput> | DiscussionCommentCreateWithoutPostInput[] | DiscussionCommentUncheckedCreateWithoutPostInput[]
+    connectOrCreate?: DiscussionCommentCreateOrConnectWithoutPostInput | DiscussionCommentCreateOrConnectWithoutPostInput[]
+    upsert?: DiscussionCommentUpsertWithWhereUniqueWithoutPostInput | DiscussionCommentUpsertWithWhereUniqueWithoutPostInput[]
+    createMany?: DiscussionCommentCreateManyPostInputEnvelope
+    set?: DiscussionCommentWhereUniqueInput | DiscussionCommentWhereUniqueInput[]
+    disconnect?: DiscussionCommentWhereUniqueInput | DiscussionCommentWhereUniqueInput[]
+    delete?: DiscussionCommentWhereUniqueInput | DiscussionCommentWhereUniqueInput[]
+    connect?: DiscussionCommentWhereUniqueInput | DiscussionCommentWhereUniqueInput[]
+    update?: DiscussionCommentUpdateWithWhereUniqueWithoutPostInput | DiscussionCommentUpdateWithWhereUniqueWithoutPostInput[]
+    updateMany?: DiscussionCommentUpdateManyWithWhereWithoutPostInput | DiscussionCommentUpdateManyWithWhereWithoutPostInput[]
+    deleteMany?: DiscussionCommentScalarWhereInput | DiscussionCommentScalarWhereInput[]
+  }
+
+  export type DiscussionPostCreateNestedOneWithoutCommentsInput = {
+    create?: XOR<DiscussionPostCreateWithoutCommentsInput, DiscussionPostUncheckedCreateWithoutCommentsInput>
+    connectOrCreate?: DiscussionPostCreateOrConnectWithoutCommentsInput
+    connect?: DiscussionPostWhereUniqueInput
+  }
+
+  export type DiscussionPostUpdateOneRequiredWithoutCommentsNestedInput = {
+    create?: XOR<DiscussionPostCreateWithoutCommentsInput, DiscussionPostUncheckedCreateWithoutCommentsInput>
+    connectOrCreate?: DiscussionPostCreateOrConnectWithoutCommentsInput
+    upsert?: DiscussionPostUpsertWithoutCommentsInput
+    connect?: DiscussionPostWhereUniqueInput
+    update?: XOR<XOR<DiscussionPostUpdateToOneWithWhereWithoutCommentsInput, DiscussionPostUpdateWithoutCommentsInput>, DiscussionPostUncheckedUpdateWithoutCommentsInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -25541,17 +32824,6 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
-  export type NestedIntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
-  }
-
   export type NestedStringNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -25564,6 +32836,22 @@ export namespace Prisma {
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type NestedIntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
   export type NestedEnumRoadmapVisibilityFilter<$PrismaModel = never> = {
@@ -25601,6 +32889,34 @@ export namespace Prisma {
     _max?: NestedStringFilter<$PrismaModel>
   }
 
+  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type NestedIntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -25627,6 +32943,14 @@ export namespace Prisma {
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatFilter<$PrismaModel> | number
   }
+
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
   export type NestedJsonFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
@@ -25650,17 +32974,6 @@ export namespace Prisma {
     gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
-
-  export type NestedIntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
-  }
   export type NestedJsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
@@ -25683,23 +32996,6 @@ export namespace Prisma {
     gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-  }
-
-  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
   export type NestedEnumRoadmapVisibilityWithAggregatesFilter<$PrismaModel = never> = {
@@ -25742,11 +33038,6 @@ export namespace Prisma {
     in?: $Enums.RoadmapDifficulty[] | ListEnumRoadmapDifficultyFieldRefInput<$PrismaModel>
     notIn?: $Enums.RoadmapDifficulty[] | ListEnumRoadmapDifficultyFieldRefInput<$PrismaModel>
     not?: NestedEnumRoadmapDifficultyFilter<$PrismaModel> | $Enums.RoadmapDifficulty
-  }
-
-  export type NestedBoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
   export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -25798,14 +33089,6 @@ export namespace Prisma {
     gt?: number | FloatFieldRefInput<$PrismaModel>
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null
-  }
-
-  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type NestedEnumSkillRelationTypeFilter<$PrismaModel = never> = {
@@ -26020,11 +33303,13 @@ export namespace Prisma {
     orderIndex: number
     estimatedMinutes?: number
     requiresEvidence?: boolean
+    requiresAssessment?: boolean
     targetProficiency?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
     phase?: RoadmapPhaseCreateNestedOneWithoutNodesInput
     skills?: RoadmapNodeSkillCreateNestedManyWithoutNodeInput
+    assessments?: MicroAssessmentCreateNestedManyWithoutRoadmapNodeInput
     prerequisites?: RoadmapNodeDependencyCreateNestedManyWithoutNodeInput
     unlocks?: RoadmapNodeDependencyCreateNestedManyWithoutPrerequisiteNodeInput
     sprintTasks?: RoadmapSprintTaskCreateNestedManyWithoutRoadmapNodeInput
@@ -26040,10 +33325,12 @@ export namespace Prisma {
     orderIndex: number
     estimatedMinutes?: number
     requiresEvidence?: boolean
+    requiresAssessment?: boolean
     targetProficiency?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
     skills?: RoadmapNodeSkillUncheckedCreateNestedManyWithoutNodeInput
+    assessments?: MicroAssessmentUncheckedCreateNestedManyWithoutRoadmapNodeInput
     prerequisites?: RoadmapNodeDependencyUncheckedCreateNestedManyWithoutNodeInput
     unlocks?: RoadmapNodeDependencyUncheckedCreateNestedManyWithoutPrerequisiteNodeInput
     sprintTasks?: RoadmapSprintTaskUncheckedCreateNestedManyWithoutRoadmapNodeInput
@@ -26069,6 +33356,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     sprints?: RoadmapSprintCreateNestedManyWithoutUserRoadmapInput
     skillEvidence?: SkillEvidenceCreateNestedManyWithoutUserRoadmapInput
+    assessmentAttempts?: MicroAssessmentAttemptCreateNestedManyWithoutUserRoadmapInput
     adaptations?: RoadmapAdaptationCreateNestedManyWithoutUserRoadmapInput
   }
 
@@ -26082,6 +33370,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     sprints?: RoadmapSprintUncheckedCreateNestedManyWithoutUserRoadmapInput
     skillEvidence?: SkillEvidenceUncheckedCreateNestedManyWithoutUserRoadmapInput
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedCreateNestedManyWithoutUserRoadmapInput
     adaptations?: RoadmapAdaptationUncheckedCreateNestedManyWithoutUserRoadmapInput
   }
 
@@ -26197,6 +33486,7 @@ export namespace Prisma {
     orderIndex?: IntFilter<"RoadmapNode"> | number
     estimatedMinutes?: IntFilter<"RoadmapNode"> | number
     requiresEvidence?: BoolFilter<"RoadmapNode"> | boolean
+    requiresAssessment?: BoolFilter<"RoadmapNode"> | boolean
     targetProficiency?: IntNullableFilter<"RoadmapNode"> | number | null
     createdAt?: DateTimeFilter<"RoadmapNode"> | Date | string
     updatedAt?: DateTimeFilter<"RoadmapNode"> | Date | string
@@ -26235,13 +33525,16 @@ export namespace Prisma {
   export type CareerRoadmapCreateWithoutGoalInput = {
     id?: string
     userId: string
-    rolePath: string
-    targetCompanyTier?: string
-    overallReadiness?: number
-    nodesData: JsonNullValueInput | InputJsonValue
-    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     title?: string | null
     description?: string | null
+    rolePath: string
+    targetCompanyTier?: string
+    estimatedWeeks?: number
+    overallReadiness?: number
+    isPublic?: boolean
+    isOfficial?: boolean
+    nodesData: JsonNullValueInput | InputJsonValue
+    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     visibility?: $Enums.RoadmapVisibility
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -26253,13 +33546,16 @@ export namespace Prisma {
   export type CareerRoadmapUncheckedCreateWithoutGoalInput = {
     id?: string
     userId: string
-    rolePath: string
-    targetCompanyTier?: string
-    overallReadiness?: number
-    nodesData: JsonNullValueInput | InputJsonValue
-    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     title?: string | null
     description?: string | null
+    rolePath: string
+    targetCompanyTier?: string
+    estimatedWeeks?: number
+    overallReadiness?: number
+    isPublic?: boolean
+    isOfficial?: boolean
+    nodesData: JsonNullValueInput | InputJsonValue
+    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     visibility?: $Enums.RoadmapVisibility
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -26287,13 +33583,16 @@ export namespace Prisma {
   export type CareerRoadmapUpdateWithoutGoalInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    rolePath?: StringFieldUpdateOperationsInput | string
-    targetCompanyTier?: StringFieldUpdateOperationsInput | string
-    overallReadiness?: IntFieldUpdateOperationsInput | number
-    nodesData?: JsonNullValueInput | InputJsonValue
-    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     title?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    rolePath?: StringFieldUpdateOperationsInput | string
+    targetCompanyTier?: StringFieldUpdateOperationsInput | string
+    estimatedWeeks?: IntFieldUpdateOperationsInput | number
+    overallReadiness?: IntFieldUpdateOperationsInput | number
+    isPublic?: BoolFieldUpdateOperationsInput | boolean
+    isOfficial?: BoolFieldUpdateOperationsInput | boolean
+    nodesData?: JsonNullValueInput | InputJsonValue
+    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     visibility?: EnumRoadmapVisibilityFieldUpdateOperationsInput | $Enums.RoadmapVisibility
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -26305,13 +33604,16 @@ export namespace Prisma {
   export type CareerRoadmapUncheckedUpdateWithoutGoalInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    rolePath?: StringFieldUpdateOperationsInput | string
-    targetCompanyTier?: StringFieldUpdateOperationsInput | string
-    overallReadiness?: IntFieldUpdateOperationsInput | number
-    nodesData?: JsonNullValueInput | InputJsonValue
-    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     title?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    rolePath?: StringFieldUpdateOperationsInput | string
+    targetCompanyTier?: StringFieldUpdateOperationsInput | string
+    estimatedWeeks?: IntFieldUpdateOperationsInput | number
+    overallReadiness?: IntFieldUpdateOperationsInput | number
+    isPublic?: BoolFieldUpdateOperationsInput | boolean
+    isOfficial?: BoolFieldUpdateOperationsInput | boolean
+    nodesData?: JsonNullValueInput | InputJsonValue
+    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     visibility?: EnumRoadmapVisibilityFieldUpdateOperationsInput | $Enums.RoadmapVisibility
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -26371,6 +33673,80 @@ export namespace Prisma {
 
   export type SkillEvidenceCreateManySkillInputEnvelope = {
     data: SkillEvidenceCreateManySkillInput | SkillEvidenceCreateManySkillInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type MicroAssessmentCreateWithoutSkillInput = {
+    id?: string
+    title: string
+    description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    roadmapNode?: RoadmapNodeCreateNestedOneWithoutAssessmentsInput
+    questions?: MicroAssessmentQuestionCreateNestedManyWithoutAssessmentInput
+    attempts?: MicroAssessmentAttemptCreateNestedManyWithoutAssessmentInput
+  }
+
+  export type MicroAssessmentUncheckedCreateWithoutSkillInput = {
+    id?: string
+    title: string
+    description?: string | null
+    roadmapNodeId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    questions?: MicroAssessmentQuestionUncheckedCreateNestedManyWithoutAssessmentInput
+    attempts?: MicroAssessmentAttemptUncheckedCreateNestedManyWithoutAssessmentInput
+  }
+
+  export type MicroAssessmentCreateOrConnectWithoutSkillInput = {
+    where: MicroAssessmentWhereUniqueInput
+    create: XOR<MicroAssessmentCreateWithoutSkillInput, MicroAssessmentUncheckedCreateWithoutSkillInput>
+  }
+
+  export type MicroAssessmentCreateManySkillInputEnvelope = {
+    data: MicroAssessmentCreateManySkillInput | MicroAssessmentCreateManySkillInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type MicroAssessmentAttemptCreateWithoutSkillInput = {
+    id?: string
+    userId: string
+    totalQuestions: number
+    correctAnswers: number
+    score: number
+    passed?: boolean
+    answers: JsonNullValueInput | InputJsonValue
+    completedAt?: Date | string
+    createdAt?: Date | string
+    assessment: MicroAssessmentCreateNestedOneWithoutAttemptsInput
+    userRoadmap?: UserRoadmapCreateNestedOneWithoutAssessmentAttemptsInput
+    sprint?: RoadmapSprintCreateNestedOneWithoutAssessmentAttemptsInput
+    sprintTask?: RoadmapSprintTaskCreateNestedOneWithoutAssessmentAttemptsInput
+  }
+
+  export type MicroAssessmentAttemptUncheckedCreateWithoutSkillInput = {
+    id?: string
+    assessmentId: string
+    userId: string
+    userRoadmapId?: string | null
+    sprintId?: string | null
+    sprintTaskId?: string | null
+    totalQuestions: number
+    correctAnswers: number
+    score: number
+    passed?: boolean
+    answers: JsonNullValueInput | InputJsonValue
+    completedAt?: Date | string
+    createdAt?: Date | string
+  }
+
+  export type MicroAssessmentAttemptCreateOrConnectWithoutSkillInput = {
+    where: MicroAssessmentAttemptWhereUniqueInput
+    create: XOR<MicroAssessmentAttemptCreateWithoutSkillInput, MicroAssessmentAttemptUncheckedCreateWithoutSkillInput>
+  }
+
+  export type MicroAssessmentAttemptCreateManySkillInputEnvelope = {
+    data: MicroAssessmentAttemptCreateManySkillInput | MicroAssessmentAttemptCreateManySkillInput[]
     skipDuplicates?: boolean
   }
 
@@ -26479,6 +33855,71 @@ export namespace Prisma {
     assessedAt?: DateTimeFilter<"SkillEvidence"> | Date | string
   }
 
+  export type MicroAssessmentUpsertWithWhereUniqueWithoutSkillInput = {
+    where: MicroAssessmentWhereUniqueInput
+    update: XOR<MicroAssessmentUpdateWithoutSkillInput, MicroAssessmentUncheckedUpdateWithoutSkillInput>
+    create: XOR<MicroAssessmentCreateWithoutSkillInput, MicroAssessmentUncheckedCreateWithoutSkillInput>
+  }
+
+  export type MicroAssessmentUpdateWithWhereUniqueWithoutSkillInput = {
+    where: MicroAssessmentWhereUniqueInput
+    data: XOR<MicroAssessmentUpdateWithoutSkillInput, MicroAssessmentUncheckedUpdateWithoutSkillInput>
+  }
+
+  export type MicroAssessmentUpdateManyWithWhereWithoutSkillInput = {
+    where: MicroAssessmentScalarWhereInput
+    data: XOR<MicroAssessmentUpdateManyMutationInput, MicroAssessmentUncheckedUpdateManyWithoutSkillInput>
+  }
+
+  export type MicroAssessmentScalarWhereInput = {
+    AND?: MicroAssessmentScalarWhereInput | MicroAssessmentScalarWhereInput[]
+    OR?: MicroAssessmentScalarWhereInput[]
+    NOT?: MicroAssessmentScalarWhereInput | MicroAssessmentScalarWhereInput[]
+    id?: StringFilter<"MicroAssessment"> | string
+    title?: StringFilter<"MicroAssessment"> | string
+    description?: StringNullableFilter<"MicroAssessment"> | string | null
+    roadmapNodeId?: StringNullableFilter<"MicroAssessment"> | string | null
+    skillId?: StringNullableFilter<"MicroAssessment"> | string | null
+    createdAt?: DateTimeFilter<"MicroAssessment"> | Date | string
+    updatedAt?: DateTimeFilter<"MicroAssessment"> | Date | string
+  }
+
+  export type MicroAssessmentAttemptUpsertWithWhereUniqueWithoutSkillInput = {
+    where: MicroAssessmentAttemptWhereUniqueInput
+    update: XOR<MicroAssessmentAttemptUpdateWithoutSkillInput, MicroAssessmentAttemptUncheckedUpdateWithoutSkillInput>
+    create: XOR<MicroAssessmentAttemptCreateWithoutSkillInput, MicroAssessmentAttemptUncheckedCreateWithoutSkillInput>
+  }
+
+  export type MicroAssessmentAttemptUpdateWithWhereUniqueWithoutSkillInput = {
+    where: MicroAssessmentAttemptWhereUniqueInput
+    data: XOR<MicroAssessmentAttemptUpdateWithoutSkillInput, MicroAssessmentAttemptUncheckedUpdateWithoutSkillInput>
+  }
+
+  export type MicroAssessmentAttemptUpdateManyWithWhereWithoutSkillInput = {
+    where: MicroAssessmentAttemptScalarWhereInput
+    data: XOR<MicroAssessmentAttemptUpdateManyMutationInput, MicroAssessmentAttemptUncheckedUpdateManyWithoutSkillInput>
+  }
+
+  export type MicroAssessmentAttemptScalarWhereInput = {
+    AND?: MicroAssessmentAttemptScalarWhereInput | MicroAssessmentAttemptScalarWhereInput[]
+    OR?: MicroAssessmentAttemptScalarWhereInput[]
+    NOT?: MicroAssessmentAttemptScalarWhereInput | MicroAssessmentAttemptScalarWhereInput[]
+    id?: StringFilter<"MicroAssessmentAttempt"> | string
+    assessmentId?: StringFilter<"MicroAssessmentAttempt"> | string
+    userId?: StringFilter<"MicroAssessmentAttempt"> | string
+    userRoadmapId?: StringNullableFilter<"MicroAssessmentAttempt"> | string | null
+    sprintId?: StringNullableFilter<"MicroAssessmentAttempt"> | string | null
+    sprintTaskId?: StringNullableFilter<"MicroAssessmentAttempt"> | string | null
+    skillId?: StringNullableFilter<"MicroAssessmentAttempt"> | string | null
+    totalQuestions?: IntFilter<"MicroAssessmentAttempt"> | number
+    correctAnswers?: IntFilter<"MicroAssessmentAttempt"> | number
+    score?: IntFilter<"MicroAssessmentAttempt"> | number
+    passed?: BoolFilter<"MicroAssessmentAttempt"> | boolean
+    answers?: JsonFilter<"MicroAssessmentAttempt">
+    completedAt?: DateTimeFilter<"MicroAssessmentAttempt"> | Date | string
+    createdAt?: DateTimeFilter<"MicroAssessmentAttempt"> | Date | string
+  }
+
   export type SkillRelationshipUpsertWithWhereUniqueWithoutFromSkillInput = {
     where: SkillRelationshipWhereUniqueInput
     update: XOR<SkillRelationshipUpdateWithoutFromSkillInput, SkillRelationshipUncheckedUpdateWithoutFromSkillInput>
@@ -26532,6 +33973,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     nodeLinks?: RoadmapNodeSkillCreateNestedManyWithoutSkillInput
     evidence?: SkillEvidenceCreateNestedManyWithoutSkillInput
+    assessments?: MicroAssessmentCreateNestedManyWithoutSkillInput
+    assessmentAttempts?: MicroAssessmentAttemptCreateNestedManyWithoutSkillInput
     incomingLinks?: SkillRelationshipCreateNestedManyWithoutToSkillInput
   }
 
@@ -26545,6 +33988,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     nodeLinks?: RoadmapNodeSkillUncheckedCreateNestedManyWithoutSkillInput
     evidence?: SkillEvidenceUncheckedCreateNestedManyWithoutSkillInput
+    assessments?: MicroAssessmentUncheckedCreateNestedManyWithoutSkillInput
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedCreateNestedManyWithoutSkillInput
     incomingLinks?: SkillRelationshipUncheckedCreateNestedManyWithoutToSkillInput
   }
 
@@ -26563,6 +34008,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     nodeLinks?: RoadmapNodeSkillCreateNestedManyWithoutSkillInput
     evidence?: SkillEvidenceCreateNestedManyWithoutSkillInput
+    assessments?: MicroAssessmentCreateNestedManyWithoutSkillInput
+    assessmentAttempts?: MicroAssessmentAttemptCreateNestedManyWithoutSkillInput
     outgoingLinks?: SkillRelationshipCreateNestedManyWithoutFromSkillInput
   }
 
@@ -26576,6 +34023,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     nodeLinks?: RoadmapNodeSkillUncheckedCreateNestedManyWithoutSkillInput
     evidence?: SkillEvidenceUncheckedCreateNestedManyWithoutSkillInput
+    assessments?: MicroAssessmentUncheckedCreateNestedManyWithoutSkillInput
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedCreateNestedManyWithoutSkillInput
     outgoingLinks?: SkillRelationshipUncheckedCreateNestedManyWithoutFromSkillInput
   }
 
@@ -26605,6 +34054,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     nodeLinks?: RoadmapNodeSkillUpdateManyWithoutSkillNestedInput
     evidence?: SkillEvidenceUpdateManyWithoutSkillNestedInput
+    assessments?: MicroAssessmentUpdateManyWithoutSkillNestedInput
+    assessmentAttempts?: MicroAssessmentAttemptUpdateManyWithoutSkillNestedInput
     incomingLinks?: SkillRelationshipUpdateManyWithoutToSkillNestedInput
   }
 
@@ -26618,6 +34069,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     nodeLinks?: RoadmapNodeSkillUncheckedUpdateManyWithoutSkillNestedInput
     evidence?: SkillEvidenceUncheckedUpdateManyWithoutSkillNestedInput
+    assessments?: MicroAssessmentUncheckedUpdateManyWithoutSkillNestedInput
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedUpdateManyWithoutSkillNestedInput
     incomingLinks?: SkillRelationshipUncheckedUpdateManyWithoutToSkillNestedInput
   }
 
@@ -26642,6 +34095,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     nodeLinks?: RoadmapNodeSkillUpdateManyWithoutSkillNestedInput
     evidence?: SkillEvidenceUpdateManyWithoutSkillNestedInput
+    assessments?: MicroAssessmentUpdateManyWithoutSkillNestedInput
+    assessmentAttempts?: MicroAssessmentAttemptUpdateManyWithoutSkillNestedInput
     outgoingLinks?: SkillRelationshipUpdateManyWithoutFromSkillNestedInput
   }
 
@@ -26655,19 +34110,24 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     nodeLinks?: RoadmapNodeSkillUncheckedUpdateManyWithoutSkillNestedInput
     evidence?: SkillEvidenceUncheckedUpdateManyWithoutSkillNestedInput
+    assessments?: MicroAssessmentUncheckedUpdateManyWithoutSkillNestedInput
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedUpdateManyWithoutSkillNestedInput
     outgoingLinks?: SkillRelationshipUncheckedUpdateManyWithoutFromSkillNestedInput
   }
 
   export type CareerRoadmapCreateWithoutPhasesInput = {
     id?: string
     userId: string
-    rolePath: string
-    targetCompanyTier?: string
-    overallReadiness?: number
-    nodesData: JsonNullValueInput | InputJsonValue
-    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     title?: string | null
     description?: string | null
+    rolePath: string
+    targetCompanyTier?: string
+    estimatedWeeks?: number
+    overallReadiness?: number
+    isPublic?: boolean
+    isOfficial?: boolean
+    nodesData: JsonNullValueInput | InputJsonValue
+    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     visibility?: $Enums.RoadmapVisibility
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -26679,13 +34139,16 @@ export namespace Prisma {
   export type CareerRoadmapUncheckedCreateWithoutPhasesInput = {
     id?: string
     userId: string
-    rolePath: string
-    targetCompanyTier?: string
-    overallReadiness?: number
-    nodesData: JsonNullValueInput | InputJsonValue
-    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     title?: string | null
     description?: string | null
+    rolePath: string
+    targetCompanyTier?: string
+    estimatedWeeks?: number
+    overallReadiness?: number
+    isPublic?: boolean
+    isOfficial?: boolean
+    nodesData: JsonNullValueInput | InputJsonValue
+    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     visibility?: $Enums.RoadmapVisibility
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -26708,11 +34171,13 @@ export namespace Prisma {
     orderIndex: number
     estimatedMinutes?: number
     requiresEvidence?: boolean
+    requiresAssessment?: boolean
     targetProficiency?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
     roadmap: CareerRoadmapCreateNestedOneWithoutNodesInput
     skills?: RoadmapNodeSkillCreateNestedManyWithoutNodeInput
+    assessments?: MicroAssessmentCreateNestedManyWithoutRoadmapNodeInput
     prerequisites?: RoadmapNodeDependencyCreateNestedManyWithoutNodeInput
     unlocks?: RoadmapNodeDependencyCreateNestedManyWithoutPrerequisiteNodeInput
     sprintTasks?: RoadmapSprintTaskCreateNestedManyWithoutRoadmapNodeInput
@@ -26728,10 +34193,12 @@ export namespace Prisma {
     orderIndex: number
     estimatedMinutes?: number
     requiresEvidence?: boolean
+    requiresAssessment?: boolean
     targetProficiency?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
     skills?: RoadmapNodeSkillUncheckedCreateNestedManyWithoutNodeInput
+    assessments?: MicroAssessmentUncheckedCreateNestedManyWithoutRoadmapNodeInput
     prerequisites?: RoadmapNodeDependencyUncheckedCreateNestedManyWithoutNodeInput
     unlocks?: RoadmapNodeDependencyUncheckedCreateNestedManyWithoutPrerequisiteNodeInput
     sprintTasks?: RoadmapSprintTaskUncheckedCreateNestedManyWithoutRoadmapNodeInput
@@ -26761,13 +34228,16 @@ export namespace Prisma {
   export type CareerRoadmapUpdateWithoutPhasesInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    rolePath?: StringFieldUpdateOperationsInput | string
-    targetCompanyTier?: StringFieldUpdateOperationsInput | string
-    overallReadiness?: IntFieldUpdateOperationsInput | number
-    nodesData?: JsonNullValueInput | InputJsonValue
-    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     title?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    rolePath?: StringFieldUpdateOperationsInput | string
+    targetCompanyTier?: StringFieldUpdateOperationsInput | string
+    estimatedWeeks?: IntFieldUpdateOperationsInput | number
+    overallReadiness?: IntFieldUpdateOperationsInput | number
+    isPublic?: BoolFieldUpdateOperationsInput | boolean
+    isOfficial?: BoolFieldUpdateOperationsInput | boolean
+    nodesData?: JsonNullValueInput | InputJsonValue
+    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     visibility?: EnumRoadmapVisibilityFieldUpdateOperationsInput | $Enums.RoadmapVisibility
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -26779,13 +34249,16 @@ export namespace Prisma {
   export type CareerRoadmapUncheckedUpdateWithoutPhasesInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    rolePath?: StringFieldUpdateOperationsInput | string
-    targetCompanyTier?: StringFieldUpdateOperationsInput | string
-    overallReadiness?: IntFieldUpdateOperationsInput | number
-    nodesData?: JsonNullValueInput | InputJsonValue
-    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     title?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    rolePath?: StringFieldUpdateOperationsInput | string
+    targetCompanyTier?: StringFieldUpdateOperationsInput | string
+    estimatedWeeks?: IntFieldUpdateOperationsInput | number
+    overallReadiness?: IntFieldUpdateOperationsInput | number
+    isPublic?: BoolFieldUpdateOperationsInput | boolean
+    isOfficial?: BoolFieldUpdateOperationsInput | boolean
+    nodesData?: JsonNullValueInput | InputJsonValue
+    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     visibility?: EnumRoadmapVisibilityFieldUpdateOperationsInput | $Enums.RoadmapVisibility
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -26813,13 +34286,16 @@ export namespace Prisma {
   export type CareerRoadmapCreateWithoutNodesInput = {
     id?: string
     userId: string
-    rolePath: string
-    targetCompanyTier?: string
-    overallReadiness?: number
-    nodesData: JsonNullValueInput | InputJsonValue
-    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     title?: string | null
     description?: string | null
+    rolePath: string
+    targetCompanyTier?: string
+    estimatedWeeks?: number
+    overallReadiness?: number
+    isPublic?: boolean
+    isOfficial?: boolean
+    nodesData: JsonNullValueInput | InputJsonValue
+    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     visibility?: $Enums.RoadmapVisibility
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -26831,13 +34307,16 @@ export namespace Prisma {
   export type CareerRoadmapUncheckedCreateWithoutNodesInput = {
     id?: string
     userId: string
-    rolePath: string
-    targetCompanyTier?: string
-    overallReadiness?: number
-    nodesData: JsonNullValueInput | InputJsonValue
-    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     title?: string | null
     description?: string | null
+    rolePath: string
+    targetCompanyTier?: string
+    estimatedWeeks?: number
+    overallReadiness?: number
+    isPublic?: boolean
+    isOfficial?: boolean
+    nodesData: JsonNullValueInput | InputJsonValue
+    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     visibility?: $Enums.RoadmapVisibility
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -26896,6 +34375,38 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type MicroAssessmentCreateWithoutRoadmapNodeInput = {
+    id?: string
+    title: string
+    description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    skill?: SkillCreateNestedOneWithoutAssessmentsInput
+    questions?: MicroAssessmentQuestionCreateNestedManyWithoutAssessmentInput
+    attempts?: MicroAssessmentAttemptCreateNestedManyWithoutAssessmentInput
+  }
+
+  export type MicroAssessmentUncheckedCreateWithoutRoadmapNodeInput = {
+    id?: string
+    title: string
+    description?: string | null
+    skillId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    questions?: MicroAssessmentQuestionUncheckedCreateNestedManyWithoutAssessmentInput
+    attempts?: MicroAssessmentAttemptUncheckedCreateNestedManyWithoutAssessmentInput
+  }
+
+  export type MicroAssessmentCreateOrConnectWithoutRoadmapNodeInput = {
+    where: MicroAssessmentWhereUniqueInput
+    create: XOR<MicroAssessmentCreateWithoutRoadmapNodeInput, MicroAssessmentUncheckedCreateWithoutRoadmapNodeInput>
+  }
+
+  export type MicroAssessmentCreateManyRoadmapNodeInputEnvelope = {
+    data: MicroAssessmentCreateManyRoadmapNodeInput | MicroAssessmentCreateManyRoadmapNodeInput[]
+    skipDuplicates?: boolean
+  }
+
   export type RoadmapNodeDependencyCreateWithoutNodeInput = {
     prerequisiteNode: RoadmapNodeCreateNestedOneWithoutUnlocksInput
   }
@@ -26939,11 +34450,13 @@ export namespace Prisma {
     orderIndex: number
     estimatedMinutes?: number
     requiresEvidence?: boolean
+    requiresAssessment?: boolean
     status?: $Enums.SprintTaskStatus
     completedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     sprint: RoadmapSprintCreateNestedOneWithoutTasksInput
+    assessmentAttempts?: MicroAssessmentAttemptCreateNestedManyWithoutSprintTaskInput
   }
 
   export type RoadmapSprintTaskUncheckedCreateWithoutRoadmapNodeInput = {
@@ -26954,10 +34467,12 @@ export namespace Prisma {
     orderIndex: number
     estimatedMinutes?: number
     requiresEvidence?: boolean
+    requiresAssessment?: boolean
     status?: $Enums.SprintTaskStatus
     completedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedCreateNestedManyWithoutSprintTaskInput
   }
 
   export type RoadmapSprintTaskCreateOrConnectWithoutRoadmapNodeInput = {
@@ -26984,13 +34499,16 @@ export namespace Prisma {
   export type CareerRoadmapUpdateWithoutNodesInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    rolePath?: StringFieldUpdateOperationsInput | string
-    targetCompanyTier?: StringFieldUpdateOperationsInput | string
-    overallReadiness?: IntFieldUpdateOperationsInput | number
-    nodesData?: JsonNullValueInput | InputJsonValue
-    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     title?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    rolePath?: StringFieldUpdateOperationsInput | string
+    targetCompanyTier?: StringFieldUpdateOperationsInput | string
+    estimatedWeeks?: IntFieldUpdateOperationsInput | number
+    overallReadiness?: IntFieldUpdateOperationsInput | number
+    isPublic?: BoolFieldUpdateOperationsInput | boolean
+    isOfficial?: BoolFieldUpdateOperationsInput | boolean
+    nodesData?: JsonNullValueInput | InputJsonValue
+    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     visibility?: EnumRoadmapVisibilityFieldUpdateOperationsInput | $Enums.RoadmapVisibility
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -27002,13 +34520,16 @@ export namespace Prisma {
   export type CareerRoadmapUncheckedUpdateWithoutNodesInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    rolePath?: StringFieldUpdateOperationsInput | string
-    targetCompanyTier?: StringFieldUpdateOperationsInput | string
-    overallReadiness?: IntFieldUpdateOperationsInput | number
-    nodesData?: JsonNullValueInput | InputJsonValue
-    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     title?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    rolePath?: StringFieldUpdateOperationsInput | string
+    targetCompanyTier?: StringFieldUpdateOperationsInput | string
+    estimatedWeeks?: IntFieldUpdateOperationsInput | number
+    overallReadiness?: IntFieldUpdateOperationsInput | number
+    isPublic?: BoolFieldUpdateOperationsInput | boolean
+    isOfficial?: BoolFieldUpdateOperationsInput | boolean
+    nodesData?: JsonNullValueInput | InputJsonValue
+    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     visibility?: EnumRoadmapVisibilityFieldUpdateOperationsInput | $Enums.RoadmapVisibility
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -27062,6 +34583,22 @@ export namespace Prisma {
   export type RoadmapNodeSkillUpdateManyWithWhereWithoutNodeInput = {
     where: RoadmapNodeSkillScalarWhereInput
     data: XOR<RoadmapNodeSkillUpdateManyMutationInput, RoadmapNodeSkillUncheckedUpdateManyWithoutNodeInput>
+  }
+
+  export type MicroAssessmentUpsertWithWhereUniqueWithoutRoadmapNodeInput = {
+    where: MicroAssessmentWhereUniqueInput
+    update: XOR<MicroAssessmentUpdateWithoutRoadmapNodeInput, MicroAssessmentUncheckedUpdateWithoutRoadmapNodeInput>
+    create: XOR<MicroAssessmentCreateWithoutRoadmapNodeInput, MicroAssessmentUncheckedCreateWithoutRoadmapNodeInput>
+  }
+
+  export type MicroAssessmentUpdateWithWhereUniqueWithoutRoadmapNodeInput = {
+    where: MicroAssessmentWhereUniqueInput
+    data: XOR<MicroAssessmentUpdateWithoutRoadmapNodeInput, MicroAssessmentUncheckedUpdateWithoutRoadmapNodeInput>
+  }
+
+  export type MicroAssessmentUpdateManyWithWhereWithoutRoadmapNodeInput = {
+    where: MicroAssessmentScalarWhereInput
+    data: XOR<MicroAssessmentUpdateManyMutationInput, MicroAssessmentUncheckedUpdateManyWithoutRoadmapNodeInput>
   }
 
   export type RoadmapNodeDependencyUpsertWithWhereUniqueWithoutNodeInput = {
@@ -27132,6 +34669,7 @@ export namespace Prisma {
     orderIndex?: IntFilter<"RoadmapSprintTask"> | number
     estimatedMinutes?: IntFilter<"RoadmapSprintTask"> | number
     requiresEvidence?: BoolFilter<"RoadmapSprintTask"> | boolean
+    requiresAssessment?: BoolFilter<"RoadmapSprintTask"> | boolean
     status?: EnumSprintTaskStatusFilter<"RoadmapSprintTask"> | $Enums.SprintTaskStatus
     completedAt?: DateTimeNullableFilter<"RoadmapSprintTask"> | Date | string | null
     createdAt?: DateTimeFilter<"RoadmapSprintTask"> | Date | string
@@ -27147,11 +34685,13 @@ export namespace Prisma {
     orderIndex: number
     estimatedMinutes?: number
     requiresEvidence?: boolean
+    requiresAssessment?: boolean
     targetProficiency?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
     roadmap: CareerRoadmapCreateNestedOneWithoutNodesInput
     phase?: RoadmapPhaseCreateNestedOneWithoutNodesInput
+    assessments?: MicroAssessmentCreateNestedManyWithoutRoadmapNodeInput
     prerequisites?: RoadmapNodeDependencyCreateNestedManyWithoutNodeInput
     unlocks?: RoadmapNodeDependencyCreateNestedManyWithoutPrerequisiteNodeInput
     sprintTasks?: RoadmapSprintTaskCreateNestedManyWithoutRoadmapNodeInput
@@ -27168,9 +34708,11 @@ export namespace Prisma {
     orderIndex: number
     estimatedMinutes?: number
     requiresEvidence?: boolean
+    requiresAssessment?: boolean
     targetProficiency?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    assessments?: MicroAssessmentUncheckedCreateNestedManyWithoutRoadmapNodeInput
     prerequisites?: RoadmapNodeDependencyUncheckedCreateNestedManyWithoutNodeInput
     unlocks?: RoadmapNodeDependencyUncheckedCreateNestedManyWithoutPrerequisiteNodeInput
     sprintTasks?: RoadmapSprintTaskUncheckedCreateNestedManyWithoutRoadmapNodeInput
@@ -27190,6 +34732,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     evidence?: SkillEvidenceCreateNestedManyWithoutSkillInput
+    assessments?: MicroAssessmentCreateNestedManyWithoutSkillInput
+    assessmentAttempts?: MicroAssessmentAttemptCreateNestedManyWithoutSkillInput
     outgoingLinks?: SkillRelationshipCreateNestedManyWithoutFromSkillInput
     incomingLinks?: SkillRelationshipCreateNestedManyWithoutToSkillInput
   }
@@ -27203,6 +34747,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     evidence?: SkillEvidenceUncheckedCreateNestedManyWithoutSkillInput
+    assessments?: MicroAssessmentUncheckedCreateNestedManyWithoutSkillInput
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedCreateNestedManyWithoutSkillInput
     outgoingLinks?: SkillRelationshipUncheckedCreateNestedManyWithoutFromSkillInput
     incomingLinks?: SkillRelationshipUncheckedCreateNestedManyWithoutToSkillInput
   }
@@ -27232,11 +34778,13 @@ export namespace Prisma {
     orderIndex?: IntFieldUpdateOperationsInput | number
     estimatedMinutes?: IntFieldUpdateOperationsInput | number
     requiresEvidence?: BoolFieldUpdateOperationsInput | boolean
+    requiresAssessment?: BoolFieldUpdateOperationsInput | boolean
     targetProficiency?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     roadmap?: CareerRoadmapUpdateOneRequiredWithoutNodesNestedInput
     phase?: RoadmapPhaseUpdateOneWithoutNodesNestedInput
+    assessments?: MicroAssessmentUpdateManyWithoutRoadmapNodeNestedInput
     prerequisites?: RoadmapNodeDependencyUpdateManyWithoutNodeNestedInput
     unlocks?: RoadmapNodeDependencyUpdateManyWithoutPrerequisiteNodeNestedInput
     sprintTasks?: RoadmapSprintTaskUpdateManyWithoutRoadmapNodeNestedInput
@@ -27253,9 +34801,11 @@ export namespace Prisma {
     orderIndex?: IntFieldUpdateOperationsInput | number
     estimatedMinutes?: IntFieldUpdateOperationsInput | number
     requiresEvidence?: BoolFieldUpdateOperationsInput | boolean
+    requiresAssessment?: BoolFieldUpdateOperationsInput | boolean
     targetProficiency?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assessments?: MicroAssessmentUncheckedUpdateManyWithoutRoadmapNodeNestedInput
     prerequisites?: RoadmapNodeDependencyUncheckedUpdateManyWithoutNodeNestedInput
     unlocks?: RoadmapNodeDependencyUncheckedUpdateManyWithoutPrerequisiteNodeNestedInput
     sprintTasks?: RoadmapSprintTaskUncheckedUpdateManyWithoutRoadmapNodeNestedInput
@@ -27281,6 +34831,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     evidence?: SkillEvidenceUpdateManyWithoutSkillNestedInput
+    assessments?: MicroAssessmentUpdateManyWithoutSkillNestedInput
+    assessmentAttempts?: MicroAssessmentAttemptUpdateManyWithoutSkillNestedInput
     outgoingLinks?: SkillRelationshipUpdateManyWithoutFromSkillNestedInput
     incomingLinks?: SkillRelationshipUpdateManyWithoutToSkillNestedInput
   }
@@ -27294,6 +34846,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     evidence?: SkillEvidenceUncheckedUpdateManyWithoutSkillNestedInput
+    assessments?: MicroAssessmentUncheckedUpdateManyWithoutSkillNestedInput
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedUpdateManyWithoutSkillNestedInput
     outgoingLinks?: SkillRelationshipUncheckedUpdateManyWithoutFromSkillNestedInput
     incomingLinks?: SkillRelationshipUncheckedUpdateManyWithoutToSkillNestedInput
   }
@@ -27307,12 +34861,14 @@ export namespace Prisma {
     orderIndex: number
     estimatedMinutes?: number
     requiresEvidence?: boolean
+    requiresAssessment?: boolean
     targetProficiency?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
     roadmap: CareerRoadmapCreateNestedOneWithoutNodesInput
     phase?: RoadmapPhaseCreateNestedOneWithoutNodesInput
     skills?: RoadmapNodeSkillCreateNestedManyWithoutNodeInput
+    assessments?: MicroAssessmentCreateNestedManyWithoutRoadmapNodeInput
     unlocks?: RoadmapNodeDependencyCreateNestedManyWithoutPrerequisiteNodeInput
     sprintTasks?: RoadmapSprintTaskCreateNestedManyWithoutRoadmapNodeInput
   }
@@ -27328,10 +34884,12 @@ export namespace Prisma {
     orderIndex: number
     estimatedMinutes?: number
     requiresEvidence?: boolean
+    requiresAssessment?: boolean
     targetProficiency?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
     skills?: RoadmapNodeSkillUncheckedCreateNestedManyWithoutNodeInput
+    assessments?: MicroAssessmentUncheckedCreateNestedManyWithoutRoadmapNodeInput
     unlocks?: RoadmapNodeDependencyUncheckedCreateNestedManyWithoutPrerequisiteNodeInput
     sprintTasks?: RoadmapSprintTaskUncheckedCreateNestedManyWithoutRoadmapNodeInput
   }
@@ -27350,12 +34908,14 @@ export namespace Prisma {
     orderIndex: number
     estimatedMinutes?: number
     requiresEvidence?: boolean
+    requiresAssessment?: boolean
     targetProficiency?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
     roadmap: CareerRoadmapCreateNestedOneWithoutNodesInput
     phase?: RoadmapPhaseCreateNestedOneWithoutNodesInput
     skills?: RoadmapNodeSkillCreateNestedManyWithoutNodeInput
+    assessments?: MicroAssessmentCreateNestedManyWithoutRoadmapNodeInput
     prerequisites?: RoadmapNodeDependencyCreateNestedManyWithoutNodeInput
     sprintTasks?: RoadmapSprintTaskCreateNestedManyWithoutRoadmapNodeInput
   }
@@ -27371,10 +34931,12 @@ export namespace Prisma {
     orderIndex: number
     estimatedMinutes?: number
     requiresEvidence?: boolean
+    requiresAssessment?: boolean
     targetProficiency?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
     skills?: RoadmapNodeSkillUncheckedCreateNestedManyWithoutNodeInput
+    assessments?: MicroAssessmentUncheckedCreateNestedManyWithoutRoadmapNodeInput
     prerequisites?: RoadmapNodeDependencyUncheckedCreateNestedManyWithoutNodeInput
     sprintTasks?: RoadmapSprintTaskUncheckedCreateNestedManyWithoutRoadmapNodeInput
   }
@@ -27404,12 +34966,14 @@ export namespace Prisma {
     orderIndex?: IntFieldUpdateOperationsInput | number
     estimatedMinutes?: IntFieldUpdateOperationsInput | number
     requiresEvidence?: BoolFieldUpdateOperationsInput | boolean
+    requiresAssessment?: BoolFieldUpdateOperationsInput | boolean
     targetProficiency?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     roadmap?: CareerRoadmapUpdateOneRequiredWithoutNodesNestedInput
     phase?: RoadmapPhaseUpdateOneWithoutNodesNestedInput
     skills?: RoadmapNodeSkillUpdateManyWithoutNodeNestedInput
+    assessments?: MicroAssessmentUpdateManyWithoutRoadmapNodeNestedInput
     unlocks?: RoadmapNodeDependencyUpdateManyWithoutPrerequisiteNodeNestedInput
     sprintTasks?: RoadmapSprintTaskUpdateManyWithoutRoadmapNodeNestedInput
   }
@@ -27425,10 +34989,12 @@ export namespace Prisma {
     orderIndex?: IntFieldUpdateOperationsInput | number
     estimatedMinutes?: IntFieldUpdateOperationsInput | number
     requiresEvidence?: BoolFieldUpdateOperationsInput | boolean
+    requiresAssessment?: BoolFieldUpdateOperationsInput | boolean
     targetProficiency?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     skills?: RoadmapNodeSkillUncheckedUpdateManyWithoutNodeNestedInput
+    assessments?: MicroAssessmentUncheckedUpdateManyWithoutRoadmapNodeNestedInput
     unlocks?: RoadmapNodeDependencyUncheckedUpdateManyWithoutPrerequisiteNodeNestedInput
     sprintTasks?: RoadmapSprintTaskUncheckedUpdateManyWithoutRoadmapNodeNestedInput
   }
@@ -27453,12 +35019,14 @@ export namespace Prisma {
     orderIndex?: IntFieldUpdateOperationsInput | number
     estimatedMinutes?: IntFieldUpdateOperationsInput | number
     requiresEvidence?: BoolFieldUpdateOperationsInput | boolean
+    requiresAssessment?: BoolFieldUpdateOperationsInput | boolean
     targetProficiency?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     roadmap?: CareerRoadmapUpdateOneRequiredWithoutNodesNestedInput
     phase?: RoadmapPhaseUpdateOneWithoutNodesNestedInput
     skills?: RoadmapNodeSkillUpdateManyWithoutNodeNestedInput
+    assessments?: MicroAssessmentUpdateManyWithoutRoadmapNodeNestedInput
     prerequisites?: RoadmapNodeDependencyUpdateManyWithoutNodeNestedInput
     sprintTasks?: RoadmapSprintTaskUpdateManyWithoutRoadmapNodeNestedInput
   }
@@ -27474,10 +35042,12 @@ export namespace Prisma {
     orderIndex?: IntFieldUpdateOperationsInput | number
     estimatedMinutes?: IntFieldUpdateOperationsInput | number
     requiresEvidence?: BoolFieldUpdateOperationsInput | boolean
+    requiresAssessment?: BoolFieldUpdateOperationsInput | boolean
     targetProficiency?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     skills?: RoadmapNodeSkillUncheckedUpdateManyWithoutNodeNestedInput
+    assessments?: MicroAssessmentUncheckedUpdateManyWithoutRoadmapNodeNestedInput
     prerequisites?: RoadmapNodeDependencyUncheckedUpdateManyWithoutNodeNestedInput
     sprintTasks?: RoadmapSprintTaskUncheckedUpdateManyWithoutRoadmapNodeNestedInput
   }
@@ -27485,13 +35055,16 @@ export namespace Prisma {
   export type CareerRoadmapCreateWithoutFollowersInput = {
     id?: string
     userId: string
-    rolePath: string
-    targetCompanyTier?: string
-    overallReadiness?: number
-    nodesData: JsonNullValueInput | InputJsonValue
-    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     title?: string | null
     description?: string | null
+    rolePath: string
+    targetCompanyTier?: string
+    estimatedWeeks?: number
+    overallReadiness?: number
+    isPublic?: boolean
+    isOfficial?: boolean
+    nodesData: JsonNullValueInput | InputJsonValue
+    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     visibility?: $Enums.RoadmapVisibility
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -27503,13 +35076,16 @@ export namespace Prisma {
   export type CareerRoadmapUncheckedCreateWithoutFollowersInput = {
     id?: string
     userId: string
-    rolePath: string
-    targetCompanyTier?: string
-    overallReadiness?: number
-    nodesData: JsonNullValueInput | InputJsonValue
-    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     title?: string | null
     description?: string | null
+    rolePath: string
+    targetCompanyTier?: string
+    estimatedWeeks?: number
+    overallReadiness?: number
+    isPublic?: boolean
+    isOfficial?: boolean
+    nodesData: JsonNullValueInput | InputJsonValue
+    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     visibility?: $Enums.RoadmapVisibility
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -27536,6 +35112,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     tasks?: RoadmapSprintTaskCreateNestedManyWithoutSprintInput
     performance?: SprintPerformanceCreateNestedOneWithoutSprintInput
+    assessmentAttempts?: MicroAssessmentAttemptCreateNestedManyWithoutSprintInput
     adaptations?: RoadmapAdaptationCreateNestedManyWithoutSprintInput
   }
 
@@ -27552,6 +35129,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     tasks?: RoadmapSprintTaskUncheckedCreateNestedManyWithoutSprintInput
     performance?: SprintPerformanceUncheckedCreateNestedOneWithoutSprintInput
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedCreateNestedManyWithoutSprintInput
     adaptations?: RoadmapAdaptationUncheckedCreateNestedManyWithoutSprintInput
   }
 
@@ -27596,6 +35174,48 @@ export namespace Prisma {
 
   export type SkillEvidenceCreateManyUserRoadmapInputEnvelope = {
     data: SkillEvidenceCreateManyUserRoadmapInput | SkillEvidenceCreateManyUserRoadmapInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type MicroAssessmentAttemptCreateWithoutUserRoadmapInput = {
+    id?: string
+    userId: string
+    totalQuestions: number
+    correctAnswers: number
+    score: number
+    passed?: boolean
+    answers: JsonNullValueInput | InputJsonValue
+    completedAt?: Date | string
+    createdAt?: Date | string
+    assessment: MicroAssessmentCreateNestedOneWithoutAttemptsInput
+    sprint?: RoadmapSprintCreateNestedOneWithoutAssessmentAttemptsInput
+    sprintTask?: RoadmapSprintTaskCreateNestedOneWithoutAssessmentAttemptsInput
+    skill?: SkillCreateNestedOneWithoutAssessmentAttemptsInput
+  }
+
+  export type MicroAssessmentAttemptUncheckedCreateWithoutUserRoadmapInput = {
+    id?: string
+    assessmentId: string
+    userId: string
+    sprintId?: string | null
+    sprintTaskId?: string | null
+    skillId?: string | null
+    totalQuestions: number
+    correctAnswers: number
+    score: number
+    passed?: boolean
+    answers: JsonNullValueInput | InputJsonValue
+    completedAt?: Date | string
+    createdAt?: Date | string
+  }
+
+  export type MicroAssessmentAttemptCreateOrConnectWithoutUserRoadmapInput = {
+    where: MicroAssessmentAttemptWhereUniqueInput
+    create: XOR<MicroAssessmentAttemptCreateWithoutUserRoadmapInput, MicroAssessmentAttemptUncheckedCreateWithoutUserRoadmapInput>
+  }
+
+  export type MicroAssessmentAttemptCreateManyUserRoadmapInputEnvelope = {
+    data: MicroAssessmentAttemptCreateManyUserRoadmapInput | MicroAssessmentAttemptCreateManyUserRoadmapInput[]
     skipDuplicates?: boolean
   }
 
@@ -27645,13 +35265,16 @@ export namespace Prisma {
   export type CareerRoadmapUpdateWithoutFollowersInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    rolePath?: StringFieldUpdateOperationsInput | string
-    targetCompanyTier?: StringFieldUpdateOperationsInput | string
-    overallReadiness?: IntFieldUpdateOperationsInput | number
-    nodesData?: JsonNullValueInput | InputJsonValue
-    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     title?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    rolePath?: StringFieldUpdateOperationsInput | string
+    targetCompanyTier?: StringFieldUpdateOperationsInput | string
+    estimatedWeeks?: IntFieldUpdateOperationsInput | number
+    overallReadiness?: IntFieldUpdateOperationsInput | number
+    isPublic?: BoolFieldUpdateOperationsInput | boolean
+    isOfficial?: BoolFieldUpdateOperationsInput | boolean
+    nodesData?: JsonNullValueInput | InputJsonValue
+    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     visibility?: EnumRoadmapVisibilityFieldUpdateOperationsInput | $Enums.RoadmapVisibility
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -27663,13 +35286,16 @@ export namespace Prisma {
   export type CareerRoadmapUncheckedUpdateWithoutFollowersInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    rolePath?: StringFieldUpdateOperationsInput | string
-    targetCompanyTier?: StringFieldUpdateOperationsInput | string
-    overallReadiness?: IntFieldUpdateOperationsInput | number
-    nodesData?: JsonNullValueInput | InputJsonValue
-    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     title?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    rolePath?: StringFieldUpdateOperationsInput | string
+    targetCompanyTier?: StringFieldUpdateOperationsInput | string
+    estimatedWeeks?: IntFieldUpdateOperationsInput | number
+    overallReadiness?: IntFieldUpdateOperationsInput | number
+    isPublic?: BoolFieldUpdateOperationsInput | boolean
+    isOfficial?: BoolFieldUpdateOperationsInput | boolean
+    nodesData?: JsonNullValueInput | InputJsonValue
+    customTechStack?: NullableJsonNullValueInput | InputJsonValue
     visibility?: EnumRoadmapVisibilityFieldUpdateOperationsInput | $Enums.RoadmapVisibility
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -27727,6 +35353,22 @@ export namespace Prisma {
     data: XOR<SkillEvidenceUpdateManyMutationInput, SkillEvidenceUncheckedUpdateManyWithoutUserRoadmapInput>
   }
 
+  export type MicroAssessmentAttemptUpsertWithWhereUniqueWithoutUserRoadmapInput = {
+    where: MicroAssessmentAttemptWhereUniqueInput
+    update: XOR<MicroAssessmentAttemptUpdateWithoutUserRoadmapInput, MicroAssessmentAttemptUncheckedUpdateWithoutUserRoadmapInput>
+    create: XOR<MicroAssessmentAttemptCreateWithoutUserRoadmapInput, MicroAssessmentAttemptUncheckedCreateWithoutUserRoadmapInput>
+  }
+
+  export type MicroAssessmentAttemptUpdateWithWhereUniqueWithoutUserRoadmapInput = {
+    where: MicroAssessmentAttemptWhereUniqueInput
+    data: XOR<MicroAssessmentAttemptUpdateWithoutUserRoadmapInput, MicroAssessmentAttemptUncheckedUpdateWithoutUserRoadmapInput>
+  }
+
+  export type MicroAssessmentAttemptUpdateManyWithWhereWithoutUserRoadmapInput = {
+    where: MicroAssessmentAttemptScalarWhereInput
+    data: XOR<MicroAssessmentAttemptUpdateManyMutationInput, MicroAssessmentAttemptUncheckedUpdateManyWithoutUserRoadmapInput>
+  }
+
   export type RoadmapAdaptationUpsertWithWhereUniqueWithoutUserRoadmapInput = {
     where: RoadmapAdaptationWhereUniqueInput
     update: XOR<RoadmapAdaptationUpdateWithoutUserRoadmapInput, RoadmapAdaptationUncheckedUpdateWithoutUserRoadmapInput>
@@ -27768,6 +35410,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     sourceRoadmap: CareerRoadmapCreateNestedOneWithoutFollowersInput
     skillEvidence?: SkillEvidenceCreateNestedManyWithoutUserRoadmapInput
+    assessmentAttempts?: MicroAssessmentAttemptCreateNestedManyWithoutUserRoadmapInput
     adaptations?: RoadmapAdaptationCreateNestedManyWithoutUserRoadmapInput
   }
 
@@ -27781,6 +35424,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     skillEvidence?: SkillEvidenceUncheckedCreateNestedManyWithoutUserRoadmapInput
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedCreateNestedManyWithoutUserRoadmapInput
     adaptations?: RoadmapAdaptationUncheckedCreateNestedManyWithoutUserRoadmapInput
   }
 
@@ -27796,11 +35440,13 @@ export namespace Prisma {
     orderIndex: number
     estimatedMinutes?: number
     requiresEvidence?: boolean
+    requiresAssessment?: boolean
     status?: $Enums.SprintTaskStatus
     completedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     roadmapNode?: RoadmapNodeCreateNestedOneWithoutSprintTasksInput
+    assessmentAttempts?: MicroAssessmentAttemptCreateNestedManyWithoutSprintTaskInput
   }
 
   export type RoadmapSprintTaskUncheckedCreateWithoutSprintInput = {
@@ -27811,10 +35457,12 @@ export namespace Prisma {
     orderIndex: number
     estimatedMinutes?: number
     requiresEvidence?: boolean
+    requiresAssessment?: boolean
     status?: $Enums.SprintTaskStatus
     completedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedCreateNestedManyWithoutSprintTaskInput
   }
 
   export type RoadmapSprintTaskCreateOrConnectWithoutSprintInput = {
@@ -27856,6 +35504,48 @@ export namespace Prisma {
   export type SprintPerformanceCreateOrConnectWithoutSprintInput = {
     where: SprintPerformanceWhereUniqueInput
     create: XOR<SprintPerformanceCreateWithoutSprintInput, SprintPerformanceUncheckedCreateWithoutSprintInput>
+  }
+
+  export type MicroAssessmentAttemptCreateWithoutSprintInput = {
+    id?: string
+    userId: string
+    totalQuestions: number
+    correctAnswers: number
+    score: number
+    passed?: boolean
+    answers: JsonNullValueInput | InputJsonValue
+    completedAt?: Date | string
+    createdAt?: Date | string
+    assessment: MicroAssessmentCreateNestedOneWithoutAttemptsInput
+    userRoadmap?: UserRoadmapCreateNestedOneWithoutAssessmentAttemptsInput
+    sprintTask?: RoadmapSprintTaskCreateNestedOneWithoutAssessmentAttemptsInput
+    skill?: SkillCreateNestedOneWithoutAssessmentAttemptsInput
+  }
+
+  export type MicroAssessmentAttemptUncheckedCreateWithoutSprintInput = {
+    id?: string
+    assessmentId: string
+    userId: string
+    userRoadmapId?: string | null
+    sprintTaskId?: string | null
+    skillId?: string | null
+    totalQuestions: number
+    correctAnswers: number
+    score: number
+    passed?: boolean
+    answers: JsonNullValueInput | InputJsonValue
+    completedAt?: Date | string
+    createdAt?: Date | string
+  }
+
+  export type MicroAssessmentAttemptCreateOrConnectWithoutSprintInput = {
+    where: MicroAssessmentAttemptWhereUniqueInput
+    create: XOR<MicroAssessmentAttemptCreateWithoutSprintInput, MicroAssessmentAttemptUncheckedCreateWithoutSprintInput>
+  }
+
+  export type MicroAssessmentAttemptCreateManySprintInputEnvelope = {
+    data: MicroAssessmentAttemptCreateManySprintInput | MicroAssessmentAttemptCreateManySprintInput[]
+    skipDuplicates?: boolean
   }
 
   export type RoadmapAdaptationCreateWithoutSprintInput = {
@@ -27911,6 +35601,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sourceRoadmap?: CareerRoadmapUpdateOneRequiredWithoutFollowersNestedInput
     skillEvidence?: SkillEvidenceUpdateManyWithoutUserRoadmapNestedInput
+    assessmentAttempts?: MicroAssessmentAttemptUpdateManyWithoutUserRoadmapNestedInput
     adaptations?: RoadmapAdaptationUpdateManyWithoutUserRoadmapNestedInput
   }
 
@@ -27924,6 +35615,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     skillEvidence?: SkillEvidenceUncheckedUpdateManyWithoutUserRoadmapNestedInput
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedUpdateManyWithoutUserRoadmapNestedInput
     adaptations?: RoadmapAdaptationUncheckedUpdateManyWithoutUserRoadmapNestedInput
   }
 
@@ -27980,6 +35672,22 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type MicroAssessmentAttemptUpsertWithWhereUniqueWithoutSprintInput = {
+    where: MicroAssessmentAttemptWhereUniqueInput
+    update: XOR<MicroAssessmentAttemptUpdateWithoutSprintInput, MicroAssessmentAttemptUncheckedUpdateWithoutSprintInput>
+    create: XOR<MicroAssessmentAttemptCreateWithoutSprintInput, MicroAssessmentAttemptUncheckedCreateWithoutSprintInput>
+  }
+
+  export type MicroAssessmentAttemptUpdateWithWhereUniqueWithoutSprintInput = {
+    where: MicroAssessmentAttemptWhereUniqueInput
+    data: XOR<MicroAssessmentAttemptUpdateWithoutSprintInput, MicroAssessmentAttemptUncheckedUpdateWithoutSprintInput>
+  }
+
+  export type MicroAssessmentAttemptUpdateManyWithWhereWithoutSprintInput = {
+    where: MicroAssessmentAttemptScalarWhereInput
+    data: XOR<MicroAssessmentAttemptUpdateManyMutationInput, MicroAssessmentAttemptUncheckedUpdateManyWithoutSprintInput>
+  }
+
   export type RoadmapAdaptationUpsertWithWhereUniqueWithoutSprintInput = {
     where: RoadmapAdaptationWhereUniqueInput
     update: XOR<RoadmapAdaptationUpdateWithoutSprintInput, RoadmapAdaptationUncheckedUpdateWithoutSprintInput>
@@ -28009,6 +35717,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     userRoadmap: UserRoadmapCreateNestedOneWithoutSprintsInput
     performance?: SprintPerformanceCreateNestedOneWithoutSprintInput
+    assessmentAttempts?: MicroAssessmentAttemptCreateNestedManyWithoutSprintInput
     adaptations?: RoadmapAdaptationCreateNestedManyWithoutSprintInput
   }
 
@@ -28025,6 +35734,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     performance?: SprintPerformanceUncheckedCreateNestedOneWithoutSprintInput
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedCreateNestedManyWithoutSprintInput
     adaptations?: RoadmapAdaptationUncheckedCreateNestedManyWithoutSprintInput
   }
 
@@ -28042,12 +35752,14 @@ export namespace Prisma {
     orderIndex: number
     estimatedMinutes?: number
     requiresEvidence?: boolean
+    requiresAssessment?: boolean
     targetProficiency?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
     roadmap: CareerRoadmapCreateNestedOneWithoutNodesInput
     phase?: RoadmapPhaseCreateNestedOneWithoutNodesInput
     skills?: RoadmapNodeSkillCreateNestedManyWithoutNodeInput
+    assessments?: MicroAssessmentCreateNestedManyWithoutRoadmapNodeInput
     prerequisites?: RoadmapNodeDependencyCreateNestedManyWithoutNodeInput
     unlocks?: RoadmapNodeDependencyCreateNestedManyWithoutPrerequisiteNodeInput
   }
@@ -28063,10 +35775,12 @@ export namespace Prisma {
     orderIndex: number
     estimatedMinutes?: number
     requiresEvidence?: boolean
+    requiresAssessment?: boolean
     targetProficiency?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
     skills?: RoadmapNodeSkillUncheckedCreateNestedManyWithoutNodeInput
+    assessments?: MicroAssessmentUncheckedCreateNestedManyWithoutRoadmapNodeInput
     prerequisites?: RoadmapNodeDependencyUncheckedCreateNestedManyWithoutNodeInput
     unlocks?: RoadmapNodeDependencyUncheckedCreateNestedManyWithoutPrerequisiteNodeInput
   }
@@ -28074,6 +35788,48 @@ export namespace Prisma {
   export type RoadmapNodeCreateOrConnectWithoutSprintTasksInput = {
     where: RoadmapNodeWhereUniqueInput
     create: XOR<RoadmapNodeCreateWithoutSprintTasksInput, RoadmapNodeUncheckedCreateWithoutSprintTasksInput>
+  }
+
+  export type MicroAssessmentAttemptCreateWithoutSprintTaskInput = {
+    id?: string
+    userId: string
+    totalQuestions: number
+    correctAnswers: number
+    score: number
+    passed?: boolean
+    answers: JsonNullValueInput | InputJsonValue
+    completedAt?: Date | string
+    createdAt?: Date | string
+    assessment: MicroAssessmentCreateNestedOneWithoutAttemptsInput
+    userRoadmap?: UserRoadmapCreateNestedOneWithoutAssessmentAttemptsInput
+    sprint?: RoadmapSprintCreateNestedOneWithoutAssessmentAttemptsInput
+    skill?: SkillCreateNestedOneWithoutAssessmentAttemptsInput
+  }
+
+  export type MicroAssessmentAttemptUncheckedCreateWithoutSprintTaskInput = {
+    id?: string
+    assessmentId: string
+    userId: string
+    userRoadmapId?: string | null
+    sprintId?: string | null
+    skillId?: string | null
+    totalQuestions: number
+    correctAnswers: number
+    score: number
+    passed?: boolean
+    answers: JsonNullValueInput | InputJsonValue
+    completedAt?: Date | string
+    createdAt?: Date | string
+  }
+
+  export type MicroAssessmentAttemptCreateOrConnectWithoutSprintTaskInput = {
+    where: MicroAssessmentAttemptWhereUniqueInput
+    create: XOR<MicroAssessmentAttemptCreateWithoutSprintTaskInput, MicroAssessmentAttemptUncheckedCreateWithoutSprintTaskInput>
+  }
+
+  export type MicroAssessmentAttemptCreateManySprintTaskInputEnvelope = {
+    data: MicroAssessmentAttemptCreateManySprintTaskInput | MicroAssessmentAttemptCreateManySprintTaskInput[]
+    skipDuplicates?: boolean
   }
 
   export type RoadmapSprintUpsertWithoutTasksInput = {
@@ -28100,6 +35856,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userRoadmap?: UserRoadmapUpdateOneRequiredWithoutSprintsNestedInput
     performance?: SprintPerformanceUpdateOneWithoutSprintNestedInput
+    assessmentAttempts?: MicroAssessmentAttemptUpdateManyWithoutSprintNestedInput
     adaptations?: RoadmapAdaptationUpdateManyWithoutSprintNestedInput
   }
 
@@ -28116,6 +35873,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     performance?: SprintPerformanceUncheckedUpdateOneWithoutSprintNestedInput
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedUpdateManyWithoutSprintNestedInput
     adaptations?: RoadmapAdaptationUncheckedUpdateManyWithoutSprintNestedInput
   }
 
@@ -28139,12 +35897,14 @@ export namespace Prisma {
     orderIndex?: IntFieldUpdateOperationsInput | number
     estimatedMinutes?: IntFieldUpdateOperationsInput | number
     requiresEvidence?: BoolFieldUpdateOperationsInput | boolean
+    requiresAssessment?: BoolFieldUpdateOperationsInput | boolean
     targetProficiency?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     roadmap?: CareerRoadmapUpdateOneRequiredWithoutNodesNestedInput
     phase?: RoadmapPhaseUpdateOneWithoutNodesNestedInput
     skills?: RoadmapNodeSkillUpdateManyWithoutNodeNestedInput
+    assessments?: MicroAssessmentUpdateManyWithoutRoadmapNodeNestedInput
     prerequisites?: RoadmapNodeDependencyUpdateManyWithoutNodeNestedInput
     unlocks?: RoadmapNodeDependencyUpdateManyWithoutPrerequisiteNodeNestedInput
   }
@@ -28160,12 +35920,30 @@ export namespace Prisma {
     orderIndex?: IntFieldUpdateOperationsInput | number
     estimatedMinutes?: IntFieldUpdateOperationsInput | number
     requiresEvidence?: BoolFieldUpdateOperationsInput | boolean
+    requiresAssessment?: BoolFieldUpdateOperationsInput | boolean
     targetProficiency?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     skills?: RoadmapNodeSkillUncheckedUpdateManyWithoutNodeNestedInput
+    assessments?: MicroAssessmentUncheckedUpdateManyWithoutRoadmapNodeNestedInput
     prerequisites?: RoadmapNodeDependencyUncheckedUpdateManyWithoutNodeNestedInput
     unlocks?: RoadmapNodeDependencyUncheckedUpdateManyWithoutPrerequisiteNodeNestedInput
+  }
+
+  export type MicroAssessmentAttemptUpsertWithWhereUniqueWithoutSprintTaskInput = {
+    where: MicroAssessmentAttemptWhereUniqueInput
+    update: XOR<MicroAssessmentAttemptUpdateWithoutSprintTaskInput, MicroAssessmentAttemptUncheckedUpdateWithoutSprintTaskInput>
+    create: XOR<MicroAssessmentAttemptCreateWithoutSprintTaskInput, MicroAssessmentAttemptUncheckedCreateWithoutSprintTaskInput>
+  }
+
+  export type MicroAssessmentAttemptUpdateWithWhereUniqueWithoutSprintTaskInput = {
+    where: MicroAssessmentAttemptWhereUniqueInput
+    data: XOR<MicroAssessmentAttemptUpdateWithoutSprintTaskInput, MicroAssessmentAttemptUncheckedUpdateWithoutSprintTaskInput>
+  }
+
+  export type MicroAssessmentAttemptUpdateManyWithWhereWithoutSprintTaskInput = {
+    where: MicroAssessmentAttemptScalarWhereInput
+    data: XOR<MicroAssessmentAttemptUpdateManyMutationInput, MicroAssessmentAttemptUncheckedUpdateManyWithoutSprintTaskInput>
   }
 
   export type RoadmapSprintCreateWithoutPerformanceInput = {
@@ -28181,6 +35959,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     userRoadmap: UserRoadmapCreateNestedOneWithoutSprintsInput
     tasks?: RoadmapSprintTaskCreateNestedManyWithoutSprintInput
+    assessmentAttempts?: MicroAssessmentAttemptCreateNestedManyWithoutSprintInput
     adaptations?: RoadmapAdaptationCreateNestedManyWithoutSprintInput
   }
 
@@ -28197,6 +35976,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     tasks?: RoadmapSprintTaskUncheckedCreateNestedManyWithoutSprintInput
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedCreateNestedManyWithoutSprintInput
     adaptations?: RoadmapAdaptationUncheckedCreateNestedManyWithoutSprintInput
   }
 
@@ -28229,6 +36009,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userRoadmap?: UserRoadmapUpdateOneRequiredWithoutSprintsNestedInput
     tasks?: RoadmapSprintTaskUpdateManyWithoutSprintNestedInput
+    assessmentAttempts?: MicroAssessmentAttemptUpdateManyWithoutSprintNestedInput
     adaptations?: RoadmapAdaptationUpdateManyWithoutSprintNestedInput
   }
 
@@ -28245,6 +36026,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     tasks?: RoadmapSprintTaskUncheckedUpdateManyWithoutSprintNestedInput
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedUpdateManyWithoutSprintNestedInput
     adaptations?: RoadmapAdaptationUncheckedUpdateManyWithoutSprintNestedInput
   }
 
@@ -28258,6 +36040,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     sourceRoadmap: CareerRoadmapCreateNestedOneWithoutFollowersInput
     sprints?: RoadmapSprintCreateNestedManyWithoutUserRoadmapInput
+    assessmentAttempts?: MicroAssessmentAttemptCreateNestedManyWithoutUserRoadmapInput
     adaptations?: RoadmapAdaptationCreateNestedManyWithoutUserRoadmapInput
   }
 
@@ -28271,6 +36054,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     sprints?: RoadmapSprintUncheckedCreateNestedManyWithoutUserRoadmapInput
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedCreateNestedManyWithoutUserRoadmapInput
     adaptations?: RoadmapAdaptationUncheckedCreateNestedManyWithoutUserRoadmapInput
   }
 
@@ -28288,6 +36072,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     nodeLinks?: RoadmapNodeSkillCreateNestedManyWithoutSkillInput
+    assessments?: MicroAssessmentCreateNestedManyWithoutSkillInput
+    assessmentAttempts?: MicroAssessmentAttemptCreateNestedManyWithoutSkillInput
     outgoingLinks?: SkillRelationshipCreateNestedManyWithoutFromSkillInput
     incomingLinks?: SkillRelationshipCreateNestedManyWithoutToSkillInput
   }
@@ -28301,6 +36087,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     nodeLinks?: RoadmapNodeSkillUncheckedCreateNestedManyWithoutSkillInput
+    assessments?: MicroAssessmentUncheckedCreateNestedManyWithoutSkillInput
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedCreateNestedManyWithoutSkillInput
     outgoingLinks?: SkillRelationshipUncheckedCreateNestedManyWithoutFromSkillInput
     incomingLinks?: SkillRelationshipUncheckedCreateNestedManyWithoutToSkillInput
   }
@@ -28331,6 +36119,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sourceRoadmap?: CareerRoadmapUpdateOneRequiredWithoutFollowersNestedInput
     sprints?: RoadmapSprintUpdateManyWithoutUserRoadmapNestedInput
+    assessmentAttempts?: MicroAssessmentAttemptUpdateManyWithoutUserRoadmapNestedInput
     adaptations?: RoadmapAdaptationUpdateManyWithoutUserRoadmapNestedInput
   }
 
@@ -28344,6 +36133,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sprints?: RoadmapSprintUncheckedUpdateManyWithoutUserRoadmapNestedInput
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedUpdateManyWithoutUserRoadmapNestedInput
     adaptations?: RoadmapAdaptationUncheckedUpdateManyWithoutUserRoadmapNestedInput
   }
 
@@ -28367,6 +36157,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     nodeLinks?: RoadmapNodeSkillUpdateManyWithoutSkillNestedInput
+    assessments?: MicroAssessmentUpdateManyWithoutSkillNestedInput
+    assessmentAttempts?: MicroAssessmentAttemptUpdateManyWithoutSkillNestedInput
     outgoingLinks?: SkillRelationshipUpdateManyWithoutFromSkillNestedInput
     incomingLinks?: SkillRelationshipUpdateManyWithoutToSkillNestedInput
   }
@@ -28380,6 +36172,734 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     nodeLinks?: RoadmapNodeSkillUncheckedUpdateManyWithoutSkillNestedInput
+    assessments?: MicroAssessmentUncheckedUpdateManyWithoutSkillNestedInput
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedUpdateManyWithoutSkillNestedInput
+    outgoingLinks?: SkillRelationshipUncheckedUpdateManyWithoutFromSkillNestedInput
+    incomingLinks?: SkillRelationshipUncheckedUpdateManyWithoutToSkillNestedInput
+  }
+
+  export type RoadmapNodeCreateWithoutAssessmentsInput = {
+    id?: string
+    legacyNodeId?: string | null
+    title: string
+    description?: string | null
+    category: string
+    orderIndex: number
+    estimatedMinutes?: number
+    requiresEvidence?: boolean
+    requiresAssessment?: boolean
+    targetProficiency?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    roadmap: CareerRoadmapCreateNestedOneWithoutNodesInput
+    phase?: RoadmapPhaseCreateNestedOneWithoutNodesInput
+    skills?: RoadmapNodeSkillCreateNestedManyWithoutNodeInput
+    prerequisites?: RoadmapNodeDependencyCreateNestedManyWithoutNodeInput
+    unlocks?: RoadmapNodeDependencyCreateNestedManyWithoutPrerequisiteNodeInput
+    sprintTasks?: RoadmapSprintTaskCreateNestedManyWithoutRoadmapNodeInput
+  }
+
+  export type RoadmapNodeUncheckedCreateWithoutAssessmentsInput = {
+    id?: string
+    roadmapId: string
+    phaseId?: string | null
+    legacyNodeId?: string | null
+    title: string
+    description?: string | null
+    category: string
+    orderIndex: number
+    estimatedMinutes?: number
+    requiresEvidence?: boolean
+    requiresAssessment?: boolean
+    targetProficiency?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    skills?: RoadmapNodeSkillUncheckedCreateNestedManyWithoutNodeInput
+    prerequisites?: RoadmapNodeDependencyUncheckedCreateNestedManyWithoutNodeInput
+    unlocks?: RoadmapNodeDependencyUncheckedCreateNestedManyWithoutPrerequisiteNodeInput
+    sprintTasks?: RoadmapSprintTaskUncheckedCreateNestedManyWithoutRoadmapNodeInput
+  }
+
+  export type RoadmapNodeCreateOrConnectWithoutAssessmentsInput = {
+    where: RoadmapNodeWhereUniqueInput
+    create: XOR<RoadmapNodeCreateWithoutAssessmentsInput, RoadmapNodeUncheckedCreateWithoutAssessmentsInput>
+  }
+
+  export type SkillCreateWithoutAssessmentsInput = {
+    id?: string
+    slug: string
+    name: string
+    category: string
+    description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    nodeLinks?: RoadmapNodeSkillCreateNestedManyWithoutSkillInput
+    evidence?: SkillEvidenceCreateNestedManyWithoutSkillInput
+    assessmentAttempts?: MicroAssessmentAttemptCreateNestedManyWithoutSkillInput
+    outgoingLinks?: SkillRelationshipCreateNestedManyWithoutFromSkillInput
+    incomingLinks?: SkillRelationshipCreateNestedManyWithoutToSkillInput
+  }
+
+  export type SkillUncheckedCreateWithoutAssessmentsInput = {
+    id?: string
+    slug: string
+    name: string
+    category: string
+    description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    nodeLinks?: RoadmapNodeSkillUncheckedCreateNestedManyWithoutSkillInput
+    evidence?: SkillEvidenceUncheckedCreateNestedManyWithoutSkillInput
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedCreateNestedManyWithoutSkillInput
+    outgoingLinks?: SkillRelationshipUncheckedCreateNestedManyWithoutFromSkillInput
+    incomingLinks?: SkillRelationshipUncheckedCreateNestedManyWithoutToSkillInput
+  }
+
+  export type SkillCreateOrConnectWithoutAssessmentsInput = {
+    where: SkillWhereUniqueInput
+    create: XOR<SkillCreateWithoutAssessmentsInput, SkillUncheckedCreateWithoutAssessmentsInput>
+  }
+
+  export type MicroAssessmentQuestionCreateWithoutAssessmentInput = {
+    id?: string
+    questionText: string
+    options?: MicroAssessmentQuestionCreateoptionsInput | string[]
+    correctOptionIndex: number
+    explanation?: string | null
+    orderIndex?: number
+    createdAt?: Date | string
+  }
+
+  export type MicroAssessmentQuestionUncheckedCreateWithoutAssessmentInput = {
+    id?: string
+    questionText: string
+    options?: MicroAssessmentQuestionCreateoptionsInput | string[]
+    correctOptionIndex: number
+    explanation?: string | null
+    orderIndex?: number
+    createdAt?: Date | string
+  }
+
+  export type MicroAssessmentQuestionCreateOrConnectWithoutAssessmentInput = {
+    where: MicroAssessmentQuestionWhereUniqueInput
+    create: XOR<MicroAssessmentQuestionCreateWithoutAssessmentInput, MicroAssessmentQuestionUncheckedCreateWithoutAssessmentInput>
+  }
+
+  export type MicroAssessmentQuestionCreateManyAssessmentInputEnvelope = {
+    data: MicroAssessmentQuestionCreateManyAssessmentInput | MicroAssessmentQuestionCreateManyAssessmentInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type MicroAssessmentAttemptCreateWithoutAssessmentInput = {
+    id?: string
+    userId: string
+    totalQuestions: number
+    correctAnswers: number
+    score: number
+    passed?: boolean
+    answers: JsonNullValueInput | InputJsonValue
+    completedAt?: Date | string
+    createdAt?: Date | string
+    userRoadmap?: UserRoadmapCreateNestedOneWithoutAssessmentAttemptsInput
+    sprint?: RoadmapSprintCreateNestedOneWithoutAssessmentAttemptsInput
+    sprintTask?: RoadmapSprintTaskCreateNestedOneWithoutAssessmentAttemptsInput
+    skill?: SkillCreateNestedOneWithoutAssessmentAttemptsInput
+  }
+
+  export type MicroAssessmentAttemptUncheckedCreateWithoutAssessmentInput = {
+    id?: string
+    userId: string
+    userRoadmapId?: string | null
+    sprintId?: string | null
+    sprintTaskId?: string | null
+    skillId?: string | null
+    totalQuestions: number
+    correctAnswers: number
+    score: number
+    passed?: boolean
+    answers: JsonNullValueInput | InputJsonValue
+    completedAt?: Date | string
+    createdAt?: Date | string
+  }
+
+  export type MicroAssessmentAttemptCreateOrConnectWithoutAssessmentInput = {
+    where: MicroAssessmentAttemptWhereUniqueInput
+    create: XOR<MicroAssessmentAttemptCreateWithoutAssessmentInput, MicroAssessmentAttemptUncheckedCreateWithoutAssessmentInput>
+  }
+
+  export type MicroAssessmentAttemptCreateManyAssessmentInputEnvelope = {
+    data: MicroAssessmentAttemptCreateManyAssessmentInput | MicroAssessmentAttemptCreateManyAssessmentInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type RoadmapNodeUpsertWithoutAssessmentsInput = {
+    update: XOR<RoadmapNodeUpdateWithoutAssessmentsInput, RoadmapNodeUncheckedUpdateWithoutAssessmentsInput>
+    create: XOR<RoadmapNodeCreateWithoutAssessmentsInput, RoadmapNodeUncheckedCreateWithoutAssessmentsInput>
+    where?: RoadmapNodeWhereInput
+  }
+
+  export type RoadmapNodeUpdateToOneWithWhereWithoutAssessmentsInput = {
+    where?: RoadmapNodeWhereInput
+    data: XOR<RoadmapNodeUpdateWithoutAssessmentsInput, RoadmapNodeUncheckedUpdateWithoutAssessmentsInput>
+  }
+
+  export type RoadmapNodeUpdateWithoutAssessmentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    legacyNodeId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: StringFieldUpdateOperationsInput | string
+    orderIndex?: IntFieldUpdateOperationsInput | number
+    estimatedMinutes?: IntFieldUpdateOperationsInput | number
+    requiresEvidence?: BoolFieldUpdateOperationsInput | boolean
+    requiresAssessment?: BoolFieldUpdateOperationsInput | boolean
+    targetProficiency?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    roadmap?: CareerRoadmapUpdateOneRequiredWithoutNodesNestedInput
+    phase?: RoadmapPhaseUpdateOneWithoutNodesNestedInput
+    skills?: RoadmapNodeSkillUpdateManyWithoutNodeNestedInput
+    prerequisites?: RoadmapNodeDependencyUpdateManyWithoutNodeNestedInput
+    unlocks?: RoadmapNodeDependencyUpdateManyWithoutPrerequisiteNodeNestedInput
+    sprintTasks?: RoadmapSprintTaskUpdateManyWithoutRoadmapNodeNestedInput
+  }
+
+  export type RoadmapNodeUncheckedUpdateWithoutAssessmentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    roadmapId?: StringFieldUpdateOperationsInput | string
+    phaseId?: NullableStringFieldUpdateOperationsInput | string | null
+    legacyNodeId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: StringFieldUpdateOperationsInput | string
+    orderIndex?: IntFieldUpdateOperationsInput | number
+    estimatedMinutes?: IntFieldUpdateOperationsInput | number
+    requiresEvidence?: BoolFieldUpdateOperationsInput | boolean
+    requiresAssessment?: BoolFieldUpdateOperationsInput | boolean
+    targetProficiency?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    skills?: RoadmapNodeSkillUncheckedUpdateManyWithoutNodeNestedInput
+    prerequisites?: RoadmapNodeDependencyUncheckedUpdateManyWithoutNodeNestedInput
+    unlocks?: RoadmapNodeDependencyUncheckedUpdateManyWithoutPrerequisiteNodeNestedInput
+    sprintTasks?: RoadmapSprintTaskUncheckedUpdateManyWithoutRoadmapNodeNestedInput
+  }
+
+  export type SkillUpsertWithoutAssessmentsInput = {
+    update: XOR<SkillUpdateWithoutAssessmentsInput, SkillUncheckedUpdateWithoutAssessmentsInput>
+    create: XOR<SkillCreateWithoutAssessmentsInput, SkillUncheckedCreateWithoutAssessmentsInput>
+    where?: SkillWhereInput
+  }
+
+  export type SkillUpdateToOneWithWhereWithoutAssessmentsInput = {
+    where?: SkillWhereInput
+    data: XOR<SkillUpdateWithoutAssessmentsInput, SkillUncheckedUpdateWithoutAssessmentsInput>
+  }
+
+  export type SkillUpdateWithoutAssessmentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    nodeLinks?: RoadmapNodeSkillUpdateManyWithoutSkillNestedInput
+    evidence?: SkillEvidenceUpdateManyWithoutSkillNestedInput
+    assessmentAttempts?: MicroAssessmentAttemptUpdateManyWithoutSkillNestedInput
+    outgoingLinks?: SkillRelationshipUpdateManyWithoutFromSkillNestedInput
+    incomingLinks?: SkillRelationshipUpdateManyWithoutToSkillNestedInput
+  }
+
+  export type SkillUncheckedUpdateWithoutAssessmentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    nodeLinks?: RoadmapNodeSkillUncheckedUpdateManyWithoutSkillNestedInput
+    evidence?: SkillEvidenceUncheckedUpdateManyWithoutSkillNestedInput
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedUpdateManyWithoutSkillNestedInput
+    outgoingLinks?: SkillRelationshipUncheckedUpdateManyWithoutFromSkillNestedInput
+    incomingLinks?: SkillRelationshipUncheckedUpdateManyWithoutToSkillNestedInput
+  }
+
+  export type MicroAssessmentQuestionUpsertWithWhereUniqueWithoutAssessmentInput = {
+    where: MicroAssessmentQuestionWhereUniqueInput
+    update: XOR<MicroAssessmentQuestionUpdateWithoutAssessmentInput, MicroAssessmentQuestionUncheckedUpdateWithoutAssessmentInput>
+    create: XOR<MicroAssessmentQuestionCreateWithoutAssessmentInput, MicroAssessmentQuestionUncheckedCreateWithoutAssessmentInput>
+  }
+
+  export type MicroAssessmentQuestionUpdateWithWhereUniqueWithoutAssessmentInput = {
+    where: MicroAssessmentQuestionWhereUniqueInput
+    data: XOR<MicroAssessmentQuestionUpdateWithoutAssessmentInput, MicroAssessmentQuestionUncheckedUpdateWithoutAssessmentInput>
+  }
+
+  export type MicroAssessmentQuestionUpdateManyWithWhereWithoutAssessmentInput = {
+    where: MicroAssessmentQuestionScalarWhereInput
+    data: XOR<MicroAssessmentQuestionUpdateManyMutationInput, MicroAssessmentQuestionUncheckedUpdateManyWithoutAssessmentInput>
+  }
+
+  export type MicroAssessmentQuestionScalarWhereInput = {
+    AND?: MicroAssessmentQuestionScalarWhereInput | MicroAssessmentQuestionScalarWhereInput[]
+    OR?: MicroAssessmentQuestionScalarWhereInput[]
+    NOT?: MicroAssessmentQuestionScalarWhereInput | MicroAssessmentQuestionScalarWhereInput[]
+    id?: StringFilter<"MicroAssessmentQuestion"> | string
+    assessmentId?: StringFilter<"MicroAssessmentQuestion"> | string
+    questionText?: StringFilter<"MicroAssessmentQuestion"> | string
+    options?: StringNullableListFilter<"MicroAssessmentQuestion">
+    correctOptionIndex?: IntFilter<"MicroAssessmentQuestion"> | number
+    explanation?: StringNullableFilter<"MicroAssessmentQuestion"> | string | null
+    orderIndex?: IntFilter<"MicroAssessmentQuestion"> | number
+    createdAt?: DateTimeFilter<"MicroAssessmentQuestion"> | Date | string
+  }
+
+  export type MicroAssessmentAttemptUpsertWithWhereUniqueWithoutAssessmentInput = {
+    where: MicroAssessmentAttemptWhereUniqueInput
+    update: XOR<MicroAssessmentAttemptUpdateWithoutAssessmentInput, MicroAssessmentAttemptUncheckedUpdateWithoutAssessmentInput>
+    create: XOR<MicroAssessmentAttemptCreateWithoutAssessmentInput, MicroAssessmentAttemptUncheckedCreateWithoutAssessmentInput>
+  }
+
+  export type MicroAssessmentAttemptUpdateWithWhereUniqueWithoutAssessmentInput = {
+    where: MicroAssessmentAttemptWhereUniqueInput
+    data: XOR<MicroAssessmentAttemptUpdateWithoutAssessmentInput, MicroAssessmentAttemptUncheckedUpdateWithoutAssessmentInput>
+  }
+
+  export type MicroAssessmentAttemptUpdateManyWithWhereWithoutAssessmentInput = {
+    where: MicroAssessmentAttemptScalarWhereInput
+    data: XOR<MicroAssessmentAttemptUpdateManyMutationInput, MicroAssessmentAttemptUncheckedUpdateManyWithoutAssessmentInput>
+  }
+
+  export type MicroAssessmentCreateWithoutQuestionsInput = {
+    id?: string
+    title: string
+    description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    roadmapNode?: RoadmapNodeCreateNestedOneWithoutAssessmentsInput
+    skill?: SkillCreateNestedOneWithoutAssessmentsInput
+    attempts?: MicroAssessmentAttemptCreateNestedManyWithoutAssessmentInput
+  }
+
+  export type MicroAssessmentUncheckedCreateWithoutQuestionsInput = {
+    id?: string
+    title: string
+    description?: string | null
+    roadmapNodeId?: string | null
+    skillId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    attempts?: MicroAssessmentAttemptUncheckedCreateNestedManyWithoutAssessmentInput
+  }
+
+  export type MicroAssessmentCreateOrConnectWithoutQuestionsInput = {
+    where: MicroAssessmentWhereUniqueInput
+    create: XOR<MicroAssessmentCreateWithoutQuestionsInput, MicroAssessmentUncheckedCreateWithoutQuestionsInput>
+  }
+
+  export type MicroAssessmentUpsertWithoutQuestionsInput = {
+    update: XOR<MicroAssessmentUpdateWithoutQuestionsInput, MicroAssessmentUncheckedUpdateWithoutQuestionsInput>
+    create: XOR<MicroAssessmentCreateWithoutQuestionsInput, MicroAssessmentUncheckedCreateWithoutQuestionsInput>
+    where?: MicroAssessmentWhereInput
+  }
+
+  export type MicroAssessmentUpdateToOneWithWhereWithoutQuestionsInput = {
+    where?: MicroAssessmentWhereInput
+    data: XOR<MicroAssessmentUpdateWithoutQuestionsInput, MicroAssessmentUncheckedUpdateWithoutQuestionsInput>
+  }
+
+  export type MicroAssessmentUpdateWithoutQuestionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    roadmapNode?: RoadmapNodeUpdateOneWithoutAssessmentsNestedInput
+    skill?: SkillUpdateOneWithoutAssessmentsNestedInput
+    attempts?: MicroAssessmentAttemptUpdateManyWithoutAssessmentNestedInput
+  }
+
+  export type MicroAssessmentUncheckedUpdateWithoutQuestionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    roadmapNodeId?: NullableStringFieldUpdateOperationsInput | string | null
+    skillId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    attempts?: MicroAssessmentAttemptUncheckedUpdateManyWithoutAssessmentNestedInput
+  }
+
+  export type MicroAssessmentCreateWithoutAttemptsInput = {
+    id?: string
+    title: string
+    description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    roadmapNode?: RoadmapNodeCreateNestedOneWithoutAssessmentsInput
+    skill?: SkillCreateNestedOneWithoutAssessmentsInput
+    questions?: MicroAssessmentQuestionCreateNestedManyWithoutAssessmentInput
+  }
+
+  export type MicroAssessmentUncheckedCreateWithoutAttemptsInput = {
+    id?: string
+    title: string
+    description?: string | null
+    roadmapNodeId?: string | null
+    skillId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    questions?: MicroAssessmentQuestionUncheckedCreateNestedManyWithoutAssessmentInput
+  }
+
+  export type MicroAssessmentCreateOrConnectWithoutAttemptsInput = {
+    where: MicroAssessmentWhereUniqueInput
+    create: XOR<MicroAssessmentCreateWithoutAttemptsInput, MicroAssessmentUncheckedCreateWithoutAttemptsInput>
+  }
+
+  export type UserRoadmapCreateWithoutAssessmentAttemptsInput = {
+    id?: string
+    userId: string
+    status?: $Enums.UserRoadmapStatus
+    personalization: JsonNullValueInput | InputJsonValue
+    planSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    sourceRoadmap: CareerRoadmapCreateNestedOneWithoutFollowersInput
+    sprints?: RoadmapSprintCreateNestedManyWithoutUserRoadmapInput
+    skillEvidence?: SkillEvidenceCreateNestedManyWithoutUserRoadmapInput
+    adaptations?: RoadmapAdaptationCreateNestedManyWithoutUserRoadmapInput
+  }
+
+  export type UserRoadmapUncheckedCreateWithoutAssessmentAttemptsInput = {
+    id?: string
+    userId: string
+    sourceRoadmapId: string
+    status?: $Enums.UserRoadmapStatus
+    personalization: JsonNullValueInput | InputJsonValue
+    planSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    sprints?: RoadmapSprintUncheckedCreateNestedManyWithoutUserRoadmapInput
+    skillEvidence?: SkillEvidenceUncheckedCreateNestedManyWithoutUserRoadmapInput
+    adaptations?: RoadmapAdaptationUncheckedCreateNestedManyWithoutUserRoadmapInput
+  }
+
+  export type UserRoadmapCreateOrConnectWithoutAssessmentAttemptsInput = {
+    where: UserRoadmapWhereUniqueInput
+    create: XOR<UserRoadmapCreateWithoutAssessmentAttemptsInput, UserRoadmapUncheckedCreateWithoutAssessmentAttemptsInput>
+  }
+
+  export type RoadmapSprintCreateWithoutAssessmentAttemptsInput = {
+    id?: string
+    sprintNumber: number
+    startDate: Date | string
+    endDate: Date | string
+    objective: string
+    expectedMinutes?: number
+    status?: $Enums.SprintStatus
+    decision?: $Enums.SprintDecision | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userRoadmap: UserRoadmapCreateNestedOneWithoutSprintsInput
+    tasks?: RoadmapSprintTaskCreateNestedManyWithoutSprintInput
+    performance?: SprintPerformanceCreateNestedOneWithoutSprintInput
+    adaptations?: RoadmapAdaptationCreateNestedManyWithoutSprintInput
+  }
+
+  export type RoadmapSprintUncheckedCreateWithoutAssessmentAttemptsInput = {
+    id?: string
+    userRoadmapId: string
+    sprintNumber: number
+    startDate: Date | string
+    endDate: Date | string
+    objective: string
+    expectedMinutes?: number
+    status?: $Enums.SprintStatus
+    decision?: $Enums.SprintDecision | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    tasks?: RoadmapSprintTaskUncheckedCreateNestedManyWithoutSprintInput
+    performance?: SprintPerformanceUncheckedCreateNestedOneWithoutSprintInput
+    adaptations?: RoadmapAdaptationUncheckedCreateNestedManyWithoutSprintInput
+  }
+
+  export type RoadmapSprintCreateOrConnectWithoutAssessmentAttemptsInput = {
+    where: RoadmapSprintWhereUniqueInput
+    create: XOR<RoadmapSprintCreateWithoutAssessmentAttemptsInput, RoadmapSprintUncheckedCreateWithoutAssessmentAttemptsInput>
+  }
+
+  export type RoadmapSprintTaskCreateWithoutAssessmentAttemptsInput = {
+    id?: string
+    title: string
+    description?: string | null
+    orderIndex: number
+    estimatedMinutes?: number
+    requiresEvidence?: boolean
+    requiresAssessment?: boolean
+    status?: $Enums.SprintTaskStatus
+    completedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    sprint: RoadmapSprintCreateNestedOneWithoutTasksInput
+    roadmapNode?: RoadmapNodeCreateNestedOneWithoutSprintTasksInput
+  }
+
+  export type RoadmapSprintTaskUncheckedCreateWithoutAssessmentAttemptsInput = {
+    id?: string
+    sprintId: string
+    roadmapNodeId?: string | null
+    title: string
+    description?: string | null
+    orderIndex: number
+    estimatedMinutes?: number
+    requiresEvidence?: boolean
+    requiresAssessment?: boolean
+    status?: $Enums.SprintTaskStatus
+    completedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type RoadmapSprintTaskCreateOrConnectWithoutAssessmentAttemptsInput = {
+    where: RoadmapSprintTaskWhereUniqueInput
+    create: XOR<RoadmapSprintTaskCreateWithoutAssessmentAttemptsInput, RoadmapSprintTaskUncheckedCreateWithoutAssessmentAttemptsInput>
+  }
+
+  export type SkillCreateWithoutAssessmentAttemptsInput = {
+    id?: string
+    slug: string
+    name: string
+    category: string
+    description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    nodeLinks?: RoadmapNodeSkillCreateNestedManyWithoutSkillInput
+    evidence?: SkillEvidenceCreateNestedManyWithoutSkillInput
+    assessments?: MicroAssessmentCreateNestedManyWithoutSkillInput
+    outgoingLinks?: SkillRelationshipCreateNestedManyWithoutFromSkillInput
+    incomingLinks?: SkillRelationshipCreateNestedManyWithoutToSkillInput
+  }
+
+  export type SkillUncheckedCreateWithoutAssessmentAttemptsInput = {
+    id?: string
+    slug: string
+    name: string
+    category: string
+    description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    nodeLinks?: RoadmapNodeSkillUncheckedCreateNestedManyWithoutSkillInput
+    evidence?: SkillEvidenceUncheckedCreateNestedManyWithoutSkillInput
+    assessments?: MicroAssessmentUncheckedCreateNestedManyWithoutSkillInput
+    outgoingLinks?: SkillRelationshipUncheckedCreateNestedManyWithoutFromSkillInput
+    incomingLinks?: SkillRelationshipUncheckedCreateNestedManyWithoutToSkillInput
+  }
+
+  export type SkillCreateOrConnectWithoutAssessmentAttemptsInput = {
+    where: SkillWhereUniqueInput
+    create: XOR<SkillCreateWithoutAssessmentAttemptsInput, SkillUncheckedCreateWithoutAssessmentAttemptsInput>
+  }
+
+  export type MicroAssessmentUpsertWithoutAttemptsInput = {
+    update: XOR<MicroAssessmentUpdateWithoutAttemptsInput, MicroAssessmentUncheckedUpdateWithoutAttemptsInput>
+    create: XOR<MicroAssessmentCreateWithoutAttemptsInput, MicroAssessmentUncheckedCreateWithoutAttemptsInput>
+    where?: MicroAssessmentWhereInput
+  }
+
+  export type MicroAssessmentUpdateToOneWithWhereWithoutAttemptsInput = {
+    where?: MicroAssessmentWhereInput
+    data: XOR<MicroAssessmentUpdateWithoutAttemptsInput, MicroAssessmentUncheckedUpdateWithoutAttemptsInput>
+  }
+
+  export type MicroAssessmentUpdateWithoutAttemptsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    roadmapNode?: RoadmapNodeUpdateOneWithoutAssessmentsNestedInput
+    skill?: SkillUpdateOneWithoutAssessmentsNestedInput
+    questions?: MicroAssessmentQuestionUpdateManyWithoutAssessmentNestedInput
+  }
+
+  export type MicroAssessmentUncheckedUpdateWithoutAttemptsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    roadmapNodeId?: NullableStringFieldUpdateOperationsInput | string | null
+    skillId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    questions?: MicroAssessmentQuestionUncheckedUpdateManyWithoutAssessmentNestedInput
+  }
+
+  export type UserRoadmapUpsertWithoutAssessmentAttemptsInput = {
+    update: XOR<UserRoadmapUpdateWithoutAssessmentAttemptsInput, UserRoadmapUncheckedUpdateWithoutAssessmentAttemptsInput>
+    create: XOR<UserRoadmapCreateWithoutAssessmentAttemptsInput, UserRoadmapUncheckedCreateWithoutAssessmentAttemptsInput>
+    where?: UserRoadmapWhereInput
+  }
+
+  export type UserRoadmapUpdateToOneWithWhereWithoutAssessmentAttemptsInput = {
+    where?: UserRoadmapWhereInput
+    data: XOR<UserRoadmapUpdateWithoutAssessmentAttemptsInput, UserRoadmapUncheckedUpdateWithoutAssessmentAttemptsInput>
+  }
+
+  export type UserRoadmapUpdateWithoutAssessmentAttemptsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    status?: EnumUserRoadmapStatusFieldUpdateOperationsInput | $Enums.UserRoadmapStatus
+    personalization?: JsonNullValueInput | InputJsonValue
+    planSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sourceRoadmap?: CareerRoadmapUpdateOneRequiredWithoutFollowersNestedInput
+    sprints?: RoadmapSprintUpdateManyWithoutUserRoadmapNestedInput
+    skillEvidence?: SkillEvidenceUpdateManyWithoutUserRoadmapNestedInput
+    adaptations?: RoadmapAdaptationUpdateManyWithoutUserRoadmapNestedInput
+  }
+
+  export type UserRoadmapUncheckedUpdateWithoutAssessmentAttemptsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    sourceRoadmapId?: StringFieldUpdateOperationsInput | string
+    status?: EnumUserRoadmapStatusFieldUpdateOperationsInput | $Enums.UserRoadmapStatus
+    personalization?: JsonNullValueInput | InputJsonValue
+    planSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sprints?: RoadmapSprintUncheckedUpdateManyWithoutUserRoadmapNestedInput
+    skillEvidence?: SkillEvidenceUncheckedUpdateManyWithoutUserRoadmapNestedInput
+    adaptations?: RoadmapAdaptationUncheckedUpdateManyWithoutUserRoadmapNestedInput
+  }
+
+  export type RoadmapSprintUpsertWithoutAssessmentAttemptsInput = {
+    update: XOR<RoadmapSprintUpdateWithoutAssessmentAttemptsInput, RoadmapSprintUncheckedUpdateWithoutAssessmentAttemptsInput>
+    create: XOR<RoadmapSprintCreateWithoutAssessmentAttemptsInput, RoadmapSprintUncheckedCreateWithoutAssessmentAttemptsInput>
+    where?: RoadmapSprintWhereInput
+  }
+
+  export type RoadmapSprintUpdateToOneWithWhereWithoutAssessmentAttemptsInput = {
+    where?: RoadmapSprintWhereInput
+    data: XOR<RoadmapSprintUpdateWithoutAssessmentAttemptsInput, RoadmapSprintUncheckedUpdateWithoutAssessmentAttemptsInput>
+  }
+
+  export type RoadmapSprintUpdateWithoutAssessmentAttemptsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sprintNumber?: IntFieldUpdateOperationsInput | number
+    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    endDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    objective?: StringFieldUpdateOperationsInput | string
+    expectedMinutes?: IntFieldUpdateOperationsInput | number
+    status?: EnumSprintStatusFieldUpdateOperationsInput | $Enums.SprintStatus
+    decision?: NullableEnumSprintDecisionFieldUpdateOperationsInput | $Enums.SprintDecision | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userRoadmap?: UserRoadmapUpdateOneRequiredWithoutSprintsNestedInput
+    tasks?: RoadmapSprintTaskUpdateManyWithoutSprintNestedInput
+    performance?: SprintPerformanceUpdateOneWithoutSprintNestedInput
+    adaptations?: RoadmapAdaptationUpdateManyWithoutSprintNestedInput
+  }
+
+  export type RoadmapSprintUncheckedUpdateWithoutAssessmentAttemptsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userRoadmapId?: StringFieldUpdateOperationsInput | string
+    sprintNumber?: IntFieldUpdateOperationsInput | number
+    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    endDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    objective?: StringFieldUpdateOperationsInput | string
+    expectedMinutes?: IntFieldUpdateOperationsInput | number
+    status?: EnumSprintStatusFieldUpdateOperationsInput | $Enums.SprintStatus
+    decision?: NullableEnumSprintDecisionFieldUpdateOperationsInput | $Enums.SprintDecision | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    tasks?: RoadmapSprintTaskUncheckedUpdateManyWithoutSprintNestedInput
+    performance?: SprintPerformanceUncheckedUpdateOneWithoutSprintNestedInput
+    adaptations?: RoadmapAdaptationUncheckedUpdateManyWithoutSprintNestedInput
+  }
+
+  export type RoadmapSprintTaskUpsertWithoutAssessmentAttemptsInput = {
+    update: XOR<RoadmapSprintTaskUpdateWithoutAssessmentAttemptsInput, RoadmapSprintTaskUncheckedUpdateWithoutAssessmentAttemptsInput>
+    create: XOR<RoadmapSprintTaskCreateWithoutAssessmentAttemptsInput, RoadmapSprintTaskUncheckedCreateWithoutAssessmentAttemptsInput>
+    where?: RoadmapSprintTaskWhereInput
+  }
+
+  export type RoadmapSprintTaskUpdateToOneWithWhereWithoutAssessmentAttemptsInput = {
+    where?: RoadmapSprintTaskWhereInput
+    data: XOR<RoadmapSprintTaskUpdateWithoutAssessmentAttemptsInput, RoadmapSprintTaskUncheckedUpdateWithoutAssessmentAttemptsInput>
+  }
+
+  export type RoadmapSprintTaskUpdateWithoutAssessmentAttemptsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    orderIndex?: IntFieldUpdateOperationsInput | number
+    estimatedMinutes?: IntFieldUpdateOperationsInput | number
+    requiresEvidence?: BoolFieldUpdateOperationsInput | boolean
+    requiresAssessment?: BoolFieldUpdateOperationsInput | boolean
+    status?: EnumSprintTaskStatusFieldUpdateOperationsInput | $Enums.SprintTaskStatus
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sprint?: RoadmapSprintUpdateOneRequiredWithoutTasksNestedInput
+    roadmapNode?: RoadmapNodeUpdateOneWithoutSprintTasksNestedInput
+  }
+
+  export type RoadmapSprintTaskUncheckedUpdateWithoutAssessmentAttemptsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sprintId?: StringFieldUpdateOperationsInput | string
+    roadmapNodeId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    orderIndex?: IntFieldUpdateOperationsInput | number
+    estimatedMinutes?: IntFieldUpdateOperationsInput | number
+    requiresEvidence?: BoolFieldUpdateOperationsInput | boolean
+    requiresAssessment?: BoolFieldUpdateOperationsInput | boolean
+    status?: EnumSprintTaskStatusFieldUpdateOperationsInput | $Enums.SprintTaskStatus
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SkillUpsertWithoutAssessmentAttemptsInput = {
+    update: XOR<SkillUpdateWithoutAssessmentAttemptsInput, SkillUncheckedUpdateWithoutAssessmentAttemptsInput>
+    create: XOR<SkillCreateWithoutAssessmentAttemptsInput, SkillUncheckedCreateWithoutAssessmentAttemptsInput>
+    where?: SkillWhereInput
+  }
+
+  export type SkillUpdateToOneWithWhereWithoutAssessmentAttemptsInput = {
+    where?: SkillWhereInput
+    data: XOR<SkillUpdateWithoutAssessmentAttemptsInput, SkillUncheckedUpdateWithoutAssessmentAttemptsInput>
+  }
+
+  export type SkillUpdateWithoutAssessmentAttemptsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    nodeLinks?: RoadmapNodeSkillUpdateManyWithoutSkillNestedInput
+    evidence?: SkillEvidenceUpdateManyWithoutSkillNestedInput
+    assessments?: MicroAssessmentUpdateManyWithoutSkillNestedInput
+    outgoingLinks?: SkillRelationshipUpdateManyWithoutFromSkillNestedInput
+    incomingLinks?: SkillRelationshipUpdateManyWithoutToSkillNestedInput
+  }
+
+  export type SkillUncheckedUpdateWithoutAssessmentAttemptsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    nodeLinks?: RoadmapNodeSkillUncheckedUpdateManyWithoutSkillNestedInput
+    evidence?: SkillEvidenceUncheckedUpdateManyWithoutSkillNestedInput
+    assessments?: MicroAssessmentUncheckedUpdateManyWithoutSkillNestedInput
     outgoingLinks?: SkillRelationshipUncheckedUpdateManyWithoutFromSkillNestedInput
     incomingLinks?: SkillRelationshipUncheckedUpdateManyWithoutToSkillNestedInput
   }
@@ -28395,6 +36915,7 @@ export namespace Prisma {
     sourceRoadmap: CareerRoadmapCreateNestedOneWithoutFollowersInput
     sprints?: RoadmapSprintCreateNestedManyWithoutUserRoadmapInput
     skillEvidence?: SkillEvidenceCreateNestedManyWithoutUserRoadmapInput
+    assessmentAttempts?: MicroAssessmentAttemptCreateNestedManyWithoutUserRoadmapInput
   }
 
   export type UserRoadmapUncheckedCreateWithoutAdaptationsInput = {
@@ -28408,6 +36929,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     sprints?: RoadmapSprintUncheckedCreateNestedManyWithoutUserRoadmapInput
     skillEvidence?: SkillEvidenceUncheckedCreateNestedManyWithoutUserRoadmapInput
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedCreateNestedManyWithoutUserRoadmapInput
   }
 
   export type UserRoadmapCreateOrConnectWithoutAdaptationsInput = {
@@ -28429,6 +36951,7 @@ export namespace Prisma {
     userRoadmap: UserRoadmapCreateNestedOneWithoutSprintsInput
     tasks?: RoadmapSprintTaskCreateNestedManyWithoutSprintInput
     performance?: SprintPerformanceCreateNestedOneWithoutSprintInput
+    assessmentAttempts?: MicroAssessmentAttemptCreateNestedManyWithoutSprintInput
   }
 
   export type RoadmapSprintUncheckedCreateWithoutAdaptationsInput = {
@@ -28445,6 +36968,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     tasks?: RoadmapSprintTaskUncheckedCreateNestedManyWithoutSprintInput
     performance?: SprintPerformanceUncheckedCreateNestedOneWithoutSprintInput
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedCreateNestedManyWithoutSprintInput
   }
 
   export type RoadmapSprintCreateOrConnectWithoutAdaptationsInput = {
@@ -28474,6 +36998,7 @@ export namespace Prisma {
     sourceRoadmap?: CareerRoadmapUpdateOneRequiredWithoutFollowersNestedInput
     sprints?: RoadmapSprintUpdateManyWithoutUserRoadmapNestedInput
     skillEvidence?: SkillEvidenceUpdateManyWithoutUserRoadmapNestedInput
+    assessmentAttempts?: MicroAssessmentAttemptUpdateManyWithoutUserRoadmapNestedInput
   }
 
   export type UserRoadmapUncheckedUpdateWithoutAdaptationsInput = {
@@ -28487,6 +37012,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sprints?: RoadmapSprintUncheckedUpdateManyWithoutUserRoadmapNestedInput
     skillEvidence?: SkillEvidenceUncheckedUpdateManyWithoutUserRoadmapNestedInput
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedUpdateManyWithoutUserRoadmapNestedInput
   }
 
   export type RoadmapSprintUpsertWithoutAdaptationsInput = {
@@ -28514,6 +37040,7 @@ export namespace Prisma {
     userRoadmap?: UserRoadmapUpdateOneRequiredWithoutSprintsNestedInput
     tasks?: RoadmapSprintTaskUpdateManyWithoutSprintNestedInput
     performance?: SprintPerformanceUpdateOneWithoutSprintNestedInput
+    assessmentAttempts?: MicroAssessmentAttemptUpdateManyWithoutSprintNestedInput
   }
 
   export type RoadmapSprintUncheckedUpdateWithoutAdaptationsInput = {
@@ -28530,6 +37057,143 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     tasks?: RoadmapSprintTaskUncheckedUpdateManyWithoutSprintNestedInput
     performance?: SprintPerformanceUncheckedUpdateOneWithoutSprintNestedInput
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedUpdateManyWithoutSprintNestedInput
+  }
+
+  export type DiscussionCommentCreateWithoutPostInput = {
+    id?: string
+    userId: string
+    userName: string
+    userAvatar?: string | null
+    content: string
+    upvotes?: number
+    createdAt?: Date | string
+  }
+
+  export type DiscussionCommentUncheckedCreateWithoutPostInput = {
+    id?: string
+    userId: string
+    userName: string
+    userAvatar?: string | null
+    content: string
+    upvotes?: number
+    createdAt?: Date | string
+  }
+
+  export type DiscussionCommentCreateOrConnectWithoutPostInput = {
+    where: DiscussionCommentWhereUniqueInput
+    create: XOR<DiscussionCommentCreateWithoutPostInput, DiscussionCommentUncheckedCreateWithoutPostInput>
+  }
+
+  export type DiscussionCommentCreateManyPostInputEnvelope = {
+    data: DiscussionCommentCreateManyPostInput | DiscussionCommentCreateManyPostInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type DiscussionCommentUpsertWithWhereUniqueWithoutPostInput = {
+    where: DiscussionCommentWhereUniqueInput
+    update: XOR<DiscussionCommentUpdateWithoutPostInput, DiscussionCommentUncheckedUpdateWithoutPostInput>
+    create: XOR<DiscussionCommentCreateWithoutPostInput, DiscussionCommentUncheckedCreateWithoutPostInput>
+  }
+
+  export type DiscussionCommentUpdateWithWhereUniqueWithoutPostInput = {
+    where: DiscussionCommentWhereUniqueInput
+    data: XOR<DiscussionCommentUpdateWithoutPostInput, DiscussionCommentUncheckedUpdateWithoutPostInput>
+  }
+
+  export type DiscussionCommentUpdateManyWithWhereWithoutPostInput = {
+    where: DiscussionCommentScalarWhereInput
+    data: XOR<DiscussionCommentUpdateManyMutationInput, DiscussionCommentUncheckedUpdateManyWithoutPostInput>
+  }
+
+  export type DiscussionCommentScalarWhereInput = {
+    AND?: DiscussionCommentScalarWhereInput | DiscussionCommentScalarWhereInput[]
+    OR?: DiscussionCommentScalarWhereInput[]
+    NOT?: DiscussionCommentScalarWhereInput | DiscussionCommentScalarWhereInput[]
+    id?: StringFilter<"DiscussionComment"> | string
+    postId?: StringFilter<"DiscussionComment"> | string
+    userId?: StringFilter<"DiscussionComment"> | string
+    userName?: StringFilter<"DiscussionComment"> | string
+    userAvatar?: StringNullableFilter<"DiscussionComment"> | string | null
+    content?: StringFilter<"DiscussionComment"> | string
+    upvotes?: IntFilter<"DiscussionComment"> | number
+    createdAt?: DateTimeFilter<"DiscussionComment"> | Date | string
+  }
+
+  export type DiscussionPostCreateWithoutCommentsInput = {
+    id?: string
+    userId: string
+    userName: string
+    userAvatar?: string | null
+    roleCategory: string
+    title: string
+    content: string
+    tags?: DiscussionPostCreatetagsInput | string[]
+    upvotes?: number
+    aiReply?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DiscussionPostUncheckedCreateWithoutCommentsInput = {
+    id?: string
+    userId: string
+    userName: string
+    userAvatar?: string | null
+    roleCategory: string
+    title: string
+    content: string
+    tags?: DiscussionPostCreatetagsInput | string[]
+    upvotes?: number
+    aiReply?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DiscussionPostCreateOrConnectWithoutCommentsInput = {
+    where: DiscussionPostWhereUniqueInput
+    create: XOR<DiscussionPostCreateWithoutCommentsInput, DiscussionPostUncheckedCreateWithoutCommentsInput>
+  }
+
+  export type DiscussionPostUpsertWithoutCommentsInput = {
+    update: XOR<DiscussionPostUpdateWithoutCommentsInput, DiscussionPostUncheckedUpdateWithoutCommentsInput>
+    create: XOR<DiscussionPostCreateWithoutCommentsInput, DiscussionPostUncheckedCreateWithoutCommentsInput>
+    where?: DiscussionPostWhereInput
+  }
+
+  export type DiscussionPostUpdateToOneWithWhereWithoutCommentsInput = {
+    where?: DiscussionPostWhereInput
+    data: XOR<DiscussionPostUpdateWithoutCommentsInput, DiscussionPostUncheckedUpdateWithoutCommentsInput>
+  }
+
+  export type DiscussionPostUpdateWithoutCommentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    userName?: StringFieldUpdateOperationsInput | string
+    userAvatar?: NullableStringFieldUpdateOperationsInput | string | null
+    roleCategory?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    tags?: DiscussionPostUpdatetagsInput | string[]
+    upvotes?: IntFieldUpdateOperationsInput | number
+    aiReply?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DiscussionPostUncheckedUpdateWithoutCommentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    userName?: StringFieldUpdateOperationsInput | string
+    userAvatar?: NullableStringFieldUpdateOperationsInput | string | null
+    roleCategory?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    tags?: DiscussionPostUpdatetagsInput | string[]
+    upvotes?: IntFieldUpdateOperationsInput | number
+    aiReply?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type RoadmapPhaseCreateManyRoadmapInput = {
@@ -28551,6 +37215,7 @@ export namespace Prisma {
     orderIndex: number
     estimatedMinutes?: number
     requiresEvidence?: boolean
+    requiresAssessment?: boolean
     targetProficiency?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -28604,11 +37269,13 @@ export namespace Prisma {
     orderIndex?: IntFieldUpdateOperationsInput | number
     estimatedMinutes?: IntFieldUpdateOperationsInput | number
     requiresEvidence?: BoolFieldUpdateOperationsInput | boolean
+    requiresAssessment?: BoolFieldUpdateOperationsInput | boolean
     targetProficiency?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     phase?: RoadmapPhaseUpdateOneWithoutNodesNestedInput
     skills?: RoadmapNodeSkillUpdateManyWithoutNodeNestedInput
+    assessments?: MicroAssessmentUpdateManyWithoutRoadmapNodeNestedInput
     prerequisites?: RoadmapNodeDependencyUpdateManyWithoutNodeNestedInput
     unlocks?: RoadmapNodeDependencyUpdateManyWithoutPrerequisiteNodeNestedInput
     sprintTasks?: RoadmapSprintTaskUpdateManyWithoutRoadmapNodeNestedInput
@@ -28624,10 +37291,12 @@ export namespace Prisma {
     orderIndex?: IntFieldUpdateOperationsInput | number
     estimatedMinutes?: IntFieldUpdateOperationsInput | number
     requiresEvidence?: BoolFieldUpdateOperationsInput | boolean
+    requiresAssessment?: BoolFieldUpdateOperationsInput | boolean
     targetProficiency?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     skills?: RoadmapNodeSkillUncheckedUpdateManyWithoutNodeNestedInput
+    assessments?: MicroAssessmentUncheckedUpdateManyWithoutRoadmapNodeNestedInput
     prerequisites?: RoadmapNodeDependencyUncheckedUpdateManyWithoutNodeNestedInput
     unlocks?: RoadmapNodeDependencyUncheckedUpdateManyWithoutPrerequisiteNodeNestedInput
     sprintTasks?: RoadmapSprintTaskUncheckedUpdateManyWithoutRoadmapNodeNestedInput
@@ -28643,6 +37312,7 @@ export namespace Prisma {
     orderIndex?: IntFieldUpdateOperationsInput | number
     estimatedMinutes?: IntFieldUpdateOperationsInput | number
     requiresEvidence?: BoolFieldUpdateOperationsInput | boolean
+    requiresAssessment?: BoolFieldUpdateOperationsInput | boolean
     targetProficiency?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -28658,6 +37328,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sprints?: RoadmapSprintUpdateManyWithoutUserRoadmapNestedInput
     skillEvidence?: SkillEvidenceUpdateManyWithoutUserRoadmapNestedInput
+    assessmentAttempts?: MicroAssessmentAttemptUpdateManyWithoutUserRoadmapNestedInput
     adaptations?: RoadmapAdaptationUpdateManyWithoutUserRoadmapNestedInput
   }
 
@@ -28671,6 +37342,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sprints?: RoadmapSprintUncheckedUpdateManyWithoutUserRoadmapNestedInput
     skillEvidence?: SkillEvidenceUncheckedUpdateManyWithoutUserRoadmapNestedInput
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedUpdateManyWithoutUserRoadmapNestedInput
     adaptations?: RoadmapAdaptationUncheckedUpdateManyWithoutUserRoadmapNestedInput
   }
 
@@ -28699,6 +37371,31 @@ export namespace Prisma {
     externalReference?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     assessedAt?: Date | string
+  }
+
+  export type MicroAssessmentCreateManySkillInput = {
+    id?: string
+    title: string
+    description?: string | null
+    roadmapNodeId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MicroAssessmentAttemptCreateManySkillInput = {
+    id?: string
+    assessmentId: string
+    userId: string
+    userRoadmapId?: string | null
+    sprintId?: string | null
+    sprintTaskId?: string | null
+    totalQuestions: number
+    correctAnswers: number
+    score: number
+    passed?: boolean
+    answers: JsonNullValueInput | InputJsonValue
+    completedAt?: Date | string
+    createdAt?: Date | string
   }
 
   export type SkillRelationshipCreateManyFromSkillInput = {
@@ -28766,6 +37463,85 @@ export namespace Prisma {
     assessedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type MicroAssessmentUpdateWithoutSkillInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    roadmapNode?: RoadmapNodeUpdateOneWithoutAssessmentsNestedInput
+    questions?: MicroAssessmentQuestionUpdateManyWithoutAssessmentNestedInput
+    attempts?: MicroAssessmentAttemptUpdateManyWithoutAssessmentNestedInput
+  }
+
+  export type MicroAssessmentUncheckedUpdateWithoutSkillInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    roadmapNodeId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    questions?: MicroAssessmentQuestionUncheckedUpdateManyWithoutAssessmentNestedInput
+    attempts?: MicroAssessmentAttemptUncheckedUpdateManyWithoutAssessmentNestedInput
+  }
+
+  export type MicroAssessmentUncheckedUpdateManyWithoutSkillInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    roadmapNodeId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MicroAssessmentAttemptUpdateWithoutSkillInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    totalQuestions?: IntFieldUpdateOperationsInput | number
+    correctAnswers?: IntFieldUpdateOperationsInput | number
+    score?: IntFieldUpdateOperationsInput | number
+    passed?: BoolFieldUpdateOperationsInput | boolean
+    answers?: JsonNullValueInput | InputJsonValue
+    completedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assessment?: MicroAssessmentUpdateOneRequiredWithoutAttemptsNestedInput
+    userRoadmap?: UserRoadmapUpdateOneWithoutAssessmentAttemptsNestedInput
+    sprint?: RoadmapSprintUpdateOneWithoutAssessmentAttemptsNestedInput
+    sprintTask?: RoadmapSprintTaskUpdateOneWithoutAssessmentAttemptsNestedInput
+  }
+
+  export type MicroAssessmentAttemptUncheckedUpdateWithoutSkillInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    assessmentId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    userRoadmapId?: NullableStringFieldUpdateOperationsInput | string | null
+    sprintId?: NullableStringFieldUpdateOperationsInput | string | null
+    sprintTaskId?: NullableStringFieldUpdateOperationsInput | string | null
+    totalQuestions?: IntFieldUpdateOperationsInput | number
+    correctAnswers?: IntFieldUpdateOperationsInput | number
+    score?: IntFieldUpdateOperationsInput | number
+    passed?: BoolFieldUpdateOperationsInput | boolean
+    answers?: JsonNullValueInput | InputJsonValue
+    completedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MicroAssessmentAttemptUncheckedUpdateManyWithoutSkillInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    assessmentId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    userRoadmapId?: NullableStringFieldUpdateOperationsInput | string | null
+    sprintId?: NullableStringFieldUpdateOperationsInput | string | null
+    sprintTaskId?: NullableStringFieldUpdateOperationsInput | string | null
+    totalQuestions?: IntFieldUpdateOperationsInput | number
+    correctAnswers?: IntFieldUpdateOperationsInput | number
+    score?: IntFieldUpdateOperationsInput | number
+    passed?: BoolFieldUpdateOperationsInput | boolean
+    answers?: JsonNullValueInput | InputJsonValue
+    completedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type SkillRelationshipUpdateWithoutFromSkillInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumSkillRelationTypeFieldUpdateOperationsInput | $Enums.SkillRelationType
@@ -28818,6 +37594,7 @@ export namespace Prisma {
     orderIndex: number
     estimatedMinutes?: number
     requiresEvidence?: boolean
+    requiresAssessment?: boolean
     targetProficiency?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -28832,11 +37609,13 @@ export namespace Prisma {
     orderIndex?: IntFieldUpdateOperationsInput | number
     estimatedMinutes?: IntFieldUpdateOperationsInput | number
     requiresEvidence?: BoolFieldUpdateOperationsInput | boolean
+    requiresAssessment?: BoolFieldUpdateOperationsInput | boolean
     targetProficiency?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     roadmap?: CareerRoadmapUpdateOneRequiredWithoutNodesNestedInput
     skills?: RoadmapNodeSkillUpdateManyWithoutNodeNestedInput
+    assessments?: MicroAssessmentUpdateManyWithoutRoadmapNodeNestedInput
     prerequisites?: RoadmapNodeDependencyUpdateManyWithoutNodeNestedInput
     unlocks?: RoadmapNodeDependencyUpdateManyWithoutPrerequisiteNodeNestedInput
     sprintTasks?: RoadmapSprintTaskUpdateManyWithoutRoadmapNodeNestedInput
@@ -28852,10 +37631,12 @@ export namespace Prisma {
     orderIndex?: IntFieldUpdateOperationsInput | number
     estimatedMinutes?: IntFieldUpdateOperationsInput | number
     requiresEvidence?: BoolFieldUpdateOperationsInput | boolean
+    requiresAssessment?: BoolFieldUpdateOperationsInput | boolean
     targetProficiency?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     skills?: RoadmapNodeSkillUncheckedUpdateManyWithoutNodeNestedInput
+    assessments?: MicroAssessmentUncheckedUpdateManyWithoutRoadmapNodeNestedInput
     prerequisites?: RoadmapNodeDependencyUncheckedUpdateManyWithoutNodeNestedInput
     unlocks?: RoadmapNodeDependencyUncheckedUpdateManyWithoutPrerequisiteNodeNestedInput
     sprintTasks?: RoadmapSprintTaskUncheckedUpdateManyWithoutRoadmapNodeNestedInput
@@ -28871,6 +37652,7 @@ export namespace Prisma {
     orderIndex?: IntFieldUpdateOperationsInput | number
     estimatedMinutes?: IntFieldUpdateOperationsInput | number
     requiresEvidence?: BoolFieldUpdateOperationsInput | boolean
+    requiresAssessment?: BoolFieldUpdateOperationsInput | boolean
     targetProficiency?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -28879,6 +37661,15 @@ export namespace Prisma {
   export type RoadmapNodeSkillCreateManyNodeInput = {
     skillId: string
     targetProficiency?: number | null
+  }
+
+  export type MicroAssessmentCreateManyRoadmapNodeInput = {
+    id?: string
+    title: string
+    description?: string | null
+    skillId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type RoadmapNodeDependencyCreateManyNodeInput = {
@@ -28897,6 +37688,7 @@ export namespace Prisma {
     orderIndex: number
     estimatedMinutes?: number
     requiresEvidence?: boolean
+    requiresAssessment?: boolean
     status?: $Enums.SprintTaskStatus
     completedAt?: Date | string | null
     createdAt?: Date | string
@@ -28916,6 +37708,37 @@ export namespace Prisma {
   export type RoadmapNodeSkillUncheckedUpdateManyWithoutNodeInput = {
     skillId?: StringFieldUpdateOperationsInput | string
     targetProficiency?: NullableIntFieldUpdateOperationsInput | number | null
+  }
+
+  export type MicroAssessmentUpdateWithoutRoadmapNodeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    skill?: SkillUpdateOneWithoutAssessmentsNestedInput
+    questions?: MicroAssessmentQuestionUpdateManyWithoutAssessmentNestedInput
+    attempts?: MicroAssessmentAttemptUpdateManyWithoutAssessmentNestedInput
+  }
+
+  export type MicroAssessmentUncheckedUpdateWithoutRoadmapNodeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    skillId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    questions?: MicroAssessmentQuestionUncheckedUpdateManyWithoutAssessmentNestedInput
+    attempts?: MicroAssessmentAttemptUncheckedUpdateManyWithoutAssessmentNestedInput
+  }
+
+  export type MicroAssessmentUncheckedUpdateManyWithoutRoadmapNodeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    skillId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type RoadmapNodeDependencyUpdateWithoutNodeInput = {
@@ -28949,11 +37772,13 @@ export namespace Prisma {
     orderIndex?: IntFieldUpdateOperationsInput | number
     estimatedMinutes?: IntFieldUpdateOperationsInput | number
     requiresEvidence?: BoolFieldUpdateOperationsInput | boolean
+    requiresAssessment?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumSprintTaskStatusFieldUpdateOperationsInput | $Enums.SprintTaskStatus
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sprint?: RoadmapSprintUpdateOneRequiredWithoutTasksNestedInput
+    assessmentAttempts?: MicroAssessmentAttemptUpdateManyWithoutSprintTaskNestedInput
   }
 
   export type RoadmapSprintTaskUncheckedUpdateWithoutRoadmapNodeInput = {
@@ -28964,10 +37789,12 @@ export namespace Prisma {
     orderIndex?: IntFieldUpdateOperationsInput | number
     estimatedMinutes?: IntFieldUpdateOperationsInput | number
     requiresEvidence?: BoolFieldUpdateOperationsInput | boolean
+    requiresAssessment?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumSprintTaskStatusFieldUpdateOperationsInput | $Enums.SprintTaskStatus
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedUpdateManyWithoutSprintTaskNestedInput
   }
 
   export type RoadmapSprintTaskUncheckedUpdateManyWithoutRoadmapNodeInput = {
@@ -28978,6 +37805,7 @@ export namespace Prisma {
     orderIndex?: IntFieldUpdateOperationsInput | number
     estimatedMinutes?: IntFieldUpdateOperationsInput | number
     requiresEvidence?: BoolFieldUpdateOperationsInput | boolean
+    requiresAssessment?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumSprintTaskStatusFieldUpdateOperationsInput | $Enums.SprintTaskStatus
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -29009,6 +37837,22 @@ export namespace Prisma {
     assessedAt?: Date | string
   }
 
+  export type MicroAssessmentAttemptCreateManyUserRoadmapInput = {
+    id?: string
+    assessmentId: string
+    userId: string
+    sprintId?: string | null
+    sprintTaskId?: string | null
+    skillId?: string | null
+    totalQuestions: number
+    correctAnswers: number
+    score: number
+    passed?: boolean
+    answers: JsonNullValueInput | InputJsonValue
+    completedAt?: Date | string
+    createdAt?: Date | string
+  }
+
   export type RoadmapAdaptationCreateManyUserRoadmapInput = {
     id?: string
     sprintId?: string | null
@@ -29033,6 +37877,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     tasks?: RoadmapSprintTaskUpdateManyWithoutSprintNestedInput
     performance?: SprintPerformanceUpdateOneWithoutSprintNestedInput
+    assessmentAttempts?: MicroAssessmentAttemptUpdateManyWithoutSprintNestedInput
     adaptations?: RoadmapAdaptationUpdateManyWithoutSprintNestedInput
   }
 
@@ -29049,6 +37894,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     tasks?: RoadmapSprintTaskUncheckedUpdateManyWithoutSprintNestedInput
     performance?: SprintPerformanceUncheckedUpdateOneWithoutSprintNestedInput
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedUpdateManyWithoutSprintNestedInput
     adaptations?: RoadmapAdaptationUncheckedUpdateManyWithoutSprintNestedInput
   }
 
@@ -29101,6 +37947,54 @@ export namespace Prisma {
     assessedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type MicroAssessmentAttemptUpdateWithoutUserRoadmapInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    totalQuestions?: IntFieldUpdateOperationsInput | number
+    correctAnswers?: IntFieldUpdateOperationsInput | number
+    score?: IntFieldUpdateOperationsInput | number
+    passed?: BoolFieldUpdateOperationsInput | boolean
+    answers?: JsonNullValueInput | InputJsonValue
+    completedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assessment?: MicroAssessmentUpdateOneRequiredWithoutAttemptsNestedInput
+    sprint?: RoadmapSprintUpdateOneWithoutAssessmentAttemptsNestedInput
+    sprintTask?: RoadmapSprintTaskUpdateOneWithoutAssessmentAttemptsNestedInput
+    skill?: SkillUpdateOneWithoutAssessmentAttemptsNestedInput
+  }
+
+  export type MicroAssessmentAttemptUncheckedUpdateWithoutUserRoadmapInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    assessmentId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    sprintId?: NullableStringFieldUpdateOperationsInput | string | null
+    sprintTaskId?: NullableStringFieldUpdateOperationsInput | string | null
+    skillId?: NullableStringFieldUpdateOperationsInput | string | null
+    totalQuestions?: IntFieldUpdateOperationsInput | number
+    correctAnswers?: IntFieldUpdateOperationsInput | number
+    score?: IntFieldUpdateOperationsInput | number
+    passed?: BoolFieldUpdateOperationsInput | boolean
+    answers?: JsonNullValueInput | InputJsonValue
+    completedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MicroAssessmentAttemptUncheckedUpdateManyWithoutUserRoadmapInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    assessmentId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    sprintId?: NullableStringFieldUpdateOperationsInput | string | null
+    sprintTaskId?: NullableStringFieldUpdateOperationsInput | string | null
+    skillId?: NullableStringFieldUpdateOperationsInput | string | null
+    totalQuestions?: IntFieldUpdateOperationsInput | number
+    correctAnswers?: IntFieldUpdateOperationsInput | number
+    score?: IntFieldUpdateOperationsInput | number
+    passed?: BoolFieldUpdateOperationsInput | boolean
+    answers?: JsonNullValueInput | InputJsonValue
+    completedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type RoadmapAdaptationUpdateWithoutUserRoadmapInput = {
     id?: StringFieldUpdateOperationsInput | string
     action?: EnumRoadmapAdaptationActionFieldUpdateOperationsInput | $Enums.RoadmapAdaptationAction
@@ -29142,10 +38036,27 @@ export namespace Prisma {
     orderIndex: number
     estimatedMinutes?: number
     requiresEvidence?: boolean
+    requiresAssessment?: boolean
     status?: $Enums.SprintTaskStatus
     completedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+  }
+
+  export type MicroAssessmentAttemptCreateManySprintInput = {
+    id?: string
+    assessmentId: string
+    userId: string
+    userRoadmapId?: string | null
+    sprintTaskId?: string | null
+    skillId?: string | null
+    totalQuestions: number
+    correctAnswers: number
+    score: number
+    passed?: boolean
+    answers: JsonNullValueInput | InputJsonValue
+    completedAt?: Date | string
+    createdAt?: Date | string
   }
 
   export type RoadmapAdaptationCreateManySprintInput = {
@@ -29166,11 +38077,13 @@ export namespace Prisma {
     orderIndex?: IntFieldUpdateOperationsInput | number
     estimatedMinutes?: IntFieldUpdateOperationsInput | number
     requiresEvidence?: BoolFieldUpdateOperationsInput | boolean
+    requiresAssessment?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumSprintTaskStatusFieldUpdateOperationsInput | $Enums.SprintTaskStatus
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     roadmapNode?: RoadmapNodeUpdateOneWithoutSprintTasksNestedInput
+    assessmentAttempts?: MicroAssessmentAttemptUpdateManyWithoutSprintTaskNestedInput
   }
 
   export type RoadmapSprintTaskUncheckedUpdateWithoutSprintInput = {
@@ -29181,10 +38094,12 @@ export namespace Prisma {
     orderIndex?: IntFieldUpdateOperationsInput | number
     estimatedMinutes?: IntFieldUpdateOperationsInput | number
     requiresEvidence?: BoolFieldUpdateOperationsInput | boolean
+    requiresAssessment?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumSprintTaskStatusFieldUpdateOperationsInput | $Enums.SprintTaskStatus
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assessmentAttempts?: MicroAssessmentAttemptUncheckedUpdateManyWithoutSprintTaskNestedInput
   }
 
   export type RoadmapSprintTaskUncheckedUpdateManyWithoutSprintInput = {
@@ -29195,10 +38110,59 @@ export namespace Prisma {
     orderIndex?: IntFieldUpdateOperationsInput | number
     estimatedMinutes?: IntFieldUpdateOperationsInput | number
     requiresEvidence?: BoolFieldUpdateOperationsInput | boolean
+    requiresAssessment?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumSprintTaskStatusFieldUpdateOperationsInput | $Enums.SprintTaskStatus
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MicroAssessmentAttemptUpdateWithoutSprintInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    totalQuestions?: IntFieldUpdateOperationsInput | number
+    correctAnswers?: IntFieldUpdateOperationsInput | number
+    score?: IntFieldUpdateOperationsInput | number
+    passed?: BoolFieldUpdateOperationsInput | boolean
+    answers?: JsonNullValueInput | InputJsonValue
+    completedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assessment?: MicroAssessmentUpdateOneRequiredWithoutAttemptsNestedInput
+    userRoadmap?: UserRoadmapUpdateOneWithoutAssessmentAttemptsNestedInput
+    sprintTask?: RoadmapSprintTaskUpdateOneWithoutAssessmentAttemptsNestedInput
+    skill?: SkillUpdateOneWithoutAssessmentAttemptsNestedInput
+  }
+
+  export type MicroAssessmentAttemptUncheckedUpdateWithoutSprintInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    assessmentId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    userRoadmapId?: NullableStringFieldUpdateOperationsInput | string | null
+    sprintTaskId?: NullableStringFieldUpdateOperationsInput | string | null
+    skillId?: NullableStringFieldUpdateOperationsInput | string | null
+    totalQuestions?: IntFieldUpdateOperationsInput | number
+    correctAnswers?: IntFieldUpdateOperationsInput | number
+    score?: IntFieldUpdateOperationsInput | number
+    passed?: BoolFieldUpdateOperationsInput | boolean
+    answers?: JsonNullValueInput | InputJsonValue
+    completedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MicroAssessmentAttemptUncheckedUpdateManyWithoutSprintInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    assessmentId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    userRoadmapId?: NullableStringFieldUpdateOperationsInput | string | null
+    sprintTaskId?: NullableStringFieldUpdateOperationsInput | string | null
+    skillId?: NullableStringFieldUpdateOperationsInput | string | null
+    totalQuestions?: IntFieldUpdateOperationsInput | number
+    correctAnswers?: IntFieldUpdateOperationsInput | number
+    score?: IntFieldUpdateOperationsInput | number
+    passed?: BoolFieldUpdateOperationsInput | boolean
+    answers?: JsonNullValueInput | InputJsonValue
+    completedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type RoadmapAdaptationUpdateWithoutSprintInput = {
@@ -29231,6 +38195,214 @@ export namespace Prisma {
     evidence?: JsonNullValueInput | InputJsonValue
     previousState?: NullableJsonNullValueInput | InputJsonValue
     newState?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MicroAssessmentAttemptCreateManySprintTaskInput = {
+    id?: string
+    assessmentId: string
+    userId: string
+    userRoadmapId?: string | null
+    sprintId?: string | null
+    skillId?: string | null
+    totalQuestions: number
+    correctAnswers: number
+    score: number
+    passed?: boolean
+    answers: JsonNullValueInput | InputJsonValue
+    completedAt?: Date | string
+    createdAt?: Date | string
+  }
+
+  export type MicroAssessmentAttemptUpdateWithoutSprintTaskInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    totalQuestions?: IntFieldUpdateOperationsInput | number
+    correctAnswers?: IntFieldUpdateOperationsInput | number
+    score?: IntFieldUpdateOperationsInput | number
+    passed?: BoolFieldUpdateOperationsInput | boolean
+    answers?: JsonNullValueInput | InputJsonValue
+    completedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assessment?: MicroAssessmentUpdateOneRequiredWithoutAttemptsNestedInput
+    userRoadmap?: UserRoadmapUpdateOneWithoutAssessmentAttemptsNestedInput
+    sprint?: RoadmapSprintUpdateOneWithoutAssessmentAttemptsNestedInput
+    skill?: SkillUpdateOneWithoutAssessmentAttemptsNestedInput
+  }
+
+  export type MicroAssessmentAttemptUncheckedUpdateWithoutSprintTaskInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    assessmentId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    userRoadmapId?: NullableStringFieldUpdateOperationsInput | string | null
+    sprintId?: NullableStringFieldUpdateOperationsInput | string | null
+    skillId?: NullableStringFieldUpdateOperationsInput | string | null
+    totalQuestions?: IntFieldUpdateOperationsInput | number
+    correctAnswers?: IntFieldUpdateOperationsInput | number
+    score?: IntFieldUpdateOperationsInput | number
+    passed?: BoolFieldUpdateOperationsInput | boolean
+    answers?: JsonNullValueInput | InputJsonValue
+    completedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MicroAssessmentAttemptUncheckedUpdateManyWithoutSprintTaskInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    assessmentId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    userRoadmapId?: NullableStringFieldUpdateOperationsInput | string | null
+    sprintId?: NullableStringFieldUpdateOperationsInput | string | null
+    skillId?: NullableStringFieldUpdateOperationsInput | string | null
+    totalQuestions?: IntFieldUpdateOperationsInput | number
+    correctAnswers?: IntFieldUpdateOperationsInput | number
+    score?: IntFieldUpdateOperationsInput | number
+    passed?: BoolFieldUpdateOperationsInput | boolean
+    answers?: JsonNullValueInput | InputJsonValue
+    completedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MicroAssessmentQuestionCreateManyAssessmentInput = {
+    id?: string
+    questionText: string
+    options?: MicroAssessmentQuestionCreateoptionsInput | string[]
+    correctOptionIndex: number
+    explanation?: string | null
+    orderIndex?: number
+    createdAt?: Date | string
+  }
+
+  export type MicroAssessmentAttemptCreateManyAssessmentInput = {
+    id?: string
+    userId: string
+    userRoadmapId?: string | null
+    sprintId?: string | null
+    sprintTaskId?: string | null
+    skillId?: string | null
+    totalQuestions: number
+    correctAnswers: number
+    score: number
+    passed?: boolean
+    answers: JsonNullValueInput | InputJsonValue
+    completedAt?: Date | string
+    createdAt?: Date | string
+  }
+
+  export type MicroAssessmentQuestionUpdateWithoutAssessmentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    questionText?: StringFieldUpdateOperationsInput | string
+    options?: MicroAssessmentQuestionUpdateoptionsInput | string[]
+    correctOptionIndex?: IntFieldUpdateOperationsInput | number
+    explanation?: NullableStringFieldUpdateOperationsInput | string | null
+    orderIndex?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MicroAssessmentQuestionUncheckedUpdateWithoutAssessmentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    questionText?: StringFieldUpdateOperationsInput | string
+    options?: MicroAssessmentQuestionUpdateoptionsInput | string[]
+    correctOptionIndex?: IntFieldUpdateOperationsInput | number
+    explanation?: NullableStringFieldUpdateOperationsInput | string | null
+    orderIndex?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MicroAssessmentQuestionUncheckedUpdateManyWithoutAssessmentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    questionText?: StringFieldUpdateOperationsInput | string
+    options?: MicroAssessmentQuestionUpdateoptionsInput | string[]
+    correctOptionIndex?: IntFieldUpdateOperationsInput | number
+    explanation?: NullableStringFieldUpdateOperationsInput | string | null
+    orderIndex?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MicroAssessmentAttemptUpdateWithoutAssessmentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    totalQuestions?: IntFieldUpdateOperationsInput | number
+    correctAnswers?: IntFieldUpdateOperationsInput | number
+    score?: IntFieldUpdateOperationsInput | number
+    passed?: BoolFieldUpdateOperationsInput | boolean
+    answers?: JsonNullValueInput | InputJsonValue
+    completedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userRoadmap?: UserRoadmapUpdateOneWithoutAssessmentAttemptsNestedInput
+    sprint?: RoadmapSprintUpdateOneWithoutAssessmentAttemptsNestedInput
+    sprintTask?: RoadmapSprintTaskUpdateOneWithoutAssessmentAttemptsNestedInput
+    skill?: SkillUpdateOneWithoutAssessmentAttemptsNestedInput
+  }
+
+  export type MicroAssessmentAttemptUncheckedUpdateWithoutAssessmentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    userRoadmapId?: NullableStringFieldUpdateOperationsInput | string | null
+    sprintId?: NullableStringFieldUpdateOperationsInput | string | null
+    sprintTaskId?: NullableStringFieldUpdateOperationsInput | string | null
+    skillId?: NullableStringFieldUpdateOperationsInput | string | null
+    totalQuestions?: IntFieldUpdateOperationsInput | number
+    correctAnswers?: IntFieldUpdateOperationsInput | number
+    score?: IntFieldUpdateOperationsInput | number
+    passed?: BoolFieldUpdateOperationsInput | boolean
+    answers?: JsonNullValueInput | InputJsonValue
+    completedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MicroAssessmentAttemptUncheckedUpdateManyWithoutAssessmentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    userRoadmapId?: NullableStringFieldUpdateOperationsInput | string | null
+    sprintId?: NullableStringFieldUpdateOperationsInput | string | null
+    sprintTaskId?: NullableStringFieldUpdateOperationsInput | string | null
+    skillId?: NullableStringFieldUpdateOperationsInput | string | null
+    totalQuestions?: IntFieldUpdateOperationsInput | number
+    correctAnswers?: IntFieldUpdateOperationsInput | number
+    score?: IntFieldUpdateOperationsInput | number
+    passed?: BoolFieldUpdateOperationsInput | boolean
+    answers?: JsonNullValueInput | InputJsonValue
+    completedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DiscussionCommentCreateManyPostInput = {
+    id?: string
+    userId: string
+    userName: string
+    userAvatar?: string | null
+    content: string
+    upvotes?: number
+    createdAt?: Date | string
+  }
+
+  export type DiscussionCommentUpdateWithoutPostInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    userName?: StringFieldUpdateOperationsInput | string
+    userAvatar?: NullableStringFieldUpdateOperationsInput | string | null
+    content?: StringFieldUpdateOperationsInput | string
+    upvotes?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DiscussionCommentUncheckedUpdateWithoutPostInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    userName?: StringFieldUpdateOperationsInput | string
+    userAvatar?: NullableStringFieldUpdateOperationsInput | string | null
+    content?: StringFieldUpdateOperationsInput | string
+    upvotes?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DiscussionCommentUncheckedUpdateManyWithoutPostInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    userName?: StringFieldUpdateOperationsInput | string
+    userAvatar?: NullableStringFieldUpdateOperationsInput | string | null
+    content?: StringFieldUpdateOperationsInput | string
+    upvotes?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 

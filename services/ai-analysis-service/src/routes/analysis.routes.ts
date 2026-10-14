@@ -9,5 +9,6 @@ const router: Router = Router();
 
 router.get('/session/:id', analysisController.getSessionAnalysis);
 router.get('/history', analysisController.getAnalysisHistory);
+router.post('/ats-semantic-match', analysisController.evaluateAtsSemanticMatchInternal);
 
 export default router;

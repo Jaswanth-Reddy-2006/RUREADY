@@ -344,10 +344,10 @@ export default function ProfilePage() {
             <Button
               variant="eggplant"
               size="sm"
-              onClick={() => navigate('/ats')}
+              onClick={() => navigate('/resume')}
               icon={<ArrowRight size={13} />}
             >
-              Open Resume Builder
+              Open Resume Workspace
             </Button>
           </div>
         </div>

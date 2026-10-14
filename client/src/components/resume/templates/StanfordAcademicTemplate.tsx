@@ -178,10 +178,10 @@ export default function StanfordAcademicTemplate({ data, highlightKeywords = [] 
               <span className="text-[#44403c]">{data.skills.languages.join(', ')}</span>
             </div>
           )}
-          {data.skills.frameworks?.length > 0 && (
+          {((data.skills.frameworks && data.skills.frameworks.length > 0) || (data.skills.libraries && data.skills.libraries.length > 0)) && (
             <div>
-              <span className="font-bold text-[#1c1917]">Frameworks: </span>
-              <span className="text-[#44403c]">{data.skills.frameworks.join(', ')}</span>
+              <span className="font-bold text-[#1c1917]">Frameworks & Libraries: </span>
+              <span className="text-[#44403c]">{[...(data.skills.frameworks || []), ...(data.skills.libraries || [])].join(', ')}</span>
             </div>
           )}
           {data.skills.databases?.length > 0 && (
@@ -196,14 +196,32 @@ export default function StanfordAcademicTemplate({ data, highlightKeywords = [] 
               <span className="text-[#44403c]">{data.skills.cloudDevOps.join(', ')}</span>
             </div>
           )}
+          {data.skills.tools && data.skills.tools.length > 0 && (
+            <div>
+              <span className="font-bold text-[#1c1917]">Tools & Systems: </span>
+              <span className="text-[#44403c]">{data.skills.tools.join(', ')}</span>
+            </div>
+          )}
+          {data.skills.security && data.skills.security.length > 0 && (
+            <div>
+              <span className="font-bold text-[#1c1917]">Security: </span>
+              <span className="text-[#44403c]">{data.skills.security.join(', ')}</span>
+            </div>
+          )}
+          {data.skills.other && data.skills.other.length > 0 && (
+            <div>
+              <span className="font-bold text-[#1c1917]">Other Skills: </span>
+              <span className="text-[#44403c]">{data.skills.other.join(', ')}</span>
+            </div>
+          )}
         </div>
       </section>
 
-      {/* Honors & Certifications */}
+      {/* Certifications */}
       {data.certifications?.length > 0 && (
-        <section>
+        <section className="mb-3">
           <h2 className="text-[12px] font-bold uppercase tracking-wider text-[#1c1917] border-b border-[#a8a29e] pb-0.5 mb-1.5 font-sans">
-            Honors, Grants & Certifications
+            Certifications
           </h2>
           <ul className="list-disc list-outside ml-4 space-y-0.5 text-[11px] text-[#44403c]">
             {data.certifications.map((cert) => (
@@ -213,6 +231,94 @@ export default function StanfordAcademicTemplate({ data, highlightKeywords = [] 
             ))}
           </ul>
         </section>
+      )}
+
+      {/* Publications */}
+      {data.publications && data.publications.length > 0 && (
+        <section className="mb-3">
+          <h2 className="text-[12px] font-bold uppercase tracking-wider text-[#1c1917] border-b border-[#a8a29e] pb-0.5 mb-1.5 font-sans">
+            Scholarly Publications
+          </h2>
+          <div className="space-y-1 text-[11px]">
+            {data.publications.map((pub) => (
+              <div key={pub.id} className="flex justify-between items-baseline">
+                <div>
+                  <span className="font-bold text-[#1c1917]">{pub.title}</span>
+                  {pub.venue && <span className="text-[#44403c] italic ml-1.5">— {pub.venue}</span>}
+                </div>
+                {pub.date && <span className="text-[10px] text-[#57534e] shrink-0">{pub.date}</span>}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Patents */}
+      {data.patents && data.patents.length > 0 && (
+        <section className="mb-3">
+          <h2 className="text-[12px] font-bold uppercase tracking-wider text-[#1c1917] border-b border-[#a8a29e] pb-0.5 mb-1.5 font-sans">
+            Patents & IP
+          </h2>
+          <div className="space-y-1 text-[11px]">
+            {data.patents.map((pat) => (
+              <div key={pat.id} className="flex justify-between items-baseline">
+                <div>
+                  <span className="font-bold text-[#1c1917]">{pat.title}</span>
+                  {pat.number && <span className="text-[#44403c] ml-1.5">({pat.number})</span>}
+                </div>
+                {pat.date && <span className="text-[10px] text-[#57534e] shrink-0">{pat.date}</span>}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Achievements */}
+      {data.achievements && data.achievements.length > 0 && (
+        <section className="mb-3">
+          <h2 className="text-[12px] font-bold uppercase tracking-wider text-[#1c1917] border-b border-[#a8a29e] pb-0.5 mb-1.5 font-sans">
+            Academic & Professional Awards
+          </h2>
+          <ul className="list-disc list-outside ml-4 space-y-0.5 text-[11px] text-[#44403c]">
+            {data.achievements.map((ach, idx) => (
+              <li key={idx}>{ach}</li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {/* Languages */}
+      {data.languages && data.languages.length > 0 && (
+        <section className="mb-3">
+          <h2 className="text-[12px] font-bold uppercase tracking-wider text-[#1c1917] border-b border-[#a8a29e] pb-0.5 mb-1.5 font-sans">
+            Languages
+          </h2>
+          <div className="flex flex-wrap gap-2 text-[11px] text-[#44403c]">
+            {data.languages.map((lang, idx) => (
+              <span key={idx} className="bg-stone-100 px-2 py-0.5 rounded text-[#1c1917]">
+                {lang}
+              </span>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Custom Sections */}
+      {data.customSections && data.customSections.length > 0 && (
+        <div className="space-y-3">
+          {data.customSections.map((sec) => (
+            <section key={sec.id}>
+              <h2 className="text-[12px] font-bold uppercase tracking-wider text-[#1c1917] border-b border-[#a8a29e] pb-0.5 mb-1.5 font-sans">
+                {sec.title}
+              </h2>
+              <ul className="list-disc list-outside ml-4 space-y-0.5 text-[11px] text-[#44403c]">
+                {sec.items.map((item, idx) => (
+                  <li key={idx}>{item}</li>
+                ))}
+              </ul>
+            </section>
+          ))}
+        </div>
       )}
 
     </div>

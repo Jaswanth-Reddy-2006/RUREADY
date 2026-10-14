@@ -9,6 +9,23 @@ import FaangCompactTemplate from './FaangCompactTemplate';
 import StanfordAcademicTemplate from './StanfordAcademicTemplate';
 import StartupInnovatorTemplate from './StartupInnovatorTemplate';
 import ExecutiveSuiteTemplate from './ExecutiveSuiteTemplate';
+import SwissPrecisionTemplate from './SwissPrecisionTemplate';
+import ExecutiveBlacklineTemplate from './ExecutiveBlacklineTemplate';
+import HarvardProfessionalTemplate from './HarvardProfessionalTemplate';
+import ModernEditorialTemplate from './ModernEditorialTemplate';
+import CareerPivotTemplate from './CareerPivotTemplate';
+import GraduateLaunchTemplate from './GraduateLaunchTemplate';
+import CompactProfessionalTemplate from './CompactProfessionalTemplate';
+import PrincipalEngineerTemplate from './PrincipalEngineerTemplate';
+import FullstackArchitectTemplate from './FullstackArchitectTemplate';
+import CloudDevopsTemplate from './CloudDevopsTemplate';
+import CybersecuritySpecialistTemplate from './CybersecuritySpecialistTemplate';
+import DataAiResearchTemplate from './DataAiResearchTemplate';
+import ProductEngineeringTemplate from './ProductEngineeringTemplate';
+import ProductManagerTemplate from './ProductManagerTemplate';
+import UxCaseStudyTemplate from './UxCaseStudyTemplate';
+import AcademicResearcherTemplate from './AcademicResearcherTemplate';
+import ConsultingStrategyTemplate from './ConsultingStrategyTemplate';
 
 interface ResumeRendererProps {
   templateId: ResumeTemplateId;
@@ -79,6 +96,57 @@ export default function ResumeRenderer({
       )}
       {templateId === 'executive-suite' && (
         <ExecutiveSuiteTemplate data={data} highlightKeywords={highlightKeywords} />
+      )}
+      {templateId === 'swiss-precision' && (
+        <SwissPrecisionTemplate data={data} highlightKeywords={highlightKeywords} />
+      )}
+      {templateId === 'executive-blackline' && (
+        <ExecutiveBlacklineTemplate data={data} highlightKeywords={highlightKeywords} />
+      )}
+      {templateId === 'harvard-professional' && (
+        <HarvardProfessionalTemplate data={data} highlightKeywords={highlightKeywords} />
+      )}
+      {templateId === 'modern-editorial' && (
+        <ModernEditorialTemplate data={data} highlightKeywords={highlightKeywords} />
+      )}
+      {templateId === 'career-pivot' && (
+        <CareerPivotTemplate data={data} highlightKeywords={highlightKeywords} />
+      )}
+      {templateId === 'graduate-launch' && (
+        <GraduateLaunchTemplate data={data} highlightKeywords={highlightKeywords} />
+      )}
+      {templateId === 'compact-professional' && (
+        <CompactProfessionalTemplate data={data} highlightKeywords={highlightKeywords} />
+      )}
+      {templateId === 'principal-engineer' && (
+        <PrincipalEngineerTemplate data={data} highlightKeywords={highlightKeywords} />
+      )}
+      {templateId === 'fullstack-architect' && (
+        <FullstackArchitectTemplate data={data} highlightKeywords={highlightKeywords} />
+      )}
+      {templateId === 'cloud-devops' && (
+        <CloudDevopsTemplate data={data} highlightKeywords={highlightKeywords} />
+      )}
+      {templateId === 'cybersecurity-specialist' && (
+        <CybersecuritySpecialistTemplate data={data} highlightKeywords={highlightKeywords} />
+      )}
+      {templateId === 'data-ai-research' && (
+        <DataAiResearchTemplate data={data} highlightKeywords={highlightKeywords} />
+      )}
+      {templateId === 'product-engineering' && (
+        <ProductEngineeringTemplate data={data} highlightKeywords={highlightKeywords} />
+      )}
+      {templateId === 'product-manager' && (
+        <ProductManagerTemplate data={data} highlightKeywords={highlightKeywords} />
+      )}
+      {templateId === 'ux-case-study' && (
+        <UxCaseStudyTemplate data={data} highlightKeywords={highlightKeywords} />
+      )}
+      {templateId === 'academic-researcher' && (
+        <AcademicResearcherTemplate data={data} highlightKeywords={highlightKeywords} />
+      )}
+      {templateId === 'consulting-strategy' && (
+        <ConsultingStrategyTemplate data={data} highlightKeywords={highlightKeywords} />
       )}
     </div>
   );

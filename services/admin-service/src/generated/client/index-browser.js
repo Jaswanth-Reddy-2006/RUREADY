@@ -121,6 +121,18 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
+exports.Prisma.FeatureFlagScalarFieldEnum = {
+  id: 'id',
+  key: 'key',
+  name: 'name',
+  description: 'description',
+  enabled: 'enabled',
+  allowedTiers: 'allowedTiers',
+  updatedBy: 'updatedBy',
+  updatedAt: 'updatedAt',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.AuditLogScalarFieldEnum = {
   id: 'id',
   adminId: 'adminId',
@@ -142,6 +154,10 @@ exports.Prisma.UserScalarFieldEnum = {
   email: 'email',
   passwordHash: 'passwordHash',
   name: 'name',
+  role: 'role',
+  isEmailVerified: 'isEmailVerified',
+  bannedAt: 'bannedAt',
+  lastLoginAt: 'lastLoginAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -159,6 +175,8 @@ exports.Prisma.OralSessionScalarFieldEnum = {
   interviewGoal: 'interviewGoal',
   durationMins: 'durationMins',
   status: 'status',
+  overallScore: 'overallScore',
+  feedbackSummary: 'feedbackSummary',
   startedAt: 'startedAt',
   completedAt: 'completedAt',
   createdAt: 'createdAt'
@@ -168,10 +186,13 @@ exports.Prisma.CodingSessionScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   targetRole: 'targetRole',
+  focusTrack: 'focusTrack',
   difficulty: 'difficulty',
   selectedLanguage: 'selectedLanguage',
   status: 'status',
   testCasesPassed: 'testCasesPassed',
+  overallScore: 'overallScore',
+  feedbackSummary: 'feedbackSummary',
   startedAt: 'startedAt',
   completedAt: 'completedAt'
 };
@@ -211,19 +232,20 @@ exports.Prisma.QueryMode = {
   insensitive: 'insensitive'
 };
 
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
+};
+
 exports.Prisma.JsonNullValueFilter = {
   DbNull: Prisma.DbNull,
   JsonNull: Prisma.JsonNull,
   AnyNull: Prisma.AnyNull
 };
 
-exports.Prisma.NullsOrder = {
-  first: 'first',
-  last: 'last'
-};
-
 
 exports.Prisma.ModelName = {
+  FeatureFlag: 'FeatureFlag',
   AuditLog: 'AuditLog',
   SystemMetric: 'SystemMetric',
   User: 'User',

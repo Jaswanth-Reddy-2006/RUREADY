@@ -134,6 +134,8 @@ exports.Prisma.OralSessionScalarFieldEnum = {
   interviewGoal: 'interviewGoal',
   durationMins: 'durationMins',
   status: 'status',
+  overallScore: 'overallScore',
+  feedbackSummary: 'feedbackSummary',
   startedAt: 'startedAt',
   completedAt: 'completedAt',
   createdAt: 'createdAt'
@@ -145,6 +147,7 @@ exports.Prisma.OralQuestionScalarFieldEnum = {
   orderIndex: 'orderIndex',
   questionText: 'questionText',
   questionType: 'questionType',
+  category: 'category',
   difficulty: 'difficulty',
   answerText: 'answerText',
   answeredAt: 'answeredAt',

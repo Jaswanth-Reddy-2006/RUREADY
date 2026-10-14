@@ -64,8 +64,6 @@ import Dashboard from './pages/analysis/Dashboard';
 import SessionDetail from './pages/analysis/SessionDetail';
 import AnalyticsPage from './pages/analysis/AnalyticsPage';
 import Settings from './pages/Settings';
-import AtsScanner from './pages/ats/AtsScanner';
-import AtsReport from './pages/ats/AtsReport';
 import ResumeDashboard from './pages/resume/ResumeDashboard';
 import ResumeBuilderPage from './pages/resume/ResumeBuilderPage';
 import AtsAnalyzerPage from './pages/resume/AtsAnalyzerPage';
@@ -727,11 +725,15 @@ function App() {
                 }
               />
               <Route
+                path="/resume-parser"
+                element={<Navigate to="/resume" replace />}
+              />
+              <Route
                 path="/resume"
                 element={
                   <ProtectedRoute>
-                    <FeatureGuard featureKey="ai_resume_ats" featureTitle="AI Resume & ATS">
-                      <ResumeDashboard />
+                    <FeatureGuard featureKey="ai_resume_ats" featureTitle="Resume">
+                      <ResumeBuilderPage />
                     </FeatureGuard>
                   </ProtectedRoute>
                 }
@@ -740,8 +742,18 @@ function App() {
                 path="/resume/builder"
                 element={
                   <ProtectedRoute>
-                    <FeatureGuard featureKey="ai_resume_ats" featureTitle="AI Resume & ATS">
+                    <FeatureGuard featureKey="ai_resume_ats" featureTitle="Resume">
                       <ResumeBuilderPage />
+                    </FeatureGuard>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/resume/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <FeatureGuard featureKey="ai_resume_ats" featureTitle="Resume">
+                      <ResumeDashboard />
                     </FeatureGuard>
                   </ProtectedRoute>
                 }
@@ -750,7 +762,7 @@ function App() {
                 path="/resume/edit/:id"
                 element={
                   <ProtectedRoute>
-                    <FeatureGuard featureKey="ai_resume_ats" featureTitle="AI Resume & ATS">
+                    <FeatureGuard featureKey="ai_resume_ats" featureTitle="Resume">
                       <ResumeBuilderPage />
                     </FeatureGuard>
                   </ProtectedRoute>
@@ -760,7 +772,7 @@ function App() {
                 path="/resume/analyze"
                 element={
                   <ProtectedRoute>
-                    <FeatureGuard featureKey="ai_resume_ats" featureTitle="AI Resume & ATS">
+                    <FeatureGuard featureKey="ai_resume_ats" featureTitle="Resume">
                       <AtsAnalyzerPage />
                     </FeatureGuard>
                   </ProtectedRoute>
@@ -770,7 +782,7 @@ function App() {
                 path="/resume/versions"
                 element={
                   <ProtectedRoute>
-                    <FeatureGuard featureKey="ai_resume_ats" featureTitle="AI Resume & ATS">
+                    <FeatureGuard featureKey="ai_resume_ats" featureTitle="Resume">
                       <ResumeVersionsPage />
                     </FeatureGuard>
                   </ProtectedRoute>
@@ -780,7 +792,7 @@ function App() {
                 path="/resume/preview/:id"
                 element={
                   <ProtectedRoute>
-                    <FeatureGuard featureKey="ai_resume_ats" featureTitle="AI Resume & ATS">
+                    <FeatureGuard featureKey="ai_resume_ats" featureTitle="Resume">
                       <ResumePreviewPage />
                     </FeatureGuard>
                   </ProtectedRoute>
@@ -788,23 +800,11 @@ function App() {
               />
               <Route
                 path="/ats"
-                element={
-                  <ProtectedRoute>
-                    <FeatureGuard featureKey="ai_resume_ats" featureTitle="AI Resume & ATS">
-                      <AtsAnalyzerPage />
-                    </FeatureGuard>
-                  </ProtectedRoute>
-                }
+                element={<Navigate to="/resume" replace />}
               />
               <Route
                 path="/ats/report/:id"
-                element={
-                  <ProtectedRoute>
-                    <FeatureGuard featureKey="ai_resume_ats" featureTitle="AI Resume & ATS">
-                      <AtsAnalyzerPage />
-                    </FeatureGuard>
-                  </ProtectedRoute>
-                }
+                element={<Navigate to="/resume" replace />}
               />
               <Route
                 path="/placement-crm"

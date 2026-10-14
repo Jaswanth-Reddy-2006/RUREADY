@@ -1,3 +1,8 @@
+// ═══════════════════════════════════════════════════════════════
+// Video & Oral Interview Microservice — Prisma Schema
+// Data ownership: oral_sessions, oral_questions, oral_chat_history
+// ═══════════════════════════════════════════════════════════════
+
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/client"
@@ -16,11 +21,13 @@ model OralSession {
   targetRole      String
   targetCompany   String?
   industry        String
-  experienceLevel String
-  focusAreas      String[]
+  experienceLevel String    @default("MID") // FRESHER, MID, SENIOR, LEAD
+  focusAreas      String[]  @default([])
   interviewGoal   String?
   durationMins    Int       @default(20)
-  status          String    @default("SETUP")
+  status          String    @default("SETUP") // SETUP, IN_PROGRESS, COMPLETED, ABANDONED
+  overallScore    Int?
+  feedbackSummary String?
   startedAt       DateTime?
   completedAt     DateTime?
   createdAt       DateTime  @default(now())
@@ -28,7 +35,7 @@ model OralSession {
   questions   OralQuestion[]
   chatHistory OralChatHistory[]
 
-  @@index([userId])
+  @@index([userId, status])
   @@map("oral_sessions")
 }
 
@@ -39,14 +46,15 @@ model OralQuestion {
   orderIndex     Int
   questionText   String
   questionType   String
-  difficulty     String
+  category       String?     @default("TECHNICAL") // BEHAVIORAL, TECHNICAL, SYSTEM_DESIGN, SITUATIONAL
+  difficulty     String      @default("MEDIUM")
   answerText     String?
   answeredAt     DateTime?
   timeTakenSecs  Int?
   evalScore      Int?
   evalFeedback   String?
-  evalStrengths  String[]
-  evalWeaknesses String[]
+  evalStrengths  String[]    @default([])
+  evalWeaknesses String[]    @default([])
   betterAnswer   String?
 
   @@index([sessionId])

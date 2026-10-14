@@ -193,6 +193,8 @@ export default function AtsAnalyzerPage() {
         isOpen={isCopilotOpen}
         onClose={() => setIsCopilotOpen(false)}
         bulletsAudit={analysisResult?.bulletsAudit || []}
+        recommendationGroups={analysisResult?.recommendationGroups || []}
+        recommendationSummary={analysisResult?.recommendationSummary}
       />
     </div>
   );

@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Sparkles, Check, RefreshCw, AlertCircle, ArrowRight, FileText, CheckCircle2 } from 'lucide-react';
+import { X, Sparkles, Check, AlertCircle, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { useResumeStore } from '../../store/useResumeStore';
-import { BulletAudit } from '../../utils/atsEngine';
+import { BulletAudit, RecommendationGroup, RecommendationSummary } from '../../utils/atsEngine';
 import toast from 'react-hot-toast';
 
 interface ResumeCopilotDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   bulletsAudit?: BulletAudit[];
+  recommendationGroups?: RecommendationGroup[];
+  recommendationSummary?: RecommendationSummary;
   onApplyBulletRewrite?: (bulletId: string, newText: string) => void;
 }
 
@@ -16,6 +18,8 @@ export default function ResumeCopilotDrawer({
   isOpen,
   onClose,
   bulletsAudit = [],
+  recommendationGroups = [],
+  recommendationSummary,
   onApplyBulletRewrite
 }: ResumeCopilotDrawerProps) {
   const { masterResume, updateSummary, applyStarRewrite } = useResumeStore();
@@ -55,6 +59,9 @@ export default function ResumeCopilotDrawer({
     toast.success('STAR bullet rewrite applied cleanly!');
   };
 
+  const hasGroups = recommendationGroups && recommendationGroups.length > 0;
+  const totalAuditCount = hasGroups ? recommendationGroups.length : bulletsAudit.length;
+
   return (
     <AnimatePresence>
       <div className="fixed inset-0 z-50 flex justify-end bg-slate-900/40 backdrop-blur-xs font-sans">
@@ -76,14 +83,14 @@ export default function ResumeCopilotDrawer({
                   Non-Destructive AI Copilot
                 </h3>
                 <p className="text-xs text-[#526078]">
-                  Before/After comparison rewrites without metric fabrication
+                  Targeted, deduplicated recommendations without invented metrics
                 </p>
               </div>
             </div>
 
             <button
               onClick={onClose}
-              className="p-2 text-[#7B8799] hover:text-[#11183D] rounded-xl hover:bg-white transition-colors"
+              className="p-2 text-[#7B8799] hover:text-[#11183D] rounded-xl hover:bg-white transition-colors cursor-pointer"
             >
               <X size={18} />
             </button>
@@ -99,7 +106,7 @@ export default function ResumeCopilotDrawer({
                   : 'text-[#526078] hover:text-[#11183D]'
               }`}
             >
-              STAR Bullet Audits ({bulletsAudit.length})
+              Bullet Quality Recommendations ({totalAuditCount})
             </button>
             <button
               onClick={() => setActiveTab('SUMMARY_OPT')}
@@ -117,17 +124,124 @@ export default function ResumeCopilotDrawer({
           <div className="p-6 overflow-y-auto space-y-6 flex-1">
             {activeTab === 'STAR_BULLETS' ? (
               <div className="space-y-4">
+                {/* Standards Alert */}
                 <div className="p-3.5 bg-blue-50 border border-blue-200 rounded-2xl text-xs text-blue-900 flex items-start gap-2.5">
                   <AlertCircle size={16} className="text-blue-600 shrink-0 mt-0.5" />
                   <div>
                     <p className="font-bold">STAR Method Standards</p>
                     <p className="mt-0.5 opacity-90">
-                      Strong bullet points start with active verbs (e.g. <em>Architected, Spearheaded</em>) and include verified quantitative results.
+                      Strong bullet points assert individual ownership, start with active verbs, and include verified quantitative results where available. Numbers and achievements are never fabricated.
                     </p>
                   </div>
                 </div>
 
-                {bulletsAudit.length > 0 ? (
+                {/* Summary Stats Pill Bar */}
+                {recommendationSummary && (
+                  <div className="grid grid-cols-4 gap-2 p-3 bg-slate-50 border border-[#DCE7F2] rounded-2xl text-center">
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-[#526078] block">Evaluated</span>
+                      <span className="text-sm font-bold text-[#11183D] font-mono">{recommendationSummary.bulletsEvaluated}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-[#526078] block">With Issues</span>
+                      <span className="text-sm font-bold text-amber-600 font-mono">{recommendationSummary.bulletsWithIssues}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-[#526078] block">Unique Recs</span>
+                      <span className="text-sm font-bold text-[#2459A8] font-mono">{recommendationSummary.uniqueRecommendationsCount}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-[#526078] block">Clean Quality</span>
+                      <span className="text-sm font-bold text-emerald-600 font-mono">{recommendationSummary.healthPercentage}%</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Deduplicated Recommendations */}
+                {hasGroups ? (
+                  recommendationGroups.map((group) => {
+                    const isCorrupt = group.isFlaggedForReview || group.category === 'TEXT_CORRUPTION';
+                    return (
+                      <div
+                        key={group.id}
+                        className={`p-4 rounded-2xl border space-y-3 transition-all ${
+                          isCorrupt
+                            ? 'bg-rose-50/60 border-rose-200'
+                            : 'bg-white border-[#DCE7F2] shadow-2xs'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span
+                                className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                                  isCorrupt
+                                    ? 'bg-rose-100 text-rose-800'
+                                    : group.category === 'VAGUE_OWNERSHIP'
+                                    ? 'bg-amber-100 text-amber-800'
+                                    : group.category === 'WEAK_ACTION_VERB'
+                                    ? 'bg-blue-100 text-blue-800'
+                                    : group.category === 'UNCLEAR_TECH'
+                                    ? 'bg-purple-100 text-purple-800'
+                                    : 'bg-indigo-100 text-indigo-800'
+                                }`}
+                              >
+                                {group.title}
+                              </span>
+                              {group.domain && group.domain !== 'general' && (
+                                <span className="text-[10px] font-mono font-semibold uppercase bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">
+                                  {group.domain}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-[#11183D] font-medium">
+                              {group.feedback}
+                            </p>
+                          </div>
+                          <span className="text-[10px] font-bold text-[#526078] bg-slate-100 px-2 py-0.5 rounded-full shrink-0">
+                            {group.affectedBullets.length} {group.affectedBullets.length === 1 ? 'bullet' : 'bullets'}
+                          </span>
+                        </div>
+
+                        {/* Actionable Guidance */}
+                        <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-[11px] text-[#334155]">
+                          <span className="font-bold text-[#2459A8] block mb-0.5">Recommended Guidance:</span>
+                          <p>{group.actionableGuidance}</p>
+                        </div>
+
+                        {isCorrupt && (
+                          <div className="p-2.5 bg-rose-100/70 border border-rose-200 rounded-xl text-[11px] text-rose-900 flex items-start gap-2">
+                            <AlertTriangle size={14} className="text-rose-600 shrink-0 mt-0.5" />
+                            <p>
+                              Flagged for Review: Potential text extraction corruption. Automated rewrites are disabled to preserve data integrity. Inspect your source document and edit directly.
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Affected Bullets List */}
+                        <div className="space-y-1.5 pt-1">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-[#526078] block">
+                            Affected Bullet References ({group.affectedBullets.length}):
+                          </span>
+                          <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+                            {group.affectedBullets.map((bulletRef) => (
+                              <div
+                                key={bulletRef.id}
+                                className="p-2 bg-slate-50/80 border border-slate-200 rounded-lg text-[11px] space-y-0.5"
+                              >
+                                <div className="flex items-center justify-between text-[10px] text-[#526078] font-mono">
+                                  <span>{bulletRef.context}</span>
+                                  <span>{bulletRef.id}</span>
+                                </div>
+                                <p className="text-slate-700 italic">"{bulletRef.original}"</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : bulletsAudit.length > 0 ? (
                   bulletsAudit.map((audit) => {
                     const isApplied = appliedBulletIds.includes(audit.id);
                     return (
@@ -160,7 +274,7 @@ export default function ResumeCopilotDrawer({
                           <div className="p-2.5 bg-blue-50/50 border border-blue-200 rounded-xl">
                             <span className="text-[10px] font-bold uppercase tracking-wider text-[#2459A8] block mb-1 flex items-center gap-1">
                               <Sparkles size={11} />
-                              AI Suggested STAR Rewrite
+                              Guidance & Polish
                             </span>
                             <p className="text-[#11183D] font-medium">{audit.suggestedRewrite}</p>
                             <p className="text-[10px] text-[#526078] mt-1.5 italic">
@@ -181,7 +295,7 @@ export default function ResumeCopilotDrawer({
                               className="px-3.5 py-1.5 bg-[#2459A8] hover:bg-[#1d4787] text-white rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-2xs"
                             >
                               <Check size={13} />
-                              <span>Accept Rewrite</span>
+                              <span>Accept Polish</span>
                             </button>
                           )}
                         </div>
@@ -189,7 +303,10 @@ export default function ResumeCopilotDrawer({
                     );
                   })
                 ) : (
-                  <p className="text-xs text-[#526078] italic">No bullet point audits available for this version.</p>
+                  <div className="p-6 text-center text-xs text-slate-500 italic bg-slate-50 rounded-2xl border border-slate-200">
+                    <CheckCircle2 size={24} className="text-emerald-500 mx-auto mb-2" />
+                    All analyzed bullet points follow STAR method standards with strong active verbs and validated impact.
+                  </div>
                 )}
               </div>
             ) : (
@@ -200,28 +317,29 @@ export default function ResumeCopilotDrawer({
                     Current Resume Summary
                   </label>
                   <textarea
-                    rows={5}
+                    rows={4}
                     value={editedSummary}
                     onChange={(e) => setEditedSummary(e.target.value)}
-                    className="w-full p-3 bg-slate-50 border border-[#DCE7F2] rounded-2xl text-xs text-[#11183D] focus:outline-none focus:border-[#2459A8]"
+                    className="w-full p-3 bg-slate-50 border border-[#DCE7F2] rounded-xl text-xs font-medium text-[#11183D] focus:outline-none focus:border-[#2459A8]"
+                    placeholder="Provide a concise 30-80 word professional executive summary..."
                   />
                 </div>
 
-                <div className="flex items-center justify-between">
+                <div className="flex gap-2">
                   <button
                     onClick={handleGenerateSummary}
                     disabled={isGeneratingSummary}
-                    className="px-3 py-1.5 bg-[#EFFAFD] border border-[#DCE7F2] text-[#2459A8] rounded-xl text-xs font-bold flex items-center gap-1.5 hover:bg-blue-100 cursor-pointer"
+                    className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-[#11183D] rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                   >
-                    <RefreshCw size={13} className={isGeneratingSummary ? 'animate-spin' : ''} />
-                    <span>{isGeneratingSummary ? 'Generating...' : 'Enhance with AI'}</span>
+                    <Sparkles size={14} className="text-[#2459A8]" />
+                    <span>{isGeneratingSummary ? 'Drafting Profile...' : 'AI Enhance Summary'}</span>
                   </button>
-
                   <button
                     onClick={handleApplySummary}
-                    className="px-4 py-2 bg-[#2459A8] hover:bg-[#1d4787] text-white rounded-xl text-xs font-bold shadow-2xs cursor-pointer"
+                    className="flex-1 py-2.5 bg-[#2459A8] hover:bg-[#1d4787] text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
                   >
-                    Save Summary
+                    <Check size={14} />
+                    <span>Apply to Resume</span>
                   </button>
                 </div>
               </div>

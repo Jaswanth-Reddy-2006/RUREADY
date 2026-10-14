@@ -124,13 +124,16 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
 exports.Prisma.CareerRoadmapScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
-  rolePath: 'rolePath',
-  targetCompanyTier: 'targetCompanyTier',
-  overallReadiness: 'overallReadiness',
-  nodesData: 'nodesData',
-  customTechStack: 'customTechStack',
   title: 'title',
   description: 'description',
+  rolePath: 'rolePath',
+  targetCompanyTier: 'targetCompanyTier',
+  estimatedWeeks: 'estimatedWeeks',
+  overallReadiness: 'overallReadiness',
+  isPublic: 'isPublic',
+  isOfficial: 'isOfficial',
+  nodesData: 'nodesData',
+  customTechStack: 'customTechStack',
   visibility: 'visibility',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -192,6 +195,7 @@ exports.Prisma.RoadmapNodeScalarFieldEnum = {
   orderIndex: 'orderIndex',
   estimatedMinutes: 'estimatedMinutes',
   requiresEvidence: 'requiresEvidence',
+  requiresAssessment: 'requiresAssessment',
   targetProficiency: 'targetProficiency',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -242,6 +246,7 @@ exports.Prisma.RoadmapSprintTaskScalarFieldEnum = {
   orderIndex: 'orderIndex',
   estimatedMinutes: 'estimatedMinutes',
   requiresEvidence: 'requiresEvidence',
+  requiresAssessment: 'requiresAssessment',
   status: 'status',
   completedAt: 'completedAt',
   createdAt: 'createdAt',
@@ -275,6 +280,44 @@ exports.Prisma.SkillEvidenceScalarFieldEnum = {
   assessedAt: 'assessedAt'
 };
 
+exports.Prisma.MicroAssessmentScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  roadmapNodeId: 'roadmapNodeId',
+  skillId: 'skillId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.MicroAssessmentQuestionScalarFieldEnum = {
+  id: 'id',
+  assessmentId: 'assessmentId',
+  questionText: 'questionText',
+  options: 'options',
+  correctOptionIndex: 'correctOptionIndex',
+  explanation: 'explanation',
+  orderIndex: 'orderIndex',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.MicroAssessmentAttemptScalarFieldEnum = {
+  id: 'id',
+  assessmentId: 'assessmentId',
+  userId: 'userId',
+  userRoadmapId: 'userRoadmapId',
+  sprintId: 'sprintId',
+  sprintTaskId: 'sprintTaskId',
+  skillId: 'skillId',
+  totalQuestions: 'totalQuestions',
+  correctAnswers: 'correctAnswers',
+  score: 'score',
+  passed: 'passed',
+  answers: 'answers',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.RoadmapAdaptationScalarFieldEnum = {
   id: 'id',
   userRoadmapId: 'userRoadmapId',
@@ -291,12 +334,25 @@ exports.Prisma.DiscussionPostScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   userName: 'userName',
+  userAvatar: 'userAvatar',
   roleCategory: 'roleCategory',
   title: 'title',
   content: 'content',
   tags: 'tags',
   upvotes: 'upvotes',
   aiReply: 'aiReply',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.DiscussionCommentScalarFieldEnum = {
+  id: 'id',
+  postId: 'postId',
+  userId: 'userId',
+  userName: 'userName',
+  userAvatar: 'userAvatar',
+  content: 'content',
+  upvotes: 'upvotes',
   createdAt: 'createdAt'
 };
 
@@ -408,8 +464,12 @@ exports.Prisma.ModelName = {
   RoadmapSprintTask: 'RoadmapSprintTask',
   SprintPerformance: 'SprintPerformance',
   SkillEvidence: 'SkillEvidence',
+  MicroAssessment: 'MicroAssessment',
+  MicroAssessmentQuestion: 'MicroAssessmentQuestion',
+  MicroAssessmentAttempt: 'MicroAssessmentAttempt',
   RoadmapAdaptation: 'RoadmapAdaptation',
-  DiscussionPost: 'DiscussionPost'
+  DiscussionPost: 'DiscussionPost',
+  DiscussionComment: 'DiscussionComment'
 };
 
 /**
