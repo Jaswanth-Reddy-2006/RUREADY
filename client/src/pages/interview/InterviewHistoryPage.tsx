@@ -138,8 +138,8 @@ export default function InterviewHistoryPage() {
               className={clsx(
                 'px-3 py-1.5 rounded-xl text-xs font-bold font-mono transition-all flex-1 md:flex-none text-center',
                 typeFilter === t
-                  ? 'bg-[#11183D] text-white shadow-2xs'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  ? 'bg-[#11183D] text-white dark:bg-white dark:text-black shadow-2xs'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-[#262626] dark:text-[#A8A8A8] dark:hover:bg-[#303030]'
               )}
             >
               {t === 'ALL' ? 'All Modes' : t === 'ORAL' ? 'Oral Speech' : 'Observed Coding'}

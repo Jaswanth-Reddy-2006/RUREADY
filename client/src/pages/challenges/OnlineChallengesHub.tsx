@@ -324,7 +324,7 @@ export default function OnlineChallengesHub() {
                     TIER AWARDS ACTIVE
                   </span>
                 </div>
-                <h2 className="text-base font-bold text-white tracking-tight">
+                <h2 className="text-base font-bold text-slate-100 tracking-tight">
                   Climb the Weekly Ladder — Win Badges & Score Streak Multipliers
                 </h2>
               </div>

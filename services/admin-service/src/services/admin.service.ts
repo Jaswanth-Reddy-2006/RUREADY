@@ -9,8 +9,8 @@ import { NotFoundError } from '../lib/errors.js';
 const systemState = {
   maintenanceMode: false,
   maintenanceMessage: 'RU Ready is currently undergoing scheduled platform upgrades. All mock interviews will resume shortly.',
-  activeLlmEngine: 'ollama/deepseek-coder:6.7b',
-  llmFallbackEngine: 'gemini/gemini-1.5-flash',
+  activeLlmEngine: 'ollama/llama3.1',
+  llmFallbackEngine: 'ollama/llama3.2:1b',
   temperature: 0.3,
   maxTokens: 2048,
   redisCacheStatus: {

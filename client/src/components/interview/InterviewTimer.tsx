@@ -42,30 +42,20 @@ const InterviewTimer: React.FC<InterviewTimerProps> = ({
 
   return (
     <motion.div
-      className={`flex items-center gap-4 ${className}`}
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.3 }}
+      className={`flex items-center ${className}`}
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.4 }}
     >
-      {/* Timer */}
-      <div className="flex items-center gap-2 rounded-full border border-white/10 bg-black/40 px-4 py-2 backdrop-blur-lg">
-        {/* Recording dot */}
-        <motion.div
-          className="h-2 w-2 rounded-full bg-red-500"
-          animate={{
-            opacity: isRunning ? [1, 0.3, 1] : 0.3,
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-        />
-        <span className="font-mono text-sm font-medium text-white/90 tabular-nums">
+      <div className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl border border-slate-700/60 bg-slate-800/80 backdrop-blur-md shadow-xs text-slate-100">
+        <div className="relative flex items-center justify-center">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="absolute w-3.5 h-3.5 rounded-full bg-emerald-500/20 animate-ping" />
+        </div>
+        <span className="font-mono text-xs font-bold tracking-wider tabular-nums text-slate-100">
           {timeStr}
         </span>
       </div>
-
     </motion.div>
   );
 };

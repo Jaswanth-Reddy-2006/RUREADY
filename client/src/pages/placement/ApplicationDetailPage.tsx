@@ -168,7 +168,7 @@ export default function ApplicationDetailPage() {
               {/* Company & Role Text */}
               <div className="space-y-2">
                 <div className="flex items-center gap-3 flex-wrap">
-                  <h1 className="text-2xl sm:text-3xl font-black font-display tracking-tight text-white">
+                  <h1 className="text-2xl sm:text-3xl font-black font-display tracking-tight text-slate-100">
                     {app.company}
                   </h1>
                   <span className="px-3 py-1 bg-[#4A8BDF]/20 text-[#4A8BDF] border border-[#4A8BDF]/40 rounded-full text-xs font-bold">

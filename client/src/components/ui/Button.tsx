@@ -26,23 +26,23 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    'bg-[#4A8BDF] hover:bg-[#2459A8] text-white font-semibold shadow-sm active:scale-[0.98] border border-transparent',
+    'bg-[#4A8BDF] hover:bg-[#2459A8] text-white dark:bg-[#0066CC] dark:hover:bg-[#0053A6] dark:text-white dark:border-[#0066CC] font-semibold shadow-sm active:scale-[0.98] border border-transparent',
   royal:
-    'bg-[#4A8BDF] hover:bg-[#2459A8] text-white font-semibold shadow-sm active:scale-[0.98] border border-transparent',
+    'bg-[#4A8BDF] hover:bg-[#2459A8] text-white dark:bg-[#0066CC] dark:hover:bg-[#0053A6] dark:text-white dark:border-[#0066CC] font-semibold shadow-sm active:scale-[0.98] border border-transparent',
   secondary:
-    'bg-white dark:bg-[#152046] text-[#11183D] dark:text-[#F8FAFC] font-semibold border border-[#DCE7F2] dark:border-[#1E294B] hover:bg-[#EFFAFD] dark:hover:bg-[#1E2C5E] hover:border-[#4A8BDF] dark:hover:border-[#4A8BDF] hover:text-[#4A8BDF] dark:hover:text-[#60A5FA] active:scale-[0.98] shadow-sm',
+    'bg-white dark:bg-[#262626] text-[#11183D] dark:text-white font-semibold border border-[#DCE7F2] dark:border-[#303030] hover:bg-[#EFFAFD] dark:hover:bg-[#303030] hover:text-[#4A8BDF] dark:hover:text-white active:scale-[0.98] shadow-sm',
   ai:
-    'bg-[#A0006D] hover:bg-[#780052] text-white font-semibold shadow-sm active:scale-[0.98] border border-transparent',
+    'bg-[#A0006D] hover:bg-[#780052] text-white dark:bg-[#8E005F] dark:hover:bg-[#70004A] dark:text-white dark:border-[#8E005F] font-semibold shadow-sm active:scale-[0.98] border border-transparent',
   eggplant:
-    'bg-[#A0006D] hover:bg-[#780052] text-white font-semibold shadow-sm active:scale-[0.98] border border-transparent',
+    'bg-[#A0006D] hover:bg-[#780052] text-white dark:bg-[#8E005F] dark:hover:bg-[#70004A] dark:text-white dark:border-[#8E005F] font-semibold shadow-sm active:scale-[0.98] border border-transparent',
   outline:
-    'bg-transparent text-[#4A8BDF] dark:text-[#60A5FA] font-semibold border border-[#4A8BDF] dark:border-[#60A5FA] hover:bg-[#EFFAFD] dark:hover:bg-[#4A8BDF]/15 active:scale-[0.98]',
+    'bg-transparent text-[#4A8BDF] dark:text-white font-semibold border border-[#4A8BDF] dark:border-[#303030] hover:bg-[#EFFAFD] dark:hover:bg-[#262626] active:scale-[0.98]',
   ghost:
-    'bg-transparent text-[#526078] dark:text-[#94A3B8] hover:text-[#11183D] dark:hover:text-white hover:bg-[#EFFAFD] dark:hover:bg-white/[0.06] active:scale-[0.98] font-medium',
+    'bg-transparent text-[#526078] dark:text-[#D2D2D7] hover:text-[#11183D] dark:hover:text-white hover:bg-[#EFFAFD] dark:hover:bg-[#262626] active:scale-[0.98] font-medium',
   danger:
-    'bg-[#D64545] hover:bg-[#B91C1C] text-white font-semibold border border-transparent active:scale-[0.98] shadow-sm',
+    'bg-[#D64545] hover:bg-[#B91C1C] text-white dark:bg-[#EF4743] dark:hover:bg-[#F63737] font-semibold border border-transparent active:scale-[0.98] shadow-sm',
   glass:
-    'bg-white/80 dark:bg-[#152046]/80 text-[#11183D] dark:text-[#F8FAFC] font-semibold border border-[#DCE7F2] dark:border-[#1E294B] hover:bg-[#EFFAFD] dark:hover:bg-[#1E2C5E] active:scale-[0.98] shadow-sm backdrop-blur-md',
+    'bg-white/80 dark:bg-[#262626]/90 text-[#11183D] dark:text-white font-semibold border border-[#DCE7F2] dark:border-[#303030] hover:bg-[#EFFAFD] dark:hover:bg-[#303030] active:scale-[0.98] shadow-sm backdrop-blur-md',
 };
 
 const sizeStyles: Record<ButtonSize, string> = {

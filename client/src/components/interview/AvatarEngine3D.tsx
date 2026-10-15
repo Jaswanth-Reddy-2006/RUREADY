@@ -327,27 +327,41 @@ export default function AvatarEngine3D({
         targetPitch += Math.sin(breathPhase * 4) * 0.014;
       }
 
-      avatarGroup.position.y = Math.sin(breathPhase * 0.8) * 0.0015;
-      avatarGroup.position.x = THREE.MathUtils.lerp(avatarGroup.position.x, targetYaw, 0.05);
-      avatarGroup.rotation.x = THREE.MathUtils.lerp(avatarGroup.rotation.x, targetPitch, 0.08);
-      avatarGroup.rotation.y = THREE.MathUtils.lerp(avatarGroup.rotation.y, targetYaw, 0.08);
-      avatarGroup.rotation.z = THREE.MathUtils.lerp(avatarGroup.rotation.z, targetRoll, 0.08);
+      avatarGroup.position.y = Math.sin(breathPhase * 0.8) * 0.0012;
+      avatarGroup.position.x = Math.sin(breathPhase * 0.4) * 0.0004;
+      avatarGroup.rotation.x = THREE.MathUtils.lerp(avatarGroup.rotation.x, targetPitch, 0.06);
+      avatarGroup.rotation.y = THREE.MathUtils.lerp(avatarGroup.rotation.y, targetYaw, 0.06);
+      avatarGroup.rotation.z = THREE.MathUtils.lerp(avatarGroup.rotation.z, targetRoll, 0.06);
 
-      // ─── Morph Target Influence Driver ───
+      // ─── Morph Target Influence Driver (High-Fidelity Lip-Sync) ───
+      const isSpeakingNow = currentState === 'SPEAKING' || frameState.viseme !== 'viseme_sil';
+      const rawVol = volumeRef.current || 35;
+      const volumeScale = THREE.MathUtils.clamp(rawVol / 40, 0.7, 1.35);
+
       for (const mesh of morphMeshes) {
         const inf = mesh.morphTargetInfluences;
         const dict = mesh.morphTargetDictionary;
         if (!inf || !dict) continue;
 
-        // 1. Oculus Visemes for models having Oculus viseme shapes
+        // 1. Oculus Visemes with Dynamic Volume Modulation (for Ready Player Me / Oculus Rigs)
         if (dict['viseme_aa'] !== undefined) {
           for (const v of oculusVisemeList) {
             if (dict[v] !== undefined) {
-              const maxIntensity = (v === 'viseme_aa' || v === 'viseme_O' || v === 'viseme_E') ? 0.25 : 0.18;
-              const target = frameState.viseme === v ? maxIntensity : 0.0;
-              const lerpFactor = target > inf[dict[v]] ? 0.34 : 0.18;
+              const isVowel = (v === 'viseme_aa' || v === 'viseme_O' || v === 'viseme_E' || v === 'viseme_I');
+              const baseIntensity = isVowel ? 0.65 : 0.48;
+              const target = (frameState.viseme === v && isSpeakingNow) ? (baseIntensity * volumeScale) : 0.0;
+              const lerpFactor = target > inf[dict[v]] ? 0.42 : 0.22;
               inf[dict[v]] = THREE.MathUtils.lerp(inf[dict[v]], target, lerpFactor);
             }
+          }
+
+          // Natural vertical jaw articulation synchronized with Oculus speech
+          if (dict['jawOpen'] !== undefined) {
+            const isVowel = (frameState.viseme === 'viseme_aa' || frameState.viseme === 'viseme_O' || frameState.viseme === 'viseme_E');
+            const targetJaw = (isSpeakingNow && frameState.viseme !== 'viseme_sil')
+              ? (isVowel ? 0.36 : 0.20) * volumeScale
+              : Math.sin(breathPhase * 0.8) * 0.005;
+            inf[dict['jawOpen']] = THREE.MathUtils.lerp(inf[dict['jawOpen']], Math.max(0, targetJaw), 0.35);
           }
         }
 
@@ -380,8 +394,8 @@ export default function AvatarEngine3D({
             let targetVal = bsVal;
             
             // If model does not have native Oculus visemes, inject calibrated ARKit viseme weights
-            if (dict['viseme_aa'] === undefined && activeVisemeARKit[bsName] !== undefined) {
-              targetVal = Math.max(targetVal, activeVisemeARKit[bsName]);
+            if (dict['viseme_aa'] === undefined && activeVisemeARKit[bsName] !== undefined && isSpeakingNow) {
+              targetVal = Math.max(targetVal, activeVisemeARKit[bsName] * 1.4 * volumeScale);
             }
 
             // Situational enhancements
@@ -398,16 +412,17 @@ export default function AvatarEngine3D({
               if (bsName === 'mouthSmileLeft' || bsName === 'mouthSmileRight') targetVal = Math.max(targetVal, 0.06);
             }
 
-            const maxLimit = isMouthShape(bsName) ? 0.28 : 0.20;
+            // High-fidelity mouth amplitude (0.65 for jawOpen, 0.50 for mouth shapes)
+            const maxLimit = isMouthShape(bsName) ? (bsName === 'jawOpen' ? 0.65 : 0.50) : 0.25;
             const clamped = Math.min(maxLimit, Math.max(0, targetVal));
-            const lerpSpeed = isMouthShape(bsName) ? 0.30 : 0.16;
+            const lerpSpeed = isMouthShape(bsName) ? 0.40 : 0.18;
             inf[dict[bsName]] = THREE.MathUtils.lerp(inf[dict[bsName]], clamped, lerpSpeed);
           }
         }
 
-        // Idle gentle breathing when silent
-        if (dict['jawOpen'] !== undefined && frameState.viseme === 'viseme_sil') {
-          inf[dict['jawOpen']] = THREE.MathUtils.lerp(inf[dict['jawOpen']], Math.sin(breathPhase * 0.8) * 0.008, 0.08);
+        // Idle gentle breathing when silent for non-Oculus models
+        if (dict['viseme_aa'] === undefined && dict['jawOpen'] !== undefined && !isSpeakingNow) {
+          inf[dict['jawOpen']] = THREE.MathUtils.lerp(inf[dict['jawOpen']], Math.sin(breathPhase * 0.8) * 0.006, 0.08);
         }
       }
 

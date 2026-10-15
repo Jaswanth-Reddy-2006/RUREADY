@@ -146,7 +146,7 @@ export default function ChallengesLeaderboardPage() {
                 <span>{leaderboardPayload?.seasonLabel || 'Weekly Sprint Season'}</span>
               </div>
 
-              <h1 className="text-2xl sm:text-4xl font-black tracking-tight font-display text-white">
+              <h1 className="text-2xl sm:text-4xl font-black tracking-tight font-display text-slate-100">
                 Competitive Elo Leaderboard
               </h1>
 

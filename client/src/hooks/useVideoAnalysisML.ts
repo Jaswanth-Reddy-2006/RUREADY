@@ -227,9 +227,24 @@ export function useVideoAnalysisML(
         } else if (centerSkinPixels + leftSkinPixels + rightSkinPixels > 80) {
           faceFound = true;
           detectedFaceCount = 1;
+          const totalSkin = centerSkinPixels + leftSkinPixels + rightSkinPixels;
+          const centerFraction = centerSkinPixels / Math.max(1, totalSkin);
+          if (centerFraction > 0.42) {
+            posture = 'Optimal';
+            eyeScore = 88;
+          } else if (centerFraction > 0.22) {
+            posture = 'Slight Shift';
+            eyeScore = 78;
+          } else {
+            posture = 'Off-Center';
+            eyeScore = 65;
+          }
         } else {
           faceFound = false;
           detectedFaceCount = 0;
+          posture = 'Off-Center';
+          eyeScore = 40;
+          anomalyDelta = 1;
         }
       }
 

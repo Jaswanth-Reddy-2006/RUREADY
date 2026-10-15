@@ -9,6 +9,7 @@ const footerLinks = [
       { label: 'Oral Interview', href: '/interview/new' },
       { label: 'Coding Playground', href: '/interview/coding/new' },
       { label: 'Resume Workspace', href: '/resume' },
+      { label: 'ATS Resume Match', href: '/ats' },
       { label: 'Career Roadmaps', href: '/roadmap' },
       { label: 'Role Communities', href: '/discuss' },
     ],
@@ -42,7 +43,7 @@ const socialLinks = [
 
 export default function Footer() {
   return (
-    <footer className="bg-white text-[#526078] border-t border-[#DCE7F2]">
+    <footer className="bg-white dark:bg-[#000000] text-[#526078] dark:text-[#D2D2D7] border-t border-[#DCE7F2] dark:border-[#262626] transition-colors">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 md:grid-cols-6 gap-8 py-12 lg:py-16">
           <div className="col-span-2">
@@ -51,7 +52,7 @@ export default function Footer() {
                 <Logo size="sm" theme="light" showTagline />
               </Link>
             </div>
-            <p className="text-xs text-[#526078] font-body max-w-xs leading-relaxed mb-6">
+            <p className="text-xs text-[#526078] dark:text-[#A8A8A8] font-body max-w-xs leading-relaxed mb-6">
               AI-powered mock interviews with uninflated feedback. Recognize your potential, Rebuild your confidence, and Rise to Tier-1 engineering bars.
             </p>
             <div className="flex items-center gap-2.5">
@@ -62,7 +63,7 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={social.label}
-                  className="h-8 w-8 rounded-xl bg-[#EFFAFD] flex items-center justify-center hover:bg-[#4A8BDF] hover:text-white transition-all duration-200 text-[#526078] border border-[#DCE7F2]"
+                  className="h-8 w-8 rounded-xl bg-[#EFFAFD] dark:bg-[#1C1C1C] flex items-center justify-center hover:bg-[#4A8BDF] hover:text-white transition-all duration-200 text-[#526078] dark:text-[#D2D2D7] border border-[#DCE7F2] dark:border-[#262626]"
                 >
                   <social.icon className="h-3.5 w-3.5" />
                 </a>
@@ -72,7 +73,7 @@ export default function Footer() {
 
           {footerLinks.map((group) => (
             <div key={group.title}>
-              <h4 className="text-xs font-bold text-[#11183D] font-display mb-4 uppercase tracking-wider">
+              <h4 className="text-xs font-bold text-[#11183D] dark:text-white font-display mb-4 uppercase tracking-wider">
                 {group.title}
               </h4>
               <ul className="flex flex-col gap-2">
@@ -81,14 +82,14 @@ export default function Footer() {
                     {link.href.startsWith('/#') ? (
                       <a
                         href={link.href}
-                        className="text-xs text-[#526078] hover:text-[#4A8BDF] transition-colors font-body"
+                        className="text-xs text-[#526078] dark:text-[#A8A8A8] hover:text-[#4A8BDF] dark:hover:text-[#64D2FF] transition-colors font-body"
                       >
                         {link.label}
                       </a>
                     ) : (
                       <Link
                         to={link.href}
-                        className="text-xs text-[#526078] hover:text-[#4A8BDF] transition-colors font-body"
+                        className="text-xs text-[#526078] dark:text-[#A8A8A8] hover:text-[#4A8BDF] dark:hover:text-[#64D2FF] transition-colors font-body"
                       >
                         {link.label}
                       </Link>
@@ -100,17 +101,17 @@ export default function Footer() {
           ))}
 
           <div className="col-span-2 md:col-span-1">
-            <h4 className="text-xs font-bold text-[#11183D] font-display mb-4 uppercase tracking-wider">
+            <h4 className="text-xs font-bold text-[#11183D] dark:text-white font-display mb-4 uppercase tracking-wider">
               Stay Updated
             </h4>
-            <p className="text-xs text-[#526078] font-body mb-3 leading-relaxed">
+            <p className="text-xs text-[#526078] dark:text-[#A8A8A8] font-body mb-3 leading-relaxed">
               Receive calibrated interview tips & question blueprints.
             </p>
             <form onSubmit={(e) => e.preventDefault()} className="flex items-center gap-1.5">
               <input
                 type="email"
                 placeholder="Your email..."
-                className="bg-[#EFFAFD] border border-[#DCE7F2] rounded-xl px-3 py-2 text-xs text-[#11183D] placeholder:text-[#7B8799] focus:outline-none focus:border-[#4A8BDF] flex-1 min-w-0"
+                className="bg-[#EFFAFD] dark:bg-[#1C1C1C] border border-[#DCE7F2] dark:border-[#262626] rounded-xl px-3 py-2 text-xs text-[#11183D] dark:text-white placeholder:text-[#7B8799] dark:placeholder:text-[#8A8A8A] focus:outline-none focus:border-[#4A8BDF] flex-1 min-w-0"
               />
               <button
                 type="submit"
@@ -123,11 +124,11 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-[#DCE7F2] py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-[#7B8799] font-body">
+        <div className="border-t border-[#DCE7F2] dark:border-[#262626] py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-[#7B8799] dark:text-[#8A8A8A] font-body">
             © {new Date().getFullYear()} Rennetus. All rights reserved.
           </p>
-          <p className="text-xs text-[#7B8799] font-body">
+          <p className="text-xs text-[#7B8799] dark:text-[#8A8A8A] font-body">
             Recognize • Rebuild • Rise — Professional AI Career Technology.
           </p>
         </div>

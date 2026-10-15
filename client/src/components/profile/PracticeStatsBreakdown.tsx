@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { 
-  Video, Code2, FileText, Compass, CheckCircle2, 
+  Video, Code2, FileText, CheckCircle2, 
   TrendingUp, Sparkles, Brain, ShieldCheck, Zap, 
   Layers, Mic, Eye, Award, Target, MessageSquare
 } from 'lucide-react';
@@ -130,17 +130,6 @@ export default function PracticeStatsBreakdown() {
               <span className="text-2xl font-extrabold text-[#4A8BDF] font-mono">91/100</span>
             </div>
             <p className="text-[10px] text-[#526078]">Calibrated for Tier-1 engineering JDs</p>
-          </div>
-
-          <div className="p-4 rounded-2xl bg-[#EFFAFD] border border-[#DCE7F2] space-y-1">
-            <div className="flex items-center justify-between text-xs text-[#526078] font-medium">
-              <span>Roadmap Modules</span>
-              <Compass size={14} className="text-[#A0006D]" />
-            </div>
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-2xl font-extrabold text-[#11183D] font-mono">8 / 10</span>
-            </div>
-            <p className="text-[10px] text-[#526078]">Distributed systems & Microservices</p>
           </div>
 
           <div className="p-4 rounded-2xl bg-[#EFFAFD] border border-[#DCE7F2] space-y-1">

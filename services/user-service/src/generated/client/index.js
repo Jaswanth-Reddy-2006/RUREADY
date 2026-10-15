@@ -159,7 +159,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\rafey\\Desktop\\Rennetus\\RUREADY\\services\\user-service\\src\\generated\\client",
+      "value": "C:\\Users\\Jaswanth Reddy\\OneDrive\\Desktop\\Projects\\RU_Ready\\services\\user-service\\src\\generated\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -173,7 +173,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\rafey\\Desktop\\Rennetus\\RUREADY\\services\\user-service\\src\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\Jaswanth Reddy\\OneDrive\\Desktop\\Projects\\RU_Ready\\services\\user-service\\src\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {

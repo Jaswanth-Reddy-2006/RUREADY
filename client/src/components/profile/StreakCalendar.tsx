@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Flame, Calendar as CalendarIcon, Sparkles, 
-  ChevronLeft, ChevronRight, Zap, Award, Info, Code2, Video, FileText, Compass, X
+  ChevronLeft, ChevronRight, Zap, Award, Info, Code2, Video, FileText, X
 } from 'lucide-react';
 import { useProfileStore, type ActivityDay } from '../../store/useProfileStore';
 import Card from '../ui/Card';
@@ -66,7 +66,6 @@ export default function StreakCalendar() {
       count: 0,
       codingCount: 0,
       oralCount: 0,
-      roadmapCount: 0
     };
   };
 
@@ -136,7 +135,7 @@ export default function StreakCalendar() {
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   selectedYear === year
                     ? 'bg-[#4A8BDF] text-white shadow-xs'
-                    : 'text-[#526078] hover:text-[#11183D]:text-white'
+                    : 'text-[#526078] hover:text-[#11183D] dark:hover:text-white'
                 }`}
               >
                 {year}
@@ -237,7 +236,7 @@ export default function StreakCalendar() {
               <button
                 type="button"
                 onClick={() => setSelectedDay(null)}
-                className="p-1 rounded-lg text-[#7B8799] hover:text-[#11183D]:text-white transition-colors"
+                className="p-1 rounded-lg text-[#7B8799] hover:text-[#11183D] dark:hover:text-white transition-colors"
               >
                 <X size={16} />
               </button>
@@ -265,13 +264,7 @@ export default function StreakCalendar() {
                   <span className="text-xs font-bold font-mono text-[#4A8BDF]">{selectedDay.codingCount} Solved</span>
                 </div>
 
-                <div className="p-3 rounded-xl bg-white border border-[#DCE7F2] flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Compass size={15} className="text-[#168A62]" />
-                    <span className="text-xs font-semibold text-[#11183D]">Roadmap Steps</span>
-                  </div>
-                  <span className="text-xs font-bold font-mono text-[#168A62]">{selectedDay.roadmapCount} Finished</span>
-                </div>
+
               </div>
             )}
           </motion.div>

@@ -148,7 +148,7 @@ export default function RadarChart({
       {(title || subtitle) && (
         <div className="w-full text-center mb-3">
           {title && (
-            <h4 className="text-sm font-bold font-display uppercase tracking-widest text-white">
+            <h4 className="text-sm font-bold font-display uppercase tracking-widest text-slate-100">
               {title}
             </h4>
           )}

@@ -30,6 +30,7 @@ interface SystemDesignState {
   nodes: Node[];
   edges: Edge[];
   selectedNodeId: string | null;
+  selectedEdgeId: string | null;
   activeTab: 'interviewer' | 'capacity' | 'inspector' | 'tradeoffs' | 'problem';
   isSaving: boolean;
   isAiThinking: boolean;
@@ -47,6 +48,7 @@ interface SystemDesignState {
   createAndLoadSession: (problemId: string, userName?: string) => Promise<string>;
   setActiveTab: (tab: 'interviewer' | 'capacity' | 'inspector' | 'tradeoffs' | 'problem') => void;
   setSelectedNodeId: (nodeId: string | null) => void;
+  setSelectedEdgeId: (edgeId: string | null) => void;
   toggleSpeech: () => void;
   setEvaluationModalOpen: (open: boolean) => void;
 
@@ -57,6 +59,7 @@ interface SystemDesignState {
   addNode: (nodeType: string, label: string, category: any, subType: string, position?: { x: number; y: number }) => void;
   updateNodeConfig: (nodeId: string, config: any) => void;
   deleteSelectedNode: () => void;
+  deleteSelectedEdge: () => void;
   clearCanvas: () => void;
   loadReferenceArchitecture: () => void;
 
@@ -74,6 +77,7 @@ export const useSystemDesignStore = create<SystemDesignState>((set, get) => ({
   nodes: [],
   edges: [],
   selectedNodeId: null,
+  selectedEdgeId: null,
   activeTab: 'interviewer',
   isSaving: false,
   isAiThinking: false,
@@ -147,7 +151,8 @@ export const useSystemDesignStore = create<SystemDesignState>((set, get) => ({
   },
 
   setActiveTab: (tab) => set({ activeTab: tab }),
-  setSelectedNodeId: (nodeId) => set({ selectedNodeId: nodeId }),
+  setSelectedNodeId: (nodeId) => set({ selectedNodeId: nodeId, selectedEdgeId: null }),
+  setSelectedEdgeId: (edgeId) => set({ selectedEdgeId: edgeId, selectedNodeId: null }),
   toggleSpeech: () => set((s) => ({ isSpeechEnabled: !s.isSpeechEnabled })),
   setEvaluationModalOpen: (open) => set({ evaluationModalOpen: open }),
 
@@ -193,6 +198,7 @@ export const useSystemDesignStore = create<SystemDesignState>((set, get) => ({
         config: {
           instances: 2,
           replication: 3,
+          size: 'medium',
         },
       },
     };
@@ -200,6 +206,7 @@ export const useSystemDesignStore = create<SystemDesignState>((set, get) => ({
     set((state) => ({
       nodes: [...state.nodes, newNode],
       selectedNodeId: id,
+      selectedEdgeId: null,
     }));
 
     get().saveGraphToServer();
@@ -231,12 +238,24 @@ export const useSystemDesignStore = create<SystemDesignState>((set, get) => ({
       nodes: nodes.filter((n) => n.id !== selectedNodeId),
       edges: edges.filter((e) => e.source !== selectedNodeId && e.target !== selectedNodeId),
       selectedNodeId: null,
+      selectedEdgeId: null,
+    });
+    get().saveGraphToServer();
+  },
+
+  deleteSelectedEdge: () => {
+    const { selectedEdgeId, edges } = get();
+    if (!selectedEdgeId) return;
+
+    set({
+      edges: edges.filter((edge) => edge.id !== selectedEdgeId),
+      selectedEdgeId: null,
     });
     get().saveGraphToServer();
   },
 
   clearCanvas: () => {
-    set({ nodes: [], edges: [], selectedNodeId: null });
+    set({ nodes: [], edges: [], selectedNodeId: null, selectedEdgeId: null });
     get().saveGraphToServer();
   },
 

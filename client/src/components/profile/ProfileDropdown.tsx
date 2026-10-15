@@ -103,41 +103,41 @@ export default function ProfileDropdown({ isOpen, onClose, positionClass = 'righ
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.96, y: -6 }}
         transition={{ duration: 0.15, ease: 'easeOut' }}
-        className="w-72 sm:w-80 rounded-3xl bg-white dark:bg-[#11183D] text-[#11183D] dark:text-[#F1F5F9] border border-[#DCE7F2] dark:border-[#1E293B] shadow-2xl p-4 space-y-3 font-sans relative"
+        className="w-72 sm:w-80 rounded-3xl bg-white dark:bg-[#1A1A1A] text-[#11183D] dark:text-[#FFFFFF] border border-[#DCE7F2] dark:border-[#262626] shadow-2xl p-4 space-y-3 font-sans relative"
       >
         {/* 1. Header Profile Box with Initial */}
         <Link 
           to="/profile"
           onClick={onClose}
-          className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-[#EFFAFD] dark:hover:bg-white/[0.06] transition-colors group"
+          className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-[#EFFAFD] dark:hover:bg-[#262626] transition-colors group"
         >
           <div className="relative shrink-0">
-            <div className="h-11 w-11 rounded-2xl bg-gradient-to-tr from-[#2459A8] to-[#4A8BDF] flex items-center justify-center text-white font-bold text-lg font-sans shadow-md border border-[#DCE7F2] dark:border-[#1E293B] group-hover:scale-105 transition-transform">
+            <div className="h-11 w-11 rounded-2xl bg-gradient-to-tr from-[#2459A8] to-[#4A8BDF] flex items-center justify-center text-white font-bold text-lg font-sans shadow-md border border-[#DCE7F2] dark:border-[#262626] group-hover:scale-105 transition-transform">
               {userInitial}
             </div>
-            <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-500 border-2 border-white dark:border-[#11183D]" />
+            <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-500 border-2 border-white dark:border-[#1A1A1A]" />
           </div>
           <div className="min-w-0 flex-1">
             <h4 className="text-sm font-bold text-[#11183D] dark:text-white tracking-tight truncate group-hover:text-[#4A8BDF] transition-colors">
               {displayName}
             </h4>
-            <p className="text-[11px] text-[#526078] dark:text-[#94A3B8] font-medium leading-tight mt-0.5 truncate font-mono">
+            <p className="text-[11px] text-[#526078] dark:text-[#A8A8A8] font-medium leading-tight mt-0.5 truncate font-mono">
               @{username}
             </p>
           </div>
         </Link>
 
         {/* 2. Action Menu Items */}
-        <div className="space-y-1 pt-2 border-t border-[#DCE7F2] dark:border-[#1E293B] text-xs">
+        <div className="space-y-1 pt-2 border-t border-[#DCE7F2] dark:border-[#262626] text-xs">
           
           {/* Item 1: Dashboard (Only shown on landing page) */}
           {isLanding && (
             <Link
               to="/dashboard"
               onClick={onClose}
-              className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-[#EFFAFD] dark:hover:bg-white/[0.06] text-[#11183D] dark:text-[#F1F5F9] transition-colors"
+              className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-[#EFFAFD] dark:hover:bg-[#262626] text-[#11183D] dark:text-[#FFFFFF] transition-colors"
             >
-              <LayoutDashboard size={17} className="text-[#4A8BDF]" />
+              <LayoutDashboard size={17} className="text-[#4A8BDF] dark:text-white" />
               <span className="font-semibold text-xs">Dashboard</span>
             </Link>
           )}
@@ -146,9 +146,9 @@ export default function ProfileDropdown({ isOpen, onClose, positionClass = 'righ
           <Link
             to="/profile"
             onClick={onClose}
-            className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-[#EFFAFD] dark:hover:bg-white/[0.06] text-[#11183D] dark:text-[#F1F5F9] transition-colors"
+            className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-[#EFFAFD] dark:hover:bg-[#262626] text-[#11183D] dark:text-[#FFFFFF] transition-colors"
           >
-            <User size={17} className="text-[#4A8BDF]" />
+            <User size={17} className="text-[#4A8BDF] dark:text-white" />
             <span className="font-semibold text-xs">Profile</span>
           </Link>
 
@@ -156,9 +156,9 @@ export default function ProfileDropdown({ isOpen, onClose, positionClass = 'righ
           <Link
             to="/settings"
             onClick={onClose}
-            className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-[#EFFAFD] dark:hover:bg-white/[0.06] text-[#11183D] dark:text-[#F1F5F9] transition-colors"
+            className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-[#EFFAFD] dark:hover:bg-[#262626] text-[#11183D] dark:text-[#FFFFFF] transition-colors"
           >
-            <Sliders size={17} className="text-[#4A8BDF]" />
+            <Sliders size={17} className="text-[#4A8BDF] dark:text-white" />
             <span className="font-semibold text-xs">Settings</span>
           </Link>
 
@@ -166,9 +166,9 @@ export default function ProfileDropdown({ isOpen, onClose, positionClass = 'righ
           <Link
             to="/settings?tab=notifications"
             onClick={onClose}
-            className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-[#EFFAFD] dark:hover:bg-white/[0.06] text-[#11183D] dark:text-[#F1F5F9] transition-colors"
+            className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-[#EFFAFD] dark:hover:bg-[#262626] text-[#11183D] dark:text-[#FFFFFF] transition-colors"
           >
-            <Bell size={17} className="text-[#4A8BDF]" />
+            <Bell size={17} className="text-[#4A8BDF] dark:text-white" />
             <span className="font-semibold text-xs">Notifications</span>
           </Link>
 
@@ -181,13 +181,13 @@ export default function ProfileDropdown({ isOpen, onClose, positionClass = 'righ
             <button
               type="button"
               onClick={() => setShowAppearanceSideCard(!showAppearanceSideCard)}
-              className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-[#EFFAFD] dark:hover:bg-white/[0.06] text-[#11183D] dark:text-[#F1F5F9] transition-colors cursor-pointer"
+              className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-[#EFFAFD] dark:hover:bg-[#262626] text-[#11183D] dark:text-[#FFFFFF] transition-colors cursor-pointer"
             >
               <div className="flex items-center gap-3">
-                <Moon size={17} className="text-[#4A8BDF]" />
+                <Moon size={17} className="text-[#4A8BDF] dark:text-white" />
                 <span className="font-semibold text-xs">Appearance</span>
               </div>
-              <ChevronRight size={14} className="text-[#7B8799]" />
+              <ChevronRight size={14} className="text-[#7B8799] dark:text-[#A8A8A8]" />
             </button>
 
             {/* SIDE FLYOUT CARD: Light, Dark, System */}
@@ -198,11 +198,11 @@ export default function ProfileDropdown({ isOpen, onClose, positionClass = 'righ
                   animate={{ opacity: 1, x: 0, scale: 1 }}
                   exit={{ opacity: 0, x: 6, scale: 0.96 }}
                   transition={{ duration: 0.12 }}
-                  className="absolute left-full top-0 ml-2.5 w-52 rounded-2xl bg-white dark:bg-[#11183D] border border-[#DCE7F2] dark:border-[#1E293B] shadow-2xl p-2 space-y-1 z-50 text-[#11183D] dark:text-[#F1F5F9]"
+                  className="absolute right-0 top-full mt-2 w-52 rounded-2xl bg-white dark:bg-[#1C1C1C] border border-[#DCE7F2] dark:border-[#262626] shadow-2xl p-2 space-y-1 z-50 text-[#11183D] dark:text-[#FFFFFF]"
                   onMouseEnter={handleMouseEnterAppearance}
                   onMouseLeave={handleMouseLeaveAppearance}
                 >
-                  <div className="px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#7B8799] dark:text-[#94A3B8] font-mono">
+                  <div className="px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#7B8799] dark:text-[#8A8A8A] font-mono">
                     Theme Mode
                   </div>
 
@@ -223,16 +223,16 @@ export default function ProfileDropdown({ isOpen, onClose, positionClass = 'righ
                         }}
                         className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-colors cursor-pointer ${
                           isSelected
-                            ? 'bg-[#EFFAFD] dark:bg-[#4A8BDF]/20 text-[#4A8BDF] font-bold'
-                            : 'text-[#526078] dark:text-[#94A3B8] hover:bg-[#EFFAFD] dark:hover:bg-white/[0.06]'
+                            ? 'bg-[#EFFAFD] dark:bg-[#262626] text-[#4A8BDF] dark:text-white font-bold'
+                            : 'text-[#526078] dark:text-[#A8A8A8] hover:bg-[#EFFAFD] dark:hover:bg-[#262626] dark:hover:text-white'
                         }`}
                       >
                         <div className="flex items-center gap-2.5">
-                          <Icon size={14} className={isSelected ? 'text-[#4A8BDF]' : 'text-[#7B8799] dark:text-[#94A3B8]'} />
+                          <Icon size={14} className={isSelected ? 'text-[#4A8BDF] dark:text-white' : 'text-[#7B8799] dark:text-[#A8A8A8]'} />
                           <span>{item.label}</span>
                         </div>
                         {isSelected && (
-                          <Check size={14} className="text-[#4A8BDF]" />
+                          <Check size={14} className="text-[#4A8BDF] dark:text-white" />
                         )}
                       </button>
                     );

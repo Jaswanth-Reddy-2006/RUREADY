@@ -19,7 +19,6 @@ export interface ActivityDay {
   count: number;
   codingCount: number;
   oralCount: number;
-  roadmapCount: number;
   scoreAvg?: number;
 }
 
@@ -104,7 +103,7 @@ export interface UserProfileData {
   badges: CandidateBadge[];
   recentSubmissions: Array<{
     id: string;
-    type: 'CODING' | 'ORAL' | 'ROADMAP' | 'ATS';
+    type: 'CODING' | 'ORAL' | 'ATS';
     title: string;
     timestamp: string;
     scoreOrResult: string;
@@ -232,15 +231,13 @@ function generateInitialActivityMap(): Record<string, ActivityDay> {
     if (Math.random() < activeChance) {
       const coding = Math.floor(Math.random() * 4);
       const oral = Math.random() > 0.6 ? 1 : 0;
-      const roadmap = Math.random() > 0.7 ? 1 : 0;
-      const total = coding + oral + roadmap;
+      const total = coding + oral;
       if (total > 0) {
         map[dateStr] = {
           date: dateStr,
           count: total,
           codingCount: coding,
           oralCount: oral,
-          roadmapCount: roadmap,
           scoreAvg: Math.floor(75 + Math.random() * 23)
         };
       }
@@ -257,7 +254,6 @@ function generateInitialActivityMap(): Record<string, ActivityDay> {
       count: 3 + (i % 3),
       codingCount: 2 + (i % 2),
       oralCount: (i % 2),
-      roadmapCount: 1,
       scoreAvg: 88 + (i % 8)
     };
   }
@@ -332,7 +328,7 @@ interface ProfileStoreState {
   toggleFollow: (userId: string) => void;
   updateProfile: (partial: Partial<UserProfileData>) => void;
   updatePreferences: (partial: Partial<ProfilePreferences>) => void;
-  recordActivity: (type: 'CODING' | 'ORAL' | 'ROADMAP' | 'ATS', title: string, score: string) => void;
+  recordActivity: (type: 'CODING' | 'ORAL' | 'ATS', title: string, score: string) => void;
   syncWithAuthUser: (user: any) => void;
 }
 
@@ -500,7 +496,6 @@ export const useProfileStore = create<ProfileStoreState>()(
             count: 0,
             codingCount: 0,
             oralCount: 0,
-            roadmapCount: 0
           };
 
           const newDay: ActivityDay = {
@@ -508,7 +503,6 @@ export const useProfileStore = create<ProfileStoreState>()(
             count: currentDay.count + 1,
             codingCount: type === 'CODING' ? currentDay.codingCount + 1 : currentDay.codingCount,
             oralCount: type === 'ORAL' ? currentDay.oralCount + 1 : currentDay.oralCount,
-            roadmapCount: type === 'ROADMAP' ? currentDay.roadmapCount + 1 : currentDay.roadmapCount
           };
 
           const newSubmission = {

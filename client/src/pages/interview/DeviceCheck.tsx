@@ -354,7 +354,7 @@ export default function DeviceCheck() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#EFFAFD] text-[#11183D] p-4 sm:p-8">
+    <div className="min-h-screen bg-[#EFFAFD] dark:bg-[#000000] text-[#11183D] dark:text-[#FFFFFF] p-4 sm:p-8 transition-colors">
       
       {/* Violation / Anti-Cheat Modal Overlay */}
       <AnimatePresence>
@@ -363,7 +363,7 @@ export default function DeviceCheck() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-[#11183D]/70 backdrop-blur-sm p-4 text-center select-none"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 text-center select-none"
           >
             <div className="max-w-md w-full bg-white border border-[#D64545]/20 p-8 rounded-3xl shadow-2xl relative overflow-hidden">
               <div className="mx-auto h-14 w-14 rounded-2xl bg-[#FDF0F0] text-[#D64545] flex items-center justify-center mb-4 shadow-sm">
@@ -511,7 +511,7 @@ export default function DeviceCheck() {
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
                   {/* Video Viewport Frame with Face Framing Guide */}
                   <div className="md:col-span-8">
-                    <div className="w-full aspect-video border border-[#DCE7F2] bg-[#11183D] rounded-2xl overflow-hidden relative flex items-center justify-center shadow-inner">
+                    <div className="w-full aspect-video border border-[#DCE7F2] dark:border-[#262626] bg-[#000000] rounded-2xl overflow-hidden relative flex items-center justify-center shadow-inner">
                       {cameraStatus === 'ALLOWED' ? (
                         <>
                           <video 
@@ -524,10 +524,10 @@ export default function DeviceCheck() {
                           {/* Face Guideline Oval Overlay */}
                           <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
                             <div className="w-48 h-64 border-2 border-dashed border-white/60 rounded-[50%] shadow-[0_0_20px_rgba(0,0,0,0.15)] flex flex-col items-center justify-between py-4">
-                              <span className="text-[10px] font-bold text-white bg-[#11183D]/70 px-2 py-0.5 rounded-full font-mono">
+                              <span className="text-[10px] font-bold text-white bg-black/70 px-2 py-0.5 rounded-full font-mono">
                                 Center Face Here
                               </span>
-                              <span className="text-[9px] text-white/80 font-body">Eye Level</span>
+                              <span className="text-[9px] text-slate-300 font-body">Eye Level</span>
                             </div>
                           </div>
                         </>
@@ -540,7 +540,7 @@ export default function DeviceCheck() {
                         <div className="text-center p-6 space-y-3 max-w-xs font-body">
                           <AlertTriangle size={24} className="mx-auto text-[#D64545] animate-pulse" />
                           <p className="text-xs font-bold text-white">Camera Access Denied</p>
-                          <p className="text-[11px] text-white/70 leading-relaxed">
+                          <p className="text-[11px] text-slate-400 leading-relaxed">
                             Please allow camera permissions in your browser address bar and reload.
                           </p>
                           <Button size="sm" variant="secondary" onClick={setupHardware}>
@@ -549,7 +549,7 @@ export default function DeviceCheck() {
                         </div>
                       )}
 
-                      <div className="absolute top-3 left-3 bg-[#11183D]/80 backdrop-blur-sm border border-white/10 px-3 py-1 text-[10px] font-bold text-white rounded-full uppercase tracking-wider flex items-center gap-1.5">
+                      <div className="absolute top-3 left-3 bg-black/80 backdrop-blur-sm border border-white/10 px-3 py-1 text-[10px] font-bold text-white rounded-full uppercase tracking-wider flex items-center gap-1.5">
                         <span className="h-2 w-2 rounded-full bg-[#168A62] animate-pulse" />
                         <span>Live Stream</span>
                       </div>
@@ -610,7 +610,7 @@ export default function DeviceCheck() {
                 </div>
 
                 {/* Live Audio Visualizer Frequency Bars */}
-                <div className="space-y-3 p-6 rounded-2xl bg-[#11183D] border border-[#2459A8]/40 text-white shadow-sm">
+                <div className="space-y-3 p-6 rounded-2xl bg-slate-900 dark:bg-[#1A1A1A] border border-[#2459A8]/40 dark:border-[#262626] text-white shadow-sm">
                   <div className="flex items-center justify-between text-xs">
                     <span className="font-semibold text-[#EFFAFD] flex items-center gap-2">
                       <Mic size={14} className="text-[#4A8BDF]" />
@@ -621,7 +621,7 @@ export default function DeviceCheck() {
                     </span>
                   </div>
 
-                  <div className="flex justify-between items-end h-16 bg-[#11183D]/90 rounded-xl p-3 border border-white/10">
+                  <div className="flex justify-between items-end h-16 bg-black/30 dark:bg-[#1C1C1C] rounded-xl p-3 border border-white/10 dark:border-[#262626]">
                     {Array.from({ length: 32 }).map((_, idx) => {
                       const barThresh = idx * 2.5;
                       const isActive = micStatus === 'ALLOWED' && decibels > barThresh;

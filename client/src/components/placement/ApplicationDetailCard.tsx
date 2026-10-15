@@ -380,7 +380,7 @@ export default function ApplicationDetailCard({
           <div className="space-y-6">
             <div className="p-5 bg-gradient-to-br from-[#2459A8] via-[#4A8BDF] to-[#A0006D] text-white rounded-2xl space-y-2 shadow-md">
               <h4 className="text-sm font-bold font-display">{app.company} Hiring Intelligence</h4>
-              <p className="text-xs text-white/90 leading-relaxed">
+              <p className="text-xs text-slate-200 leading-relaxed">
                 Vetted hiring patterns and past candidate questions for {app.role}.
               </p>
             </div>

@@ -1,4 +1,9 @@
-export type AIProviderType = 'ollama' | 'openai' | 'gemini' | 'custom' | 'mock';
+// ═══════════════════════════════════════════════════════════════
+// Resume & ATS Microservice — AI Provider Client
+// Centralized Architecture: Routes to ai-analysis-service (Meta Llama via Ollama)
+// ═══════════════════════════════════════════════════════════════
+
+export type AIProviderType = 'ollama' | 'mock';
 
 export interface AIProviderConfig {
   provider: AIProviderType;
@@ -11,51 +16,23 @@ export interface AIProviderConfig {
   isAvailable?: boolean;
 }
 
-const DEFAULT_CONFIGS: Record<AIProviderType, { baseUrl: string; model: string; requiresKey: boolean }> = {
-  ollama: {
-    baseUrl: process.env.AI_OLLAMA_BASE_URL || 'http://127.0.0.1:11434/v1',
-    model: process.env.AI_OLLAMA_MODEL || 'llama3',
-    requiresKey: false,
-  },
-  openai: {
-    baseUrl: 'https://api.openai.com/v1',
-    model: 'gpt-4o',
-    requiresKey: true,
-  },
-  gemini: {
-    baseUrl: 'https://generativelanguage.googleapis.com/v1beta/openai',
-    model: 'gemini-1.5-flash',
-    requiresKey: true,
-  },
-  custom: {
-    baseUrl: process.env.AI_API_BASE_URL || 'http://127.0.0.1:8000/v1',
-    model: process.env.AI_MODEL || 'default',
-    requiresKey: false,
-  },
-  mock: {
-    baseUrl: 'mock://local',
-    model: 'mock-engine-v1',
-    requiresKey: false,
-  },
-};
-
-class AIProviderManager {
+export class AIProviderManager {
+  private aiServiceUrl: string;
+  private ollamaBaseUrl: string;
+  private model: string;
   private config: AIProviderConfig;
 
   constructor() {
-    const envProvider = (process.env.AI_PROVIDER?.toLowerCase() as AIProviderType) || 'mock';
-    const initialProvider: AIProviderType = ['ollama', 'openai', 'gemini', 'custom', 'mock'].includes(envProvider)
-      ? envProvider
-      : (process.env.AI_API_KEY && process.env.AI_API_KEY.length > 20 ? 'openai' : 'mock');
-
-    const providerDefaults = DEFAULT_CONFIGS[initialProvider] || DEFAULT_CONFIGS.mock;
+    this.aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:4003';
+    this.ollamaBaseUrl = process.env.AI_OLLAMA_BASE_URL || 'http://127.0.0.1:11434/v1';
+    this.model = process.env.AI_OLLAMA_MODEL || 'llama3.1';
 
     this.config = {
-      provider: initialProvider,
-      baseUrl: process.env.AI_API_BASE_URL || providerDefaults.baseUrl,
-      apiKey: process.env.AI_API_KEY || 'ollama-local-key',
-      model: process.env.AI_MODEL || providerDefaults.model,
-      temperature: 0.7,
+      provider: 'ollama',
+      baseUrl: this.aiServiceUrl,
+      apiKey: 'ollama-local-key',
+      model: this.model,
+      temperature: 0.3,
       timeoutMs: 30000,
     };
   }
@@ -64,63 +41,64 @@ class AIProviderManager {
     return { ...this.config };
   }
 
-  public async callChatCompletion(systemPrompt: string, userPrompt: string, timeoutMsOverride?: number): Promise<string> {
-    if (this.config.provider === 'mock') {
-      throw new Error('AI_PROVIDER is mock. Use mock generator logic.');
+  public async generateText(prompt: string, systemPrompt?: string): Promise<string> {
+    return this.callChatCompletion(
+      systemPrompt || 'You are an elite ATS auditor and Principal Technical Recruiter powered by Meta Llama.',
+      prompt
+    );
+  }
+
+  public async callChatCompletion(systemPrompt: string, userPrompt: string, timeoutMs: number = 30000): Promise<string> {
+    // 1. Approach centralized AI Service (ai-analysis-service running Meta Llama)
+    try {
+      const response = await fetch(`${this.aiServiceUrl}/internal/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          systemPrompt,
+          userPrompt,
+          temperature: this.config.temperature,
+          timeoutMs,
+        }),
+        signal: AbortSignal.timeout(timeoutMs),
+      });
+
+      if (response.ok) {
+        const data = (await response.json()) as any;
+        if (data.content) return data.content;
+      }
+    } catch (err: any) {
+      console.warn('[Resume AI] Centralized AI service request skipped, attempting direct Ollama Llama:', err.message);
     }
 
-    const timeout = timeoutMsOverride || this.config.timeoutMs;
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeout);
-
+    // 2. Direct local Ollama fallback using Meta Llama
     try {
-      const base = this.config.baseUrl.replace(/\/+$/g, '');
+      const base = this.ollamaBaseUrl.replace(/\/+$/g, '');
       const url = base.endsWith('/chat/completions') ? base : `${base}/chat/completions`;
-
-      const response = await fetch(url, {
+      const res = await fetch(url, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.config.apiKey}`,
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: this.config.model,
+          model: this.model,
           messages: [
             { role: 'system', content: systemPrompt },
             { role: 'user', content: userPrompt },
           ],
           temperature: this.config.temperature,
-          ...(this.config.maxTokens ? { max_tokens: this.config.maxTokens } : {}),
         }),
-        signal: controller.signal,
+        signal: AbortSignal.timeout(timeoutMs),
       });
 
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`AI Provider HTTP ${response.status}: ${errText.slice(0, 200)}`);
+      if (res.ok) {
+        const data = (await res.json()) as any;
+        const content = data.choices?.[0]?.message?.content;
+        if (content) return content;
       }
-
-      const data = (await response.json()) as any;
-      const content = data.choices?.[0]?.message?.content;
-      if (!content) {
-        throw new Error('Empty response payload from AI Provider.');
-      }
-
-      return content;
-    } catch (error: any) {
-      clearTimeout(timeoutId);
-      console.warn(`[AIProviderManager] Request to ${this.config.provider} failed:`, error.message);
-      throw error;
+    } catch (err: any) {
+      console.warn('[Resume AI] Direct Ollama call failed:', err.message);
     }
-  }
 
-  public async generateText(prompt: string): Promise<string> {
-    if (this.config.provider === 'mock') {
-      throw new Error('AI_PROVIDER is mock mode.');
-    }
-    return this.callChatCompletion('You are an expert AI assistant.', prompt);
+    throw new Error('Centralized AI analysis service and Ollama Meta Llama are currently unreachable.');
   }
 }
 

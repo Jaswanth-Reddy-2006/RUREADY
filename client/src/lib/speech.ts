@@ -9,17 +9,17 @@ import { getPlatformVoice, PlatformVoiceId, PLATFORM_VOICES } from './platformCo
 /** Map a spoken character/word to mouth openness 0–1 for backwards compatibility */
 export function visemeOpenness(fragment: string): number {
   const t = fragment.toLowerCase().trim();
-  if (!t) return 0.04;
-  if (/[aeiou]/.test(t) && t.length <= 2) return 0.32;
-  if (/^(th|oh|ow|ay|ee|oo|ah|uh)/.test(t)) return 0.30;
-  if (/[bmpw]/.test(t.charAt(0))) return 0.04;
-  if (/[fv]/.test(t.charAt(0))) return 0.12;
-  if (/[lr]/.test(t.charAt(0))) return 0.16;
-  if (/[sztcndkg]/.test(t)) return 0.14;
+  if (!t) return 0.05;
+  if (/[aeiou]/.test(t) && t.length <= 2) return 0.48;
+  if (/^(th|oh|ow|ay|ee|oo|ah|uh)/.test(t)) return 0.44;
+  if (/[bmpw]/.test(t.charAt(0))) return 0.08;
+  if (/[fv]/.test(t.charAt(0))) return 0.22;
+  if (/[lr]/.test(t.charAt(0))) return 0.28;
+  if (/[sztcndkg]/.test(t)) return 0.24;
   const vowelCount = (t.match(/[aeiou]/g) || []).length;
-  if (vowelCount >= 2) return 0.28;
-  if (vowelCount === 1) return 0.22;
-  return 0.14;
+  if (vowelCount >= 2) return 0.42;
+  if (vowelCount === 1) return 0.35;
+  return 0.22;
 }
 
 export type LipSyncCallbacks = {
@@ -107,26 +107,38 @@ export function stopAllSpeech(): void {
 
   if (typeof window !== 'undefined' && window.speechSynthesis) {
     try {
+      window.speechSynthesis.pause();
       window.speechSynthesis.cancel();
     } catch {}
   }
 
-  activeUtterance = null;
+  if (activeUtterance) {
+    activeUtterance.onstart = null;
+    activeUtterance.onend = null;
+    activeUtterance.onerror = null;
+    activeUtterance.onboundary = null;
+    activeUtterance = null;
+  }
 
   if (lipSyncRaf) {
     cancelAnimationFrame(lipSyncRaf);
     lipSyncRaf = 0;
   }
+  speechStartTime = 0;
 }
 
 /**
  * Filter and find the best matching English (Male or Female) voice from the browser's native speech synthesis.
- * Prioritizes natural neural, online high-definition voices.
+ * Prioritizes natural neural, online high-definition human voices and strictly eliminates mechanical/robotic voices.
  */
 export function findEnglishBrowserVoice(voiceId?: PlatformVoiceId): SpeechSynthesisVoice | null {
   if (typeof window === 'undefined' || !window.speechSynthesis) return null;
   const voices = window.speechSynthesis.getVoices();
   if (!voices || voices.length === 0) return null;
+
+  // Filter out robotic legacy desktop and synthetic voices
+  const isRobotic = (v: SpeechSynthesisVoice) =>
+    /desktop|espeak|mumble|sapi|sin-wave|robot/i.test(v.name);
 
   // STRICT ENGLISH FILTER: Must match en-* or English language code
   const englishVoices = voices.filter(
@@ -150,34 +162,39 @@ export function findEnglishBrowserVoice(voiceId?: PlatformVoiceId): SpeechSynthe
   });
 
   const searchPool = genderPool.length > 0 ? genderPool : pool;
-  const keywords = voiceMeta?.voiceMatchKeywords || (isTargetMale ? ['male', 'david', 'natural'] : ['female', 'natural', 'jenny']);
 
-  // 2. High-priority: Try matching Natural/Neural voices with keywords first
-  const naturalPool = searchPool.filter((v) => /natural|neural|online|premium|enhanced/i.test(v.name));
-  for (const kw of keywords) {
-    const naturalMatch = naturalPool.find(
-      (v) => v.name.toLowerCase().includes(kw) || v.lang.toLowerCase().includes(kw)
-    );
-    if (naturalMatch) return naturalMatch;
-  }
+  // 2. High-priority rankings: Natural Neural Online voices (Jenny, Aria, Ava, Google, Apple Enhanced)
+  const topTierNatural = [
+    /jenny.*(natural|online)/i,
+    /aria.*(natural|online)/i,
+    /ava.*(natural|online|neural)/i,
+    /google.*us.*english/i,
+    /google.*uk.*english.*female/i,
+    /natural/i,
+    /neural/i,
+    /online/i,
+    /enhanced/i,
+    /premium/i,
+    /samantha/i,
+    /karen/i,
+    /serena/i,
+    /zoe/i,
+  ];
 
-  // 3. Match preferred keywords in full searchPool
-  for (const kw of keywords) {
-    const matched = searchPool.find(
-      (v) => v.name.toLowerCase().includes(kw) || v.lang.toLowerCase().includes(kw)
-    );
+  for (const regex of topTierNatural) {
+    const matched = searchPool.find((v) => regex.test(v.name) && !isRobotic(v));
     if (matched) return matched;
   }
 
-  // 4. Fallback to any natural / neural voice in searchPool
-  const highQuality =
-    naturalPool[0] ||
-    searchPool.find((v) => v.lang.toLowerCase().includes('en-us')) ||
-    searchPool.find((v) => v.lang.toLowerCase().includes('en-gb')) ||
-    searchPool[0] ||
-    pool[0];
+  // 3. Fallback to any non-robotic English voice
+  const nonRobotic = searchPool.filter((v) => !isRobotic(v));
+  if (nonRobotic.length > 0) {
+    const enUS = nonRobotic.find((v) => v.lang.toLowerCase() === 'en-us');
+    if (enUS) return enUS;
+    return nonRobotic[0];
+  }
 
-  return highQuality;
+  return searchPool[0] || pool[0];
 }
 
 /** Check if speech synthesis is available in the browser */
@@ -266,8 +283,8 @@ export function speakWithLipSync(
   activeUtterance = utterance; // Keep global reference so garbage collection doesn't kill it mid-sentence
 
   utterance.lang = 'en-US';
-  utterance.rate = 1.0;
-  utterance.pitch = 1.02;
+  utterance.rate = 0.94; // Conversational human pace
+  utterance.pitch = 1.0; // Grounded natural pitch
   utterance.volume = 1.0; // 100% full volume
 
   const selectedVoice = findEnglishBrowserVoice(voiceChoice);

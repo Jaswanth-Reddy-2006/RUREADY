@@ -145,19 +145,19 @@ export default function InbuiltInterviewModal({
                 </span>
               </div>
 
-              <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white font-display tracking-tight leading-snug">
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100 font-display tracking-tight leading-snug">
                 {interview.title}
               </h2>
 
               <p className="text-xs text-slate-600 dark:text-slate-300 font-medium">
-                Target Role: <strong className="text-slate-900 dark:text-white">{interview.role}</strong>
+                Target Role: <strong className="text-slate-900 dark:text-slate-100">{interview.role}</strong>
               </p>
             </div>
 
             <button
               type="button"
               onClick={onClose}
-              className="p-2 rounded-full text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-colors shrink-0 cursor-pointer"
+              className="p-2 rounded-full text-slate-400 hover:text-slate-700 dark:hover:text-slate-100 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-colors shrink-0 cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -180,7 +180,7 @@ export default function InbuiltInterviewModal({
               <div className="p-3 rounded-2xl bg-slate-50 dark:bg-[#0E152E] border border-slate-200/80 dark:border-[#1E293B] text-center space-y-0.5">
                 <Clock className="w-4 h-4 text-blue-600 dark:text-blue-400 mx-auto mb-1" />
                 <span className="text-[10px] text-slate-400 font-medium block">Duration</span>
-                <span className="text-sm font-bold text-slate-900 dark:text-white font-mono">
+                <span className="text-sm font-bold text-slate-900 dark:text-slate-100 font-mono">
                   {interview.durationMins} mins
                 </span>
               </div>
@@ -188,7 +188,7 @@ export default function InbuiltInterviewModal({
               <div className="p-3 rounded-2xl bg-slate-50 dark:bg-[#0E152E] border border-slate-200/80 dark:border-[#1E293B] text-center space-y-0.5">
                 <FileText className="w-4 h-4 text-purple-600 dark:text-purple-400 mx-auto mb-1" />
                 <span className="text-[10px] text-slate-400 font-medium block">Questions</span>
-                <span className="text-sm font-bold text-slate-900 dark:text-white font-mono">
+                <span className="text-sm font-bold text-slate-900 dark:text-slate-100 font-mono">
                   {interview.questionCount} Prompts
                 </span>
               </div>
@@ -196,7 +196,7 @@ export default function InbuiltInterviewModal({
               <div className="p-3 rounded-2xl bg-slate-50 dark:bg-[#0E152E] border border-slate-200/80 dark:border-[#1E293B] text-center space-y-0.5">
                 <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 mx-auto mb-1" />
                 <span className="text-[10px] text-slate-400 font-medium block">Simulation</span>
-                <span className="text-xs font-bold text-slate-900 dark:text-white uppercase truncate block">
+                <span className="text-xs font-bold text-slate-900 dark:text-slate-100 uppercase truncate block">
                   {interview.simulationMode}
                 </span>
               </div>
@@ -209,7 +209,7 @@ export default function InbuiltInterviewModal({
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <h4 className="font-bold text-slate-900 dark:text-white text-xs">
+                  <h4 className="font-bold text-slate-900 dark:text-slate-100 text-xs">
                     {interview.interviewerPersona.name} ({interview.interviewerPersona.role})
                   </h4>
                   <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-mono">
@@ -291,7 +291,7 @@ export default function InbuiltInterviewModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="w-full sm:w-auto px-4 py-2.5 rounded-xl text-slate-500 dark:text-slate-400 font-semibold text-xs hover:text-slate-800 dark:hover:text-white transition-colors cursor-pointer"
+                className="w-full sm:w-auto px-4 py-2.5 rounded-xl text-slate-500 dark:text-slate-400 font-semibold text-xs hover:text-slate-800 dark:hover:text-slate-100 transition-colors cursor-pointer"
               >
                 Cancel
               </button>

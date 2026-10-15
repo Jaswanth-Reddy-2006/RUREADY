@@ -72,7 +72,7 @@ export const PORTFOLIO_PROJECTS: PortfolioProject[] = [
     category: 'AI / ML',
     difficulty: 'Advanced',
     tagline: 'Multi-modal document vector search with semantic chunking and LLM re-ranking',
-    techStack: ['Python', 'FastAPI', 'Qdrant / ChromaDB', 'LangChain', 'Gemini / Ollama', 'React', 'Docker'],
+    techStack: ['Python', 'FastAPI', 'Qdrant / ChromaDB', 'LangChain', 'Meta Llama / Ollama', 'React', 'Docker'],
     githubUrl: 'https://github.com/ru-ready/enterprise-rag-assistant-blueprint',
     architectureOverview: 'End-to-end Retrieval-Augmented Generation pipeline. Ingests PDFs, Word docs, and markdown, applies semantic chunking with sliding overlaps, generates dense vector embeddings, stores in Qdrant Vector DB, and executes reciprocal rank fusion (RRF) before synthesis.',
     coreFeatures: [

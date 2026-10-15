@@ -1,8 +1,23 @@
-import React, { useEffect, useRef } from 'react';
+// ═══════════════════════════════════════════════════════════════
+// Renatus — Video Interview Room UI (Google Meet Experience)
+// Clean White Aesthetic, Balanced Dual-Stage Architecture
+// Minimal Brand Header, Pure Spoken Prompt, Google Meet Dock
+// ═══════════════════════════════════════════════════════════════
+
+import React, { useEffect, useRef, useState } from 'react';
 import AIAvatar, { type AvatarState } from './interview/AIAvatar';
 import { type OculusViseme } from './interview/visemeMapper';
 import { type VideoAnalysisMetrics } from '../hooks/useVideoAnalysisML';
-import { Maximize2, Mic, ShieldAlert, Sparkles } from 'lucide-react';
+import { 
+  Maximize2, VideoOff, PhoneOff, ShieldAlert, Sun, Moon 
+} from 'lucide-react';
+
+function getQuestionFontSize(text: string): string {
+  const len = text ? text.length : 0;
+  if (len > 220) return 'text-xs sm:text-sm leading-snug';
+  if (len > 120) return 'text-sm sm:text-base leading-normal';
+  return 'text-base sm:text-lg leading-relaxed';
+}
 
 interface NormalInterviewRoomProps {
   mediaStream: MediaStream | null;
@@ -26,6 +41,15 @@ interface NormalInterviewRoomProps {
   onReEnterFullscreen?: () => void;
   onTranscriptionChange?: (text: string) => void;
   videoMLMetrics?: VideoAnalysisMetrics;
+  // Interactive Controls & Follow-up Props
+  isFollowUpMode?: boolean;
+  isMicOn?: boolean;
+  isCameraOn?: boolean;
+  onToggleMic?: () => void;
+  onToggleCamera?: () => void;
+  onRepeatQuestion?: () => void;
+  onRequestClarification?: () => void;
+  onSkipQuestion?: () => void;
 }
 
 export default function NormalInterviewRoom({
@@ -38,14 +62,35 @@ export default function NormalInterviewRoom({
   currentQuestionText,
   onEndInterview,
   isProcessing,
-  processingLabel,
-  candidateTranscription,
+  processingLabel = 'Ava is considering your response…',
+  candidateTranscription = '',
   isFullscreen = true,
   onReEnterFullscreen,
-  silenceCountdown,
+  focusArea = 'Software Engineer',
+  isFollowUpMode = false,
+  isMicOn = true,
+  isCameraOn = true,
+  onToggleMic,
+  onToggleCamera,
+  onSubmitAnswer,
   videoMLMetrics,
 }: NormalInterviewRoomProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [isDark, setIsDark] = useState<boolean>(() => {
+    return document.documentElement.classList.contains('dark');
+  });
+
+  const toggleTheme = () => {
+    const nextDark = !isDark;
+    setIsDark(nextDark);
+    if (nextDark) {
+      document.documentElement.classList.add('dark');
+      document.documentElement.style.colorScheme = 'dark';
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.documentElement.style.colorScheme = 'light';
+    }
+  };
 
   // Bind candidate media stream (strictly locked on)
   useEffect(() => {
@@ -57,8 +102,22 @@ export default function NormalInterviewRoom({
     }
   }, [mediaStream]);
 
+  // Keyboard shortcut: Press Enter to submit answer immediately if candidate has finished talking
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter' && !e.shiftKey && !isProcessing && !aiIsSpeaking) {
+        if (candidateTranscription && candidateTranscription.trim().length > 3) {
+          e.preventDefault();
+          onSubmitAnswer(candidateTranscription);
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [candidateTranscription, isProcessing, aiIsSpeaking, onSubmitAnswer]);
+
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-[#EFFAFD] text-[#11183D] font-sans select-none overflow-hidden">
+    <div className="fixed inset-0 z-50 flex flex-col bg-slate-50 dark:bg-black text-slate-900 dark:text-white font-sans select-none overflow-hidden transition-colors">
       
       {/* ─── 0. STRICT FULL-SCREEN LOCKDOWN OVERLAY (If Exited) ─── */}
       {!isFullscreen && (
@@ -68,93 +127,88 @@ export default function NormalInterviewRoom({
               <ShieldAlert size={32} />
             </div>
             <div>
-              <h2 className="text-xl font-bold font-display text-white">Full-Screen Security Lockdown</h2>
+              <h2 className="text-xl font-bold font-display text-slate-100">Full-Screen Security Lockdown</h2>
               <p className="text-xs text-slate-400 mt-2 leading-relaxed font-body">
                 For complete proctoring integrity, this interview must remain in full-screen mode at all times. Tab switches, multi-window events, and external processes are monitored.
               </p>
             </div>
-            <button
-              type="button"
-              onClick={onReEnterFullscreen}
-              className="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-2xl transition-all shadow-lg cursor-pointer flex items-center justify-center gap-2 font-display"
-            >
-              <Maximize2 size={16} />
-              <span>Return to Full-Screen Mode</span>
-            </button>
+            <div className="flex flex-col gap-2.5 w-full">
+              <button
+                type="button"
+                onClick={onReEnterFullscreen}
+                className="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-2xl transition-all shadow-lg cursor-pointer flex items-center justify-center gap-2 font-display"
+              >
+                <Maximize2 size={16} />
+                <span>Return to Full-Screen Mode</span>
+              </button>
+              <button
+                type="button"
+                onClick={onEndInterview}
+                className="w-full py-2.5 text-xs font-semibold text-rose-400 hover:text-rose-300 transition-colors cursor-pointer"
+              >
+                End Interview
+              </button>
+            </div>
           </div>
         </div>
       )}
 
-      {/* ─── 1. TOP MINIMAL BRAND & EXIT BAR ─── */}
-      <header className="px-6 py-3 shrink-0 border-b border-[#DCE7F2] bg-white shadow-xs z-20 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-[#4A8BDF] to-[#2459A8] flex items-center justify-center text-white font-bold text-xs shadow-xs font-display">
-            RU
+      {/* ─── 1. TOP MINIMAL BRAND HEADER WITH PROMINENT END CALL BUTTON ─── */}
+      <header className="px-6 py-3.5 shrink-0 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0D1117] z-20 flex items-center justify-between transition-colors">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
+            <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-[#2459A8] to-[#4A8BDF] flex items-center justify-center text-white font-bold text-xs shadow-sm font-display">
+              RU
+            </div>
+            <span className="text-base font-bold text-slate-900 dark:text-white font-display">
+              Renatus
+            </span>
           </div>
-          <span className="text-sm font-bold text-[#11183D] font-display">
-            RU Ready
+
+          <div className="h-4 w-px bg-slate-300 dark:bg-slate-700" />
+
+          <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 truncate max-w-[240px] sm:max-w-md">
+            {focusArea || 'Software Engineer'}
           </span>
         </div>
 
-        {/* Right Controls: AI State Pill + End Call */}
-        <div className="flex items-center gap-3">
-          {/* Live AI State Pill */}
-          {aiIsSpeaking ? (
-            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-50 border border-sky-200 text-sky-700 text-xs font-bold font-mono shadow-xs animate-pulse">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
-              </span>
-              <span>Ava Speaking...</span>
-            </div>
-          ) : isProcessing ? (
-            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-50 border border-purple-200 text-purple-700 text-xs font-bold font-mono shadow-xs">
-              <div className="h-2.5 w-2.5 rounded-full border-2 border-purple-600 border-t-transparent animate-spin" />
-              <span>Thinking & Processing...</span>
-            </div>
-          ) : avatarState === 'listening' ? (
-            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold font-mono shadow-xs">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-              </span>
-              <span>
-                {(silenceCountdown ?? 0) > 0
-                  ? `Listening (Submitting in ${silenceCountdown}s)...`
-                  : 'Listening to you...'}
-              </span>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-slate-600 text-xs font-bold font-mono shadow-xs">
-              <span className="h-2 w-2 rounded-full bg-slate-400" />
-              <span>Ready</span>
-            </div>
-          )}
+        {/* Clear End Call Button & Theme Toggle at Top */}
+        <div className="flex items-center gap-2.5">
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="p-2 rounded-xl transition-all cursor-pointer border flex items-center justify-center bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-amber-300 border-slate-200 dark:border-slate-700 shadow-xs"
+            title={isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
+          >
+            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
 
-          {/* Discreet End Call */}
           <button
             type="button"
             onClick={onEndInterview}
-            className="bg-[#D64545] hover:bg-[#D64545]/90 text-white px-4 py-1.5 rounded-full font-bold text-xs shadow-xs transition-all cursor-pointer active:scale-95 font-display"
+            className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs sm:text-sm flex items-center gap-2 shadow-sm hover:shadow transition-all cursor-pointer font-display active:scale-95 border border-rose-500/40"
+            title="End interview immediately"
           >
-            End Call
+            <PhoneOff className="w-4 h-4" />
+            <span>End Call</span>
           </button>
         </div>
       </header>
 
-      {/* ─── 2. MAIN 2-PANEL EQUAL STAGE ─── */}
-      <main className="flex-1 w-full max-w-[1750px] mx-auto p-4 sm:p-5 grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch min-h-0 relative overflow-hidden">
+      {/* ─── 2. MAIN 2-PANEL BALANCED STAGE ─── */}
+      <main className="flex-1 w-full max-w-[1700px] mx-auto p-4 sm:p-6 pb-24 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 items-stretch min-h-0 overflow-hidden">
         
-        {/* ─── LEFT: AVA'S STAGE ─── */}
-        <div className="w-full h-full flex flex-col bg-white border border-[#DCE7F2] rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm">
+        {/* ═══════════ LEFT PANEL: AI INTERVIEWER ═══════════ */}
+        <div className="w-full h-full flex flex-col bg-white dark:bg-[#0D1117] border border-slate-200/90 dark:border-slate-800 rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm transition-colors">
           
           {/* 3D Avatar Canvas */}
-          <div className="relative flex-1 min-h-[260px] w-full flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#0e172e] via-[#090e1c] to-[#04060c]">
+          <div className="relative flex-1 min-h-[220px] w-full flex items-center justify-center overflow-hidden bg-gradient-to-b from-slate-900 via-slate-950 to-black">
             <AIAvatar
               state={avatarState}
               expression={
                 aiIsSpeaking ? 'SPEAKING' :
                 isProcessing ? 'THINKING' :
+                isFollowUpMode ? 'INTERESTED' :
                 avatarState === 'listening' ? 'INTERESTED' :
                 avatarState === 'pleased' ? 'ENCOURAGING' :
                 avatarState === 'concerned' ? 'CONCERNED' :
@@ -167,46 +221,25 @@ export default function NormalInterviewRoom({
               persona="AVA"
               className="w-full h-full object-cover"
             />
-
-            {/* Clean Ava Tag */}
-            <div className="absolute top-4 left-4 z-10 px-3 py-1 rounded-full bg-[#11183D]/80 backdrop-blur-md border border-white/10 text-white text-xs font-bold font-display shadow-md">
-              Ava
-            </div>
           </div>
 
-          {/* ─── AVA'S BOTTOM CAPTION BOX ─── */}
-          <div className="bg-[#11183D] p-5 shrink-0 z-10">
-            <div className="min-h-[72px] max-h-36 overflow-y-auto pr-1 flex flex-col justify-center">
-              {aiIsSpeaking ? (
-                <div>
-                  <span className="text-[10px] font-mono text-[#7dd3fc] uppercase tracking-wider block mb-1">
-                    Ava Speaking
-                  </span>
-                  <p className="text-sm sm:text-base text-white font-medium leading-relaxed font-body">
-                    {currentQuestionText || 'Preparing question...'}
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-1">
-                  <p className="text-sm sm:text-base font-bold text-[#38bdf8] font-display tracking-tight">
-                    Ava is listening — please respond whenever you're ready
-                  </p>
-                  <p className="text-xs sm:text-sm text-slate-300 font-normal leading-relaxed font-body line-clamp-2">
-                    {currentQuestionText}
-                  </p>
-                </div>
-              )}
+          {/* Question Text Area — STRICT FIXED HEIGHT to prevent video feed jumping or shrinking */}
+          <div className="bg-white dark:bg-[#0D1117] border-t border-slate-100 dark:border-slate-800 px-4 py-3 sm:px-5 sm:py-3.5 shrink-0 h-28 sm:h-32 flex flex-col justify-center overflow-hidden transition-colors">
+            <div className="overflow-y-auto max-h-full pr-1">
+              <p className={`${getQuestionFontSize(currentQuestionText || '')} text-slate-800 dark:text-slate-100 font-medium font-display`}>
+                {currentQuestionText || 'Preparing technical question...'}
+              </p>
             </div>
           </div>
 
         </div>
 
-        {/* ─── RIGHT: CANDIDATE STAGE ─── */}
-        <div className="w-full h-full flex flex-col bg-white border border-[#DCE7F2] rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm">
+        {/* ═══════════ RIGHT PANEL: CANDIDATE ═══════════ */}
+        <div className="w-full h-full flex flex-col bg-white dark:bg-[#0D1117] border border-slate-200/90 dark:border-slate-800 rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm relative transition-colors">
           
-          {/* Candidate Webcam Feed Area (Clean, full height) */}
-          <div className="relative flex-1 bg-[#11183D] min-h-[260px] flex items-center justify-center overflow-hidden">
-            {mediaStream ? (
+          {/* Candidate Webcam Feed Area — Clean full-tile view matching video conferencing platforms */}
+          <div className="relative flex-1 w-full h-full bg-slate-950 flex items-center justify-center overflow-hidden">
+            {mediaStream && isCameraOn ? (
               <video
                 ref={videoRef}
                 autoPlay
@@ -216,37 +249,25 @@ export default function NormalInterviewRoom({
               />
             ) : (
               <div className="text-center space-y-2 p-6">
-                <div className="h-3 w-3 rounded-full bg-emerald-500 animate-pulse mx-auto" />
-                <p className="text-xs text-white/70 font-medium font-body">Camera Active</p>
+                <div className="h-14 w-14 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center mx-auto text-slate-400">
+                  <VideoOff className="h-7 w-7 text-slate-500" />
+                </div>
+                <p className="text-sm font-medium text-slate-300">Camera Off</p>
               </div>
             )}
 
-            {/* Clean You Tag */}
-            <div className="absolute top-4 left-4 z-10 px-3 py-1 rounded-full bg-[#11183D]/80 backdrop-blur-md border border-white/10 text-white text-xs font-bold font-display shadow-md">
-              You
+            {/* Subtle "You" badge overlay (Zero distracting transcript) */}
+            <div className="absolute bottom-4 left-4 z-10 flex items-center gap-2">
+              <span className="px-3 py-1 rounded-xl bg-slate-900/75 backdrop-blur-md text-white text-xs font-semibold shadow-xs">
+                You
+              </span>
             </div>
-
-            {/* Multiple People Integrity Warning */}
-            {(videoMLMetrics?.multipleFacesDetected || (videoMLMetrics?.faceCount && videoMLMetrics.faceCount > 1)) && (
-              <div className="absolute top-4 right-4 z-20 px-3.5 py-1.5 rounded-full bg-red-600/95 backdrop-blur-md border border-red-400 text-white text-xs font-bold font-display shadow-xl flex items-center gap-1.5 animate-bounce">
-                <span>⚠️ Multiple People Detected</span>
-              </div>
-            )}
-
-            {/* Pause / Auto-submit Countdown Badge */}
-            {(silenceCountdown ?? 0) > 0 && !videoMLMetrics?.multipleFacesDetected && (
-              <div className="absolute top-4 right-4 z-10 px-3.5 py-1.5 rounded-full bg-amber-500/95 backdrop-blur-md border border-amber-300 text-white text-xs font-bold font-mono shadow-lg flex items-center gap-2 animate-pulse">
-                <div className="h-2 w-2 rounded-full bg-white" />
-                <span>Submitting in {silenceCountdown}s (speak to continue)</span>
-              </div>
-            )}
           </div>
 
         </div>
 
       </main>
+
     </div>
   );
 }
-
-

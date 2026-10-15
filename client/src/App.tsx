@@ -4,6 +4,7 @@ import { AnimatePresence } from 'framer-motion';
 import { Agentation } from 'agentation';
 import { useProfileStore } from './store/useProfileStore';
 import { useAuthStore } from './store/authStore';
+import { stopAllSpeech } from './lib/speech';
 import ProtectedRoute from './components/layout/ProtectedRoute';
 import ErrorBoundary from './components/ui/ErrorBoundary';
 import Navbar from './components/layout/Navbar';
@@ -11,11 +12,11 @@ import Footer from './components/layout/Footer';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ResetPassword from './pages/ResetPassword';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
-import PublicVerificationPage from './pages/PublicVerificationPage';
 
 // Interview flow pages
 import UnifiedInterviewHub from './pages/interview/UnifiedInterviewHub';
@@ -35,6 +36,7 @@ import CodingInterviewRoom from './components/interview/CodingInterviewRoom';
 import OralHistoryPage from './pages/interview/OralHistoryPage';
 import CompanyWiseCatalogPage from './pages/interview/CompanyWiseCatalogPage';
 import CompanyTrackDetailPage from './pages/interview/CompanyTrackDetailPage';
+import InbuiltInterviewCatalogPage from './pages/interview/InbuiltInterviewCatalogPage';
 
 // Placement Preparation Engine pages
 import PreparationCommandCenter from './pages/prep/PreparationCommandCenter';
@@ -58,6 +60,8 @@ import SystemDesignHub from './pages/system-design/SystemDesignHub';
 import SystemDesignStudio from './pages/system-design/SystemDesignStudio';
 import SystemDesignHistory from './pages/system-design/SystemDesignHistory';
 import SystemDesignSetupForm from './pages/system-design/SystemDesignSetupForm';
+import SystemDesignReviewPage from './pages/system-design/SystemDesignReviewPage';
+import SystemDesignPreCheckPage from './pages/system-design/SystemDesignPreCheckPage';
 
 // Analysis pages
 import Dashboard from './pages/analysis/Dashboard';
@@ -69,15 +73,15 @@ import ResumeBuilderPage from './pages/resume/ResumeBuilderPage';
 import AtsAnalyzerPage from './pages/resume/AtsAnalyzerPage';
 import ResumeVersionsPage from './pages/resume/ResumeVersionsPage';
 import ResumePreviewPage from './pages/resume/ResumePreviewPage';
-import RoadmapCatalog from './pages/roadmap/RoadmapCatalog';
-import RoadmapView from './pages/roadmap/RoadmapView';
-import RoadmapBuilderPage from './pages/roadmap/RoadmapBuilderPage';
 import DiscussPage from './pages/discuss/DiscussPage';
 import DiscussDetail from './pages/discuss/DiscussDetail';
 import ProfilePage from './pages/profile/ProfilePage';
 import PlacementCommandCenterPage from './pages/placement/PlacementCommandCenterPage';
 import AddApplicationPage from './pages/placement/AddApplicationPage';
 import ApplicationDetailPage from './pages/placement/ApplicationDetailPage';
+import RoadmapHubPage from './pages/roadmap/RoadmapHubPage';
+import RoadmapBuilderPage from './pages/roadmap/RoadmapBuilderPage';
+import RoadmapWorkspacePage from './pages/roadmap/RoadmapWorkspacePage';
 
 // Layout shell
 import AppLayout from './layouts/AppLayout';
@@ -119,6 +123,36 @@ function App() {
     }
   }, [user]);
 
+  // Cancel any active AI speech synthesis whenever navigating outside active interview rooms or landing on report/analysis pages
+  useEffect(() => {
+    const p = location.pathname;
+    const isLiveOralRoom = (
+      (/^\/video\/(room\/)?[^/]+$/.test(p) && !p.startsWith('/video/new') && !p.startsWith('/video/setup') && !p.startsWith('/video/review') && !p.startsWith('/video/precheck') && !p.startsWith('/video/device-check') && !p.startsWith('/video/history') && !p.startsWith('/video/catalog')) ||
+      (/^\/interview\/[^/]+$/.test(p) && !p.startsWith('/interview/new') && !p.startsWith('/interview/setup') && !p.startsWith('/interview/catalog')) ||
+      (/^\/oral\/room\/[^/]+$/.test(p))
+    ) && !p.includes('/analysis') && !p.includes('/complete') && !p.includes('/replay');
+
+    const isLiveCodingRoom = (
+      (/^\/coding\/(room\/)?[^/]+$/.test(p) && !p.startsWith('/coding/new') && !p.startsWith('/coding/setup') && !p.startsWith('/coding/review') && !p.startsWith('/coding/precheck') && !p.startsWith('/coding/history') && !p.startsWith('/coding/catalog')) ||
+      (/^\/interview\/coding\/[^/]+$/.test(p))
+    ) && !p.includes('/analysis') && !p.includes('/complete');
+
+    const isLiveSystemDesignRoom = (
+      p.startsWith('/system-design/studio/') ||
+      (/^\/system-design\/(room\/)?[^/]+$/.test(p) &&
+        !p.startsWith('/system-design/new') &&
+        !p.startsWith('/system-design/setup') &&
+        !p.startsWith('/system-design/review') &&
+        !p.startsWith('/system-design/precheck') &&
+        !p.startsWith('/system-design/device-check') &&
+        !p.startsWith('/system-design/history'))
+    ) && !p.includes('/analysis');
+
+    if (!isLiveOralRoom && !isLiveCodingRoom && !isLiveSystemDesignRoom) {
+      stopAllSpeech();
+    }
+  }, [location.pathname]);
+
   // Dynamically apply theme (light, dark, or system preference) on root html
   useEffect(() => {
     const root = document.documentElement;
@@ -152,32 +186,55 @@ function App() {
   }, [preferences?.themeMode]);
 
   const showHeaderFooter = shouldShowHeaderFooter(location.pathname);
+  const isVideoRoom =
+    location.pathname.startsWith('/video/') &&
+    !location.pathname.startsWith('/video/new') &&
+    !location.pathname.startsWith('/video/setup') &&
+    !location.pathname.startsWith('/video/history') &&
+    !location.pathname.startsWith('/video/catalog') &&
+    !location.pathname.startsWith('/video/review') &&
+    !location.pathname.startsWith('/video/precheck') &&
+    !location.pathname.startsWith('/video/device-check') &&
+    !location.pathname.includes('/analysis') &&
+    !location.pathname.includes('/complete') &&
+    !location.pathname.includes('/replay');
+
+  const isCodingRoom =
+    location.pathname.startsWith('/coding/') &&
+    !location.pathname.startsWith('/coding/new') &&
+    !location.pathname.startsWith('/coding/setup') &&
+    !location.pathname.startsWith('/coding/history') &&
+    !location.pathname.includes('/analysis');
+
+  const isSystemDesignRoom =
+    location.pathname.startsWith('/system-design/studio/') ||
+    (/^\/system-design\/(room\/)?[^/]+$/.test(location.pathname) &&
+      !location.pathname.startsWith('/system-design/new') &&
+      !location.pathname.startsWith('/system-design/setup') &&
+      !location.pathname.startsWith('/system-design/review') &&
+      !location.pathname.startsWith('/system-design/precheck') &&
+      !location.pathname.startsWith('/system-design/device-check') &&
+      !location.pathname.startsWith('/system-design/history') &&
+      !location.pathname.includes('/analysis'));
+
   const isLiveInterviewRoom =
-    (/^\/interview\/(coding\/)?[^/]+$/.test(location.pathname) ||
-     /^\/video\/room\/[^/]+$/.test(location.pathname) ||
-     /^\/oral\/room\/[^/]+$/.test(location.pathname) ||
-     /^\/coding\/room\/[^/]+$/.test(location.pathname)) &&
-    location.pathname !== '/interview/setup' &&
-    location.pathname !== '/interview/new' &&
-    location.pathname !== '/interview/review' &&
-    location.pathname !== '/interview/precheck' &&
-    location.pathname !== '/interview/history' &&
-    location.pathname !== '/interview/coding' &&
-    location.pathname !== '/interview/coding/new' &&
-    location.pathname !== '/video/new' &&
-    location.pathname !== '/video/setup' &&
-    location.pathname !== '/video/review' &&
-    location.pathname !== '/video/precheck' &&
-    location.pathname !== '/video/history' &&
-    location.pathname !== '/video/device-check' &&
-    location.pathname !== '/oral/new' &&
-    location.pathname !== '/oral/setup' &&
-    location.pathname !== '/oral/review' &&
-    location.pathname !== '/oral/precheck' &&
-    location.pathname !== '/oral/history' &&
-    location.pathname !== '/oral/device-check' &&
-    !location.pathname.includes('/analytics') &&
-    !location.pathname.includes('/results');
+    isVideoRoom ||
+    isCodingRoom ||
+    isSystemDesignRoom ||
+    ((/^\/interview\/(coding\/)?[^/]+$/.test(location.pathname) ||
+      /^\/video\/room\/[^/]+$/.test(location.pathname) ||
+      /^\/oral\/room\/[^/]+$/.test(location.pathname) ||
+      /^\/coding\/room\/[^/]+$/.test(location.pathname)) &&
+     location.pathname !== '/interview/setup' &&
+     location.pathname !== '/interview/new' &&
+     location.pathname !== '/interview/review' &&
+     location.pathname !== '/interview/precheck' &&
+     location.pathname !== '/interview/history' &&
+     location.pathname !== '/interview/coding' &&
+     location.pathname !== '/interview/coding/new' &&
+     location.pathname !== '/interview/catalog' &&
+     !location.pathname.includes('/analytics') &&
+     !location.pathname.includes('/results'));
 
   return (
     <AppLayout>
@@ -198,11 +255,11 @@ function App() {
               <Route path="/" element={<Landing />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />
-              <Route path="/verify/:verificationId" element={<PublicVerificationPage />} />
 
               {/* Workspace Dashboard & Navigation links */}
               <Route
@@ -355,6 +412,28 @@ function App() {
                 }
               />
               <Route
+                path="/video/catalog"
+                element={
+                  <ProtectedRoute>
+                    <FeatureGuard featureKey="video_interview" featureTitle="Video Interview Catalog">
+                      <InbuiltInterviewCatalogPage />
+                    </FeatureGuard>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/video/inbuilt"
+                element={<Navigate to="/video/catalog" replace />}
+              />
+              <Route
+                path="/oral/catalog"
+                element={<Navigate to="/video/catalog" replace />}
+              />
+              <Route
+                path="/interview/catalog"
+                element={<Navigate to="/video/catalog" replace />}
+              />
+              <Route
                 path="/video/room/:id"
                 element={
                   <ProtectedRoute>
@@ -496,7 +575,7 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <FeatureGuard featureKey="coding_interview" featureTitle="Coding Interview">
-                      <SessionDetail />
+                      <AnalysisReport />
                     </FeatureGuard>
                   </ProtectedRoute>
                 }
@@ -646,12 +725,80 @@ function App() {
                 }
               />
               <Route
+                path="/system-design/setup"
+                element={
+                  <ProtectedRoute>
+                    <FeatureGuard featureKey="system_design_interview" featureTitle="System Design Setup">
+                      <SystemDesignSetupForm />
+                    </FeatureGuard>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/system-design/review"
+                element={
+                  <ProtectedRoute>
+                    <FeatureGuard featureKey="system_design_interview" featureTitle="System Design Review">
+                      <SystemDesignReviewPage />
+                    </FeatureGuard>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/system-design/precheck"
+                element={
+                  <ProtectedRoute>
+                    <FeatureGuard featureKey="system_design_interview" featureTitle="System Design Pre-Check">
+                      <SystemDesignPreCheckPage />
+                    </FeatureGuard>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/system-design/device-check"
+                element={
+                  <ProtectedRoute>
+                    <FeatureGuard featureKey="system_design_interview" featureTitle="System Design Pre-Check">
+                      <SystemDesignPreCheckPage />
+                    </FeatureGuard>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/system-design/studio/:sessionId"
                 element={
                   <ProtectedRoute>
                     <FeatureGuard featureKey="system_design_interview" featureTitle="System Design Studio">
                       <SystemDesignStudio />
                     </FeatureGuard>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/system-design/room/:sessionId"
+                element={
+                  <ProtectedRoute>
+                    <FeatureGuard featureKey="system_design_interview" featureTitle="System Design Studio">
+                      <SystemDesignStudio />
+                    </FeatureGuard>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/system-design/:id"
+                element={
+                  <ProtectedRoute>
+                    <FeatureGuard featureKey="system_design_interview" featureTitle="System Design Studio">
+                      <SystemDesignStudio />
+                    </FeatureGuard>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/system-design/:id/analysis"
+                element={
+                  <ProtectedRoute>
+                    <AnalysisReport />
                   </ProtectedRoute>
                 }
               />
@@ -857,18 +1004,26 @@ function App() {
                 }
               />
               <Route
-                path="/roadmap"
+                path="/discuss"
                 element={
                   <ProtectedRoute>
-                    <RoadmapCatalog />
+                    <DiscussPage />
                   </ProtectedRoute>
                 }
               />
               <Route
-                path="/roadmap/builder"
+                path="/discuss/:id"
                 element={
                   <ProtectedRoute>
-                    <RoadmapBuilderPage />
+                    <DiscussDetail />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/roadmap"
+                element={
+                  <ProtectedRoute>
+                    <RoadmapHubPage />
                   </ProtectedRoute>
                 }
               />
@@ -884,23 +1039,7 @@ function App() {
                 path="/roadmap/:id"
                 element={
                   <ProtectedRoute>
-                    <RoadmapView />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/discuss"
-                element={
-                  <ProtectedRoute>
-                    <DiscussPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/discuss/:id"
-                element={
-                  <ProtectedRoute>
-                    <DiscussDetail />
+                    <RoadmapWorkspacePage />
                   </ProtectedRoute>
                 }
               />
@@ -1126,13 +1265,8 @@ function App() {
           </AnimatePresence>
         </main>
         {showHeaderFooter && <Footer />}
-        {import.meta.env.DEV && import.meta.env.VITE_ENABLE_AGENTATION === 'true' && (
-          <Agentation
-            endpoint={import.meta.env.VITE_AGENTATION_ENDPOINT || 'http://localhost:4747'}
-            onSessionCreated={(sessionId) => {
-              console.log('Agentation session started:', sessionId);
-            }}
-          />
+        {import.meta.env.DEV && (
+          <Agentation endpoint="http://localhost:4747" />
         )}
       </div>
     </AppLayout>

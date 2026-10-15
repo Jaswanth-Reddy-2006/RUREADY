@@ -30,9 +30,9 @@ export default function ArchitectureInspector() {
   const score = validationReport?.score || 100;
 
   return (
-    <div className="flex flex-col h-full bg-white select-none overflow-y-auto p-4 space-y-6">
+    <div className="flex flex-col h-full bg-white dark:bg-[#0D1117] select-none overflow-y-auto p-4 space-y-6 transition-colors">
       {/* Health Score Overview */}
-      <div className="p-4 rounded-2xl bg-slate-900 text-white space-y-3">
+      <div className="p-4 rounded-2xl bg-slate-900 dark:bg-[#161B22] border border-transparent dark:border-slate-800 text-white space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <ShieldAlert size={18} className="text-[#4A8BDF]" />
@@ -62,7 +62,7 @@ export default function ArchitectureInspector() {
         </div>
 
         {/* Progress meter */}
-        <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+        <div className="h-2 w-full bg-slate-800 dark:bg-slate-700/60 rounded-full overflow-hidden">
           <div
             className={clsx(
               'h-full transition-all duration-500 rounded-full',
@@ -75,18 +75,18 @@ export default function ArchitectureInspector() {
 
       {/* Selected Node Properties Editor */}
       {selectedNode && (
-        <div className="p-4 rounded-2xl bg-[#EFFAFD] border border-blue-200 space-y-3">
+        <div className="p-4 rounded-2xl bg-[#EFFAFD] dark:bg-[#161B22] border border-blue-200 dark:border-blue-900/50 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Sliders size={15} className="text-[#4A8BDF]" />
-              <span className="text-xs font-bold text-slate-800 font-sans">
+              <span className="text-xs font-bold text-slate-800 dark:text-white font-sans">
                 Selected: {selectedNodeData.label}
               </span>
             </div>
             <button
               type="button"
               onClick={() => setSelectedNodeId(null)}
-              className="text-[10px] text-slate-500 hover:text-slate-800 underline"
+              className="text-[10px] text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 underline"
             >
               Deselect
             </button>
@@ -94,31 +94,31 @@ export default function ArchitectureInspector() {
 
           <div className="grid grid-cols-2 gap-2 text-xs">
             <div>
-              <label className="text-[11px] font-medium text-slate-600 mb-1 block">Instances</label>
+              <label className="text-[11px] font-medium text-slate-600 dark:text-slate-400 mb-1 block">Instances</label>
               <input
                 type="number"
                 min="1"
                 max="50"
                 value={config.instances || 1}
                 onChange={(e) => updateNodeConfig(selectedNode.id, { instances: Number(e.target.value) })}
-                className="w-full px-2 py-1 bg-white border border-[#DCE7F2] rounded-lg text-slate-800 font-mono"
+                className="w-full px-2 py-1 bg-white dark:bg-[#0D1117] border border-[#DCE7F2] dark:border-slate-700 rounded-lg text-slate-800 dark:text-white font-mono focus:outline-none focus:border-[#4A8BDF]"
               />
             </div>
             <div>
-              <label className="text-[11px] font-medium text-slate-600 mb-1 block">Replicas</label>
+              <label className="text-[11px] font-medium text-slate-600 dark:text-slate-400 mb-1 block">Replicas</label>
               <input
                 type="number"
                 min="1"
                 max="10"
                 value={config.replication || 1}
                 onChange={(e) => updateNodeConfig(selectedNode.id, { replication: Number(e.target.value) })}
-                className="w-full px-2 py-1 bg-white border border-[#DCE7F2] rounded-lg text-slate-800 font-mono"
+                className="w-full px-2 py-1 bg-white dark:bg-[#0D1117] border border-[#DCE7F2] dark:border-slate-700 rounded-lg text-slate-800 dark:text-white font-mono focus:outline-none focus:border-[#4A8BDF]"
               />
             </div>
           </div>
 
           <div className="flex items-center gap-3 pt-1 text-xs">
-            <label className="flex items-center gap-1.5 cursor-pointer text-slate-700">
+            <label className="flex items-center gap-1.5 cursor-pointer text-slate-700 dark:text-slate-300">
               <input
                 type="checkbox"
                 checked={!!config.hasRateLimiting}
@@ -127,7 +127,7 @@ export default function ArchitectureInspector() {
               />
               <span>Rate Limiting</span>
             </label>
-            <label className="flex items-center gap-1.5 cursor-pointer text-slate-700">
+            <label className="flex items-center gap-1.5 cursor-pointer text-slate-700 dark:text-slate-300">
               <input
                 type="checkbox"
                 checked={!!config.isClustered}
@@ -142,20 +142,20 @@ export default function ArchitectureInspector() {
 
       {/* Identified Issues List */}
       <div className="space-y-3">
-        <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider font-mono flex items-center justify-between">
+        <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider font-mono flex items-center justify-between">
           <span>Diagnostic Findings</span>
-          <span className="text-slate-400 text-[11px] font-normal font-sans">
+          <span className="text-slate-400 dark:text-slate-500 text-[11px] font-normal font-sans">
             {issues.length} Issues
           </span>
         </h4>
 
         {issues.length === 0 ? (
-          <div className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200 text-center space-y-1.5">
+          <div className="p-4 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 text-center space-y-1.5">
             <CheckCircle2 size={24} className="text-emerald-500 mx-auto" />
-            <p className="text-xs font-bold text-emerald-800">
+            <p className="text-xs font-bold text-emerald-800 dark:text-emerald-300">
               All Architectural Rules Passed
             </p>
-            <p className="text-[11px] text-emerald-600">
+            <p className="text-[11px] text-emerald-600 dark:text-emerald-400">
               No single points of failure or unmitigated bottlenecks detected on canvas.
             </p>
           </div>
@@ -167,10 +167,10 @@ export default function ArchitectureInspector() {
                 className={clsx(
                   'p-3 rounded-2xl border transition-all text-xs space-y-1.5',
                   issue.severity === 'ERROR'
-                    ? 'bg-rose-50/70 border-rose-200 text-rose-950'
+                    ? 'bg-rose-50/70 dark:bg-rose-950/30 border-rose-200 dark:border-rose-900/60 text-rose-950 dark:text-rose-200'
                     : issue.severity === 'WARNING'
-                    ? 'bg-amber-50/70 border-amber-200 text-amber-950'
-                    : 'bg-blue-50/70 border-blue-200 text-blue-950'
+                    ? 'bg-amber-50/70 dark:bg-amber-950/30 border-amber-200 dark:border-amber-900/60 text-amber-950 dark:text-amber-200'
+                    : 'bg-blue-50/70 dark:bg-blue-950/30 border-blue-200 dark:border-blue-900/60 text-blue-950 dark:text-blue-200'
                 )}
               >
                 <div className="flex items-center justify-between gap-1">
@@ -179,10 +179,10 @@ export default function ArchitectureInspector() {
                       size={14}
                       className={
                         issue.severity === 'ERROR'
-                          ? 'text-rose-600'
+                          ? 'text-rose-600 dark:text-rose-400'
                           : issue.severity === 'WARNING'
-                          ? 'text-amber-600'
-                          : 'text-blue-600'
+                          ? 'text-amber-600 dark:text-amber-400'
+                          : 'text-blue-600 dark:text-blue-400'
                       }
                     />
                     <span>{issue.title}</span>
@@ -191,19 +191,19 @@ export default function ArchitectureInspector() {
                     className={clsx(
                       'text-[9px] font-bold font-mono px-1.5 py-0.5 rounded uppercase',
                       issue.severity === 'ERROR'
-                        ? 'bg-rose-200 text-rose-800'
+                        ? 'bg-rose-200 dark:bg-rose-900/70 text-rose-800 dark:text-rose-200'
                         : issue.severity === 'WARNING'
-                        ? 'bg-amber-200 text-amber-800'
-                        : 'bg-blue-200 text-blue-800'
+                        ? 'bg-amber-200 dark:bg-amber-900/70 text-amber-800 dark:text-amber-200'
+                        : 'bg-blue-200 dark:bg-blue-900/70 text-blue-800 dark:text-blue-200'
                     )}
                   >
                     {issue.category}
                   </span>
                 </div>
 
-                <p className="text-[11px] text-slate-700 leading-snug">{issue.message}</p>
+                <p className="text-[11px] text-slate-700 dark:text-slate-300 leading-snug">{issue.message}</p>
 
-                <div className="pt-1 border-t border-black/5 text-[11px] font-medium text-slate-800 flex items-start gap-1">
+                <div className="pt-1 border-t border-black/5 dark:border-white/5 text-[11px] font-medium text-slate-800 dark:text-slate-200 flex items-start gap-1">
                   <span className="text-[#4A8BDF] font-bold">Fix:</span>
                   <span>{issue.recommendation}</span>
                 </div>
@@ -215,13 +215,13 @@ export default function ArchitectureInspector() {
 
       {/* Verified Rules */}
       {passedChecks.length > 0 && (
-        <div className="space-y-2 pt-2 border-t border-slate-100">
-          <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider font-mono">
+        <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+          <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider font-mono">
             Verified Invariants
           </h4>
           <div className="space-y-1.5">
             {passedChecks.map((check, idx) => (
-              <div key={idx} className="flex items-center gap-2 text-xs text-slate-600 font-sans">
+              <div key={idx} className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400 font-sans">
                 <CheckCircle2 size={13} className="text-emerald-500 shrink-0" />
                 <span>{check}</span>
               </div>

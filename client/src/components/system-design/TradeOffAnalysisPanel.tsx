@@ -15,25 +15,25 @@ export default function TradeOffAnalysisPanel() {
   const [syncAsync, setSyncAsync] = useState<'HYBRID' | 'STRICT_SYNC' | 'EVENT_DRIVEN'>('HYBRID');
 
   return (
-    <div className="flex flex-col h-full bg-white select-none overflow-y-auto p-4 space-y-6">
+    <div className="flex flex-col h-full bg-white dark:bg-[#0D1117] select-none overflow-y-auto p-4 space-y-6 transition-colors">
       {/* Header */}
       <div>
         <div className="flex items-center gap-2 mb-1">
-          <div className="p-1.5 rounded-lg bg-[#EFFAFD] text-[#4A8BDF]">
+          <div className="p-1.5 rounded-lg bg-[#EFFAFD] dark:bg-blue-950/50 text-[#4A8BDF]">
             <Scale size={16} />
           </div>
-          <h3 className="font-bold text-sm text-slate-800">
+          <h3 className="font-bold text-sm text-slate-800 dark:text-white">
             Architectural Trade-Offs & CAP Matrix
           </h3>
         </div>
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-slate-500 dark:text-slate-400">
           Senior system design requires conscious compromise between consistency, latency, durability, and cost.
         </p>
       </div>
 
       {/* 1. CAP Theorem Decision Matrix */}
       <div className="space-y-3">
-        <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider font-mono flex items-center justify-between">
+        <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider font-mono flex items-center justify-between">
           <span>1. CAP Theorem Choice</span>
           <span className="text-[#4A8BDF] font-sans font-bold text-[11px]">{selectedCap} Chosen</span>
         </h4>
@@ -46,12 +46,12 @@ export default function TradeOffAnalysisPanel() {
             className={clsx(
               'p-3 rounded-2xl border text-left transition-all',
               selectedCap === 'AP'
-                ? 'bg-blue-50/80 border-[#4A8BDF] ring-2 ring-blue-200'
-                : 'bg-slate-50/70 border-slate-200 hover:bg-slate-100'
+                ? 'bg-blue-50/80 dark:bg-blue-950/60 border-[#4A8BDF] dark:border-blue-500 ring-2 ring-blue-200 dark:ring-blue-900/60'
+                : 'bg-slate-50/70 dark:bg-[#161B22] border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800/60'
             )}
           >
-            <div className="font-bold text-xs text-slate-800 mb-1">AP</div>
-            <div className="text-[10px] text-slate-600 font-medium">Availability + Partition Tolerance</div>
+            <div className="font-bold text-xs text-slate-800 dark:text-white mb-1">AP</div>
+            <div className="text-[10px] text-slate-600 dark:text-slate-400 font-medium">Availability + Partition Tolerance</div>
             <div className="text-[9px] text-[#4A8BDF] mt-1 font-mono">Eventual Consistency</div>
           </button>
 
@@ -62,12 +62,12 @@ export default function TradeOffAnalysisPanel() {
             className={clsx(
               'p-3 rounded-2xl border text-left transition-all',
               selectedCap === 'CP'
-                ? 'bg-blue-50/80 border-[#4A8BDF] ring-2 ring-blue-200'
-                : 'bg-slate-50/70 border-slate-200 hover:bg-slate-100'
+                ? 'bg-blue-50/80 dark:bg-blue-950/60 border-[#4A8BDF] dark:border-blue-500 ring-2 ring-blue-200 dark:ring-blue-900/60'
+                : 'bg-slate-50/70 dark:bg-[#161B22] border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800/60'
             )}
           >
-            <div className="font-bold text-xs text-slate-800 mb-1">CP</div>
-            <div className="text-[10px] text-slate-600 font-medium">Consistency + Partition Tolerance</div>
+            <div className="font-bold text-xs text-slate-800 dark:text-white mb-1">CP</div>
+            <div className="text-[10px] text-slate-600 dark:text-slate-400 font-medium">Consistency + Partition Tolerance</div>
             <div className="text-[9px] text-[#4A8BDF] mt-1 font-mono">Linearizable / Strong</div>
           </button>
 
@@ -78,30 +78,30 @@ export default function TradeOffAnalysisPanel() {
             className={clsx(
               'p-3 rounded-2xl border text-left transition-all',
               selectedCap === 'CA'
-                ? 'bg-blue-50/80 border-[#4A8BDF] ring-2 ring-blue-200'
-                : 'bg-slate-50/70 border-slate-200 hover:bg-slate-100'
+                ? 'bg-blue-50/80 dark:bg-blue-950/60 border-[#4A8BDF] dark:border-blue-500 ring-2 ring-blue-200 dark:ring-blue-900/60'
+                : 'bg-slate-50/70 dark:bg-[#161B22] border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800/60'
             )}
           >
-            <div className="font-bold text-xs text-slate-800 mb-1">CA</div>
-            <div className="text-[10px] text-slate-600 font-medium">Consistency + Availability</div>
+            <div className="font-bold text-xs text-slate-800 dark:text-white mb-1">CA</div>
+            <div className="text-[10px] text-slate-600 dark:text-slate-400 font-medium">Consistency + Availability</div>
             <div className="text-[9px] text-slate-400 mt-1 font-mono">Single Datacenter Only</div>
           </button>
         </div>
 
-        <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-700 leading-relaxed">
+        <div className="p-3 bg-slate-50 dark:bg-[#161B22] rounded-xl border border-slate-200 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
           {selectedCap === 'AP' && (
             <p>
-              <strong>AP Rationale:</strong> The system returns the most recently available data even if network partitions occur across zones. Writes succeed locally and reconcile asynchronously via gossip protocols or CRDTs (Ideal for Social Feeds, URL Shorteners, Video Streaming).
+              <strong className="text-slate-900 dark:text-white">AP Rationale:</strong> The system returns the most recently available data even if network partitions occur across zones. Writes succeed locally and reconcile asynchronously via gossip protocols or CRDTs (Ideal for Social Feeds, URL Shorteners, Video Streaming).
             </p>
           )}
           {selectedCap === 'CP' && (
             <p>
-              <strong>CP Rationale:</strong> The system denies writes and returns errors during network partitions rather than allowing split-brain or stale balances. Uses Paxos/Raft consensus (Ideal for Payments, Seat Booking, Master Election).
+              <strong className="text-slate-900 dark:text-white">CP Rationale:</strong> The system denies writes and returns errors during network partitions rather than allowing split-brain or stale balances. Uses Paxos/Raft consensus (Ideal for Payments, Seat Booking, Master Election).
             </p>
           )}
           {selectedCap === 'CA' && (
             <p>
-              <strong>CA Caveat:</strong> In distributed cloud environments, network partitions are inevitable (P is mandatory). CA is only valid in single-node or localized synchronous replication environments.
+              <strong className="text-slate-900 dark:text-white">CA Caveat:</strong> In distributed cloud environments, network partitions are inevitable (P is mandatory). CA is only valid in single-node or localized synchronous replication environments.
             </p>
           )}
         </div>
@@ -109,7 +109,7 @@ export default function TradeOffAnalysisPanel() {
 
       {/* 2. SQL vs NoSQL Evaluation */}
       <div className="space-y-3">
-        <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider font-mono">
+        <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider font-mono">
           2. Database Engine Justification
         </h4>
 
@@ -119,11 +119,11 @@ export default function TradeOffAnalysisPanel() {
             onClick={() => setSelectedDb('SQL')}
             className={clsx(
               'p-2.5 rounded-xl border text-left transition-all',
-              selectedDb === 'SQL' ? 'bg-[#EFFAFD] border-[#4A8BDF]' : 'bg-slate-50 border-slate-200'
+              selectedDb === 'SQL' ? 'bg-[#EFFAFD] dark:bg-blue-950/60 border-[#4A8BDF]' : 'bg-slate-50 dark:bg-[#161B22] border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800/60'
             )}
           >
-            <div className="font-bold text-slate-800">Relational SQL</div>
-            <div className="text-[10px] text-slate-500">ACID, structured schema, complex joins</div>
+            <div className="font-bold text-slate-800 dark:text-white">Relational SQL</div>
+            <div className="text-[10px] text-slate-500 dark:text-slate-400">ACID, structured schema, complex joins</div>
           </button>
 
           <button
@@ -131,11 +131,11 @@ export default function TradeOffAnalysisPanel() {
             onClick={() => setSelectedDb('NOSQL_WIDE')}
             className={clsx(
               'p-2.5 rounded-xl border text-left transition-all',
-              selectedDb === 'NOSQL_WIDE' ? 'bg-[#EFFAFD] border-[#4A8BDF]' : 'bg-slate-50 border-slate-200'
+              selectedDb === 'NOSQL_WIDE' ? 'bg-[#EFFAFD] dark:bg-blue-950/60 border-[#4A8BDF]' : 'bg-slate-50 dark:bg-[#161B22] border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800/60'
             )}
           >
-            <div className="font-bold text-slate-800">Wide-Column (Cassandra)</div>
-            <div className="text-[10px] text-slate-500">High write throughput, linear horizontal scale</div>
+            <div className="font-bold text-slate-800 dark:text-white">Wide-Column (Cassandra)</div>
+            <div className="text-[10px] text-slate-500 dark:text-slate-400">High write throughput, linear horizontal scale</div>
           </button>
 
           <button
@@ -143,11 +143,11 @@ export default function TradeOffAnalysisPanel() {
             onClick={() => setSelectedDb('NOSQL_DOC')}
             className={clsx(
               'p-2.5 rounded-xl border text-left transition-all',
-              selectedDb === 'NOSQL_DOC' ? 'bg-[#EFFAFD] border-[#4A8BDF]' : 'bg-slate-50 border-slate-200'
+              selectedDb === 'NOSQL_DOC' ? 'bg-[#EFFAFD] dark:bg-blue-950/60 border-[#4A8BDF]' : 'bg-slate-50 dark:bg-[#161B22] border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800/60'
             )}
           >
-            <div className="font-bold text-slate-800">Document Store (MongoDB)</div>
-            <div className="text-[10px] text-slate-500">Flexible JSON hierarchy, dynamic schemas</div>
+            <div className="font-bold text-slate-800 dark:text-white">Document Store (MongoDB)</div>
+            <div className="text-[10px] text-slate-500 dark:text-slate-400">Flexible JSON hierarchy, dynamic schemas</div>
           </button>
 
           <button
@@ -155,23 +155,23 @@ export default function TradeOffAnalysisPanel() {
             onClick={() => setSelectedDb('KEY_VALUE')}
             className={clsx(
               'p-2.5 rounded-xl border text-left transition-all',
-              selectedDb === 'KEY_VALUE' ? 'bg-[#EFFAFD] border-[#4A8BDF]' : 'bg-slate-50 border-slate-200'
+              selectedDb === 'KEY_VALUE' ? 'bg-[#EFFAFD] dark:bg-blue-950/60 border-[#4A8BDF]' : 'bg-slate-50 dark:bg-[#161B22] border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800/60'
             )}
           >
-            <div className="font-bold text-slate-800">Key-Value (Redis / DynamoDB)</div>
-            <div className="text-[10px] text-slate-500">Sub-millisecond O(1) point lookups</div>
+            <div className="font-bold text-slate-800 dark:text-white">Key-Value (Redis / DynamoDB)</div>
+            <div className="text-[10px] text-slate-500 dark:text-slate-400">Sub-millisecond O(1) point lookups</div>
           </button>
         </div>
       </div>
 
       {/* 3. Communication Model */}
       <div className="space-y-3">
-        <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider font-mono">
+        <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider font-mono">
           3. Synchronous vs Asynchronous Communication
         </h4>
 
         <div className="space-y-2 text-xs">
-          <label className="flex items-start gap-2.5 p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+          <label className="flex items-start gap-2.5 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-transparent dark:bg-[#161B22] hover:bg-slate-50 dark:hover:bg-slate-800/60 cursor-pointer">
             <input
               type="radio"
               name="sync_model"
@@ -180,14 +180,14 @@ export default function TradeOffAnalysisPanel() {
               className="mt-0.5 accent-[#4A8BDF]"
             />
             <div>
-              <div className="font-bold text-slate-800">Hybrid (Sync Ingress + Async Message Bus)</div>
-              <div className="text-[11px] text-slate-500">
+              <div className="font-bold text-slate-800 dark:text-white">Hybrid (Sync Ingress + Async Message Bus)</div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400">
                 Low-latency synchronous HTTP/gRPC for user responses; Kafka/RabbitMQ event stream for database write queues and background indexing.
               </div>
             </div>
           </label>
 
-          <label className="flex items-start gap-2.5 p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+          <label className="flex items-start gap-2.5 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-transparent dark:bg-[#161B22] hover:bg-slate-50 dark:hover:bg-slate-800/60 cursor-pointer">
             <input
               type="radio"
               name="sync_model"
@@ -196,8 +196,8 @@ export default function TradeOffAnalysisPanel() {
               className="mt-0.5 accent-[#4A8BDF]"
             />
             <div>
-              <div className="font-bold text-slate-800">Fully Event-Driven Choreography</div>
-              <div className="text-[11px] text-slate-500">
+              <div className="font-bold text-slate-800 dark:text-white">Fully Event-Driven Choreography</div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400">
                 Microservices communicate entirely through event streams with zero tight coupling.
               </div>
             </div>

@@ -104,7 +104,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         <div className="flex flex-col flex-1 overflow-y-auto">
           {/* Brand Header */}
           <div className="h-16 flex items-center px-6 border-b border-[#DCE7F2] shrink-0">
-            <Link to="/admin" className="block focus:outline-none">
+            <Link to="/" title="Go to Landing Page" className="block focus:outline-none transition-opacity hover:opacity-90 cursor-pointer">
               <Logo size="md" theme="light" />
             </Link>
           </div>
@@ -174,7 +174,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         
         {/* Mobile Header Bar */}
         <header className="lg:hidden h-14 bg-white text-[#11183D] px-4 flex items-center justify-between border-b border-[#DCE7F2] shrink-0 z-20">
-          <Link to="/admin">
+          <Link to="/" title="Go to Landing Page" className="cursor-pointer">
             <Logo size="sm" theme="light" />
           </Link>
 

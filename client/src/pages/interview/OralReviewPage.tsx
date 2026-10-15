@@ -39,28 +39,28 @@ export default function OralReviewPage() {
   const finalDisplayCompany = config.isCustomCompany && config.customCompanyInput ? config.customCompanyInput : config.targetCompany;
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8 px-4 sm:px-6 lg:px-8 text-slate-800 font-sans select-none">
+    <div className="min-h-screen bg-[#F4F7FC] dark:bg-[#000000] py-8 px-4 sm:px-6 lg:px-8 text-slate-800 dark:text-slate-100 font-sans select-none transition-colors">
       <div className="max-w-4xl mx-auto space-y-6">
 
         {/* TOP BRAND & STEP NAVIGATOR */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={() => navigate('/video/setup')}
-              className="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-300 transition-all cursor-pointer shadow-2xs"
+              className="p-2 rounded-xl bg-white dark:bg-[#161B22] border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all cursor-pointer shadow-2xs"
               title="Back to Configuration"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
             <div>
-              <h1 className="text-xl font-black text-slate-900 flex items-center gap-2">
+              <h1 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
                 <span>Video Mock Interview Setup</span>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 font-mono">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 font-mono">
                   AI
                 </span>
               </h1>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 Step 2 of 3: Summary Review & Readiness Check
               </p>
             </div>
@@ -71,7 +71,7 @@ export default function OralReviewPage() {
             <button
               type="button"
               onClick={() => navigate('/video/setup')}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 transition-colors cursor-pointer"
             >
               <span className="h-2 w-2 rounded-full bg-emerald-500" />
               <span>1. Config</span>
@@ -83,9 +83,9 @@ export default function OralReviewPage() {
             <button
               type="button"
               onClick={() => navigate('/video/precheck')}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-500 border border-slate-200 hover:bg-slate-200 transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
             >
-              <span className="h-2 w-2 rounded-full bg-slate-400" />
+              <span className="h-2 w-2 rounded-full bg-slate-400 dark:bg-slate-500" />
               <span>3. Pre-Check</span>
             </button>
           </div>
@@ -95,79 +95,79 @@ export default function OralReviewPage() {
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="p-6 md:p-8 rounded-3xl bg-white text-slate-900 shadow-sm border border-slate-200/90 space-y-6"
+          className="p-6 md:p-8 rounded-3xl bg-white dark:bg-[#0D1117] text-slate-900 dark:text-white shadow-sm border border-slate-200/90 dark:border-slate-800 space-y-6 transition-colors"
         >
-          <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-            <span className="text-sm font-extrabold text-blue-700 uppercase tracking-wider flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-blue-600" />
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+            <span className="text-sm font-extrabold text-blue-700 dark:text-blue-400 uppercase tracking-wider flex items-center gap-2">
+              <ShieldCheck className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               Selected Interview Configuration Details
             </span>
-            <Badge className="bg-blue-50 text-blue-700 font-mono text-xs border-blue-200">
+            <Badge className="bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 font-mono text-xs border-blue-200 dark:border-blue-800">
               Step 2 of 3: Summary Review
             </Badge>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-5 rounded-2xl bg-slate-50 border border-slate-200/80">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-5 rounded-2xl bg-slate-50 dark:bg-[#161B22] border border-slate-200/80 dark:border-slate-800">
             <div className="space-y-1">
-              <span className="text-xs text-slate-500 font-medium block">Interview Type</span>
-              <strong className="text-sm font-bold text-slate-900 block">{(config.interviewType || 'FULL_SIMULATION').replace('_', ' ')}</strong>
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium block">Interview Type</span>
+              <strong className="text-sm font-bold text-slate-900 dark:text-white block">{(config.interviewType || 'FULL_SIMULATION').replace('_', ' ')}</strong>
             </div>
 
             <div className="space-y-1">
-              <span className="text-xs text-slate-500 font-medium block">Target Job Role</span>
-              <strong className="text-sm font-bold text-slate-900 block">{finalDisplayRole || 'Software Engineer'}</strong>
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium block">Target Job Role</span>
+              <strong className="text-sm font-bold text-slate-900 dark:text-white block">{finalDisplayRole || 'Software Engineer'}</strong>
             </div>
 
             <div className="space-y-1">
-              <span className="text-xs text-slate-500 font-medium block">Target Company</span>
-              <strong className="text-sm font-bold text-slate-900 block">{finalDisplayCompany || 'None / General Target'}</strong>
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium block">Target Company</span>
+              <strong className="text-sm font-bold text-slate-900 dark:text-white block">{finalDisplayCompany || 'None / General Target'}</strong>
             </div>
 
             <div className="space-y-1">
-              <span className="text-xs text-slate-500 font-medium block">Experience Level</span>
-              <strong className="text-sm font-bold text-slate-900 block">{config.experienceLevel || 'FRESHER'}</strong>
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium block">Experience Level</span>
+              <strong className="text-sm font-bold text-slate-900 dark:text-white block">{config.experienceLevel || 'FRESHER'}</strong>
             </div>
 
             <div className="space-y-1">
-              <span className="text-xs text-slate-500 font-medium block">Duration</span>
-              <strong className="text-sm font-bold text-slate-900 block">{config.durationMins || 30} Minutes</strong>
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium block">Duration</span>
+              <strong className="text-sm font-bold text-slate-900 dark:text-white block">{config.durationMins || 30} Minutes</strong>
             </div>
 
             <div className="space-y-1">
-              <span className="text-xs text-slate-500 font-medium block">Selected Skills</span>
-              <strong className="text-sm font-bold text-slate-900 block truncate">
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium block">Selected Skills</span>
+              <strong className="text-sm font-bold text-slate-900 dark:text-white block truncate">
                 {config.selectedSkills && config.selectedSkills.length > 0 ? config.selectedSkills.join(', ') : 'General Role Skills'}
               </strong>
             </div>
           </div>
 
           <div className="space-y-2 pt-2">
-            <span className="text-xs font-bold text-slate-700 block">Focus Areas:</span>
+            <span className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Focus Areas:</span>
             <div className="flex flex-wrap gap-2">
               {config.selectedFocus && config.selectedFocus.length > 0 ? (
                 config.selectedFocus.map((f: string) => (
-                  <Badge key={f} className="bg-purple-50 text-purple-700 border-purple-200 text-xs">
+                  <Badge key={f} className="bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800 text-xs">
                     {f}
                   </Badge>
                 ))
               ) : (
-                <Badge className="bg-slate-100 text-slate-600 text-xs">All Round Balanced Probing</Badge>
+                <Badge className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 text-xs">All Round Balanced Probing</Badge>
               )}
             </div>
           </div>
 
           {config.jobDescription && (
-            <div className="space-y-1 p-4 rounded-2xl bg-blue-50/50 border border-blue-100 text-xs text-slate-700">
-              <span className="font-bold text-blue-900 block">Provided Job Description / Context:</span>
-              <p className="line-clamp-3 italic text-slate-600">{config.jobDescription}</p>
+            <div className="space-y-1 p-4 rounded-2xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/40 text-xs text-slate-700 dark:text-slate-300">
+              <span className="font-bold text-blue-900 dark:text-blue-300 block">Provided Job Description / Context:</span>
+              <p className="line-clamp-3 italic text-slate-600 dark:text-slate-400">{config.jobDescription}</p>
             </div>
           )}
 
           {/* BUTTON ACTIONS */}
-          <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
             <Button
               onClick={() => navigate('/video/setup')}
-              className="w-full sm:w-auto bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 px-6 py-3 rounded-2xl font-bold text-xs sm:text-sm shadow-2xs cursor-pointer flex items-center justify-center gap-2"
+              className="w-full sm:w-auto bg-white dark:bg-[#161B22] hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 px-6 py-3 rounded-2xl font-bold text-xs sm:text-sm shadow-2xs cursor-pointer flex items-center justify-center gap-2"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Edit Selections</span>

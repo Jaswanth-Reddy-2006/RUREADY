@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════
-// RU READY Replaceable LLM Provider Abstraction
-// Supports Ollama (Local), Cloud Provider, and Hybrid Mode
+// RU READY LLM Provider Abstraction
+// Centralized Architecture: Routes to ai-analysis-service (Meta Llama via Ollama)
 // ═══════════════════════════════════════════════════════════════
 
 import { LLMProviderConfig, StructuredEvaluation } from '@ru-ready/shared';
@@ -25,10 +25,12 @@ export interface InterviewLLM {
 export class OllamaLLMProvider implements InterviewLLM {
   private baseUrl: string;
   private model: string;
+  private aiServiceUrl: string;
 
   constructor(baseUrl = 'http://localhost:11434', model = 'llama3.2:1b') {
     this.baseUrl = process.env.OLLAMA_BASE_URL || baseUrl;
     this.model = process.env.OLLAMA_MODEL || model;
+    this.aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:4003';
   }
 
   async evaluateAnswer(params: {
@@ -52,6 +54,54 @@ Return JSON matching:
   "spokenResponse": "What Ava will say next"
 }`;
 
+    // 1. Approach centralized AI Analysis Service (Meta Llama via Ollama)
+    try {
+      const aiResp = await fetch(`${this.aiServiceUrl}/internal/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          systemPrompt: `You are Ava, a senior tech interviewer evaluating a candidate for the role of ${params.targetRole || 'Software Engineer'}. Output strictly valid JSON.`,
+          userPrompt: prompt,
+          responseFormatJson: true,
+          timeoutMs: 6000,
+        }),
+        signal: AbortSignal.timeout(6000),
+      });
+
+      if (aiResp.ok) {
+        const aiData = (await aiResp.json()) as any;
+        let content = aiData.content || '';
+        let cleaned = content.trim();
+        if (cleaned.startsWith('```json')) cleaned = cleaned.slice(7);
+        if (cleaned.startsWith('```')) cleaned = cleaned.slice(3);
+        if (cleaned.endsWith('```')) cleaned = cleaned.slice(0, -3);
+        const parsed = JSON.parse(cleaned.trim());
+
+        return {
+          intent: parsed.intent || 'ANSWER',
+          correctness: parsed.correctness ?? 0.75,
+          conceptCoverage: parsed.depth ?? 0.7,
+          depth: parsed.depth ?? 0.7,
+          clarity: 0.8,
+          relevance: 0.85,
+          confidence: 0.8,
+          coveredConcepts: params.requiredConcepts || [],
+          missingConcepts: [],
+          misconceptions: [],
+          quality: parsed.quality || 'STRONG',
+          score: parsed.score ?? 78,
+          feedback: parsed.feedback || 'Solid response.',
+          recommendedAction: 'NEXT_QUESTION',
+          spokenResponse: parsed.spokenResponse || 'Good. Let us move forward.',
+          emotion: 'thoughtful',
+          gesture: 'nod',
+        };
+      }
+    } catch {
+      // Proceed to direct Ollama fallback
+    }
+
+    // 2. Direct Ollama fallback
     try {
       const response = await fetch(`${this.baseUrl}/api/generate`, {
         method: 'POST',

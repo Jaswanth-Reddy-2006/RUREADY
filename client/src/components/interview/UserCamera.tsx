@@ -119,7 +119,7 @@ const UserCamera: React.FC<UserCameraProps> = ({
               ease: 'easeInOut',
             }}
           />
-          <span className="text-sm font-medium text-white/90">{userName}</span>
+          <span className="text-sm font-medium text-slate-200">{userName}</span>
         </div>
       </div>
 

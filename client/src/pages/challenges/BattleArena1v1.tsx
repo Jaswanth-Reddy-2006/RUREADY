@@ -275,7 +275,7 @@ export default function BattleArena1v1() {
               <Swords size={15} />
             </div>
             <div>
-              <h1 className="text-xs font-bold text-white flex items-center gap-2">
+              <h1 className="text-xs font-bold text-slate-100 flex items-center gap-2">
                 <span>{match.problem.title}</span>
                 <span
                   className={`text-[9px] px-1.5 py-0.2 rounded-sm font-bold uppercase ${

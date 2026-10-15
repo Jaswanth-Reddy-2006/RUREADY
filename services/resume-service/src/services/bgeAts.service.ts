@@ -86,7 +86,7 @@ export const bgeAtsService = {
 
     await fs.promises.writeFile(tempPayloadPath, JSON.stringify(payload), 'utf-8');
 
-    const pythonCmd = process.env.PYTHON_PATH || 'python';
+    const pythonCmd = process.env.PYTHON_PATH || (process.platform === 'win32' ? 'py' : 'python');
 
     return new Promise((resolve, reject) => {
       const child = spawn(pythonCmd, [BGE_SCORER_SCRIPT_PATH, tempPayloadPath], {

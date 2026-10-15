@@ -19,6 +19,7 @@ import { AppError } from './lib/errors.js';
 import aiRoutes from './routes/ai.routes.js';
 import analysisRoutes from './routes/analysis.routes.js';
 import { analysisController } from './controllers/analysis.controller.js';
+import { aiController } from './controllers/ai.controller.js';
 
 const app: express.Express = express();
 const PORT = parseInt(process.env.AI_SERVICE_PORT || '4003', 10);
@@ -50,6 +51,8 @@ app.post('/internal/evaluate-session', analysisController.evaluateSessionInterna
 app.post('/internal/generate-next-question', analysisController.generateNextQuestionInternal);
 app.post('/internal/evaluate-answer', analysisController.evaluateAnswerInternal);
 app.post('/internal/ats-semantic-match', analysisController.evaluateAtsSemanticMatchInternal);
+app.post('/internal/chat', aiController.chatCompletion);
+app.post('/internal/generate-text', aiController.generateText);
 
 // Global Error Handler
 app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {

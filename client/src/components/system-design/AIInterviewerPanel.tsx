@@ -106,16 +106,16 @@ export default function AIInterviewerPanel() {
   const suggestions = lastAiMessage?.suggestions || [];
 
   return (
-    <div className="flex flex-col h-full bg-white select-none overflow-hidden">
+    <div className="flex flex-col h-full bg-white dark:bg-[#0D1117] select-none overflow-hidden transition-colors">
       {/* Stage Roadmap Progress Header */}
-      <div className="p-3 border-b border-[#DCE7F2] bg-slate-50/70">
+      <div className="p-3 border-b border-[#DCE7F2] dark:border-slate-800 bg-slate-50/70 dark:bg-[#161B22]/80">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <div className="h-6 w-6 rounded-lg bg-[#4A8BDF] text-white flex items-center justify-center">
               <Bot size={14} />
             </div>
-            <span className="text-xs font-bold text-slate-800 font-sans">
-              AI Staff Interviewer
+            <span className="text-xs font-bold text-slate-800 dark:text-white font-sans">
+              Ava — System Design Interviewer
             </span>
           </div>
 
@@ -126,8 +126,8 @@ export default function AIInterviewerPanel() {
               className={clsx(
                 'p-1.5 rounded-lg border transition-colors',
                 isSpeechEnabled
-                  ? 'bg-blue-50 border-blue-200 text-[#4A8BDF]'
-                  : 'bg-slate-100 border-slate-200 text-slate-400'
+                  ? 'bg-blue-50 dark:bg-blue-950/40 border-blue-200 dark:border-blue-800 text-[#4A8BDF]'
+                  : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400'
               )}
               title={isSpeechEnabled ? 'Mute AI voice' : 'Enable AI voice output'}
             >
@@ -156,10 +156,10 @@ export default function AIInterviewerPanel() {
                 className={clsx(
                   'text-center py-1 px-0.5 rounded-lg text-[10px] font-mono transition-all',
                   isCurrent
-                    ? 'bg-[#EFFAFD] text-[#4A8BDF] font-bold border border-blue-200 shadow-2xs'
+                    ? 'bg-[#EFFAFD] dark:bg-blue-950/60 text-[#4A8BDF] dark:text-blue-400 font-bold border border-blue-200 dark:border-blue-800 shadow-2xs'
                     : isDone
-                    ? 'bg-emerald-50 text-emerald-700 font-medium'
-                    : 'bg-slate-100 text-slate-400'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-medium'
+                    : 'bg-slate-100 dark:bg-slate-800/80 text-slate-400 dark:text-slate-500'
                 )}
               >
                 <div className="truncate">{step.title}</div>
@@ -170,7 +170,7 @@ export default function AIInterviewerPanel() {
       </div>
 
       {/* Transcript Chat Area */}
-      <div className="flex-1 overflow-y-auto p-3.5 space-y-3.5">
+      <div className="flex-1 overflow-y-auto p-3.5 space-y-3.5 bg-white dark:bg-[#0D1117]">
         {chatMessages.map((msg) => {
           const isAi = msg.role === 'ai';
 
@@ -180,7 +180,7 @@ export default function AIInterviewerPanel() {
               className={clsx('flex items-start gap-2.5 text-xs', isAi ? 'justify-start' : 'justify-end')}
             >
               {isAi && (
-                <div className="h-6 w-6 rounded-lg bg-[#EFFAFD] text-[#4A8BDF] border border-blue-200 flex items-center justify-center shrink-0 mt-0.5">
+                <div className="h-6 w-6 rounded-lg bg-[#EFFAFD] dark:bg-blue-950/50 text-[#4A8BDF] border border-blue-200 dark:border-blue-900 flex items-center justify-center shrink-0 mt-0.5">
                   <Bot size={13} />
                 </div>
               )}
@@ -189,7 +189,7 @@ export default function AIInterviewerPanel() {
                 className={clsx(
                   'max-w-[85%] rounded-2xl p-3 shadow-2xs space-y-1',
                   isAi
-                    ? 'bg-white border border-[#DCE7F2] text-slate-800'
+                    ? 'bg-white dark:bg-[#161B22] border border-[#DCE7F2] dark:border-slate-800 text-slate-800 dark:text-slate-100'
                     : 'bg-[#4A8BDF] text-white font-medium'
                 )}
               >
@@ -199,7 +199,7 @@ export default function AIInterviewerPanel() {
                 <div
                   className={clsx(
                     'text-[9px] font-mono',
-                    isAi ? 'text-slate-400' : 'text-blue-100'
+                    isAi ? 'text-slate-400 dark:text-slate-500' : 'text-blue-100'
                   )}
                 >
                   {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -207,7 +207,7 @@ export default function AIInterviewerPanel() {
               </div>
 
               {!isAi && (
-                <div className="h-6 w-6 rounded-lg bg-slate-900 text-white flex items-center justify-center shrink-0 mt-0.5">
+                <div className="h-6 w-6 rounded-lg bg-slate-900 dark:bg-slate-800 text-white flex items-center justify-center shrink-0 mt-0.5 border border-slate-700">
                   <User size={13} />
                 </div>
               )}
@@ -216,9 +216,9 @@ export default function AIInterviewerPanel() {
         })}
 
         {isAiThinking && (
-          <div className="flex items-center gap-2 text-xs text-slate-500 bg-slate-50 p-2.5 rounded-2xl border border-slate-100 w-fit">
+          <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-[#161B22] p-2.5 rounded-2xl border border-slate-100 dark:border-slate-800 w-fit">
             <Loader2 size={13} className="animate-spin text-[#4A8BDF]" />
-            <span className="font-mono">AI Interviewer is analyzing your architecture...</span>
+            <span className="font-mono">Ava is analyzing your architecture...</span>
           </div>
         )}
 
@@ -227,7 +227,7 @@ export default function AIInterviewerPanel() {
 
       {/* Socratic Suggestion Chips */}
       {suggestions.length > 0 && !isAiThinking && (
-        <div className="px-3 py-2 bg-slate-50/60 border-t border-slate-100 flex items-center gap-1.5 overflow-x-auto select-none">
+        <div className="px-3 py-2 bg-slate-50/60 dark:bg-[#161B22]/80 border-t border-slate-100 dark:border-slate-800 flex items-center gap-1.5 overflow-x-auto select-none">
           <Sparkles size={13} className="text-[#4A8BDF] shrink-0" />
           <div className="flex gap-1.5">
             {suggestions.map((sug, idx) => (
@@ -235,7 +235,7 @@ export default function AIInterviewerPanel() {
                 key={idx}
                 type="button"
                 onClick={() => handleSuggestionClick(sug)}
-                className="whitespace-nowrap px-2.5 py-1 bg-white hover:bg-[#EFFAFD] border border-slate-200 hover:border-[#4A8BDF] text-[11px] font-medium text-slate-700 hover:text-[#4A8BDF] rounded-xl transition-all"
+                className="whitespace-nowrap px-2.5 py-1 bg-white dark:bg-[#0D1117] hover:bg-[#EFFAFD] dark:hover:bg-blue-950/40 border border-slate-200 dark:border-slate-700 hover:border-[#4A8BDF] dark:hover:border-blue-500 text-[11px] font-medium text-slate-700 dark:text-slate-300 hover:text-[#4A8BDF] dark:hover:text-blue-400 rounded-xl transition-all"
               >
                 {sug}
               </button>
@@ -245,7 +245,7 @@ export default function AIInterviewerPanel() {
       )}
 
       {/* Message Input Box */}
-      <div className="p-3 border-t border-[#DCE7F2] bg-white">
+      <div className="p-3 border-t border-[#DCE7F2] dark:border-slate-800 bg-white dark:bg-[#161B22]">
         <div className="flex items-center gap-2">
           {recognitionRef.current && (
             <button
@@ -254,8 +254,8 @@ export default function AIInterviewerPanel() {
               className={clsx(
                 'p-2 rounded-xl border transition-colors',
                 isRecording
-                  ? 'bg-rose-50 border-rose-300 text-rose-600 animate-pulse'
-                  : 'bg-slate-50 border-[#DCE7F2] text-slate-500 hover:text-slate-800'
+                  ? 'bg-rose-50 dark:bg-rose-950/60 border-rose-300 dark:border-rose-700 text-rose-600 dark:text-rose-400 animate-pulse'
+                  : 'bg-slate-50 dark:bg-[#0D1117] border-[#DCE7F2] dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
               )}
               title={isRecording ? 'Stop voice input' : 'Speak answer (Speech-to-Text)'}
             >
@@ -270,14 +270,14 @@ export default function AIInterviewerPanel() {
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
             disabled={isAiThinking}
-            className="flex-1 px-3 py-2 text-xs bg-slate-50 border border-[#DCE7F2] rounded-xl focus:outline-none focus:bg-white focus:border-[#4A8BDF] transition-all"
+            className="flex-1 px-3 py-2 text-xs bg-slate-50 dark:bg-[#0D1117] border border-[#DCE7F2] dark:border-slate-700 rounded-xl text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:bg-white dark:focus:bg-[#0D1117] focus:border-[#4A8BDF] transition-all"
           />
 
           <button
             type="button"
             onClick={handleSend}
             disabled={!inputMessage.trim() || isAiThinking}
-            className="p-2 bg-[#4A8BDF] hover:bg-blue-600 disabled:bg-slate-200 text-white rounded-xl transition-colors shrink-0 shadow-2xs"
+            className="p-2 bg-[#4A8BDF] hover:bg-blue-600 disabled:bg-slate-200 dark:disabled:bg-slate-800 disabled:text-slate-400 text-white rounded-xl transition-colors shrink-0 shadow-2xs"
           >
             <Send size={15} />
           </button>

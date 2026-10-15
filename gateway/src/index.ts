@@ -32,10 +32,11 @@ const CODING_INTERVIEW_SERVICE_URL = process.env.CODING_INTERVIEW_SERVICE_URL ||
 const PAYMENT_SERVICE_URL = process.env.PAYMENT_SERVICE_URL || 'http://localhost:4007';
 const ADMIN_SERVICE_URL = process.env.ADMIN_SERVICE_URL || 'http://localhost:4008';
 const RESUME_SERVICE_URL = process.env.RESUME_SERVICE_URL || 'http://localhost:3009';
-const ROADMAP_SERVICE_URL = process.env.ROADMAP_SERVICE_URL || 'http://localhost:3010';
+const DISCUSSION_SERVICE_URL = process.env.DISCUSSION_SERVICE_URL || 'http://localhost:3014';
 const PLACEMENT_SERVICE_URL = process.env.PLACEMENT_SERVICE_URL || 'http://localhost:3011';
 const CHALLENGE_SERVICE_URL = process.env.CHALLENGE_SERVICE_URL || 'http://localhost:4012';
 const SYSTEM_DESIGN_SERVICE_URL = process.env.SYSTEM_DESIGN_SERVICE_URL || 'http://localhost:4013';
+const ROADMAP_SERVICE_URL = process.env.ROADMAP_SERVICE_URL || 'http://localhost:3015';
 
 // Parse CORS origins from env
 const corsOrigins = process.env.CORS_ORIGIN
@@ -111,6 +112,8 @@ app.get('/api/health', (_req: Request, res: Response) => {
       payment: PAYMENT_SERVICE_URL,
       analytics: ANALYTICS_SERVICE_URL,
       admin: ADMIN_SERVICE_URL,
+      discussion: DISCUSSION_SERVICE_URL,
+      roadmap: ROADMAP_SERVICE_URL,
     },
   });
 });
@@ -240,26 +243,26 @@ app.use(
 );
 
 app.use(
-  '/api/roadmap',
+  '/api/discuss',
   createProxyMiddleware({
-    target: ROADMAP_SERVICE_URL,
+    target: DISCUSSION_SERVICE_URL,
     changeOrigin: true,
     pathRewrite: (path: string) => {
       const clean = path.startsWith('/') ? path : `/${path}`;
-      return `/api/roadmap${clean === '/' ? '' : clean}`;
+      return `/api/discuss${clean === '/' ? '' : clean}`;
     },
     ws: true,
   }),
 );
 
 app.use(
-  '/api/discuss',
+  '/discuss',
   createProxyMiddleware({
-    target: ROADMAP_SERVICE_URL,
+    target: DISCUSSION_SERVICE_URL,
     changeOrigin: true,
     pathRewrite: (path: string) => {
       const clean = path.startsWith('/') ? path : `/${path}`;
-      return `/api/discuss${clean === '/' ? '' : clean}`;
+      return `/discuss${clean === '/' ? '' : clean}`;
     },
     ws: true,
   }),
@@ -274,6 +277,20 @@ app.use(
     pathRewrite: (path: string) => {
       const clean = path.startsWith('/') ? path : `/${path}`;
       return `/api/placement${clean === '/' ? '' : clean}`;
+    },
+    ws: true,
+  }),
+);
+
+// Roadmap planning and collaboration service
+app.use(
+  '/api/roadmaps',
+  createProxyMiddleware({
+    target: ROADMAP_SERVICE_URL,
+    changeOrigin: true,
+    pathRewrite: (path: string) => {
+      const clean = path.startsWith('/') ? path : `/${path}`;
+      return `/api/roadmaps${clean === '/' ? '' : clean}`;
     },
     ws: true,
   }),

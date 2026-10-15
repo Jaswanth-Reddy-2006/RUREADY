@@ -130,7 +130,7 @@ export default function InbuiltCatalogModal({
                 <Sparkles className="w-3.5 h-3.5 text-blue-600" />
                 <span>Pre-calibrated In-built Interview Loops</span>
               </div>
-              <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white font-display">
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100 font-display">
                 Explore All In-Built Interviews
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -141,7 +141,7 @@ export default function InbuiltCatalogModal({
             <button
               type="button"
               onClick={onClose}
-              className="p-2 rounded-full text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-colors self-start sm:self-center shrink-0 cursor-pointer"
+              className="p-2 rounded-full text-slate-400 hover:text-slate-700 dark:hover:text-slate-100 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-colors self-start sm:self-center shrink-0 cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -158,8 +158,8 @@ export default function InbuiltCatalogModal({
                   onClick={() => setSelectedTypeTab('all')}
                   className={`px-3.5 py-1.5 rounded-xl transition-all cursor-pointer ${
                     selectedTypeTab === 'all'
-                      ? 'bg-white dark:bg-[#11183D] text-slate-900 dark:text-white shadow-xs font-extrabold'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                      ? 'bg-white dark:bg-[#11183D] text-slate-900 dark:text-slate-100 shadow-xs font-extrabold'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
                   }`}
                 >
                   All ({allInterviews.length})
@@ -170,7 +170,7 @@ export default function InbuiltCatalogModal({
                   className={`px-3.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer ${
                     selectedTypeTab === 'video'
                       ? 'bg-blue-600 text-white shadow-xs font-extrabold'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
                   }`}
                 >
                   <Video className="w-3.5 h-3.5" />
@@ -182,7 +182,7 @@ export default function InbuiltCatalogModal({
                   className={`px-3.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer ${
                     selectedTypeTab === 'coding'
                       ? 'bg-purple-600 text-white shadow-xs font-extrabold'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
                   }`}
                 >
                   <Code2 className="w-3.5 h-3.5" />
@@ -198,7 +198,7 @@ export default function InbuiltCatalogModal({
                   placeholder="Search by role, company, skill (e.g. React, FAANG, SDE, Two Pointers)..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2 text-xs rounded-xl bg-white dark:bg-[#11183D] border border-slate-200 dark:border-[#1E293B] text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-blue-500 shadow-2xs"
+                  className="w-full pl-9 pr-4 py-2 text-xs rounded-xl bg-white dark:bg-[#11183D] border border-slate-200 dark:border-[#1E293B] text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 shadow-2xs"
                 />
                 {searchQuery && (
                   <button
@@ -261,7 +261,7 @@ export default function InbuiltCatalogModal({
                 <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mx-auto">
                   <Search className="w-6 h-6" />
                 </div>
-                <h4 className="text-sm font-bold text-slate-900 dark:text-white">No matching in-built interviews found</h4>
+                <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">No matching in-built interviews found</h4>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
                   Try adjusting your search query or reset category and difficulty filters.
                 </p>
@@ -319,7 +319,7 @@ export default function InbuiltCatalogModal({
                         </div>
 
                         <div>
-                          <h3 className="font-bold text-base text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-1">
+                          <h3 className="font-bold text-base text-slate-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-1">
                             {interview.title}
                           </h3>
                           <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">

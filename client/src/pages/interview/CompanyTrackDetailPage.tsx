@@ -97,20 +97,20 @@ export default function CompanyTrackDetailPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F4F7FC] dark:bg-[#080C1D] text-slate-900 dark:text-slate-100 py-8 px-4 sm:px-6 lg:px-8 font-sans transition-colors">
+    <div className="min-h-screen bg-[#F4F7FC] dark:bg-[#000000] text-slate-900 dark:text-[#FFFFFF] py-8 px-4 sm:px-6 lg:px-8 font-sans transition-colors">
       <div className="max-w-5xl mx-auto space-y-7">
         
         {/* Back Link */}
         <button
           onClick={() => navigate('/interviews/company-wise')}
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 transition-colors cursor-pointer"
         >
           <ChevronLeft className="w-4 h-4" />
           <span>Back to All Company Tracks</span>
         </button>
 
         {/* ─── TRACK HEADER ─── */}
-        <Card className="p-6 md:p-8 bg-white dark:bg-[#11183D] border-slate-200/80 dark:border-[#1E293B] rounded-3xl shadow-xs space-y-6">
+        <Card className="p-6 md:p-8 bg-white dark:bg-[#1A1A1A] border-slate-200/80 dark:border-[#262626] rounded-3xl shadow-xs space-y-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-slate-100 dark:border-slate-800 pb-6">
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white font-black text-2xl flex items-center justify-center border border-white/20 shadow-xs shrink-0">
@@ -125,30 +125,30 @@ export default function CompanyTrackDetailPage() {
                     {track.packageLpa}
                   </span>
                 </div>
-                <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-display">
+                <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-[#FFFFFF] font-display">
                   {track.role}
                 </h1>
-                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xl">{track.description}</p>
+                <p className="text-xs text-slate-500 dark:text-[#A8A8A8] max-w-xl">{track.description}</p>
               </div>
             </div>
 
             {/* Progress indicator */}
-            <div className="bg-slate-50 dark:bg-[#0E152E] p-4 rounded-2xl border border-slate-200/80 dark:border-[#1E293B] text-right shrink-0">
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 block">Loop Progress</span>
-              <span className="text-2xl font-black text-slate-900 dark:text-white font-mono">
+            <div className="bg-slate-50 dark:bg-[#1C1C1C] p-4 rounded-2xl border border-slate-200/80 dark:border-[#262626] text-right shrink-0">
+              <span className="text-xs font-semibold text-slate-500 dark:text-[#A8A8A8] block">Loop Progress</span>
+              <span className="text-2xl font-black text-slate-900 dark:text-[#FFFFFF] font-mono">
                 {completedSectionIds.length} / {track.sections.length} Done
               </span>
             </div>
           </div>
 
           {/* Hiring Strategy Blueprint Callout */}
-          <div className="p-4 rounded-2xl bg-purple-50/60 dark:bg-[#152046] border border-purple-100 dark:border-[#1E293B] flex items-start gap-3.5">
+          <div className="p-4 rounded-2xl bg-purple-50/60 dark:bg-[#262626] border border-purple-100 dark:border-[#262626] flex items-start gap-3.5">
             <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400 shrink-0 mt-0.5" />
             <div className="space-y-1 text-xs">
-              <strong className="text-slate-900 dark:text-white font-bold block">
+              <strong className="text-slate-900 dark:text-[#FFFFFF] font-bold block">
                 {track.companyName} Hiring Blueprint & Evaluation Focus:
               </strong>
-              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
+              <p className="text-slate-600 dark:text-[#D2D2D7] leading-relaxed">
                 {track.hiringOverview}
               </p>
             </div>
@@ -196,7 +196,7 @@ export default function CompanyTrackDetailPage() {
           {/* ─── SECTION ROUNDS LIST ─── */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-base font-bold text-slate-900 dark:text-white">
+              <h2 className="text-base font-bold text-slate-900 dark:text-[#FFFFFF]">
                 Interview Rounds Breakdown ({track.sections.length} Rounds)
               </h2>
               <span className="text-xs text-slate-400 font-mono">
@@ -218,8 +218,8 @@ export default function CompanyTrackDetailPage() {
                       isCompleted
                         ? 'bg-emerald-50/40 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/60'
                         : isCurrent
-                        ? 'bg-white dark:bg-[#11183D] border-blue-400 dark:border-blue-500 shadow-md ring-2 ring-blue-500/15'
-                        : 'bg-slate-50/60 dark:bg-[#0E152E]/60 border-slate-200 dark:border-[#1E293B] opacity-85'
+                        ? 'bg-white dark:bg-[#1A1A1A] border-blue-400 dark:border-blue-500 shadow-md ring-2 ring-blue-500/15'
+                        : 'bg-slate-50/60 dark:bg-[#1C1C1C]/60 border-slate-200 dark:border-[#262626] opacity-85'
                     }`}
                   >
                     <div className="space-y-2 max-w-xl">
@@ -229,7 +229,7 @@ export default function CompanyTrackDetailPage() {
                             ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300'
                             : isCurrent
                             ? 'bg-blue-600 text-white shadow-2xs'
-                            : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                            : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-[#A8A8A8]'
                         }`}>
                           Round {sec.order}
                         </span>
@@ -248,14 +248,14 @@ export default function CompanyTrackDetailPage() {
                         </span>
                       </div>
 
-                      <h3 className="font-bold text-base text-slate-900 dark:text-white">{sec.title}</h3>
-                      <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">{sec.description}</p>
+                      <h3 className="font-bold text-base text-slate-900 dark:text-[#FFFFFF]">{sec.title}</h3>
+                      <p className="text-xs text-slate-600 dark:text-[#D2D2D7] leading-relaxed">{sec.description}</p>
 
                       <div className="flex flex-wrap gap-1.5 pt-1">
                         {sec.skills.map((skill) => (
                           <span
                             key={skill}
-                            className="px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-[#152046] text-slate-700 dark:text-slate-300 text-[10px] font-medium border border-slate-200/60 dark:border-[#1E293B]"
+                            className="px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-[#262626] text-slate-700 dark:text-[#D2D2D7] text-[10px] font-medium border border-slate-200/60 dark:border-[#262626]"
                           >
                             {skill}
                           </span>
@@ -266,7 +266,7 @@ export default function CompanyTrackDetailPage() {
                         <div className="pt-1.5 space-y-1">
                           <span className="text-[10px] font-bold uppercase text-slate-400 font-mono">Sample Focus:</span>
                           {sec.sampleQuestions.map((q, qIdx) => (
-                            <p key={qIdx} className="text-[11px] text-slate-500 dark:text-slate-400 italic">
+                            <p key={qIdx} className="text-[11px] text-slate-500 dark:text-[#A8A8A8] italic">
                               • {q}
                             </p>
                           ))}
@@ -313,7 +313,7 @@ export default function CompanyTrackDetailPage() {
                           </button>
                         </div>
                       ) : (
-                        <div className="flex items-center gap-1 text-slate-400 text-xs font-semibold px-3 py-2 rounded-xl bg-slate-100 dark:bg-[#152046]">
+                        <div className="flex items-center gap-1 text-slate-400 text-xs font-semibold px-3 py-2 rounded-xl bg-slate-100 dark:bg-[#262626]">
                           <Lock className="w-3.5 h-3.5" />
                           <span>Locked (Pass Round {sec.order - 1})</span>
                         </div>

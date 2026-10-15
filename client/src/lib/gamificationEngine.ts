@@ -374,7 +374,7 @@ export function computeGamificationData(
       levelLabel: completedSessions.length === 0 ? 'Not Started' : 'Level 1 — Practical APIs',
       isStarted: completedSessions.length > 0,
       actionText: 'Explore Projects',
-      actionHref: '/roadmap',
+      actionHref: '/preparation',
       iconName: 'Globe',
     },
   ];

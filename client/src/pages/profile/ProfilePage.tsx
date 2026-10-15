@@ -12,12 +12,9 @@ import {
 import { useProfileStore } from '../../store/useProfileStore';
 import { useAuthStore } from '../../store/authStore';
 import { useResumeStore } from '../../store/useResumeStore';
-import { useRoadmapStore, Roadmap } from '../../store/useRoadmapStore';
 import ResumeFillDetailsModal from '../../components/resume/ResumeFillDetailsModal';
-import RoadmapPreviewModal from '../../components/roadmap/RoadmapPreviewModal';
 import StreakCalendar from '../../components/profile/StreakCalendar';
 import PracticeStatsBreakdown from '../../components/profile/PracticeStatsBreakdown';
-import RoadmapProfileSummaryCard from '../../components/profile/RoadmapProfileSummaryCard';
 import FollowModal from '../../components/profile/FollowModal';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
@@ -31,7 +28,7 @@ export default function ProfilePage() {
   const { user } = useAuthStore();
   const { profile, followers, following, toggleFollow, updateProfile } = useProfileStore();
 
-  const [activeHistoryTab, setActiveHistoryTab] = useState<'ALL' | 'CODING' | 'ORAL' | 'ROADMAP' | 'ATS'>('ALL');
+  const [activeHistoryTab, setActiveHistoryTab] = useState<'ALL' | 'CODING' | 'ORAL' | 'ATS'>('ALL');
   const [isFollowModalOpen, setIsFollowModalOpen] = useState(false);
   const [followModalTab, setFollowModalTab] = useState<'followers' | 'following'>('followers');
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -40,9 +37,6 @@ export default function ProfilePage() {
   // Resume Store Integration
   const { masterResume, syncFromProfile } = useResumeStore();
 
-  // Roadmap State for Profile
-  const { roadmaps, enrolledRoadmapIds, enrollRoadmap } = useRoadmapStore();
-  const [profilePreviewRoadmap, setProfilePreviewRoadmap] = useState<Roadmap | null>(null);
 
   // Edit Profile Form States
   const [editName, setEditName] = useState(profile.name);
@@ -266,7 +260,7 @@ export default function ProfilePage() {
           {/* Social Links */}
           <div className="flex items-center gap-3 text-[#526078]">
             {profile.githubUrl && (
-              <a href={profile.githubUrl} target="_blank" rel="noreferrer" className="hover:text-[#11183D]:text-white transition-colors">
+              <a href={profile.githubUrl} target="_blank" rel="noreferrer" className="hover:text-[#11183D] dark:hover:text-white transition-colors">
                 <Github size={16} />
               </a>
             )}
@@ -416,208 +410,6 @@ export default function ProfilePage() {
         )}
       </Card>
 
-      {/* 3.8 Verified Career Roadmap & Proof of Work (Stage 7.4) */}
-      <RoadmapProfileSummaryCard isOwnProfile={isOwnProfile} />
-
-      {/* 4. Authored & Enrolled Career Roadmaps Showcase */}
-      {(() => {
-        const authoredRoadmaps = roadmaps.filter((r) => {
-          if (isOwnProfile) {
-            return (
-              r.creatorId === (user?.id || 'current-user') ||
-              r.creatorUsername === profile.username ||
-              r.creatorUsername === 'you_ai'
-            );
-          }
-          return (r.creatorUsername === username || r.creatorId === username) && r.isPublic;
-        });
-
-        const userEnrolledRoadmaps = roadmaps.filter((r) => enrolledRoadmapIds.includes(r.id));
-
-        return (
-          <Card className="p-6 sm:p-7 bg-white border border-[#DCE7F2] rounded-3xl shadow-sm space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#DCE7F2] pb-4">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <Compass className="text-[#4A8BDF]" size={20} />
-                  <h3 className="text-lg font-bold font-display text-[#11183D]">
-                    {isOwnProfile ? 'Career Roadmaps & Learning Blueprints' : `${profile.name}'s Public Roadmaps`}
-                  </h3>
-                </div>
-                <p className="text-xs text-[#526078]">
-                  {isOwnProfile
-                    ? 'Curriculums you authored manually or with AI, plus roadmaps you are currently mastering.'
-                    : `Career roadmaps created and published by ${profile.name}.`}
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="royal"
-                  size="sm"
-                  onClick={() => navigate('/roadmap')}
-                >
-                  Explore Marketplace
-                </Button>
-              </div>
-            </div>
-
-            {/* Roadmaps Grid */}
-            {authoredRoadmaps.length === 0 && (!isOwnProfile || userEnrolledRoadmaps.length === 0) ? (
-              <div className="p-8 text-center bg-[#EFFAFD]/60 rounded-2xl border border-[#DCE7F2] space-y-3">
-                <Compass size={32} className="text-[#4A8BDF] mx-auto opacity-70" />
-                <p className="text-xs font-bold text-[#11183D] font-display">No roadmaps published yet</p>
-                <p className="text-xs text-[#526078] max-w-sm mx-auto">
-                  {isOwnProfile
-                    ? 'Create your first step-by-step career roadmap manually or with AI to showcase your learning path!'
-                    : `${profile.name} has not published any public roadmaps yet.`}
-                </p>
-                {isOwnProfile && (
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => navigate('/roadmap/builder')}
-                    className="bg-white"
-                  >
-                    Create a Career Roadmap
-                  </Button>
-                )}
-              </div>
-            ) : (
-              <div className="space-y-6">
-                {authoredRoadmaps.length > 0 && (
-                  <div className="space-y-3">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#11183D] font-display flex items-center gap-2">
-                      <span>Authored Blueprints</span>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] bg-[#EFFAFD] text-[#2459A8] font-mono">
-                        {authoredRoadmaps.length}
-                      </span>
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {authoredRoadmaps.map((r) => (
-                        <div
-                          key={r.id}
-                          className="p-5 rounded-2xl bg-[#EFFAFD]/40 border border-[#DCE7F2] hover:border-[#4A8BDF]/40 transition-all space-y-3"
-                        >
-                          <div className="flex items-center justify-between gap-2">
-                            <span className="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded bg-white text-[#2459A8] border border-[#DCE7F2] font-mono">
-                              {r.targetCompanyTier}
-                            </span>
-                            <div className="flex items-center gap-2">
-                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${r.isPublic ? 'bg-[#E8F5F0] text-[#168A62]' : 'bg-[#DCE7F2] text-[#526078]'}`}>
-                                {r.isPublic ? 'Public' : 'Private'}
-                              </span>
-                              <span className="text-[10px] font-semibold text-[#526078]">
-                                {r.nodesData.length} steps
-                              </span>
-                            </div>
-                          </div>
-
-                          <div>
-                            <h5 className="text-sm font-bold font-display text-[#11183D] leading-snug">
-                              {r.title}
-                            </h5>
-                            <p className="text-xs text-[#526078] line-clamp-2 mt-1">
-                              {r.description}
-                            </p>
-                          </div>
-
-                          <div className="flex items-center justify-between pt-2 border-t border-[#DCE7F2]">
-                            <button
-                              type="button"
-                              onClick={() => setProfilePreviewRoadmap(r)}
-                              className="text-xs font-bold font-display text-[#4A8BDF] hover:underline flex items-center gap-1 cursor-pointer"
-                            >
-                              Quick Preview
-                            </button>
-                            <Button
-                              variant="secondary"
-                              size="sm"
-                              onClick={() => navigate(`/roadmap/${r.id}`)}
-                              className="bg-white"
-                            >
-                              View Track
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {isOwnProfile && userEnrolledRoadmaps.length > 0 && (
-                  <div className="space-y-3 pt-2">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#11183D] font-display flex items-center gap-2">
-                      <span>Currently Enrolled & Pursuing</span>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] bg-[#F8EAF4] text-[#A0006D] font-mono">
-                        {userEnrolledRoadmaps.length}
-                      </span>
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {userEnrolledRoadmaps.map((r) => {
-                        const completed = r.nodesData.filter((n) => n.status === 'MASTERED').length;
-                        const percent = Math.round((completed / r.nodesData.length) * 100);
-                        return (
-                          <div
-                            key={r.id}
-                            className="p-5 rounded-2xl bg-white border border-[#DCE7F2] hover:shadow-xs transition-all space-y-3"
-                          >
-                            <div className="flex items-center justify-between gap-2">
-                              <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-[#EFFAFD] text-[#2459A8] font-mono">
-                                {r.rolePath}
-                              </span>
-                              <span className="text-xs font-bold font-mono text-[#A0006D]">
-                                {percent}% Ready
-                              </span>
-                            </div>
-
-                            <h5 className="text-sm font-bold font-display text-[#11183D] leading-snug">
-                              {r.title}
-                            </h5>
-
-                            <div className="w-full bg-[#EFFAFD] h-2 rounded-full overflow-hidden border border-[#DCE7F2]">
-                              <div
-                                className="bg-gradient-to-r from-[#4A8BDF] to-[#A0006D] h-full rounded-full transition-all"
-                                style={{ width: `${percent}%` }}
-                              />
-                            </div>
-
-                            <div className="flex items-center justify-between pt-1">
-                              <span className="text-[11px] text-[#526078]">
-                                {completed} of {r.nodesData.length} milestones mastered
-                              </span>
-                              <Button
-                                variant="royal"
-                                size="sm"
-                                onClick={() => navigate(`/roadmap/${r.id}`)}
-                              >
-                                Continue
-                              </Button>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-          </Card>
-        );
-      })()}
-
-      {/* Roadmap Preview Modal on Profile */}
-      <RoadmapPreviewModal
-        roadmap={profilePreviewRoadmap}
-        isOpen={!!profilePreviewRoadmap}
-        onClose={() => setProfilePreviewRoadmap(null)}
-        onEnrollAndStart={(r) => {
-          enrollRoadmap(r.id);
-          setProfilePreviewRoadmap(null);
-          navigate(`/roadmap/${r.id}`);
-        }}
-      />
-
       {/* Follow / Following Modal */}
       <FollowModal
         isOpen={isFollowModalOpen}
@@ -643,7 +435,7 @@ export default function ProfilePage() {
                 <button
                   type="button"
                   onClick={() => setIsEditModalOpen(false)}
-                  className="p-1 rounded-lg text-[#7B8799] hover:text-[#11183D]:text-white transition-colors"
+                  className="p-1 rounded-lg text-[#7B8799] hover:text-[#11183D] dark:hover:text-white transition-colors"
                 >
                   <X size={18} />
                 </button>

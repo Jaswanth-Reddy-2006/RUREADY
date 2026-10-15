@@ -47,8 +47,8 @@ function TranscriptBubble({
       <p
         className={`mt-0.5 rounded-lg px-3 py-2 text-sm leading-relaxed ${
           isAi
-            ? 'bg-white/5 text-white/85'
-            : 'bg-[#00897B]/10 text-white/85'
+            ? 'bg-white/5 text-slate-200'
+            : 'bg-[#00897B]/10 text-slate-200'
         } ${align === 'right' ? 'ml-auto' : 'mr-auto'} max-w-full`}
       >
         {entry.text}
@@ -160,8 +160,8 @@ const LiveTranscript: React.FC<LiveTranscriptProps> = ({
                       <div
                         className={`max-w-[85%] rounded-lg px-3 py-2 text-sm leading-relaxed ${
                           entry.speaker === 'ai'
-                            ? 'bg-white/5 text-white/85'
-                            : 'bg-[#00897B]/10 text-white/85'
+                            ? 'bg-white/5 text-slate-200'
+                            : 'bg-[#00897B]/10 text-slate-200'
                         }`}
                       >
                         <span

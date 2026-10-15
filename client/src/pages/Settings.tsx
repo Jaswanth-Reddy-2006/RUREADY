@@ -245,16 +245,16 @@ export default function Settings() {
   ];
 
   return (
-    <div className="min-h-[calc(100vh-80px)] bg-[#EFFAFD] dark:bg-[#0B0F28] text-[#11183D] dark:text-[#F1F5F9] font-sans pb-16 transition-colors">
+    <div className="min-h-[calc(100vh-80px)] bg-[#EFFAFD] dark:bg-[#000000] text-[#11183D] dark:text-[#FFFFFF] font-sans pb-16 transition-colors">
       
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-6">
         
         {/* Header Title */}
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#11183D] dark:text-white tracking-tight font-display">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#11183D] dark:text-[#FFFFFF] tracking-tight font-display">
             Settings & Customization
           </h1>
-          <p className="text-xs text-[#526078] dark:text-[#94A3B8] mt-1 font-body">
+          <p className="text-xs text-[#526078] dark:text-[#A8A8A8] mt-1 font-body">
             Manage your subscription tier, theme appearance, security credentials, proctoring telemetry, and Ava AI persona calibration.
           </p>
         </div>
@@ -262,8 +262,8 @@ export default function Settings() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
           
           {/* LEFT SIDEBAR: Settings Menu Tabs */}
-          <div className="md:col-span-4 lg:col-span-3 bg-white dark:bg-[#11183D] border border-[#DCE7F2] dark:border-[#1E293B] rounded-3xl p-3 shadow-card space-y-1">
-            <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-[#7B8799] dark:text-[#94A3B8] font-mono">
+          <div className="md:col-span-4 lg:col-span-3 bg-white dark:bg-[#1A1A1A] border border-[#DCE7F2] dark:border-[#262626] rounded-3xl p-3 shadow-card space-y-1">
+            <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-[#7B8799] dark:text-[#A8A8A8] font-mono">
               Configuration
             </div>
 
@@ -280,7 +280,7 @@ export default function Settings() {
                     className={`w-full text-left px-3.5 py-3 rounded-2xl text-xs font-bold font-display transition-all cursor-pointer flex items-center gap-3 ${
                       isActive 
                         ? 'bg-[#4A8BDF] text-white shadow-xs' 
-                        : 'text-[#526078] dark:text-[#94A3B8] hover:text-[#11183D] dark:hover:text-white hover:bg-[#EFFAFD] dark:hover:bg-white/[0.05]'
+                        : 'text-[#526078] dark:text-[#A8A8A8] hover:text-[#11183D] dark:hover:text-slate-100 hover:bg-[#EFFAFD] dark:hover:bg-white/[0.05]'
                     }`}
                   >
                     <Icon size={16} className={isActive ? 'text-white' : 'text-[#4A8BDF]'} />
@@ -294,13 +294,13 @@ export default function Settings() {
                 <button
                   type="button"
                   onClick={() => navigate('/profile')}
-                  className="w-full text-left px-3.5 py-2.5 rounded-2xl text-xs font-semibold text-[#526078] hover:text-[#11183D]:text-white hover:bg-[#EFFAFD]:bg-white/[0.05] transition-colors flex items-center justify-between group cursor-pointer"
+                  className="w-full text-left px-3.5 py-2.5 rounded-2xl text-xs font-semibold text-[#526078] hover:text-[#11183D] dark:hover:text-white hover:bg-[#EFFAFD] dark:hover:bg-white/[0.05] transition-colors flex items-center justify-between group cursor-pointer"
                 >
                   <span className="flex items-center gap-3">
                     <User size={16} className="text-[#4A8BDF]" />
                     <span>Candidate Profile</span>
                   </span>
-                  <ExternalLink size={14} className="text-[#7B8799] group-hover:text-[#11183D]:text-white" />
+                  <ExternalLink size={14} className="text-[#7B8799] group-hover:text-[#11183D] dark:group-hover:text-white" />
                 </button>
               </div>
             </nav>
@@ -311,28 +311,28 @@ export default function Settings() {
             
             {/* 1. PRICING & SUBSCRIPTION TAB */}
             {activeTab === 'pricing' && (
-              <Card padding="lg" className="border-[#DCE7F2] dark:border-[#1E293B] bg-white dark:bg-[#11183D] shadow-card space-y-6">
+              <Card padding="lg" className="border-[#DCE7F2] dark:border-[#262626] bg-white dark:bg-[#1A1A1A] shadow-card space-y-6">
                 
                 {/* Header & Monthly / Annual Switcher */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#DCE7F2] dark:border-[#1E293B] pb-5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#DCE7F2] dark:border-[#262626] pb-5">
                   <div>
-                    <h2 className="text-base font-bold font-display text-[#11183D] dark:text-white flex items-center gap-2">
+                    <h2 className="text-base font-bold font-display text-[#11183D] dark:text-[#FFFFFF] flex items-center gap-2">
                       <CreditCard size={18} className="text-[#A0006D]" />
                       <span>Subscription Plans & Pricing</span>
                     </h2>
-                    <p className="text-xs text-[#526078] dark:text-[#94A3B8] mt-0.5">
+                    <p className="text-xs text-[#526078] dark:text-[#A8A8A8] mt-0.5">
                       Choose the preparation tier calibrated for your interview schedule
                     </p>
                   </div>
 
-                  <div className="inline-flex items-center bg-[#EFFAFD] dark:bg-[#0B0F28] border border-[#DCE7F2] dark:border-[#1E293B] p-1 rounded-2xl self-start sm:self-auto">
+                  <div className="inline-flex items-center bg-[#EFFAFD] dark:bg-[#000000] border border-[#DCE7F2] dark:border-[#262626] p-1 rounded-2xl self-start sm:self-auto">
                     <button
                       type="button"
                       onClick={() => setBillingCycle('monthly')}
                       className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                         billingCycle === 'monthly'
                           ? 'bg-[#4A8BDF] text-white shadow-xs'
-                          : 'text-[#526078] dark:text-[#94A3B8] hover:text-[#11183D] dark:hover:text-white'
+                          : 'text-[#526078] dark:text-[#A8A8A8] hover:text-[#11183D] dark:hover:text-slate-100'
                       }`}
                     >
                       Monthly
@@ -343,7 +343,7 @@ export default function Settings() {
                       className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
                         billingCycle === 'annual'
                           ? 'bg-[#4A8BDF] text-white shadow-xs'
-                          : 'text-[#526078] dark:text-[#94A3B8] hover:text-[#11183D] dark:hover:text-white'
+                          : 'text-[#526078] dark:text-[#A8A8A8] hover:text-[#11183D] dark:hover:text-slate-100'
                       }`}
                     >
                       <span>Annual</span>
@@ -356,19 +356,19 @@ export default function Settings() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                   
                   {/* Tier 1: Free Starter */}
-                  <div className="p-5 rounded-3xl bg-[#EFFAFD]/60 dark:bg-[#152046]/40 border border-[#DCE7F2] dark:border-[#1E293B] flex flex-col justify-between space-y-5">
+                  <div className="p-5 rounded-3xl bg-[#EFFAFD]/60 dark:bg-[#262626]/40 border border-[#DCE7F2] dark:border-[#262626] flex flex-col justify-between space-y-5">
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <h3 className="text-sm font-bold font-display text-[#11183D] dark:text-white">Free Starter</h3>
+                        <h3 className="text-sm font-bold font-display text-[#11183D] dark:text-[#FFFFFF]">Free Starter</h3>
                         <Badge variant="navy" size="xs">BASIC</Badge>
                       </div>
                       <div className="flex items-baseline gap-1">
-                        <span className="text-2xl font-extrabold text-[#11183D] dark:text-white font-mono">$0</span>
-                        <span className="text-xs text-[#526078] dark:text-[#94A3B8]">/ forever</span>
+                        <span className="text-2xl font-extrabold text-[#11183D] dark:text-[#FFFFFF] font-mono">$0</span>
+                        <span className="text-xs text-[#526078] dark:text-[#A8A8A8]">/ forever</span>
                       </div>
-                      <p className="text-[11px] text-[#526078] dark:text-[#94A3B8]">Essential tools to test live AI mock interviews and check ATS match.</p>
+                      <p className="text-[11px] text-[#526078] dark:text-[#A8A8A8]">Essential tools to test live AI mock interviews and check ATS match.</p>
 
-                      <div className="pt-2 space-y-2 text-xs text-[#334155] dark:text-[#CBD5E1]">
+                      <div className="pt-2 space-y-2 text-xs text-[#334155] dark:text-[#D2D2D7]">
                         <div className="flex items-center gap-2">
                           <Check size={14} className="text-[#168A62]" />
                           <span>3 AI Mock Sessions / mo</span>
@@ -391,35 +391,35 @@ export default function Settings() {
                     <button
                       type="button"
                       disabled
-                      className="w-full py-2.5 rounded-xl text-xs font-bold bg-[#DCE7F2] dark:bg-[#1E293B] text-[#526078] dark:text-[#94A3B8] text-center cursor-default"
+                      className="w-full py-2.5 rounded-xl text-xs font-bold bg-[#DCE7F2] dark:bg-[#262626] text-[#526078] dark:text-[#A8A8A8] text-center cursor-default"
                     >
                       Included
                     </button>
                   </div>
 
                   {/* Tier 2: Pro Candidate (Featured) */}
-                  <div className="p-5 rounded-3xl bg-gradient-to-b from-white to-[#EFFAFD] dark:from-[#11183D] dark:to-[#152046] border-2 border-[#4A8BDF] shadow-lg flex flex-col justify-between space-y-5 relative">
+                  <div className="p-5 rounded-3xl bg-gradient-to-b from-white to-[#EFFAFD] dark:from-[#1A1A1A] dark:to-[#262626] border-2 border-[#4A8BDF] shadow-lg flex flex-col justify-between space-y-5 relative">
                     <div className="absolute -top-3 right-4 px-2.5 py-0.5 rounded-full bg-[#A0006D] text-white text-[10px] font-bold tracking-wider font-mono">
                       MOST POPULAR
                     </div>
 
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <h3 className="text-sm font-bold font-display text-[#11183D] dark:text-white">Pro Candidate</h3>
+                        <h3 className="text-sm font-bold font-display text-[#11183D] dark:text-[#FFFFFF]">Pro Candidate</h3>
                         <Badge variant="teal" size="xs">ACTIVE</Badge>
                       </div>
                       <div className="flex items-baseline gap-1">
                         <span className="text-3xl font-extrabold text-[#4A8BDF] font-mono">
                           {billingCycle === 'monthly' ? '$19' : '$15'}
                         </span>
-                        <span className="text-xs text-[#526078] dark:text-[#94A3B8]">/ month</span>
+                        <span className="text-xs text-[#526078] dark:text-[#A8A8A8]">/ month</span>
                       </div>
-                      <p className="text-[11px] text-[#526078] dark:text-[#94A3B8]">Full unlimited access to senior oral defense rubrics & gaze tracking.</p>
+                      <p className="text-[11px] text-[#526078] dark:text-[#A8A8A8]">Full unlimited access to senior oral defense rubrics & gaze tracking.</p>
 
-                      <div className="pt-2 space-y-2 text-xs text-[#334155] dark:text-[#CBD5E1]">
+                      <div className="pt-2 space-y-2 text-xs text-[#334155] dark:text-[#D2D2D7]">
                         <div className="flex items-center gap-2">
                           <Check size={14} className="text-[#4A8BDF]" />
-                          <strong className="text-[#11183D] dark:text-white">Unlimited Mock Interviews</strong>
+                          <strong className="text-[#11183D] dark:text-[#FFFFFF]">Unlimited Mock Interviews</strong>
                         </div>
                         <div className="flex items-center gap-2">
                           <Check size={14} className="text-[#4A8BDF]" />
@@ -451,19 +451,19 @@ export default function Settings() {
                   </div>
 
                   {/* Tier 3: Team / Enterprise */}
-                  <div className="p-5 rounded-3xl bg-[#EFFAFD]/60 dark:bg-[#152046]/40 border border-[#DCE7F2] dark:border-[#1E293B] flex flex-col justify-between space-y-5">
+                  <div className="p-5 rounded-3xl bg-[#EFFAFD]/60 dark:bg-[#262626]/40 border border-[#DCE7F2] dark:border-[#262626] flex flex-col justify-between space-y-5">
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <h3 className="text-sm font-bold font-display text-[#11183D] dark:text-white">Team & Campus</h3>
+                        <h3 className="text-sm font-bold font-display text-[#11183D] dark:text-[#FFFFFF]">Team & Campus</h3>
                         <Badge variant="eggplant" size="xs">ENTERPRISE</Badge>
                       </div>
                       <div className="flex items-baseline gap-1">
-                        <span className="text-2xl font-extrabold text-[#11183D] dark:text-white font-mono">$49</span>
-                        <span className="text-xs text-[#526078] dark:text-[#94A3B8]">/ seat / mo</span>
+                        <span className="text-2xl font-extrabold text-[#11183D] dark:text-[#FFFFFF] font-mono">$49</span>
+                        <span className="text-xs text-[#526078] dark:text-[#A8A8A8]">/ seat / mo</span>
                       </div>
-                      <p className="text-[11px] text-[#526078] dark:text-[#94A3B8]">For university cohorts, bootcamps, and hiring recruitment prep.</p>
+                      <p className="text-[11px] text-[#526078] dark:text-[#A8A8A8]">For university cohorts, bootcamps, and hiring recruitment prep.</p>
 
-                      <div className="pt-2 space-y-2 text-xs text-[#334155] dark:text-[#CBD5E1]">
+                      <div className="pt-2 space-y-2 text-xs text-[#334155] dark:text-[#D2D2D7]">
                         <div className="flex items-center gap-2">
                           <Check size={14} className="text-[#A0006D]" />
                           <span>Everything in Pro</span>
@@ -478,7 +478,7 @@ export default function Settings() {
                         </div>
                         <div className="flex items-center gap-2">
                           <Check size={14} className="text-[#A0006D]" />
-                          <span>Dedicated Campus Roadmaps</span>
+                          <span>Dedicated Campus Preparation</span>
                         </div>
                       </div>
                     </div>
@@ -486,7 +486,7 @@ export default function Settings() {
                     <button
                       type="button"
                       onClick={() => toast.success('Connecting with RU Ready enterprise sales...')}
-                      className="w-full py-2.5 rounded-xl text-xs font-bold bg-[#11183D] dark:bg-[#4A8BDF] text-white text-center cursor-pointer hover:bg-[#2459A8] transition-colors"
+                      className="w-full py-2.5 rounded-xl text-xs font-bold bg-[#11183D] text-white hover:bg-[#2459A8] dark:bg-white dark:hover:bg-[#EBEBF5] dark:text-black dark:border-white border border-transparent text-center cursor-pointer transition-colors"
                     >
                       Contact Sales
                     </button>
@@ -500,15 +500,15 @@ export default function Settings() {
             {/* 2. GENERAL & CREDENTIALS TAB */}
             {activeTab === 'account' && (
               <div className="space-y-6">
-                <Card padding="lg" className="border-[#DCE7F2] dark:border-[#1E293B] bg-white dark:bg-[#11183D] shadow-card space-y-5">
+                <Card padding="lg" className="border-[#DCE7F2] dark:border-[#262626] bg-white dark:bg-[#1A1A1A] shadow-card space-y-5">
                   <div>
-                    <h2 className="text-base font-bold font-display text-[#11183D] dark:text-white">General Account Credentials</h2>
-                    <p className="text-xs text-[#526078] dark:text-[#94A3B8] mt-0.5">
+                    <h2 className="text-base font-bold font-display text-[#11183D] dark:text-[#FFFFFF]">General Account Credentials</h2>
+                    <p className="text-xs text-[#526078] dark:text-[#A8A8A8] mt-0.5">
                       You can log in using your email, phone number, or R U Ready? ID.
                     </p>
                   </div>
 
-                  <div className="rounded-2xl bg-[#EFFAFD]/40 dark:bg-white/[0.02] border border-[#DCE7F2] dark:border-[#1E293B] divide-y divide-[#DCE7F2] dark:divide-[#1E293B] overflow-hidden shadow-xs">
+                  <div className="rounded-2xl bg-[#EFFAFD]/40 dark:bg-white/[0.02] border border-[#DCE7F2] dark:border-[#262626] divide-y divide-[#DCE7F2] dark:divide-[#262626] overflow-hidden shadow-xs">
                     
                     {/* Row 1: R U Ready ID */}
                     <button
@@ -522,8 +522,8 @@ export default function Settings() {
                       <div className="flex items-center gap-4 min-w-0">
                         <User size={18} className="text-[#4A8BDF] shrink-0" />
                         <div className="flex items-baseline gap-3 min-w-0">
-                          <span className="text-sm font-semibold text-[#11183D] dark:text-white shrink-0">R U Ready? ID</span>
-                          <span className="text-xs text-[#526078] dark:text-[#94A3B8] truncate">
+                          <span className="text-sm font-semibold text-[#11183D] dark:text-[#FFFFFF] shrink-0">R U Ready? ID</span>
+                          <span className="text-xs text-[#526078] dark:text-[#A8A8A8] truncate">
                             {user?.name ? user.name.toLowerCase().replace(/\s+/g, '_') : (profile.username || 'user')}
                           </span>
                         </div>
@@ -543,8 +543,8 @@ export default function Settings() {
                       <div className="flex items-center gap-4 min-w-0">
                         <Mail size={18} className="text-[#4A8BDF] shrink-0" />
                         <div className="flex items-baseline gap-3 min-w-0">
-                          <span className="text-sm font-semibold text-[#11183D] dark:text-white shrink-0">Email</span>
-                          <span className="text-xs text-[#526078] dark:text-[#94A3B8] truncate">
+                          <span className="text-sm font-semibold text-[#11183D] dark:text-[#FFFFFF] shrink-0">Email</span>
+                          <span className="text-xs text-[#526078] dark:text-[#A8A8A8] truncate">
                             {maskEmail(user?.email || profile.email || '')}
                           </span>
                         </div>
@@ -564,8 +564,8 @@ export default function Settings() {
                       <div className="flex items-center gap-4 min-w-0">
                         <Phone size={18} className="text-[#4A8BDF] shrink-0" />
                         <div className="flex items-baseline gap-3 min-w-0">
-                          <span className="text-sm font-semibold text-[#11183D] dark:text-white shrink-0">Phone Number</span>
-                          <span className="text-xs text-[#526078] dark:text-[#94A3B8] truncate">
+                          <span className="text-sm font-semibold text-[#11183D] dark:text-[#FFFFFF] shrink-0">Phone Number</span>
+                          <span className="text-xs text-[#526078] dark:text-[#A8A8A8] truncate">
                             {maskPhone(profile.phoneNumber || '+91 80088 88808')}
                           </span>
                         </div>
@@ -582,8 +582,8 @@ export default function Settings() {
                       <div className="flex items-center gap-4 min-w-0">
                         <Key size={18} className="text-[#4A8BDF] shrink-0" />
                         <div className="flex items-baseline gap-3 min-w-0">
-                          <span className="text-sm font-semibold text-[#11183D] dark:text-white shrink-0">Password</span>
-                          <span className="text-xs text-[#526078] dark:text-[#94A3B8] tracking-widest">••••••••</span>
+                          <span className="text-sm font-semibold text-[#11183D] dark:text-[#FFFFFF] shrink-0">Password</span>
+                          <span className="text-xs text-[#526078] dark:text-[#A8A8A8] tracking-widest">••••••••</span>
                         </div>
                       </div>
                       <ChevronRight size={16} className="text-[#7B8799] dark:text-[#64748B] group-hover:text-[#4A8BDF] shrink-0" />
@@ -593,8 +593,8 @@ export default function Settings() {
                 </Card>
 
                 {/* Two-Step Authentication Card */}
-                <Card padding="lg" className="border-[#DCE7F2] dark:border-[#1E293B] bg-white dark:bg-[#11183D] shadow-card text-center flex flex-col items-center justify-center p-8 space-y-4">
-                  <div className="h-16 w-16 rounded-3xl bg-[#EFFAFD] dark:bg-[#152046] border border-[#DCE7F2] dark:border-[#1E293B] flex items-center justify-center text-[#4A8BDF]">
+                <Card padding="lg" className="border-[#DCE7F2] dark:border-[#262626] bg-white dark:bg-[#1A1A1A] shadow-card text-center flex flex-col items-center justify-center p-8 space-y-4">
+                  <div className="h-16 w-16 rounded-3xl bg-[#EFFAFD] dark:bg-[#262626] border border-[#DCE7F2] dark:border-[#262626] flex items-center justify-center text-[#4A8BDF]">
                     {profile.twoFactorEnabled ? (
                       <ShieldCheck size={28} className="text-[#168A62]" />
                     ) : (
@@ -603,10 +603,10 @@ export default function Settings() {
                   </div>
 
                   <div>
-                    <h3 className="text-base font-bold text-[#11183D] dark:text-white font-display">
+                    <h3 className="text-base font-bold text-[#11183D] dark:text-[#FFFFFF] font-display">
                       {profile.twoFactorEnabled ? 'Two-step authentication is on' : 'Two-step authentication is off'}
                     </h3>
-                    <p className="text-xs text-[#526078] dark:text-[#94A3B8] max-w-md mx-auto mt-1">
+                    <p className="text-xs text-[#526078] dark:text-[#A8A8A8] max-w-md mx-auto mt-1">
                       {profile.twoFactorEnabled
                         ? 'Your candidate account is shielded with multi-factor verification code prompts.'
                         : "Add a second step at sign-in, so a password alone isn't enough to access your account."}
@@ -619,7 +619,7 @@ export default function Settings() {
                     className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer ${
                       profile.twoFactorEnabled
                         ? 'bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/60 hover:bg-red-100'
-                        : 'bg-[#4A8BDF] hover:bg-[#2459A8] text-white'
+                        : 'bg-[#4A8BDF] hover:bg-[#2459A8] text-white dark:bg-white dark:hover:bg-[#EBEBF5] dark:text-black dark:border-white border border-transparent'
                     }`}
                   >
                     {profile.twoFactorEnabled ? 'Turn off two-step authentication' : 'Turn on two-step authentication'}
@@ -631,20 +631,20 @@ export default function Settings() {
             {/* 3. APPEARANCE & THEME TAB */}
             {activeTab === 'appearance' && (
               <div className="space-y-6">
-                <Card padding="lg" className="border-[#DCE7F2] dark:border-[#1E293B] bg-white dark:bg-[#11183D] shadow-card space-y-6">
+                <Card padding="lg" className="border-[#DCE7F2] dark:border-[#262626] bg-white dark:bg-[#1A1A1A] shadow-card space-y-6">
                   <div>
-                    <h2 className="text-base font-bold font-display text-[#11183D] dark:text-white flex items-center gap-2">
+                    <h2 className="text-base font-bold font-display text-[#11183D] dark:text-[#FFFFFF] flex items-center gap-2">
                       <Moon size={18} className="text-[#4A8BDF]" />
                       <span>Appearance & UI Theme</span>
                     </h2>
-                    <p className="text-xs text-[#526078] dark:text-[#94A3B8] mt-0.5">
+                    <p className="text-xs text-[#526078] dark:text-[#A8A8A8] mt-0.5">
                       Choose your preferred interface theme mode and calibrate code editor visuals.
                     </p>
                   </div>
 
                   {/* Theme Mode Selection Cards */}
                   <div className="space-y-3">
-                    <label className="text-xs font-bold uppercase tracking-wider text-[#11183D] dark:text-white font-display">
+                    <label className="text-xs font-bold uppercase tracking-wider text-[#11183D] dark:text-[#FFFFFF] font-display">
                       Interface Theme Mode
                     </label>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -663,8 +663,8 @@ export default function Settings() {
                           title: 'Dark Theme',
                           desc: 'Deep obsidian contrast calibrated for low-light coding sessions.',
                           icon: Moon,
-                          previewBg: 'bg-[#0B0F28] border-[#1E293B]',
-                          previewCard: 'bg-[#11183D] border-[#1E293B]',
+                          previewBg: 'bg-[#000000] border-[#262626]',
+                          previewCard: 'bg-[#1A1A1A] border-[#262626]',
                           previewBar: 'bg-[#4A8BDF]',
                         },
                         {
@@ -672,8 +672,8 @@ export default function Settings() {
                           title: 'System Default',
                           desc: 'Automatically adapts to your operating system appearance preference.',
                           icon: Laptop,
-                          previewBg: 'bg-gradient-to-r from-[#EFFAFD] to-[#0B0F28] border-[#DCE7F2]',
-                          previewCard: 'bg-white/90 dark:bg-[#11183D]/90 border-[#DCE7F2] dark:border-[#1E293B]',
+                          previewBg: 'bg-gradient-to-r from-[#EFFAFD] to-[#000000] border-[#DCE7F2]',
+                          previewCard: 'bg-white/90 dark:bg-[#1A1A1A]/90 border-[#DCE7F2] dark:border-[#262626]',
                           previewBar: 'bg-[#4A8BDF]',
                         },
                       ].map((mode) => {
@@ -687,7 +687,7 @@ export default function Settings() {
                             className={`p-4 rounded-3xl border-2 transition-all cursor-pointer flex flex-col justify-between space-y-4 relative ${
                               isSelected
                                 ? 'border-[#4A8BDF] bg-[#EFFAFD]/80 dark:bg-[#4A8BDF]/10 shadow-md ring-2 ring-[#4A8BDF]/20'
-                                : 'border-[#DCE7F2] dark:border-[#1E293B] bg-white dark:bg-[#11183D]/60 hover:border-[#4A8BDF]/50 hover:bg-[#EFFAFD]/30 dark:hover:bg-white/[0.03]'
+                                : 'border-[#DCE7F2] dark:border-[#262626] bg-white dark:bg-[#1A1A1A]/60 hover:border-[#4A8BDF]/50 hover:bg-[#EFFAFD]/30 dark:hover:bg-white/[0.03]'
                             }`}
                           >
                             {/* Miniature UI Mock Preview */}
@@ -713,8 +713,8 @@ export default function Settings() {
                             <div>
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                  <Icon size={16} className={isSelected ? 'text-[#4A8BDF]' : 'text-[#7B8799] dark:text-[#94A3B8]'} />
-                                  <h4 className="text-xs font-bold font-display text-[#11183D] dark:text-white">
+                                  <Icon size={16} className={isSelected ? 'text-[#4A8BDF]' : 'text-[#7B8799] dark:text-[#A8A8A8]'} />
+                                  <h4 className="text-xs font-bold font-display text-[#11183D] dark:text-[#FFFFFF]">
                                     {mode.title}
                                   </h4>
                                 </div>
@@ -724,7 +724,7 @@ export default function Settings() {
                                   </div>
                                 )}
                               </div>
-                              <p className="text-[11px] text-[#526078] dark:text-[#94A3B8] font-body mt-1">
+                              <p className="text-[11px] text-[#526078] dark:text-[#A8A8A8] font-body mt-1">
                                 {mode.desc}
                               </p>
                             </div>
@@ -736,7 +736,7 @@ export default function Settings() {
 
                   {/* Accent Color Selection */}
                   <div className="pt-3 space-y-3">
-                    <label className="text-xs font-bold uppercase tracking-wider text-[#11183D] dark:text-white font-display">
+                    <label className="text-xs font-bold uppercase tracking-wider text-[#11183D] dark:text-[#FFFFFF] font-display">
                       Signature Brand Accent
                     </label>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -755,13 +755,13 @@ export default function Settings() {
                             className={`p-3 rounded-2xl border flex items-center gap-3 transition-all cursor-pointer ${
                               isSelected
                                 ? 'border-[#4A8BDF] bg-[#EFFAFD] dark:bg-[#4A8BDF]/20 shadow-xs'
-                                : 'border-[#DCE7F2] dark:border-[#1E293B] bg-white dark:bg-[#11183D]/60 hover:bg-[#EFFAFD]/30 dark:hover:bg-white/[0.04]'
+                                : 'border-[#DCE7F2] dark:border-[#262626] bg-white dark:bg-[#1A1A1A]/60 hover:bg-[#EFFAFD]/30 dark:hover:bg-white/[0.04]'
                             }`}
                           >
                             <span className={`h-5 w-5 rounded-full ${accent.bgClass} shadow-sm shrink-0 flex items-center justify-center`}>
                               {isSelected && <Check size={10} className="text-white" strokeWidth={3} />}
                             </span>
-                            <span className="text-xs font-semibold text-[#11183D] dark:text-[#F1F5F9] truncate">
+                            <span className="text-xs font-semibold text-[#11183D] dark:text-[#FFFFFF] truncate">
                               {accent.label}
                             </span>
                           </button>
@@ -772,7 +772,7 @@ export default function Settings() {
 
                   {/* Monaco Code Editor Preferences */}
                   <div className="pt-3 space-y-4">
-                    <label className="text-xs font-bold uppercase tracking-wider text-[#11183D] dark:text-white font-display flex items-center gap-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-[#11183D] dark:text-[#FFFFFF] font-display flex items-center gap-2">
                       <Sliders size={14} className="text-[#4A8BDF]" />
                       <span>Monaco Code Editor Calibration</span>
                     </label>
@@ -780,13 +780,13 @@ export default function Settings() {
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       {/* Editor Theme */}
                       <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-[#526078] dark:text-[#94A3B8]">
+                        <label className="text-xs font-semibold text-[#526078] dark:text-[#A8A8A8]">
                           Editor Theme
                         </label>
                         <select
                           value={editorTheme}
                           onChange={(e) => setEditorTheme(e.target.value as any)}
-                          className="w-full px-3.5 py-2.5 rounded-xl border border-[#DCE7F2] dark:border-[#1E293B] bg-white dark:bg-[#11183D] text-[#11183D] dark:text-white text-xs font-sans focus:outline-none focus:border-[#4A8BDF]"
+                          className="w-full px-3.5 py-2.5 rounded-xl border border-[#DCE7F2] dark:border-[#262626] bg-white dark:bg-[#1A1A1A] text-[#11183D] dark:text-[#FFFFFF] text-xs font-sans focus:outline-none focus:border-[#4A8BDF]"
                         >
                           <option value="vs-dark">VS Dark (Default)</option>
                           <option value="vs-light">VS Light</option>
@@ -798,13 +798,13 @@ export default function Settings() {
 
                       {/* Font Size */}
                       <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-[#526078] dark:text-[#94A3B8]">
+                        <label className="text-xs font-semibold text-[#526078] dark:text-[#A8A8A8]">
                           Font Size (px)
                         </label>
                         <select
                           value={editorFontSize}
                           onChange={(e) => setEditorFontSize(Number(e.target.value))}
-                          className="w-full px-3.5 py-2.5 rounded-xl border border-[#DCE7F2] dark:border-[#1E293B] bg-white dark:bg-[#11183D] text-[#11183D] dark:text-white text-xs font-sans focus:outline-none focus:border-[#4A8BDF]"
+                          className="w-full px-3.5 py-2.5 rounded-xl border border-[#DCE7F2] dark:border-[#262626] bg-white dark:bg-[#1A1A1A] text-[#11183D] dark:text-[#FFFFFF] text-xs font-sans focus:outline-none focus:border-[#4A8BDF]"
                         >
                           <option value={12}>12px (Compact)</option>
                           <option value={14}>14px (Standard)</option>
@@ -815,13 +815,13 @@ export default function Settings() {
 
                       {/* Tab Size */}
                       <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-[#526078] dark:text-[#94A3B8]">
+                        <label className="text-xs font-semibold text-[#526078] dark:text-[#A8A8A8]">
                           Tab Indentation
                         </label>
                         <select
                           value={editorTabSize}
                           onChange={(e) => setEditorTabSize(Number(e.target.value))}
-                          className="w-full px-3.5 py-2.5 rounded-xl border border-[#DCE7F2] dark:border-[#1E293B] bg-white dark:bg-[#11183D] text-[#11183D] dark:text-white text-xs font-sans focus:outline-none focus:border-[#4A8BDF]"
+                          className="w-full px-3.5 py-2.5 rounded-xl border border-[#DCE7F2] dark:border-[#262626] bg-white dark:bg-[#1A1A1A] text-[#11183D] dark:text-[#FFFFFF] text-xs font-sans focus:outline-none focus:border-[#4A8BDF]"
                         >
                           <option value={2}>2 Spaces (JavaScript/TS)</option>
                           <option value={4}>4 Spaces (Python/Java/C++)</option>
@@ -831,10 +831,10 @@ export default function Settings() {
 
                     {/* Toggle row: Minimap and Word Wrap */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                      <label className="p-3.5 rounded-2xl bg-[#EFFAFD]/40 dark:bg-white/[0.02] border border-[#DCE7F2] dark:border-[#1E293B] flex items-center justify-between cursor-pointer">
+                      <label className="p-3.5 rounded-2xl bg-[#EFFAFD]/40 dark:bg-white/[0.02] border border-[#DCE7F2] dark:border-[#262626] flex items-center justify-between cursor-pointer">
                         <div className="space-y-0.5">
-                          <span className="text-xs font-bold text-[#11183D] dark:text-white block">Code Minimap</span>
-                          <span className="text-[11px] text-[#526078] dark:text-[#94A3B8] block">Show outline overview scrollbar</span>
+                          <span className="text-xs font-bold text-[#11183D] dark:text-[#FFFFFF] block">Code Minimap</span>
+                          <span className="text-[11px] text-[#526078] dark:text-[#A8A8A8] block">Show outline overview scrollbar</span>
                         </div>
                         <input
                           type="checkbox"
@@ -844,10 +844,10 @@ export default function Settings() {
                         />
                       </label>
 
-                      <label className="p-3.5 rounded-2xl bg-[#EFFAFD]/40 dark:bg-white/[0.02] border border-[#DCE7F2] dark:border-[#1E293B] flex items-center justify-between cursor-pointer">
+                      <label className="p-3.5 rounded-2xl bg-[#EFFAFD]/40 dark:bg-white/[0.02] border border-[#DCE7F2] dark:border-[#262626] flex items-center justify-between cursor-pointer">
                         <div className="space-y-0.5">
-                          <span className="text-xs font-bold text-[#11183D] dark:text-white block">Word Wrap</span>
-                          <span className="text-[11px] text-[#526078] dark:text-[#94A3B8] block">Wrap long algorithmic lines</span>
+                          <span className="text-xs font-bold text-[#11183D] dark:text-[#FFFFFF] block">Word Wrap</span>
+                          <span className="text-[11px] text-[#526078] dark:text-[#A8A8A8] block">Wrap long algorithmic lines</span>
                         </div>
                         <input
                           type="checkbox"
@@ -859,7 +859,7 @@ export default function Settings() {
                     </div>
                   </div>
 
-                  <div className="pt-4 border-t border-[#DCE7F2] dark:border-[#1E293B] flex justify-end">
+                  <div className="pt-4 border-t border-[#DCE7F2] dark:border-[#262626] flex justify-end">
                     <Button variant="royal" size="md" onClick={handleSaveAppearance} icon={<Save size={15} />}>
                       Save Appearance Preferences
                     </Button>
@@ -870,17 +870,17 @@ export default function Settings() {
 
             {/* 4. PRIVACY & TELEMETRY TAB */}
             {activeTab === 'privacy' && (
-              <Card padding="lg" className="border-[#DCE7F2] dark:border-[#1E293B] bg-white dark:bg-[#11183D] shadow-card space-y-6">
+              <Card padding="lg" className="border-[#DCE7F2] dark:border-[#262626] bg-white dark:bg-[#1A1A1A] shadow-card space-y-6">
                 <div>
-                  <h2 className="text-base font-bold font-display text-[#11183D] dark:text-white">Privacy & Telemetry Controls</h2>
-                  <p className="text-xs text-[#526078] dark:text-[#94A3B8] mt-0.5">Control public portfolio visibility and proctoring telemetry settings</p>
+                  <h2 className="text-base font-bold font-display text-[#11183D] dark:text-[#FFFFFF]">Privacy & Telemetry Controls</h2>
+                  <p className="text-xs text-[#526078] dark:text-[#A8A8A8] mt-0.5">Control public portfolio visibility and proctoring telemetry settings</p>
                 </div>
 
                 <div className="space-y-4">
-                  <label className="p-4 rounded-2xl bg-[#EFFAFD]/40 dark:bg-white/[0.02] border border-[#DCE7F2] dark:border-[#1E293B] flex items-center justify-between cursor-pointer">
+                  <label className="p-4 rounded-2xl bg-[#EFFAFD]/40 dark:bg-white/[0.02] border border-[#DCE7F2] dark:border-[#262626] flex items-center justify-between cursor-pointer">
                     <div className="space-y-0.5 pr-4">
-                      <span className="text-sm font-semibold text-[#11183D] dark:text-white block">Public Candidate Portfolio</span>
-                      <span className="text-xs text-[#526078] dark:text-[#94A3B8] block">Allow other users and recruiters to view your public consistency heatmap.</span>
+                      <span className="text-sm font-semibold text-[#11183D] dark:text-[#FFFFFF] block">Public Candidate Portfolio</span>
+                      <span className="text-xs text-[#526078] dark:text-[#A8A8A8] block">Allow other users and recruiters to view your public consistency heatmap.</span>
                     </div>
                     <input
                       type="checkbox"
@@ -890,10 +890,10 @@ export default function Settings() {
                     />
                   </label>
 
-                  <label className="p-4 rounded-2xl bg-[#EFFAFD]/40 dark:bg-white/[0.02] border border-[#DCE7F2] dark:border-[#1E293B] flex items-center justify-between cursor-pointer">
+                  <label className="p-4 rounded-2xl bg-[#EFFAFD]/40 dark:bg-white/[0.02] border border-[#DCE7F2] dark:border-[#262626] flex items-center justify-between cursor-pointer">
                     <div className="space-y-0.5 pr-4">
-                      <span className="text-sm font-semibold text-[#11183D] dark:text-white block">Real-time Eye Gaze Telemetry</span>
-                      <span className="text-xs text-[#526078] dark:text-[#94A3B8] block">Track eye stability and head orientation feedback during oral assessments.</span>
+                      <span className="text-sm font-semibold text-[#11183D] dark:text-[#FFFFFF] block">Real-time Eye Gaze Telemetry</span>
+                      <span className="text-xs text-[#526078] dark:text-[#A8A8A8] block">Track eye stability and head orientation feedback during oral assessments.</span>
                     </div>
                     <input
                       type="checkbox"
@@ -903,10 +903,10 @@ export default function Settings() {
                     />
                   </label>
 
-                  <label className="p-4 rounded-2xl bg-[#EFFAFD]/40 dark:bg-white/[0.02] border border-[#DCE7F2] dark:border-[#1E293B] flex items-center justify-between cursor-pointer">
+                  <label className="p-4 rounded-2xl bg-[#EFFAFD]/40 dark:bg-white/[0.02] border border-[#DCE7F2] dark:border-[#262626] flex items-center justify-between cursor-pointer">
                     <div className="space-y-0.5 pr-4">
-                      <span className="text-sm font-semibold text-[#11183D] dark:text-white block">Strict Tab-Deviation Alerts</span>
-                      <span className="text-xs text-[#526078] dark:text-[#94A3B8] block">Triggers security deviation flags if candidate leaves the active Monaco tab.</span>
+                      <span className="text-sm font-semibold text-[#11183D] dark:text-[#FFFFFF] block">Strict Tab-Deviation Alerts</span>
+                      <span className="text-xs text-[#526078] dark:text-[#A8A8A8] block">Triggers security deviation flags if candidate leaves the active Monaco tab.</span>
                     </div>
                     <input
                       type="checkbox"
@@ -917,7 +917,7 @@ export default function Settings() {
                   </label>
                 </div>
 
-                <div className="pt-4 border-t border-[#DCE7F2] dark:border-[#1E293B] flex justify-end">
+                <div className="pt-4 border-t border-[#DCE7F2] dark:border-[#262626] flex justify-end">
                   <Button variant="royal" size="md" onClick={handleSavePrivacy} icon={<Save size={15} />}>
                     Save Privacy & Telemetry
                   </Button>
@@ -927,15 +927,15 @@ export default function Settings() {
 
             {/* 5. AI PERSONA & VOICE TAB */}
             {activeTab === 'ai' && (
-              <Card padding="lg" className="border-[#DCE7F2] dark:border-[#1E293B] bg-white dark:bg-[#11183D] shadow-card space-y-6">
+              <Card padding="lg" className="border-[#DCE7F2] dark:border-[#262626] bg-white dark:bg-[#1A1A1A] shadow-card space-y-6">
                 <div>
-                  <h2 className="text-base font-bold font-display text-[#11183D] dark:text-white">Ava AI Persona & Calibration</h2>
-                  <p className="text-xs text-[#526078] dark:text-[#94A3B8] mt-0.5">Customize voice synthesis, grading strictness, and Socratic hints</p>
+                  <h2 className="text-base font-bold font-display text-[#11183D] dark:text-[#FFFFFF]">Ava AI Persona & Calibration</h2>
+                  <p className="text-xs text-[#526078] dark:text-[#A8A8A8] mt-0.5">Customize voice synthesis, grading strictness, and Socratic hints</p>
                 </div>
 
                 {/* Voice Model */}
                 <div className="space-y-3">
-                  <label className="text-xs font-bold uppercase tracking-wider text-[#11183D] dark:text-white font-display">
+                  <label className="text-xs font-bold uppercase tracking-wider text-[#11183D] dark:text-[#FFFFFF] font-display">
                     AI Speech Synthesis Model
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -950,11 +950,11 @@ export default function Settings() {
                         className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer ${
                           voiceModel === v.id
                             ? 'border-[#A0006D] bg-[#F8EAF4] dark:bg-[#2A0E2E] ring-2 ring-[#A0006D]/30'
-                            : 'border-[#DCE7F2] dark:border-[#1E293B] bg-white dark:bg-[#11183D] hover:bg-[#F8EAF4]/30 dark:hover:bg-white/[0.03]'
+                            : 'border-[#DCE7F2] dark:border-[#262626] bg-white dark:bg-[#1A1A1A] hover:bg-[#F8EAF4]/30 dark:hover:bg-white/[0.03]'
                         }`}
                       >
-                        <span className="text-xs font-bold font-display text-[#11183D] dark:text-white block">{v.title}</span>
-                        <span className="text-[11px] text-[#526078] dark:text-[#94A3B8] font-body">{v.desc}</span>
+                        <span className="text-xs font-bold font-display text-[#11183D] dark:text-[#FFFFFF] block">{v.title}</span>
+                        <span className="text-[11px] text-[#526078] dark:text-[#A8A8A8] font-body">{v.desc}</span>
                       </button>
                     ))}
                   </div>
@@ -962,7 +962,7 @@ export default function Settings() {
 
                 {/* Grading Strictness */}
                 <div className="pt-2 space-y-3">
-                  <label className="text-xs font-bold uppercase tracking-wider text-[#11183D] dark:text-white font-display">
+                  <label className="text-xs font-bold uppercase tracking-wider text-[#11183D] dark:text-[#FFFFFF] font-display">
                     Evaluation Strictness Bar
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -978,21 +978,21 @@ export default function Settings() {
                         className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer ${
                           gradingStrictness === tier.id
                             ? 'border-[#4A8BDF] bg-[#EFFAFD] dark:bg-[#4A8BDF]/20 ring-2 ring-[#4A8BDF]/30'
-                            : 'border-[#DCE7F2] dark:border-[#1E293B] bg-white dark:bg-[#11183D] hover:bg-[#EFFAFD]/50 dark:hover:bg-white/[0.03]'
+                            : 'border-[#DCE7F2] dark:border-[#262626] bg-white dark:bg-[#1A1A1A] hover:bg-[#EFFAFD]/50 dark:hover:bg-white/[0.03]'
                         }`}
                       >
-                        <span className="text-xs font-bold font-display text-[#11183D] dark:text-white block">{tier.title}</span>
-                        <span className="text-[10px] text-[#526078] dark:text-[#94A3B8] font-body">{tier.desc}</span>
+                        <span className="text-xs font-bold font-display text-[#11183D] dark:text-[#FFFFFF] block">{tier.title}</span>
+                        <span className="text-[10px] text-[#526078] dark:text-[#A8A8A8] font-body">{tier.desc}</span>
                       </button>
                     ))}
                   </div>
                 </div>
 
                 {/* Socratic Protocol */}
-                <label className="p-4 rounded-2xl bg-[#EFFAFD]/40 dark:bg-white/[0.02] border border-[#DCE7F2] dark:border-[#1E293B] flex items-center justify-between cursor-pointer">
+                <label className="p-4 rounded-2xl bg-[#EFFAFD]/40 dark:bg-white/[0.02] border border-[#DCE7F2] dark:border-[#262626] flex items-center justify-between cursor-pointer">
                   <div>
-                    <span className="text-xs font-bold text-[#11183D] dark:text-white font-display block">Socratic Hint Protocol</span>
-                    <span className="text-[11px] text-[#526078] dark:text-[#94A3B8] font-body">Guide with conceptual STAR questions rather than giving immediate solutions.</span>
+                    <span className="text-xs font-bold text-[#11183D] dark:text-[#FFFFFF] font-display block">Socratic Hint Protocol</span>
+                    <span className="text-[11px] text-[#526078] dark:text-[#A8A8A8] font-body">Guide with conceptual STAR questions rather than giving immediate solutions.</span>
                   </div>
                   <input
                     type="checkbox"
@@ -1002,7 +1002,7 @@ export default function Settings() {
                   />
                 </label>
 
-                <div className="pt-4 border-t border-[#DCE7F2] dark:border-[#1E293B] flex justify-end">
+                <div className="pt-4 border-t border-[#DCE7F2] dark:border-[#262626] flex justify-end">
                   <Button variant="royal" size="md" onClick={handleSaveAi} icon={<Save size={15} />}>
                     Save AI Calibration
                   </Button>
@@ -1012,20 +1012,20 @@ export default function Settings() {
 
             {/* 6. NOTIFICATIONS TAB */}
             {activeTab === 'notifications' && (
-              <Card padding="lg" className="border-[#DCE7F2] dark:border-[#1E293B] bg-white dark:bg-[#11183D] shadow-card space-y-6">
+              <Card padding="lg" className="border-[#DCE7F2] dark:border-[#262626] bg-white dark:bg-[#1A1A1A] shadow-card space-y-6">
                 <div>
-                  <h2 className="text-base font-bold font-display text-[#11183D] dark:text-white">Notification Preferences</h2>
-                  <p className="text-xs text-[#526078] dark:text-[#94A3B8] mt-0.5">Configure streak alerts, discussion replies, and security digests</p>
+                  <h2 className="text-base font-bold font-display text-[#11183D] dark:text-[#FFFFFF]">Notification Preferences</h2>
+                  <p className="text-xs text-[#526078] dark:text-[#A8A8A8] mt-0.5">Configure streak alerts, discussion replies, and security digests</p>
                 </div>
 
                 <div className="space-y-4">
-                  <label className="p-4 rounded-2xl bg-[#EFFAFD]/40 dark:bg-white/[0.02] border border-[#DCE7F2] dark:border-[#1E293B] flex items-center justify-between cursor-pointer">
+                  <label className="p-4 rounded-2xl bg-[#EFFAFD]/40 dark:bg-white/[0.02] border border-[#DCE7F2] dark:border-[#262626] flex items-center justify-between cursor-pointer">
                     <div className="space-y-0.5 pr-4">
-                      <span className="text-sm font-semibold text-[#11183D] dark:text-white flex items-center gap-1.5">
+                      <span className="text-sm font-semibold text-[#11183D] dark:text-[#FFFFFF] flex items-center gap-1.5">
                         <Flame size={14} className="text-orange-500 fill-orange-500" />
                         Daily Streak Preservation Alerts
                       </span>
-                      <span className="text-xs text-[#526078] dark:text-[#94A3B8] block">Receive an email alert 4 hours prior to midnight if today's session is pending.</span>
+                      <span className="text-xs text-[#526078] dark:text-[#A8A8A8] block">Receive an email alert 4 hours prior to midnight if today's session is pending.</span>
                     </div>
                     <input
                       type="checkbox"
@@ -1035,10 +1035,10 @@ export default function Settings() {
                     />
                   </label>
 
-                  <label className="p-4 rounded-2xl bg-[#EFFAFD]/40 dark:bg-white/[0.02] border border-[#DCE7F2] dark:border-[#1E293B] flex items-center justify-between cursor-pointer">
+                  <label className="p-4 rounded-2xl bg-[#EFFAFD]/40 dark:bg-white/[0.02] border border-[#DCE7F2] dark:border-[#262626] flex items-center justify-between cursor-pointer">
                     <div className="space-y-0.5 pr-4">
-                      <span className="text-sm font-semibold text-[#11183D] dark:text-white block">Community Discuss Replies</span>
-                      <span className="text-xs text-[#526078] dark:text-[#94A3B8] block">Notifications when fellow engineers comment on your interview solution threads.</span>
+                      <span className="text-sm font-semibold text-[#11183D] dark:text-[#FFFFFF] block">Community Discuss Replies</span>
+                      <span className="text-xs text-[#526078] dark:text-[#A8A8A8] block">Notifications when fellow engineers comment on your interview solution threads.</span>
                     </div>
                     <input
                       type="checkbox"
@@ -1049,7 +1049,7 @@ export default function Settings() {
                   </label>
                 </div>
 
-                <div className="pt-4 border-t border-[#DCE7F2] dark:border-[#1E293B] flex justify-end">
+                <div className="pt-4 border-t border-[#DCE7F2] dark:border-[#262626] flex justify-end">
                   <Button variant="royal" size="md" onClick={handleSaveNotifications} icon={<Save size={15} />}>
                     Save Notification Preferences
                   </Button>
@@ -1071,10 +1071,10 @@ export default function Settings() {
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="w-full max-w-md bg-white dark:bg-[#11183D] border border-[#DCE7F2] dark:border-[#1E293B] rounded-3xl p-6 shadow-2xl space-y-5 text-[#11183D] dark:text-[#F1F5F9]"
+              className="w-full max-w-md bg-white dark:bg-[#1A1A1A] border border-[#DCE7F2] dark:border-[#262626] rounded-3xl p-6 shadow-2xl space-y-5 text-[#11183D] dark:text-[#FFFFFF]"
             >
-              <div className="flex items-center justify-between border-b border-[#DCE7F2] dark:border-[#1E293B] pb-4">
-                <h3 className="text-base font-bold font-display text-[#11183D] dark:text-white">
+              <div className="flex items-center justify-between border-b border-[#DCE7F2] dark:border-[#262626] pb-4">
+                <h3 className="text-base font-bold font-display text-[#11183D] dark:text-[#FFFFFF]">
                   {modalType === 'USERNAME' && 'Change R U Ready? ID'}
                   {modalType === 'EMAIL' && 'Change Account Email'}
                   {modalType === 'PHONE' && 'Change Phone Number'}
@@ -1084,7 +1084,7 @@ export default function Settings() {
                 <button
                   type="button"
                   onClick={() => setModalType('NONE')}
-                  className="p-1 rounded-lg text-[#7B8799] dark:text-[#94A3B8] hover:text-[#11183D] dark:hover:text-white transition-colors"
+                  className="p-1 rounded-lg text-[#7B8799] dark:text-[#A8A8A8] hover:text-[#11183D] dark:hover:text-slate-100 transition-colors"
                 >
                   <X size={18} />
                 </button>
@@ -1172,7 +1172,7 @@ export default function Settings() {
                 <div className="space-y-4">
                   {profile.twoFactorEnabled ? (
                     <div className="space-y-3">
-                      <p className="text-xs text-[#526078] dark:text-[#94A3B8]">
+                      <p className="text-xs text-[#526078] dark:text-[#A8A8A8]">
                         Are you sure you want to disable two-step authentication?
                       </p>
                       <div className="flex justify-end gap-2 pt-2">
@@ -1182,12 +1182,12 @@ export default function Settings() {
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      <p className="text-xs text-[#526078] dark:text-[#94A3B8]">
+                      <p className="text-xs text-[#526078] dark:text-[#A8A8A8]">
                         Scan the authenticator QR code with Google Authenticator or 1Password, then enter the 6-digit code below.
                       </p>
-                      <div className="h-28 rounded-2xl bg-[#EFFAFD] dark:bg-[#152046] border border-[#DCE7F2] dark:border-[#1E293B] flex flex-col items-center justify-center p-3 text-center">
+                      <div className="h-28 rounded-2xl bg-[#EFFAFD] dark:bg-[#262626] border border-[#DCE7F2] dark:border-[#262626] flex flex-col items-center justify-center p-3 text-center">
                         <Smartphone size={22} className="text-[#4A8BDF] mb-1" />
-                        <span className="text-[11px] font-mono text-[#526078] dark:text-[#94A3B8]">RU-READY-2FA-AUTH-SECRET</span>
+                        <span className="text-[11px] font-mono text-[#526078] dark:text-[#A8A8A8]">RU-READY-2FA-AUTH-SECRET</span>
                       </div>
                       <input
                         type="text"
@@ -1195,7 +1195,7 @@ export default function Settings() {
                         placeholder="123456"
                         value={twoFactorCode}
                         onChange={(e) => setTwoFactorCode(e.target.value)}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-[#11183D] border border-[#DCE7F2] dark:border-[#1E293B] text-[#11183D] dark:text-white text-center font-mono text-sm tracking-widest focus:outline-none focus:border-[#4A8BDF]"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-[#1A1A1A] border border-[#DCE7F2] dark:border-[#262626] text-[#11183D] dark:text-[#FFFFFF] text-center font-mono text-sm tracking-widest focus:outline-none focus:border-[#4A8BDF]"
                       />
                       <div className="flex justify-end gap-2 pt-2">
                         <Button variant="secondary" size="md" onClick={() => setModalType('NONE')}>Cancel</Button>

@@ -224,7 +224,7 @@ class LRUCache:
               <span className="text-xs text-slate-400">•</span>
               <span className="text-xs text-slate-400 font-mono">Session #{session?.id?.slice(0, 10)}</span>
             </div>
-            <h1 className="text-lg font-bold text-white flex items-center gap-2">
+            <h1 className="text-lg font-bold text-slate-100 flex items-center gap-2">
               {session?.targetRole || 'Full Stack Engineer'} — {session?.targetCompany || 'Google'}
             </h1>
           </div>
@@ -282,7 +282,7 @@ class LRUCache:
                   <Brain className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-white">Ava AI Interviewer</h3>
+                  <h3 className="text-sm font-bold text-slate-100">Ava AI Interviewer</h3>
                   <p className="text-[10px] text-slate-400">Adaptive Socratic Observer</p>
                 </div>
               </div>

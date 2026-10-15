@@ -187,8 +187,24 @@ export default function SystemDesignHub() {
   const handleStartProblem = async (problemId: string) => {
     setStartingProblemId(problemId);
     try {
-      const sessionId = await createAndLoadSession(problemId);
-      navigate(`/system-design/studio/${sessionId}`);
+      const prob = problems.find((p) => p.id === problemId);
+      const cfg = {
+        targetRole: 'Senior Software Engineer (SDE-2)',
+        selectedDomain: prob?.category || 'STORAGE',
+        domainTitle: prob?.title || 'System Architecture Whiteboard',
+        domainDesc: prob?.description || 'Design and defend high-scale distributed systems.',
+        durationMins: 45,
+        simulationMode: 'REALISTIC',
+        selectedSkills: [
+          'Consistent Hashing',
+          'Load Balancing',
+          'Partitioning & Sharding',
+          'Replication & Failover',
+          'CAP Theorem & ACID',
+        ],
+      };
+      sessionStorage.setItem('ru_ready_system_design_config', JSON.stringify(cfg));
+      navigate('/system-design/review');
     } catch (err) {
       console.error('Failed to start system design session:', err);
       setStartingProblemId(null);

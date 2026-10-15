@@ -205,7 +205,7 @@ export const analysisService = {
             answeredQuestions.reduce((sum, q) => sum + (Number(q.evalScore) || 0), 0) /
               answeredQuestions.length
           )
-        : 50;
+        : 0;
 
     const rawWpm = confidenceMetrics?.signals?.avgWpm;
     const avgWpm = (rawWpm != null && !isNaN(Number(rawWpm))) ? Number(rawWpm) : 130;
@@ -235,14 +235,18 @@ export const analysisService = {
     const safeTabDeduction = isNaN(tabDeduction) ? 0 : tabDeduction;
 
     const rawEyeContact = proctoring?.eyeContactScore;
-    const eyeContactScore = (rawEyeContact != null && !isNaN(Number(rawEyeContact))) ? Number(rawEyeContact) : 85;
+    const eyeContactScore = (rawEyeContact != null && !isNaN(Number(rawEyeContact))) ? Number(rawEyeContact) : null;
     let eyeContactDeduction = 0;
-    if (eyeContactScore < 80) {
+    if (eyeContactScore != null && eyeContactScore < 80) {
       eyeContactDeduction = Math.max(0, Math.round((80 - eyeContactScore) / 10) * 5);
     }
     const safeEyeContactDeduction = isNaN(eyeContactDeduction) ? 0 : eyeContactDeduction;
 
-    const confidenceScore = Math.max(0, Math.round(100 - safeTabDeduction - safeEyeContactDeduction));
+    const confidenceScore = confidenceMetrics?.score != null && !isNaN(Number(confidenceMetrics.score))
+      ? Math.max(0, Math.min(100, Math.round(Number(confidenceMetrics.score) - safeTabDeduction - safeEyeContactDeduction)))
+      : (eyeContactScore != null
+          ? Math.max(0, Math.round(100 - safeTabDeduction - safeEyeContactDeduction))
+          : Math.max(0, Math.round(100 - safeTabDeduction)));
 
     const safeTech = isNaN(technicalScore) ? 0 : technicalScore;
     const safeComm = isNaN(communicationScore) ? 0 : communicationScore;
@@ -333,10 +337,18 @@ export const analysisService = {
 
     const summary = `Candidate completed mock interview for target role: ${session.targetRole}. The overall Technical capability was scored at ${technicalScore}/100, while verbal clarity and communication structure scored at ${communicationScore}/100. Environmental proctoring stability registered at ${confidenceScore}/100.\n\n[CORPORATE BENCHMARK] ${benchmark.feedback}`;
 
-    const problemSolvingScore = Math.max(30, Math.min(100, Math.round(technicalScore * 0.95 + 2)));
-    const depthScore = Math.max(30, Math.min(100, Math.round(commAnalysis.clarityScore * 0.85 + 10)));
-    const relevanceScore = Math.max(50, Math.min(100, 88));
-    const industryReadinessScore = Math.max(30, Math.min(100, Math.round(technicalScore * 0.40 + communicationScore * 0.30 + structureScore * 0.30)));
+    const problemSolvingScore = answeredQuestions.length > 0
+      ? Math.max(0, Math.min(100, Math.round(technicalScore * 0.9 + (commAnalysis.lexicalDiversity > 0.4 ? 10 : 0))))
+      : 0;
+    const depthScore = answeredQuestions.length > 0
+      ? Math.max(0, Math.min(100, Math.round(commAnalysis.clarityScore * 0.7 + (Math.min(1, commAnalysis.wordCount / 120) * 30))))
+      : 0;
+    const relevanceScore = answeredQuestions.length > 0
+      ? Math.round(answeredQuestions.reduce((sum, q) => sum + (Number(q.evalScore) || 0), 0) / answeredQuestions.length)
+      : 0;
+    const industryReadinessScore = answeredQuestions.length > 0
+      ? Math.max(0, Math.min(100, Math.round(safeTech * 0.40 + safeComm * 0.30 + safeConf * 0.30)))
+      : 0;
 
     const finalSignals = {
       ...((confidenceMetrics?.signals as any) || {}),
@@ -605,7 +617,7 @@ export const analysisService = {
         confidenceMeterScore: confidenceMetrics?.score ?? null,
         confidenceSignals: confidenceSignals as any,
         eyeContactScore: proctoring?.eyeContactScore ?? null,
-        presenceScore: confidenceScore,
+        presenceScore: proctoring?.presenceScore ?? null,
         summary,
         strengths,
         improvements,
@@ -622,7 +634,7 @@ export const analysisService = {
         confidenceMeterScore: confidenceMetrics?.score ?? null,
         confidenceSignals: confidenceSignals as any,
         eyeContactScore: proctoring?.eyeContactScore ?? null,
-        presenceScore: confidenceScore,
+        presenceScore: proctoring?.presenceScore ?? null,
         summary,
         strengths,
         improvements,

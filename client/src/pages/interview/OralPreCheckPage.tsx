@@ -10,12 +10,15 @@ import {
   Lock,
   ArrowLeft,
   ChevronLeft,
+  Check,
+  CheckCircle2,
 } from 'lucide-react';
 import apiClient from '../../api/client';
 import { InterviewType, ExperienceLevel } from '@ru-ready/shared';
 import Button from '../../components/ui/Button';
 import Badge from '../../components/ui/Badge';
 import toast from 'react-hot-toast';
+import { findEnglishBrowserVoice } from '../../lib/speech';
 
 export default function OralPreCheckPage() {
   const navigate = useNavigate();
@@ -44,6 +47,7 @@ export default function OralPreCheckPage() {
   const [micVolume, setMicVolume] = useState<number>(0);
   const [spokenTranscript, setSpokenTranscript] = useState<string>('');
   const recognitionRef = useRef<any>(null);
+  const micVerifiedRef = useRef<boolean>(false);
   const [agreedToIntegrityRules, setAgreedToIntegrityRules] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [prepMessage, setPrepMessage] = useState<string>('');
@@ -206,6 +210,8 @@ export default function OralPreCheckPage() {
       rec.lang = 'en-US';
 
       rec.onresult = (event: any) => {
+        if (micVerifiedRef.current) return;
+
         let transcript = '';
         for (let i = 0; i < event.results.length; i++) {
           transcript += event.results[i][0]?.transcript || '';
@@ -214,18 +220,20 @@ export default function OralPreCheckPage() {
         setSpokenTranscript(clean);
 
         const lower = clean.toLowerCase();
-        // Check for required phrase matches
+        // Check for required phrase matches or sufficient clear spoken words
         const matchesTarget =
           lower.includes('ready to start') ||
           lower.includes('start my mock') ||
           lower.includes('ready to start my mock interview') ||
           lower.includes('ready to take my mock interview') ||
           lower.includes('ready to take the ai mock interview') ||
-          lower.includes('ready to start the mock interview');
+          lower.includes('ready to start the mock interview') ||
+          (clean.length > 12 && micVolume > 10);
 
-        if (matchesTarget) {
+        if (matchesTarget && !micVerifiedRef.current) {
+          micVerifiedRef.current = true;
           setMicStatus('ready');
-          toast.success('Microphone & speech phrase verified successfully!');
+          toast.success('Microphone verified successfully!');
           try {
             rec.stop();
           } catch {
@@ -262,7 +270,7 @@ export default function OralPreCheckPage() {
       utterance.rate = 1.0;
       utterance.pitch = 1.0;
 
-      // Also play a test chime
+      // Play soft confirmation chime
       try {
         const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
         const osc = audioCtx.createOscillator();
@@ -286,17 +294,11 @@ export default function OralPreCheckPage() {
         setAudioVoiceHeard(true);
       };
 
-      const voices = window.speechSynthesis.getVoices();
-      const preferredVoice = voices.find(
-        (v) =>
-          v.lang.startsWith('en') &&
-          (v.name.includes('Google') ||
-            v.name.includes('Natural') ||
-            v.name.includes('Samantha') ||
-            v.name.includes('Ava') ||
-            v.name.includes('Jenny'))
-      );
-      if (preferredVoice) utterance.voice = preferredVoice;
+      const highQualityVoice = findEnglishBrowserVoice();
+      if (highQualityVoice) {
+        utterance.voice = highQualityVoice;
+        utterance.lang = highQualityVoice.lang || 'en-US';
+      }
 
       window.speechSynthesis.speak(utterance);
       setAudioVoiceHeard(true);
@@ -379,28 +381,28 @@ export default function OralPreCheckPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8 px-4 sm:px-6 lg:px-8 text-slate-800 font-sans select-none">
+    <div className="min-h-screen bg-[#F4F7FC] dark:bg-[#000000] py-8 px-4 sm:px-6 lg:px-8 text-slate-800 dark:text-slate-100 font-sans select-none transition-colors">
       <div className="max-w-4xl mx-auto space-y-6">
 
         {/* TOP BRAND & STEP NAVIGATOR */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={() => navigate('/video/review')}
-              className="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-300 transition-all cursor-pointer shadow-2xs"
+              className="p-2 rounded-xl bg-white dark:bg-[#161B22] border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all cursor-pointer shadow-2xs"
               title="Back to Review"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
             <div>
-              <h1 className="text-xl font-black text-slate-900 flex items-center gap-2">
+              <h1 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
                 <span>Video Mock Interview Setup</span>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 font-mono">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 font-mono">
                   AI
                 </span>
               </h1>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 Step 3 of 3: Allow Permissions & Launch
               </p>
             </div>
@@ -411,7 +413,7 @@ export default function OralPreCheckPage() {
             <button
               type="button"
               onClick={() => navigate('/video/setup')}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 transition-colors cursor-pointer"
             >
               <span className="h-2 w-2 rounded-full bg-emerald-500" />
               <span>1. Config</span>
@@ -419,7 +421,7 @@ export default function OralPreCheckPage() {
             <button
               type="button"
               onClick={() => navigate('/video/review')}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 transition-colors cursor-pointer"
             >
               <span className="h-2 w-2 rounded-full bg-emerald-500" />
               <span>2. Review</span>
@@ -435,19 +437,19 @@ export default function OralPreCheckPage() {
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="p-6 md:p-8 rounded-3xl bg-white text-slate-900 shadow-sm border border-slate-200/90 space-y-6"
+          className="p-6 md:p-8 rounded-3xl bg-white dark:bg-[#0D1117] text-slate-900 dark:text-white shadow-sm border border-slate-200/90 dark:border-slate-800 space-y-6 transition-colors"
         >
-          <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-            <span className="text-sm font-extrabold text-blue-700 uppercase tracking-wider flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-blue-600" />
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+            <span className="text-sm font-extrabold text-blue-700 dark:text-blue-400 uppercase tracking-wider flex items-center gap-2">
+              <ShieldCheck className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               Device Permissions & Integrity Verification
             </span>
-            <Badge className="bg-blue-50 text-blue-700 font-mono text-xs border-blue-200">
+            <Badge className="bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 font-mono text-xs border-blue-200 dark:border-blue-850">
               Step 3 of 3: Allow & Launch
             </Badge>
           </div>
 
-          <p className="text-xs sm:text-sm text-slate-600 font-medium">
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
             Complete permissions check for your Camera, Microphone, Speaker, and Full-Screen Mode before launching the proctored interview.
           </p>
 
@@ -455,11 +457,11 @@ export default function OralPreCheckPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             
             {/* Card 1: Camera & Candidate Detection */}
-            <div className="p-5 rounded-2xl bg-white border border-slate-200/90 text-slate-900 space-y-3.5 flex flex-col justify-between shadow-2xs">
+            <div className="p-5 rounded-2xl bg-white dark:bg-[#161B22] border border-slate-200/90 dark:border-slate-800 text-slate-900 dark:text-white space-y-3.5 flex flex-col justify-between shadow-2xs">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Camera className="w-4 h-4 text-blue-600" />
-                  <span className="text-xs font-bold text-slate-900">1. Camera & Candidate Check</span>
+                  <Camera className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  <span className="text-xs font-bold text-slate-900 dark:text-white">1. Camera & Candidate Check</span>
                 </div>
                 <Badge
                   className={
@@ -468,7 +470,9 @@ export default function OralPreCheckPage() {
                       : 'bg-slate-100 text-slate-600 border-slate-200'
                   }
                 >
-                  {camStatus === 'ready' ? '✓ Candidate Verified' : 'Pending'}
+                  {camStatus === 'ready' ? (
+                    <span className="inline-flex items-center gap-1"><Check className="w-3.5 h-3.5" /> Candidate Verified</span>
+                  ) : 'Pending'}
                 </Badge>
               </div>
 
@@ -497,56 +501,60 @@ export default function OralPreCheckPage() {
                     : 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs'
                 }`}
               >
-                {camStatus === 'ready'
-                  ? '✓ Camera Active (Click to Turn Off)'
-                  : camStatus === 'testing'
-                  ? 'Testing Camera...'
-                  : 'Allow Camera & Check Candidate'}
+                {camStatus === 'ready' ? (
+                  <span className="inline-flex items-center gap-1.5"><Check className="w-4 h-4" /> Camera Active (Click to Turn Off)</span>
+                ) : camStatus === 'testing' ? (
+                  'Testing Camera...'
+                ) : (
+                  <span className="inline-flex items-center gap-1.5"><Camera className="w-4 h-4" /> Allow Camera & Check Candidate</span>
+                )}
               </Button>
             </div>
 
             {/* Card 2: Microphone & Speech Sentence Test */}
-            <div className="p-5 rounded-2xl bg-white border border-slate-200/90 text-slate-900 space-y-3.5 flex flex-col justify-between shadow-2xs">
+            <div className="p-5 rounded-2xl bg-white dark:bg-[#161B22] border border-slate-200/90 dark:border-slate-800 text-slate-900 dark:text-white space-y-3.5 flex flex-col justify-between shadow-2xs">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Mic className="w-4 h-4 text-purple-600" />
-                  <span className="text-xs font-bold text-slate-900">2. Microphone & Speech Check</span>
+                  <Mic className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                  <span className="text-xs font-bold text-slate-900 dark:text-white">2. Microphone & Speech Check</span>
                 </div>
                 <Badge
                   className={
                     micStatus === 'ready'
-                      ? 'bg-emerald-100 text-emerald-800 border-emerald-200 font-bold'
-                      : 'bg-slate-100 text-slate-600 border-slate-200'
+                      ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 font-bold'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
                   }
                 >
-                  {micStatus === 'ready' ? '✓ Speech Verified' : 'Pending'}
+                  {micStatus === 'ready' ? (
+                    <span className="inline-flex items-center gap-1"><Check className="w-3.5 h-3.5" /> Speech Verified</span>
+                  ) : 'Pending'}
                 </Badge>
               </div>
 
-              <div className="p-3.5 bg-purple-50/60 rounded-xl border border-purple-100 space-y-2">
-                <span className="text-[10px] font-bold text-purple-900 block uppercase tracking-wider">
+              <div className="p-3.5 bg-purple-50/60 dark:bg-purple-950/20 rounded-xl border border-purple-100 dark:border-purple-900/40 space-y-2">
+                <span className="text-[10px] font-bold text-purple-900 dark:text-purple-300 block uppercase tracking-wider">
                   Read Out Loud to Verify Mic:
                 </span>
-                <p className="text-xs italic text-purple-950 font-serif leading-relaxed font-semibold">
+                <p className="text-xs italic text-purple-950 dark:text-purple-200 font-serif leading-relaxed font-semibold">
                   "I am ready to start my mock interview."
                 </p>
 
                 {spokenTranscript && (
-                  <div className="p-2 bg-white rounded-lg border border-purple-200 text-xs text-purple-900 font-mono">
-                    <span className="font-bold text-purple-700">Heard: </span>
+                  <div className="p-2 bg-white dark:bg-[#0D1117] rounded-lg border border-purple-200 dark:border-purple-800/60 text-xs text-purple-900 dark:text-purple-300 font-mono">
+                    <span className="font-bold text-purple-700 dark:text-purple-400">Heard: </span>
                     <span>"{spokenTranscript}"</span>
                   </div>
                 )}
 
                 {/* Volume Level Indicator */}
                 <div className="space-y-1 pt-1">
-                  <div className="flex justify-between text-[10px] font-bold text-slate-500">
+                  <div className="flex justify-between text-[10px] font-bold text-slate-500 dark:text-slate-400">
                     <span>Audio Input Level</span>
                     <span>{micVolume}%</span>
                   </div>
-                  <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                  <div className="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-purple-600 transition-all duration-150"
+                      className="h-full bg-purple-600 dark:bg-purple-500 transition-all duration-150"
                       style={{ width: `${micVolume}%` }}
                     />
                   </div>
@@ -561,37 +569,41 @@ export default function OralPreCheckPage() {
                     : 'bg-purple-600 hover:bg-purple-700 text-white shadow-xs'
                 }`}
               >
-                {micStatus === 'ready'
-                  ? '✓ Speech Phrase Verified'
-                  : micStatus === 'testing'
-                  ? 'Listening for Phrase...'
-                  : '🎤 Start Mic & Speak Phrase'}
+                {micStatus === 'ready' ? (
+                  <span className="inline-flex items-center gap-1.5"><Check className="w-4 h-4" /> Speech Phrase Verified</span>
+                ) : micStatus === 'testing' ? (
+                  'Listening for Phrase...'
+                ) : (
+                  <span className="inline-flex items-center gap-1.5"><Mic className="w-4 h-4" /> Start Mic & Speak Phrase</span>
+                )}
               </Button>
             </div>
 
             {/* Card 3: Speaker Simple Check */}
-            <div className="p-5 rounded-2xl bg-white border border-slate-200/90 text-slate-900 space-y-3.5 flex flex-col justify-between shadow-2xs">
+            <div className="p-5 rounded-2xl bg-white dark:bg-[#161B22] border border-slate-200/90 dark:border-slate-800 text-slate-900 dark:text-white space-y-3.5 flex flex-col justify-between shadow-2xs">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Volume2 className="w-4 h-4 text-emerald-600" />
-                  <span className="text-xs font-bold text-slate-900">3. Speaker Sound Check</span>
+                  <Volume2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <span className="text-xs font-bold text-slate-900 dark:text-white">3. Speaker Sound Check</span>
                 </div>
                 <Badge
                   className={
                     audioStatus === 'ready'
-                      ? 'bg-emerald-100 text-emerald-800 border-emerald-200 font-bold'
-                      : 'bg-slate-100 text-slate-600 border-slate-200'
+                      ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 font-bold'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
                   }
                 >
-                  {audioStatus === 'ready' ? '✓ Speaker Ready' : 'Pending'}
+                  {audioStatus === 'ready' ? (
+                    <span className="inline-flex items-center gap-1"><Check className="w-3.5 h-3.5" /> Speaker Ready</span>
+                  ) : 'Pending'}
                 </Badge>
               </div>
 
-              <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2">
-                <span className="text-[10px] font-bold text-slate-500 block uppercase tracking-wider">
+              <div className="p-3.5 bg-slate-50 dark:bg-[#0D1117] rounded-xl border border-slate-200/80 dark:border-slate-800 space-y-2">
+                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 block uppercase tracking-wider">
                   Audio Playback Check:
                 </span>
-                <p className="text-xs text-slate-700 leading-relaxed font-medium">
+                <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
                   Click "Play Voice" to hear Ava speak, then confirm audibility below.
                 </p>
               </div>
@@ -601,52 +613,65 @@ export default function OralPreCheckPage() {
                   onClick={testAudio}
                   className="w-full text-xs py-2.5 rounded-xl font-bold cursor-pointer transition-all whitespace-nowrap flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-xs"
                 >
-                  {audioVoicePlaying ? '🔊 Ava is speaking...' : '🔊 Play Voice'}
+                  {audioVoicePlaying ? (
+                    <span className="inline-flex items-center gap-1.5"><Volume2 className="w-4 h-4 animate-pulse" /> Ava is speaking...</span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5"><Volume2 className="w-4 h-4" /> Play Voice</span>
+                  )}
                 </Button>
 
                 {audioVoiceHeard && audioStatus !== 'ready' && (
                   <Button
                     onClick={() => {
+                      if (typeof window !== 'undefined' && window.speechSynthesis) {
+                        try {
+                          window.speechSynthesis.cancel();
+                        } catch {}
+                      }
+                      setAudioVoicePlaying(false);
                       setAudioStatus('ready');
                       toast.success('Speaker verified successfully!');
                     }}
                     className="w-full text-xs py-2.5 rounded-xl font-bold cursor-pointer transition-all whitespace-nowrap flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
                   >
-                    ✓ Yes, the voice is audible
+                    <span className="inline-flex items-center gap-1.5"><Check className="w-4 h-4" /> Yes, the voice is audible</span>
                   </Button>
                 )}
 
                 {audioStatus === 'ready' && (
-                  <div className="text-center text-xs font-bold text-emerald-700 py-1">
-                    ✓ Voice Verified & Clear
+                  <div className="text-center text-xs font-bold text-emerald-700 dark:text-emerald-400 py-1 flex items-center justify-center gap-1.5">
+                    <Check className="w-4 h-4" />
+                    <span>Voice Verified & Clear</span>
                   </div>
                 )}
               </div>
             </div>
 
             {/* Card 4: Full-Screen Mode Permission */}
-            <div className="p-5 rounded-2xl bg-white border border-slate-200/90 text-slate-900 space-y-3.5 flex flex-col justify-between shadow-2xs">
+            <div className="p-5 rounded-2xl bg-white dark:bg-[#161B22] border border-slate-200/90 dark:border-slate-800 text-slate-900 dark:text-white space-y-3.5 flex flex-col justify-between shadow-2xs">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Maximize className="w-4 h-4 text-indigo-600" />
-                  <span className="text-xs font-bold text-slate-900">4. Full-Screen Permission</span>
+                  <Maximize className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                  <span className="text-xs font-bold text-slate-900 dark:text-white">4. Full-Screen Permission</span>
                 </div>
                 <Badge
                   className={
                     fullscreenStatus === 'ready'
-                      ? 'bg-emerald-100 text-emerald-800 border-emerald-200 font-bold'
-                      : 'bg-slate-100 text-slate-600 border-slate-200'
+                      ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 font-bold'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
                   }
                 >
-                  {fullscreenStatus === 'ready' ? '✓ Full-Screen Allowed' : 'Pending'}
+                  {fullscreenStatus === 'ready' ? (
+                    <span className="inline-flex items-center gap-1"><Check className="w-3.5 h-3.5" /> Full-Screen Allowed</span>
+                  ) : 'Pending'}
                 </Badge>
               </div>
 
-              <div className="p-3.5 bg-indigo-50/60 rounded-xl border border-indigo-100 space-y-2">
-                <span className="text-[10px] font-bold text-indigo-900 block uppercase tracking-wider">
+              <div className="p-3.5 bg-indigo-50/60 dark:bg-indigo-950/20 rounded-xl border border-indigo-100 dark:border-indigo-900/40 space-y-2">
+                <span className="text-[10px] font-bold text-indigo-900 dark:text-indigo-300 block uppercase tracking-wider">
                   Screen Mode Enforcement:
                 </span>
-                <p className="text-xs text-slate-700 leading-relaxed font-medium">
+                <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
                   Allow full-screen mode to ensure an authentic, distraction-free interview session.
                 </p>
               </div>
@@ -659,21 +684,25 @@ export default function OralPreCheckPage() {
                     : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs'
                 }`}
               >
-                {fullscreenStatus === 'ready' ? '✓ Full-Screen Active & Allowed' : '🖥️ Allow & Enable Full-Screen Mode'}
+                {fullscreenStatus === 'ready' ? (
+                  <span className="inline-flex items-center gap-1.5"><Check className="w-4 h-4" /> Full-Screen Active & Allowed</span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5"><Maximize className="w-4 h-4" /> Allow & Enable Full-Screen Mode</span>
+                )}
               </Button>
             </div>
 
           </div>
 
           {/* Anti-Cheating & Full-Screen Proctoring Rules Box */}
-          <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 space-y-3">
+          <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 text-amber-900 dark:text-amber-300 space-y-3">
             <div className="flex items-center gap-2">
-              <Lock className="w-4 h-4 text-amber-600 shrink-0" />
-              <span className="text-xs font-bold text-amber-900 uppercase tracking-wider">
+              <Lock className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+              <span className="text-xs font-bold text-amber-900 dark:text-amber-300 uppercase tracking-wider">
                 Proctoring & Anti-Cheating Integrity Rules
               </span>
             </div>
-            <ul className="text-xs space-y-1.5 list-disc list-inside text-amber-800 leading-relaxed font-medium">
+            <ul className="text-xs space-y-1.5 list-disc list-inside text-amber-800 dark:text-amber-200/80 leading-relaxed font-medium">
               <li>
                 <strong>Full-Screen Enforcement:</strong> The interview will run in strict full-screen. Pressing ESC, switching tabs, or minimizing window will trigger proctoring violations.
               </li>
@@ -689,16 +718,16 @@ export default function OralPreCheckPage() {
                 onChange={(e) => setAgreedToIntegrityRules(e.target.checked)}
                 className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 cursor-pointer"
               />
-              <span className="text-xs font-bold text-slate-900">
+              <span className="text-xs font-bold text-slate-900 dark:text-slate-200">
                 I agree to the Full-Screen Proctoring & Anti-Cheating Rules
               </span>
             </label>
           </div>
 
-          <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
             <Button
               onClick={() => navigate('/video/review')}
-              className="w-full sm:w-auto bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 px-6 py-3 rounded-2xl font-bold text-xs sm:text-sm shadow-2xs cursor-pointer whitespace-nowrap flex items-center justify-center gap-2"
+              className="w-full sm:w-auto bg-white dark:bg-[#161B22] hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 px-6 py-3 rounded-2xl font-bold text-xs sm:text-sm shadow-2xs cursor-pointer whitespace-nowrap flex items-center justify-center gap-2"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Back to Review</span>
@@ -706,7 +735,7 @@ export default function OralPreCheckPage() {
 
             <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
               {!isAllVerifiedAndAgreed && (
-                <span className="text-[11px] font-mono text-amber-700 font-semibold text-center sm:text-right">
+                <span className="text-[11px] font-mono text-amber-700 dark:text-amber-400 font-semibold text-center sm:text-right">
                   {[
                     camStatus !== 'ready' && 'Camera',
                     micStatus !== 'ready' && 'Mic',
@@ -726,11 +755,11 @@ export default function OralPreCheckPage() {
                 className={`w-full sm:w-auto px-8 py-4 rounded-2xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 whitespace-nowrap ${
                   isAllVerifiedAndAgreed
                     ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md cursor-pointer'
-                    : 'bg-slate-200 text-slate-400 border border-slate-300 shadow-none cursor-not-allowed'
+                    : 'bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 border border-slate-300 dark:border-slate-700 shadow-none cursor-not-allowed'
                 }`}
               >
-                <Maximize className={`w-4 h-4 ${isAllVerifiedAndAgreed ? 'text-white' : 'text-slate-400'}`} />
-                <span>{isSubmitting ? prepMessage || 'Launching...' : '🚀 Launch Live Interview Session'}</span>
+                <Maximize className={`w-4 h-4 ${isAllVerifiedAndAgreed ? 'text-white' : 'text-slate-400 dark:text-slate-500'}`} />
+                <span>{isSubmitting ? prepMessage || 'Launching...' : 'Launch Live Interview Session'}</span>
               </Button>
             </div>
           </div>

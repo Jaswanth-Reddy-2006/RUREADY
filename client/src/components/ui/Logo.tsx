@@ -6,12 +6,11 @@ export interface LogoProps {
   showTagline?: boolean;
   className?: string;
 }
-
 const sizeConfig = {
   xs: {
     icon: 'h-5 w-5',
     text: 'text-sm font-black tracking-widest',
-    tagline: 'text-[7px]',
+    tagline: 'text-[8px]',
   },
   sm: {
     icon: 'h-7 w-7',
@@ -38,30 +37,29 @@ const sizeConfig = {
 export default function Logo({ size = 'md', theme = 'light', showTagline = false, className }: LogoProps) {
   const s = sizeConfig[size] || sizeConfig.md;
   const isDark = theme === 'dark';
-  const textColor = isDark ? 'text-white' : 'text-[#0F172A] dark:text-white';
+  const textColor = isDark ? 'text-white' : 'text-[#0F172A] dark:text-slate-100';
 
   return (
-    <div className={clsx('flex items-center gap-2.5 select-none leading-none group', className)}>
-      {/* Rennetus Stylized Emblem */}
-      <div className={clsx('relative rounded-xl overflow-hidden shrink-0 shadow-xs transition-transform group-hover:scale-105', s.icon)}>
+    <div className={clsx('flex items-center gap-2.5 select-none leading-none group cursor-pointer', className)}>
+      {/* Rennetus Stylized Emblem with visible red square dot */}
+      <div className={clsx('relative shrink-0 transition-transform group-hover:scale-105 p-0.5', s.icon)}>
         <img
           src="/images/rennetus-logo.png"
           alt="Rennetus Logo"
-          className="w-full h-full object-cover object-center"
+          className="w-full h-full object-contain drop-shadow-xs"
         />
       </div>
 
       {/* Typography */}
       <div className="flex flex-col justify-center">
-        <div className="flex items-baseline gap-0.5">
-          <span className={clsx(s.text, textColor, 'font-display uppercase font-black tracking-[0.18em]')}>
+        <div className="flex items-center gap-1">
+          <span className={clsx(s.text, textColor, 'font-display uppercase font-black tracking-[0.16em] leading-none')}>
             RENNETUS
           </span>
-          <span className="h-1.5 w-1.5 rounded-full bg-[#E11D48] ml-0.5 inline-block shrink-0" />
         </div>
 
         {showTagline && (
-          <span className={clsx(s.tagline, 'font-display font-bold uppercase tracking-[0.24em] text-slate-400 mt-0.5')}>
+          <span className={clsx(s.tagline, 'font-display font-bold uppercase tracking-[0.24em] text-slate-400 mt-1')}>
             <span className="text-[#E11D48]">R</span>ECOGNIZE • <span className="text-[#E11D48]">R</span>EBUILD • <span className="text-[#E11D48]">R</span>ISE
           </span>
         )}

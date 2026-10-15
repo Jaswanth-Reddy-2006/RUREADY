@@ -569,7 +569,7 @@ export default function SetupForm() {
   const filteredCompanies = POPULAR_COMPANIES.filter((c) => c.toLowerCase().includes(companySearch.toLowerCase()));
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 py-8 px-4 sm:px-6 lg:px-8 font-sans">
+    <div className="min-h-screen bg-[#F4F7FC] dark:bg-[#000000] text-slate-900 dark:text-slate-100 py-8 px-4 sm:px-6 lg:px-8 font-sans transition-colors">
       <div className="max-w-6xl mx-auto space-y-6">
         
         {/* Top Header Row: Back Link on Left & Seamless Step Progress Bar on Right */}
@@ -582,9 +582,9 @@ export default function SetupForm() {
                 navigate('/video');
               }
             }}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs text-xs font-bold text-slate-700 hover:text-blue-600 hover:border-blue-300 transition-all cursor-pointer shrink-0"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white dark:bg-[#161B22] border border-slate-200/90 dark:border-slate-800 shadow-2xs text-xs font-bold text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-300 dark:hover:border-blue-700 transition-all cursor-pointer shrink-0"
           >
-            <ChevronLeft className="w-4 h-4 text-slate-600" />
+            <ChevronLeft className="w-4 h-4 text-slate-600 dark:text-slate-400" />
             <span>
               {wizardStep === 1
                 ? 'Back to Video Command Center'
@@ -605,22 +605,22 @@ export default function SetupForm() {
               <div
                 className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black transition-all ${
                   wizardStep >= 1
-                    ? 'bg-blue-600 text-white shadow-2xs ring-2 ring-blue-100'
-                    : 'bg-slate-200 text-slate-500'
+                    ? 'bg-blue-600 text-white shadow-2xs ring-2 ring-blue-100 dark:ring-blue-900/50'
+                    : 'bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
                 }`}
               >
                 1
               </div>
               <span
                 className={`text-xs font-bold transition-all ${
-                  wizardStep === 1 ? 'text-blue-700 font-extrabold' : 'text-slate-500 group-hover:text-slate-800'
+                  wizardStep === 1 ? 'text-blue-700 dark:text-blue-400 font-extrabold' : 'text-slate-500 dark:text-slate-400 group-hover:text-slate-800 dark:group-hover:text-slate-200'
                 }`}
               >
                 Prepare
               </span>
             </button>
 
-            <div className="w-6 sm:w-8 h-0.5 bg-slate-200 rounded-full" />
+            <div className="w-6 sm:w-8 h-0.5 bg-slate-200 dark:bg-slate-800 rounded-full" />
 
             {/* Step 2: Check */}
             <button
@@ -631,22 +631,22 @@ export default function SetupForm() {
               <div
                 className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black transition-all ${
                   wizardStep >= 2
-                    ? 'bg-blue-600 text-white shadow-2xs ring-2 ring-blue-100'
-                    : 'bg-slate-200 text-slate-500'
+                    ? 'bg-blue-600 text-white shadow-2xs ring-2 ring-blue-100 dark:ring-blue-900/50'
+                    : 'bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
                 }`}
               >
                 2
               </div>
               <span
                 className={`text-xs font-bold transition-all ${
-                  wizardStep === 2 ? 'text-blue-700 font-extrabold' : 'text-slate-500 group-hover:text-slate-800'
+                  wizardStep === 2 ? 'text-blue-700 dark:text-blue-400 font-extrabold' : 'text-slate-500 dark:text-slate-400 group-hover:text-slate-800 dark:group-hover:text-slate-200'
                 }`}
               >
                 Check
               </span>
             </button>
 
-            <div className="w-6 sm:w-8 h-0.5 bg-slate-200 rounded-full" />
+            <div className="w-6 sm:w-8 h-0.5 bg-slate-200 dark:bg-slate-800 rounded-full" />
 
             {/* Step 3: Allow */}
             <button
@@ -657,15 +657,15 @@ export default function SetupForm() {
               <div
                 className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black transition-all ${
                   wizardStep >= 3
-                    ? 'bg-blue-600 text-white shadow-2xs ring-2 ring-blue-100'
-                    : 'bg-slate-200 text-slate-500'
+                    ? 'bg-blue-600 text-white shadow-2xs ring-2 ring-blue-100 dark:ring-blue-900/50'
+                    : 'bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
                 }`}
               >
                 3
               </div>
               <span
                 className={`text-xs font-bold transition-all ${
-                  wizardStep === 3 ? 'text-blue-700 font-extrabold' : 'text-slate-500 group-hover:text-slate-800'
+                  wizardStep === 3 ? 'text-blue-700 dark:text-blue-400 font-extrabold' : 'text-slate-500 dark:text-slate-400 group-hover:text-slate-800 dark:group-hover:text-slate-200'
                 }`}
               >
                 Allow
@@ -683,17 +683,17 @@ export default function SetupForm() {
           >
             {/* ─── TOP CARD: INTERVIEW ACCORDING TO YOUR PROFILE vs CREATE YOUR PROFILE ─── */}
             {hasProfile ? (
-              <div className="bg-gradient-to-r from-blue-50/90 via-indigo-50/60 to-purple-50/70 border border-blue-200/80 p-6 md:p-8 rounded-3xl shadow-xs space-y-4">
+              <div className="bg-gradient-to-r from-blue-50/90 via-indigo-50/60 to-purple-50/70 dark:from-blue-950/30 dark:via-indigo-950/20 dark:to-purple-950/20 border border-blue-200/80 dark:border-blue-900/40 p-6 md:p-8 rounded-3xl shadow-xs space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="space-y-1">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-bold border border-blue-200">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 text-xs font-bold border border-blue-200 dark:border-blue-800">
                       <UserCheck className="w-3.5 h-3.5" />
                       <span>Interview According To Your Profile</span>
                     </div>
-                    <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 font-display">
+                    <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white font-display">
                       Quick Launch Profile Interview
                     </h2>
-                    <p className="text-slate-600 text-xs sm:text-sm font-medium">
+                    <p className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm font-medium">
                       Give an interview instantly based on your configured profile settings.
                     </p>
                   </div>
@@ -707,18 +707,18 @@ export default function SetupForm() {
                   </Button>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-blue-100">
-                  <div className="bg-white/80 p-3 rounded-2xl border border-blue-100">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase block">Target Role</span>
-                    <strong className="text-xs font-bold text-slate-900">{userProfile.targetRole || 'Software Engineer'}</strong>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-blue-100 dark:border-slate-800">
+                  <div className="bg-white/80 dark:bg-[#161B22] p-3 rounded-2xl border border-blue-100 dark:border-slate-800">
+                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase block">Target Role</span>
+                    <strong className="text-xs font-bold text-slate-900 dark:text-white">{userProfile.targetRole || 'Software Engineer'}</strong>
                   </div>
-                  <div className="bg-white/80 p-3 rounded-2xl border border-blue-100">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase block">Target Company</span>
-                    <strong className="text-xs font-bold text-slate-900">{userProfile.targetCompany || 'General'}</strong>
+                  <div className="bg-white/80 dark:bg-[#161B22] p-3 rounded-2xl border border-blue-100 dark:border-slate-800">
+                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase block">Target Company</span>
+                    <strong className="text-xs font-bold text-slate-900 dark:text-white">{userProfile.targetCompany || 'General'}</strong>
                   </div>
-                  <div className="bg-white/80 p-3 rounded-2xl border border-blue-100">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase block">Configured Skills</span>
-                    <strong className="text-xs font-bold text-slate-900 truncate block">
+                  <div className="bg-white/80 dark:bg-[#161B22] p-3 rounded-2xl border border-blue-100 dark:border-slate-800">
+                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase block">Configured Skills</span>
+                    <strong className="text-xs font-bold text-slate-900 dark:text-white truncate block">
                       {Array.isArray(userProfile.skills) && userProfile.skills.length > 0
                         ? userProfile.skills.slice(0, 3).join(', ')
                         : 'General Technical'}
@@ -727,17 +727,17 @@ export default function SetupForm() {
                 </div>
               </div>
             ) : (
-              <div className="bg-gradient-to-r from-pink-50/90 via-purple-50/60 to-indigo-50/70 border border-pink-200/80 p-6 md:p-8 rounded-3xl shadow-xs space-y-4">
+              <div className="bg-gradient-to-r from-pink-50/90 via-purple-50/60 to-indigo-50/70 dark:from-pink-950/30 dark:via-purple-950/20 dark:to-indigo-950/20 border border-pink-200/80 dark:border-pink-900/40 p-6 md:p-8 rounded-3xl shadow-xs space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="space-y-1">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-100 text-pink-700 text-xs font-bold border border-pink-200">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-100 dark:bg-pink-900/40 text-pink-700 dark:text-pink-300 text-xs font-bold border border-pink-200 dark:border-pink-800">
                       <UserPlus className="w-3.5 h-3.5" />
                       <span>Create Your Profile</span>
                     </div>
-                    <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 font-display">
+                    <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white font-display">
                       Setup Your Candidate Profile
                     </h2>
-                    <p className="text-slate-600 text-xs sm:text-sm font-medium">
+                    <p className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm font-medium">
                       Create your profile so that from next time you can give interviews quickly in 1 click.
                     </p>
                   </div>
@@ -756,9 +756,9 @@ export default function SetupForm() {
             <div className="space-y-6">
               
               {/* 1. INTERVIEW TYPE */}
-              <Card className="p-6 bg-white border-slate-200/80 shadow-xs rounded-3xl space-y-4">
-                <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                  <Target className="w-4 h-4 text-blue-600" />
+              <Card className="p-6 bg-white dark:bg-[#0D1117] border-slate-200/80 dark:border-slate-800 shadow-xs rounded-3xl space-y-4">
+                <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <Target className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                   <span>1. Select Interview Type *</span>
                 </h2>
 
@@ -771,21 +771,21 @@ export default function SetupForm() {
                         key={type.id}
                         type="button"
                         onClick={() => setInterviewType(type.id)}
-                        className={`p-5 rounded-2xl border text-left transition-all flex flex-col justify-between space-y-3 relative ${
+                        className={`p-5 rounded-2xl border text-left transition-all flex flex-col justify-between space-y-3 relative cursor-pointer ${
                           isSelected
-                            ? 'border-blue-600 bg-blue-50/40 ring-2 ring-blue-500/20 shadow-md'
-                            : 'border-slate-200 hover:border-blue-300 bg-white'
+                            ? 'border-blue-600 dark:border-blue-500 bg-blue-50/40 dark:bg-blue-950/30 ring-2 ring-blue-500/20 shadow-md'
+                            : 'border-slate-200 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-700 bg-white dark:bg-[#161B22]'
                         }`}
                       >
                         <div className="flex items-center justify-between w-full">
-                          <div className={`p-2.5 rounded-xl ${isSelected ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'}`}>
+                          <div className={`p-2.5 rounded-xl ${isSelected ? 'bg-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'}`}>
                             <Icon className="w-4 h-4" />
                           </div>
-                          <Badge className="text-[10px] bg-slate-100 text-slate-600">{type.badge}</Badge>
+                          <Badge className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">{type.badge}</Badge>
                         </div>
                         <div>
-                          <h3 className="font-bold text-sm text-slate-900">{type.title}</h3>
-                          <p className="text-xs text-slate-500 mt-1 leading-relaxed">{type.desc}</p>
+                          <h3 className="font-bold text-sm text-slate-900 dark:text-white">{type.title}</h3>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">{type.desc}</p>
                         </div>
                       </button>
                     );
@@ -794,9 +794,9 @@ export default function SetupForm() {
               </Card>
 
               {/* 2. TARGET ROLE & COMPANY (EXPANDED SEARCHABLE SELECTION) */}
-              <Card className="p-6 bg-white border-slate-200/80 shadow-xs rounded-3xl space-y-6">
-                <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                  <Briefcase className="w-4 h-4 text-blue-600" />
+              <Card className="p-6 bg-white dark:bg-[#0D1117] border-slate-200/80 dark:border-slate-800 shadow-xs rounded-3xl space-y-6">
+                <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <Briefcase className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                   <span>2. Target Role & Company *</span>
                 </h2>
 
@@ -804,8 +804,8 @@ export default function SetupForm() {
                   {/* Role Selector with Search */}
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <label className="text-xs font-bold text-slate-700 block">Target Job Role *</label>
-                      <span className="text-[10px] text-slate-500 font-mono">{POPULAR_ROLES.length}+ Available</span>
+                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Target Job Role *</label>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">{POPULAR_ROLES.length}+ Available</span>
                     </div>
 
                     {/* Role Search Box */}
@@ -816,7 +816,7 @@ export default function SetupForm() {
                         placeholder="Search roles (e.g. Backend, AI...)"
                         value={roleSearch}
                         onChange={(e) => setRoleSearch(e.target.value)}
-                        className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50"
+                        className="w-full pl-9 pr-3 py-2 border border-slate-200 dark:border-slate-800 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50 dark:bg-[#161B22] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                       />
                     </div>
 
@@ -829,10 +829,10 @@ export default function SetupForm() {
                             setIsCustomRole(false);
                             setTargetRole(role);
                           }}
-                          className={`p-2.5 rounded-xl border text-xs font-semibold text-left truncate transition-all ${
+                          className={`p-2.5 rounded-xl border text-xs font-semibold text-left truncate transition-all cursor-pointer ${
                             !isCustomRole && targetRole === role
-                              ? 'border-blue-600 bg-blue-50 text-blue-700 font-bold shadow-2xs'
-                              : 'border-slate-200 text-slate-700 hover:border-slate-300 bg-white'
+                              ? 'border-blue-600 bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 font-bold shadow-2xs'
+                              : 'border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-700 bg-white dark:bg-[#161B22]'
                           }`}
                         >
                           {role}
@@ -844,7 +844,7 @@ export default function SetupForm() {
                       <button
                         type="button"
                         onClick={() => setIsCustomRole(true)}
-                        className="text-xs font-bold text-blue-600 hover:underline inline-flex items-center gap-1 mt-1 cursor-pointer"
+                        className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1 mt-1 cursor-pointer"
                       >
                         <Plus className="w-3.5 h-3.5" />
                         <span>Type Custom Role</span>
@@ -856,12 +856,12 @@ export default function SetupForm() {
                           placeholder="e.g. Quantum Computing Engineer"
                           value={customRoleInput}
                           onChange={(e) => setCustomRoleInput(e.target.value)}
-                          className="w-full p-2.5 border border-blue-400 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none"
+                          className="w-full p-2.5 border border-blue-400 dark:border-blue-600 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none bg-white dark:bg-[#161B22] text-slate-900 dark:text-white"
                         />
                         <button
                           type="button"
                           onClick={() => setIsCustomRole(false)}
-                          className="text-[11px] text-slate-500 underline"
+                          className="text-[11px] text-slate-500 dark:text-slate-400 underline cursor-pointer"
                         >
                           Select from list
                         </button>
@@ -872,8 +872,8 @@ export default function SetupForm() {
                   {/* Company Selector with Search (Optional) */}
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <label className="text-xs font-bold text-slate-700 block">Target Company (Optional)</label>
-                      <Badge className="bg-slate-100 text-slate-600 text-[10px]">Optional</Badge>
+                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Target Company (Optional)</label>
+                      <Badge className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[10px]">Optional</Badge>
                     </div>
 
                     {/* Company Search Box */}
@@ -884,7 +884,7 @@ export default function SetupForm() {
                         placeholder="Search company (e.g. Google, TCS...)"
                         value={companySearch}
                         onChange={(e) => setCompanySearch(e.target.value)}
-                        className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-purple-500 outline-none bg-slate-50"
+                        className="w-full pl-9 pr-3 py-2 border border-slate-200 dark:border-slate-800 rounded-xl text-xs focus:ring-2 focus:ring-purple-500 outline-none bg-slate-50 dark:bg-[#161B22] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                       />
                     </div>
 
@@ -897,10 +897,10 @@ export default function SetupForm() {
                             setIsCustomCompany(false);
                             setTargetCompany(comp);
                           }}
-                          className={`p-2.5 rounded-xl border text-xs font-semibold text-left truncate transition-all ${
+                          className={`p-2.5 rounded-xl border text-xs font-semibold text-left truncate transition-all cursor-pointer ${
                             !isCustomCompany && targetCompany === comp
-                              ? 'border-purple-600 bg-purple-50 text-purple-700 font-bold shadow-2xs'
-                              : 'border-slate-200 text-slate-700 hover:border-slate-300 bg-white'
+                              ? 'border-purple-600 bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 font-bold shadow-2xs'
+                              : 'border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-700 bg-white dark:bg-[#161B22]'
                           }`}
                         >
                           {comp}
@@ -912,7 +912,7 @@ export default function SetupForm() {
                       <button
                         type="button"
                         onClick={() => setIsCustomCompany(true)}
-                        className="text-xs font-bold text-purple-600 hover:underline inline-flex items-center gap-1 mt-1 cursor-pointer"
+                        className="text-xs font-bold text-purple-600 dark:text-purple-400 hover:underline inline-flex items-center gap-1 mt-1 cursor-pointer"
                       >
                         <Plus className="w-3.5 h-3.5" />
                         <span>Type Custom Company</span>
@@ -924,12 +924,12 @@ export default function SetupForm() {
                           placeholder="e.g. OpenAI, Stripe, Startup"
                           value={customCompanyInput}
                           onChange={(e) => setCustomCompanyInput(e.target.value)}
-                          className="w-full p-2.5 border border-purple-400 rounded-xl text-xs focus:ring-2 focus:ring-purple-500 outline-none"
+                          className="w-full p-2.5 border border-purple-400 dark:border-purple-600 rounded-xl text-xs focus:ring-2 focus:ring-purple-500 outline-none bg-white dark:bg-[#161B22] text-slate-900 dark:text-white"
                         />
                         <button
                           type="button"
                           onClick={() => setIsCustomCompany(false)}
-                          className="text-[11px] text-slate-500 underline"
+                          className="text-[11px] text-slate-500 dark:text-slate-400 underline cursor-pointer"
                         >
                           Select from list
                         </button>
@@ -940,9 +940,9 @@ export default function SetupForm() {
               </Card>
 
               {/* 3. EXPERIENCE LEVEL */}
-              <Card className="p-6 bg-white border-slate-200/80 shadow-xs rounded-3xl space-y-4">
-                <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                  <GraduationCap className="w-4 h-4 text-blue-600" />
+              <Card className="p-6 bg-white dark:bg-[#0D1117] border-slate-200/80 dark:border-slate-800 shadow-xs rounded-3xl space-y-4">
+                <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <GraduationCap className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                   <span>3. Experience Level *</span>
                 </h2>
 
@@ -956,27 +956,27 @@ export default function SetupForm() {
                       key={lvl.id}
                       type="button"
                       onClick={() => setExperienceLevel(lvl.id as ExperienceLevel)}
-                      className={`p-3.5 rounded-2xl border text-center transition-all ${
+                      className={`p-3.5 rounded-2xl border text-center transition-all cursor-pointer ${
                         experienceLevel === lvl.id
-                          ? 'border-blue-600 bg-blue-50 text-blue-700 font-bold shadow-2xs'
-                          : 'border-slate-200 text-slate-700 hover:border-slate-300 bg-white'
+                          ? 'border-blue-600 bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 font-bold shadow-2xs'
+                          : 'border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-700 bg-white dark:bg-[#161B22]'
                       }`}
                     >
                       <span className="text-xs font-bold block">{lvl.label}</span>
-                      <span className="text-[10px] text-slate-500 block mt-0.5">{lvl.sub}</span>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-0.5">{lvl.sub}</span>
                     </button>
                   ))}
                 </div>
               </Card>
 
               {/* 4. SKILLS TO ASSESS (EXPANDED TO 30+ SKILLS, CLEAN EMPTY DEFAULTS!) */}
-              <Card className="p-6 bg-white border-slate-200/80 shadow-xs rounded-3xl space-y-4">
+              <Card className="p-6 bg-white dark:bg-[#0D1117] border-slate-200/80 dark:border-slate-800 shadow-xs rounded-3xl space-y-4">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                    <Code className="w-4 h-4 text-blue-600" />
+                  <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <Code className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                     <span>4. Skills to Assess (Optional)</span>
                   </h2>
-                  <Badge className="bg-slate-100 text-slate-700 font-mono text-xs">
+                  <Badge className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono text-xs">
                     {selectedSkills.length} Selected
                   </Badge>
                 </div>
@@ -992,7 +992,7 @@ export default function SetupForm() {
                         className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-all cursor-pointer ${
                           isSelected
                             ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
-                            : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-blue-300'
+                            : 'bg-slate-50 dark:bg-[#161B22] text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-700'
                         }`}
                       >
                         {skill} {isSelected && '✓'}
@@ -1008,12 +1008,12 @@ export default function SetupForm() {
                     value={customSkillInput}
                     onChange={(e) => setCustomSkillInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddCustomSkill())}
-                    className="p-2.5 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none flex-1"
+                    className="p-2.5 border border-slate-200 dark:border-slate-800 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 outline-none flex-1 bg-white dark:bg-[#161B22] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   />
                   <Button
                     type="button"
                     onClick={handleAddCustomSkill}
-                    className="bg-slate-800 text-white text-xs px-4 py-2.5 rounded-xl font-bold cursor-pointer"
+                    className="bg-slate-800 dark:bg-slate-700 hover:bg-slate-900 dark:hover:bg-slate-600 text-white text-xs px-4 py-2.5 rounded-xl font-bold cursor-pointer"
                   >
                     Add
                   </Button>
@@ -1021,13 +1021,13 @@ export default function SetupForm() {
               </Card>
 
               {/* 5. JOB DESCRIPTION (ACCURATE CUSTOM PROMPT / REQUIREMENTS) */}
-              <Card className="p-6 bg-white border-slate-200/80 shadow-xs rounded-3xl space-y-3">
+              <Card className="p-6 bg-white dark:bg-[#0D1117] border-slate-200/80 dark:border-slate-800 shadow-xs rounded-3xl space-y-3">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-blue-600" />
+                  <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                     <span>5. Job Description / Requirements (Optional)</span>
                   </h2>
-                  <Badge className="bg-slate-100 text-slate-600 text-[10px]">Tailored Probing</Badge>
+                  <Badge className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[10px]">Tailored Probing</Badge>
                 </div>
 
                 <textarea
@@ -1035,18 +1035,18 @@ export default function SetupForm() {
                   placeholder="Paste job description, requirements, or focus topics here to tailor interview questions specifically to your opportunity..."
                   value={jobDescription}
                   onChange={(e) => setJobDescription(e.target.value)}
-                  className="w-full p-3 border border-slate-200 rounded-2xl text-xs focus:ring-2 focus:ring-blue-500 outline-none leading-relaxed"
+                  className="w-full p-3 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs focus:ring-2 focus:ring-blue-500 outline-none leading-relaxed bg-white dark:bg-[#161B22] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </Card>
 
               {/* 6. INTERVIEW FOCUS AREAS (OPTIONAL) */}
-              <Card className="p-6 bg-white border-slate-200/80 shadow-xs rounded-3xl space-y-4">
+              <Card className="p-6 bg-white dark:bg-[#0D1117] border-slate-200/80 dark:border-slate-800 shadow-xs rounded-3xl space-y-4">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                    <Award className="w-4 h-4 text-blue-600" />
+                  <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <Award className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                     <span>6. Interview Focus Areas (Optional)</span>
                   </h2>
-                  <Badge className="bg-slate-100 text-slate-700 font-mono text-xs">
+                  <Badge className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono text-xs">
                     {selectedFocus.length} Selected
                   </Badge>
                 </div>
@@ -1059,10 +1059,10 @@ export default function SetupForm() {
                         key={focus.id}
                         type="button"
                         onClick={() => toggleFocus(focus.id)}
-                        className={`p-3 rounded-2xl border text-xs font-bold text-left transition-all ${
+                        className={`p-3 rounded-2xl border text-xs font-bold text-left transition-all cursor-pointer ${
                           isSelected
-                            ? 'border-purple-600 bg-purple-50 text-purple-700 shadow-2xs'
-                            : 'border-slate-200 text-slate-700 hover:border-slate-300 bg-white'
+                            ? 'border-purple-600 bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 shadow-2xs'
+                            : 'border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-700 bg-white dark:bg-[#161B22]'
                         }`}
                       >
                         {focus.label} {isSelected && '✓'}
@@ -1073,9 +1073,9 @@ export default function SetupForm() {
               </Card>
 
               {/* 7. DURATION */}
-              <Card className="p-6 bg-white border-slate-200/80 shadow-xs rounded-3xl space-y-4">
-                <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-blue-600" />
+              <Card className="p-6 bg-white dark:bg-[#0D1117] border-slate-200/80 dark:border-slate-800 shadow-xs rounded-3xl space-y-4">
+                <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                   <span>7. Interview Duration *</span>
                 </h2>
 
@@ -1085,10 +1085,10 @@ export default function SetupForm() {
                       key={mins}
                       type="button"
                       onClick={() => setDurationMins(mins)}
-                      className={`p-4 rounded-2xl border font-bold text-sm text-center transition-all ${
+                      className={`p-4 rounded-2xl border font-bold text-sm text-center transition-all cursor-pointer ${
                         durationMins === mins
                           ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
-                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-blue-300'
+                          : 'bg-slate-50 dark:bg-[#161B22] text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-700'
                       }`}
                     >
                       {mins} Minutes
@@ -1117,72 +1117,72 @@ export default function SetupForm() {
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="p-6 md:p-8 rounded-3xl bg-white text-slate-900 shadow-sm border border-slate-200/90 space-y-6"
+            className="p-6 md:p-8 rounded-3xl bg-white dark:bg-[#0D1117] text-slate-900 dark:text-white shadow-sm border border-slate-200/90 dark:border-slate-800 space-y-6 transition-colors"
           >
-            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-              <span className="text-sm font-extrabold text-blue-700 uppercase tracking-wider flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-blue-600" />
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+              <span className="text-sm font-extrabold text-blue-700 dark:text-blue-400 uppercase tracking-wider flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                 Selected Interview Configuration Details
               </span>
-              <Badge className="bg-blue-50 text-blue-700 font-mono text-xs border-blue-200">
+              <Badge className="bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 font-mono text-xs border-blue-200 dark:border-blue-800">
                 Step 2 of 3: Summary Review
               </Badge>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-5 rounded-2xl bg-slate-50 border border-slate-200/80">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-5 rounded-2xl bg-slate-50 dark:bg-[#161B22] border border-slate-200/80 dark:border-slate-800">
               <div className="space-y-1">
-                <span className="text-xs text-slate-500 font-medium block">Interview Type</span>
-                <strong className="text-sm font-bold text-slate-900 block">{interviewType.replace('_', ' ')}</strong>
+                <span className="text-xs text-slate-500 dark:text-slate-400 font-medium block">Interview Type</span>
+                <strong className="text-sm font-bold text-slate-900 dark:text-white block">{interviewType.replace('_', ' ')}</strong>
               </div>
 
               <div className="space-y-1">
-                <span className="text-xs text-slate-500 font-medium block">Target Job Role</span>
-                <strong className="text-sm font-bold text-slate-900 block">{finalDisplayRole}</strong>
+                <span className="text-xs text-slate-500 dark:text-slate-400 font-medium block">Target Job Role</span>
+                <strong className="text-sm font-bold text-slate-900 dark:text-white block">{finalDisplayRole}</strong>
               </div>
 
               <div className="space-y-1">
-                <span className="text-xs text-slate-500 font-medium block">Target Company</span>
-                <strong className="text-sm font-bold text-slate-900 block">{finalDisplayCompany}</strong>
+                <span className="text-xs text-slate-500 dark:text-slate-400 font-medium block">Target Company</span>
+                <strong className="text-sm font-bold text-slate-900 dark:text-white block">{finalDisplayCompany}</strong>
               </div>
 
               <div className="space-y-1">
-                <span className="text-xs text-slate-500 font-medium block">Experience Level</span>
-                <strong className="text-sm font-bold text-slate-900 block">{experienceLevel}</strong>
+                <span className="text-xs text-slate-500 dark:text-slate-400 font-medium block">Experience Level</span>
+                <strong className="text-sm font-bold text-slate-900 dark:text-white block">{experienceLevel}</strong>
               </div>
 
               <div className="space-y-1">
-                <span className="text-xs text-slate-500 font-medium block">Duration</span>
-                <strong className="text-sm font-bold text-slate-900 block">{durationMins} Minutes</strong>
+                <span className="text-xs text-slate-500 dark:text-slate-400 font-medium block">Duration</span>
+                <strong className="text-sm font-bold text-slate-900 dark:text-white block">{durationMins} Minutes</strong>
               </div>
 
               <div className="space-y-1">
-                <span className="text-xs text-slate-500 font-medium block">Selected Skills</span>
-                <strong className="text-sm font-bold text-slate-900 block truncate">
+                <span className="text-xs text-slate-500 dark:text-slate-400 font-medium block">Selected Skills</span>
+                <strong className="text-sm font-bold text-slate-900 dark:text-white block truncate">
                   {selectedSkills.length > 0 ? selectedSkills.join(', ') : 'General Role Skills'}
                 </strong>
               </div>
             </div>
 
             <div className="space-y-2 pt-2">
-              <span className="text-xs font-bold text-slate-700 block">Focus Areas:</span>
+              <span className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Focus Areas:</span>
               <div className="flex flex-wrap gap-2">
                 {selectedFocus.length > 0 ? (
                   selectedFocus.map((f) => (
-                    <Badge key={f} className="bg-purple-50 text-purple-700 border-purple-200 text-xs">
+                    <Badge key={f} className="bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800 text-xs">
                       {f}
                     </Badge>
                   ))
                 ) : (
-                  <Badge className="bg-slate-100 text-slate-600 text-xs">All Round Balanced Probing</Badge>
+                  <Badge className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs">All Round Balanced Probing</Badge>
                 )}
               </div>
             </div>
 
             {/* BUTTON COLORS FIXED: White/Slate button for Edit, Blue button for Next */}
-            <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
               <Button
                 onClick={() => setWizardStep(1)}
-                className="w-full sm:w-auto bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 px-6 py-3 rounded-2xl font-bold text-xs sm:text-sm shadow-2xs cursor-pointer"
+                className="w-full sm:w-auto bg-white dark:bg-[#161B22] hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 px-6 py-3 rounded-2xl font-bold text-xs sm:text-sm shadow-2xs cursor-pointer"
               >
                 <span>← Edit Selections</span>
               </Button>
@@ -1203,19 +1203,19 @@ export default function SetupForm() {
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="p-6 md:p-8 rounded-3xl bg-white text-slate-900 shadow-sm border border-slate-200/90 space-y-6"
+            className="p-6 md:p-8 rounded-3xl bg-white dark:bg-[#0D1117] text-slate-900 dark:text-white shadow-sm border border-slate-200/90 dark:border-slate-800 space-y-6 transition-colors"
           >
-            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-              <span className="text-sm font-extrabold text-blue-700 uppercase tracking-wider flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-blue-600" />
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+              <span className="text-sm font-extrabold text-blue-700 dark:text-blue-400 uppercase tracking-wider flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                 Device Permissions & Integrity Verification
               </span>
-              <Badge className="bg-blue-50 text-blue-700 font-mono text-xs border-blue-200">
+              <Badge className="bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 font-mono text-xs border-blue-200 dark:border-blue-800">
                 Step 3 of 3: Allow & Launch
               </Badge>
             </div>
 
-            <p className="text-xs sm:text-sm text-slate-600 font-medium">
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
               Complete permissions check for your Camera, Microphone, Speaker, and Full-Screen Mode before launching the proctored interview.
             </p>
 
@@ -1223,17 +1223,17 @@ export default function SetupForm() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               
               {/* Card 1: Camera & Candidate Detection */}
-              <div className="p-5 rounded-2xl bg-white border border-slate-200/90 text-slate-900 space-y-3.5 flex flex-col justify-between shadow-2xs">
+              <div className="p-5 rounded-2xl bg-white dark:bg-[#161B22] border border-slate-200/90 dark:border-slate-800 text-slate-900 dark:text-white space-y-3.5 flex flex-col justify-between shadow-2xs">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Camera className="w-4 h-4 text-blue-600" />
-                    <span className="text-xs font-bold text-slate-900">1. Camera & Candidate Check</span>
+                    <Camera className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                    <span className="text-xs font-bold text-slate-900 dark:text-white">1. Camera & Candidate Check</span>
                   </div>
                   <Badge
                     className={
                       camStatus === 'ready'
-                        ? 'bg-emerald-100 text-emerald-800 border-emerald-200 font-bold'
-                        : 'bg-slate-100 text-slate-600 border-slate-200'
+                        ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 font-bold'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
                     }
                   >
                     {camStatus === 'ready' ? '✓ Candidate Verified' : 'Pending'}
@@ -1274,40 +1274,40 @@ export default function SetupForm() {
               </div>
 
               {/* Card 2: Microphone & Speech Sentence Test */}
-              <div className="p-5 rounded-2xl bg-white border border-slate-200/90 text-slate-900 space-y-3.5 flex flex-col justify-between shadow-2xs">
+              <div className="p-5 rounded-2xl bg-white dark:bg-[#161B22] border border-slate-200/90 dark:border-slate-800 text-slate-900 dark:text-white space-y-3.5 flex flex-col justify-between shadow-2xs">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Mic className="w-4 h-4 text-purple-600" />
-                    <span className="text-xs font-bold text-slate-900">2. Microphone & Speech Check</span>
+                    <Mic className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                    <span className="text-xs font-bold text-slate-900 dark:text-white">2. Microphone & Speech Check</span>
                   </div>
                   <Badge
                     className={
                       micStatus === 'ready'
-                        ? 'bg-emerald-100 text-emerald-800 border-emerald-200 font-bold'
-                        : 'bg-slate-100 text-slate-600 border-slate-200'
+                        ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 font-bold'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
                     }
                   >
                     {micStatus === 'ready' ? '✓ Speech Verified' : 'Pending'}
                   </Badge>
                 </div>
 
-                <div className="p-3.5 bg-purple-50/60 rounded-xl border border-purple-100 space-y-2">
-                  <span className="text-[10px] font-bold text-purple-900 block uppercase tracking-wider">
+                <div className="p-3.5 bg-purple-50/60 dark:bg-purple-950/20 rounded-xl border border-purple-100 dark:border-purple-900/40 space-y-2">
+                  <span className="text-[10px] font-bold text-purple-900 dark:text-purple-300 block uppercase tracking-wider">
                     Read Out Loud to Verify Mic:
                   </span>
-                  <p className="text-xs italic text-purple-950 font-serif leading-relaxed font-semibold">
+                  <p className="text-xs italic text-purple-950 dark:text-purple-200 font-serif leading-relaxed font-semibold">
                     "I am ready to take my RU READY AI mock interview."
                   </p>
 
                   {/* Volume Level Indicator */}
                   <div className="space-y-1 pt-1">
-                    <div className="flex justify-between text-[10px] font-bold text-slate-500">
+                    <div className="flex justify-between text-[10px] font-bold text-slate-500 dark:text-slate-400">
                       <span>Audio Input Level</span>
                       <span>{micVolume}%</span>
                     </div>
-                    <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                    <div className="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-purple-600 transition-all duration-150"
+                        className="h-full bg-purple-600 dark:bg-purple-500 transition-all duration-150"
                         style={{ width: `${micVolume}%` }}
                       />
                     </div>
@@ -1327,28 +1327,28 @@ export default function SetupForm() {
               </div>
 
               {/* Card 3: Speaker Simple Check */}
-              <div className="p-5 rounded-2xl bg-white border border-slate-200/90 text-slate-900 space-y-3.5 flex flex-col justify-between shadow-2xs">
+              <div className="p-5 rounded-2xl bg-white dark:bg-[#161B22] border border-slate-200/90 dark:border-slate-800 text-slate-900 dark:text-white space-y-3.5 flex flex-col justify-between shadow-2xs">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Volume2 className="w-4 h-4 text-emerald-600" />
-                    <span className="text-xs font-bold text-slate-900">3. Speaker Sound Check</span>
+                    <Volume2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    <span className="text-xs font-bold text-slate-900 dark:text-white">3. Speaker Sound Check</span>
                   </div>
                   <Badge
                     className={
                       audioStatus === 'ready'
-                        ? 'bg-emerald-100 text-emerald-800 border-emerald-200 font-bold'
-                        : 'bg-slate-100 text-slate-600 border-slate-200'
+                        ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 font-bold'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
                     }
                   >
                     {audioStatus === 'ready' ? '✓ Speaker Ready' : 'Pending'}
                   </Badge>
                 </div>
 
-                <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2">
-                  <span className="text-[10px] font-bold text-slate-500 block uppercase tracking-wider">
+                <div className="p-3.5 bg-slate-50 dark:bg-[#0D1117] rounded-xl border border-slate-200/80 dark:border-slate-800 space-y-2">
+                  <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 block uppercase tracking-wider">
                     Audio Playback Check:
                   </span>
-                  <p className="text-xs text-slate-700 leading-relaxed font-medium">
+                  <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
                     Click the button below to play a test chime and ensure speaker clarity.
                   </p>
                 </div>
@@ -1366,28 +1366,28 @@ export default function SetupForm() {
               </div>
 
               {/* Card 4: Full-Screen Mode Permission */}
-              <div className="p-5 rounded-2xl bg-white border border-slate-200/90 text-slate-900 space-y-3.5 flex flex-col justify-between shadow-2xs">
+              <div className="p-5 rounded-2xl bg-white dark:bg-[#161B22] border border-slate-200/90 dark:border-slate-800 text-slate-900 dark:text-white space-y-3.5 flex flex-col justify-between shadow-2xs">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Maximize className="w-4 h-4 text-indigo-600" />
-                    <span className="text-xs font-bold text-slate-900">4. Full-Screen Permission</span>
+                    <Maximize className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                    <span className="text-xs font-bold text-slate-900 dark:text-white">4. Full-Screen Permission</span>
                   </div>
                   <Badge
                     className={
                       fullscreenStatus === 'ready'
-                        ? 'bg-emerald-100 text-emerald-800 border-emerald-200 font-bold'
-                        : 'bg-slate-100 text-slate-600 border-slate-200'
+                        ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 font-bold'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
                     }
                   >
                     {fullscreenStatus === 'ready' ? '✓ Full-Screen Allowed' : 'Pending'}
                   </Badge>
                 </div>
 
-                <div className="p-3.5 bg-indigo-50/60 rounded-xl border border-indigo-100 space-y-2">
-                  <span className="text-[10px] font-bold text-indigo-900 block uppercase tracking-wider">
+                <div className="p-3.5 bg-indigo-50/60 dark:bg-indigo-950/20 rounded-xl border border-indigo-100 dark:border-indigo-900/40 space-y-2">
+                  <span className="text-[10px] font-bold text-indigo-900 dark:text-indigo-300 block uppercase tracking-wider">
                     Screen Mode Enforcement:
                   </span>
-                  <p className="text-xs text-slate-700 leading-relaxed font-medium">
+                  <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
                     Allow full-screen mode to ensure an authentic, distraction-free interview session.
                   </p>
                 </div>
@@ -1407,14 +1407,14 @@ export default function SetupForm() {
             </div>
 
             {/* Anti-Cheating & Full-Screen Proctoring Rules Box */}
-            <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 space-y-3">
+            <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 text-amber-900 dark:text-amber-300 space-y-3">
               <div className="flex items-center gap-2">
-                <Lock className="w-4 h-4 text-amber-600 shrink-0" />
-                <span className="text-xs font-bold text-amber-900 uppercase tracking-wider">
+                <Lock className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                <span className="text-xs font-bold text-amber-900 dark:text-amber-300 uppercase tracking-wider">
                   Proctoring & Anti-Cheating Integrity Rules
                 </span>
               </div>
-              <ul className="text-xs space-y-1.5 list-disc list-inside text-amber-800 leading-relaxed font-medium">
+              <ul className="text-xs space-y-1.5 list-disc list-inside text-amber-800 dark:text-amber-200/80 leading-relaxed font-medium">
                 <li>
                   <strong>Full-Screen Enforcement:</strong> The interview will run in strict full-screen. Pressing ESC, switching tabs, or minimizing window will trigger proctoring violations.
                 </li>
@@ -1430,23 +1430,23 @@ export default function SetupForm() {
                   onChange={(e) => setAgreedToIntegrityRules(e.target.checked)}
                   className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 cursor-pointer"
                 />
-                <span className="text-xs font-bold text-slate-900">
+                <span className="text-xs font-bold text-slate-900 dark:text-slate-200">
                   I agree to the Full-Screen Proctoring & Anti-Cheating Rules
                 </span>
               </label>
             </div>
 
-            <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
               <Button
                 onClick={() => setWizardStep(2)}
-                className="w-full sm:w-auto bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 px-6 py-3 rounded-2xl font-bold text-xs sm:text-sm shadow-2xs cursor-pointer whitespace-nowrap flex items-center justify-center gap-2"
+                className="w-full sm:w-auto bg-white dark:bg-[#161B22] hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 px-6 py-3 rounded-2xl font-bold text-xs sm:text-sm shadow-2xs cursor-pointer whitespace-nowrap flex items-center justify-center gap-2"
               >
                 <span>← Back to Review</span>
               </Button>
 
               <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
                 {!isAllVerifiedAndAgreed && (
-                  <span className="text-[11px] font-mono text-amber-700 font-semibold text-center sm:text-right">
+                  <span className="text-[11px] font-mono text-amber-700 dark:text-amber-400 font-semibold text-center sm:text-right">
                     {[
                       camStatus !== 'ready' && 'Camera',
                       micStatus !== 'ready' && 'Mic',
@@ -1466,10 +1466,10 @@ export default function SetupForm() {
                   className={`w-full sm:w-auto px-8 py-4 rounded-2xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 whitespace-nowrap ${
                     isAllVerifiedAndAgreed
                       ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md cursor-pointer'
-                      : 'bg-slate-200 text-slate-400 border border-slate-300 shadow-none cursor-not-allowed'
+                      : 'bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 border border-slate-300 dark:border-slate-700 shadow-none cursor-not-allowed'
                   }`}
                 >
-                  <Maximize className={`w-4 h-4 ${isAllVerifiedAndAgreed ? 'text-white' : 'text-slate-400'}`} />
+                  <Maximize className={`w-4 h-4 ${isAllVerifiedAndAgreed ? 'text-white' : 'text-slate-400 dark:text-slate-500'}`} />
                   <span>{isSubmitting ? prepMessage || 'Launching...' : '🚀 Launch Live Interview Session'}</span>
                 </Button>
               </div>

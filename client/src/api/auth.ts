@@ -25,6 +25,26 @@ export const authApi = {
     return response.data;
   },
 
+  sendRegistrationOtp: async (data: { email: string; name?: string }): Promise<{ success: boolean; message: string; emailSent?: boolean }> => {
+    const response = await apiClient.post<{ success: boolean; message: string; emailSent?: boolean }>('/auth/send-registration-otp', data);
+    return response.data;
+  },
+
+  verifyRegistrationOtp: async (data: { email: string; otp: string }): Promise<{ verified: boolean; verificationToken: string }> => {
+    const response = await apiClient.post<{ verified: boolean; verificationToken: string }>('/auth/verify-registration-otp', data);
+    return response.data;
+  },
+
+  forgotPassword: async (email: string): Promise<{ success: boolean; message: string; emailSent?: boolean }> => {
+    const response = await apiClient.post<{ success: boolean; message: string; emailSent?: boolean }>('/auth/forgot-password', { email });
+    return response.data;
+  },
+
+  resetPassword: async (data: { token: string; email: string; newPassword: string }): Promise<{ success: boolean; message: string }> => {
+    const response = await apiClient.post<{ success: boolean; message: string }>('/auth/reset-password', data);
+    return response.data;
+  },
+
   refresh: async (): Promise<RefreshResponse> => {
     const response = await axios.post<RefreshResponse>(
       `${API_BASE}/auth/refresh`,

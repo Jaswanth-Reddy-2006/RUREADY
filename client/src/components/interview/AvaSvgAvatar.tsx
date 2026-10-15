@@ -877,14 +877,14 @@ const AvaSvgAvatar: React.FC<AvaSvgAvatarProps> = ({
             </div>
 
             {/* Word content */}
-            <span className="flex-1 text-center font-display text-sm font-bold tracking-wide text-white/95 truncate">
+            <span className="flex-1 text-center font-display text-sm font-bold tracking-wide text-slate-100 truncate">
               {currentWord}
             </span>
 
             {/* Small microphone speaker icon */}
             <div className="flex items-center gap-1.5 shrink-0 bg-white/5 border border-white/10 px-2 py-0.5 rounded-lg">
               <span className="h-1.5 w-1.5 rounded-full bg-[#F5A623] animate-pulse" />
-              <span className="text-[9px] font-bold uppercase tracking-wider text-white/40 font-display">
+              <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500 font-display">
                 Ava
               </span>
             </div>
@@ -917,7 +917,7 @@ const AvaSvgAvatar: React.FC<AvaSvgAvatarProps> = ({
             }
             transition={{ duration: 1, repeat: Infinity }}
           />
-          <span className="text-[9px] font-bold uppercase tracking-wider text-white/50 font-display">
+          <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 font-display">
             {stateConfig.label}
           </span>
         </div>

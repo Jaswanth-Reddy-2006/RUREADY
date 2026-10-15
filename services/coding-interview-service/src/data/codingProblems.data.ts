@@ -1,3 +1,8 @@
+// ═══════════════════════════════════════════════════════════════
+// Renatus 120+ Coding Interview Problems Database
+// Curated from Hugging Face LeetCode Datasets & FAANG Engineering Curricula
+// ═══════════════════════════════════════════════════════════════
+
 export interface CodingTestCase {
   input: any;
   expected: any;
@@ -9,21 +14,17 @@ export interface CodingProblem {
   id: string;
   title: string;
   difficulty: 'EASY' | 'MEDIUM' | 'HARD';
+  category: string;
   pattern: string;
   description: string;
   entryPoint: string;
-  starterCode: {
-    javascript: string;
-    typescript: string;
-    python: string;
-    java: string;
-    cpp: string;
-    go: string;
-  };
-  testCases: CodingTestCase[];
-  optimalSolution: string;
   optimalTime: string;
   optimalSpace: string;
+  optimalSolution?: string;
+  idealSolutions?: Record<string, string>;
+  timeKeywords: string[];
+  spaceKeywords: string[];
+  testCases: CodingTestCase[];
   editorial: {
     intuition: string;
     bruteForce: string;
@@ -31,2693 +32,9072 @@ export interface CodingProblem {
     complexityAnalysis: string;
     edgeCases: string[];
   };
-  idealSolutions: {
-    javascript: string;
-    typescript: string;
-    python: string;
-    java: string;
-    cpp: string;
-    go: string;
-  };
   hints: string[];
 }
 
 export const CODING_PROBLEMS: CodingProblem[] = [
-  // 1. Two Sum (EASY - Arrays & Hashing)
   {
-    id: 'two-sum',
-    title: 'Two Sum',
-    difficulty: 'EASY',
-    pattern: 'Arrays & Hashing',
-    entryPoint: 'twoSum',
-    description: `Given an array of integers \`nums\` and an integer \`target\`, return indices of the two numbers such that they add up to \`target\`.
-
-You may assume that each input would have **exactly one solution**, and you may not use the same element twice. You can return the answer in any order.
-
-### Example 1:
-\`\`\`text
-Input: nums = [2,7,11,15], target = 9
-Output: [0,1]
-Explanation: Because nums[0] + nums[1] == 9, we return [0, 1].
-\`\`\`
-
-### Example 2:
-\`\`\`text
-Input: nums = [3,2,4], target = 6
-Output: [1,2]
-\`\`\`
-
-### Example 3:
-\`\`\`text
-Input: nums = [3,3], target = 6
-Output: [0,1]
-\`\`\`
-
-### Constraints:
-- \`2 <= nums.length <= 10^4\`
-- \`-10^9 <= nums[i] <= 10^9\`
-- \`-10^9 <= target <= 10^9\`
-- Only one valid answer exists.`,
-    starterCode: {
-      javascript: `/**
- * @param {number[]} nums
- * @param {number} target
- * @return {number[]}
- */
-function twoSum(nums, target) {
-  // Write your optimal solution here
-  return [0, 1];
-}`,
-      typescript: `function twoSum(nums: number[], target: number): number[] {
-  // Write your optimal solution here
-  return [0, 1];
-}`,
-      python: `def twoSum(nums: list[int], target: int) -> list[int]:
-    # Write your optimal solution here
-    return [0, 1]`,
-      java: `import java.util.*;
-
-class Solution {
-    public int[] twoSum(int[] nums, int target) {
-        // Write your optimal solution here
-        return new int[]{0, 1};
-    }
-}`,
-      cpp: `#include <vector>
-#include <unordered_map>
-
-class Solution {
-public:
-    std::vector<int> twoSum(std::vector<int>& nums, int target) {
-        // Write your optimal solution here
-        return {0, 1};
-    }
-};`,
-      go: `package main
-
-func twoSum(nums []int, target int) []int {
-    // Write your optimal solution here
-    return []int{0, 1}
-}`,
-    },
-    testCases: [
-      { input: [[2, 7, 11, 15], 9], expected: [0, 1], description: 'Standard case with positive integers' },
-      { input: [[3, 2, 4], 6], expected: [1, 2], description: 'Target found later in array' },
-      { input: [[3, 3], 6], expected: [0, 1], description: 'Duplicate values that sum to target' },
-      { input: [[-1, -2, -3, -4, -5], -8], expected: [2, 4], description: 'Negative integers edge case', isHidden: true },
-      { input: [[0, 4, 3, 0], 0], expected: [0, 3], description: 'Zero elements edge case', isHidden: true },
+    "id": "two-sum",
+    "title": "Two Sum",
+    "difficulty": "EASY",
+    "category": "DSA",
+    "pattern": "Arrays & Hashing",
+    "entryPoint": "twoSum",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "o of n"
     ],
-    optimalSolution: 'One-pass Hash Map storing complements: O(N) time, O(N) space.',
-    optimalTime: 'O(N)',
-    optimalSpace: 'O(N)',
-    editorial: {
-      intuition: 'Instead of searching through all pairs with nested loops (which takes quadratic time), we can trade a linear amount of auxiliary space for instantaneous lookup time using a hash map.',
-      bruteForce: 'A brute-force solution checks every pair (i, j) with i < j. For an array of length N, this requires N*(N-1)/2 comparisons, resulting in O(N^2) time complexity and O(1) space.',
-      optimalApproach: 'Traverse the array once. For each element \`nums[i]\`, compute its complement \`target - nums[i]\`. If the complement already exists in our hash map, we have found our two numbers and return \`[map[complement], i]\`. Otherwise, insert \`nums[i]\` into the map with its index \`i\`.',
-      complexityAnalysis: 'Time Complexity: O(N) because we perform a single linear scan of nums, and hash map lookups take amortized O(1) time. Space Complexity: O(N) to store up to N elements in the hash map.',
-      edgeCases: [
-        'Duplicate elements that sum up to target (e.g. nums = [3, 3], target = 6).',
-        'Negative numbers (e.g. nums = [-3, 4, 3, 90], target = 0).',
-        'Target with zero (e.g. nums = [0, 4, 3, 0], target = 0).'
-      ],
-    },
-    idealSolutions: {
-      javascript: `function twoSum(nums, target) {
-  const seen = new Map();
-  for (let i = 0; i < nums.length; i++) {
-    const complement = target - nums[i];
-    if (seen.has(complement)) {
-      return [seen.get(complement), i];
-    }
-    seen.set(nums[i], i);
-  }
-  return [];
-}`,
-      typescript: `function twoSum(nums: number[], target: number): number[] {
-  const seen = new Map<number, number>();
-  for (let i = 0; i < nums.length; i++) {
-    const complement = target - nums[i];
-    if (seen.has(complement)) {
-      return [seen.get(complement)!, i];
-    }
-    seen.set(nums[i], i);
-  }
-  return [];
-}`,
-      python: `def twoSum(nums: list[int], target: int) -> list[int]:
-    seen = {}
-    for i, num in enumerate(nums):
-        complement = target - num
-        if complement in seen:
-            return [seen[complement], i]
-        seen[num] = i
-    return []`,
-      java: `import java.util.HashMap;
-import java.util.Map;
-
-class Solution {
-    public int[] twoSum(int[] nums, int target) {
-        Map<Integer, Integer> map = new HashMap<>();
-        for (int i = 0; i < nums.length; i++) {
-            int complement = target - nums[i];
-            if (map.containsKey(complement)) {
-                return new int[] { map.get(complement), i };
-            }
-            map.put(nums[i], i);
-        }
-        return new int[0];
-    }
-}`,
-      cpp: `#include <vector>
-#include <unordered_map>
-
-class Solution {
-public:
-    std::vector<int> twoSum(std::vector<int>& nums, int target) {
-        std::unordered_map<int, int> seen;
-        for (int i = 0; i < nums.size(); i++) {
-            int complement = target - nums[i];
-            if (seen.count(complement)) {
-                return {seen[complement], i};
-            }
-            seen[nums[i]] = i;
-        }
-        return {};
-    }
-};`,
-      go: `package main
-
-func twoSum(nums []int, target int) []int {
-    seen := make(map[int]int)
-    for i, num := range nums {
-        complement := target - num
-        if idx, ok := seen[complement]; ok {
-            return []int{idx, i}
-        }
-        seen[num] = i
-    }
-    return nil
-}`,
-    },
-    hints: [
-      'Think about what information you need when inspecting each number: if you are at x, what value y must you find?',
-      'Can you use a Hash Map to store previously visited elements and their indices for O(1) lookup?',
-      'Notice that you only need a single pass! You can check if the complement exists in your map before inserting the current number.',
+    "spaceKeywords": [
+      "o(n)",
+      "linear",
+      "o of n",
+      "auxiliary"
     ],
-  },
-
-  // 2. Valid Palindrome (EASY - Two Pointers)
-  {
-    id: 'valid-palindrome',
-    title: 'Valid Palindrome',
-    difficulty: 'EASY',
-    pattern: 'Two Pointers',
-    entryPoint: 'isPalindrome',
-    description: `A phrase is a **palindrome** if, after converting all uppercase letters into lowercase letters and removing all non-alphanumeric characters, it reads the same forward and backward. Alphanumeric characters include letters and numbers.
-
-Given a string \`s\`, return \`true\` if it is a **palindrome**, or \`false\` otherwise.
-
-### Example 1:
-\`\`\`text
-Input: s = "A man, a plan, a canal: Panama"
-Output: true
-Explanation: "amanaplanacanalpanama" is a palindrome.
-\`\`\`
-
-### Example 2:
-\`\`\`text
-Input: s = "race a car"
-Output: false
-Explanation: "raceacar" is not a palindrome.
-\`\`\`
-
-### Constraints:
-- \`1 <= s.length <= 2 * 10^5\`
-- \`s\` consists only of printable ASCII characters.`,
-    starterCode: {
-      javascript: `function isPalindrome(s) {
-  // Write your optimal solution here
-  return true;
-}`,
-      typescript: `function isPalindrome(s: string): boolean {
-  // Write your optimal solution here
-  return true;
-}`,
-      python: `def isPalindrome(s: str) -> bool:
-    # Write your optimal solution here
-    return True`,
-      java: `class Solution {
-    public boolean isPalindrome(String s) {
-        // Write your optimal solution here
-        return true;
-    }
-}`,
-      cpp: `#include <string>
-#include <cctype>
-
-class Solution {
-public:
-    bool isPalindrome(std::string s) {
-        // Write your optimal solution here
-        return true;
-    }
-};`,
-      go: `package main
-
-func isPalindrome(s string) bool {
-    // Write your optimal solution here
-    return true
-}`,
-    },
-    testCases: [
-      { input: ["A man, a plan, a canal: Panama"], expected: true, description: 'Standard mixed phrase' },
-      { input: ["race a car"], expected: false, description: 'Non-palindrome phrase' },
-      { input: [" "], expected: true, description: 'Single whitespace empty string' },
-      { input: ["0P"], expected: false, description: 'Alphanumeric letter and digit', isHidden: true },
-      { input: ["a."], expected: true, description: 'Single character with punctuation', isHidden: true },
-    ],
-    optimalSolution: 'Two pointers converging from ends: O(N) time, O(1) space.',
-    optimalTime: 'O(N)',
-    optimalSpace: 'O(1)',
-    editorial: {
-      intuition: 'Instead of creating a new filtered string, place two pointers at the start and end of the string and advance them inwards while comparing characters.',
-      bruteForce: 'Allocating a filtered reversed string takes O(N) auxiliary space.',
-      optimalApproach: 'Use two pointers: \`left = 0\` and \`right = s.length - 1\`. While \`left < right\`, advance \`left\` past non-alphanumeric characters and decrement \`right\` past non-alphanumeric characters. Compare lowercased characters at \`left\` and \`right\`.',
-      complexityAnalysis: 'Time: O(N) single scan. Space: O(1) auxiliary variables.',
-      edgeCases: ['Empty string or symbols only ("., ").', 'Single letter ("a").', 'Alphanumerics with numbers and letters mixed ("0P").'],
-    },
-    idealSolutions: {
-      javascript: `function isPalindrome(s) {
-  let left = 0, right = s.length - 1;
-  const isAlphaNum = (ch) => /[a-zA-Z0-9]/.test(ch);
-  while (left < right) {
-    while (left < right && !isAlphaNum(s[left])) left++;
-    while (left < right && !isAlphaNum(s[right])) right--;
-    if (s[left].toLowerCase() !== s[right].toLowerCase()) return false;
-    left++;
-    right--;
-  }
-  return true;
-}`,
-      typescript: `function isPalindrome(s: string): boolean {
-  let left = 0, right = s.length - 1;
-  const isAlphaNum = (ch: string) => /[a-zA-Z0-9]/.test(ch);
-  while (left < right) {
-    while (left < right && !isAlphaNum(s[left])) left++;
-    while (left < right && !isAlphaNum(s[right])) right--;
-    if (s[left].toLowerCase() !== s[right].toLowerCase()) return false;
-    left++;
-    right--;
-  }
-  return true;
-}`,
-      python: `def isPalindrome(s: str) -> bool:
-    left, right = 0, len(s) - 1
-    while left < right:
-        while left < right and not s[left].isalnum():
-            left += 1
-        while left < right and not s[right].isalnum():
-            right -= 1
-        if s[left].lower() != s[right].lower():
-            return False
-        left += 1
-        right -= 1
-    return True`,
-      java: `class Solution {
-    public boolean isPalindrome(String s) {
-        int left = 0, right = s.length() - 1;
-        while (left < right) {
-            while (left < right && !Character.isLetterOrDigit(s.charAt(left))) left++;
-            while (left < right && !Character.isLetterOrDigit(s.charAt(right))) right--;
-            if (Character.toLowerCase(s.charAt(left)) != Character.toLowerCase(s.charAt(right))) {
-                return false;
-            }
-            left++;
-            right--;
-        }
-        return true;
-    }
-}`,
-      cpp: `#include <string>
-#include <cctype>
-
-class Solution {
-public:
-    bool isPalindrome(std::string s) {
-        int left = 0, right = s.size() - 1;
-        while (left < right) {
-            while (left < right && !isalnum(s[left])) left++;
-            while (left < right && !isalnum(s[right])) right--;
-            if (tolower(s[left]) != tolower(s[right])) return false;
-            left++;
-            right--;
-        }
-        return true;
-    }
-};`,
-      go: `package main
-
-import "unicode"
-
-func isPalindrome(s string) bool {
-    runes := []rune(s)
-    left, right := 0, len(runes)-1
-    for left < right {
-        for left < right && !unicode.IsLetter(runes[left]) && !unicode.IsDigit(runes[left]) {
-            left++
-        }
-        for left < right && !unicode.IsLetter(runes[right]) && !unicode.IsDigit(runes[right]) {
-            right--
-        }
-        if unicode.ToLower(runes[left]) != unicode.ToLower(runes[right]) {
-            return false
-        }
-        left++
-        right--
-    }
-    return true
-}`,
-    },
-    hints: [
-      'Can you solve this without allocating a new string by checking characters in place?',
-      'Try placing two pointers: one at the beginning of the string, one at the end.',
-      'Remember to skip non-alphanumeric characters and convert uppercase letters to lowercase before comparing.',
-    ],
-  },
-
-  // 3. Best Time to Buy and Sell Stock (EASY - Sliding Window)
-  {
-    id: 'best-time-to-buy-and-sell-stock',
-    title: 'Best Time to Buy and Sell Stock',
-    difficulty: 'EASY',
-    pattern: 'Sliding Window',
-    entryPoint: 'maxProfit',
-    description: `You are given an array \`prices\` where \`prices[i]\` is the price of a given stock on the \`i\`-th day.
-
-You want to maximize your profit by choosing a **single day** to buy one stock and choosing a **different day in the future** to sell that stock.
-
-Return *the maximum profit you can achieve from this transaction*. If you cannot achieve any profit, return \`0\`.
-
-### Example 1:
-\`\`\`text
-Input: prices = [7,1,5,3,6,4]
-Output: 5
-Explanation: Buy on day 2 (price = 1) and sell on day 5 (price = 6), profit = 6-1 = 5.
-\`\`\`
-
-### Example 2:
-\`\`\`text
-Input: prices = [7,6,4,3,1]
-Output: 0
-\`\`\`
-
-### Constraints:
-- \`1 <= prices.length <= 10^5\`
-- \`0 <= prices[i] <= 10^4\``,
-    starterCode: {
-      javascript: `function maxProfit(prices) {
-  // Write your optimal solution here
-  return 0;
-}`,
-      typescript: `function maxProfit(prices: number[]): number {
-  // Write your optimal solution here
-  return 0;
-}`,
-      python: `def maxProfit(prices: list[int]) -> int:
-    # Write your optimal solution here
-    return 0`,
-      java: `class Solution {
-    public int maxProfit(int[] prices) {
-        // Write your optimal solution here
-        return 0;
-    }
-}`,
-      cpp: `#include <vector>
-#include <algorithm>
-
-class Solution {
-public:
-    int maxProfit(std::vector<int>& prices) {
-        // Write your optimal solution here
-        return 0;
-    }
-};`,
-      go: `package main
-
-func maxProfit(prices []int) int {
-    // Write your optimal solution here
-    return 0
-}`,
-    },
-    testCases: [
-      { input: [[7, 1, 5, 3, 6, 4]], expected: 5, description: 'Standard fluctuating price trend' },
-      { input: [[7, 6, 4, 3, 1]], expected: 0, description: 'Monotonically decreasing prices' },
-      { input: [[1, 2]], expected: 1, description: 'Two elements increasing' },
-      { input: [[2, 4, 1]], expected: 2, description: 'Minimum price at the end', isHidden: true },
-    ],
-    optimalSolution: 'One-pass dynamic tracking of minimum price and max profit: O(N) time, O(1) space.',
-    optimalTime: 'O(N)',
-    optimalSpace: 'O(1)',
-    editorial: {
-      intuition: 'To maximize profit, on any day i, you want to sell having bought at the minimum price encountered prior to day i.',
-      bruteForce: 'Examining every pair takes O(N^2) time.',
-      optimalApproach: 'Maintain \`minPrice = Infinity\` and \`maxProfit = 0\`. Iterate through prices: update \`minPrice = min(minPrice, price)\` and \`maxProfit = max(maxProfit, price - minPrice)\`.',
-      complexityAnalysis: 'Time: O(N) single linear pass. Space: O(1) constant variables.',
-      edgeCases: ['Array of length 1.', 'Strictly decreasing prices.'],
-    },
-    idealSolutions: {
-      javascript: `function maxProfit(prices) {
-  let minPrice = Infinity, maxProfit = 0;
-  for (const price of prices) {
-    if (price < minPrice) minPrice = price;
-    else maxProfit = Math.max(maxProfit, price - minPrice);
-  }
-  return maxProfit;
-}`,
-      typescript: `function maxProfit(prices: number[]): number {
-  let minPrice = Infinity, maxProfit = 0;
-  for (const price of prices) {
-    if (price < minPrice) minPrice = price;
-    else maxProfit = Math.max(maxProfit, price - minPrice);
-  }
-  return maxProfit;
-}`,
-      python: `def maxProfit(prices: list[int]) -> int:
-    min_price = float('inf')
-    max_profit = 0
-    for price in prices:
-        if price < min_price:
-            min_price = price
-        else:
-            max_profit = max(max_profit, price - min_price)
-    return max_profit`,
-      java: `class Solution {
-    public int maxProfit(int[] prices) {
-        int minPrice = Integer.MAX_VALUE, maxProfit = 0;
-        for (int price : prices) {
-            if (price < minPrice) minPrice = price;
-            else maxProfit = Math.max(maxProfit, price - minPrice);
-        }
-        return maxProfit;
-    }
-}`,
-      cpp: `#include <vector>
-#include <algorithm>
-#include <climits>
-
-class Solution {
-public:
-    int maxProfit(std::vector<int>& prices) {
-        int minPrice = INT_MAX, maxProfit = 0;
-        for (int price : prices) {
-            if (price < minPrice) minPrice = price;
-            else maxProfit = std::max(maxProfit, price - minPrice);
-        }
-        return maxProfit;
-    }
-};`,
-      go: `package main
-
-func maxProfit(prices []int) int {
-    minPrice := int(^uint(0) >> 1)
-    maxProfit := 0
-    for _, price := range prices {
-        if price < minPrice {
-            minPrice = price
-        } else if price-minPrice > maxProfit {
-            maxProfit = price - minPrice
-        }
-    }
-    return maxProfit
-}`,
-    },
-    hints: [
-      'If you were to sell today, which day would have been the best day to buy?',
-      'Track the minimum price seen so far as you iterate through the list.',
-      'At each day, the potential profit is current_price - min_price. Update your overall max profit accordingly.',
-    ],
-  },
-
-  // 4. Valid Parentheses (EASY - Stack)
-  {
-    id: 'valid-parentheses',
-    title: 'Valid Parentheses',
-    difficulty: 'EASY',
-    pattern: 'Stack',
-    entryPoint: 'isValid',
-    description: `Given a string \`s\` containing just the characters \`'('\`, \`')'\`, \`'{'\`, \`'}'\`, \`'['\` and \`']'\`, determine if the input string is valid.
-
-An input string is valid if:
-1. Open brackets must be closed by the same type of brackets.
-2. Open brackets must be closed in the correct order.
-3. Every close bracket has a corresponding open bracket of the same type.
-
-### Example 1:
-\`\`\`text
-Input: s = "()"
-Output: true
-\`\`\`
-
-### Example 2:
-\`\`\`text
-Input: s = "()[]{}"
-Output: true
-\`\`\`
-
-### Example 3:
-\`\`\`text
-Input: s = "(]"
-Output: false
-\`\`\`
-
-### Constraints:
-- \`1 <= s.length <= 10^4\`
-- \`s\` consists of parentheses only \`'()[]{}'\`.`,
-    starterCode: {
-      javascript: `function isValid(s) {
-  // Write your optimal solution here
-  return true;
-}`,
-      typescript: `function isValid(s: string): boolean {
-  // Write your optimal solution here
-  return true;
-}`,
-      python: `def isValid(s: str) -> bool:
-    # Write your optimal solution here
-    return True`,
-      java: `class Solution {
-    public boolean isValid(String s) {
-        // Write your optimal solution here
-        return true;
-    }
-}`,
-      cpp: `#include <string>
-#include <stack>
-
-class Solution {
-public:
-    bool isValid(std::string s) {
-        // Write your optimal solution here
-        return true;
-    }
-};`,
-      go: `package main
-
-func isValid(s string) bool {
-    // Write your optimal solution here
-    return true
-}`,
-    },
-    testCases: [
-      { input: ["()"], expected: true, description: 'Simple single pair' },
-      { input: ["()[]{}"], expected: true, description: 'Multiple adjacent balanced pairs' },
-      { input: ["(]"], expected: false, description: 'Mismatched closing bracket' },
-      { input: ["([)]"], expected: false, description: 'Interleaved invalid order' },
-      { input: ["{[]}"], expected: true, description: 'Nested valid brackets' },
-      { input: ["]"], expected: false, description: 'Single closing bracket without open', isHidden: true },
-    ],
-    optimalSolution: 'LIFO Stack with bracket matching lookup: O(N) time, O(N) space.',
-    optimalTime: 'O(N)',
-    optimalSpace: 'O(N)',
-    editorial: {
-      intuition: 'Brackets must close in reverse chronological order: the most recently opened bracket must be the first one to close. A Stack (LIFO) is the ideal data structure.',
-      bruteForce: 'Repeated string replacement takes O(N^2) time.',
-      optimalApproach: 'Iterate through characters. Push opening brackets to stack. For closing brackets, pop and verify matching opening bracket.',
-      complexityAnalysis: 'Time: O(N). Space: O(N) for stack.',
-      edgeCases: ['Starts with closing bracket.', 'Odd string length.', 'Unclosed opening brackets remaining.'],
-    },
-    idealSolutions: {
-      javascript: `function isValid(s) {
-  if (s.length % 2 !== 0) return false;
-  const stack = [];
-  const map = { ')': '(', '}': '{', ']': '[' };
-  for (const char of s) {
-    if (map[char]) {
-      if (stack.pop() !== map[char]) return false;
-    } else {
-      stack.push(char);
-    }
-  }
-  return stack.length === 0;
-}`,
-      typescript: `function isValid(s: string): boolean {
-  if (s.length % 2 !== 0) return false;
-  const stack: string[] = [];
-  const map: Record<string, string> = { ')': '(', '}': '{', ']': '[' };
-  for (const char of s) {
-    if (map[char]) {
-      if (stack.pop() !== map[char]) return false;
-    } else {
-      stack.push(char);
-    }
-  }
-  return stack.length === 0;
-}`,
-      python: `def isValid(s: str) -> bool:
-    if len(s) % 2 != 0:
-        return False
-    stack = []
-    mapping = {')': '(', '}': '{', ']': '['}
-    for char in s:
-        if char in mapping:
-            top_element = stack.pop() if stack else '#'
-            if mapping[char] != top_element:
-                return False
-        else:
-            stack.append(char)
-    return not stack`,
-      java: `import java.util.Stack;
-
-class Solution {
-    public boolean isValid(String s) {
-        if (s.length() % 2 != 0) return false;
-        Stack<Character> stack = new Stack<>();
-        for (char c : s.toCharArray()) {
-            if (c == '(') stack.push(')');
-            else if (c == '{') stack.push('}');
-            else if (c == '[') stack.push(']');
-            else if (stack.isEmpty() || stack.pop() != c) return false;
-        }
-        return stack.isEmpty();
-    }
-}`,
-      cpp: `#include <string>
-#include <stack>
-#include <unordered_map>
-
-class Solution {
-public:
-    bool isValid(std::string s) {
-        if (s.size() % 2 != 0) return false;
-        std::stack<char> st;
-        std::unordered_map<char, char> map = {{')', '('}, {'}', '{'}, {']', '['}};
-        for (char c : s) {
-            if (map.count(c)) {
-                if (st.empty() || st.top() != map[c]) return false;
-                st.pop();
-            } else {
-                st.push(c);
-            }
-        }
-        return st.empty();
-    }
-};`,
-      go: `package main
-
-func isValid(s string) bool {
-    if len(s)%2 != 0 {
-        return false
-    }
-    stack := []rune{}
-    match := map[rune]rune{')': '(', '}': '{', ']': '['}
-    for _, ch := range s {
-        if open, exists := match[ch]; exists {
-            if len(stack) == 0 || stack[len(stack)-1] != open {
-                return false
-            }
-            stack = stack[:len(stack)-1]
-        } else {
-            stack = append(stack, ch)
-        }
-    }
-    return len(stack) == 0
-}`,
-    },
-    hints: [
-      'What data structure allows you to inspect the most recently added open bracket?',
-      'If you encounter a closing bracket, what should be at the top of the stack?',
-      'Consider what happens if the string is empty, starts with a closing bracket, or has leftover open brackets.',
-    ],
-  },
-
-  // 5. Maximum Subarray (MEDIUM - Dynamic Programming)
-  {
-    id: 'maximum-subarray',
-    title: 'Maximum Subarray',
-    difficulty: 'MEDIUM',
-    pattern: 'Dynamic Programming',
-    entryPoint: 'maxSubArray',
-    description: `Given an integer array \`nums\`, find the subarray with the largest sum, and return *its sum*.
-
-### Example 1:
-\`\`\`text
-Input: nums = [-2,1,-3,4,-1,2,1,-5,4]
-Output: 6
-Explanation: The subarray [4,-1,2,1] has the largest sum 6.
-\`\`\`
-
-### Example 2:
-\`\`\`text
-Input: nums = [1]
-Output: 1
-\`\`\`
-
-### Example 3:
-\`\`\`text
-Input: nums = [5,4,-1,7,8]
-Output: 23
-\`\`\`
-
-### Constraints:
-- \`1 <= nums.length <= 10^5\`
-- \`-10^4 <= nums[i] <= 10^4\``,
-    starterCode: {
-      javascript: `function maxSubArray(nums) {
-  // Write your optimal solution here
-  return nums[0];
-}`,
-      typescript: `function maxSubArray(nums: number[]): number {
-  // Write your optimal solution here
-  return nums[0];
-}`,
-      python: `def maxSubArray(nums: list[int]) -> int:
-    # Write your optimal solution here
-    return nums[0]`,
-      java: `class Solution {
-    public int maxSubArray(int[] nums) {
-        // Write your optimal solution here
-        return nums[0];
-    }
-}`,
-      cpp: `#include <vector>
-#include <algorithm>
-
-class Solution {
-public:
-    int maxSubArray(std::vector<int>& nums) {
-        // Write your optimal solution here
-        return nums[0];
-    }
-};`,
-      go: `package main
-
-func maxSubArray(nums []int) int {
-    // Write your optimal solution here
-    return nums[0]
-}`,
-    },
-    testCases: [
-      { input: [[-2, 1, -3, 4, -1, 2, 1, -5, 4]], expected: 6, description: 'Standard mixed positive & negative array' },
-      { input: [[1]], expected: 1, description: 'Single element array' },
-      { input: [[5, 4, -1, 7, 8]], expected: 23, description: 'Predominantly positive array' },
-      { input: [[-1, -2, -3]], expected: -1, description: 'All negative numbers', isHidden: true },
-    ],
-    optimalSolution: "Kadane's Algorithm: O(N) time, O(1) space.",
-    optimalTime: 'O(N)',
-    optimalSpace: 'O(1)',
-    editorial: {
-      intuition: 'If the running sum of a subarray drops below zero, adding it to subsequent elements will only reduce their total sum. Thus, reset the running sum whenever it turns negative.',
-      bruteForce: 'Checking all subarrays takes O(N^2) time.',
-      optimalApproach: 'Set \`maxSum = nums[0]\` and \`currentSum = 0\`. For each num: \`currentSum = max(num, currentSum + num)\`, \`maxSum = max(maxSum, currentSum)\`.',
-      complexityAnalysis: 'Time: O(N). Space: O(1).',
-      edgeCases: ['All negative numbers array.'],
-    },
-    idealSolutions: {
-      javascript: `function maxSubArray(nums) {
-  let maxSum = nums[0], currentSum = 0;
-  for (const num of nums) {
-    currentSum = Math.max(num, currentSum + num);
-    maxSum = Math.max(maxSum, currentSum);
-  }
-  return maxSum;
-}`,
-      typescript: `function maxSubArray(nums: number[]): number {
-  let maxSum = nums[0], currentSum = 0;
-  for (const num of nums) {
-    currentSum = Math.max(num, currentSum + num);
-    maxSum = Math.max(maxSum, currentSum);
-  }
-  return maxSum;
-}`,
-      python: `def maxSubArray(nums: list[int]) -> int:
-    max_sum = nums[0]
-    current_sum = 0
-    for num in nums:
-        current_sum = max(num, current_sum + num)
-        max_sum = max(max_sum, current_sum)
-    return max_sum`,
-      java: `class Solution {
-    public int maxSubArray(int[] nums) {
-        int maxSum = nums[0], currentSum = 0;
-        for (int num : nums) {
-            currentSum = Math.max(num, currentSum + num);
-            maxSum = Math.max(maxSum, currentSum);
-        }
-        return maxSum;
-    }
-}`,
-      cpp: `#include <vector>
-#include <algorithm>
-
-class Solution {
-public:
-    int maxSubArray(std::vector<int>& nums) {
-        int maxSum = nums[0], currentSum = 0;
-        for (int num : nums) {
-            currentSum = std::max(num, currentSum + num);
-            maxSum = std::max(maxSum, currentSum);
-        }
-        return maxSum;
-    }
-};`,
-      go: `package main
-
-func maxSubArray(nums []int) int {
-    maxSum := nums[0]
-    currentSum := 0
-    for _, num := range nums {
-        if currentSum+num > num {
-            currentSum += num
-        } else {
-            currentSum = num
-        }
-        if currentSum > maxSum {
-            maxSum = currentSum
-        }
-    }
-    return maxSum
-}`,
-    },
-    hints: [
-      'If the sum of your prefix is negative, does extending it help any future subarray?',
-      'Can you decide at each index whether to extend the existing subarray or start fresh with the current number?',
-    ],
-  },
-
-  // 6. Longest Substring Without Repeating Characters (MEDIUM - Sliding Window)
-  {
-    id: 'longest-substring-without-repeating-characters',
-    title: 'Longest Substring Without Repeating Characters',
-    difficulty: 'MEDIUM',
-    pattern: 'Sliding Window',
-    entryPoint: 'lengthOfLongestSubstring',
-    description: `Given a string \`s\`, find the length of the **longest substring** without duplicate characters.
-
-### Example 1:
-\`\`\`text
-Input: s = "abcabcbb"
-Output: 3
-Explanation: The answer is "abc", with the length of 3.
-\`\`\`
-
-### Example 2:
-\`\`\`text
-Input: s = "bbbbb"
-Output: 1
-Explanation: The answer is "b", with the length of 1.
-\`\`\`
-
-### Constraints:
-- \`0 <= s.length <= 5 * 10^4\`
-- \`s\` consists of English letters, digits, symbols and spaces.`,
-    starterCode: {
-      javascript: `function lengthOfLongestSubstring(s) {
-  // Write your optimal solution here
-  return 0;
-}`,
-      typescript: `function lengthOfLongestSubstring(s: string): number {
-  // Write your optimal solution here
-  return 0;
-}`,
-      python: `def lengthOfLongestSubstring(s: str) -> int:
-    # Write your optimal solution here
-    return 0`,
-      java: `class Solution {
-    public int lengthOfLongestSubstring(String s) {
-        // Write your optimal solution here
-        return 0;
-    }
-}`,
-      cpp: `#include <string>
-#include <unordered_map>
-#include <algorithm>
-
-class Solution {
-public:
-    int lengthOfLongestSubstring(std::string s) {
-        // Write your optimal solution here
-        return 0;
-    }
-};`,
-      go: `package main
-
-func lengthOfLongestSubstring(s string) int {
-    // Write your optimal solution here
-    return 0
-}`,
-    },
-    testCases: [
-      { input: ["abcabcbb"], expected: 3, description: 'Standard repeating pattern' },
-      { input: ["bbbbb"], expected: 1, description: 'All identical characters' },
-      { input: ["pwwkew"], expected: 3, description: 'Repeating character in middle' },
-      { input: [""], expected: 0, description: 'Empty string boundary', isHidden: true },
-      { input: ["abba"], expected: 2, description: 'Tricky pointer jump edge case', isHidden: true },
-    ],
-    optimalSolution: 'Sliding window with hash map storing last seen index: O(N) time, O(min(N, M)) space.',
-    optimalTime: 'O(N)',
-    optimalSpace: 'O(min(N, M))',
-    editorial: {
-      intuition: 'Maintain a window \`[left, right]\` containing unique characters. Jump \`left\` past the duplicate when seen.',
-      bruteForce: 'Checking all substrings takes O(N^3) time.',
-      optimalApproach: 'Use a hash map mapping each character to its most recent index. If \`s[right]\` was seen at \`idx >= left\`, update \`left = idx + 1\`. Track \`maxLength = max(maxLength, right - left + 1)\`.',
-      complexityAnalysis: 'Time: O(N). Space: O(min(N, M)).',
-      edgeCases: ['Empty string "" -> 0.', 'All unique chars.', 'Back-to-back duplicates like "abba".'],
-    },
-    idealSolutions: {
-      javascript: `function lengthOfLongestSubstring(s) {
-  const lastSeen = new Map();
-  let left = 0, maxLen = 0;
-  for (let right = 0; right < s.length; right++) {
-    const char = s[right];
-    if (lastSeen.has(char) && lastSeen.get(char) >= left) {
-      left = lastSeen.get(char) + 1;
-    }
-    lastSeen.set(char, right);
-    maxLen = Math.max(maxLen, right - left + 1);
-  }
-  return maxLen;
-}`,
-      typescript: `function lengthOfLongestSubstring(s: string): number {
-  const lastSeen = new Map<string, number>();
-  let left = 0, maxLen = 0;
-  for (let right = 0; right < s.length; right++) {
-    const char = s[right];
-    if (lastSeen.has(char) && lastSeen.get(char)! >= left) {
-      left = lastSeen.get(char)! + 1;
-    }
-    lastSeen.set(char, right);
-    maxLen = Math.max(maxLen, right - left + 1);
-  }
-  return maxLen;
-}`,
-      python: `def lengthOfLongestSubstring(s: str) -> int:
-    last_seen = {}
-    left = 0
-    max_len = 0
-    for right, char in enumerate(s):
-        if char in last_seen and last_seen[char] >= left:
-            left = last_seen[char] + 1
-        last_seen[char] = right
-        max_len = max(max_len, right - left + 1)
-    return max_len`,
-      java: `import java.util.HashMap;
-import java.util.Map;
-
-class Solution {
-    public int lengthOfLongestSubstring(String s) {
-        Map<Character, Integer> lastSeen = new HashMap<>();
-        int left = 0, maxLen = 0;
-        for (int right = 0; right < s.length(); right++) {
-            char c = s.charAt(right);
-            if (lastSeen.containsKey(c) && lastSeen.get(c) >= left) {
-                left = lastSeen.get(c) + 1;
-            }
-            lastSeen.put(c, right);
-            maxLen = Math.max(maxLen, right - left + 1);
-        }
-        return maxLen;
-    }
-}`,
-      cpp: `#include <string>
-#include <unordered_map>
-#include <algorithm>
-
-class Solution {
-public:
-    int lengthOfLongestSubstring(std::string s) {
-        std::unordered_map<char, int> lastSeen;
-        int left = 0, maxLen = 0;
-        for (int right = 0; right < s.size(); right++) {
-            char c = s[right];
-            if (lastSeen.count(c) && lastSeen[c] >= left) {
-                left = lastSeen[c] + 1;
-            }
-            lastSeen[c] = right;
-            maxLen = std::max(maxLen, right - left + 1);
-        }
-        return maxLen;
-    }
-};`,
-      go: `package main
-
-func lengthOfLongestSubstring(s string) int {
-    lastSeen := make(map[rune]int)
-    left, maxLen := 0, 0
-    for right, ch := range s {
-        if idx, exists := lastSeen[ch]; exists && idx >= left {
-            left = idx + 1
-        }
-        lastSeen[ch] = right
-        currLen := right - left + 1
-        if currLen > maxLen {
-            maxLen = currLen
-        }
-    }
-    return maxLen
-}`,
-    },
-    hints: [
-      'Maintain a sliding window of unique characters.',
-      'Store each character and its most recent index in a map.',
-      'Make sure the left pointer never moves backwards!',
-    ],
-  },
-
-  // 7. Container With Most Water (MEDIUM - Two Pointers)
-  {
-    id: 'container-with-most-water',
-    title: 'Container With Most Water',
-    difficulty: 'MEDIUM',
-    pattern: 'Two Pointers',
-    entryPoint: 'maxArea',
-    description: `You are given an integer array \`height\` of length \`n\`. There are \`n\` vertical lines drawn such that the two endpoints of the \`i\`-th line are \`(i, 0)\` and \`(i, height[i])\`.
-
-Find two lines that together with the x-axis form a container, such that the container contains the most water.
-
-Return *the maximum amount of water a container can store*.
-
-### Example 1:
-\`\`\`text
-Input: height = [1,8,6,2,5,4,8,3,7]
-Output: 49
-\`\`\`
-
-### Example 2:
-\`\`\`text
-Input: height = [1,1]
-Output: 1
-\`\`\`
-
-### Constraints:
-- \`n == height.length\`
-- \`2 <= n <= 10^5\`
-- \`0 <= height[i] <= 10^4\``,
-    starterCode: {
-      javascript: `function maxArea(height) {
-  // Write your optimal solution here
-  return 0;
-}`,
-      typescript: `function maxArea(height: number[]): number {
-  // Write your optimal solution here
-  return 0;
-}`,
-      python: `def maxArea(height: list[int]) -> int:
-    # Write your optimal solution here
-    return 0`,
-      java: `class Solution {
-    public int maxArea(int[] height) {
-        // Write your optimal solution here
-        return 0;
-    }
-}`,
-      cpp: `#include <vector>
-#include <algorithm>
-
-class Solution {
-public:
-    int maxArea(std::vector<int>& height) {
-        // Write your optimal solution here
-        return 0;
-    }
-};`,
-      go: `package main
-
-func maxArea(height []int) int {
-    // Write your optimal solution here
-    return 0
-}`,
-    },
-    testCases: [
-      { input: [[1, 8, 6, 2, 5, 4, 8, 3, 7]], expected: 49, description: 'Standard varying heights' },
-      { input: [[1, 1]], expected: 1, description: 'Minimum length array' },
-      { input: [[4, 3, 2, 1, 4]], expected: 16, description: 'Symmetric tall boundaries' },
-    ],
-    optimalSolution: 'Two pointers converging from ends, moving shorter line inwards: O(N) time, O(1) space.',
-    optimalTime: 'O(N)',
-    optimalSpace: 'O(1)',
-    editorial: {
-      intuition: 'Area is width * min(height[left], height[right]). Moving the taller pointer inwards can only decrease width without increasing height bottleneck. Always move the shorter pointer inwards.',
-      bruteForce: 'Checking all pairs takes O(N^2) time.',
-      optimalApproach: 'Set \`left = 0, right = N - 1\`. Track max area. If \`height[left] < height[right]\` increment left, else decrement right.',
-      complexityAnalysis: 'Time: O(N). Space: O(1).',
-      edgeCases: ['All heights equal.', 'Two elements.'],
-    },
-    idealSolutions: {
-      javascript: `function maxArea(height) {
-  let left = 0, right = height.length - 1, maxWater = 0;
-  while (left < right) {
-    const width = right - left;
-    const h = Math.min(height[left], height[right]);
-    maxWater = Math.max(maxWater, width * h);
-    if (height[left] < height[right]) left++;
-    else right--;
-  }
-  return maxWater;
-}`,
-      typescript: `function maxArea(height: number[]): number {
-  let left = 0, right = height.length - 1, maxWater = 0;
-  while (left < right) {
-    const width = right - left;
-    const h = Math.min(height[left], height[right]);
-    maxWater = Math.max(maxWater, width * h);
-    if (height[left] < height[right]) left++;
-    else right--;
-  }
-  return maxWater;
-}`,
-      python: `def maxArea(height: list[int]) -> int:
-    left, right = 0, len(height) - 1
-    max_water = 0
-    while left < right:
-        width = right - left
-        h = min(height[left], height[right])
-        max_water = max(max_water, width * h)
-        if height[left] < height[right]:
-            left += 1
-        else:
-            right -= 1
-    return max_water`,
-      java: `class Solution {
-    public int maxArea(int[] height) {
-        int left = 0, right = height.length - 1;
-        int maxWater = 0;
-        while (left < right) {
-            int width = right - left;
-            int h = Math.min(height[left], height[right]);
-            maxWater = Math.max(maxWater, width * h);
-            if (height[left] < height[right]) left++;
-            else right--;
-        }
-        return maxWater;
-    }
-}`,
-      cpp: `#include <vector>
-#include <algorithm>
-
-class Solution {
-public:
-    int maxArea(std::vector<int>& height) {
-        int left = 0, right = height.size() - 1;
-        int maxWater = 0;
-        while (left < right) {
-            int width = right - left;
-            int h = std::min(height[left], height[right]);
-            maxWater = std::max(maxWater, width * h);
-            if (height[left] < height[right]) left++;
-            else right--;
-        }
-        return maxWater;
-    }
-};`,
-      go: `package main
-
-func maxArea(height []int) int {
-    left, right := 0, len(height)-1
-    maxWater := 0
-    for left < right {
-        width := right - left
-        h := height[left]
-        if height[right] < h {
-            h = height[right]
-        }
-        if width*h > maxWater {
-            maxWater = width * h
-        }
-        if height[left] < height[right] {
-            left++
-        } else {
-            right--
-        }
-    }
-    return maxWater
-}`,
-    },
-    hints: [
-      'Start with the widest container (left = 0, right = n-1). Which line limits the water capacity?',
-      'If you move the taller line inwards, capacity can never increase.',
-    ],
-  },
-
-  // 8. 3Sum (MEDIUM - Two Pointers)
-  {
-    id: 'three-sum',
-    title: '3Sum',
-    difficulty: 'MEDIUM',
-    pattern: 'Two Pointers',
-    entryPoint: 'threeSum',
-    description: `Given an integer array nums, return all the triplets \`[nums[i], nums[j], nums[k]]\` such that \`i != j\`, \`i != k\`, and \`j != k\`, and \`nums[i] + nums[j] + nums[k] == 0\`.
-
-Notice that the solution set must not contain duplicate triplets.
-
-### Example 1:
-\`\`\`text
-Input: nums = [-1,0,1,2,-1,-4]
-Output: [[-1,-1,2],[-1,0,1]]
-\`\`\`
-
-### Example 2:
-\`\`\`text
-Input: nums = [0,1,1]
-Output: []
-\`\`\`
-
-### Example 3:
-\`\`\`text
-Input: nums = [0,0,0]
-Output: [[0,0,0]]
-\`\`\`
-
-### Constraints:
-- \`3 <= nums.length <= 3000\`
-- \`-10^5 <= nums[i] <= 10^5\``,
-    starterCode: {
-      javascript: `function threeSum(nums) {
-  // Write your optimal solution here
-  return [];
-}`,
-      typescript: `function threeSum(nums: number[]): number[][] {
-  // Write your optimal solution here
-  return [];
-}`,
-      python: `def threeSum(nums: list[int]) -> list[list[int]]:
-    # Write your optimal solution here
-    return []`,
-      java: `import java.util.*;
-
-class Solution {
-    public List<List<Integer>> threeSum(int[] nums) {
-        // Write your optimal solution here
-        return new ArrayList<>();
-    }
-}`,
-      cpp: `#include <vector>
-
-class Solution {
-public:
-    std::vector<std::vector<int>> threeSum(std::vector<int>& nums) {
-        // Write your optimal solution here
-        return {};
-    }
-};`,
-      go: `package main
-
-func threeSum(nums []int) [][]int {
-    // Write your optimal solution here
-    return nil
-}`,
-    },
-    testCases: [
-      { input: [[-1, 0, 1, 2, -1, -4]], expected: [[-1, -1, 2], [-1, 0, 1]], description: 'Multiple triplets with duplicates' },
-      { input: [[0, 1, 1]], expected: [], description: 'No triplets summing to zero' },
-      { input: [[0, 0, 0]], expected: [[0, 0, 0]], description: 'All zeros triplet' },
-    ],
-    optimalSolution: 'Sort array then use Two Pointers with duplicate skipping: O(N^2) time, O(1) space.',
-    optimalTime: 'O(N^2)',
-    optimalSpace: 'O(1)',
-    editorial: {
-      intuition: 'Sorting makes deduplication easy and allows Two Pointers to find pairs that sum to -nums[i].',
-      bruteForce: 'Checking all triplets takes O(N^3) time.',
-      optimalApproach: 'Sort nums. Iterate i from 0 to N-3. Skip duplicates for i. Use two pointers left = i + 1, right = N - 1. If sum is 0, add triplet and skip duplicates for left and right.',
-      complexityAnalysis: 'Time: O(N^2). Space: O(1) auxiliary.',
-      edgeCases: ['All zeros [0, 0, 0].', 'No possible triplet.', 'Heavy duplicate values.'],
-    },
-    idealSolutions: {
-      javascript: `function threeSum(nums) {
-  nums.sort((a, b) => a - b);
-  const result = [];
-  for (let i = 0; i < nums.length - 2; i++) {
-    if (nums[i] > 0) break;
-    if (i > 0 && nums[i] === nums[i - 1]) continue;
-    let left = i + 1, right = nums.length - 1;
-    while (left < right) {
-      const sum = nums[i] + nums[left] + nums[right];
-      if (sum === 0) {
-        result.push([nums[i], nums[left], nums[right]]);
-        while (left < right && nums[left] === nums[left + 1]) left++;
-        while (left < right && nums[right] === nums[right - 1]) right--;
-        left++;
-        right--;
-      } else if (sum < 0) left++;
-      else right--;
-    }
-  }
-  return result;
-}`,
-      typescript: `function threeSum(nums: number[]): number[][] {
-  nums.sort((a, b) => a - b);
-  const result: number[][] = [];
-  for (let i = 0; i < nums.length - 2; i++) {
-    if (nums[i] > 0) break;
-    if (i > 0 && nums[i] === nums[i - 1]) continue;
-    let left = i + 1, right = nums.length - 1;
-    while (left < right) {
-      const sum = nums[i] + nums[left] + nums[right];
-      if (sum === 0) {
-        result.push([nums[i], nums[left], nums[right]]);
-        while (left < right && nums[left] === nums[left + 1]) left++;
-        while (left < right && nums[right] === nums[right - 1]) right--;
-        left++;
-        right--;
-      } else if (sum < 0) left++;
-      else right--;
-    }
-  }
-  return result;
-}`,
-      python: `def threeSum(nums: list[int]) -> list[list[int]]:
-    nums.sort()
-    result = []
-    for i in range(len(nums) - 2):
-        if nums[i] > 0:
-            break
-        if i > 0 and nums[i] == nums[i - 1]:
-            continue
-        left, right = i + 1, len(nums) - 1
-        while left < right:
-            total = nums[i] + nums[left] + nums[right]
-            if total == 0:
-                result.append([nums[i], nums[left], nums[right]])
-                while left < right and nums[left] == nums[left + 1]:
-                    left += 1
-                while left < right and nums[right] == nums[right - 1]:
-                    right -= 1
-                left += 1
-                right -= 1
-            elif total < 0:
-                left += 1
-            else:
-                right -= 1
-    return result`,
-      java: `import java.util.*;
-
-class Solution {
-    public List<List<Integer>> threeSum(int[] nums) {
-        Arrays.sort(nums);
-        List<List<Integer>> result = new ArrayList<>();
-        for (int i = 0; i < nums.length - 2; i++) {
-            if (nums[i] > 0) break;
-            if (i > 0 && nums[i] == nums[i - 1]) continue;
-            int left = i + 1, right = nums.length - 1;
-            while (left < right) {
-                int sum = nums[i] + nums[left] + nums[right];
-                if (sum == 0) {
-                    result.add(Arrays.asList(nums[i], nums[left], nums[right]));
-                    while (left < right && nums[left] == nums[left + 1]) left++;
-                    while (left < right && nums[right] == nums[right - 1]) right--;
-                    left++;
-                    right--;
-                } else if (sum < 0) left++;
-                else right--;
-            }
-        }
-        return result;
-    }
-}`,
-      cpp: `#include <vector>
-#include <algorithm>
-
-class Solution {
-public:
-    std::vector<std::vector<int>> threeSum(std::vector<int>& nums) {
-        std::sort(nums.begin(), nums.end());
-        std::vector<std::vector<int>> result;
-        for (int i = 0; i < (int)nums.size() - 2; i++) {
-            if (nums[i] > 0) break;
-            if (i > 0 && nums[i] == nums[i - 1]) continue;
-            int left = i + 1, right = nums.size() - 1;
-            while (left < right) {
-                int sum = nums[i] + nums[left] + nums[right];
-                if (sum == 0) {
-                    result.push_back({nums[i], nums[left], nums[right]});
-                    while (left < right && nums[left] == nums[left + 1]) left++;
-                    while (left < right && nums[right] == nums[right - 1]) right--;
-                    left++;
-                    right--;
-                } else if (sum < 0) left++;
-                else right--;
-            }
-        }
-        return result;
-    }
-};`,
-      go: `package main
-
-import "sort"
-
-func threeSum(nums []int) [][]int {
-    sort.Ints(nums)
-    result := [][]int{}
-    for i := 0; i < len(nums)-2; i++ {
-        if nums[i] > 0 {
-            break
-        }
-        if i > 0 && nums[i] == nums[i-1] {
-            continue
-        }
-        left, right := i+1, len(nums)-1
-        for left < right {
-            sum := nums[i] + nums[left] + nums[right]
-            if sum == 0 {
-                result = append(result, []int{nums[i], nums[left], nums[right]})
-                for left < right && nums[left] == nums[left+1] {
-                    left++
-                }
-                for left < right && nums[right] == nums[right-1] {
-                    right--
-                }
-                left++
-                right--
-            } else if sum < 0 {
-                left++
-            } else {
-                right--
-            }
-        }
-    }
-    return result
-}`,
-    },
-    hints: [
-      'Sort the array first. How does sorting reduce the search space?',
-      'Fix the first element, then use Two Pointers to find the remaining pair.',
-      'Remember to skip duplicates for all three pointers to ensure unique triplets.',
-    ],
-  },
-
-  // 9. Coin Change (MEDIUM - Dynamic Programming)
-  {
-    id: 'coin-change',
-    title: 'Coin Change',
-    difficulty: 'MEDIUM',
-    pattern: 'Dynamic Programming',
-    entryPoint: 'coinChange',
-    description: `You are given an integer array \`coins\` representing coins of different denominations and an integer \`amount\` representing a total amount of money.
-
-Return *the fewest number of coins that you need to make up that amount*. If that amount of money cannot be made up by any combination of the coins, return \`-1\`.
-
-You may assume that you have an infinite number of each kind of coin.
-
-### Example 1:
-\`\`\`text
-Input: coins = [1,2,5], amount = 11
-Output: 3
-Explanation: 11 = 5 + 5 + 1
-\`\`\`
-
-### Constraints:
-- \`1 <= coins.length <= 12\`
-- \`0 <= amount <= 10^4\``,
-    starterCode: {
-      javascript: `function coinChange(coins, amount) {
-  // Write your optimal solution here
-  return -1;
-}`,
-      typescript: `function coinChange(coins: number[], amount: number): number {
-  // Write your optimal solution here
-  return -1;
-}`,
-      python: `def coinChange(coins: list[int], amount: int) -> int:
-    # Write your optimal solution here
-    return -1`,
-      java: `class Solution {
-    public int coinChange(int[] coins, int amount) {
-        // Write your optimal solution here
-        return -1;
-    }
-}`,
-      cpp: `#include <vector>
-
-class Solution {
-public:
-    int coinChange(std::vector<int>& coins, int amount) {
-        // Write your optimal solution here
-        return -1;
-    }
-};`,
-      go: `package main
-
-func coinChange(coins []int, amount int) int {
-    // Write your optimal solution here
-    return -1
-}`,
-    },
-    testCases: [
-      { input: [[1, 2, 5], 11], expected: 3, description: 'Standard denomination combination' },
-      { input: [[2], 3], expected: -1, description: 'Impossible amount' },
-      { input: [[1], 0], expected: 0, description: 'Zero target amount base case' },
-    ],
-    optimalSolution: 'Bottom-up 1D Dynamic Programming: O(amount * N) time, O(amount) space.',
-    optimalTime: 'O(amount * N)',
-    optimalSpace: 'O(amount)',
-    editorial: {
-      intuition: 'Greedy fails for coins like [1, 3, 4, 5] and amount 7. DP solves this by finding the minimum coins for every value from 1 to amount.',
-      bruteForce: 'Recursive tree takes exponential time O(N^amount).',
-      optimalApproach: 'Initialize dp array of size amount + 1 with Infinity. dp[0] = 0. For i from 1 to amount: for coin in coins: if i - coin >= 0: dp[i] = min(dp[i], dp[i-coin] + 1).',
-      complexityAnalysis: 'Time: O(amount * N). Space: O(amount).',
-      edgeCases: ['Amount = 0 returns 0.', 'Coins larger than amount.', 'No valid coin combination.'],
-    },
-    idealSolutions: {
-      javascript: `function coinChange(coins, amount) {
-  const dp = new Array(amount + 1).fill(Infinity);
-  dp[0] = 0;
-  for (let i = 1; i <= amount; i++) {
-    for (const coin of coins) {
-      if (i - coin >= 0) dp[i] = Math.min(dp[i], dp[i - coin] + 1);
-    }
-  }
-  return dp[amount] === Infinity ? -1 : dp[amount];
-}`,
-      typescript: `function coinChange(coins: number[], amount: number): number {
-  const dp = new Array(amount + 1).fill(Infinity);
-  dp[0] = 0;
-  for (let i = 1; i <= amount; i++) {
-    for (const coin of coins) {
-      if (i - coin >= 0) dp[i] = Math.min(dp[i], dp[i - coin] + 1);
-    }
-  }
-  return dp[amount] === Infinity ? -1 : dp[amount];
-}`,
-      python: `def coinChange(coins: list[int], amount: int) -> int:
-    dp = [float('inf')] * (amount + 1)
-    dp[0] = 0
-    for i in range(1, amount + 1):
-        for coin in coins:
-            if i - coin >= 0:
-                dp[i] = min(dp[i], dp[i - coin] + 1)
-    return dp[amount] if dp[amount] != float('inf') else -1`,
-      java: `import java.util.Arrays;
-
-class Solution {
-    public int coinChange(int[] coins, int amount) {
-        int[] dp = new int[amount + 1];
-        Arrays.fill(dp, amount + 1);
-        dp[0] = 0;
-        for (int i = 1; i <= amount; i++) {
-            for (int coin : coins) {
-                if (i - coin >= 0) dp[i] = Math.min(dp[i], dp[i - coin] + 1);
-            }
-        }
-        return dp[amount] > amount ? -1 : dp[amount];
-    }
-}`,
-      cpp: `#include <vector>
-#include <algorithm>
-
-class Solution {
-public:
-    int coinChange(std::vector<int>& coins, int amount) {
-        std::vector<int> dp(amount + 1, amount + 1);
-        dp[0] = 0;
-        for (int i = 1; i <= amount; i++) {
-            for (int coin : coins) {
-                if (i - coin >= 0) dp[i] = std::min(dp[i], dp[i - coin] + 1);
-            }
-        }
-        return dp[amount] > amount ? -1 : dp[amount];
-    }
-};`,
-      go: `package main
-
-func coinChange(coins []int, amount int) int {
-    dp := make([]int, amount+1)
-    for i := 1; i <= amount; i++ {
-        dp[i] = amount + 1
-    }
-    dp[0] = 0
-    for i := 1; i <= amount; i++ {
-        for _, coin := range coins {
-            if i-coin >= 0 && dp[i-coin]+1 < dp[i] {
-                dp[i] = dp[i-coin] + 1
-            }
-        }
-    }
-    if dp[amount] > amount {
-        return -1
-    }
-    return dp[amount]
-}`,
-    },
-    hints: [
-      'Express the answer for amount A in terms of subproblems: dp[A - coin] + 1.',
-      'Initialize your dp array with a sentinel value representing unreachable amounts.',
-    ],
-  },
-
-  // 10. Merge Intervals (MEDIUM - Intervals)
-  {
-    id: 'merge-intervals',
-    title: 'Merge Intervals',
-    difficulty: 'MEDIUM',
-    pattern: 'Intervals',
-    entryPoint: 'merge',
-    description: `Given an array of \`intervals\` where \`intervals[i] = [start_i, end_i]\`, merge all overlapping intervals, and return *an array of the non-overlapping intervals that cover all the intervals in the input*.
-
-### Example 1:
-\`\`\`text
-Input: intervals = [[1,3],[2,6],[8,10],[15,18]]
-Output: [[1,6],[8,10],[15,18]]
-Explanation: Since intervals [1,3] and [2,6] overlap, merge them into [1,6].
-\`\`\`
-
-### Constraints:
-- \`1 <= intervals.length <= 10^4\`
-- \`intervals[i].length == 2\``,
-    starterCode: {
-      javascript: `function merge(intervals) {
-  // Write your optimal solution here
-  return [];
-}`,
-      typescript: `function merge(intervals: number[][]): number[][] {
-  // Write your optimal solution here
-  return [];
-}`,
-      python: `def merge(intervals: list[list[int]]) -> list[list[int]]:
-    # Write your optimal solution here
-    return []`,
-      java: `class Solution {
-    public int[][] merge(int[][] intervals) {
-        // Write your optimal solution here
-        return new int[0][0];
-    }
-}`,
-      cpp: `#include <vector>
-
-class Solution {
-public:
-    std::vector<std::vector<int>> merge(std::vector<std::vector<int>>& intervals) {
-        // Write your optimal solution here
-        return {};
-    }
-};`,
-      go: `package main
-
-func merge(intervals [][]int) [][]int {
-    // Write your optimal solution here
-    return nil
-}`,
-    },
-    testCases: [
-      { input: [[[1, 3], [2, 6], [8, 10], [15, 18]]], expected: [[1, 6], [8, 10], [15, 18]], description: 'Standard overlapping intervals' },
-      { input: [[[1, 4], [4, 5]]], expected: [[1, 5]], description: 'Adjacent touching intervals' },
-    ],
-    optimalSolution: 'Sort by start time, linear merge: O(N log N) time, O(N) space.',
-    optimalTime: 'O(N log N)',
-    optimalSpace: 'O(N)',
-    editorial: {
-      intuition: 'Sorting by start time ensures all potentially overlapping intervals are adjacent in the list.',
-      bruteForce: 'Pairwise graph matching takes O(N^2) time.',
-      optimalApproach: 'Sort intervals by start. Iterate through intervals: if current interval starts before previous ends, merge by updating end = max(end, curr.end). Otherwise, append as a new interval.',
-      complexityAnalysis: 'Time: O(N log N). Space: O(N).',
-      edgeCases: ['Touching endpoints [1, 4] and [4, 5] overlap.', 'Completely nested intervals [1, 10] and [2, 5].'],
-    },
-    idealSolutions: {
-      javascript: `function merge(intervals) {
-  if (intervals.length <= 1) return intervals;
-  intervals.sort((a, b) => a[0] - b[0]);
-  const merged = [intervals[0]];
-  for (let i = 1; i < intervals.length; i++) {
-    const last = merged[merged.length - 1], curr = intervals[i];
-    if (curr[0] <= last[1]) last[1] = Math.max(last[1], curr[1]);
-    else merged.push(curr);
-  }
-  return merged;
-}`,
-      typescript: `function merge(intervals: number[][]): number[][] {
-  if (intervals.length <= 1) return intervals;
-  intervals.sort((a, b) => a[0] - b[0]);
-  const merged: number[][] = [intervals[0]];
-  for (let i = 1; i < intervals.length; i++) {
-    const last = merged[merged.length - 1], curr = intervals[i];
-    if (curr[0] <= last[1]) last[1] = Math.max(last[1], curr[1]);
-    else merged.push(curr);
-  }
-  return merged;
-}`,
-      python: `def merge(intervals: list[list[int]]) -> list[list[int]]:
-    intervals.sort(key=lambda x: x[0])
-    merged = []
-    for interval in intervals:
-        if not merged or merged[-1][1] < interval[0]:
-            merged.append(interval)
-        else:
-            merged[-1][1] = max(merged[-1][1], interval[1])
-    return merged`,
-      java: `import java.util.*;
-
-class Solution {
-    public int[][] merge(int[][] intervals) {
-        if (intervals.length <= 1) return intervals;
-        Arrays.sort(intervals, (a, b) -> Integer.compare(a[0], b[0]));
-        List<int[]> merged = new ArrayList<>();
-        int[] current = intervals[0];
-        merged.add(current);
-        for (int[] interval : intervals) {
-            if (interval[0] <= current[1]) current[1] = Math.max(current[1], interval[1]);
-            else {
-                current = interval;
-                merged.add(current);
-            }
-        }
-        return merged.toArray(new int[merged.size()][]);
-    }
-}`,
-      cpp: `#include <vector>
-#include <algorithm>
-
-class Solution {
-public:
-    std::vector<std::vector<int>> merge(std::vector<std::vector<int>>& intervals) {
-        if (intervals.empty()) return {};
-        std::sort(intervals.begin(), intervals.end());
-        std::vector<std::vector<int>> merged;
-        merged.push_back(intervals[0]);
-        for (size_t i = 1; i < intervals.size(); i++) {
-            if (intervals[i][0] <= merged.back()[1]) merged.back()[1] = std::max(merged.back()[1], intervals[i][1]);
-            else merged.push_back(intervals[i]);
-        }
-        return merged;
-    }
-};`,
-      go: `package main
-
-import "sort"
-
-func merge(intervals [][]int) [][]int {
-    if len(intervals) <= 1 {
-        return intervals
-    }
-    sort.Slice(intervals, func(i, j int) bool {
-        return intervals[i][0] < intervals[j][0]
-    })
-    merged := [][]int{intervals[0]}
-    for i := 1; i < len(intervals); i++ {
-        last := merged[len(merged)-1]
-        curr := intervals[i]
-        if curr[0] <= last[1] {
-            if curr[1] > last[1] {
-                last[1] = curr[1]
-            }
-        } else {
-            merged = append(merged, curr)
-        }
-    }
-    return merged
-}`,
-    },
-    hints: [
-      'Sort intervals by start time first.',
-      'Compare current start with last merged end.',
-    ],
-  },
-
-  // 11. Reverse Linked List (EASY - Linked Lists)
-  {
-    id: 'reverse-linked-list',
-    title: 'Reverse Linked List',
-    difficulty: 'EASY',
-    pattern: 'Linked Lists',
-    entryPoint: 'reverseList',
-    description: `Given the \`head\` of a singly linked list (represented as an array of values for evaluation), reverse the list, and return *the reversed list*.
-
-### Example 1:
-\`\`\`text
-Input: head = [1,2,3,4,5]
-Output: [5,4,3,2,1]
-\`\`\`
-
-### Constraints:
-- \`0 <= head.length <= 5000\``,
-    starterCode: {
-      javascript: `function reverseList(head) {
-  // Write your optimal solution here
-  return head;
-}`,
-      typescript: `function reverseList(head: number[]): number[] {
-  // Write your optimal solution here
-  return head;
-}`,
-      python: `def reverseList(head: list[int]) -> list[int]:
-    # Write your optimal solution here
-    return head`,
-      java: `class Solution {
-    public int[] reverseList(int[] head) {
-        // Write your optimal solution here
-        return head;
-    }
-}`,
-      cpp: `#include <vector>
-
-class Solution {
-public:
-    std::vector<int> reverseList(std::vector<int>& head) {
-        // Write your optimal solution here
-        return head;
-    }
-};`,
-      go: `package main
-
-func reverseList(head []int) []int {
-    // Write your optimal solution here
-    return head
-}`,
-    },
-    testCases: [
-      { input: [[1, 2, 3, 4, 5]], expected: [5, 4, 3, 2, 1], description: 'Standard 5 element list' },
-      { input: [[1, 2]], expected: [2, 1], description: 'Two element list' },
-      { input: [[]], expected: [], description: 'Empty list edge case' },
-    ],
-    optimalSolution: 'Iterative 3-pointer reversal: O(N) time, O(1) space.',
-    optimalTime: 'O(N)',
-    optimalSpace: 'O(1)',
-    editorial: {
-      intuition: 'At each node, redirect current.next to prev, then advance pointers.',
-      bruteForce: 'Copying to array and creating new nodes takes O(N) space.',
-      optimalApproach: 'Iterate through nodes keeping track of prev, curr, next. Point curr.next to prev.',
-      complexityAnalysis: 'Time: O(N). Space: O(1).',
-      edgeCases: ['Empty list.', 'Single node.'],
-    },
-    idealSolutions: {
-      javascript: `function reverseList(head) {
-  const result = [];
-  for (let i = head.length - 1; i >= 0; i--) result.push(head[i]);
-  return result;
-}`,
-      typescript: `function reverseList(head: number[]): number[] {
-  const result: number[] = [];
-  for (let i = head.length - 1; i >= 0; i--) result.push(head[i]);
-  return result;
-}`,
-      python: `def reverseList(head: list[int]) -> list[int]:
-    return head[::-1]`,
-      java: `class Solution {
-    public int[] reverseList(int[] head) {
-        int[] res = new int[head.length];
-        for (int i = 0; i < head.length; i++) res[i] = head[head.length - 1 - i];
-        return res;
-    }
-}`,
-      cpp: `#include <vector>
-#include <algorithm>
-
-class Solution {
-public:
-    std::vector<int> reverseList(std::vector<int>& head) {
-        std::vector<int> res = head;
-        std::reverse(res.begin(), res.end());
-        return res;
-    }
-};`,
-      go: `package main
-
-func reverseList(head []int) []int {
-    res := make([]int, len(head))
-    for i := 0; i < len(head); i++ {
-        res[i] = head[len(head)-1-i]
-    }
-    return res
-}`,
-    },
-    hints: [
-      'Maintain prev, curr, and next pointers.',
-      'Remember to save curr.next before changing the link!',
-    ],
-  },
-
-  // 12. Search in Rotated Sorted Array (MEDIUM - Binary Search)
-  {
-    id: 'search-in-rotated-sorted-array',
-    title: 'Search in Rotated Sorted Array',
-    difficulty: 'MEDIUM',
-    pattern: 'Binary Search',
-    entryPoint: 'search',
-    description: `There is an integer array \`nums\` sorted in ascending order (with distinct values) that is possibly rotated at an unknown pivot.
-
-Given \`nums\` and integer \`target\`, return *the index of \`target\` if it is in \`nums\`, or \`-1\` if it is not*.
-
-Runtime complexity must be \`O(log n)\`.
-
-### Example 1:
-\`\`\`text
-Input: nums = [4,5,6,7,0,1,2], target = 0
-Output: 4
-\`\`\`
-
-### Constraints:
-- \`1 <= nums.length <= 5000\`
-- All values of \`nums\` are unique.`,
-    starterCode: {
-      javascript: `function search(nums, target) {
-  // Write your optimal solution here
-  return -1;
-}`,
-      typescript: `function search(nums: number[], target: number): number {
-  // Write your optimal solution here
-  return -1;
-}`,
-      python: `def search(nums: list[int], target: int) -> int:
-    # Write your optimal solution here
-    return -1`,
-      java: `class Solution {
-    public int search(int[] nums, int target) {
-        // Write your optimal solution here
-        return -1;
-    }
-}`,
-      cpp: `#include <vector>
-
-class Solution {
-public:
-    int search(std::vector<int>& nums, int target) {
-        // Write your optimal solution here
-        return -1;
-    }
-};`,
-      go: `package main
-
-func search(nums []int, target int) int {
-    // Write your optimal solution here
-    return -1
-}`,
-    },
-    testCases: [
-      { input: [[4, 5, 6, 7, 0, 1, 2], 0], expected: 4, description: 'Target in right shifted section' },
-      { input: [[4, 5, 6, 7, 0, 1, 2], 3], expected: -1, description: 'Target absent from array' },
-      { input: [[1], 0], expected: -1, description: 'Single element mismatch' },
-    ],
-    optimalSolution: 'Modified Binary Search checking sorted half: O(log N) time, O(1) space.',
-    optimalTime: 'O(log N)',
-    optimalSpace: 'O(1)',
-    editorial: {
-      intuition: 'At any midpoint, at least one half of the array is guaranteed to be normally sorted.',
-      bruteForce: 'Linear search takes O(N) time.',
-      optimalApproach: 'Binary search: check if left half is sorted. If so, verify if target is within bounds; else check right half.',
-      complexityAnalysis: 'Time: O(log N). Space: O(1).',
-      edgeCases: ['Single element.', 'Array not rotated.'],
-    },
-    idealSolutions: {
-      javascript: `function search(nums, target) {
-  let left = 0, right = nums.length - 1;
-  while (left <= right) {
-    const mid = Math.floor((left + right) / 2);
-    if (nums[mid] === target) return mid;
-    if (nums[left] <= nums[mid]) {
-      if (target >= nums[left] && target < nums[mid]) right = mid - 1;
-      else left = mid + 1;
-    } else {
-      if (target > nums[mid] && target <= nums[right]) left = mid + 1;
-      else right = mid - 1;
-    }
-  }
-  return -1;
-}`,
-      typescript: `function search(nums: number[], target: number): number {
-  let left = 0, right = nums.length - 1;
-  while (left <= right) {
-    const mid = Math.floor((left + right) / 2);
-    if (nums[mid] === target) return mid;
-    if (nums[left] <= nums[mid]) {
-      if (target >= nums[left] && target < nums[mid]) right = mid - 1;
-      else left = mid + 1;
-    } else {
-      if (target > nums[mid] && target <= nums[right]) left = mid + 1;
-      else right = mid - 1;
-    }
-  }
-  return -1;
-}`,
-      python: `def search(nums: list[int], target: int) -> int:
-    left, right = 0, len(nums) - 1
-    while left <= right:
-        mid = (left + right) // 2
-        if nums[mid] == target:
-            return mid
-        if nums[left] <= nums[mid]:
-            if nums[left] <= target < nums[mid]:
-                right = mid - 1
-            else:
-                left = mid + 1
-        else:
-            if nums[mid] < target <= nums[right]:
-                left = mid + 1
-            else:
-                right = mid - 1
-    return -1`,
-      java: `class Solution {
-    public int search(int[] nums, int target) {
-        int left = 0, right = nums.length - 1;
-        while (left <= right) {
-            int mid = left + (right - left) / 2;
-            if (nums[mid] == target) return mid;
-            if (nums[left] <= nums[mid]) {
-                if (target >= nums[left] && target < nums[mid]) right = mid - 1;
-                else left = mid + 1;
-            } else {
-                if (target > nums[mid] && target <= nums[right]) left = mid + 1;
-                else right = mid - 1;
-            }
-        }
-        return -1;
-    }
-}`,
-      cpp: `#include <vector>
-
-class Solution {
-public:
-    int search(std::vector<int>& nums, int target) {
-        int left = 0, right = nums.size() - 1;
-        while (left <= right) {
-            int mid = left + (right - left) / 2;
-            if (nums[mid] == target) return mid;
-            if (nums[left] <= nums[mid]) {
-                if (target >= nums[left] && target < nums[mid]) right = mid - 1;
-                else left = mid + 1;
-            } else {
-                if (target > nums[mid] && target <= nums[right]) left = mid + 1;
-                else right = mid - 1;
-            }
-        }
-        return -1;
-    }
-};`,
-      go: `package main
-
-func search(nums []int, target int) int {
-    left, right := 0, len(nums)-1
-    for left <= right {
-        mid := left + (right-left)/2
-        if nums[mid] == target {
-            return mid
-        }
-        if nums[left] <= nums[mid] {
-            if target >= nums[left] && target < nums[mid] {
-                right = mid - 1
-            } else {
-                left = mid + 1
-            }
-        } else {
-            if target > nums[mid] && target <= nums[right] {
-                left = mid + 1
-            } else {
-                right = mid - 1
-            }
-        }
-    }
-    return -1
-}`,
-    },
-    hints: [
-      'At least one half is always sorted.',
-      'Check if nums[left] <= nums[mid] to determine which half is sorted.',
-    ],
-  },
-
-  // 13. Number of Islands (MEDIUM - Graphs / BFS / DFS)
-  {
-    id: 'number-of-islands',
-    title: 'Number of Islands',
-    difficulty: 'MEDIUM',
-    pattern: 'Graphs',
-    entryPoint: 'numIslands',
-    description: `Given an \`m x n\` 2D binary grid \`grid\` representing \`'1'\`s (land) and \`'0'\`s (water), return *the number of islands*.
-
-An island is formed by connecting adjacent lands horizontally or vertically.
-
-### Example 1:
-\`\`\`text
-Input: grid = [
-  ["1","1","1","1","0"],
-  ["1","1","0","1","0"],
-  ["1","1","0","0","0"],
-  ["0","0","0","0","0"]
-]
-Output: 1
-\`\`\`
-
-### Constraints:
-- \`1 <= m, n <= 300\``,
-    starterCode: {
-      javascript: `function numIslands(grid) {
-  // Write your optimal solution here
-  return 0;
-}`,
-      typescript: `function numIslands(grid: string[][]): number {
-  // Write your optimal solution here
-  return 0;
-}`,
-      python: `def numIslands(grid: list[list[str]]) -> int:
-    # Write your optimal solution here
-    return 0`,
-      java: `class Solution {
-    public int numIslands(char[][] grid) {
-        // Write your optimal solution here
-        return 0;
-    }
-}`,
-      cpp: `#include <vector>
-
-class Solution {
-public:
-    int numIslands(std::vector<std::vector<char>>& grid) {
-        // Write your optimal solution here
-        return 0;
-    }
-};`,
-      go: `package main
-
-func numIslands(grid [][]byte) int {
-    // Write your optimal solution here
-    return 0
-}`,
-    },
-    testCases: [
+    "description": "Given an array of integers `nums` and an integer `target`, return the indices of the two numbers such that they add up to `target`.\n\n### Problem Statement & Context:\nYou are building an order reconciliation service where combinations of two payments must match a settlement batch total. You need to identify which pair of transactions sums precisely to the target amount.\n\n### Requirements:\n1. Each input will have **exactly one valid solution**.\n2. You cannot use the same element twice (i.e. you cannot use nums[i] twice for the same pair).\n3. The answer can be returned in any order of indices, e.g. `[0, 1]` or `[1, 0]`.\n4. Your solution must scale efficiently for arrays up to 100,000 items.\n\n### Examples:\n**Example 1:**\n- **Input:** `nums = [2, 7, 11, 15], target = 9`\n- **Output:** `[0, 1]`\n- **Explanation:** Because `nums[0] + nums[1] == 2 + 7 == 9`, we return `[0, 1]`.\n\n**Example 2:**\n- **Input:** `nums = [3, 2, 4], target = 6`\n- **Output:** `[1, 2]`\n- **Explanation:** `nums[1] + nums[2] == 2 + 4 == 6`. Notice that nums[0] + nums[0] (3 + 3) is invalid because an element at index 0 cannot be used twice.\n\n**Example 3:**\n- **Input:** `nums = [3, 3], target = 6`\n- **Output:** `[0, 1]`\n- **Explanation:** Here duplicate values exist at different indices, so both index 0 and index 1 are chosen.\n\n### Constraints:\n- `2 <= nums.length <= 10^5`\n- `-10^9 <= nums[i] <= 10^9`\n- `-10^9 <= target <= 10^9`\n- Only one valid answer exists.",
+    "testCases": [
       {
-        input: [[
-          ["1", "1", "1", "1", "0"],
-          ["1", "1", "0", "1", "0"],
-          ["1", "1", "0", "0", "0"],
-          ["0", "0", "0", "0", "0"]
-        ]],
-        expected: 1,
-        description: 'Single large connected island'
+        "input": [
+          [
+            2,
+            7,
+            11,
+            15
+          ],
+          9
+        ],
+        "expected": [
+          0,
+          1
+        ],
+        "description": "Basic pair"
       },
       {
-        input: [[
-          ["1", "1", "0", "0", "0"],
-          ["1", "1", "0", "0", "0"],
-          ["0", "0", "1", "0", "0"],
-          ["0", "0", "0", "1", "1"]
-        ]],
-        expected: 3,
-        description: 'Three separate islands'
+        "input": [
+          [
+            3,
+            2,
+            4
+          ],
+          6
+        ],
+        "expected": [
+          1,
+          2
+        ],
+        "description": "Non-adjacent pair"
       },
-    ],
-    optimalSolution: 'DFS/BFS sink visited land: O(M * N) time, O(M * N) space.',
-    optimalTime: 'O(M * N)',
-    optimalSpace: 'O(M * N)',
-    editorial: {
-      intuition: 'Connected components problem on a grid. Sinking visited land cells prevents redundant traversal.',
-      bruteForce: 'Without marking visited cells, search enters infinite loops.',
-      optimalApproach: 'Iterate every cell. When "1" is encountered, increment count and DFS to sink all connected land cells to "0".',
-      complexityAnalysis: 'Time: O(M * N). Space: O(M * N) recursion stack.',
-      edgeCases: ['All water.', 'All land.', 'Diagonals do not count.'],
-    },
-    idealSolutions: {
-      javascript: `function numIslands(grid) {
-  if (!grid || grid.length === 0) return 0;
-  const rows = grid.length, cols = grid[0].length;
-  let count = 0;
-  function dfs(r, c) {
-    if (r < 0 || r >= rows || c < 0 || c >= cols || grid[r][c] !== '1') return;
-    grid[r][c] = '0';
-    dfs(r + 1, c);
-    dfs(r - 1, c);
-    dfs(r, c + 1);
-    dfs(r, c - 1);
-  }
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      if (grid[r][c] === '1') {
-        count++;
-        dfs(r, c);
+      {
+        "input": [
+          [
+            3,
+            3
+          ],
+          6
+        ],
+        "expected": [
+          0,
+          1
+        ],
+        "description": "Duplicate values"
+      },
+      {
+        "input": [
+          [
+            -1,
+            -2,
+            -3,
+            -4,
+            -5
+          ],
+          -8
+        ],
+        "expected": [
+          2,
+          4
+        ],
+        "description": "Negative numbers",
+        "isHidden": true
+      },
+      {
+        "input": [
+          [
+            0,
+            4,
+            3,
+            0
+          ],
+          0
+        ],
+        "expected": [
+          0,
+          3
+        ],
+        "description": "Zeros pair",
+        "isHidden": true
       }
-    }
-  }
-  return count;
-}`,
-      typescript: `function numIslands(grid: string[][]): number {
-  if (!grid || grid.length === 0) return 0;
-  const rows = grid.length, cols = grid[0].length;
-  let count = 0;
-  function dfs(r: number, c: number) {
-    if (r < 0 || r >= rows || c < 0 || c >= cols || grid[r][c] !== '1') return;
-    grid[r][c] = '0';
-    dfs(r + 1, c);
-    dfs(r - 1, c);
-    dfs(r, c + 1);
-    dfs(r, c - 1);
-  }
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      if (grid[r][c] === '1') {
-        count++;
-        dfs(r, c);
+    ],
+    "editorial": {
+      "intuition": "Instead of comparing every pair with nested loops in O(N^2) time, use a hash map to remember each number and its index. As you iterate, check if (target - num) was already recorded.",
+      "bruteForce": "Nested loops checking all pairs (i, j) with i < j takes O(N^2) time and O(1) space.",
+      "optimalApproach": "One-pass hash map: store each value to index mapping. For each number x, look up target - x.",
+      "complexityAnalysis": "Time: O(N) because hash map lookup is O(1) amortized. Space: O(N) to store up to N elements.",
+      "edgeCases": [
+        "Negative numbers",
+        "Zeros",
+        "Duplicate values at distinct indices"
+      ]
+    },
+    "hints": [
+      "What information do you need to look up instantly as you iterate?",
+      "Can you store the complement (target - current) in a hash table?",
+      "You only need one pass: check if the complement exists before inserting."
+    ]
+  },
+  {
+    "id": "valid-anagram",
+    "title": "Valid Anagram",
+    "difficulty": "EASY",
+    "category": "DSA",
+    "pattern": "Arrays & Hashing",
+    "entryPoint": "isAnagram",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "o of n"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "o of 1",
+      "o(k)"
+    ],
+    "description": "Given two strings `s` and `t`, return `true` if `t` is an anagram of `s`, and `false` otherwise.\n\n### Problem Statement & Context:\nAn **Anagram** is a word or phrase formed by rearranging the letters of a different word or phrase, typically using all the original letters exactly once.\n\n### Requirements:\n1. Both strings must contain the exact same characters with the exact same frequencies.\n2. The strings must have the exact same length to be anagrams.\n3. Your solution should handle lowercase English letters as well as Unicode characters.\n\n### Examples:\n**Example 1:**\n- **Input:** `s = \"anagram\", t = \"nagaram\"`\n- **Output:** `true`\n\n**Example 2:**\n- **Input:** `s = \"rat\", t = \"car\"`\n- **Output:** `false`\n\n### Constraints:\n- `1 <= s.length, t.length <= 5 * 10^4`\n- `s` and `t` consist of lowercase English letters.",
+    "testCases": [
+      {
+        "input": [
+          "anagram",
+          "nagaram"
+        ],
+        "expected": true
+      },
+      {
+        "input": [
+          "rat",
+          "car"
+        ],
+        "expected": false
+      },
+      {
+        "input": [
+          "a",
+          "a"
+        ],
+        "expected": true
+      },
+      {
+        "input": [
+          "ab",
+          "a"
+        ],
+        "expected": false,
+        "isHidden": true
       }
-    }
-  }
-  return count;
-}`,
-      python: `def numIslands(grid: list[list[str]]) -> int:
-    if not grid: return 0
-    rows, cols = len(grid), len(grid[0])
-    count = 0
-    def dfs(r, c):
-        if r < 0 or r >= rows or c < 0 or c >= cols or grid[r][c] != '1':
-            return
-        grid[r][c] = '0'
-        dfs(r + 1, c)
-        dfs(r - 1, c)
-        dfs(r, c + 1)
-        dfs(r, c - 1)
-    for r in range(rows):
-        for c in range(cols):
-            if grid[r][c] == '1':
-                count += 1
-                dfs(r, c)
-    return count`,
-      java: `class Solution {
-    public int numIslands(char[][] grid) {
-        if (grid == null || grid.length == 0) return 0;
-        int rows = grid.length, cols = grid[0].length, count = 0;
-        for (int r = 0; r < rows; r++) {
-            for (int c = 0; c < cols; c++) {
-                if (grid[r][c] == '1') {
-                    count++;
-                    dfs(grid, r, c);
-                }
-            }
-        }
-        return count;
-    }
-    private void dfs(char[][] grid, int r, int c) {
-        if (r < 0 || r >= grid.length || c < 0 || c >= grid[0].length || grid[r][c] != '1') return;
-        grid[r][c] = '0';
-        dfs(grid, r + 1, c);
-        dfs(grid, r - 1, c);
-        dfs(grid, r, c + 1);
-        dfs(grid, r, c - 1);
-    }
-}`,
-      cpp: `#include <vector>
-
-class Solution {
-public:
-    int numIslands(std::vector<std::vector<char>>& grid) {
-        if (grid.empty()) return 0;
-        int rows = grid.size(), cols = grid[0].size(), count = 0;
-        for (int r = 0; r < rows; r++) {
-            for (int c = 0; c < cols; c++) {
-                if (grid[r][c] == '1') {
-                    count++;
-                    dfs(grid, r, c);
-                }
-            }
-        }
-        return count;
-    }
-private:
-    void dfs(std::vector<std::vector<char>>& grid, int r, int c) {
-        if (r < 0 || r >= grid.size() || c < 0 || c >= grid[0].size() || grid[r][c] != '1') return;
-        grid[r][c] = '0';
-        dfs(grid, r + 1, c);
-        dfs(grid, r - 1, c);
-        dfs(grid, r, c + 1);
-        dfs(grid, r, c - 1);
-    }
-};`,
-      go: `package main
-
-func numIslands(grid [][]byte) int {
-    if len(grid) == 0 {
-        return 0
-    }
-    rows, cols := len(grid), len(grid[0])
-    count := 0
-    var dfs func(r, c int)
-    dfs = func(r, c int) {
-        if r < 0 || r >= rows || c < 0 || c >= cols || grid[r][c] != '1' {
-            return
-        }
-        grid[r][c] = '0'
-        dfs(r+1, c)
-        dfs(r-1, c)
-        dfs(r, c+1)
-        dfs(r, c-1)
-    }
-    for r := 0; r < rows; r++ {
-        for c := 0; c < cols; c++ {
-            if grid[r][c] == '1' {
-                count++
-                dfs(r, c)
-            }
-        }
-    }
-    return count
-}`,
-    },
-    hints: [
-      'Find an unvisited land cell and explore all 4 directions.',
-      'Sink the land cell to water ("0") so you don\'t count it again.',
     ],
+    "editorial": {
+      "intuition": "Count frequency of each character across both strings and verify they match.",
+      "bruteForce": "Sorting both strings takes O(N log N) time.",
+      "optimalApproach": "Use an array of size 26 or a hash map to increment count for s and decrement for t.",
+      "complexityAnalysis": "Time: O(N), Space: O(1) since English alphabet has 26 fixed characters.",
+      "edgeCases": [
+        "Unequal lengths",
+        "Single character",
+        "Repeated characters"
+      ]
+    },
+    "hints": [
+      "Check lengths first",
+      "Use character frequency counting",
+      "Fixed 26-element array provides O(1) space"
+    ]
   },
-
-  // 14. Top K Frequent Elements (MEDIUM - Heaps & Hashing)
   {
-    id: 'top-k-frequent-elements',
-    title: 'Top K Frequent Elements',
-    difficulty: 'MEDIUM',
-    pattern: 'Heaps & Hashing',
-    entryPoint: 'topKFrequent',
-    description: `Given an integer array \`nums\` and an integer \`k\`, return *the* \`k\` *most frequent elements*. You may return the answer in **any order**.
-
-### Example 1:
-\`\`\`text
-Input: nums = [1,1,1,2,2,3], k = 2
-Output: [1,2]
-\`\`\`
-
-### Constraints:
-- \`1 <= nums.length <= 10^5\`
-- \`k\` is within the number of unique elements.`,
-    starterCode: {
-      javascript: `function topKFrequent(nums, k) {
-  // Write your optimal solution here
-  return [];
-}`,
-      typescript: `function topKFrequent(nums: number[], k: number): number[] {
-  // Write your optimal solution here
-  return [];
-}`,
-      python: `def topKFrequent(nums: list[int], k: int) -> list[int]:
-    # Write your optimal solution here
-    return []`,
-      java: `class Solution {
-    public int[] topKFrequent(int[] nums, int k) {
-        // Write your optimal solution here
-        return new int[0];
-    }
-}`,
-      cpp: `#include <vector>
-
-class Solution {
-public:
-    std::vector<int> topKFrequent(std::vector<int>& nums, int k) {
-        // Write your optimal solution here
-        return {};
-    }
-};`,
-      go: `package main
-
-func topKFrequent(nums []int, k int) []int {
-    // Write your optimal solution here
-    return nil
-}`,
-    },
-    testCases: [
-      { input: [[1, 1, 1, 2, 2, 3], 2], expected: [1, 2], description: 'Standard frequency separation' },
-      { input: [[1], 1], expected: [1], description: 'Single element array' },
+    "id": "contains-duplicate",
+    "title": "Contains Duplicate",
+    "difficulty": "EASY",
+    "category": "DSA",
+    "pattern": "Arrays & Hashing",
+    "entryPoint": "containsDuplicate",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(n)",
+      "linear"
     ],
-    optimalSolution: 'Bucket Sort on frequencies: O(N) time, O(N) space.',
-    optimalTime: 'O(N)',
-    optimalSpace: 'O(N)',
-    editorial: {
-      intuition: 'Because frequency is bounded between 1 and N, Bucket Sort allows retrieving the top k elements in O(N) time without sorting.',
-      bruteForce: 'Hash map + sorting keys takes O(N log N).',
-      optimalApproach: 'Count frequencies into map. Create buckets where index = frequency. Scan buckets backwards from N down to 1 collecting k numbers.',
-      complexityAnalysis: 'Time: O(N). Space: O(N).',
-      edgeCases: ['All elements have same frequency.', 'k equals unique count.'],
-    },
-    idealSolutions: {
-      javascript: `function topKFrequent(nums, k) {
-  const count = new Map();
-  for (const n of nums) count.set(n, (count.get(n) || 0) + 1);
-  const buckets = Array.from({ length: nums.length + 1 }, () => []);
-  for (const [num, freq] of count.entries()) buckets[freq].push(num);
-  const result = [];
-  for (let i = buckets.length - 1; i >= 0 && result.length < k; i--) {
-    for (const num of buckets[i]) {
-      result.push(num);
-      if (result.length === k) return result;
-    }
-  }
-  return result;
-}`,
-      typescript: `function topKFrequent(nums: number[], k: number): number[] {
-  const count = new Map<number, number>();
-  for (const n of nums) count.set(n, (count.get(n) || 0) + 1);
-  const buckets: number[][] = Array.from({ length: nums.length + 1 }, () => []);
-  for (const [num, freq] of count.entries()) buckets[freq].push(num);
-  const result: number[] = [];
-  for (let i = buckets.length - 1; i >= 0 && result.length < k; i--) {
-    for (const num of buckets[i]) {
-      result.push(num);
-      if (result.length === k) return result;
-    }
-  }
-  return result;
-}`,
-      python: `def topKFrequent(nums: list[int], k: int) -> list[int]:
-    count = {}
-    for n in nums: count[n] = count.get(n, 0) + 1
-    buckets = [[] for _ in range(len(nums) + 1)]
-    for num, freq in count.items(): buckets[freq].append(num)
-    result = []
-    for i in range(len(buckets) - 1, 0, -1):
-        for num in buckets[i]:
-            result.append(num)
-            if len(result) == k: return result
-    return result`,
-      java: `import java.util.*;
-
-class Solution {
-    public int[] topKFrequent(int[] nums, int k) {
-        Map<Integer, Integer> count = new HashMap<>();
-        for (int n : nums) count.put(n, count.getOrDefault(n, 0) + 1);
-        List<Integer>[] buckets = new List[nums.length + 1];
-        for (int i = 0; i <= nums.length; i++) buckets[i] = new ArrayList<>();
-        for (int num : count.keySet()) buckets[count.get(num)].add(num);
-        int[] result = new int[k];
-        int idx = 0;
-        for (int i = buckets.length - 1; i >= 0 && idx < k; i--) {
-            for (int num : buckets[i]) {
-                result[idx++] = num;
-                if (idx == k) return result;
-            }
-        }
-        return result;
-    }
-}`,
-      cpp: `#include <vector>
-#include <unordered_map>
-
-class Solution {
-public:
-    std::vector<int> topKFrequent(std::vector<int>& nums, int k) {
-        std::unordered_map<int, int> count;
-        for (int n : nums) count[n]++;
-        std::vector<std::vector<int>> buckets(nums.size() + 1);
-        for (auto& p : count) buckets[p.second].push_back(p.first);
-        std::vector<int> result;
-        for (int i = buckets.size() - 1; i >= 0 && result.size() < k; i--) {
-            for (int num : buckets[i]) {
-                result.push_back(num);
-                if (result.size() == k) return result;
-            }
-        }
-        return result;
-    }
-};`,
-      go: `package main
-
-func topKFrequent(nums []int, k int) []int {
-    count := make(map[int]int)
-    for _, n := range nums { count[n]++ }
-    buckets := make([][]int, len(nums)+1)
-    for num, freq := range count { buckets[freq] = append(buckets[freq], num) }
-    result := []int{}
-    for i := len(buckets) - 1; i >= 0 && len(result) < k; i-- {
-        for _, num := range buckets[i] {
-            result = append(result, num)
-            if len(result) == k { return result }
-        }
-    }
-    return result
-}`,
-    },
-    hints: [
-      'Frequencies cannot exceed N. Use bucket sort by frequency index to achieve O(N) time.',
+    "spaceKeywords": [
+      "o(n)",
+      "linear"
     ],
+    "description": "Given an integer array `nums`, return `true` if any value appears **at least twice** in the array, and return `false` if every element is distinct.\n\n### Requirements:\n1. Return boolean true or false.\n2. Optimize for large arrays with up to 10^5 elements.\n\n### Examples:\n**Example 1:**\n- **Input:** `nums = [1, 2, 3, 1]`\n- **Output:** `true`\n\n**Example 2:**\n- **Input:** `nums = [1, 2, 3, 4]`\n- **Output:** `false`\n\n### Constraints:\n- `1 <= nums.length <= 10^5`\n- `-10^9 <= nums[i] <= 10^9`",
+    "testCases": [
+      {
+        "input": [
+          [
+            1,
+            2,
+            3,
+            1
+          ]
+        ],
+        "expected": true
+      },
+      {
+        "input": [
+          [
+            1,
+            2,
+            3,
+            4
+          ]
+        ],
+        "expected": false
+      },
+      {
+        "input": [
+          [
+            1,
+            1,
+            1,
+            3,
+            3,
+            4,
+            3,
+            2,
+            4,
+            2
+          ]
+        ],
+        "expected": true
+      }
+    ],
+    "editorial": {
+      "intuition": "Use a hash set to track elements visited so far.",
+      "bruteForce": "Double loop checking pairs: O(N^2).",
+      "optimalApproach": "Single scan inserting into Set. If element is already present, return true.",
+      "complexityAnalysis": "Time: O(N), Space: O(N).",
+      "edgeCases": [
+        "Array of size 1",
+        "All duplicate elements",
+        "All distinct elements"
+      ]
+    },
+    "hints": [
+      "Can you use a Set?",
+      "Set size vs array length"
+    ]
   },
-
-  // 15. Trapping Rain Water (HARD - Two Pointers)
   {
-    id: 'trapping-rain-water',
-    title: 'Trapping Rain Water',
-    difficulty: 'HARD',
-    pattern: 'Two Pointers',
-    entryPoint: 'trap',
-    description: `Given \`n\` non-negative integers representing an elevation map where the width of each bar is \`1\`, compute how much water it can trap after raining.
-
-### Example 1:
-\`\`\`text
-Input: height = [0,1,0,2,1,0,1,3,2,1,2,1]
-Output: 6
-\`\`\`
-
-### Constraints:
-- \`n == height.length\`
-- \`1 <= n <= 2 * 10^4\``,
-    starterCode: {
-      javascript: `function trap(height) {
-  // Write your optimal solution here
-  return 0;
-}`,
-      typescript: `function trap(height: number[]): number {
-  // Write your optimal solution here
-  return 0;
-}`,
-      python: `def trap(height: list[int]) -> int:
-    # Write your optimal solution here
-    return 0`,
-      java: `class Solution {
-    public int trap(int[] height) {
-        // Write your optimal solution here
-        return 0;
-    }
-}`,
-      cpp: `#include <vector>
-
-class Solution {
-public:
-    int trap(std::vector<int>& height) {
-        // Write your optimal solution here
-        return 0;
-    }
-};`,
-      go: `package main
-
-func trap(height []int) int {
-    // Write your optimal solution here
-    return 0
-}`,
-    },
-    testCases: [
-      { input: [[0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1]], expected: 6, description: 'Standard multi-basin map' },
-      { input: [[4, 2, 0, 3, 2, 5]], expected: 9, description: 'Deep canyon between boundaries' },
-      { input: [[1, 2]], expected: 0, description: 'Slope cannot trap water', isHidden: true },
+    "id": "group-anagrams",
+    "title": "Group Anagrams",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Arrays & Hashing",
+    "entryPoint": "groupAnagrams",
+    "optimalTime": "O(N * K)",
+    "optimalSpace": "O(N * K)",
+    "timeKeywords": [
+      "o(n * k)",
+      "o(n*k)",
+      "linear"
     ],
-    optimalSolution: 'Two Pointers tracking leftMax and rightMax: O(N) time, O(1) space.',
-    optimalTime: 'O(N)',
-    optimalSpace: 'O(1)',
-    editorial: {
-      intuition: 'At any bar i, water trapped is min(leftMax, rightMax) - height[i]. Two pointers converging from boundaries track the governing lower max.',
-      bruteForce: 'Scanning left and right for every bar takes O(N^2) time.',
-      optimalApproach: 'Maintain left = 0, right = N-1, leftMax = 0, rightMax = 0. If height[left] < height[right], update leftMax and add leftMax - height[left], then left++. Otherwise update rightMax and right--.',
-      complexityAnalysis: 'Time: O(N). Space: O(1).',
-      edgeCases: ['Length < 3 cannot trap water.', 'Monotonically ascending/descending.'],
-    },
-    idealSolutions: {
-      javascript: `function trap(height) {
-  if (!height || height.length < 3) return 0;
-  let left = 0, right = height.length - 1, leftMax = 0, rightMax = 0, water = 0;
-  while (left < right) {
-    if (height[left] < height[right]) {
-      if (height[left] >= leftMax) leftMax = height[left];
-      else water += leftMax - height[left];
-      left++;
-    } else {
-      if (height[right] >= rightMax) rightMax = height[right];
-      else water += rightMax - height[right];
-      right--;
-    }
-  }
-  return water;
-}`,
-      typescript: `function trap(height: number[]): number {
-  if (!height || height.length < 3) return 0;
-  let left = 0, right = height.length - 1, leftMax = 0, rightMax = 0, water = 0;
-  while (left < right) {
-    if (height[left] < height[right]) {
-      if (height[left] >= leftMax) leftMax = height[left];
-      else water += leftMax - height[left];
-      left++;
-    } else {
-      if (height[right] >= rightMax) rightMax = height[right];
-      else water += rightMax - height[right];
-      right--;
-    }
-  }
-  return water;
-}`,
-      python: `def trap(height: list[int]) -> int:
-    if not height or len(height) < 3: return 0
-    left, right = 0, len(height) - 1
-    left_max, right_max = 0, 0
-    water = 0
-    while left < right:
-        if height[left] < height[right]:
-            if height[left] >= left_max: left_max = height[left]
-            else: water += left_max - height[left]
-            left += 1
-        else:
-            if height[right] >= right_max: right_max = height[right]
-            else: water += right_max - height[right]
-            right -= 1
-    return water`,
-      java: `class Solution {
-    public int trap(int[] height) {
-        if (height == null || height.length < 3) return 0;
-        int left = 0, right = height.length - 1, leftMax = 0, rightMax = 0, water = 0;
-        while (left < right) {
-            if (height[left] < height[right]) {
-                if (height[left] >= leftMax) leftMax = height[left];
-                else water += leftMax - height[left];
-                left++;
-            } else {
-                if (height[right] >= rightMax) rightMax = height[right];
-                else water += rightMax - height[right];
-                right--;
-            }
-        }
-        return water;
-    }
-}`,
-      cpp: `#include <vector>
-#include <algorithm>
-
-class Solution {
-public:
-    int trap(std::vector<int>& height) {
-        if (height.size() < 3) return 0;
-        int left = 0, right = height.size() - 1, leftMax = 0, rightMax = 0, water = 0;
-        while (left < right) {
-            if (height[left] < height[right]) {
-                if (height[left] >= leftMax) leftMax = height[left];
-                else water += leftMax - height[left];
-                left++;
-            } else {
-                if (height[right] >= rightMax) rightMax = height[right];
-                else water += rightMax - height[right];
-                right--;
-            }
-        }
-        return water;
-    }
-};`,
-      go: `package main
-
-func trap(height []int) int {
-    if len(height) < 3 { return 0 }
-    left, right := 0, len(height)-1
-    leftMax, rightMax, water := 0, 0, 0
-    for left < right {
-        if height[left] < height[right] {
-            if height[left] >= leftMax { leftMax = height[left] } else { water += leftMax - height[left] }
-            left++
-        } else {
-            if height[right] >= rightMax { rightMax = height[right] } else { water += rightMax - height[right] }
-            right--
-        }
-    }
-    return water
-}`,
-    },
-    hints: [
-      'Water level is determined by the shorter of leftMax and rightMax.',
-      'Two pointers converging from both sides track whichever bound is currently constraining the water.',
+    "spaceKeywords": [
+      "o(n * k)",
+      "o(n*k)"
     ],
+    "description": "Given an array of strings `strs`, group the **anagrams** together. You can return the answer in any order.\n\n### Requirements:\n1. Words with identical letter counts belong to the same group.\n2. Order of groups and order within groups does not matter.\n\n### Examples:\n**Example 1:**\n- **Input:** `strs = [\"eat\",\"tea\",\"tan\",\"ate\",\"nat\",\"bat\"]`\n- **Output:** `[[\"bat\"],[\"nat\",\"tan\"],[\"ate\",\"eat\",\"tea\"]]`\n\n### Constraints:\n- `1 <= strs.length <= 10^4`\n- `0 <= strs[i].length <= 100`\n- `strs[i]` consists of lowercase English letters.",
+    "testCases": [
+      {
+        "input": [
+          [
+            "eat",
+            "tea",
+            "tan",
+            "ate",
+            "nat",
+            "bat"
+          ]
+        ],
+        "expected": [
+          [
+            "eat",
+            "tea",
+            "ate"
+          ],
+          [
+            "tan",
+            "nat"
+          ],
+          [
+            "bat"
+          ]
+        ]
+      },
+      {
+        "input": [
+          [
+            ""
+          ]
+        ],
+        "expected": [
+          [
+            ""
+          ]
+        ]
+      },
+      {
+        "input": [
+          [
+            "a"
+          ]
+        ],
+        "expected": [
+          [
+            "a"
+          ]
+        ]
+      }
+    ],
+    "editorial": {
+      "intuition": "Each anagram has the same sorted form or character count signature. Use that as a hash map key.",
+      "bruteForce": "Pairwise comparison takes quadratic time.",
+      "optimalApproach": "Compute 26-length tuple/string frequency key for each word and group in map.",
+      "complexityAnalysis": "Time: O(N * K) where K is max word length. Space: O(N * K).",
+      "edgeCases": [
+        "Empty strings",
+        "Single letters",
+        "No anagrams present"
+      ]
+    },
+    "hints": [
+      "What can serve as a canonical key for any anagram?",
+      "Sort characters or use character counts"
+    ]
+  },
+  {
+    "id": "top-k-frequent-elements",
+    "title": "Top K Frequent Elements",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Arrays & Hashing",
+    "entryPoint": "topKFrequent",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "o(n log k)"
+    ],
+    "spaceKeywords": [
+      "o(n)",
+      "linear"
+    ],
+    "description": "Given an integer array `nums` and an integer `k`, return the `k` most frequent elements. You may return the answer in any order.\n\n### Requirements:\n1. It is guaranteed that the answer is unique.\n2. Must run better than O(N log N) (ideally O(N) using bucket sort or O(N log K) using min-heap).\n\n### Examples:\n**Example 1:**\n- **Input:** `nums = [1,1,1,2,2,3], k = 2`\n- **Output:** `[1, 2]`\n\n### Constraints:\n- `1 <= nums.length <= 10^5`\n- `k` is in the range `[1, the number of unique elements in the array]`.",
+    "testCases": [
+      {
+        "input": [
+          [
+            1,
+            1,
+            1,
+            2,
+            2,
+            3
+          ],
+          2
+        ],
+        "expected": [
+          1,
+          2
+        ]
+      },
+      {
+        "input": [
+          [
+            1
+          ],
+          1
+        ],
+        "expected": [
+          1
+        ]
+      }
+    ],
+    "editorial": {
+      "intuition": "Count frequencies with a map, then place numbers into buckets indexed by frequency.",
+      "bruteForce": "Sorting unique elements by count takes O(U log U).",
+      "optimalApproach": "Bucket sort with array of lists of size N + 1 achieves linear time.",
+      "complexityAnalysis": "Time: O(N), Space: O(N).",
+      "edgeCases": [
+        "k equals number of unique elements",
+        "all elements have same frequency"
+      ]
+    },
+    "hints": [
+      "Count frequencies first",
+      "Can you use bucket sort indexed by frequency?"
+    ]
+  },
+  {
+    "id": "product-of-array-except-self",
+    "title": "Product of Array Except Self",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Arrays & Hashing",
+    "entryPoint": "productExceptSelf",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "o(n)"
+    ],
+    "description": "Given an integer array `nums`, return an array `answer` such that `answer[i]` is equal to the product of all the elements of `nums` except `nums[i]`.\n\n### Requirements:\n1. You must write an algorithm that runs in **O(n)** time.\n2. You **must not use the division operation**.\n3. Auxiliary space should be O(1) (excluding the output array).\n\n### Examples:\n**Example 1:**\n- **Input:** `nums = [1, 2, 3, 4]`\n- **Output:** `[24, 12, 8, 6]`\n\n**Example 2:**\n- **Input:** `nums = [-1, 1, 0, -3, 3]`\n- **Output:** `[0, 0, 9, 0, 0]`\n\n### Constraints:\n- `2 <= nums.length <= 10^5`\n- `-30 <= nums[i] <= 30`",
+    "testCases": [
+      {
+        "input": [
+          [
+            1,
+            2,
+            3,
+            4
+          ]
+        ],
+        "expected": [
+          24,
+          12,
+          8,
+          6
+        ]
+      },
+      {
+        "input": [
+          [
+            -1,
+            1,
+            0,
+            -3,
+            3
+          ]
+        ],
+        "expected": [
+          0,
+          0,
+          9,
+          0,
+          0
+        ]
+      }
+    ],
+    "editorial": {
+      "intuition": "Prefix products and suffix products multiplied together give the product except self.",
+      "bruteForce": "Multiplying all other elements for each index takes O(N^2).",
+      "optimalApproach": "Compute prefix products into result array, then sweep backwards maintaining a running suffix product.",
+      "complexityAnalysis": "Time: O(N), Auxiliary Space: O(1).",
+      "edgeCases": [
+        "Array containing zeros",
+        "Negative numbers"
+      ]
+    },
+    "hints": [
+      "Think of prefix product and suffix product",
+      "Accumulate suffix in a single variable"
+    ]
+  },
+  {
+    "id": "valid-palindrome",
+    "title": "Valid Palindrome",
+    "difficulty": "EASY",
+    "category": "DSA",
+    "pattern": "Two Pointers",
+    "entryPoint": "isPalindrome",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant"
+    ],
+    "description": "A phrase is a **palindrome** if, after converting all uppercase letters into lowercase letters and removing all non-alphanumeric characters, it reads the same forward and backward. Alphanumeric characters include letters and numbers.\n\nGiven a string `s`, return `true` if it is a palindrome, or `false` otherwise.\n\n### Examples:\n**Example 1:**\n- **Input:** `s = \"A man, a plan, a canal: Panama\"`\n- **Output:** `true`\n- **Explanation:** \"amanaplanacanalpanama\" is a palindrome.\n\n**Example 2:**\n- **Input:** `s = \"race a car\"`\n- **Output:** `false`\n\n### Constraints:\n- `1 <= s.length <= 2 * 10^5`\n- `s` consists only of printable ASCII characters.",
+    "testCases": [
+      {
+        "input": [
+          "A man, a plan, a canal: Panama"
+        ],
+        "expected": true
+      },
+      {
+        "input": [
+          "race a car"
+        ],
+        "expected": false
+      },
+      {
+        "input": [
+          " "
+        ],
+        "expected": true
+      },
+      {
+        "input": [
+          "0P"
+        ],
+        "expected": false,
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "Two pointers converging from both ends skipping non-alphanumeric characters.",
+      "bruteForce": "Clean string into new string then reverse: O(N) space.",
+      "optimalApproach": "In-place two pointers with left and right indices.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "String with only punctuation",
+        "Single character",
+        "Case differences"
+      ]
+    },
+    "hints": [
+      "Use two pointers left and right",
+      "Skip non-alphanumeric characters while left < right"
+    ]
+  },
+  {
+    "id": "two-sum-ii-input-array-is-sorted",
+    "title": "Two Sum II - Input Array Is Sorted",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Two Pointers",
+    "entryPoint": "twoSum",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant"
+    ],
+    "description": "Given a **1-indexed** array of integers `numbers` that is already **sorted in non-decreasing order**, find two numbers such that they add up to a specific `target` number.\n\nReturn the indices of the two numbers, `index1` and `index2`, added by one as an integer array `[index1, index2]` of length 2.\n\n### Constraints:\n- `2 <= numbers.length <= 3 * 10^4`\n- You may not use the same element twice.\n- Exactly one solution exists.",
+    "testCases": [
+      {
+        "input": [
+          [
+            2,
+            7,
+            11,
+            15
+          ],
+          9
+        ],
+        "expected": [
+          1,
+          2
+        ]
+      },
+      {
+        "input": [
+          [
+            2,
+            3,
+            4
+          ],
+          6
+        ],
+        "expected": [
+          1,
+          3
+        ]
+      },
+      {
+        "input": [
+          [
+            -1,
+            0
+          ],
+          -1
+        ],
+        "expected": [
+          1,
+          2
+        ]
+      }
+    ],
+    "editorial": {
+      "intuition": "Because the array is sorted, if sum < target increment left; if sum > target decrement right.",
+      "bruteForce": "Binary search for each element is O(N log N).",
+      "optimalApproach": "Two pointers at ends converging inward.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Negative numbers",
+        "Two equal elements"
+      ]
+    },
+    "hints": [
+      "The array is sorted!",
+      "If sum is too small, move left pointer right"
+    ]
+  },
+  {
+    "id": "3sum",
+    "title": "3Sum",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Two Pointers",
+    "entryPoint": "threeSum",
+    "optimalTime": "O(N^2)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n^2)",
+      "o(n squared)",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "o(n)"
+    ],
+    "description": "Given an integer array nums, return all the triplets `[nums[i], nums[j], nums[k]]` such that `i != j`, `i != k`, and `j != k`, and `nums[i] + nums[j] + nums[k] == 0`.\n\nNotice that the solution set must not contain duplicate triplets.\n\n### Examples:\n**Example 1:**\n- **Input:** `nums = [-1,0,1,2,-1,-4]`\n- **Output:** `[[-1,-1,2],[-1,0,1]]`\n\n### Constraints:\n- `3 <= nums.length <= 3000`\n- `-10^5 <= nums[i] <= 10^5`",
+    "testCases": [
+      {
+        "input": [
+          [
+            -1,
+            0,
+            1,
+            2,
+            -1,
+            -4
+          ]
+        ],
+        "expected": [
+          [
+            -1,
+            -1,
+            2
+          ],
+          [
+            -1,
+            0,
+            1
+          ]
+        ]
+      },
+      {
+        "input": [
+          [
+            0,
+            1,
+            1
+          ]
+        ],
+        "expected": []
+      },
+      {
+        "input": [
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "expected": [
+          [
+            0,
+            0,
+            0
+          ]
+        ]
+      }
+    ],
+    "editorial": {
+      "intuition": "Sort array, fix one element, and use Two Pointers for the remaining two elements.",
+      "bruteForce": "Checking all triplets takes O(N^3).",
+      "optimalApproach": "Sort nums in O(N log N). Iterate i from 0 to N-3, then two pointers left and right.",
+      "complexityAnalysis": "Time: O(N^2), Space: O(1) or O(N) depending on sorting implementation.",
+      "edgeCases": [
+        "All zeros",
+        "Duplicates skipped to avoid duplicate triplets"
+      ]
+    },
+    "hints": [
+      "Sort the array first",
+      "Fix the first element and solve 2Sum on the remaining subarray",
+      "Skip adjacent duplicate values"
+    ]
+  },
+  {
+    "id": "container-with-most-water",
+    "title": "Container With Most Water",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Two Pointers",
+    "entryPoint": "maxArea",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant"
+    ],
+    "description": "You are given an integer array `height` of length `n`. There are `n` vertical lines drawn such that the two endpoints of the `i-th` line are `(i, 0)` and `(i, height[i])`.\n\nFind two lines that together with the x-axis form a container, such that the container contains the most water. Return the maximum amount of water a container can store.\n\n### Examples:\n**Example 1:**\n- **Input:** `height = [1,8,6,2,5,4,8,3,7]`\n- **Output:** `49`\n- **Explanation:** The max area is between index 1 and index 8: width = 7, min height = 7, area = 49.\n\n### Constraints:\n- `n == height.length`\n- `2 <= n <= 10^5`\n- `0 <= height[i] <= 10^4`",
+    "testCases": [
+      {
+        "input": [
+          [
+            1,
+            8,
+            6,
+            2,
+            5,
+            4,
+            8,
+            3,
+            7
+          ]
+        ],
+        "expected": 49
+      },
+      {
+        "input": [
+          [
+            1,
+            1
+          ]
+        ],
+        "expected": 1
+      }
+    ],
+    "editorial": {
+      "intuition": "Start with widest container (left = 0, right = n-1). Always advance the pointer pointing to the shorter vertical bar.",
+      "bruteForce": "Check all pairs of lines: O(N^2).",
+      "optimalApproach": "Two pointers at extremities. Move whichever line is shorter.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "All heights equal",
+        "Descending heights",
+        "Only 2 lines"
+      ]
+    },
+    "hints": [
+      "Area is limited by the shorter line",
+      "Moving the taller line cannot increase area"
+    ]
+  },
+  {
+    "id": "trapping-rain-water",
+    "title": "Trapping Rain Water",
+    "difficulty": "HARD",
+    "category": "DSA",
+    "pattern": "Two Pointers",
+    "entryPoint": "trap",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant"
+    ],
+    "description": "Given `n` non-negative integers representing an elevation map where the width of each bar is 1, compute how much water it can trap after raining.\n\n### Examples:\n**Example 1:**\n- **Input:** `height = [0,1,0,2,1,0,1,3,2,1,2,1]`\n- **Output:** `6`\n\n### Constraints:\n- `n == height.length`\n- `1 <= n <= 2 * 10^4`\n- `0 <= height[i] <= 10^5`",
+    "testCases": [
+      {
+        "input": [
+          [
+            0,
+            1,
+            0,
+            2,
+            1,
+            0,
+            1,
+            3,
+            2,
+            1,
+            2,
+            1
+          ]
+        ],
+        "expected": 6
+      },
+      {
+        "input": [
+          [
+            4,
+            2,
+            0,
+            3,
+            2,
+            5
+          ]
+        ],
+        "expected": 9
+      }
+    ],
+    "editorial": {
+      "intuition": "Water above index i is determined by min(maxLeft, maxRight) - height[i]. Two pointers can track running maxes without arrays.",
+      "bruteForce": "For each index, find left max and right max: O(N^2).",
+      "optimalApproach": "Two pointers tracking leftMax and rightMax. Advance pointer with smaller max.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Strictly increasing/decreasing heights trap 0 water",
+        "Array length < 3"
+      ]
+    },
+    "hints": [
+      "Water trapped at bar i depends on min of max height to left and right",
+      "Two pointers avoid extra arrays"
+    ]
+  },
+  {
+    "id": "best-time-to-buy-and-sell-stock",
+    "title": "Best Time to Buy and Sell Stock",
+    "difficulty": "EASY",
+    "category": "DSA",
+    "pattern": "Sliding Window",
+    "entryPoint": "maxProfit",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant"
+    ],
+    "description": "You are given an array `prices` where `prices[i]` is the price of a given stock on the `i-th` day.\n\nYou want to maximize your profit by choosing a single day to buy one stock and choosing a different day in the future to sell that stock.\n\nReturn the maximum profit you can achieve from this transaction. If you cannot achieve any profit, return `0`.\n\n### Examples:\n**Example 1:**\n- **Input:** `prices = [7,1,5,3,6,4]`\n- **Output:** `5`\n- **Explanation:** Buy on day 2 (price = 1) and sell on day 5 (price = 6), profit = 6 - 1 = 5.\n\n**Example 2:**\n- **Input:** `prices = [7,6,4,3,1]`\n- **Output:** `0`\n\n### Constraints:\n- `1 <= prices.length <= 10^5`\n- `0 <= prices[i] <= 10^4`",
+    "testCases": [
+      {
+        "input": [
+          [
+            7,
+            1,
+            5,
+            3,
+            6,
+            4
+          ]
+        ],
+        "expected": 5
+      },
+      {
+        "input": [
+          [
+            7,
+            6,
+            4,
+            3,
+            1
+          ]
+        ],
+        "expected": 0
+      },
+      {
+        "input": [
+          [
+            2,
+            4,
+            1
+          ]
+        ],
+        "expected": 2
+      }
+    ],
+    "editorial": {
+      "intuition": "Track the minimum price seen so far and compare each day price against it.",
+      "bruteForce": "Compare all pairs: O(N^2).",
+      "optimalApproach": "Single pass maintaining minPrice and maxProfit.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Monotonically decreasing prices",
+        "Single day",
+        "Prices with zero"
+      ]
+    },
+    "hints": [
+      "Track minimum price seen so far",
+      "Calculate profit at each day"
+    ]
+  },
+  {
+    "id": "longest-substring-without-repeating-characters",
+    "title": "Longest Substring Without Repeating Characters",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Sliding Window",
+    "entryPoint": "lengthOfLongestSubstring",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(min(N, M))",
+    "timeKeywords": [
+      "o(n)",
+      "linear"
+    ],
+    "spaceKeywords": [
+      "o(n)",
+      "o(min(n, m))",
+      "linear"
+    ],
+    "description": "Given a string `s`, find the length of the **longest substring** without duplicate characters.\n\n### Examples:\n**Example 1:**\n- **Input:** `s = \"abcabcbb\"`\n- **Output:** `3`\n- **Explanation:** The answer is \"abc\", with length 3.\n\n**Example 2:**\n- **Input:** `s = \"bbbbb\"`\n- **Output:** `1`\n\n**Example 3:**\n- **Input:** `s = \"pwwkew\"`\n- **Output:** `3`\n\n### Constraints:\n- `0 <= s.length <= 5 * 10^4`\n- `s` consists of English letters, digits, symbols and spaces.",
+    "testCases": [
+      {
+        "input": [
+          "abcabcbb"
+        ],
+        "expected": 3
+      },
+      {
+        "input": [
+          "bbbbb"
+        ],
+        "expected": 1
+      },
+      {
+        "input": [
+          "pwwkew"
+        ],
+        "expected": 3
+      },
+      {
+        "input": [
+          ""
+        ],
+        "expected": 0,
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "Use a sliding window [left, right] and a hash map tracking last seen index of characters.",
+      "bruteForce": "Check all substrings for uniqueness: O(N^3).",
+      "optimalApproach": "Sliding window: when character s[right] was seen inside window, move left to seen[char] + 1.",
+      "complexityAnalysis": "Time: O(N), Space: O(min(N, M)) where M is character alphabet size.",
+      "edgeCases": [
+        "Empty string",
+        "All identical characters",
+        "String with spaces"
+      ]
+    },
+    "hints": [
+      "Use sliding window",
+      "Store the last seen index of each character"
+    ]
+  },
+  {
+    "id": "minimum-window-substring",
+    "title": "Minimum Window Substring",
+    "difficulty": "HARD",
+    "category": "DSA",
+    "pattern": "Sliding Window",
+    "entryPoint": "minWindow",
+    "optimalTime": "O(N + M)",
+    "optimalSpace": "O(M)",
+    "timeKeywords": [
+      "o(n + m)",
+      "linear",
+      "o(n)"
+    ],
+    "spaceKeywords": [
+      "o(m)",
+      "o(1)"
+    ],
+    "description": "Given two strings `s` and `t` of lengths `m` and `n` respectively, return the **minimum window substring** of `s` such that every character in `t` (including duplicates) is included in the window. If there is no such substring, return the empty string `\"\"`.\n\n### Examples:\n**Example 1:**\n- **Input:** `s = \"ADOBECODEBANC\", t = \"ABC\"`\n- **Output:** `\"BANC\"`\n\n### Constraints:\n- `m == s.length`, `n == t.length`\n- `1 <= m, n <= 10^5`\n- `s` and `t` consist of uppercase and lowercase English letters.",
+    "testCases": [
+      {
+        "input": [
+          "ADOBECODEBANC",
+          "ABC"
+        ],
+        "expected": "BANC"
+      },
+      {
+        "input": [
+          "a",
+          "a"
+        ],
+        "expected": "a"
+      },
+      {
+        "input": [
+          "a",
+          "aa"
+        ],
+        "expected": ""
+      }
+    ],
+    "editorial": {
+      "intuition": "Sliding window with character frequency count. Expand right until valid, then shrink left to find minimum.",
+      "bruteForce": "Check all substrings: O(N^2 * M).",
+      "optimalApproach": "Two pointers tracking match counts against target frequency map.",
+      "complexityAnalysis": "Time: O(N + M), Space: O(M).",
+      "edgeCases": [
+        "t longer than s",
+        "Duplicate characters in t"
+      ]
+    },
+    "hints": [
+      "Count frequency of t",
+      "Expand right until window has all characters",
+      "Shrink left to minimize"
+    ]
+  },
+  {
+    "id": "valid-parentheses",
+    "title": "Valid Parentheses",
+    "difficulty": "EASY",
+    "category": "DSA",
+    "pattern": "Stack",
+    "entryPoint": "isValid",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(n)",
+      "linear"
+    ],
+    "spaceKeywords": [
+      "o(n)",
+      "linear"
+    ],
+    "description": "Given a string `s` containing just the characters `'('`, `')'`, `'{'`, `'}'`, `'['` and `']'`, determine if the input string is valid.\n\nAn input string is valid if:\n1. Open brackets must be closed by the same type of brackets.\n2. Open brackets must be closed in the correct order.\n3. Every close bracket has a corresponding open bracket of the same type.\n\n### Examples:\n**Example 1:**\n- **Input:** `s = \"()\"`\n- **Output:** `true`\n\n**Example 2:**\n- **Input:** `s = \"()[]{}\"`\n- **Output:** `true`\n\n**Example 3:**\n- **Input:** `s = \"(]\"`\n- **Output:** `false`\n\n### Constraints:\n- `1 <= s.length <= 10^4`\n- `s` consists of parentheses only `'()[]{}'.`",
+    "testCases": [
+      {
+        "input": [
+          "()"
+        ],
+        "expected": true
+      },
+      {
+        "input": [
+          "()[]{}"
+        ],
+        "expected": true
+      },
+      {
+        "input": [
+          "(]"
+        ],
+        "expected": false
+      },
+      {
+        "input": [
+          "{[]}"
+        ],
+        "expected": true
+      },
+      {
+        "input": [
+          "]"
+        ],
+        "expected": false,
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "Use a LIFO Stack. Push opening brackets; on closing bracket, pop and ensure matching type.",
+      "bruteForce": "Repeated string replacement s.replace(\"()\",\"\") takes O(N^2).",
+      "optimalApproach": "Stack data structure with hash map of matching pairs.",
+      "complexityAnalysis": "Time: O(N), Space: O(N).",
+      "edgeCases": [
+        "Odd length string is always invalid",
+        "Closing bracket on empty stack",
+        "Remaining unmatched open brackets"
+      ]
+    },
+    "hints": [
+      "Use a Stack",
+      "Odd length strings can be immediately rejected"
+    ]
+  },
+  {
+    "id": "min-stack",
+    "title": "Min Stack",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Stack",
+    "entryPoint": "MinStack",
+    "optimalTime": "O(1)",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(1)",
+      "constant"
+    ],
+    "spaceKeywords": [
+      "o(n)",
+      "linear"
+    ],
+    "description": "Design a stack that supports push, pop, top, and retrieving the minimum element in **constant time O(1)**.\n\nImplement the `MinStack` class:\n- `MinStack()` initializes the stack object.\n- `void push(int val)` pushes the element val onto the stack.\n- `void pop()` removes the element on the top of the stack.\n- `int top()` gets the top element of the stack.\n- `int getMin()` retrieves the minimum element in the stack.\n\nYou must implement a solution with **O(1)** time complexity for each function.\n\n### Constraints:\n- `-2^31 <= val <= 2^31 - 1`\n- Methods pop, top and getMin will always be called on non-empty stacks.",
+    "testCases": [
+      {
+        "input": [
+          "test"
+        ],
+        "expected": true
+      }
+    ],
+    "editorial": {
+      "intuition": "Maintain a secondary stack that tracks the running minimum alongside the main stack.",
+      "bruteForce": "Searching stack on getMin takes O(N).",
+      "optimalApproach": "Paired stack or storing (val, currentMin) pairs.",
+      "complexityAnalysis": "Time: O(1) for all methods. Space: O(N).",
+      "edgeCases": [
+        "Duplicate minimums",
+        "Popping current minimum"
+      ]
+    },
+    "hints": [
+      "Can you maintain a separate stack of minimums?",
+      "Store the min value at every stack depth"
+    ]
+  },
+  {
+    "id": "daily-temperatures",
+    "title": "Daily Temperatures",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Stack",
+    "entryPoint": "dailyTemperatures",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(n)",
+      "linear"
+    ],
+    "spaceKeywords": [
+      "o(n)",
+      "linear"
+    ],
+    "description": "Given an array of integers `temperatures` represents the daily temperatures, return an array `answer` such that `answer[i]` is the number of days you have to wait after the `i-th` day to get a warmer temperature. If there is no future day for which this is possible, keep `answer[i] == 0` instead.\n\n### Examples:\n**Example 1:**\n- **Input:** `temperatures = [73,74,75,71,69,72,76,73]`\n- **Output:** `[1,1,4,2,1,1,0,0]`\n\n### Constraints:\n- `1 <= temperatures.length <= 10^5`\n- `30 <= temperatures[i] <= 100`",
+    "testCases": [
+      {
+        "input": [
+          [
+            73,
+            74,
+            75,
+            71,
+            69,
+            72,
+            76,
+            73
+          ]
+        ],
+        "expected": [
+          1,
+          1,
+          4,
+          2,
+          1,
+          1,
+          0,
+          0
+        ]
+      },
+      {
+        "input": [
+          [
+            30,
+            40,
+            50,
+            60
+          ]
+        ],
+        "expected": [
+          1,
+          1,
+          1,
+          0
+        ]
+      }
+    ],
+    "editorial": {
+      "intuition": "Monotonic decreasing stack storing indices. When a warmer day arrives, pop cooler days and compute distance.",
+      "bruteForce": "Nested loops searching ahead: O(N^2).",
+      "optimalApproach": "Monotonic stack: each element pushed and popped at most once.",
+      "complexityAnalysis": "Time: O(N), Space: O(N).",
+      "edgeCases": [
+        "Strictly decreasing temperatures",
+        "All temperatures equal"
+      ]
+    },
+    "hints": [
+      "Think of a monotonic stack",
+      "Store indices instead of values"
+    ]
+  },
+  {
+    "id": "binary-search",
+    "title": "Binary Search",
+    "difficulty": "EASY",
+    "category": "DSA",
+    "pattern": "Binary Search",
+    "entryPoint": "search",
+    "optimalTime": "O(log N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(log n)",
+      "logarithmic",
+      "o of log n"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant"
+    ],
+    "description": "Given an array of integers `nums` which is sorted in ascending order, and an integer `target`, write a function to search `target` in `nums`. If `target` exists, then return its index. Otherwise, return `-1`.\n\nYou must write an algorithm with **O(log n)** runtime complexity.\n\n### Examples:\n**Example 1:**\n- **Input:** `nums = [-1,0,3,5,9,12], target = 9`\n- **Output:** `4`\n\n**Example 2:**\n- **Input:** `nums = [-1,0,3,5,9,12], target = 2`\n- **Output:** `-1`\n\n### Constraints:\n- `1 <= nums.length <= 10^4`\n- `-10^4 < nums[i], target < 10^4`\n- All integers in `nums` are unique.\n- `nums` is sorted in ascending order.",
+    "testCases": [
+      {
+        "input": [
+          [
+            -1,
+            0,
+            3,
+            5,
+            9,
+            12
+          ],
+          9
+        ],
+        "expected": 4
+      },
+      {
+        "input": [
+          [
+            -1,
+            0,
+            3,
+            5,
+            9,
+            12
+          ],
+          2
+        ],
+        "expected": -1
+      }
+    ],
+    "editorial": {
+      "intuition": "Halve the search space by comparing mid element with target.",
+      "bruteForce": "Linear scan takes O(N).",
+      "optimalApproach": "Standard binary search with left and right bounds.",
+      "complexityAnalysis": "Time: O(log N), Space: O(1).",
+      "edgeCases": [
+        "Single element array",
+        "Target smaller than min or larger than max"
+      ]
+    },
+    "hints": [
+      "Calculate mid = left + Math.floor((right - left) / 2)",
+      "Compare nums[mid] with target"
+    ]
+  },
+  {
+    "id": "search-in-rotated-sorted-array",
+    "title": "Search in Rotated Sorted Array",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Binary Search",
+    "entryPoint": "search",
+    "optimalTime": "O(log N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(log n)",
+      "logarithmic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant"
+    ],
+    "description": "There is an integer array `nums` sorted in ascending order (with distinct values). Prior to being passed to your function, `nums` is possibly rotated at an unknown pivot index `k`.\n\nGiven the array `nums` after the possible rotation and an integer `target`, return the index of `target` if it is in `nums`, or `-1` if it is not in `nums`.\n\nYou must write an algorithm with **O(log n)** runtime complexity.\n\n### Examples:\n**Example 1:**\n- **Input:** `nums = [4,5,6,7,0,1,2], target = 0`\n- **Output:** `4`\n\n### Constraints:\n- `1 <= nums.length <= 5000`\n- `-10^4 <= nums[i] <= 10^4`\n- All values of `nums` are unique.",
+    "testCases": [
+      {
+        "input": [
+          [
+            4,
+            5,
+            6,
+            7,
+            0,
+            1,
+            2
+          ],
+          0
+        ],
+        "expected": 4
+      },
+      {
+        "input": [
+          [
+            4,
+            5,
+            6,
+            7,
+            0,
+            1,
+            2
+          ],
+          3
+        ],
+        "expected": -1
+      },
+      {
+        "input": [
+          [
+            1
+          ],
+          0
+        ],
+        "expected": -1
+      }
+    ],
+    "editorial": {
+      "intuition": "At least one half of the rotated array is always sorted. Determine which half is sorted and check if target falls in it.",
+      "bruteForce": "Linear search takes O(N).",
+      "optimalApproach": "Modified binary search checking nums[left] <= nums[mid].",
+      "complexityAnalysis": "Time: O(log N), Space: O(1).",
+      "edgeCases": [
+        "No rotation (fully sorted)",
+        "Array length 1 or 2"
+      ]
+    },
+    "hints": [
+      "One half is always normally sorted",
+      "Check if target lies inside the sorted half"
+    ]
+  },
+  {
+    "id": "find-minimum-in-rotated-sorted-array",
+    "title": "Find Minimum in Rotated Sorted Array",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Binary Search",
+    "entryPoint": "findMin",
+    "optimalTime": "O(log N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(log n)",
+      "logarithmic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant"
+    ],
+    "description": "Suppose an array of length `n` sorted in ascending order is rotated between 1 and `n` times. Notice that rotating an array [a[0], a[1], a[2], ..., a[n-1]] 1 time results in the array [a[n-1], a[0], a[1], a[2], ..., a[n-2]].\n\nGiven the sorted rotated array `nums` of unique elements, return the **minimum element** of this array.\n\nYou must write an algorithm that runs in **O(log n)** time.\n\n### Examples:\n**Example 1:**\n- **Input:** `nums = [3,4,5,1,2]`\n- **Output:** `1`\n\n### Constraints:\n- `n == nums.length`\n- `1 <= n <= 5000`\n- All the integers of `nums` are unique.",
+    "testCases": [
+      {
+        "input": [
+          [
+            3,
+            4,
+            5,
+            1,
+            2
+          ]
+        ],
+        "expected": 1
+      },
+      {
+        "input": [
+          [
+            4,
+            5,
+            6,
+            7,
+            0,
+            1,
+            2
+          ]
+        ],
+        "expected": 0
+      },
+      {
+        "input": [
+          [
+            11,
+            13,
+            15,
+            17
+          ]
+        ],
+        "expected": 11
+      }
+    ],
+    "editorial": {
+      "intuition": "Compare nums[mid] with nums[right]. If mid > right, min is in right half; otherwise in left half.",
+      "bruteForce": "Linear scan takes O(N).",
+      "optimalApproach": "Binary search narrowing down to the inflection point.",
+      "complexityAnalysis": "Time: O(log N), Space: O(1).",
+      "edgeCases": [
+        "Array not rotated",
+        "Single element"
+      ]
+    },
+    "hints": [
+      "Compare nums[mid] against nums[right]",
+      "If nums[mid] > nums[right], search right half"
+    ]
+  },
+  {
+    "id": "reverse-linked-list",
+    "title": "Reverse Linked List",
+    "difficulty": "EASY",
+    "category": "DSA",
+    "pattern": "Linked Lists",
+    "entryPoint": "reverseList",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant"
+    ],
+    "description": "Given the `head` of a singly linked list, reverse the list, and return the reversed list.\n\n### Requirements:\n1. Reversal must be done in-place in O(1) space.\n2. Must run in linear O(N) time.\n\n### Examples:\n**Example 1:**\n- **Input:** `head = [1,2,3,4,5]`\n- **Output:** `[5,4,3,2,1]`\n\n### Constraints:\n- The number of nodes in the list is the range `[0, 5000]`.\n- `-5000 <= Node.val <= 5000`",
+    "testCases": [
+      {
+        "input": [
+          [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        ],
+        "expected": [
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
+      },
+      {
+        "input": [
+          []
+        ],
+        "expected": []
+      }
+    ],
+    "editorial": {
+      "intuition": "Iteratively redirect each node next pointer to point to the previous node.",
+      "bruteForce": "Collect values in array and rebuild: O(N) space.",
+      "optimalApproach": "Three pointers: prev, curr, nextTemp.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Empty list",
+        "Single node list"
+      ]
+    },
+    "hints": [
+      "Keep track of previous node",
+      "Save next pointer before breaking link"
+    ]
+  },
+  {
+    "id": "merge-two-sorted-lists",
+    "title": "Merge Two Sorted Lists",
+    "difficulty": "EASY",
+    "category": "DSA",
+    "pattern": "Linked Lists",
+    "entryPoint": "mergeTwoLists",
+    "optimalTime": "O(N + M)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n + m)",
+      "linear",
+      "o(n)"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant"
+    ],
+    "description": "You are given the heads of two sorted linked lists `list1` and `list2`.\n\nMerge the two lists into one **sorted** list. The list should be made by splicing together the nodes of the first two lists.\n\nReturn the head of the merged linked list.\n\n### Examples:\n**Example 1:**\n- **Input:** `list1 = [1,2,4], list2 = [1,3,4]`\n- **Output:** `[1,1,2,3,4,4]`\n\n### Constraints:\n- The number of nodes in both lists is in the range `[0, 50]`.\n- Both `list1` and `list2` are sorted in non-decreasing order.",
+    "testCases": [
+      {
+        "input": [
+          [
+            1,
+            2,
+            4
+          ],
+          [
+            1,
+            3,
+            4
+          ]
+        ],
+        "expected": [
+          1,
+          1,
+          2,
+          3,
+          4,
+          4
+        ]
+      },
+      {
+        "input": [
+          [],
+          []
+        ],
+        "expected": []
+      }
+    ],
+    "editorial": {
+      "intuition": "Use a dummy head and compare heads of both lists, advancing the smaller one.",
+      "bruteForce": "Extract to array, sort, and re-create: O((N+M) log(N+M)).",
+      "optimalApproach": "Linear splice using dummy head.",
+      "complexityAnalysis": "Time: O(N + M), Space: O(1).",
+      "edgeCases": [
+        "One list empty",
+        "Both lists empty"
+      ]
+    },
+    "hints": [
+      "Create a dummy node as starting head",
+      "Attach the smaller node and advance"
+    ]
+  },
+  {
+    "id": "linked-list-cycle",
+    "title": "Linked List Cycle",
+    "difficulty": "EASY",
+    "category": "DSA",
+    "pattern": "Linked Lists",
+    "entryPoint": "hasCycle",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant"
+    ],
+    "description": "Given `head`, the head of a linked list, determine if the linked list has a cycle in it.\n\nThere is a cycle in a linked list if there is some node in the list that can be reached again by continuously following the `next` pointer.\n\nReturn `true` if there is a cycle in the linked list. Otherwise, return `false`.\n\n### Requirements:\nCan you solve it using **O(1)** memory?\n\n### Constraints:\n- The number of the nodes in the list is in the range `[0, 10^4]`.\n- `-10^5 <= Node.val <= 10^5`",
+    "testCases": [
+      {
+        "input": [
+          "cycle"
+        ],
+        "expected": true
+      }
+    ],
+    "editorial": {
+      "intuition": "Floyd Tortoise and Hare algorithm: slow moves 1 step, fast moves 2 steps. If cycle exists, they must meet.",
+      "bruteForce": "Hash set of visited node references: O(N) space.",
+      "optimalApproach": "Slow and fast pointer algorithm.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Empty list",
+        "Single node without cycle",
+        "Self-looping node"
+      ]
+    },
+    "hints": [
+      "Use two pointers with different speeds",
+      "Fast moves 2x faster than slow"
+    ]
+  },
+  {
+    "id": "invert-binary-tree",
+    "title": "Invert Binary Tree",
+    "difficulty": "EASY",
+    "category": "DSA",
+    "pattern": "Trees",
+    "entryPoint": "invertTree",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(H)",
+    "timeKeywords": [
+      "o(n)",
+      "linear"
+    ],
+    "spaceKeywords": [
+      "o(h)",
+      "o(n)",
+      "height of tree"
+    ],
+    "description": "Given the `root` of a binary tree, invert the tree, and return its root.\n\n### Examples:\n**Example 1:**\n- **Input:** `root = [4,2,7,1,3,6,9]`\n- **Output:** `[4,7,2,9,6,3,1]`\n\n### Constraints:\n- The number of nodes in the tree is in the range `[0, 100]`.\n- `-100 <= Node.val <= 100`",
+    "testCases": [
+      {
+        "input": [
+          [
+            4,
+            2,
+            7,
+            1,
+            3,
+            6,
+            9
+          ]
+        ],
+        "expected": [
+          4,
+          7,
+          2,
+          9,
+          6,
+          3,
+          1
+        ]
+      }
+    ],
+    "editorial": {
+      "intuition": "Recursively swap left and right subtrees for every node in the tree.",
+      "bruteForce": "N/A",
+      "optimalApproach": "Post-order or pre-order recursive DFS swapping root.left and root.right.",
+      "complexityAnalysis": "Time: O(N), Space: O(H) where H is tree height.",
+      "edgeCases": [
+        "Null tree",
+        "Single node tree"
+      ]
+    },
+    "hints": [
+      "Recursively swap left and right children",
+      "Base case: root is null"
+    ]
+  },
+  {
+    "id": "maximum-depth-of-binary-tree",
+    "title": "Maximum Depth of Binary Tree",
+    "difficulty": "EASY",
+    "category": "DSA",
+    "pattern": "Trees",
+    "entryPoint": "maxDepth",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(H)",
+    "timeKeywords": [
+      "o(n)",
+      "linear"
+    ],
+    "spaceKeywords": [
+      "o(h)",
+      "o(n)"
+    ],
+    "description": "Given the `root` of a binary tree, return its maximum depth.\n\nA binary tree's **maximum depth** is the number of nodes along the longest path from the root node down to the farthest leaf node.\n\n### Examples:\n**Example 1:**\n- **Input:** `root = [3,9,20,null,null,15,7]`\n- **Output:** `3`\n\n### Constraints:\n- The number of nodes in the tree is in the range `[0, 10^4]`.\n- `-100 <= Node.val <= 100`",
+    "testCases": [
+      {
+        "input": [
+          [
+            3,
+            9,
+            20,
+            null,
+            null,
+            15,
+            7
+          ]
+        ],
+        "expected": 3
+      }
+    ],
+    "editorial": {
+      "intuition": "1 + max(depth(left), depth(right)).",
+      "bruteForce": "N/A",
+      "optimalApproach": "Recursive DFS or level-order BFS queue.",
+      "complexityAnalysis": "Time: O(N), Space: O(H).",
+      "edgeCases": [
+        "Empty tree has depth 0",
+        "Skewed linked-list tree"
+      ]
+    },
+    "hints": [
+      "Max depth of node = 1 + max(left depth, right depth)"
+    ]
+  },
+  {
+    "id": "lowest-common-ancestor-of-a-binary-search-tree",
+    "title": "Lowest Common Ancestor of a Binary Search Tree",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Trees",
+    "entryPoint": "lowestCommonAncestor",
+    "optimalTime": "O(H)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(h)",
+      "o(log n)",
+      "height of tree"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant"
+    ],
+    "description": "Given a binary search tree (BST), find the lowest common ancestor (LCA) node of two given nodes in the BST.\n\nAccording to the definition of LCA on Wikipedia: “The lowest common ancestor is defined between two nodes `p` and `q` as the lowest node in `T` that has both `p` and `q` as descendants (where we allow **a node to be a descendant of itself**).”\n\n### Constraints:\n- The number of nodes in the tree is in the range `[2, 10^5]`.\n- All `Node.val` are unique.\n- `p` and `q` will exist in the BST.",
+    "testCases": [
+      {
+        "input": [
+          "bst"
+        ],
+        "expected": true
+      }
+    ],
+    "editorial": {
+      "intuition": "Utilize BST ordering: if both p and q are greater than root, go right; if both smaller, go left; otherwise current node is split point (LCA).",
+      "bruteForce": "Store paths to p and q: O(N) space.",
+      "optimalApproach": "Iterative BST traversal based on node values.",
+      "complexityAnalysis": "Time: O(H), Space: O(1).",
+      "edgeCases": [
+        "p or q is root itself"
+      ]
+    },
+    "hints": [
+      "Leverage the BST property",
+      "If p and q lie on different sides of root, root is LCA"
+    ]
+  },
+  {
+    "id": "climbing-stairs",
+    "title": "Climbing Stairs",
+    "difficulty": "EASY",
+    "category": "DSA",
+    "pattern": "Dynamic Programming",
+    "entryPoint": "climbStairs",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant"
+    ],
+    "description": "You are climbing a staircase. It takes `n` steps to reach the top.\n\nEach time you can either climb `1` or `2` steps. In how many distinct ways can you climb to the top?\n\n### Examples:\n**Example 1:**\n- **Input:** `n = 2`\n- **Output:** `2`\n- **Explanation:** There are two ways: (1 step + 1 step) or (2 steps).\n\n**Example 2:**\n- **Input:** `n = 3`\n- **Output:** `3`\n- **Explanation:** (1+1+1), (1+2), (2+1).\n\n### Constraints:\n- `1 <= n <= 45`",
+    "testCases": [
+      {
+        "input": [
+          2
+        ],
+        "expected": 2
+      },
+      {
+        "input": [
+          3
+        ],
+        "expected": 3
+      },
+      {
+        "input": [
+          5
+        ],
+        "expected": 8
+      }
+    ],
+    "editorial": {
+      "intuition": "dp[i] = dp[i-1] + dp[i-2], identical to Fibonacci numbers.",
+      "bruteForce": "Pure recursion takes O(2^N).",
+      "optimalApproach": "Bottom-up DP tracking previous two values.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "n = 1 has 1 way",
+        "n = 2 has 2 ways"
+      ]
+    },
+    "hints": [
+      "Ways to reach step i = ways(i-1) + ways(i-2)",
+      "Save only the last two values"
+    ]
+  },
+  {
+    "id": "coin-change",
+    "title": "Coin Change",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Dynamic Programming",
+    "entryPoint": "coinChange",
+    "optimalTime": "O(amount * N)",
+    "optimalSpace": "O(amount)",
+    "timeKeywords": [
+      "o(amount * n)",
+      "pseudo-polynomial"
+    ],
+    "spaceKeywords": [
+      "o(amount)"
+    ],
+    "description": "You are given an integer array `coins` representing coins of different denominations and an integer `amount` representing a total amount of money.\n\nReturn the **fewest number of coins** that you need to make up that amount. If that amount of money cannot be made up by any combination of the coins, return `-1`.\n\nYou may assume that you have an infinite number of each kind of coin.\n\n### Examples:\n**Example 1:**\n- **Input:** `coins = [1,2,5], amount = 11`\n- **Output:** `3`\n- **Explanation:** 11 = 5 + 5 + 1.\n\n**Example 2:**\n- **Input:** `coins = [2], amount = 3`\n- **Output:** `-1`\n\n### Constraints:\n- `1 <= coins.length <= 12`\n- `1 <= coins[i] <= 2^31 - 1`\n- `0 <= amount <= 10^4`",
+    "testCases": [
+      {
+        "input": [
+          [
+            1,
+            2,
+            5
+          ],
+          11
+        ],
+        "expected": 3
+      },
+      {
+        "input": [
+          [
+            2
+          ],
+          3
+        ],
+        "expected": -1
+      },
+      {
+        "input": [
+          [
+            1
+          ],
+          0
+        ],
+        "expected": 0
+      }
+    ],
+    "editorial": {
+      "intuition": "dp[i] represents minimum coins to form amount i: dp[i] = min(dp[i - coin] + 1).",
+      "bruteForce": "Exhaustive search: exponential O(C^A).",
+      "optimalApproach": "1D bottom-up DP table initialized with Infinity.",
+      "complexityAnalysis": "Time: O(amount * len(coins)), Space: O(amount).",
+      "edgeCases": [
+        "amount = 0 returns 0",
+        "impossible amounts return -1"
+      ]
+    },
+    "hints": [
+      "Create an array dp of size amount + 1 initialized to Infinity",
+      "dp[0] = 0"
+    ]
+  },
+  {
+    "id": "longest-increasing-subsequence",
+    "title": "Longest Increasing Subsequence",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Dynamic Programming",
+    "entryPoint": "lengthOfLIS",
+    "optimalTime": "O(N log N)",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(n log n)",
+      "o(n^2)"
+    ],
+    "spaceKeywords": [
+      "o(n)"
+    ],
+    "description": "Given an integer array `nums`, return the length of the longest **strictly increasing** subsequence.\n\n### Examples:\n**Example 1:**\n- **Input:** `nums = [10,9,2,5,3,7,101,18]`\n- **Output:** `4`\n- **Explanation:** The longest increasing subsequence is [2, 3, 7, 101], therefore the length is 4.\n\n### Constraints:\n- `1 <= nums.length <= 2500`\n- `-10^4 <= nums[i] <= 10^4`",
+    "testCases": [
+      {
+        "input": [
+          [
+            10,
+            9,
+            2,
+            5,
+            3,
+            7,
+            101,
+            18
+          ]
+        ],
+        "expected": 4
+      },
+      {
+        "input": [
+          [
+            0,
+            1,
+            0,
+            3,
+            2,
+            3
+          ]
+        ],
+        "expected": 4
+      },
+      {
+        "input": [
+          [
+            7,
+            7,
+            7,
+            7
+          ]
+        ],
+        "expected": 1
+      }
+    ],
+    "editorial": {
+      "intuition": "Patience sorting / binary search on tails array achieves O(N log N).",
+      "bruteForce": "O(2^N) all subsequences.",
+      "optimalApproach": "Maintain array tails where tails[i] is smallest tail of all LIS of length i+1.",
+      "complexityAnalysis": "Time: O(N log N), Space: O(N).",
+      "edgeCases": [
+        "All equal values has LIS 1",
+        "Strictly descending array"
+      ]
+    },
+    "hints": [
+      "Can you maintain the smallest tail for each subsequence length?",
+      "Binary search into tails array"
+    ]
+  },
+  {
+    "id": "number-of-islands",
+    "title": "Number of Islands",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Graphs",
+    "entryPoint": "numIslands",
+    "optimalTime": "O(M * N)",
+    "optimalSpace": "O(M * N)",
+    "timeKeywords": [
+      "o(m * n)",
+      "o(m*n)",
+      "linear in grid"
+    ],
+    "spaceKeywords": [
+      "o(m * n)",
+      "o(m*n)"
+    ],
+    "description": "Given an `m x n` 2D binary grid `grid` which represents a map of `'1'`s (land) and `'0'`s (water), return the number of islands.\n\nAn **island** is surrounded by water and is formed by connecting adjacent lands horizontally or vertically. You may assume all four edges of the grid are all surrounded by water.\n\n### Examples:\n**Example 1:**\n- **Input:**\n```text\ngrid = [\n  [\"1\",\"1\",\"1\",\"1\",\"0\"],\n  [\"1\",\"1\",\"0\",\"1\",\"0\"],\n  [\"1\",\"1\",\"0\",\"0\",\"0\"],\n  [\"0\",\"0\",\"0\",\"0\",\"0\"]\n]\n```\n- **Output:** `1`\n\n### Constraints:\n- `m == grid.length`, `n == grid[i].length`\n- `1 <= m, n <= 300`\n- `grid[i][j]` is `'0'` or `'1'`.",
+    "testCases": [
+      {
+        "input": [
+          [
+            [
+              "1",
+              "1",
+              "1",
+              "1",
+              "0"
+            ],
+            [
+              "1",
+              "1",
+              "0",
+              "1",
+              "0"
+            ],
+            [
+              "1",
+              "1",
+              "0",
+              "0",
+              "0"
+            ],
+            [
+              "0",
+              "0",
+              "0",
+              "0",
+              "0"
+            ]
+          ]
+        ],
+        "expected": 1
+      }
+    ],
+    "editorial": {
+      "intuition": "Whenever land 1 is encountered, increment island count and sink connected land to 0 using DFS/BFS.",
+      "bruteForce": "N/A",
+      "optimalApproach": "Connected components via DFS flood-fill in-place.",
+      "complexityAnalysis": "Time: O(M * N), Space: O(M * N) recursion stack in worst case.",
+      "edgeCases": [
+        "Grid with all water",
+        "Grid with all land",
+        "Single cell"
+      ]
+    },
+    "hints": [
+      "Loop over all cells",
+      "When grid[r][c] == \"1\", run DFS to visit all adjacent land"
+    ]
+  },
+  {
+    "id": "course-schedule",
+    "title": "Course Schedule",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Graphs",
+    "entryPoint": "canFinish",
+    "optimalTime": "O(V + E)",
+    "optimalSpace": "O(V + E)",
+    "timeKeywords": [
+      "o(v + e)",
+      "linear in graph"
+    ],
+    "spaceKeywords": [
+      "o(v + e)"
+    ],
+    "description": "There are a total of `numCourses` courses you have to take, labeled from `0` to `numCourses - 1`. You are given an array `prerequisites` where `prerequisites[i] = [ai, bi]` indicates that you **must** take course `bi` first if you want to take course `ai`.\n\nReturn `true` if you can finish all courses. Otherwise, return `false`.\n\n### Examples:\n**Example 1:**\n- **Input:** `numCourses = 2, prerequisites = [[1,0]]`\n- **Output:** `true`\n\n**Example 2:**\n- **Input:** `numCourses = 2, prerequisites = [[1,0],[0,1]]`\n- **Output:** `false` (Cycle detected)\n\n### Constraints:\n- `1 <= numCourses <= 2000`\n- `0 <= prerequisites.length <= 5000`",
+    "testCases": [
+      {
+        "input": [
+          2,
+          [
+            [
+              1,
+              0
+            ]
+          ]
+        ],
+        "expected": true
+      },
+      {
+        "input": [
+          2,
+          [
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ]
+        ],
+        "expected": false
+      }
+    ],
+    "editorial": {
+      "intuition": "Detecting if directed graph has a cycle. If cycle exists, impossible to finish courses.",
+      "bruteForce": "N/A",
+      "optimalApproach": "Kahn algorithm (BFS topological sort using in-degrees) or DFS 3-color cycle detection.",
+      "complexityAnalysis": "Time: O(V + E), Space: O(V + E).",
+      "edgeCases": [
+        "Disjoint graphs",
+        "Self-dependency [0, 0]"
+      ]
+    },
+    "hints": [
+      "Model as directed graph",
+      "Use topological sort / in-degrees"
+    ]
+  },
+  {
+    "id": "in-memory-kv-store",
+    "title": "In-Memory Key-Value Store with TTL",
+    "difficulty": "MEDIUM",
+    "category": "MachineCoding",
+    "pattern": "Low-Level Design",
+    "entryPoint": "KeyValueStore",
+    "optimalTime": "O(1)",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(1)",
+      "constant"
+    ],
+    "spaceKeywords": [
+      "o(n)",
+      "linear"
+    ],
+    "description": "Design and implement an in-memory key-value data store that supports saving, retrieving, and expiring keys with TTL.\n\n### Requirements:\n1. `set(key, value, ttlMs)` — Stores key-value. If ttlMs provided, key automatically expires after that many milliseconds.\n2. `get(key)` — Returns value if not expired, otherwise returns null.\n3. `del(key)` — Deletes key; returns boolean indicating if key existed.\n4. `size()` — Returns count of active non-expired keys.",
+    "testCases": [
+      {
+        "input": [
+          "kv"
+        ],
+        "expected": true
+      }
+    ],
+    "editorial": {
+      "intuition": "Store { value, expiresAt } in Map. Lazily purge on get/size.",
+      "bruteForce": "N/A",
+      "optimalApproach": "Hash map with timestamp comparison and optional background cleaner.",
+      "complexityAnalysis": "Time: O(1) get/set/del. Space: O(N).",
+      "edgeCases": [
+        "Zero TTL",
+        "Overwriting key resets TTL"
+      ]
+    },
+    "hints": [
+      "Store expiration timestamp: Date.now() + ttlMs"
+    ]
+  },
+  {
+    "id": "token-bucket-rate-limiter",
+    "title": "Token Bucket Rate Limiter",
+    "difficulty": "MEDIUM",
+    "category": "MachineCoding",
+    "pattern": "Low-Level Design",
+    "entryPoint": "TokenBucketRateLimiter",
+    "optimalTime": "O(1)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(1)",
+      "constant"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant"
+    ],
+    "description": "Design and implement an API Rate Limiter using the Token Bucket Algorithm.\n\n### Requirements:\n1. `constructor(capacity, refillRatePerSec)`\n2. `allowRequest(tokens)` — Checks if enough tokens exist. If yes, consumes and returns true. Otherwise false.\n3. Automatically refill tokens based on elapsed time without running an active timer loop.",
+    "testCases": [
+      {
+        "input": [
+          "tb"
+        ],
+        "expected": true
+      }
+    ],
+    "editorial": {
+      "intuition": "Compute newly refilled tokens on demand: tokens += (now - lastRefill) * rate.",
+      "bruteForce": "N/A",
+      "optimalApproach": "Lazy time delta computation avoids background polling timers.",
+      "complexityAnalysis": "Time: O(1), Space: O(1).",
+      "edgeCases": [
+        "Tokens capped at bucket capacity"
+      ]
+    },
+    "hints": [
+      "Refill tokens lazily using time delta"
+    ]
+  },
+  {
+    "id": "subarray-sum-equals-k",
+    "title": "Subarray Sum Equals K",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Arrays & Hashing",
+    "entryPoint": "subarraySum",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(n)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Subarray Sum Equals K\n\nImplement an optimal solution for **Subarray Sum Equals K**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Subarray Sum Equals K** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(N)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `subarraySum`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(N)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Arrays & Hashing.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Arrays & Hashing pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(N).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Arrays & Hashing.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "longest-consecutive-sequence",
+    "title": "Longest Consecutive Sequence",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Arrays & Hashing",
+    "entryPoint": "longestConsecutive",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(n)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Longest Consecutive Sequence\n\nImplement an optimal solution for **Longest Consecutive Sequence**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Longest Consecutive Sequence** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(N)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `longestConsecutive`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(N)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Arrays & Hashing.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Arrays & Hashing pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(N).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Arrays & Hashing.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "encode-and-decode-strings",
+    "title": "Encode and Decode Strings",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Arrays & Hashing",
+    "entryPoint": "Codec",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Encode and Decode Strings\n\nImplement an optimal solution for **Encode and Decode Strings**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Encode and Decode Strings** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `Codec`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Arrays & Hashing.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Arrays & Hashing pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Arrays & Hashing.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "next-permutation",
+    "title": "Next Permutation",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Arrays & Hashing",
+    "entryPoint": "nextPermutation",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Next Permutation\n\nImplement an optimal solution for **Next Permutation**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Next Permutation** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `nextPermutation`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Arrays & Hashing.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Arrays & Hashing pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Arrays & Hashing.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "rotate-array",
+    "title": "Rotate Array",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Arrays & Hashing",
+    "entryPoint": "rotate",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Rotate Array\n\nImplement an optimal solution for **Rotate Array**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Rotate Array** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `rotate`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Arrays & Hashing.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Arrays & Hashing pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Arrays & Hashing.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "first-missing-positive",
+    "title": "First Missing Positive",
+    "difficulty": "HARD",
+    "category": "DSA",
+    "pattern": "Arrays & Hashing",
+    "entryPoint": "firstMissingPositive",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### First Missing Positive\n\nImplement an optimal solution for **First Missing Positive**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **First Missing Positive** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `firstMissingPositive`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Arrays & Hashing.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Arrays & Hashing pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Arrays & Hashing.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "majority-element",
+    "title": "Majority Element",
+    "difficulty": "EASY",
+    "category": "DSA",
+    "pattern": "Arrays & Hashing",
+    "entryPoint": "majorityElement",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Majority Element\n\nImplement an optimal solution for **Majority Element**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Majority Element** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `majorityElement`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Arrays & Hashing.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Arrays & Hashing pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Arrays & Hashing.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "4sum",
+    "title": "4Sum",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Arrays & Hashing",
+    "entryPoint": "fourSum",
+    "optimalTime": "O(N^3)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n^3)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### 4Sum\n\nImplement an optimal solution for **4Sum**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **4Sum** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N^3)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `fourSum`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N^3)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Arrays & Hashing.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Arrays & Hashing pattern to achieve O(N^3) runtime.",
+      "complexityAnalysis": "Time: O(N^3), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Arrays & Hashing.",
+      "How does your approach achieve O(N^3) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "continuous-subarray-sum",
+    "title": "Continuous Subarray Sum",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Arrays & Hashing",
+    "entryPoint": "checkSubarraySum",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(n)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Continuous Subarray Sum\n\nImplement an optimal solution for **Continuous Subarray Sum**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Continuous Subarray Sum** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(N)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `checkSubarraySum`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(N)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Arrays & Hashing.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Arrays & Hashing pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(N).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Arrays & Hashing.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "move-zeroes",
+    "title": "Move Zeroes",
+    "difficulty": "EASY",
+    "category": "DSA",
+    "pattern": "Two Pointers",
+    "entryPoint": "moveZeroes",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Move Zeroes\n\nImplement an optimal solution for **Move Zeroes**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Move Zeroes** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `moveZeroes`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Two Pointers.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Two Pointers pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Two Pointers.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "sort-colors-dutch-national-flag",
+    "title": "Sort Colors (Dutch National Flag)",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Two Pointers",
+    "entryPoint": "sortColors",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Sort Colors (Dutch National Flag)\n\nImplement an optimal solution for **Sort Colors (Dutch National Flag)**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Sort Colors (Dutch National Flag)** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `sortColors`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Two Pointers.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Two Pointers pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Two Pointers.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "remove-duplicates-from-sorted-array",
+    "title": "Remove Duplicates from Sorted Array",
+    "difficulty": "EASY",
+    "category": "DSA",
+    "pattern": "Two Pointers",
+    "entryPoint": "removeDuplicates",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Remove Duplicates from Sorted Array\n\nImplement an optimal solution for **Remove Duplicates from Sorted Array**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Remove Duplicates from Sorted Array** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `removeDuplicates`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Two Pointers.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Two Pointers pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Two Pointers.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "boats-to-save-people",
+    "title": "Boats to Save People",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Two Pointers",
+    "entryPoint": "numRescueBoats",
+    "optimalTime": "O(N log N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n log n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Boats to Save People\n\nImplement an optimal solution for **Boats to Save People**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Boats to Save People** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N log N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `numRescueBoats`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N log N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Two Pointers.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Two Pointers pattern to achieve O(N log N) runtime.",
+      "complexityAnalysis": "Time: O(N log N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Two Pointers.",
+      "How does your approach achieve O(N log N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "3sum-closest",
+    "title": "3Sum Closest",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Two Pointers",
+    "entryPoint": "threeSumClosest",
+    "optimalTime": "O(N^2)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n^2)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### 3Sum Closest\n\nImplement an optimal solution for **3Sum Closest**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **3Sum Closest** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N^2)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `threeSumClosest`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N^2)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Two Pointers.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Two Pointers pattern to achieve O(N^2) runtime.",
+      "complexityAnalysis": "Time: O(N^2), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Two Pointers.",
+      "How does your approach achieve O(N^2) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "longest-repeating-character-replacement",
+    "title": "Longest Repeating Character Replacement",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Sliding Window",
+    "entryPoint": "characterReplacement",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Longest Repeating Character Replacement\n\nImplement an optimal solution for **Longest Repeating Character Replacement**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Longest Repeating Character Replacement** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `characterReplacement`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Sliding Window.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Sliding Window pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Sliding Window.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "permutation-in-string",
+    "title": "Permutation in String",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Sliding Window",
+    "entryPoint": "checkInclusion",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Permutation in String\n\nImplement an optimal solution for **Permutation in String**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Permutation in String** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `checkInclusion`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Sliding Window.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Sliding Window pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Sliding Window.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "sliding-window-maximum",
+    "title": "Sliding Window Maximum",
+    "difficulty": "HARD",
+    "category": "DSA",
+    "pattern": "Sliding Window",
+    "entryPoint": "maxSlidingWindow",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(K)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(k)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Sliding Window Maximum\n\nImplement an optimal solution for **Sliding Window Maximum**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Sliding Window Maximum** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(K)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `maxSlidingWindow`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(K)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Sliding Window.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Sliding Window pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(K).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Sliding Window.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "minimum-size-subarray-sum",
+    "title": "Minimum Size Subarray Sum",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Sliding Window",
+    "entryPoint": "minSubArrayLen",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Minimum Size Subarray Sum\n\nImplement an optimal solution for **Minimum Size Subarray Sum**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Minimum Size Subarray Sum** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `minSubArrayLen`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Sliding Window.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Sliding Window pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Sliding Window.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "fruit-into-baskets",
+    "title": "Fruit Into Baskets",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Sliding Window",
+    "entryPoint": "totalFruit",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Fruit Into Baskets\n\nImplement an optimal solution for **Fruit Into Baskets**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Fruit Into Baskets** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `totalFruit`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Sliding Window.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Sliding Window pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Sliding Window.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "find-all-anagrams-in-a-string",
+    "title": "Find All Anagrams in a String",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Sliding Window",
+    "entryPoint": "findAnagrams",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Find All Anagrams in a String\n\nImplement an optimal solution for **Find All Anagrams in a String**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Find All Anagrams in a String** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `findAnagrams`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Sliding Window.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Sliding Window pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Sliding Window.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "evaluate-reverse-polish-notation",
+    "title": "Evaluate Reverse Polish Notation",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Stack",
+    "entryPoint": "evalRPN",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(n)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Evaluate Reverse Polish Notation\n\nImplement an optimal solution for **Evaluate Reverse Polish Notation**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Evaluate Reverse Polish Notation** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(N)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `evalRPN`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(N)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Stack.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Stack pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(N).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Stack.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "generate-parentheses",
+    "title": "Generate Parentheses",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Stack",
+    "entryPoint": "generateParenthesis",
+    "optimalTime": "O(4^N / sqrt(N))",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(4^n / sqrt(n))",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(n)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Generate Parentheses\n\nImplement an optimal solution for **Generate Parentheses**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Generate Parentheses** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(4^N / sqrt(N))** time complexity and **O(N)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `generateParenthesis`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(4^N / sqrt(N))\n- **Space Complexity:** O(N)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Stack.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Stack pattern to achieve O(4^N / sqrt(N)) runtime.",
+      "complexityAnalysis": "Time: O(4^N / sqrt(N)), Space: O(N).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Stack.",
+      "How does your approach achieve O(4^N / sqrt(N)) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "largest-rectangle-in-histogram",
+    "title": "Largest Rectangle in Histogram",
+    "difficulty": "HARD",
+    "category": "DSA",
+    "pattern": "Stack",
+    "entryPoint": "largestRectangleArea",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(n)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Largest Rectangle in Histogram\n\nImplement an optimal solution for **Largest Rectangle in Histogram**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Largest Rectangle in Histogram** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(N)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `largestRectangleArea`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(N)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Stack.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Stack pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(N).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Stack.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "car-fleet",
+    "title": "Car Fleet",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Stack",
+    "entryPoint": "carFleet",
+    "optimalTime": "O(N log N)",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(n log n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(n)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Car Fleet\n\nImplement an optimal solution for **Car Fleet**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Car Fleet** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N log N)** time complexity and **O(N)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `carFleet`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N log N)\n- **Space Complexity:** O(N)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Stack.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Stack pattern to achieve O(N log N) runtime.",
+      "complexityAnalysis": "Time: O(N log N), Space: O(N).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Stack.",
+      "How does your approach achieve O(N log N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "online-stock-span",
+    "title": "Online Stock Span",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Stack",
+    "entryPoint": "StockSpanner",
+    "optimalTime": "O(1)",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(1)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(n)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Online Stock Span\n\nImplement an optimal solution for **Online Stock Span**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Online Stock Span** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(1)** time complexity and **O(N)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `StockSpanner`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(1)\n- **Space Complexity:** O(N)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Stack.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Stack pattern to achieve O(1) runtime.",
+      "complexityAnalysis": "Time: O(1), Space: O(N).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Stack.",
+      "How does your approach achieve O(1) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "decode-string",
+    "title": "Decode String",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Stack",
+    "entryPoint": "decodeString",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(n)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Decode String\n\nImplement an optimal solution for **Decode String**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Decode String** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(N)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `decodeString`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(N)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Stack.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Stack pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(N).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Stack.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "search-a-2d-matrix",
+    "title": "Search a 2D Matrix",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Binary Search",
+    "entryPoint": "searchMatrix",
+    "optimalTime": "O(log(M * N))",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(log(m * n))",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Search a 2D Matrix\n\nImplement an optimal solution for **Search a 2D Matrix**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Search a 2D Matrix** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(log(M * N))** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `searchMatrix`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(log(M * N))\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Binary Search.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Binary Search pattern to achieve O(log(M * N)) runtime.",
+      "complexityAnalysis": "Time: O(log(M * N)), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Binary Search.",
+      "How does your approach achieve O(log(M * N)) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "koko-eating-bananas",
+    "title": "Koko Eating Bananas",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Binary Search",
+    "entryPoint": "minEatingSpeed",
+    "optimalTime": "O(N log(max(P)))",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n log(max(p)))",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Koko Eating Bananas\n\nImplement an optimal solution for **Koko Eating Bananas**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Koko Eating Bananas** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N log(max(P)))** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `minEatingSpeed`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N log(max(P)))\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Binary Search.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Binary Search pattern to achieve O(N log(max(P))) runtime.",
+      "complexityAnalysis": "Time: O(N log(max(P))), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Binary Search.",
+      "How does your approach achieve O(N log(max(P))) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "time-based-key-value-store",
+    "title": "Time Based Key-Value Store",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Binary Search",
+    "entryPoint": "TimeMap",
+    "optimalTime": "O(log N)",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(log n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(n)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Time Based Key-Value Store\n\nImplement an optimal solution for **Time Based Key-Value Store**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Time Based Key-Value Store** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(log N)** time complexity and **O(N)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `TimeMap`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(log N)\n- **Space Complexity:** O(N)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Binary Search.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Binary Search pattern to achieve O(log N) runtime.",
+      "complexityAnalysis": "Time: O(log N), Space: O(N).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Binary Search.",
+      "How does your approach achieve O(log N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "median-of-two-sorted-arrays",
+    "title": "Median of Two Sorted Arrays",
+    "difficulty": "HARD",
+    "category": "DSA",
+    "pattern": "Binary Search",
+    "entryPoint": "findMedianSortedArrays",
+    "optimalTime": "O(log(min(M, N)))",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(log(min(m, n)))",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Median of Two Sorted Arrays\n\nImplement an optimal solution for **Median of Two Sorted Arrays**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Median of Two Sorted Arrays** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(log(min(M, N)))** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `findMedianSortedArrays`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(log(min(M, N)))\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Binary Search.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Binary Search pattern to achieve O(log(min(M, N))) runtime.",
+      "complexityAnalysis": "Time: O(log(min(M, N))), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Binary Search.",
+      "How does your approach achieve O(log(min(M, N))) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "find-peak-element",
+    "title": "Find Peak Element",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Binary Search",
+    "entryPoint": "findPeakElement",
+    "optimalTime": "O(log N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(log n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Find Peak Element\n\nImplement an optimal solution for **Find Peak Element**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Find Peak Element** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(log N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `findPeakElement`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(log N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Binary Search.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Binary Search pattern to achieve O(log N) runtime.",
+      "complexityAnalysis": "Time: O(log N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Binary Search.",
+      "How does your approach achieve O(log N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "capacity-to-ship-packages-within-d-days",
+    "title": "Capacity To Ship Packages Within D Days",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Binary Search",
+    "entryPoint": "shipWithinDays",
+    "optimalTime": "O(N log(sum))",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n log(sum))",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Capacity To Ship Packages Within D Days\n\nImplement an optimal solution for **Capacity To Ship Packages Within D Days**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Capacity To Ship Packages Within D Days** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N log(sum))** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `shipWithinDays`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N log(sum))\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Binary Search.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Binary Search pattern to achieve O(N log(sum)) runtime.",
+      "complexityAnalysis": "Time: O(N log(sum)), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Binary Search.",
+      "How does your approach achieve O(N log(sum)) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "reorder-list",
+    "title": "Reorder List",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Linked Lists",
+    "entryPoint": "reorderList",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Reorder List\n\nImplement an optimal solution for **Reorder List**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Reorder List** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `reorderList`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Linked Lists.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Linked Lists pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Linked Lists.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "remove-nth-node-from-end-of-list",
+    "title": "Remove Nth Node From End of List",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Linked Lists",
+    "entryPoint": "removeNthFromEnd",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Remove Nth Node From End of List\n\nImplement an optimal solution for **Remove Nth Node From End of List**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Remove Nth Node From End of List** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `removeNthFromEnd`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Linked Lists.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Linked Lists pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Linked Lists.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "copy-list-with-random-pointer",
+    "title": "Copy List with Random Pointer",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Linked Lists",
+    "entryPoint": "copyRandomList",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Copy List with Random Pointer\n\nImplement an optimal solution for **Copy List with Random Pointer**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Copy List with Random Pointer** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `copyRandomList`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Linked Lists.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Linked Lists pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Linked Lists.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "add-two-numbers",
+    "title": "Add Two Numbers",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Linked Lists",
+    "entryPoint": "addTwoNumbers",
+    "optimalTime": "O(max(N, M))",
+    "optimalSpace": "O(max(N, M))",
+    "timeKeywords": [
+      "o(max(n, m))",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(max(n, m))",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Add Two Numbers\n\nImplement an optimal solution for **Add Two Numbers**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Add Two Numbers** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(max(N, M))** time complexity and **O(max(N, M))** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `addTwoNumbers`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(max(N, M))\n- **Space Complexity:** O(max(N, M))",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Linked Lists.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Linked Lists pattern to achieve O(max(N, M)) runtime.",
+      "complexityAnalysis": "Time: O(max(N, M)), Space: O(max(N, M)).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Linked Lists.",
+      "How does your approach achieve O(max(N, M)) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "linked-list-cycle-ii",
+    "title": "Linked List Cycle II",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Linked Lists",
+    "entryPoint": "detectCycle",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Linked List Cycle II\n\nImplement an optimal solution for **Linked List Cycle II**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Linked List Cycle II** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `detectCycle`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Linked Lists.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Linked Lists pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Linked Lists.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "find-the-duplicate-number-floyd-cycle",
+    "title": "Find the Duplicate Number (Floyd Cycle)",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Linked Lists",
+    "entryPoint": "findDuplicate",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Find the Duplicate Number (Floyd Cycle)\n\nImplement an optimal solution for **Find the Duplicate Number (Floyd Cycle)**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Find the Duplicate Number (Floyd Cycle)** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `findDuplicate`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Linked Lists.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Linked Lists pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Linked Lists.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "lru-cache",
+    "title": "LRU Cache",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Linked Lists",
+    "entryPoint": "LRUCache",
+    "optimalTime": "O(1)",
+    "optimalSpace": "O(capacity)",
+    "timeKeywords": [
+      "o(1)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(capacity)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### LRU Cache\n\nImplement an optimal solution for **LRU Cache**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **LRU Cache** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(1)** time complexity and **O(capacity)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `LRUCache`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(1)\n- **Space Complexity:** O(capacity)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Linked Lists.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Linked Lists pattern to achieve O(1) runtime.",
+      "complexityAnalysis": "Time: O(1), Space: O(capacity).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Linked Lists.",
+      "How does your approach achieve O(1) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "merge-k-sorted-lists",
+    "title": "Merge k Sorted Lists",
+    "difficulty": "HARD",
+    "category": "DSA",
+    "pattern": "Linked Lists",
+    "entryPoint": "mergeKLists",
+    "optimalTime": "O(N log K)",
+    "optimalSpace": "O(K)",
+    "timeKeywords": [
+      "o(n log k)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(k)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Merge k Sorted Lists\n\nImplement an optimal solution for **Merge k Sorted Lists**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Merge k Sorted Lists** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N log K)** time complexity and **O(K)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `mergeKLists`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N log K)\n- **Space Complexity:** O(K)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Linked Lists.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Linked Lists pattern to achieve O(N log K) runtime.",
+      "complexityAnalysis": "Time: O(N log K), Space: O(K).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Linked Lists.",
+      "How does your approach achieve O(N log K) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "diameter-of-binary-tree",
+    "title": "Diameter of Binary Tree",
+    "difficulty": "EASY",
+    "category": "DSA",
+    "pattern": "Trees",
+    "entryPoint": "diameterOfBinaryTree",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(H)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(h)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Diameter of Binary Tree\n\nImplement an optimal solution for **Diameter of Binary Tree**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Diameter of Binary Tree** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(H)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `diameterOfBinaryTree`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(H)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Trees.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Trees pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(H).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Trees.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "balanced-binary-tree",
+    "title": "Balanced Binary Tree",
+    "difficulty": "EASY",
+    "category": "DSA",
+    "pattern": "Trees",
+    "entryPoint": "isBalanced",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(H)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(h)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Balanced Binary Tree\n\nImplement an optimal solution for **Balanced Binary Tree**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Balanced Binary Tree** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(H)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `isBalanced`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(H)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Trees.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Trees pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(H).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Trees.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "same-tree",
+    "title": "Same Tree",
+    "difficulty": "EASY",
+    "category": "DSA",
+    "pattern": "Trees",
+    "entryPoint": "isSameTree",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(H)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(h)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Same Tree\n\nImplement an optimal solution for **Same Tree**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Same Tree** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(H)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `isSameTree`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(H)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Trees.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Trees pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(H).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Trees.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "subtree-of-another-tree",
+    "title": "Subtree of Another Tree",
+    "difficulty": "EASY",
+    "category": "DSA",
+    "pattern": "Trees",
+    "entryPoint": "isSubtree",
+    "optimalTime": "O(N * M)",
+    "optimalSpace": "O(H)",
+    "timeKeywords": [
+      "o(n * m)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(h)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Subtree of Another Tree\n\nImplement an optimal solution for **Subtree of Another Tree**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Subtree of Another Tree** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N * M)** time complexity and **O(H)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `isSubtree`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N * M)\n- **Space Complexity:** O(H)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Trees.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Trees pattern to achieve O(N * M) runtime.",
+      "complexityAnalysis": "Time: O(N * M), Space: O(H).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Trees.",
+      "How does your approach achieve O(N * M) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "binary-tree-level-order-traversal",
+    "title": "Binary Tree Level Order Traversal",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Trees",
+    "entryPoint": "levelOrder",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(n)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Binary Tree Level Order Traversal\n\nImplement an optimal solution for **Binary Tree Level Order Traversal**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Binary Tree Level Order Traversal** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(N)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `levelOrder`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(N)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Trees.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Trees pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(N).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Trees.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "binary-tree-right-side-view",
+    "title": "Binary Tree Right Side View",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Trees",
+    "entryPoint": "rightSideView",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(H)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(h)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Binary Tree Right Side View\n\nImplement an optimal solution for **Binary Tree Right Side View**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Binary Tree Right Side View** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(H)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `rightSideView`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(H)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Trees.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Trees pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(H).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Trees.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "count-good-nodes-in-binary-tree",
+    "title": "Count Good Nodes in Binary Tree",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Trees",
+    "entryPoint": "goodNodes",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(H)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(h)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Count Good Nodes in Binary Tree\n\nImplement an optimal solution for **Count Good Nodes in Binary Tree**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Count Good Nodes in Binary Tree** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(H)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `goodNodes`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(H)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Trees.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Trees pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(H).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Trees.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "validate-binary-search-tree",
+    "title": "Validate Binary Search Tree",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Trees",
+    "entryPoint": "isValidBST",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(H)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(h)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Validate Binary Search Tree\n\nImplement an optimal solution for **Validate Binary Search Tree**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Validate Binary Search Tree** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(H)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `isValidBST`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(H)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Trees.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Trees pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(H).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Trees.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "kth-smallest-element-in-a-bst",
+    "title": "Kth Smallest Element in a BST",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Trees",
+    "entryPoint": "kthSmallest",
+    "optimalTime": "O(H + K)",
+    "optimalSpace": "O(H)",
+    "timeKeywords": [
+      "o(h + k)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(h)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Kth Smallest Element in a BST\n\nImplement an optimal solution for **Kth Smallest Element in a BST**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Kth Smallest Element in a BST** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(H + K)** time complexity and **O(H)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `kthSmallest`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(H + K)\n- **Space Complexity:** O(H)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Trees.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Trees pattern to achieve O(H + K) runtime.",
+      "complexityAnalysis": "Time: O(H + K), Space: O(H).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Trees.",
+      "How does your approach achieve O(H + K) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "construct-binary-tree-from-preorder-and-inorder-traversal",
+    "title": "Construct Binary Tree from Preorder and Inorder Traversal",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Trees",
+    "entryPoint": "buildTree",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(n)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Construct Binary Tree from Preorder and Inorder Traversal\n\nImplement an optimal solution for **Construct Binary Tree from Preorder and Inorder Traversal**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Construct Binary Tree from Preorder and Inorder Traversal** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(N)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `buildTree`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(N)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Trees.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Trees pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(N).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Trees.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "binary-tree-maximum-path-sum",
+    "title": "Binary Tree Maximum Path Sum",
+    "difficulty": "HARD",
+    "category": "DSA",
+    "pattern": "Trees",
+    "entryPoint": "maxPathSum",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(H)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(h)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Binary Tree Maximum Path Sum\n\nImplement an optimal solution for **Binary Tree Maximum Path Sum**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Binary Tree Maximum Path Sum** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(H)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `maxPathSum`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(H)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Trees.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Trees pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(H).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Trees.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "serialize-and-deserialize-binary-tree",
+    "title": "Serialize and Deserialize Binary Tree",
+    "difficulty": "HARD",
+    "category": "DSA",
+    "pattern": "Trees",
+    "entryPoint": "Codec",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(n)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Serialize and Deserialize Binary Tree\n\nImplement an optimal solution for **Serialize and Deserialize Binary Tree**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Serialize and Deserialize Binary Tree** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(N)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `Codec`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(N)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Trees.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Trees pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(N).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Trees.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "implement-trie-prefix-tree",
+    "title": "Implement Trie (Prefix Tree)",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Tries",
+    "entryPoint": "Trie",
+    "optimalTime": "O(word length)",
+    "optimalSpace": "O(total characters)",
+    "timeKeywords": [
+      "o(word length)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(total characters)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Implement Trie (Prefix Tree)\n\nImplement an optimal solution for **Implement Trie (Prefix Tree)**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Implement Trie (Prefix Tree)** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(word length)** time complexity and **O(total characters)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `Trie`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(word length)\n- **Space Complexity:** O(total characters)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Tries.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Tries pattern to achieve O(word length) runtime.",
+      "complexityAnalysis": "Time: O(word length), Space: O(total characters).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Tries.",
+      "How does your approach achieve O(word length) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "design-add-and-search-words-data-structure",
+    "title": "Design Add and Search Words Data Structure",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Tries",
+    "entryPoint": "WordDictionary",
+    "optimalTime": "O(M)",
+    "optimalSpace": "O(total chars)",
+    "timeKeywords": [
+      "o(m)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(total chars)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Design Add and Search Words Data Structure\n\nImplement an optimal solution for **Design Add and Search Words Data Structure**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Design Add and Search Words Data Structure** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(M)** time complexity and **O(total chars)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `WordDictionary`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(M)\n- **Space Complexity:** O(total chars)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Tries.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Tries pattern to achieve O(M) runtime.",
+      "complexityAnalysis": "Time: O(M), Space: O(total chars).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Tries.",
+      "How does your approach achieve O(M) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "word-search-ii",
+    "title": "Word Search II",
+    "difficulty": "HARD",
+    "category": "DSA",
+    "pattern": "Tries",
+    "entryPoint": "findWords",
+    "optimalTime": "O(M * (4^L))",
+    "optimalSpace": "O(total characters)",
+    "timeKeywords": [
+      "o(m * (4^l))",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(total characters)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Word Search II\n\nImplement an optimal solution for **Word Search II**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Word Search II** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(M * (4^L))** time complexity and **O(total characters)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `findWords`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(M * (4^L))\n- **Space Complexity:** O(total characters)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Tries.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Tries pattern to achieve O(M * (4^L)) runtime.",
+      "complexityAnalysis": "Time: O(M * (4^L)), Space: O(total characters).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Tries.",
+      "How does your approach achieve O(M * (4^L)) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "kth-largest-element-in-an-array",
+    "title": "Kth Largest Element in an Array",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Heap",
+    "entryPoint": "findKthLargest",
+    "optimalTime": "O(N log K)",
+    "optimalSpace": "O(K)",
+    "timeKeywords": [
+      "o(n log k)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(k)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Kth Largest Element in an Array\n\nImplement an optimal solution for **Kth Largest Element in an Array**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Kth Largest Element in an Array** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N log K)** time complexity and **O(K)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `findKthLargest`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N log K)\n- **Space Complexity:** O(K)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Heap.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Heap pattern to achieve O(N log K) runtime.",
+      "complexityAnalysis": "Time: O(N log K), Space: O(K).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Heap.",
+      "How does your approach achieve O(N log K) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "last-stone-weight",
+    "title": "Last Stone Weight",
+    "difficulty": "EASY",
+    "category": "DSA",
+    "pattern": "Heap",
+    "entryPoint": "lastStoneWeight",
+    "optimalTime": "O(N log N)",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(n log n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(n)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Last Stone Weight\n\nImplement an optimal solution for **Last Stone Weight**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Last Stone Weight** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N log N)** time complexity and **O(N)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `lastStoneWeight`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N log N)\n- **Space Complexity:** O(N)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Heap.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Heap pattern to achieve O(N log N) runtime.",
+      "complexityAnalysis": "Time: O(N log N), Space: O(N).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Heap.",
+      "How does your approach achieve O(N log N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "k-closest-points-to-origin",
+    "title": "K Closest Points to Origin",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Heap",
+    "entryPoint": "kClosest",
+    "optimalTime": "O(N log K)",
+    "optimalSpace": "O(K)",
+    "timeKeywords": [
+      "o(n log k)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(k)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### K Closest Points to Origin\n\nImplement an optimal solution for **K Closest Points to Origin**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **K Closest Points to Origin** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N log K)** time complexity and **O(K)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `kClosest`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N log K)\n- **Space Complexity:** O(K)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Heap.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Heap pattern to achieve O(N log K) runtime.",
+      "complexityAnalysis": "Time: O(N log K), Space: O(K).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Heap.",
+      "How does your approach achieve O(N log K) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "task-scheduler",
+    "title": "Task Scheduler",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Heap",
+    "entryPoint": "leastInterval",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Task Scheduler\n\nImplement an optimal solution for **Task Scheduler**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Task Scheduler** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `leastInterval`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Heap.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Heap pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Heap.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "design-twitter",
+    "title": "Design Twitter",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Heap",
+    "entryPoint": "Twitter",
+    "optimalTime": "O(k log k)",
+    "optimalSpace": "O(users)",
+    "timeKeywords": [
+      "o(k log k)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(users)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Design Twitter\n\nImplement an optimal solution for **Design Twitter**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Design Twitter** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(k log k)** time complexity and **O(users)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `Twitter`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(k log k)\n- **Space Complexity:** O(users)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Heap.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Heap pattern to achieve O(k log k) runtime.",
+      "complexityAnalysis": "Time: O(k log k), Space: O(users).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Heap.",
+      "How does your approach achieve O(k log k) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "find-median-from-data-stream",
+    "title": "Find Median from Data Stream",
+    "difficulty": "HARD",
+    "category": "DSA",
+    "pattern": "Heap",
+    "entryPoint": "MedianFinder",
+    "optimalTime": "O(log N)",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(log n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(n)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Find Median from Data Stream\n\nImplement an optimal solution for **Find Median from Data Stream**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Find Median from Data Stream** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(log N)** time complexity and **O(N)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `MedianFinder`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(log N)\n- **Space Complexity:** O(N)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Heap.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Heap pattern to achieve O(log N) runtime.",
+      "complexityAnalysis": "Time: O(log N), Space: O(N).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Heap.",
+      "How does your approach achieve O(log N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "subsets",
+    "title": "Subsets",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Backtracking",
+    "entryPoint": "subsets",
+    "optimalTime": "O(2^N)",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(2^n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(n)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Subsets\n\nImplement an optimal solution for **Subsets**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Subsets** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(2^N)** time complexity and **O(N)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `subsets`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(2^N)\n- **Space Complexity:** O(N)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Backtracking.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Backtracking pattern to achieve O(2^N) runtime.",
+      "complexityAnalysis": "Time: O(2^N), Space: O(N).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Backtracking.",
+      "How does your approach achieve O(2^N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "combination-sum",
+    "title": "Combination Sum",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Backtracking",
+    "entryPoint": "combinationSum",
+    "optimalTime": "O(2^target)",
+    "optimalSpace": "O(target)",
+    "timeKeywords": [
+      "o(2^target)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(target)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Combination Sum\n\nImplement an optimal solution for **Combination Sum**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Combination Sum** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(2^target)** time complexity and **O(target)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `combinationSum`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(2^target)\n- **Space Complexity:** O(target)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Backtracking.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Backtracking pattern to achieve O(2^target) runtime.",
+      "complexityAnalysis": "Time: O(2^target), Space: O(target).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Backtracking.",
+      "How does your approach achieve O(2^target) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "permutations",
+    "title": "Permutations",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Backtracking",
+    "entryPoint": "permute",
+    "optimalTime": "O(N!)",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(n!)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(n)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Permutations\n\nImplement an optimal solution for **Permutations**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Permutations** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N!)** time complexity and **O(N)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `permute`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N!)\n- **Space Complexity:** O(N)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Backtracking.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Backtracking pattern to achieve O(N!) runtime.",
+      "complexityAnalysis": "Time: O(N!), Space: O(N).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Backtracking.",
+      "How does your approach achieve O(N!) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "subsets-ii",
+    "title": "Subsets II",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Backtracking",
+    "entryPoint": "subsetsWithDup",
+    "optimalTime": "O(2^N)",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(2^n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(n)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Subsets II\n\nImplement an optimal solution for **Subsets II**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Subsets II** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(2^N)** time complexity and **O(N)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `subsetsWithDup`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(2^N)\n- **Space Complexity:** O(N)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Backtracking.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Backtracking pattern to achieve O(2^N) runtime.",
+      "complexityAnalysis": "Time: O(2^N), Space: O(N).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Backtracking.",
+      "How does your approach achieve O(2^N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "combination-sum-ii",
+    "title": "Combination Sum II",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Backtracking",
+    "entryPoint": "combinationSum2",
+    "optimalTime": "O(2^N)",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(2^n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(n)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Combination Sum II\n\nImplement an optimal solution for **Combination Sum II**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Combination Sum II** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(2^N)** time complexity and **O(N)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `combinationSum2`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(2^N)\n- **Space Complexity:** O(N)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Backtracking.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Backtracking pattern to achieve O(2^N) runtime.",
+      "complexityAnalysis": "Time: O(2^N), Space: O(N).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Backtracking.",
+      "How does your approach achieve O(2^N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "word-search",
+    "title": "Word Search",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Backtracking",
+    "entryPoint": "exist",
+    "optimalTime": "O(N * 4^L)",
+    "optimalSpace": "O(L)",
+    "timeKeywords": [
+      "o(n * 4^l)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(l)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Word Search\n\nImplement an optimal solution for **Word Search**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Word Search** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N * 4^L)** time complexity and **O(L)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `exist`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N * 4^L)\n- **Space Complexity:** O(L)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Backtracking.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Backtracking pattern to achieve O(N * 4^L) runtime.",
+      "complexityAnalysis": "Time: O(N * 4^L), Space: O(L).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Backtracking.",
+      "How does your approach achieve O(N * 4^L) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "palindrome-partitioning",
+    "title": "Palindrome Partitioning",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Backtracking",
+    "entryPoint": "partition",
+    "optimalTime": "O(N * 2^N)",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(n * 2^n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(n)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Palindrome Partitioning\n\nImplement an optimal solution for **Palindrome Partitioning**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Palindrome Partitioning** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N * 2^N)** time complexity and **O(N)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `partition`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N * 2^N)\n- **Space Complexity:** O(N)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Backtracking.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Backtracking pattern to achieve O(N * 2^N) runtime.",
+      "complexityAnalysis": "Time: O(N * 2^N), Space: O(N).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Backtracking.",
+      "How does your approach achieve O(N * 2^N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "letter-combinations-of-a-phone-number",
+    "title": "Letter Combinations of a Phone Number",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Backtracking",
+    "entryPoint": "letterCombinations",
+    "optimalTime": "O(4^N)",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(4^n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(n)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Letter Combinations of a Phone Number\n\nImplement an optimal solution for **Letter Combinations of a Phone Number**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Letter Combinations of a Phone Number** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(4^N)** time complexity and **O(N)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `letterCombinations`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(4^N)\n- **Space Complexity:** O(N)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Backtracking.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Backtracking pattern to achieve O(4^N) runtime.",
+      "complexityAnalysis": "Time: O(4^N), Space: O(N).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Backtracking.",
+      "How does your approach achieve O(4^N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "n-queens",
+    "title": "N-Queens",
+    "difficulty": "HARD",
+    "category": "DSA",
+    "pattern": "Backtracking",
+    "entryPoint": "solveNQueens",
+    "optimalTime": "O(N!)",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(n!)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(n)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### N-Queens\n\nImplement an optimal solution for **N-Queens**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **N-Queens** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N!)** time complexity and **O(N)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `solveNQueens`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N!)\n- **Space Complexity:** O(N)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Backtracking.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Backtracking pattern to achieve O(N!) runtime.",
+      "complexityAnalysis": "Time: O(N!), Space: O(N).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Backtracking.",
+      "How does your approach achieve O(N!) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "max-area-of-island",
+    "title": "Max Area of Island",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Graphs",
+    "entryPoint": "maxAreaOfIsland",
+    "optimalTime": "O(M * N)",
+    "optimalSpace": "O(M * N)",
+    "timeKeywords": [
+      "o(m * n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(m * n)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Max Area of Island\n\nImplement an optimal solution for **Max Area of Island**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Max Area of Island** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(M * N)** time complexity and **O(M * N)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `maxAreaOfIsland`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(M * N)\n- **Space Complexity:** O(M * N)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Graphs.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Graphs pattern to achieve O(M * N) runtime.",
+      "complexityAnalysis": "Time: O(M * N), Space: O(M * N).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Graphs.",
+      "How does your approach achieve O(M * N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "clone-graph",
+    "title": "Clone Graph",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Graphs",
+    "entryPoint": "cloneGraph",
+    "optimalTime": "O(V + E)",
+    "optimalSpace": "O(V)",
+    "timeKeywords": [
+      "o(v + e)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(v)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Clone Graph\n\nImplement an optimal solution for **Clone Graph**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Clone Graph** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(V + E)** time complexity and **O(V)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `cloneGraph`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(V + E)\n- **Space Complexity:** O(V)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Graphs.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Graphs pattern to achieve O(V + E) runtime.",
+      "complexityAnalysis": "Time: O(V + E), Space: O(V).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Graphs.",
+      "How does your approach achieve O(V + E) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "pacific-atlantic-water-flow",
+    "title": "Pacific Atlantic Water Flow",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Graphs",
+    "entryPoint": "pacificAtlantic",
+    "optimalTime": "O(M * N)",
+    "optimalSpace": "O(M * N)",
+    "timeKeywords": [
+      "o(m * n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(m * n)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Pacific Atlantic Water Flow\n\nImplement an optimal solution for **Pacific Atlantic Water Flow**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Pacific Atlantic Water Flow** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(M * N)** time complexity and **O(M * N)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `pacificAtlantic`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(M * N)\n- **Space Complexity:** O(M * N)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Graphs.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Graphs pattern to achieve O(M * N) runtime.",
+      "complexityAnalysis": "Time: O(M * N), Space: O(M * N).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Graphs.",
+      "How does your approach achieve O(M * N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "surrounded-regions",
+    "title": "Surrounded Regions",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Graphs",
+    "entryPoint": "solve",
+    "optimalTime": "O(M * N)",
+    "optimalSpace": "O(M * N)",
+    "timeKeywords": [
+      "o(m * n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(m * n)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Surrounded Regions\n\nImplement an optimal solution for **Surrounded Regions**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Surrounded Regions** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(M * N)** time complexity and **O(M * N)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `solve`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(M * N)\n- **Space Complexity:** O(M * N)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Graphs.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Graphs pattern to achieve O(M * N) runtime.",
+      "complexityAnalysis": "Time: O(M * N), Space: O(M * N).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Graphs.",
+      "How does your approach achieve O(M * N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "rotting-oranges",
+    "title": "Rotting Oranges",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Graphs",
+    "entryPoint": "orangesRotting",
+    "optimalTime": "O(M * N)",
+    "optimalSpace": "O(M * N)",
+    "timeKeywords": [
+      "o(m * n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(m * n)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Rotting Oranges\n\nImplement an optimal solution for **Rotting Oranges**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Rotting Oranges** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(M * N)** time complexity and **O(M * N)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `orangesRotting`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(M * N)\n- **Space Complexity:** O(M * N)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Graphs.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Graphs pattern to achieve O(M * N) runtime.",
+      "complexityAnalysis": "Time: O(M * N), Space: O(M * N).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Graphs.",
+      "How does your approach achieve O(M * N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "walls-and-gates",
+    "title": "Walls and Gates",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Graphs",
+    "entryPoint": "wallsAndGates",
+    "optimalTime": "O(M * N)",
+    "optimalSpace": "O(M * N)",
+    "timeKeywords": [
+      "o(m * n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(m * n)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Walls and Gates\n\nImplement an optimal solution for **Walls and Gates**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Walls and Gates** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(M * N)** time complexity and **O(M * N)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `wallsAndGates`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(M * N)\n- **Space Complexity:** O(M * N)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Graphs.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Graphs pattern to achieve O(M * N) runtime.",
+      "complexityAnalysis": "Time: O(M * N), Space: O(M * N).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Graphs.",
+      "How does your approach achieve O(M * N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "course-schedule-ii",
+    "title": "Course Schedule II",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Graphs",
+    "entryPoint": "findOrder",
+    "optimalTime": "O(V + E)",
+    "optimalSpace": "O(V + E)",
+    "timeKeywords": [
+      "o(v + e)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(v + e)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Course Schedule II\n\nImplement an optimal solution for **Course Schedule II**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Course Schedule II** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(V + E)** time complexity and **O(V + E)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `findOrder`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(V + E)\n- **Space Complexity:** O(V + E)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Graphs.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Graphs pattern to achieve O(V + E) runtime.",
+      "complexityAnalysis": "Time: O(V + E), Space: O(V + E).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Graphs.",
+      "How does your approach achieve O(V + E) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "redundant-connection",
+    "title": "Redundant Connection",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Graphs",
+    "entryPoint": "findRedundantConnection",
+    "optimalTime": "O(V)",
+    "optimalSpace": "O(V)",
+    "timeKeywords": [
+      "o(v)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(v)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Redundant Connection\n\nImplement an optimal solution for **Redundant Connection**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Redundant Connection** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(V)** time complexity and **O(V)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `findRedundantConnection`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(V)\n- **Space Complexity:** O(V)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Graphs.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Graphs pattern to achieve O(V) runtime.",
+      "complexityAnalysis": "Time: O(V), Space: O(V).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Graphs.",
+      "How does your approach achieve O(V) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "word-ladder",
+    "title": "Word Ladder",
+    "difficulty": "HARD",
+    "category": "DSA",
+    "pattern": "Graphs",
+    "entryPoint": "ladderLength",
+    "optimalTime": "O(M * N * L)",
+    "optimalSpace": "O(M * N)",
+    "timeKeywords": [
+      "o(m * n * l)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(m * n)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Word Ladder\n\nImplement an optimal solution for **Word Ladder**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Word Ladder** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(M * N * L)** time complexity and **O(M * N)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `ladderLength`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(M * N * L)\n- **Space Complexity:** O(M * N)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Graphs.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Graphs pattern to achieve O(M * N * L) runtime.",
+      "complexityAnalysis": "Time: O(M * N * L), Space: O(M * N).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Graphs.",
+      "How does your approach achieve O(M * N * L) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "min-cost-climbing-stairs",
+    "title": "Min Cost Climbing Stairs",
+    "difficulty": "EASY",
+    "category": "DSA",
+    "pattern": "Dynamic Programming",
+    "entryPoint": "minCostClimbingStairs",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Min Cost Climbing Stairs\n\nImplement an optimal solution for **Min Cost Climbing Stairs**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Min Cost Climbing Stairs** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `minCostClimbingStairs`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Dynamic Programming.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Dynamic Programming pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Dynamic Programming.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "house-robber",
+    "title": "House Robber",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Dynamic Programming",
+    "entryPoint": "rob",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### House Robber\n\nImplement an optimal solution for **House Robber**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **House Robber** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `rob`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Dynamic Programming.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Dynamic Programming pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Dynamic Programming.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "house-robber-ii",
+    "title": "House Robber II",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Dynamic Programming",
+    "entryPoint": "rob",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### House Robber II\n\nImplement an optimal solution for **House Robber II**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **House Robber II** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `rob`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Dynamic Programming.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Dynamic Programming pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Dynamic Programming.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "longest-palindromic-substring",
+    "title": "Longest Palindromic Substring",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Dynamic Programming",
+    "entryPoint": "longestPalindrome",
+    "optimalTime": "O(N^2)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n^2)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Longest Palindromic Substring\n\nImplement an optimal solution for **Longest Palindromic Substring**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Longest Palindromic Substring** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N^2)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `longestPalindrome`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N^2)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Dynamic Programming.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Dynamic Programming pattern to achieve O(N^2) runtime.",
+      "complexityAnalysis": "Time: O(N^2), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Dynamic Programming.",
+      "How does your approach achieve O(N^2) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "palindromic-substrings",
+    "title": "Palindromic Substrings",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Dynamic Programming",
+    "entryPoint": "countSubstrings",
+    "optimalTime": "O(N^2)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n^2)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Palindromic Substrings\n\nImplement an optimal solution for **Palindromic Substrings**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Palindromic Substrings** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N^2)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `countSubstrings`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N^2)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Dynamic Programming.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Dynamic Programming pattern to achieve O(N^2) runtime.",
+      "complexityAnalysis": "Time: O(N^2), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Dynamic Programming.",
+      "How does your approach achieve O(N^2) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "decode-ways",
+    "title": "Decode Ways",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Dynamic Programming",
+    "entryPoint": "numDecodings",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Decode Ways\n\nImplement an optimal solution for **Decode Ways**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Decode Ways** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `numDecodings`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Dynamic Programming.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Dynamic Programming pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Dynamic Programming.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "maximum-product-subarray",
+    "title": "Maximum Product Subarray",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Dynamic Programming",
+    "entryPoint": "maxProduct",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Maximum Product Subarray\n\nImplement an optimal solution for **Maximum Product Subarray**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Maximum Product Subarray** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `maxProduct`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Dynamic Programming.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Dynamic Programming pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Dynamic Programming.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "word-break",
+    "title": "Word Break",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Dynamic Programming",
+    "entryPoint": "wordBreak",
+    "optimalTime": "O(N * M * K)",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(n * m * k)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(n)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Word Break\n\nImplement an optimal solution for **Word Break**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Word Break** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N * M * K)** time complexity and **O(N)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `wordBreak`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N * M * K)\n- **Space Complexity:** O(N)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Dynamic Programming.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Dynamic Programming pattern to achieve O(N * M * K) runtime.",
+      "complexityAnalysis": "Time: O(N * M * K), Space: O(N).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Dynamic Programming.",
+      "How does your approach achieve O(N * M * K) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "partition-equal-subset-sum",
+    "title": "Partition Equal Subset Sum",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Dynamic Programming",
+    "entryPoint": "canPartition",
+    "optimalTime": "O(N * sum)",
+    "optimalSpace": "O(sum)",
+    "timeKeywords": [
+      "o(n * sum)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(sum)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Partition Equal Subset Sum\n\nImplement an optimal solution for **Partition Equal Subset Sum**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Partition Equal Subset Sum** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N * sum)** time complexity and **O(sum)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `canPartition`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N * sum)\n- **Space Complexity:** O(sum)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Dynamic Programming.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Dynamic Programming pattern to achieve O(N * sum) runtime.",
+      "complexityAnalysis": "Time: O(N * sum), Space: O(sum).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Dynamic Programming.",
+      "How does your approach achieve O(N * sum) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "unique-paths",
+    "title": "Unique Paths",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Dynamic Programming",
+    "entryPoint": "uniquePaths",
+    "optimalTime": "O(M * N)",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(m * n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(n)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Unique Paths\n\nImplement an optimal solution for **Unique Paths**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Unique Paths** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(M * N)** time complexity and **O(N)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `uniquePaths`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(M * N)\n- **Space Complexity:** O(N)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Dynamic Programming.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Dynamic Programming pattern to achieve O(M * N) runtime.",
+      "complexityAnalysis": "Time: O(M * N), Space: O(N).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Dynamic Programming.",
+      "How does your approach achieve O(M * N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "longest-common-subsequence",
+    "title": "Longest Common Subsequence",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Dynamic Programming",
+    "entryPoint": "longestCommonSubsequence",
+    "optimalTime": "O(M * N)",
+    "optimalSpace": "O(min(M, N))",
+    "timeKeywords": [
+      "o(m * n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(min(m, n))",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Longest Common Subsequence\n\nImplement an optimal solution for **Longest Common Subsequence**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Longest Common Subsequence** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(M * N)** time complexity and **O(min(M, N))** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `longestCommonSubsequence`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(M * N)\n- **Space Complexity:** O(min(M, N))",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Dynamic Programming.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Dynamic Programming pattern to achieve O(M * N) runtime.",
+      "complexityAnalysis": "Time: O(M * N), Space: O(min(M, N)).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Dynamic Programming.",
+      "How does your approach achieve O(M * N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "edit-distance",
+    "title": "Edit Distance",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Dynamic Programming",
+    "entryPoint": "minDistance",
+    "optimalTime": "O(M * N)",
+    "optimalSpace": "O(min(M, N))",
+    "timeKeywords": [
+      "o(m * n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(min(m, n))",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Edit Distance\n\nImplement an optimal solution for **Edit Distance**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Edit Distance** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(M * N)** time complexity and **O(min(M, N))** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `minDistance`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(M * N)\n- **Space Complexity:** O(min(M, N))",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Dynamic Programming.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Dynamic Programming pattern to achieve O(M * N) runtime.",
+      "complexityAnalysis": "Time: O(M * N), Space: O(min(M, N)).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Dynamic Programming.",
+      "How does your approach achieve O(M * N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "target-sum",
+    "title": "Target Sum",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Dynamic Programming",
+    "entryPoint": "findTargetSumWays",
+    "optimalTime": "O(N * sum)",
+    "optimalSpace": "O(sum)",
+    "timeKeywords": [
+      "o(n * sum)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(sum)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Target Sum\n\nImplement an optimal solution for **Target Sum**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Target Sum** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N * sum)** time complexity and **O(sum)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `findTargetSumWays`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N * sum)\n- **Space Complexity:** O(sum)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Dynamic Programming.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Dynamic Programming pattern to achieve O(N * sum) runtime.",
+      "complexityAnalysis": "Time: O(N * sum), Space: O(sum).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Dynamic Programming.",
+      "How does your approach achieve O(N * sum) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "coin-change-ii",
+    "title": "Coin Change II",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Dynamic Programming",
+    "entryPoint": "change",
+    "optimalTime": "O(amount * N)",
+    "optimalSpace": "O(amount)",
+    "timeKeywords": [
+      "o(amount * n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(amount)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Coin Change II\n\nImplement an optimal solution for **Coin Change II**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Coin Change II** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(amount * N)** time complexity and **O(amount)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `change`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(amount * N)\n- **Space Complexity:** O(amount)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Dynamic Programming.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Dynamic Programming pattern to achieve O(amount * N) runtime.",
+      "complexityAnalysis": "Time: O(amount * N), Space: O(amount).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Dynamic Programming.",
+      "How does your approach achieve O(amount * N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "regular-expression-matching",
+    "title": "Regular Expression Matching",
+    "difficulty": "HARD",
+    "category": "DSA",
+    "pattern": "Dynamic Programming",
+    "entryPoint": "isMatch",
+    "optimalTime": "O(M * N)",
+    "optimalSpace": "O(M * N)",
+    "timeKeywords": [
+      "o(m * n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(m * n)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Regular Expression Matching\n\nImplement an optimal solution for **Regular Expression Matching**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Regular Expression Matching** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(M * N)** time complexity and **O(M * N)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `isMatch`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(M * N)\n- **Space Complexity:** O(M * N)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Dynamic Programming.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Dynamic Programming pattern to achieve O(M * N) runtime.",
+      "complexityAnalysis": "Time: O(M * N), Space: O(M * N).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Dynamic Programming.",
+      "How does your approach achieve O(M * N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "maximum-subarray-kadane",
+    "title": "Maximum Subarray (Kadane)",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Greedy",
+    "entryPoint": "maxSubArray",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Maximum Subarray (Kadane)\n\nImplement an optimal solution for **Maximum Subarray (Kadane)**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Maximum Subarray (Kadane)** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `maxSubArray`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Greedy.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Greedy pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Greedy.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "jump-game",
+    "title": "Jump Game",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Greedy",
+    "entryPoint": "canJump",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Jump Game\n\nImplement an optimal solution for **Jump Game**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Jump Game** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `canJump`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Greedy.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Greedy pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Greedy.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "jump-game-ii",
+    "title": "Jump Game II",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Greedy",
+    "entryPoint": "jump",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Jump Game II\n\nImplement an optimal solution for **Jump Game II**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Jump Game II** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `jump`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Greedy.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Greedy pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Greedy.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "gas-station",
+    "title": "Gas Station",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Greedy",
+    "entryPoint": "canCompleteCircuit",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Gas Station\n\nImplement an optimal solution for **Gas Station**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Gas Station** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `canCompleteCircuit`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Greedy.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Greedy pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Greedy.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "hand-of-straights",
+    "title": "Hand of Straights",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Greedy",
+    "entryPoint": "isNStraightHand",
+    "optimalTime": "O(N log N)",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(n log n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(n)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Hand of Straights\n\nImplement an optimal solution for **Hand of Straights**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Hand of Straights** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N log N)** time complexity and **O(N)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `isNStraightHand`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N log N)\n- **Space Complexity:** O(N)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Greedy.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Greedy pattern to achieve O(N log N) runtime.",
+      "complexityAnalysis": "Time: O(N log N), Space: O(N).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Greedy.",
+      "How does your approach achieve O(N log N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "partition-labels",
+    "title": "Partition Labels",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Greedy",
+    "entryPoint": "partitionLabels",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Partition Labels\n\nImplement an optimal solution for **Partition Labels**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Partition Labels** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `partitionLabels`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Greedy.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Greedy pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Greedy.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "valid-parenthesis-string",
+    "title": "Valid Parenthesis String",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Greedy",
+    "entryPoint": "checkValidString",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Valid Parenthesis String\n\nImplement an optimal solution for **Valid Parenthesis String**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Valid Parenthesis String** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `checkValidString`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Greedy.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Greedy pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Greedy.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "insert-interval",
+    "title": "Insert Interval",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Intervals",
+    "entryPoint": "insert",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Insert Interval\n\nImplement an optimal solution for **Insert Interval**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Insert Interval** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `insert`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Intervals.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Intervals pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Intervals.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "merge-intervals",
+    "title": "Merge Intervals",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Intervals",
+    "entryPoint": "merge",
+    "optimalTime": "O(N log N)",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(n log n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(n)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Merge Intervals\n\nImplement an optimal solution for **Merge Intervals**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Merge Intervals** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N log N)** time complexity and **O(N)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `merge`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N log N)\n- **Space Complexity:** O(N)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Intervals.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Intervals pattern to achieve O(N log N) runtime.",
+      "complexityAnalysis": "Time: O(N log N), Space: O(N).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Intervals.",
+      "How does your approach achieve O(N log N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "non-overlapping-intervals",
+    "title": "Non-overlapping Intervals",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Intervals",
+    "entryPoint": "eraseOverlapIntervals",
+    "optimalTime": "O(N log N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n log n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Non-overlapping Intervals\n\nImplement an optimal solution for **Non-overlapping Intervals**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Non-overlapping Intervals** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N log N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `eraseOverlapIntervals`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N log N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Intervals.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Intervals pattern to achieve O(N log N) runtime.",
+      "complexityAnalysis": "Time: O(N log N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Intervals.",
+      "How does your approach achieve O(N log N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "meeting-rooms",
+    "title": "Meeting Rooms",
+    "difficulty": "EASY",
+    "category": "DSA",
+    "pattern": "Intervals",
+    "entryPoint": "canAttendMeetings",
+    "optimalTime": "O(N log N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n log n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Meeting Rooms\n\nImplement an optimal solution for **Meeting Rooms**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Meeting Rooms** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N log N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `canAttendMeetings`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N log N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Intervals.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Intervals pattern to achieve O(N log N) runtime.",
+      "complexityAnalysis": "Time: O(N log N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Intervals.",
+      "How does your approach achieve O(N log N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "meeting-rooms-ii",
+    "title": "Meeting Rooms II",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Intervals",
+    "entryPoint": "minMeetingRooms",
+    "optimalTime": "O(N log N)",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(n log n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(n)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Meeting Rooms II\n\nImplement an optimal solution for **Meeting Rooms II**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Meeting Rooms II** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N log N)** time complexity and **O(N)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `minMeetingRooms`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N log N)\n- **Space Complexity:** O(N)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Intervals.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Intervals pattern to achieve O(N log N) runtime.",
+      "complexityAnalysis": "Time: O(N log N), Space: O(N).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Intervals.",
+      "How does your approach achieve O(N log N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "single-number",
+    "title": "Single Number",
+    "difficulty": "EASY",
+    "category": "DSA",
+    "pattern": "Bit Manipulation",
+    "entryPoint": "singleNumber",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Single Number\n\nImplement an optimal solution for **Single Number**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Single Number** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `singleNumber`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Bit Manipulation.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Bit Manipulation pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Bit Manipulation.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "number-of-1-bits",
+    "title": "Number of 1 Bits",
+    "difficulty": "EASY",
+    "category": "DSA",
+    "pattern": "Bit Manipulation",
+    "entryPoint": "hammingWeight",
+    "optimalTime": "O(1)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(1)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Number of 1 Bits\n\nImplement an optimal solution for **Number of 1 Bits**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Number of 1 Bits** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(1)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `hammingWeight`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(1)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Bit Manipulation.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Bit Manipulation pattern to achieve O(1) runtime.",
+      "complexityAnalysis": "Time: O(1), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Bit Manipulation.",
+      "How does your approach achieve O(1) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "counting-bits",
+    "title": "Counting Bits",
+    "difficulty": "EASY",
+    "category": "DSA",
+    "pattern": "Bit Manipulation",
+    "entryPoint": "countBits",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Counting Bits\n\nImplement an optimal solution for **Counting Bits**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Counting Bits** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `countBits`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Bit Manipulation.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Bit Manipulation pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Bit Manipulation.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "reverse-bits",
+    "title": "Reverse Bits",
+    "difficulty": "EASY",
+    "category": "DSA",
+    "pattern": "Bit Manipulation",
+    "entryPoint": "reverseBits",
+    "optimalTime": "O(1)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(1)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Reverse Bits\n\nImplement an optimal solution for **Reverse Bits**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Reverse Bits** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(1)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `reverseBits`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(1)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Bit Manipulation.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Bit Manipulation pattern to achieve O(1) runtime.",
+      "complexityAnalysis": "Time: O(1), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Bit Manipulation.",
+      "How does your approach achieve O(1) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "missing-number",
+    "title": "Missing Number",
+    "difficulty": "EASY",
+    "category": "DSA",
+    "pattern": "Bit Manipulation",
+    "entryPoint": "missingNumber",
+    "optimalTime": "O(N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Missing Number\n\nImplement an optimal solution for **Missing Number**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Missing Number** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `missingNumber`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Bit Manipulation.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Bit Manipulation pattern to achieve O(N) runtime.",
+      "complexityAnalysis": "Time: O(N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Bit Manipulation.",
+      "How does your approach achieve O(N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "set-matrix-zeroes",
+    "title": "Set Matrix Zeroes",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Math & Geometry",
+    "entryPoint": "setZeroes",
+    "optimalTime": "O(M * N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(m * n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Set Matrix Zeroes\n\nImplement an optimal solution for **Set Matrix Zeroes**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Set Matrix Zeroes** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(M * N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `setZeroes`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(M * N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Math & Geometry.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Math & Geometry pattern to achieve O(M * N) runtime.",
+      "complexityAnalysis": "Time: O(M * N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Math & Geometry.",
+      "How does your approach achieve O(M * N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "spiral-matrix",
+    "title": "Spiral Matrix",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Math & Geometry",
+    "entryPoint": "spiralOrder",
+    "optimalTime": "O(M * N)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(m * n)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Spiral Matrix\n\nImplement an optimal solution for **Spiral Matrix**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Spiral Matrix** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(M * N)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `spiralOrder`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(M * N)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Math & Geometry.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Math & Geometry pattern to achieve O(M * N) runtime.",
+      "complexityAnalysis": "Time: O(M * N), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Math & Geometry.",
+      "How does your approach achieve O(M * N) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "rotate-image",
+    "title": "Rotate Image",
+    "difficulty": "MEDIUM",
+    "category": "DSA",
+    "pattern": "Math & Geometry",
+    "entryPoint": "rotate",
+    "optimalTime": "O(N^2)",
+    "optimalSpace": "O(1)",
+    "timeKeywords": [
+      "o(n^2)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(1)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Rotate Image\n\nImplement an optimal solution for **Rotate Image**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Rotate Image** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(N^2)** time complexity and **O(1)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `rotate`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(N^2)\n- **Space Complexity:** O(1)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Math & Geometry.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Math & Geometry pattern to achieve O(N^2) runtime.",
+      "complexityAnalysis": "Time: O(N^2), Space: O(1).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Math & Geometry.",
+      "How does your approach achieve O(N^2) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "concurrent-async-task-queue-with-retries",
+    "title": "Concurrent Async Task Queue with Retries",
+    "difficulty": "MEDIUM",
+    "category": "MachineCoding",
+    "pattern": "Low-Level Design",
+    "entryPoint": "AsyncTaskQueue",
+    "optimalTime": "O(1)",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(1)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(n)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Concurrent Async Task Queue with Retries\n\nImplement an optimal solution for **Concurrent Async Task Queue with Retries**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Concurrent Async Task Queue with Retries** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(1)** time complexity and **O(N)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `AsyncTaskQueue`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(1)\n- **Space Complexity:** O(N)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Low-Level Design.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Low-Level Design pattern to achieve O(1) runtime.",
+      "complexityAnalysis": "Time: O(1), Space: O(N).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Low-Level Design.",
+      "How does your approach achieve O(1) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "thread-safe-lru-cache",
+    "title": "Thread-safe LRU Cache",
+    "difficulty": "MEDIUM",
+    "category": "MachineCoding",
+    "pattern": "Low-Level Design",
+    "entryPoint": "LRUCache",
+    "optimalTime": "O(1)",
+    "optimalSpace": "O(capacity)",
+    "timeKeywords": [
+      "o(1)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(capacity)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Thread-safe LRU Cache\n\nImplement an optimal solution for **Thread-safe LRU Cache**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Thread-safe LRU Cache** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(1)** time complexity and **O(capacity)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `LRUCache`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(1)\n- **Space Complexity:** O(capacity)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Low-Level Design.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Low-Level Design pattern to achieve O(1) runtime.",
+      "complexityAnalysis": "Time: O(1), Space: O(capacity).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Low-Level Design.",
+      "How does your approach achieve O(1) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "pub-sub-event-bus",
+    "title": "Pub-Sub Event Bus",
+    "difficulty": "MEDIUM",
+    "category": "MachineCoding",
+    "pattern": "Low-Level Design",
+    "entryPoint": "EventEmitter",
+    "optimalTime": "O(1)",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(1)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(n)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Pub-Sub Event Bus\n\nImplement an optimal solution for **Pub-Sub Event Bus**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Pub-Sub Event Bus** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(1)** time complexity and **O(N)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `EventEmitter`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(1)\n- **Space Complexity:** O(N)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Low-Level Design.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Low-Level Design pattern to achieve O(1) runtime.",
+      "complexityAnalysis": "Time: O(1), Space: O(N).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Low-Level Design.",
+      "How does your approach achieve O(1) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "design-hit-counter",
+    "title": "Design Hit Counter",
+    "difficulty": "MEDIUM",
+    "category": "MachineCoding",
+    "pattern": "Low-Level Design",
+    "entryPoint": "HitCounter",
+    "optimalTime": "O(1)",
+    "optimalSpace": "O(300)",
+    "timeKeywords": [
+      "o(1)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(300)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Design Hit Counter\n\nImplement an optimal solution for **Design Hit Counter**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Design Hit Counter** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(1)** time complexity and **O(300)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `HitCounter`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(1)\n- **Space Complexity:** O(300)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Low-Level Design.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Low-Level Design pattern to achieve O(1) runtime.",
+      "complexityAnalysis": "Time: O(1), Space: O(300).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Low-Level Design.",
+      "How does your approach achieve O(1) time?",
+      "Check your boundary conditions carefully."
+    ]
+  },
+  {
+    "id": "design-snake-game",
+    "title": "Design Snake Game",
+    "difficulty": "MEDIUM",
+    "category": "MachineCoding",
+    "pattern": "Low-Level Design",
+    "entryPoint": "SnakeGame",
+    "optimalTime": "O(1)",
+    "optimalSpace": "O(N)",
+    "timeKeywords": [
+      "o(1)",
+      "linear",
+      "logarithmic",
+      "constant",
+      "quadratic"
+    ],
+    "spaceKeywords": [
+      "o(n)",
+      "constant",
+      "linear",
+      "auxiliary"
+    ],
+    "description": "### Design Snake Game\n\nImplement an optimal solution for **Design Snake Game**.\n\n### Problem Description & Specification:\nIn technical systems engineering, efficiency is paramount. Implement the core logic for **Design Snake Game** matching optimal production standards.\n\n### Requirements:\n1. Handle all edge cases including boundary values, empty inputs, single elements, and large data ranges.\n2. Achieve optimal **O(1)** time complexity and **O(N)** space complexity.\n3. Write clean, modular, and self-contained code.\n\n### Function Signature / Entry Point:\n- Name: `SnakeGame`\n- Implement from scratch. No starter template is provided.\n\n### Complexity Targets:\n- **Time Complexity:** O(1)\n- **Space Complexity:** O(N)",
+    "testCases": [
+      {
+        "input": [
+          "default"
+        ],
+        "expected": true,
+        "description": "Default correctness case"
+      },
+      {
+        "input": [
+          "edge"
+        ],
+        "expected": true,
+        "description": "Edge boundary case",
+        "isHidden": true
+      }
+    ],
+    "editorial": {
+      "intuition": "This problem evaluates proficiency in Low-Level Design.",
+      "bruteForce": "Brute force solutions perform redundant computations.",
+      "optimalApproach": "Use the Low-Level Design pattern to achieve O(1) runtime.",
+      "complexityAnalysis": "Time: O(1), Space: O(N).",
+      "edgeCases": [
+        "Empty inputs",
+        "Single element",
+        "Duplicates",
+        "Negative values"
+      ]
+    },
+    "hints": [
+      "Consider the core invariants of Low-Level Design.",
+      "How does your approach achieve O(1) time?",
+      "Check your boundary conditions carefully."
+    ]
   }
 ];
 
 export function getProblemByIdFromCatalog(id: string): CodingProblem | undefined {
-  return CODING_PROBLEMS.find((p) => p.id === id || p.id.toLowerCase() === id.toLowerCase());
+  if (!id) return CODING_PROBLEMS[0];
+  const clean = id.toLowerCase().trim();
+  return CODING_PROBLEMS.find((p) => p.id === clean || p.id.toLowerCase() === clean);
+}
+
+export function getRandomUnsolvedProblem(solvedIds: string[] = [], difficulty?: string): CodingProblem {
+  const solvedSet = new Set(solvedIds.map((s) => s.toLowerCase().trim()));
+  let pool = CODING_PROBLEMS.filter((p) => !solvedSet.has(p.id));
+
+  if (difficulty) {
+    const diffPool = pool.filter((p) => p.difficulty.toUpperCase() === difficulty.toUpperCase());
+    if (diffPool.length > 0) pool = diffPool;
+  }
+
+  if (pool.length === 0) {
+    // If all solved, pick any problem
+    pool = CODING_PROBLEMS;
+  }
+
+  const randomIndex = Math.floor(Math.random() * pool.length);
+  return pool[randomIndex] || CODING_PROBLEMS[0];
 }

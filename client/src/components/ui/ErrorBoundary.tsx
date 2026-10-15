@@ -118,7 +118,7 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
             </div>
 
             {/* Error Title & Subtitle */}
-            <h2 className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-white mb-2.5">
+            <h2 className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-100 mb-2.5">
               {fallbackTitle}
             </h2>
             <p className="font-body text-sm text-slate-300/80 leading-relaxed mb-6 max-w-md mx-auto">

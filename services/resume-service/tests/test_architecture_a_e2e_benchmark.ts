@@ -10,7 +10,11 @@
  */
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import { mapDoclingToStructuredResume, StructuredResume } from '../src/services/structuredResumeMapper.service';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 interface GroundTruth {
   fullName: string;
@@ -131,10 +135,13 @@ function runBenchmark() {
   console.log('=== Running Architecture A Ground-Truth Benchmark ===\n');
 
   // Load Jake Ryan Docling output artifact
-  const doclingPath = 'C:/Users/rafey/.gemini/antigravity-ide/brain/efdee136-8400-4cf9-994b-3d7cf3de41d2/scratch/jake_docling_out.json';
+  const localDoclingPath = path.resolve(__dirname, 'fixtures/jake_docling_out.json');
+  const doclingPath = fs.existsSync(localDoclingPath)
+    ? localDoclingPath
+    : (process.env.DOCLING_BENCHMARK_PATH || 'C:/Users/rafey/.gemini/antigravity-ide/brain/efdee136-8400-4cf9-994b-3d7cf3de41d2/scratch/jake_docling_out.json');
   if (!fs.existsSync(doclingPath)) {
-    console.error(`Benchmark fixture not found at ${doclingPath}`);
-    process.exit(1);
+    console.warn(`[SKIP] Benchmark fixture not found at ${doclingPath}. Skipping local developer scratch benchmark.\n`);
+    return;
   }
 
   const rawDocling = JSON.parse(fs.readFileSync(doclingPath, 'utf8'));

@@ -44,56 +44,56 @@ const variantStyles: Record<string, { container: string; dot: string }> = {
     dot: 'bg-[#780052] dark:bg-[#F1C5E4]',
   },
   normal: {
-    container: 'bg-[#EFF7FD] dark:bg-[#4A8BDF]/15 text-[#2459A8] dark:text-[#60A5FA] border-[#DCE7F2] dark:border-[#1E294B]',
+    container: 'bg-[#EFF7FD] dark:bg-[#262626] text-[#2459A8] dark:text-[#64D2FF] border-[#DCE7F2] dark:border-[#303030]',
     dot: 'bg-[#4A8BDF]',
   },
   royal: {
-    container: 'bg-[#EFF7FD] dark:bg-[#4A8BDF]/20 text-[#4A8BDF] dark:text-[#60A5FA] border-[#DCE7F2] dark:border-[#4A8BDF]/30',
+    container: 'bg-[#EFF7FD] dark:bg-[#262626] text-[#4A8BDF] dark:text-[#64D2FF] border-[#DCE7F2] dark:border-[#303030]',
     dot: 'bg-[#4A8BDF]',
   },
   success: {
-    container: 'bg-[#E8F5F0] dark:bg-[#168A62]/20 text-[#168A62] dark:text-[#34D399] border-[#168A62]/30 dark:border-[#168A62]/40',
-    dot: 'bg-[#168A62] dark:bg-[#34D399]',
+    container: 'bg-[#E8F5F0] dark:bg-[#1C1C1C] text-[#168A62] dark:text-[#2CBB5D] border-[#168A62]/30 dark:border-[#303030]',
+    dot: 'bg-[#168A62] dark:bg-[#2CBB5D]',
   },
   warning: {
-    container: 'bg-[#FEF7EC] dark:bg-[#D99020]/20 text-[#D99020] dark:text-[#FBBF24] border-[#D99020]/30 dark:border-[#D99020]/40',
-    dot: 'bg-[#D99020] dark:bg-[#FBBF24]',
+    container: 'bg-[#FEF7EC] dark:bg-[#1C1C1C] text-[#D99020] dark:text-[#FFA116] border-[#D99020]/30 dark:border-[#303030]',
+    dot: 'bg-[#D99020] dark:bg-[#FFA116]',
   },
   error: {
-    container: 'bg-[#FDF2F2] dark:bg-[#D64545]/20 text-[#D64545] dark:text-[#F87171] border-[#D64545]/30 dark:border-[#D64545]/40',
-    dot: 'bg-[#D64545] dark:bg-[#F87171]',
+    container: 'bg-[#FDF2F2] dark:bg-[#1C1C1C] text-[#D64545] dark:text-[#FF4757] border-[#D64545]/30 dark:border-[#303030]',
+    dot: 'bg-[#D64545] dark:bg-[#FF4757]',
   },
   neutral: {
-    container: 'bg-[#EFF7FD] dark:bg-[#152046] text-[#526078] dark:text-[#94A3B8] border-[#DCE7F2] dark:border-[#1E294B]',
-    dot: 'bg-[#526078] dark:bg-[#94A3B8]',
+    container: 'bg-[#EFF7FD] dark:bg-[#262626] text-[#526078] dark:text-[#D2D2D7] border-[#DCE7F2] dark:border-[#303030]',
+    dot: 'bg-[#526078] dark:bg-[#D2D2D7]',
   },
   info: {
-    container: 'bg-[#EFFAFD] dark:bg-[#4A8BDF]/15 text-[#4A8BDF] dark:text-[#60A5FA] border-[#DCE7F2] dark:border-[#1E294B]',
+    container: 'bg-[#EFFAFD] dark:bg-[#262626] text-[#4A8BDF] dark:text-[#64D2FF] border-[#DCE7F2] dark:border-[#303030]',
     dot: 'bg-[#4A8BDF]',
   },
   // Compatibility fallbacks
   orange: {
-    container: 'bg-[#F8EAF4] dark:bg-[#A0006D]/20 text-[#A0006D] dark:text-[#E28DC5] border-[#A0006D]/30 dark:border-[#A0006D]/40',
+    container: 'bg-[#F8EAF4] dark:bg-[#1C1C1C] text-[#A0006D] dark:text-[#FFA116] border-[#A0006D]/30 dark:border-[#303030]',
     dot: 'bg-[#A0006D]',
   },
   'solar-orange': {
-    container: 'bg-[#F8EAF4] dark:bg-[#A0006D]/20 text-[#A0006D] dark:text-[#E28DC5] border-[#A0006D]/30 dark:border-[#A0006D]/40',
+    container: 'bg-[#F8EAF4] dark:bg-[#1C1C1C] text-[#A0006D] dark:text-[#FFA116] border-[#A0006D]/30 dark:border-[#303030]',
     dot: 'bg-[#A0006D]',
   },
   amber: {
-    container: 'bg-[#FEF7EC] dark:bg-[#D99020]/20 text-[#D99020] dark:text-[#FBBF24] border-[#D99020]/30 dark:border-[#D99020]/40',
+    container: 'bg-[#FEF7EC] dark:bg-[#1C1C1C] text-[#D99020] dark:text-[#FFA116] border-[#D99020]/30 dark:border-[#303030]',
     dot: 'bg-[#D99020]',
   },
   teal: {
-    container: 'bg-[#E8F5F0] dark:bg-[#168A62]/20 text-[#168A62] dark:text-[#34D399] border-[#168A62]/30 dark:border-[#168A62]/40',
+    container: 'bg-[#E8F5F0] dark:bg-[#1C1C1C] text-[#168A62] dark:text-[#1CBABA] border-[#168A62]/30 dark:border-[#303030]',
     dot: 'bg-[#168A62]',
   },
   red: {
-    container: 'bg-[#FDF2F2] dark:bg-[#D64545]/20 text-[#D64545] dark:text-[#F87171] border-[#D64545]/30 dark:border-[#D64545]/40',
+    container: 'bg-[#FDF2F2] dark:bg-[#1C1C1C] text-[#D64545] dark:text-[#FF4757] border-[#D64545]/30 dark:border-[#303030]',
     dot: 'bg-[#D64545]',
   },
   navy: {
-    container: 'bg-[#EFF7FD] dark:bg-[#4A8BDF]/15 text-[#2459A8] dark:text-[#60A5FA] border-[#DCE7F2] dark:border-[#1E294B]',
+    container: 'bg-[#EFF7FD] dark:bg-[#262626] text-[#2459A8] dark:text-[#64D2FF] border-[#DCE7F2] dark:border-[#303030]',
     dot: 'bg-[#4A8BDF]',
   },
 };

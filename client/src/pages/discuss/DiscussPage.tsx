@@ -63,7 +63,7 @@ const TOP_BANNERS = [
     id: 'banner-4',
     title: 'System Design Crash Course',
     subtitle: 'Redis, Sharding, Kafka & Concurrency SLAs',
-    badge: 'ROADMAP',
+    badge: 'FEATURED',
     tag: 'MASTER TRACK',
     bg: 'from-[#1E293B] to-[#334155]',
     accent: '#4A8BDF',
@@ -76,7 +76,6 @@ const CATEGORIES = [
   { id: 'interview', label: 'Interview' },
   { id: 'resume_roast', label: 'Resume' },
   { id: 'jobs', label: 'Jobs' },
-  { id: 'roadmaps', label: 'RoadMap' },
   { id: 'experience', label: 'Experience' },
   { id: 'compensation', label: 'Compensation' },
   { id: 'system_design', label: 'System Design' },
@@ -217,16 +216,16 @@ export default function DiscussPage() {
                 <span className="px-2 py-0.5 rounded-full bg-white/20 text-[10px] font-mono font-bold tracking-wider uppercase backdrop-blur-xs">
                   {b.badge}
                 </span>
-                <span className="text-[10px] font-bold text-white/70 tracking-tight">
+                <span className="text-[10px] font-bold text-slate-400 tracking-tight">
                   {b.tag}
                 </span>
               </div>
 
               <div className="space-y-1 my-2">
-                <h3 className="font-bold text-sm sm:text-base leading-tight text-white">
+                <h3 className="font-bold text-sm sm:text-base leading-tight text-slate-100">
                   {b.title}
                 </h3>
-                <p className="text-[11px] text-white/80 line-clamp-1 leading-snug">
+                <p className="text-[11px] text-slate-300 line-clamp-1 leading-snug">
                   {b.subtitle}
                 </p>
               </div>
@@ -239,7 +238,7 @@ export default function DiscussPage() {
                   <span>{b.actionText}</span>
                   <ChevronRight size={12} />
                 </button>
-                <Sparkles size={14} className="text-white/40" />
+                <Sparkles size={14} className="text-slate-500" />
               </div>
             </div>
           ))}
@@ -473,7 +472,6 @@ export default function DiscussPage() {
                     <option value="INTERVIEW">Interview Experience</option>
                     <option value="RESUME_ROAST">Resume Roast</option>
                     <option value="JOBS">Jobs & Referrals</option>
-                    <option value="ROADMAPS">Career Roadmaps</option>
                     <option value="EXPERIENCE">Experience</option>
                     <option value="COMPENSATION">Compensation & Offers</option>
                     <option value="SYSTEM_DESIGN">System Design & Architecture</option>

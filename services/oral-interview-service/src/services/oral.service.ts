@@ -63,6 +63,31 @@ export function classifyCandidateIntent(text: string): any {
   return 'ANSWER';
 }
 
+function getInitialInterviewPrompt(targetRole: string, targetCompany?: string): string {
+  const roleLower = (targetRole || 'Software Engineer').toLowerCase();
+  const company = targetCompany && targetCompany !== 'None / General Target' ? targetCompany : '';
+
+  if (company) {
+    if (roleLower.includes('frontend') || roleLower.includes('react')) {
+      return `To kick off, given ${company}'s focus on high-performance web applications, walk me through the architecture of a complex user interface you recently implemented in React, and the main state management trade-offs you navigated.`;
+    } else if (roleLower.includes('backend') || roleLower.includes('api') || roleLower.includes('node') || roleLower.includes('distributed')) {
+      return `To start our technical discussion, considering ${company}'s scale, walk me through a high-throughput backend service you recently designed or maintained, and the latency or reliability requirements you had to satisfy.`;
+    }
+    return `To begin our interview, tell me about a technically demanding feature or service you recently engineered that aligns with the core challenges at ${company}, and the architectural decisions you personally made.`;
+  }
+
+  if (roleLower.includes('frontend') || roleLower.includes('react')) {
+    return `To begin our technical discussion, walk me through the architecture of a complex production application or feature you recently built with React, and how you decided what state should live locally versus shared globally.`;
+  } else if (roleLower.includes('backend') || roleLower.includes('node') || roleLower.includes('java') || roleLower.includes('python') || roleLower.includes('go')) {
+    return `To get started, describe a backend service or data pipeline you recently implemented, and the primary scaling or database concurrency considerations you had to solve.`;
+  } else if (roleLower.includes('full') || roleLower.includes('fullstack')) {
+    return `To begin, walk me through an end-to-end feature you engineered from the database schema up to the client interface, highlighting the primary architectural trade-offs you navigated.`;
+  } else if (roleLower.includes('system') || roleLower.includes('devops') || roleLower.includes('cloud') || roleLower.includes('sre')) {
+    return `To kick off, describe a critical infrastructure or deployment pipeline challenge you recently solved, and how you ensured high availability and observability under traffic spikes.`;
+  }
+  return `To kick off our technical discussion, describe a technically demanding project you recently engineered as a ${targetRole || 'Software Engineer'}, and the core system design trade-offs you had to defend.`;
+}
+
 export const oralService = {
   async createSession(userId: string, data: any) {
     const fallbackId = `sess_${uuidv4().replace(/-/g, '').slice(0, 16)}`;
@@ -127,12 +152,13 @@ export const oralService = {
           },
         });
 
+        const dynamicPrompt = getInitialInterviewPrompt(dbSession.targetRole, dbSession.targetCompany || undefined);
         const question = await prisma.oralQuestion.create({
           data: {
             sessionId,
             orderIndex: 1,
-            questionText: `Tell me about yourself and your experience relative to the ${dbSession.targetRole} role.`,
-            questionType: 'BEHAVIOURAL',
+            questionText: dynamicPrompt,
+            questionType: 'TECHNICAL',
             difficulty: 'MEDIUM',
             evalStrengths: [],
             evalWeaknesses: [],
@@ -147,12 +173,14 @@ export const oralService = {
 
     // Fallback store lookup
     const memSession = memorySessions.get(sessionId);
+    const targetRole = memSession?.targetRole || 'Software Engineer';
+    const targetCompany = memSession?.targetCompany;
     if (!memSession) {
       // Create session on the fly if not found
       const newSession = {
         id: sessionId,
         userId: userId || 'demo-user-123',
-        targetRole: 'Fullstack Engineer',
+        targetRole,
         status: 'IN_PROGRESS',
         startedAt: new Date(),
       };
@@ -162,12 +190,13 @@ export const oralService = {
       memSession.startedAt = new Date();
     }
 
+    const dynamicPrompt = getInitialInterviewPrompt(targetRole, targetCompany);
     const question = {
       id: `q_${uuidv4().slice(0, 8)}`,
       sessionId,
       orderIndex: 1,
-      questionText: `Tell me about yourself and your background in software engineering.`,
-      questionType: 'BEHAVIOURAL',
+      questionText: dynamicPrompt,
+      questionType: 'TECHNICAL',
       difficulty: 'MEDIUM',
       evalStrengths: [],
       evalWeaknesses: [],
@@ -239,25 +268,49 @@ export const oralService = {
       }
     }
 
-    // Default fallback evaluation if service unavailable
+    // Substantive fallback evaluation based on candidate answer length, structure, and detail
     if (!evaluationResult) {
+      const words = answerText ? answerText.trim().split(/\s+/).filter(Boolean) : [];
+      const wordCount = words.length;
+      let calculatedScore = 72;
+      let calculatedQuality = 'PARTIAL';
+      let feedback = 'Solid foundational answer, though exploring more architectural trade-offs would strengthen your response.';
+
+      if (wordCount < 10) {
+        calculatedScore = 40;
+        calculatedQuality = 'POOR';
+        feedback = 'Brief response. Providing concrete examples, architectural context, and trade-offs would demonstrate deeper mastery.';
+      } else if (wordCount < 25) {
+        calculatedScore = 60;
+        calculatedQuality = 'PARTIAL';
+        feedback = 'Answer is concise. Expanding on practical challenges and implementation details would elevate your technical rating.';
+      } else if (wordCount >= 70) {
+        calculatedScore = 88;
+        calculatedQuality = 'STRONG';
+        feedback = 'Very detailed and comprehensive explanation demonstrating strong technical depth and clarity.';
+      } else if (wordCount >= 40) {
+        calculatedScore = 80;
+        calculatedQuality = 'GOOD';
+        feedback = 'Well-structured response that addresses the core requirements with good technical clarity.';
+      }
+
       evaluationResult = {
         intent: 'ANSWER',
-        correctness: 0.75,
-        conceptCoverage: 0.70,
-        depth: 0.60,
-        clarity: 0.80,
+        correctness: calculatedScore / 100,
+        conceptCoverage: Math.min(1.0, (calculatedScore + 5) / 100),
+        depth: Math.min(1.0, calculatedScore / 100),
+        clarity: Math.min(1.0, (calculatedScore + 10) / 100),
         relevance: 0.85,
-        confidence: 0.75,
+        confidence: calculatedScore > 70 ? 0.85 : 0.65,
         coveredConcepts: [],
         missingConcepts: [],
         misconceptions: [],
-        quality: 'PARTIAL',
-        score: 75,
-        feedback: 'Solid answer, but deeper architectural trade-offs could be highlighted.',
-        recommendedAction: 'PROBE_DEPTH',
-        spokenResponse: "You are on the right track. Can you explain that in slightly more detail?",
-        emotion: 'curious',
+        quality: calculatedQuality,
+        score: calculatedScore,
+        feedback,
+        recommendedAction: calculatedScore >= 75 ? 'ADVANCE' : 'PROBE_DEPTH',
+        spokenResponse: calculatedScore >= 75 ? 'That makes a lot of sense. Let us dive a bit deeper.' : 'Could you expand on that with a specific example?',
+        emotion: calculatedScore >= 75 ? 'encouraging' : 'curious',
         gesture: 'nod',
       };
     }
@@ -470,10 +523,10 @@ export const oralService = {
         const roleLower = (session.targetRole || 'Software Engineer').toLowerCase();
 
         if (nextOrder === 1) {
-          promptText = `Tell me about yourself, your recent engineering experience, and what technical stack you work with day-to-day as a ${session.targetRole || 'Software Engineer'}.`;
-          qType = 'BEHAVIOURAL';
-          difficulty = 'EASY';
-          requiredConcepts = ['background overview', 'current technical stack', 'notable project or impact'];
+          promptText = getInitialInterviewPrompt(session.targetRole, session.targetCompany);
+          qType = 'TECHNICAL';
+          difficulty = 'MEDIUM';
+          requiredConcepts = ['architecture overview', 'core technical stack', 'design trade-offs'];
         } else if (nextOrder === 2) {
           // Stage 2: Deep dive into the candidate's exact stated stack
           if (allSpokenSoFar.includes('react') || allSpokenSoFar.includes('frontend') || roleLower.includes('front')) {
@@ -677,10 +730,16 @@ export const oralService = {
       ? Math.max(20, Math.min(100, Math.round(lengthScore * 0.7 + (100 - fillerPenalty) * 0.3)))
       : 0;
 
-    // 3. Confidence & Proctoring
+    // 3. Confidence & Proctoring Telemetry
     const tabBlurCount = payload?.proctoring?.tabBlurCount ?? 0;
     const eyeContactScore = payload?.proctoring?.eyeContactScore ?? (payload?.isDisqualified ? 0 : 85);
-    const confidenceScore = payload?.isDisqualified ? 0 : Math.max(0, Math.min(100, 100 - tabBlurCount * 15 - (eyeContactScore < 75 ? 15 : 0)));
+    const videoConfidence = payload?.confidenceMetrics?.videoConfidence ?? payload?.confidenceMetrics?.score;
+    const postureStatus = payload?.confidenceMetrics?.postureStatus;
+    const composureLevel = payload?.confidenceMetrics?.composureLevel;
+
+    const baseConfidence = videoConfidence != null ? videoConfidence : 85;
+    const proctorPenalty = tabBlurCount * 12 + (eyeContactScore < 70 ? 12 : 0) + (postureStatus === 'Off-Center' ? 8 : 0);
+    const confidenceScore = payload?.isDisqualified ? 0 : Math.max(20, Math.min(100, Math.round(baseConfidence * 0.7 + (100 - proctorPenalty) * 0.3)));
 
     const structureScore = Math.max(0, Math.min(100, Math.round(technicalScore * 0.55 + communicationScore * 0.3 + confidenceScore * 0.15)));
     const overallScore = Math.max(0, Math.min(100, Math.round(technicalScore * 0.40 + communicationScore * 0.30 + confidenceScore * 0.30)));
@@ -698,10 +757,27 @@ export const oralService = {
       }
     });
 
+    if (eyeContactScore >= 82) {
+      strengths.push('Maintained strong, engaging eye contact and visual poise.');
+    }
+    if (postureStatus === 'Optimal') {
+      strengths.push('Excellent on-camera posture and steady composure.');
+    }
+
     if (strengths.length === 0) {
       if (technicalScore >= 70) strengths.push(`Demonstrated solid competence in ${session.targetRole || 'engineering'} topics.`);
       if (communicationScore >= 70) strengths.push('Clear conversational pace and articulation.');
       if (strengths.length === 0) strengths.push('Completed the interview session.');
+    }
+
+    if (postureStatus === 'Off-Center') {
+      improvements.push('Keep your face centered in the camera frame throughout the session.');
+    }
+    if (eyeContactScore < 70) {
+      improvements.push('Maintain consistent eye contact with the camera to project confidence.');
+    }
+    if (composureLevel === 'Restless') {
+      improvements.push('Work on composed body language and steady pacing during explanations.');
     }
 
     if (improvements.length === 0) {

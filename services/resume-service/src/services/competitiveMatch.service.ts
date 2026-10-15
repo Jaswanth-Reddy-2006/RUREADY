@@ -84,7 +84,7 @@ class BgeWorkerManager {
   private readonly QUEUE_TIMEOUT_MS = 120_000;            // 2 minutes max queue wait time
 
   private getPythonCmd(): string {
-    return process.env.PYTHON_PATH || 'python';
+    return process.env.PYTHON_PATH || (process.platform === 'win32' ? 'py' : 'python');
   }
 
   public ensureWorkerStarted(): void {
@@ -326,7 +326,7 @@ export const competitiveMatchService = {
     );
 
     await fs.promises.writeFile(tempPayloadPath, JSON.stringify(payload), 'utf-8');
-    const pythonCmd = process.env.PYTHON_PATH || 'python';
+    const pythonCmd = process.env.PYTHON_PATH || (process.platform === 'win32' ? 'py' : 'python');
 
     return new Promise((resolve, reject) => {
       const child = spawn(pythonCmd, [COMPETITIVE_MATCHER_SCRIPT_PATH, tempPayloadPath], {

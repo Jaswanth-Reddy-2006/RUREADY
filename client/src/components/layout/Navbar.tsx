@@ -35,6 +35,7 @@ const NAV_LINKS = [
   { label: 'Resume', href: '/resume' },
   { label: 'Benefits', href: '/#benefits' },
   { label: 'Roadmaps', href: '/roadmap' },
+  { label: 'ATS Scanner', href: '/ats' },
   { label: 'Placement CRM', href: '/placement-crm' },
   { label: 'Pricing', href: '/#pricing' },
   { label: 'About', href: '/about' },
@@ -144,12 +145,21 @@ export default function Navbar() {
           className={clsx(
             'pointer-events-auto max-w-5xl mx-auto rounded-full transition-all duration-300 px-5 sm:px-7 py-2 flex items-center justify-between border shadow-lg',
             scrolled || !isLanding
-              ? 'bg-white/95 dark:bg-[#11183D]/95 backdrop-blur-xl border-[#DCE7F2] dark:border-[#1E293B] shadow-[#11183D]/5 dark:shadow-black/20'
-              : 'bg-white/90 dark:bg-[#11183D]/90 backdrop-blur-md border-[#DCE7F2]/80 dark:border-[#1E293B]/80 shadow-[#11183D]/5 dark:shadow-black/20',
+              ? 'bg-white/95 dark:bg-[#1A1A1A]/95 backdrop-blur-xl border-[#DCE7F2] dark:border-[#262626] shadow-[#11183D]/5 dark:shadow-black/40'
+              : 'bg-white/90 dark:bg-[#1A1A1A]/90 backdrop-blur-md border-[#DCE7F2]/80 dark:border-[#262626]/80 shadow-[#11183D]/5 dark:shadow-black/40',
           )}
         >
           {/* Left: Brand Logo */}
-          <Link to="/" className="shrink-0 flex items-center">
+          <Link
+            to="/"
+            title="Rennetus — Home"
+            onClick={() => {
+              if (location.pathname === '/') {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }
+            }}
+            className="shrink-0 flex items-center cursor-pointer transition-opacity hover:opacity-90"
+          >
             <Logo size="md" theme="light" />
           </Link>
 
@@ -170,12 +180,12 @@ export default function Navbar() {
                       key={link.label}
                       type="button"
                       onClick={() => setFeaturesMenuOpen((prev) => !prev)}
-                      className="flex items-center gap-1 text-sm font-semibold text-[#526078] dark:text-[#94A3B8] hover:text-[#11183D] dark:hover:text-white transition-colors duration-200 font-sans cursor-pointer"
+                      className="flex items-center gap-1 text-sm font-semibold text-[#526078] dark:text-[#D2D2D7] hover:text-[#11183D] dark:hover:text-white transition-colors duration-200 font-sans cursor-pointer"
                     >
                       <span>{link.label}</span>
                       <ChevronDown
                         className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                          featuresMenuOpen ? 'rotate-180 text-[#4A8BDF]' : 'text-[#7E8B9B] dark:text-[#64748B]'
+                          featuresMenuOpen ? 'rotate-180 text-[#4A8BDF]' : 'text-[#7E8B9B] dark:text-[#A8A8A8]'
                         }`}
                       />
                     </button>
@@ -183,7 +193,7 @@ export default function Navbar() {
                     <a
                       key={link.label}
                       href={link.href}
-                      className="text-sm font-semibold text-[#526078] dark:text-[#94A3B8] hover:text-[#11183D] dark:hover:text-white transition-colors duration-200 font-sans"
+                      className="text-sm font-semibold text-[#526078] dark:text-[#D2D2D7] hover:text-[#11183D] dark:hover:text-white transition-colors duration-200 font-sans"
                     >
                       {link.label}
                     </a>
@@ -191,7 +201,7 @@ export default function Navbar() {
                     <Link
                       key={link.label}
                       to={link.href}
-                      className="text-sm font-semibold text-[#526078] dark:text-[#94A3B8] hover:text-[#11183D] dark:hover:text-white transition-colors duration-200 font-sans"
+                      className="text-sm font-semibold text-[#526078] dark:text-[#D2D2D7] hover:text-[#11183D] dark:hover:text-white transition-colors duration-200 font-sans"
                     >
                       {link.label}
                     </Link>
@@ -202,13 +212,13 @@ export default function Navbar() {
           </div>
 
           {/* Right: Auth Buttons (Logged Out) OR Profile Avatar Dropdown (Logged In) */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-4 pl-3">
             {isAuthenticated ? (
               <div className="relative">
                 {/* Profile Avatar Icon */}
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="flex items-center gap-2 p-0.5 rounded-full hover:ring-2 hover:ring-[#4A8BDF]/40 transition-all duration-200 bg-white dark:bg-[#11183D] border border-[#DCE7F2] dark:border-[#1E293B] shadow-xs cursor-pointer"
+                  className="flex items-center gap-2 p-0.5 rounded-full hover:ring-2 hover:ring-[#4A8BDF]/40 transition-all duration-200 bg-white dark:bg-[#1A1A1A] border border-[#DCE7F2] dark:border-[#262626] shadow-xs cursor-pointer"
                   aria-label="User Profile Menu"
                 >
                   <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-[#2459A8] to-[#4A8BDF] flex items-center justify-center text-white font-bold text-xs font-sans shadow-sm border border-white/20">
@@ -224,26 +234,26 @@ export default function Navbar() {
                 />
               </div>
             ) : (
-              <>
-                <Link to="/login" className="mr-2">
-                  <button className="px-6 py-2.5 text-xs sm:text-sm font-semibold font-sans text-[#11183D] dark:text-white bg-[#F8FAFC] dark:bg-[#1E293B] hover:bg-[#F1F5F9] dark:hover:bg-[#2C374A] hover:border-[#CBD5E1] dark:hover:border-[#475569] border border-[#DCE7F2] dark:border-[#334155] rounded-full shadow-2xs transition-all duration-200 cursor-pointer">
+              <div className="flex items-center gap-3">
+                <Link to="/login" className="inline-block">
+                  <button className="px-7 sm:px-8 py-2.5 sm:py-2.5 text-xs sm:text-sm font-bold font-sans text-[#11183D] dark:text-white bg-[#F8FAFC] dark:bg-[#262626] hover:bg-[#F1F5F9] dark:hover:bg-[#303030] hover:border-[#CBD5E1] dark:hover:border-[#4A4A4A] border border-[#DCE7F2] dark:border-[#303030] rounded-full shadow-2xs hover:shadow-xs transition-all duration-200 cursor-pointer">
                     Login
                   </button>
                 </Link>
-                <Link to="/register">
-                  <button className="inline-flex items-center gap-1.5 bg-[#11183D] dark:bg-[#4A8BDF] hover:bg-[#1E293B] dark:hover:bg-[#2459A8] text-white font-sans font-semibold text-xs sm:text-sm px-6 py-2.5 rounded-full shadow-sm hover:shadow active:scale-98 transition-all duration-200 cursor-pointer">
+                <Link to="/register" className="inline-block">
+                  <button className="inline-flex items-center gap-2 bg-[#11183D] hover:bg-[#1E293B] text-white dark:bg-white dark:hover:bg-[#EBEBF5] dark:text-black dark:border-white border border-transparent font-sans font-bold text-xs sm:text-sm px-7 sm:px-8 py-2.5 sm:py-2.5 rounded-full shadow-sm hover:shadow active:scale-98 transition-all duration-200 cursor-pointer">
                     <span>Get Started</span>
-                    <ArrowRight className="h-3.5 w-3.5" />
+                    <ArrowRight className="h-4 w-4" />
                   </button>
                 </Link>
-              </>
+              </div>
             )}
           </div>
 
           {/* Mobile: Hamburger Button */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden p-2 rounded-full hover:bg-[#EFFAFD] dark:hover:bg-white/[0.05] transition-colors text-[#11183D] dark:text-white"
+            className="md:hidden p-2 rounded-full hover:bg-[#EFFAFD] dark:hover:bg-[#262626] transition-colors text-[#11183D] dark:text-white"
             aria-label="Toggle menu"
           >
             {mobileOpen ? (
@@ -269,18 +279,18 @@ export default function Navbar() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.98 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="pointer-events-auto md:hidden max-w-5xl mx-auto mt-2 rounded-3xl bg-white/98 backdrop-blur-xl border border-[#DCE7F2] shadow-2xl overflow-hidden p-5 max-h-[85vh] overflow-y-auto"
+            className="pointer-events-auto md:hidden max-w-5xl mx-auto mt-2 rounded-3xl bg-white/98 dark:bg-[#1A1A1A]/98 backdrop-blur-xl border border-[#DCE7F2] dark:border-[#262626] shadow-2xl overflow-hidden p-5 max-h-[85vh] overflow-y-auto"
           >
             <div className="flex flex-col gap-2">
-              <div className="pb-2 border-b border-[#DCE7F2]">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-[#7E8B9B]">
+              <div className="pb-2 border-b border-[#DCE7F2] dark:border-[#262626]">
+                <span className="text-[10px] uppercase font-bold tracking-wider text-[#7E8B9B] dark:text-[#A8A8A8]">
                   Features & Placement Modules
                 </span>
                 <div className="grid grid-cols-2 gap-2 mt-2">
                   <Link
                     to="/interview/new"
                     onClick={() => setMobileOpen(false)}
-                    className="p-2.5 rounded-xl bg-[#EFFAFD] text-xs font-bold text-[#4A8BDF] flex items-center gap-2"
+                    className="p-2.5 rounded-xl bg-[#EFFAFD] dark:bg-[#262626] text-xs font-bold text-[#4A8BDF] dark:text-[#64D2FF] flex items-center gap-2"
                   >
                     <Video className="w-4 h-4" />
                     <span>Oral Mock</span>
@@ -288,7 +298,7 @@ export default function Navbar() {
                   <Link
                     to="/interview/coding/new"
                     onClick={() => setMobileOpen(false)}
-                    className="p-2.5 rounded-xl bg-[#FDF4FB] text-xs font-bold text-[#A0006D] flex items-center gap-2"
+                    className="p-2.5 rounded-xl bg-[#FDF4FB] dark:bg-[#262626] text-xs font-bold text-[#A0006D] dark:text-[#BF5AF2] flex items-center gap-2"
                   >
                     <Code2 className="w-4 h-4" />
                     <span>Coding Sandbox</span>
@@ -296,7 +306,7 @@ export default function Navbar() {
                   <Link
                     to="/company-prep"
                     onClick={() => setMobileOpen(false)}
-                    className="p-2.5 rounded-xl bg-[#F8FAFC] border border-[#DCE7F2] text-xs font-bold text-[#11183D] flex items-center gap-2"
+                    className="p-2.5 rounded-xl bg-[#F8FAFC] dark:bg-[#262626] border border-[#DCE7F2] dark:border-[#303030] text-xs font-bold text-[#11183D] dark:text-white flex items-center gap-2"
                   >
                     <Building2 className="w-4 h-4 text-[#4A8BDF]" />
                     <span>Company Kits</span>
@@ -304,7 +314,7 @@ export default function Navbar() {
                   <Link
                     to="/core-cs"
                     onClick={() => setMobileOpen(false)}
-                    className="p-2.5 rounded-xl bg-[#F8FAFC] border border-[#DCE7F2] text-xs font-bold text-[#11183D] flex items-center gap-2"
+                    className="p-2.5 rounded-xl bg-[#F8FAFC] dark:bg-[#262626] border border-[#DCE7F2] dark:border-[#303030] text-xs font-bold text-[#11183D] dark:text-white flex items-center gap-2"
                   >
                     <Cpu className="w-4 h-4 text-[#4A8BDF]" />
                     <span>Core CS Hub</span>
@@ -312,7 +322,7 @@ export default function Navbar() {
                   <Link
                     to="/sql-playground"
                     onClick={() => setMobileOpen(false)}
-                    className="p-2.5 rounded-xl bg-emerald-50 text-xs font-bold text-emerald-700 flex items-center gap-2"
+                    className="p-2.5 rounded-xl bg-emerald-50 dark:bg-[#262626] text-xs font-bold text-emerald-700 dark:text-[#2CBB5D] flex items-center gap-2"
                   >
                     <Code2 className="w-4 h-4" />
                     <span>SQL Lab</span>
@@ -320,7 +330,7 @@ export default function Navbar() {
                   <Link
                     to="/aptitude"
                     onClick={() => setMobileOpen(false)}
-                    className="p-2.5 rounded-xl bg-[#F8FAFC] border border-[#DCE7F2] text-xs font-bold text-[#11183D] flex items-center gap-2"
+                    className="p-2.5 rounded-xl bg-[#F8FAFC] dark:bg-[#262626] border border-[#DCE7F2] dark:border-[#303030] text-xs font-bold text-[#11183D] dark:text-white flex items-center gap-2"
                   >
                     <BrainCircuit className="w-4 h-4 text-[#4A8BDF]" />
                     <span>Aptitude</span>
@@ -328,7 +338,7 @@ export default function Navbar() {
                   <Link
                     to="/dsa-sheets"
                     onClick={() => setMobileOpen(false)}
-                    className="p-2.5 rounded-xl bg-[#F8FAFC] border border-[#DCE7F2] text-xs font-bold text-[#11183D] flex items-center gap-2"
+                    className="p-2.5 rounded-xl bg-[#F8FAFC] dark:bg-[#262626] border border-[#DCE7F2] dark:border-[#303030] text-xs font-bold text-[#11183D] dark:text-white flex items-center gap-2"
                   >
                     <Binary className="w-4 h-4 text-[#4A8BDF]" />
                     <span>DSA Sheets</span>
@@ -336,7 +346,7 @@ export default function Navbar() {
                   <Link
                     to="/projects"
                     onClick={() => setMobileOpen(false)}
-                    className="p-2.5 rounded-xl bg-[#F8FAFC] border border-[#DCE7F2] text-xs font-bold text-[#11183D] flex items-center gap-2"
+                    className="p-2.5 rounded-xl bg-[#F8FAFC] dark:bg-[#262626] border border-[#DCE7F2] dark:border-[#303030] text-xs font-bold text-[#11183D] dark:text-white flex items-center gap-2"
                   >
                     <Layers className="w-4 h-4 text-[#A0006D]" />
                     <span>Blueprints</span>
@@ -350,7 +360,7 @@ export default function Navbar() {
                     key={link.label}
                     href={link.href}
                     onClick={() => setMobileOpen(false)}
-                    className="text-base font-semibold text-[#526078] hover:text-[#11183D] py-1.5 font-sans transition-colors"
+                    className="text-base font-semibold text-[#526078] dark:text-[#D2D2D7] hover:text-[#11183D] dark:hover:text-white py-1.5 font-sans transition-colors"
                   >
                     {link.label}
                   </a>
@@ -359,7 +369,7 @@ export default function Navbar() {
                     key={link.label}
                     to={link.href}
                     onClick={() => setMobileOpen(false)}
-                    className="text-base font-semibold text-[#526078] hover:text-[#11183D] py-1.5 font-sans transition-colors"
+                    className="text-base font-semibold text-[#526078] dark:text-[#D2D2D7] hover:text-[#11183D] dark:hover:text-white py-1.5 font-sans transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -367,15 +377,15 @@ export default function Navbar() {
               )}
 
               {isAuthenticated ? (
-                <div className="pt-3 mt-2 border-t border-[#DCE7F2] space-y-2">
-                  <div className="px-3 py-2 bg-[#EFFAFD] border border-[#DCE7F2] rounded-2xl">
-                    <p className="text-sm font-bold text-[#11183D] font-sans">{user?.name}</p>
-                    <p className="text-xs text-[#526078] font-sans">{user?.email}</p>
+                <div className="pt-3 mt-2 border-t border-[#DCE7F2] dark:border-[#262626] space-y-2">
+                  <div className="px-3 py-2 bg-[#EFFAFD] dark:bg-[#1C1C1C] border border-[#DCE7F2] dark:border-[#262626] rounded-2xl">
+                    <p className="text-sm font-bold text-[#11183D] dark:text-white font-sans">{user?.name}</p>
+                    <p className="text-xs text-[#526078] dark:text-[#A8A8A8] font-sans">{user?.email}</p>
                   </div>
                   <Link
                     to="/dashboard"
                     onClick={() => setMobileOpen(false)}
-                    className="flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-[#526078] hover:text-[#4A8BDF] rounded-xl font-sans"
+                    className="flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-[#526078] dark:text-[#D2D2D7] hover:text-[#4A8BDF] dark:hover:text-[#64D2FF] rounded-xl font-sans"
                   >
                     <LayoutDashboard className="h-4 w-4 text-[#4A8BDF]" />
                     Candidate Dashboard
@@ -385,21 +395,21 @@ export default function Navbar() {
                       logout();
                       setMobileOpen(false);
                     }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-[#D64545] hover:bg-[#FDF2F2] rounded-xl font-sans text-left cursor-pointer"
+                    className="w-full flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-[#D64545] dark:text-[#FF4757] hover:bg-[#FDF2F2] dark:hover:bg-red-950/30 rounded-xl font-sans text-left cursor-pointer"
                   >
-                    <LogOut className="h-4 w-4 text-[#D64545]" />
+                    <LogOut className="h-4 w-4 text-[#D64545] dark:text-[#FF4757]" />
                     Sign out
                   </button>
                 </div>
               ) : (
-                <div className="flex flex-col gap-2.5 pt-3 mt-2 border-t border-[#DCE7F2]">
+                <div className="flex flex-col gap-2.5 pt-3 mt-2 border-t border-[#DCE7F2] dark:border-[#262626]">
                   <Link to="/login" onClick={() => setMobileOpen(false)}>
-                    <button className="w-full px-5 py-2.5 text-sm font-semibold font-sans text-[#11183D] bg-[#F8FAFC] border border-[#DCE7F2] rounded-full hover:bg-[#F1F5F9] transition-all cursor-pointer">
+                    <button className="w-full px-5 py-2.5 text-sm font-semibold font-sans text-[#11183D] dark:text-white bg-[#F8FAFC] dark:bg-[#262626] border border-[#DCE7F2] dark:border-[#303030] rounded-full hover:bg-[#F1F5F9] dark:hover:bg-[#303030] transition-all cursor-pointer">
                       Login
                     </button>
                   </Link>
                   <Link to="/register" onClick={() => setMobileOpen(false)}>
-                    <button className="w-full inline-flex items-center justify-center gap-2 bg-[#11183D] hover:bg-[#1E293B] text-white font-sans font-semibold text-sm px-6 py-2.5 rounded-full shadow-sm transition-all cursor-pointer">
+                    <button className="w-full inline-flex items-center justify-center gap-2 bg-[#11183D] hover:bg-[#1E293B] text-white dark:bg-white dark:hover:bg-[#EBEBF5] dark:text-black dark:border-white border border-transparent font-sans font-semibold text-sm px-6 py-2.5 rounded-full shadow-sm transition-all cursor-pointer">
                       Get Started
                       <ArrowRight className="h-3.5 w-3.5" />
                     </button>

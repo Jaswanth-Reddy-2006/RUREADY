@@ -43,32 +43,32 @@ export default function CapacityCalculatorPanel() {
   const outputs = capacityOutputs;
 
   return (
-    <div className="flex flex-col h-full bg-white select-none overflow-y-auto p-4 space-y-6">
+    <div className="flex flex-col h-full bg-white dark:bg-[#0D1117] select-none overflow-y-auto p-4 space-y-6 transition-colors">
       {/* Header */}
       <div>
         <div className="flex items-center gap-2 mb-1">
-          <div className="p-1.5 rounded-lg bg-[#EFFAFD] text-[#4A8BDF]">
+          <div className="p-1.5 rounded-lg bg-[#EFFAFD] dark:bg-blue-950/50 text-[#4A8BDF]">
             <Calculator size={16} />
           </div>
-          <h3 className="font-bold text-sm text-slate-800">
+          <h3 className="font-bold text-sm text-slate-800 dark:text-white">
             Deterministic Capacity Estimator
           </h3>
         </div>
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-slate-500 dark:text-slate-400">
           Adjust traffic assumptions to calculate QPS, bandwidth, storage, and cluster sizing mathematically.
         </p>
       </div>
 
       {/* Primary Scale Sliders */}
-      <div className="space-y-4 bg-slate-50/70 p-4 rounded-2xl border border-slate-100">
-        <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider font-mono">
+      <div className="space-y-4 bg-slate-50/70 dark:bg-[#161B22] p-4 rounded-2xl border border-slate-100 dark:border-slate-800">
+        <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider font-mono">
           Traffic Assumptions
         </h4>
 
         {/* DAU */}
         <div>
           <div className="flex justify-between text-xs font-semibold mb-1">
-            <span className="text-slate-600">Daily Active Users (DAU)</span>
+            <span className="text-slate-600 dark:text-slate-400">Daily Active Users (DAU)</span>
             <span className="text-[#4A8BDF] font-mono font-bold">
               {(inputs.dau / 1_000_000).toFixed(1)} Million
             </span>
@@ -88,8 +88,8 @@ export default function CapacityCalculatorPanel() {
         <div className="grid grid-cols-2 gap-3">
           <div>
             <div className="flex justify-between text-xs font-semibold mb-1">
-              <span className="text-slate-600">Reads / User / Day</span>
-              <span className="text-slate-800 font-mono font-bold">{inputs.readsPerUserPerDay}</span>
+              <span className="text-slate-600 dark:text-slate-400">Reads / User / Day</span>
+              <span className="text-slate-800 dark:text-white font-mono font-bold">{inputs.readsPerUserPerDay}</span>
             </div>
             <input
               type="range"
@@ -102,8 +102,8 @@ export default function CapacityCalculatorPanel() {
           </div>
           <div>
             <div className="flex justify-between text-xs font-semibold mb-1">
-              <span className="text-slate-600">Writes / User / Day</span>
-              <span className="text-slate-800 font-mono font-bold">{inputs.writesPerUserPerDay}</span>
+              <span className="text-slate-600 dark:text-slate-400">Writes / User / Day</span>
+              <span className="text-slate-800 dark:text-white font-mono font-bold">{inputs.writesPerUserPerDay}</span>
             </div>
             <input
               type="range"
@@ -121,8 +121,8 @@ export default function CapacityCalculatorPanel() {
         <div className="grid grid-cols-2 gap-3">
           <div>
             <div className="flex justify-between text-xs font-semibold mb-1">
-              <span className="text-slate-600">Read Payload</span>
-              <span className="text-slate-800 font-mono font-bold">{inputs.avgReadPayloadBytes} B</span>
+              <span className="text-slate-600 dark:text-slate-400">Read Payload</span>
+              <span className="text-slate-800 dark:text-white font-mono font-bold">{inputs.avgReadPayloadBytes} B</span>
             </div>
             <input
               type="range"
@@ -136,8 +136,8 @@ export default function CapacityCalculatorPanel() {
           </div>
           <div>
             <div className="flex justify-between text-xs font-semibold mb-1">
-              <span className="text-slate-600">Write Payload</span>
-              <span className="text-slate-800 font-mono font-bold">{inputs.avgWritePayloadBytes} B</span>
+              <span className="text-slate-600 dark:text-slate-400">Write Payload</span>
+              <span className="text-slate-800 dark:text-white font-mono font-bold">{inputs.avgWritePayloadBytes} B</span>
             </div>
             <input
               type="range"
@@ -155,8 +155,8 @@ export default function CapacityCalculatorPanel() {
         <div className="grid grid-cols-2 gap-3">
           <div>
             <div className="flex justify-between text-xs font-semibold mb-1">
-              <span className="text-slate-600">Peak Multiplier</span>
-              <span className="text-slate-800 font-mono font-bold">{inputs.peakMultiplier}x</span>
+              <span className="text-slate-600 dark:text-slate-400">Peak Multiplier</span>
+              <span className="text-slate-800 dark:text-white font-mono font-bold">{inputs.peakMultiplier}x</span>
             </div>
             <input
               type="range"
@@ -170,8 +170,8 @@ export default function CapacityCalculatorPanel() {
           </div>
           <div>
             <div className="flex justify-between text-xs font-semibold mb-1">
-              <span className="text-slate-600">Retention</span>
-              <span className="text-slate-800 font-mono font-bold">{inputs.retentionYears} Yrs</span>
+              <span className="text-slate-600 dark:text-slate-400">Retention</span>
+              <span className="text-slate-800 dark:text-white font-mono font-bold">{inputs.retentionYears} Yrs</span>
             </div>
             <input
               type="range"
@@ -188,88 +188,88 @@ export default function CapacityCalculatorPanel() {
       {/* Calculated Output Cards */}
       {outputs && (
         <div className="space-y-4">
-          <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider font-mono">
+          <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider font-mono">
             Derived Calculations
           </h4>
 
           <div className="grid grid-cols-2 gap-3">
             {/* QPS */}
-            <div className="p-3.5 rounded-2xl bg-sky-50/70 border border-sky-200/80">
-              <div className="flex items-center gap-1.5 text-sky-700 text-xs font-bold mb-1 font-sans">
+            <div className="p-3.5 rounded-2xl bg-sky-50/70 dark:bg-sky-950/30 border border-sky-200/80 dark:border-sky-900/60">
+              <div className="flex items-center gap-1.5 text-sky-700 dark:text-sky-400 text-xs font-bold mb-1 font-sans">
                 <Activity size={14} />
                 <span>Peak Throughput</span>
               </div>
-              <div className="text-lg font-black text-sky-950 font-mono">
+              <div className="text-lg font-black text-sky-950 dark:text-sky-200 font-mono">
                 {Math.round(outputs.peakTotalQps).toLocaleString()}{' '}
-                <span className="text-xs font-medium text-sky-700">QPS</span>
+                <span className="text-xs font-medium text-sky-700 dark:text-sky-400">QPS</span>
               </div>
-              <div className="text-[11px] text-sky-800 mt-1 font-mono">
+              <div className="text-[11px] text-sky-800 dark:text-sky-400/80 mt-1 font-mono">
                 Avg Read: {Math.round(outputs.avgReadQps).toLocaleString()} /s • Write: {Math.round(outputs.avgWriteQps).toLocaleString()} /s
               </div>
             </div>
 
             {/* Bandwidth */}
-            <div className="p-3.5 rounded-2xl bg-indigo-50/70 border border-indigo-200/80">
-              <div className="flex items-center gap-1.5 text-indigo-700 text-xs font-bold mb-1 font-sans">
+            <div className="p-3.5 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200/80 dark:border-indigo-900/60">
+              <div className="flex items-center gap-1.5 text-indigo-700 dark:text-indigo-400 text-xs font-bold mb-1 font-sans">
                 <ArrowDownUp size={14} />
                 <span>Egress Bandwidth</span>
               </div>
-              <div className="text-lg font-black text-indigo-950 font-mono">
+              <div className="text-lg font-black text-indigo-950 dark:text-indigo-200 font-mono">
                 {outputs.peakEgressBandwidthMbps.toFixed(1)}{' '}
-                <span className="text-xs font-medium text-indigo-700">Mbps</span>
+                <span className="text-xs font-medium text-indigo-700 dark:text-indigo-400">Mbps</span>
               </div>
-              <div className="text-[11px] text-indigo-800 mt-1 font-mono">
+              <div className="text-[11px] text-indigo-800 dark:text-indigo-400/80 mt-1 font-mono">
                 Ingress: {outputs.peakIngressBandwidthMbps.toFixed(2)} Mbps
               </div>
             </div>
 
             {/* Storage */}
-            <div className="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-200/80">
-              <div className="flex items-center gap-1.5 text-emerald-700 text-xs font-bold mb-1 font-sans">
+            <div className="p-3.5 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-900/60">
+              <div className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 text-xs font-bold mb-1 font-sans">
                 <HardDrive size={14} />
                 <span>5-Yr Total Storage</span>
               </div>
-              <div className="text-lg font-black text-emerald-950 font-mono">
+              <div className="text-lg font-black text-emerald-950 dark:text-emerald-200 font-mono">
                 {outputs.totalStorageWithReplicationFormatted}
               </div>
-              <div className="text-[11px] text-emerald-800 mt-1 font-mono">
+              <div className="text-[11px] text-emerald-800 dark:text-emerald-400/80 mt-1 font-mono">
                 Daily: {outputs.dailyStorageFormatted} (3x Repl)
               </div>
             </div>
 
             {/* 80/20 Cache */}
-            <div className="p-3.5 rounded-2xl bg-rose-50/70 border border-rose-200/80">
-              <div className="flex items-center gap-1.5 text-rose-700 text-xs font-bold mb-1 font-sans">
+            <div className="p-3.5 rounded-2xl bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200/80 dark:border-rose-900/60">
+              <div className="flex items-center gap-1.5 text-rose-700 dark:text-rose-400 text-xs font-bold mb-1 font-sans">
                 <Zap size={14} />
                 <span>80/20 Cache RAM</span>
               </div>
-              <div className="text-lg font-black text-rose-950 font-mono">
+              <div className="text-lg font-black text-rose-950 dark:text-rose-200 font-mono">
                 {outputs.cacheMemoryRequiredFormatted}
               </div>
-              <div className="text-[11px] text-rose-800 mt-1 font-mono">
+              <div className="text-[11px] text-rose-800 dark:text-rose-400/80 mt-1 font-mono">
                 20% Daily Read Volume
               </div>
             </div>
           </div>
 
           {/* Sizing Recommendations */}
-          <div className="p-3.5 rounded-2xl bg-slate-900 text-white space-y-2">
+          <div className="p-3.5 rounded-2xl bg-slate-900 dark:bg-[#161B22] border border-transparent dark:border-slate-800 text-white space-y-2">
             <div className="text-xs font-bold text-slate-300 font-mono uppercase tracking-wider flex items-center gap-1.5">
               <Server size={14} className="text-[#4A8BDF]" />
               <span>Recommended Infrastructure Sizing</span>
             </div>
             <div className="grid grid-cols-3 gap-2 pt-1 font-mono text-xs">
-              <div className="bg-slate-800/80 p-2 rounded-xl text-center">
+              <div className="bg-slate-800/80 dark:bg-slate-800/50 p-2 rounded-xl text-center">
                 <div className="text-slate-400 text-[10px]">App Servers</div>
                 <div className="text-base font-bold text-white mt-0.5">~{outputs.recommendedAppServers}</div>
                 <div className="text-[9px] text-slate-500">N+2 Redundant</div>
               </div>
-              <div className="bg-slate-800/80 p-2 rounded-xl text-center">
+              <div className="bg-slate-800/80 dark:bg-slate-800/50 p-2 rounded-xl text-center">
                 <div className="text-slate-400 text-[10px]">DB Shards</div>
                 <div className="text-base font-bold text-white mt-0.5">~{outputs.recommendedDbShards}</div>
                 <div className="text-[9px] text-slate-500">Partitioned</div>
               </div>
-              <div className="bg-slate-800/80 p-2 rounded-xl text-center">
+              <div className="bg-slate-800/80 dark:bg-slate-800/50 p-2 rounded-xl text-center">
                 <div className="text-slate-400 text-[10px]">Redis Nodes</div>
                 <div className="text-base font-bold text-white mt-0.5">~{outputs.recommendedRedisNodes}</div>
                 <div className="text-[9px] text-slate-500">32GB RAM / 70%</div>
@@ -279,17 +279,17 @@ export default function CapacityCalculatorPanel() {
 
           {/* Calculation Step Breakdown */}
           <div className="space-y-2">
-            <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider font-mono">
+            <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider font-mono">
               Step-by-Step Derivations
             </h4>
             <div className="space-y-1.5 text-xs">
               {outputs.breakdown.map((item, idx) => (
-                <div key={idx} className="p-2.5 rounded-xl border border-slate-100 bg-slate-50/50 flex flex-col gap-0.5">
-                  <div className="flex justify-between font-semibold text-slate-800">
+                <div key={idx} className="p-2.5 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-[#161B22] flex flex-col gap-0.5">
+                  <div className="flex justify-between font-semibold text-slate-800 dark:text-slate-200">
                     <span>{item.title}</span>
                     <span className="font-mono text-[#4A8BDF] font-bold">{item.result}</span>
                   </div>
-                  <div className="text-[11px] font-mono text-slate-500">{item.formula}</div>
+                  <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400">{item.formula}</div>
                 </div>
               ))}
             </div>

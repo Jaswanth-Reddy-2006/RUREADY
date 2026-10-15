@@ -16,11 +16,17 @@ import { useVideoAnalysisML } from '../../hooks/useVideoAnalysisML';
 import { authApi } from '../../api/auth';
 import { useAuthStore } from '../../store/authStore';
 import { useInterviewStore } from '../../store/useInterviewStore';
-import { speakWithLipSync, loadSpeechVoices } from '../../lib/speech';
+import { speakWithLipSync, loadSpeechVoices, stopAllSpeech } from '../../lib/speech';
 import { OculusViseme, mapVisemeIdToOculus } from '../../components/interview/visemeMapper';
 import { Maximize2, Minimize2, Mic, MicOff, Video, VideoOff, Play, Shield, ShieldAlert, BookOpen, Wrench, Sparkles, FileText, Clock, AlertCircle, CheckCircle2, PhoneOff, Code2, Terminal } from 'lucide-react';
 import NormalInterviewRoom from '../../components/NormalInterviewRoom';
 import toast from 'react-hot-toast';
+import {
+  createInterviewContext,
+  generateInitialDynamicQuestion,
+  generateNextDynamicQuestion,
+  type InterviewContext,
+} from '../../lib/dynamicInterviewEngine';
 
 
 // ─── Types ─────────────────────────────────────────────────────
@@ -62,6 +68,7 @@ export default function InterviewRoom() {
   useEffect(() => {
     currentQuestionRef.current = currentQuestion;
   }, [currentQuestion]);
+  const [interviewerPrompt, setInterviewerPrompt] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const [loadingMessage, setLoadingMessage] = useState('Connecting to your interview room...');
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -85,6 +92,7 @@ export default function InterviewRoom() {
   const lastAnswerTextRef = useRef('');
 
   const submitAnswerRef = useRef<(answer: string, isExplicitSkip?: boolean) => Promise<void>>(async () => {});
+  const interviewContextRef = useRef<InterviewContext | null>(null);
 
   // Coding IDE states
   const [showCodeWorkspace, setShowCodeWorkspace] = useState(false);
@@ -96,7 +104,7 @@ export default function InterviewRoom() {
   const getLanguageBoilerplate = useCallback((lang: string) => {
     switch (lang) {
       case 'react':
-        return `// Write your React component here\nimport React from 'react';\n\nexport default function App() {\n  return (\n    <div className="p-4 bg-slate-900 text-white rounded-xl border border-white/10 shadow-lg">\n      <h1 className="text-xl font-bold text-amber-400">Hello from React!</h1>\n      <p className="text-xs text-white/50 mt-1">This component compiles and renders fine.</p>\n    </div>\n  );\n}`;
+        return `// Write your React component here\nimport React from 'react';\n\nexport default function App() {\n  return (\n    <div className="p-4 bg-slate-900 text-white rounded-xl border border-white/10 shadow-lg">\n      <h1 className="text-xl font-bold text-amber-400">Hello from React!</h1>\n      <p className="text-xs text-slate-400 mt-1">This component compiles and renders fine.</p>\n    </div>\n  );\n}`;
       case 'typescript':
         return `// Write your TypeScript code here\ninterface User {\n  id: number;\n  name: string;\n}\n\nfunction getUserInfo(user: User): string {\n  return \`User: \${user.name} (\${user.id})\`;\n}\n\nconsole.log(getUserInfo({ id: 101, name: "Ava AI" }));`;
       case 'python':
@@ -183,7 +191,6 @@ export default function InterviewRoom() {
   }, []);
 
   // End Interview & Analysis States
-  const [showEndConfirmation, setShowEndConfirmation] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisStep, setAnalysisStep] = useState(0);
 
@@ -196,6 +203,14 @@ export default function InterviewRoom() {
   const [isFullscreen, setIsFullscreen] = useState(() => 
     typeof document !== 'undefined' ? Boolean(document.fullscreenElement) : true
   );
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
 
   const toggleFullScreen = useCallback(async () => {
     if (!document.fullscreenElement) {
@@ -226,9 +241,6 @@ export default function InterviewRoom() {
     }
   }, []);
 
-  // Disqualification and Cheating Enforcement State
-  const [isDisqualified, setIsDisqualified] = useState(false);
-  const [disqualificationReason, setDisqualificationReason] = useState('');
   const hasDisqualifiedRef = useRef(false);
 
   const stopListening = useCallback(() => {
@@ -243,17 +255,24 @@ export default function InterviewRoom() {
     }
   }, [clearSilenceTimers]);
 
-  // Disqualification & Real-Time Integrity Enforcer
+  // Disqualification & Real-Time Integrity Enforcer (Immediately terminates, exits fullscreen, navigates to report)
   const handleDisqualifyAndAutoSubmit = useCallback(async (reason: string) => {
     if (hasDisqualifiedRef.current || !id) return;
     hasDisqualifiedRef.current = true;
-    setIsDisqualified(true);
-    setDisqualificationReason(reason);
     stopListening();
     if (mediaStream) {
       mediaStream.getTracks().forEach((track) => track.stop());
     }
-    window.speechSynthesis.cancel();
+    stopAllSpeech();
+
+    if (document.fullscreenElement) {
+      try {
+        await document.exitFullscreen();
+        setIsFullscreen(false);
+      } catch (err) {
+        console.error('Failed to exit fullscreen on disqualification:', err);
+      }
+    }
 
     try {
       await apiClient.post(`/interview/session/${id}/complete`, {
@@ -278,7 +297,9 @@ export default function InterviewRoom() {
     } catch (err) {
       console.error('Failed to log disqualification completion:', err);
     }
-  }, [id, stopListening, mediaStream]);
+
+    navigate(`/interview/${id}/analysis`);
+  }, [id, stopListening, mediaStream, navigate]);
 
   const chatScrollRef = useRef<HTMLDivElement>(null);
 
@@ -382,22 +403,91 @@ export default function InterviewRoom() {
 
   // Verbal Clarification / Question Detector
   const isClarificationOrQuestion = useCallback((text: string) => {
-    const normalized = text.toLowerCase().replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, ' ').replace(/\s+/g, ' ').trim();
-    if (!normalized) return false;
+    const normalized = text.toLowerCase().replace(/[.,/#!$%^&*;:{}=\-_`~()?]/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!normalized || normalized.length < 3) return false;
+
+    // Explicit question & clarification patterns
+    const clarificationPatterns = [
+      /\bwhat does (.+) mean\b/,
+      /\bwhat do you mean\b/,
+      /\bwhat does that mean\b/,
+      /\bwhat is (.+)\b/,
+      /\bwhat are (.+)\b/,
+      /\bcan you explain\b/,
+      /\bcould you explain\b/,
+      /\bcan you clarify\b/,
+      /\bcould you clarify\b/,
+      /\bclarify the question\b/,
+      /\bi don'?t understand\b/,
+      /\bwhat should i focus on\b/,
+      /\bcan you give an example\b/,
+      /\bcould you give an example\b/,
+      /\bdo you mean\b/,
+      /\bmeaning of\b/,
+      /\bwhat exactly do you mean\b/,
+      /\bwhat are you looking for\b/,
+    ];
+    if (clarificationPatterns.some((pattern) => pattern.test(normalized))) {
+      return true;
+    }
+
     const clarificationPhrases = [
-      "is this what you are asking",
-      "are you asking",
+      "what does design mean",
+      "what does it mean",
+      "what do you mean",
+      "what does that mean",
+      "can you explain",
+      "could you explain",
       "could you clarify",
       "can you clarify",
+      "is this what you are asking",
+      "are you asking",
       "should i focus on",
       "can i assume",
       "would you like high level",
       "do you mean",
-      "are we allowed to",
-      "is this frontend or backend",
-      "is memory constrained",
+      "i don't understand",
+      "i dont understand",
     ];
     return clarificationPhrases.some((phrase) => normalized.includes(phrase));
+  }, []);
+
+  const detectClarificationTopic = useCallback((query: string): string => {
+    const q = query.toLowerCase();
+    if (q.includes('design') || q.includes('system design')) return 'design';
+    if (q.includes('trade-off') || q.includes('trade off') || q.includes('tradeoff')) return 'trade-offs';
+    if (q.includes('caching') || q.includes('cache') || q.includes('redis')) return 'caching';
+    if (q.includes('architecture')) return 'architecture';
+    if (q.includes('database') || q.includes('indexing') || q.includes('sql') || q.includes('nosql')) return 'database';
+    if (q.includes('microservice') || q.includes('api') || q.includes('endpoint')) return 'apis';
+    if (q.includes('scale') || q.includes('scalability') || q.includes('load balance')) return 'scaling';
+    if (q.includes('async') || q.includes('concurrency') || q.includes('thread')) return 'concurrency';
+    if (q.includes('state') || q.includes('redux') || q.includes('context')) return 'state';
+    if (q.includes('debug') || q.includes('logging') || q.includes('observability')) return 'debugging';
+    return 'general';
+  }, []);
+
+  const getClarificationResponse = useCallback((topic: string): string => {
+    switch (topic) {
+      case 'design':
+        return "By design, I'm referring to high-level architecture — how components, data models, and APIs fit together to make a system reliable and maintainable. In your past projects, how did you structure your solution?";
+      case 'trade-offs':
+        return "A trade-off means weighing the pros and cons of two approaches — like execution speed versus memory consumption, or development simplicity versus long-term flexibility. What factors influenced your technical decisions?";
+      case 'caching':
+        return "Caching is temporarily keeping frequently accessed data in fast in-memory stores like Redis so you don't repeatedly query the database. Have you used caching or stored data in memory to speed things up?";
+      case 'architecture':
+        return "Architecture is the blueprint of how your frontend, backend services, and database communicate and handle data flow. How did you organize the structure of your application?";
+      case 'database':
+        return "By database strategy, I mean how you structure tables or collections, create indexes, and write efficient queries to avoid performance bottlenecks. How did you approach data storage?";
+      case 'apis':
+        return "I'm asking about how your API endpoints were designed, how request payloads were validated, and how error handling was structured. What was your API layer like?";
+      case 'scaling':
+        return "Scaling means ensuring the application handles increased users or data throughput without crashing or degrading latency. What techniques would you consider to scale?";
+      case 'concurrency':
+        return "Concurrency is coordinating multiple tasks executing simultaneously without blocking or causing data race conditions. How did you handle asynchronous code?";
+      default:
+        return "I'm asking for your practical experience with this concept based on your own projects. Feel free to explain it simply from your own perspective — how would you think about it?";
+    }
   }, []);
 
   // Verbal Hesitation / Thinking Request Detector
@@ -420,6 +510,10 @@ export default function InterviewRoom() {
   const normalizeTechnicalSpeech = useCallback((text: string) => {
     let cleaned = text;
     const replacements: Array<[RegExp, string]> = [
+      [/\b(the sign|desine|desighn)\b/gi, 'design'],
+      [/\b(system the sign|systems the sign)\b/gi, 'system design'],
+      [/\b(all rhythm|algo rhythm)\b/gi, 'algorithm'],
+      [/\b(data base|data bases)\b/gi, 'database'],
       [/\bsequel\b/gi, 'SQL'],
       [/\bpost grass\b/gi, 'PostgreSQL'],
       [/\bpostgres\b/gi, 'PostgreSQL'],
@@ -437,6 +531,12 @@ export default function InterviewRoom() {
       [/\bstar method\b/gi, 'STAR method'],
       [/\bcap theorem\b/gi, 'CAP theorem'],
       [/\bacid properties\b/gi, 'ACID properties'],
+      [/\btrade off\b/gi, 'trade-off'],
+      [/\btrade offs\b/gi, 'trade-offs'],
+      [/\bload balancer\b/gi, 'load balancer'],
+      [/\bmicro services\b/gi, 'microservices'],
+      [/\bfront end\b/gi, 'frontend'],
+      [/\bback end\b/gi, 'backend'],
     ];
     for (const [regex, replacement] of replacements) {
       cleaned = cleaned.replace(regex, replacement);
@@ -496,7 +596,12 @@ export default function InterviewRoom() {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
           video: { width: 640, height: 480, facingMode: 'user' },
-          audio: true,
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true,
+            sampleRate: 48000,
+          },
         });
         // Enable tracks for live webcam and microphone capture
         stream.getAudioTracks().forEach((track) => {
@@ -521,15 +626,21 @@ export default function InterviewRoom() {
     };
   }, []);
 
-  // Clean up media on unmount
+  // Clean up media and all speech synthesis on unmount
   useEffect(() => {
     return () => {
+      stopListening();
+      stopAllSpeech();
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.abort();
+        } catch {}
+      }
       if (mediaStream) {
         mediaStream.getTracks().forEach((t) => t.stop());
       }
-      window.speechSynthesis.cancel();
     };
-  }, [mediaStream]);
+  }, [mediaStream, stopListening]);
 
   const cleanupMediaStream = useCallback(() => {
     if (mediaStream) {
@@ -544,12 +655,14 @@ export default function InterviewRoom() {
 
   useEffect(() => {
     if (isAnalyzing) {
+      stopListening();
+      stopAllSpeech();
       const timer = setInterval(() => {
         setAnalysisStep((prev) => (prev < 5 ? prev + 1 : prev));
       }, 700);
       return () => clearInterval(timer);
     }
-  }, [isAnalyzing]);
+  }, [isAnalyzing, stopListening]);
 
   // ─── Background Proctoring ────────────────────────────────
 
@@ -571,7 +684,11 @@ export default function InterviewRoom() {
     const rec = new SpeechRecognition();
     rec.continuous = true;
     rec.interimResults = true;
-    rec.lang = 'en-US';
+    rec.maxAlternatives = 5;
+
+    // Auto-detect browser/system locale for Indian/UK/US English accents
+    const browserLang = (typeof navigator !== 'undefined' && navigator.language) || 'en-US';
+    rec.lang = browserLang.toLowerCase().startsWith('en') ? browserLang : 'en-US';
 
     rec.onresult = (event: any) => {
       const now = Date.now();
@@ -584,11 +701,24 @@ export default function InterviewRoom() {
       let interimText = '';
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const result = event.results[i];
-        const chunk = result[0]?.transcript || '';
+        let bestChunk = result[0]?.transcript || '';
+
+        // Search alternative hypotheses for technical terms if first alternative was unclear
+        for (let a = 1; a < Math.min(result.length, 3); a++) {
+          const alt = result[a]?.transcript || '';
+          if (
+            /\b(design|architecture|database|caching|redis|sql|scale|api|trade|async|concurrency|algorithm)\b/i.test(alt) &&
+            !/\b(design|architecture|database|caching|redis|sql|scale|api|trade|async|concurrency|algorithm)\b/i.test(bestChunk)
+          ) {
+            bestChunk = alt;
+            break;
+          }
+        }
+
         if (result.isFinal) {
-          finalTranscriptRef.current += chunk + ' ';
+          finalTranscriptRef.current += bestChunk + ' ';
         } else {
-          interimText += chunk;
+          interimText += bestChunk;
         }
       }
       const rawCombined = `${finalTranscriptRef.current}${interimText}`.replace(/\s+/g, ' ').trim();
@@ -607,6 +737,31 @@ export default function InterviewRoom() {
             await aiSpeak(`Sure, let me repeat the question: ${currentQuestionRef.current.questionText}`);
             startListening();
           }
+        }, 100);
+        return;
+      }
+
+      // Candidate asks for clarification or asks what a concept means
+      if (isClarificationOrQuestion(combined)) {
+        clearSilenceTimers();
+        stopListening();
+        setAnswerText('');
+        finalTranscriptRef.current = '';
+        latestAnswerRef.current = '';
+        setAvatarState('speaking');
+
+        const topic = detectClarificationTopic(combined);
+        const explanation = getClarificationResponse(topic);
+
+        setInterviewerPrompt(explanation);
+        addTranscriptEntry('ai', explanation);
+
+        setTimeout(async () => {
+          await aiSpeak(explanation);
+          if (currentQuestionRef.current) {
+            setInterviewerPrompt(currentQuestionRef.current.questionText);
+          }
+          startListening();
         }, 100);
         return;
       }
@@ -725,6 +880,7 @@ export default function InterviewRoom() {
   const aiSpeak = useCallback(
     (text: string): Promise<void> => {
       return new Promise((resolve) => {
+        setInterviewerPrompt(text);
         addTranscriptEntry('ai', text);
         setAvatarState('speaking');
         setSpokenWord('');
@@ -777,6 +933,40 @@ export default function InterviewRoom() {
       // Already started
     }
   }, [isMicOn, clearSilenceTimers]);
+
+  // Background Face Centering & Visibility Verbal Guidance (No UI clutter)
+  const offCenterStreakRef = useRef(0);
+  const lastOffCenterSpokenTimeRef = useRef(0);
+
+  useEffect(() => {
+    if (!isInterviewStarted || isAnalyzing || hasDisqualifiedRef.current || !isCameraOn || aiIsSpeaking || isProcessing) {
+      offCenterStreakRef.current = 0;
+      return;
+    }
+
+    const isMissingOrOffCenter = videoMLMetrics && (!videoMLMetrics.faceDetected || videoMLMetrics.postureStatus === 'Off-Center');
+
+    if (isMissingOrOffCenter) {
+      offCenterStreakRef.current += 1;
+      const now = Date.now();
+      // If candidate is off-center or missing for 5 seconds and not recently warned (>28s)
+      if (offCenterStreakRef.current >= 5 && now - lastOffCenterSpokenTimeRef.current > 28000) {
+        lastOffCenterSpokenTimeRef.current = now;
+        offCenterStreakRef.current = 0;
+
+        const reminder = !videoMLMetrics.faceDetected
+          ? "You are not visible in the camera. Please come to the center of the camera so we can continue."
+          : "Please come to the center of the camera frame so I can see you clearly.";
+
+        stopListening();
+        aiSpeak(reminder).then(() => {
+          startListening();
+        });
+      }
+    } else {
+      offCenterStreakRef.current = 0;
+    }
+  }, [videoMLMetrics, isInterviewStarted, isAnalyzing, isCameraOn, aiIsSpeaking, isProcessing, aiSpeak, stopListening, startListening]);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -849,18 +1039,35 @@ export default function InterviewRoom() {
     // 2. Transition states
     setIsInterviewStarted(true);
 
-    // 3. Trigger Ava's greeting or resume prompt
-    if (session && currentQuestion) {
-      const isResuming = session.status === 'IN_PROGRESS' && session.questions && session.questions.some((q: any) => q.answerText);
-      const greeting = isResuming
-        ? `Welcome back! Resuming your interview session for the ${session.targetRole || 'target'} role. Let's continue.`
-        : `Welcome! I'm Ava, your AI interview coach today. We'll be going through a mock interview for the ${session.targetRole || 'target'} role. I'll ask you a series of questions, and you can respond naturally by speaking. Let's begin.`;
+    // 3. Initialize Context & Dynamic Question Generation
+    if (session) {
+      const roleName = session.targetRole || 'Software Engineer';
+      const ctx = createInterviewContext({
+        targetRole: roleName,
+        targetCompany: session.targetCompany,
+        experienceLevel: session.experienceLevel || 'Fresher',
+        focusAreas: session.focusAreas || ['Technical Knowledge', 'Architecture'],
+      });
+      interviewContextRef.current = ctx;
+
+      const dynamicInitialQ = generateInitialDynamicQuestion(ctx);
+      const activeQ = {
+        id: `q_${Date.now()}`,
+        orderIndex: 0,
+        questionText: dynamicInitialQ,
+        questionType: 'TECHNICAL',
+        difficulty: 'MEDIUM',
+      };
+      setCurrentQuestion(activeQ);
+
+      const briefGreeting = `Hello! I'm Ava. We're going to dive into technical architecture and engineering decisions for the ${roleName} role today.`;
       
-      addTranscriptEntry('ai', greeting);
+      setInterviewerPrompt(briefGreeting);
+      addTranscriptEntry('ai', briefGreeting);
       setAvatarState('speaking');
 
       await new Promise<void>((resolve) => {
-        speakWithLipSync(greeting, {
+        speakWithLipSync(briefGreeting, {
           onStart: () => setAiIsSpeaking(true),
           onEnd: () => {
             setAiIsSpeaking(false);
@@ -878,11 +1085,11 @@ export default function InterviewRoom() {
         });
       });
 
-      // Now ask question
-      await aiSpeak(currentQuestion.questionText);
+      // Ava delivers the dynamic opening technical question
+      await aiSpeak(dynamicInitialQ);
       startListening();
     }
-  }, [session, currentQuestion, aiSpeak, startListening, addTranscriptEntry]);
+  }, [session, aiSpeak, startListening, addTranscriptEntry]);
 
   const buildConfidenceMetrics = useCallback(() => {
     const metrics = answerMetricsRef.current;
@@ -933,6 +1140,96 @@ export default function InterviewRoom() {
       },
     };
   }, []);
+
+  // ─── End Interview Handler ──────────────────────────────────
+  // Immediately stops voice/recording, exits fullscreen, saves completion, and displays report
+  const handleEndInterview = useCallback(async () => {
+    stopListening();
+    stopAllSpeech();
+    cleanupMediaStream();
+
+    if (document.fullscreenElement) {
+      try {
+        await document.exitFullscreen();
+        setIsFullscreen(false);
+      } catch (err) {
+        console.error('Failed to exit fullscreen on end:', err);
+      }
+    }
+
+    setIsAnalyzing(true);
+    setProcessingLabel('Completing interview and compiling report…');
+
+    try {
+      let submittedAnswer = answerText.trim();
+      if (showCodeWorkspace && codeValue.trim()) {
+        submittedAnswer += `\n\n[Submitted Code (${codeLanguage})]:\n\`\`\`${codeLanguage}\n${codeValue}\n\`\`\``;
+      }
+
+      // Submit current answer if any (ensure we don't save repeat or skip requests as answers)
+      if (
+        currentQuestion &&
+        answerText.trim() &&
+        !isRepeatRequest(answerText) &&
+        !isSkipOrUnknownRequest(answerText)
+      ) {
+        await apiClient.post(`/interview/session/${id}/answer`, {
+          questionId: currentQuestion.id,
+          answerText: submittedAnswer,
+          timeTaken: 30,
+        });
+      }
+
+      // Complete session
+      const confidenceMetrics = buildConfidenceMetrics();
+      const gaze = proctorDataRef.current.gazeScores;
+      const eyeContactScore = gaze.length
+        ? Math.round(gaze.reduce((a, b) => a + b, 0) / gaze.length)
+        : (videoMLMetrics?.eyeContactScore != null ? Math.round(videoMLMetrics.eyeContactScore) : null);
+      const tabBlurCount = proctorDataRef.current.tabBlurCount;
+      const presenceScore = eyeContactScore != null
+        ? Math.max(0, Math.min(100, 100 - tabBlurCount * 8 - (eyeContactScore < 50 ? 15 : 0)))
+        : null;
+      const overallConf = videoMLMetrics?.confidenceScore != null
+        ? Math.round((confidenceMetrics.score + videoMLMetrics.confidenceScore) / 2)
+        : confidenceMetrics.score;
+
+      await apiClient.post(`/interview/session/${id}/complete`, {
+        confidenceMetrics: {
+          ...confidenceMetrics,
+          score: overallConf,
+          videoConfidence: videoMLMetrics?.confidenceScore ?? null,
+          composureLevel: videoMLMetrics?.composureLevel ?? null,
+          postureStatus: videoMLMetrics?.postureStatus ?? null,
+        },
+        proctoring: {
+          eyeContactScore,
+          presenceScore,
+          tabBlurCount,
+          zeroRecordingActive: true,
+        },
+      });
+
+      navigate(`/interview/${id}/analysis`);
+    } catch (err) {
+      console.error('Failed to end interview:', err);
+      navigate(`/interview/${id}/analysis`);
+    }
+  }, [
+    id,
+    currentQuestion,
+    answerText,
+    navigate,
+    stopListening,
+    buildConfidenceMetrics,
+    cleanupMediaStream,
+    showCodeWorkspace,
+    codeValue,
+    codeLanguage,
+    isRepeatRequest,
+    isSkipOrUnknownRequest,
+    videoMLMetrics,
+  ]);
 
   // ─── Submit Answer ────────────────────────────────────────
 
@@ -998,6 +1295,7 @@ export default function InterviewRoom() {
               "That wraps up our interview. You've done well to make it through all the questions. Let me analyze your performance — I'll have your detailed report ready in just a moment."
             );
 
+            stopAllSpeech();
             setIsAnalyzing(true);
             cleanupMediaStream();
 
@@ -1014,23 +1312,25 @@ export default function InterviewRoom() {
             const gaze = proctorDataRef.current.gazeScores;
             const eyeContactScore = gaze.length
               ? Math.round(gaze.reduce((a, b) => a + b, 0) / gaze.length)
-              : 70;
+              : (videoMLMetrics?.eyeContactScore != null ? Math.round(videoMLMetrics.eyeContactScore) : null);
             const tabBlurCount = proctorDataRef.current.tabBlurCount;
-            const presenceScore = Math.max(
-              0,
-              Math.min(100, 100 - tabBlurCount * 8 - (eyeContactScore < 50 ? 15 : 0)),
-            );
+            const presenceScore = eyeContactScore != null
+              ? Math.max(0, Math.min(100, 100 - tabBlurCount * 8 - (eyeContactScore < 50 ? 15 : 0)))
+              : null;
+            const overallConf = videoMLMetrics?.confidenceScore != null
+              ? Math.round((confidenceMetrics.score + videoMLMetrics.confidenceScore) / 2)
+              : confidenceMetrics.score;
 
             await apiClient.post(`/interview/session/${id}/complete`, {
               confidenceMetrics: {
                 ...confidenceMetrics,
-                score: Math.round((confidenceMetrics.score + (videoMLMetrics?.confidenceScore ?? 88)) / 2),
-                videoConfidence: videoMLMetrics?.confidenceScore ?? 88,
-                composureLevel: videoMLMetrics?.composureLevel ?? 'Calm & Composed',
-                postureStatus: videoMLMetrics?.postureStatus ?? 'Optimal',
+                score: overallConf,
+                videoConfidence: videoMLMetrics?.confidenceScore ?? null,
+                composureLevel: videoMLMetrics?.composureLevel ?? null,
+                postureStatus: videoMLMetrics?.postureStatus ?? null,
               },
               proctoring: {
-                eyeContactScore: Math.round((eyeContactScore + (videoMLMetrics?.eyeContactScore ?? 85)) / 2),
+                eyeContactScore,
                 presenceScore,
                 tabBlurCount,
                 zeroRecordingActive: true,
@@ -1038,6 +1338,7 @@ export default function InterviewRoom() {
             });
 
             setTimeout(() => {
+              stopAllSpeech();
               navigate(`/interview/${id}/analysis`);
             }, 4000);
           } else {
@@ -1078,7 +1379,10 @@ export default function InterviewRoom() {
       addTranscriptEntry('user', answer);
       setIsProcessing(true);
       setAvatarState('thinking');
-      setProcessingLabel('Analyzing your answer in depth…');
+      setProcessingLabel('Ava is considering your response…');
+
+      // Human interviewer contemplation pause (1.2s thoughtful reflection)
+      await new Promise((resolve) => setTimeout(resolve, 1200));
 
       let rawAnswerText = answer.trim();
       if (isFollowUpMode) {
@@ -1091,142 +1395,64 @@ export default function InterviewRoom() {
       }
 
       try {
-        const answerRes = await apiClient.post(`/interview/session/${id}/answer`, {
+        // Initialize interview context if missing
+        if (!interviewContextRef.current && session) {
+          interviewContextRef.current = createInterviewContext({
+            targetRole: session.targetRole || 'Software Engineer',
+            targetCompany: session.targetCompany,
+            experienceLevel: session.experienceLevel || 'Fresher',
+            focusAreas: session.focusAreas || ['Technical Knowledge', 'Architecture'],
+          });
+        }
+
+        // Generate next dynamic question based on candidate answer & extracted claims
+        const { question: nextDynamicQuestion, isClosing } = interviewContextRef.current
+          ? generateNextDynamicQuestion(interviewContextRef.current, submittedAnswer)
+          : { question: 'What technical trade-offs would you weigh for that system?', isClosing: false };
+
+        // Asynchronously sync answer to backend
+        apiClient.post(`/interview/session/${id}/answer`, {
           questionId: activeQ.id,
           answerText: submittedAnswer,
           timeTaken: Math.max(5, Math.floor((Date.now() - (questionStartRef.current || Date.now())) / 1000)),
-        });
+        }).catch((err) => console.warn('Background answer post failed:', err));
 
-        const evaluation = answerRes.data?.evaluation;
-
-        // If Ava requests a follow up and we are not already in follow-up mode,
-        // intercept and ask for elaboration.
-        if (evaluation?.needsFollowUp && !isFollowUpMode) {
-          setIsFollowUpMode(true);
-          lastAnswerTextRef.current = rawAnswerText;
-          setIsProcessing(false);
-          setProcessingLabel('');
-          setAnswerText('');
-          const followUpBridge = evaluation.followUpReason || evaluation.spokenResponse || "Could you go into a bit more detail about that?";
-          await aiSpeak(followUpBridge);
-          startListening();
+        if (isClosing) {
+          setAvatarState('pleased');
+          await aiSpeak(nextDynamicQuestion);
+          stopAllSpeech();
+          handleEndInterview();
           return;
         }
 
-        // If we were in follow-up mode or no follow-up needed, reset follow-up states
-        setIsFollowUpMode(false);
-        lastAnswerTextRef.current = '';
+        const nextQ: QuestionData = {
+          id: `q_${Date.now()}`,
+          orderIndex: (activeQ.orderIndex || 0) + 1,
+          questionText: nextDynamicQuestion,
+          questionType: 'TECHNICAL',
+          difficulty: 'MEDIUM',
+        };
+        setCurrentQuestion(nextQ);
+        setInterviewerPrompt(nextDynamicQuestion);
+        setAnswerText('');
+        setIsProcessing(false);
+        setProcessingLabel('');
 
-        if (evaluation?.score != null) {
-          setProcessingLabel(`Score ${evaluation.score}/100 — preparing next question…`);
+        if (showCodeWorkspace) {
+          setCodeValue(getLanguageBoilerplate(codeLanguage));
+          setConsoleOutput('');
         }
 
-        setProcessingLabel('Ava is choosing the right follow-up or next topic…');
-        const nextRes = await apiClient.get(`/interview/session/${id}/next`);
-
-        if (nextRes.data?.isComplete) {
-          // Complete the session
-          setAvatarState('pleased');
-          await aiSpeak(
-            "That wraps up our interview. You've done well to make it through all the questions. Let me analyze your performance — I'll have your detailed report ready in just a moment."
-          );
-
-          setIsAnalyzing(true);
-          cleanupMediaStream();
-
-          if (document.fullscreenElement) {
-            try {
-              await document.exitFullscreen();
-              setIsFullscreen(false);
-            } catch (err) {
-              console.error('Failed to exit fullscreen on automatic complete:', err);
-            }
-          }
-
-          const confidenceMetrics = buildConfidenceMetrics();
-          const gaze = proctorDataRef.current.gazeScores;
-          const eyeContactScore = gaze.length
-            ? Math.round(gaze.reduce((a, b) => a + b, 0) / gaze.length)
-            : 70;
-          const tabBlurCount = proctorDataRef.current.tabBlurCount;
-          const presenceScore = Math.max(
-            0,
-            Math.min(100, 100 - tabBlurCount * 8 - (eyeContactScore < 50 ? 15 : 0)),
-          );
-
-          await apiClient.post(`/interview/session/${id}/complete`, {
-            confidenceMetrics: {
-              ...confidenceMetrics,
-              score: Math.round((confidenceMetrics.score + (videoMLMetrics?.confidenceScore ?? 88)) / 2),
-              videoConfidence: videoMLMetrics?.confidenceScore ?? 88,
-              composureLevel: videoMLMetrics?.composureLevel ?? 'Calm & Composed',
-              postureStatus: videoMLMetrics?.postureStatus ?? 'Optimal',
-            },
-            proctoring: {
-              eyeContactScore: Math.round((eyeContactScore + (videoMLMetrics?.eyeContactScore ?? 85)) / 2),
-              presenceScore,
-              tabBlurCount,
-              zeroRecordingActive: true,
-            },
-          });
-          
-          setTimeout(() => {
-            navigate(`/interview/${id}/analysis`);
-          }, 4000);
-        } else {
-          // Ask next question
-          const nextQ = nextRes.data?.question || nextRes.data;
-          setCurrentQuestion(nextQ);
-          setAnswerText('');
-          setIsProcessing(false);
-          setProcessingLabel('');
-
-          if (showCodeWorkspace) {
-            setCodeValue(getLanguageBoilerplate(codeLanguage));
-            setConsoleOutput('');
-          }
-
-          let bridge = '';
-          if (evaluation?.isSkip) {
-            const skipBridges = [
-              "That's completely fine, no worries at all. Let's move on to our next area. ",
-              "Understood, perfectly okay! Let's explore another aspect of your technical experience. ",
-              "No problem at all. Honesty is valued in engineering. Let's tackle the next question. ",
-            ];
-            bridge = skipBridges[Math.floor(Math.random() * skipBridges.length)];
-          } else if (evaluation?.score != null && evaluation.score >= 78) {
-            const strongBridges = [
-              "Great explanation. That aligns well with standard production architectures. ",
-              "Solid breakdown of the trade-offs and approach. Building on that, ",
-              "Nice breakdown. I like how you structured that solution. Moving to our next topic, ",
-            ];
-            bridge = strongBridges[Math.floor(Math.random() * strongBridges.length)];
-          } else if (evaluation?.score != null && evaluation.score >= 50) {
-            const moderateBridges = [
-              "Understood. Thanks for sharing your thought process on that. ",
-              "Got it. That covers the primary mechanics. Let's explore the next question. ",
-              "Interesting perspective. Let's see how you approach this next problem. ",
-            ];
-            bridge = moderateBridges[Math.floor(Math.random() * moderateBridges.length)];
-          } else if (evaluation?.score != null) {
-            const learningBridges = [
-              "Thanks for walking through that. Let's transition to our next question. ",
-              "Understood. Let's explore another area of your engineering background. ",
-            ];
-            bridge = learningBridges[Math.floor(Math.random() * learningBridges.length)];
-          }
-
-          if (bridge) await aiSpeak(bridge);
-          await aiSpeak(nextQ.questionText);
-          startListening();
-        }
+        // Ava delivers the dynamic follow-up inquiry directly with lip-sync
+        await aiSpeak(nextDynamicQuestion);
+        startListening();
       } catch (err) {
         console.error('Failed to submit answer:', err);
         setIsProcessing(false);
         setProcessingLabel('');
         setAvatarState('concerned');
         await aiSpeak(
-          "I encountered an issue processing your response. Could you please try answering again?"
+          "Could you expand a little further on how you implemented that?"
         );
         startListening();
       }
@@ -1251,6 +1477,7 @@ export default function InterviewRoom() {
       clearSilenceTimers,
       isFollowUpMode,
       videoMLMetrics,
+      handleEndInterview,
     ]
   );
 
@@ -1422,97 +1649,6 @@ export default function InterviewRoom() {
     }
   }, [mediaStream]);
 
-  const handleEndInterview = useCallback(() => {
-    cleanupMediaStream();
-    setShowEndConfirmation(true);
-  }, [cleanupMediaStream]);
-
-  const confirmEndInterview = useCallback(async () => {
-    stopListening();
-    window.speechSynthesis.cancel();
-    setIsAnalyzing(true);
-    cleanupMediaStream();
-
-    if (document.fullscreenElement) {
-      try {
-        await document.exitFullscreen();
-        setIsFullscreen(false);
-      } catch (err) {
-        console.error('Failed to exit fullscreen on end:', err);
-      }
-    }
-
-    try {
-      let submittedAnswer = answerText.trim();
-      if (showCodeWorkspace && codeValue.trim()) {
-        submittedAnswer += `\n\n[Submitted Code (${codeLanguage})]:\n\`\`\`${codeLanguage}\n${codeValue}\n\`\`\``;
-      }
-
-      // Submit current answer if any (ensure we don't save repeat or skip requests as answers)
-      if (
-        currentQuestion &&
-        answerText.trim() &&
-        !isRepeatRequest(answerText) &&
-        !isSkipOrUnknownRequest(answerText)
-      ) {
-        await apiClient.post(`/interview/session/${id}/answer`, {
-          questionId: currentQuestion.id,
-          answerText: submittedAnswer,
-          timeTaken: 30,
-        });
-      }
-
-      // Complete session
-      const confidenceMetrics = buildConfidenceMetrics();
-      const gaze = proctorDataRef.current.gazeScores;
-      const eyeContactScore = gaze.length
-        ? Math.round(gaze.reduce((a, b) => a + b, 0) / gaze.length)
-        : 70;
-      const tabBlurCount = proctorDataRef.current.tabBlurCount;
-      const presenceScore = Math.max(
-        0,
-        Math.min(100, 100 - tabBlurCount * 8 - (eyeContactScore < 50 ? 15 : 0)),
-      );
-
-      await apiClient.post(`/interview/session/${id}/complete`, {
-        confidenceMetrics: {
-          ...confidenceMetrics,
-          score: Math.round((confidenceMetrics.score + (videoMLMetrics?.confidenceScore ?? 88)) / 2),
-          videoConfidence: videoMLMetrics?.confidenceScore ?? 88,
-          composureLevel: videoMLMetrics?.composureLevel ?? 'Calm & Composed',
-          postureStatus: videoMLMetrics?.postureStatus ?? 'Optimal',
-        },
-        proctoring: {
-          eyeContactScore: Math.round((eyeContactScore + (videoMLMetrics?.eyeContactScore ?? 85)) / 2),
-          presenceScore,
-          tabBlurCount,
-          zeroRecordingActive: true,
-        },
-      });
-      
-      setTimeout(() => {
-        navigate(`/interview/${id}/analysis`);
-      }, 4000);
-    } catch (err) {
-      console.error('Failed to end interview:', err);
-      navigate(`/interview/${id}/analysis`);
-    }
-  }, [
-    id,
-    currentQuestion,
-    answerText,
-    navigate,
-    stopListening,
-    buildConfidenceMetrics,
-    cleanupMediaStream,
-    showCodeWorkspace,
-    codeValue,
-    codeLanguage,
-    isRepeatRequest,
-    isSkipOrUnknownRequest,
-    videoMLMetrics,
-  ]);
-
   const handleRepeatQuestionCallback = useCallback(async () => {
     if (currentQuestion) {
       stopListening();
@@ -1535,22 +1671,22 @@ export default function InterviewRoom() {
 
   if (loadError) {
     return (
-      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#EFFAFD] px-6">
-        <div className="max-w-md text-center space-y-4 bg-white p-8 rounded-3xl border border-[#DCE7F2] shadow-sm">
-          <h2 className="font-display text-2xl font-bold text-[#11183D]">Could not start interview</h2>
-          <p className="text-sm text-[#526078]">{loadError}</p>
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#EFFAFD] dark:bg-[#000000] px-6">
+        <div className="max-w-md text-center space-y-4 bg-white dark:bg-[#1A1A1A] p-8 rounded-3xl border border-[#DCE7F2] dark:border-[#262626] shadow-sm">
+          <h2 className="font-display text-2xl font-bold text-[#11183D] dark:text-[#FFFFFF]">Could not start interview</h2>
+          <p className="text-sm text-[#526078] dark:text-[#A8A8A8]">{loadError}</p>
           <div className="flex flex-wrap justify-center gap-3 pt-2">
             <button
               type="button"
               onClick={() => navigate('/interview/setup')}
-              className="rounded-xl bg-[#4A8BDF] hover:bg-[#2459A8] px-5 py-2.5 text-sm font-semibold text-white transition-all cursor-pointer font-display"
+              className="rounded-xl bg-[#4A8BDF] hover:bg-[#2459A8] dark:bg-white dark:hover:bg-[#EBEBF5] dark:text-black px-5 py-2.5 text-sm font-semibold text-white transition-all cursor-pointer font-display"
             >
               Back to setup
             </button>
             <button
               type="button"
               onClick={() => navigate('/login')}
-              className="rounded-xl border border-[#DCE7F2] px-5 py-2.5 text-sm font-semibold text-[#526078] hover:bg-[#EFFAFD] transition-all cursor-pointer font-display"
+              className="rounded-xl border border-[#DCE7F2] dark:border-[#262626] px-5 py-2.5 text-sm font-semibold text-[#526078] dark:text-[#A8A8A8] hover:bg-[#EFFAFD] dark:hover:bg-[#262626] transition-all cursor-pointer font-display"
             >
               Log in again
             </button>
@@ -1562,7 +1698,7 @@ export default function InterviewRoom() {
 
   if (isLoading) {
     return (
-      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#EFFAFD]">
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#EFFAFD] dark:bg-[#000000]">
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -1586,10 +1722,10 @@ export default function InterviewRoom() {
           </motion.div>
 
           <div className="space-y-2">
-            <h2 className="font-display text-2xl font-bold text-[#11183D]">
+            <h2 className="font-display text-2xl font-bold text-[#11183D] dark:text-[#FFFFFF]">
               Preparing your interview
             </h2>
-            <p className="text-sm text-[#526078]">
+            <p className="text-sm text-[#526078] dark:text-[#A8A8A8]">
               {loadingMessage}
             </p>
           </div>
@@ -1625,59 +1761,11 @@ export default function InterviewRoom() {
     );
   }
 
-
-
-  if (isDisqualified) {
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950 text-white p-6 overflow-hidden">
-        <div className="max-w-lg w-full bg-slate-900 border border-rose-500/50 rounded-3xl p-8 shadow-2xl space-y-6 text-center">
-          <div className="h-20 w-20 mx-auto rounded-3xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-500 animate-pulse">
-            <ShieldAlert size={40} />
-          </div>
-          <div>
-            <span className="text-[10px] font-mono uppercase tracking-widest text-rose-400 font-bold bg-rose-950/60 border border-rose-800/60 px-3 py-1 rounded-full">
-              Integrity Violation Detected
-            </span>
-            <h1 className="text-2xl font-black font-display text-white mt-3">
-              Interview Terminated & Submitted
-            </h1>
-            <p className="text-xs text-slate-300 mt-2.5 leading-relaxed font-body">
-              {disqualificationReason || "A virtual desktop switch, tab switch, or full-screen exit was detected during your live proctored session. Your exam has been automatically terminated and submitted as a cheating violation."}
-            </p>
-          </div>
-
-          <div className="p-4 rounded-2xl bg-rose-950/40 border border-rose-800/40 text-left text-xs space-y-2 text-rose-200">
-            <div className="flex items-center justify-between font-mono text-[11px]">
-              <span>Status:</span>
-              <span className="font-bold text-rose-400">DISQUALIFIED</span>
-            </div>
-            <div className="flex items-center justify-between font-mono text-[11px]">
-              <span>Integrity Score:</span>
-              <span className="font-bold text-rose-400">0 / 100</span>
-            </div>
-            <div className="flex items-center justify-between font-mono text-[11px]">
-              <span>Record:</span>
-              <span className="font-bold text-rose-400">Flagged in Audit Log</span>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => navigate(`/interview/${id}/analysis`)}
-            className="w-full py-3.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-2xl transition-all shadow-lg cursor-pointer flex items-center justify-center gap-2 font-display"
-          >
-            <span>View Integrity Report →</span>
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   // ─── Main Render ──────────────────────────────────────────
 
   if (isAnalyzing) {
     return (
-      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#EFFAFD] text-[#11183D] p-6 overflow-hidden">
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#EFFAFD] dark:bg-[#000000] text-[#11183D] dark:text-[#FFFFFF] p-6 overflow-hidden">
         {/* Soft background glows */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[500px] rounded-full bg-[#4A8BDF]/10 blur-[140px]" />
@@ -1687,7 +1775,7 @@ export default function InterviewRoom() {
         <motion.div
           initial={{ scale: 0.95, opacity: 0, y: 15 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
-          className="max-w-md w-full bg-white border border-[#DCE7F2] p-8 rounded-3xl shadow-xl space-y-8 relative overflow-hidden"
+          className="max-w-md w-full bg-white dark:bg-[#1A1A1A] border border-[#DCE7F2] dark:border-[#262626] p-8 rounded-3xl shadow-xl space-y-8 relative overflow-hidden"
         >
           <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#4A8BDF] to-[#A0006D]" />
           
@@ -1697,18 +1785,18 @@ export default function InterviewRoom() {
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }}
-                className="absolute inset-0 rounded-full border-2 border-dashed border-[#DCE7F2]"
+                className="absolute inset-0 rounded-full border-2 border-dashed border-[#DCE7F2] dark:border-[#303030]"
               />
               <motion.div
                 animate={{ scale: [1, 1.15, 1], opacity: [0.4, 0.8, 0.4] }}
                 transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                className="h-14 w-14 rounded-full bg-[#F8EAF4] flex items-center justify-center text-[#A0006D]"
+                className="h-14 w-14 rounded-full bg-[#F8EAF4] dark:bg-[#262626] flex items-center justify-center text-[#A0006D] dark:text-[#BF5AF2]"
               >
                 <Sparkles size={24} />
               </motion.div>
             </div>
-            <h2 className="text-2xl font-black font-display tracking-tight text-[#11183D]">Analyzing Your Responses</h2>
-            <p className="text-xs text-[#526078] font-body">Ava is compiling your high-fidelity mock interview report...</p>
+            <h2 className="text-2xl font-black font-display tracking-tight text-[#11183D] dark:text-[#FFFFFF]">Analyzing Your Responses</h2>
+            <p className="text-xs text-[#526078] dark:text-[#A8A8A8] font-body">Ava is compiling your high-fidelity mock interview report...</p>
           </div>
 
           {/* Checklist */}
@@ -1760,7 +1848,7 @@ export default function InterviewRoom() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex h-[100dvh] flex-col bg-[#EFFAFD] overflow-hidden">
+    <div className="fixed inset-0 z-50 flex h-[100dvh] flex-col bg-white dark:bg-black overflow-hidden transition-colors">
       {/* RENDER THE MINIMAL 2-PANEL ORAL INTERVIEW ROOM MATCHING REFERENCE */}
       <NormalInterviewRoom
         mediaStream={mediaStream}
@@ -1769,7 +1857,7 @@ export default function InterviewRoom() {
         mouthOpenness={mouthOpenness}
         spokenWord={spokenWord}
         activeVisemeShape={activeViseme}
-        currentQuestionText={currentQuestion?.questionText || ''}
+        currentQuestionText={interviewerPrompt || currentQuestion?.questionText || 'Preparing technical question...'}
         candidateTranscription={answerText}
         onSubmitAnswer={submitAnswer}
         onEndInterview={handleEndInterview}
@@ -1778,7 +1866,7 @@ export default function InterviewRoom() {
         questionIndex={(currentQuestion?.orderIndex ?? 0) + 1}
         totalQuestions={session?.questions?.length || 5}
         questionDifficulty={currentQuestion?.difficulty || 'Medium'}
-        focusArea={session?.targetRole || 'Technical & STAR Drill'}
+        focusArea={session?.targetRole || 'Software Engineer'}
         silenceCountdown={silenceCountdown}
         isFullscreen={isFullscreen}
         onReEnterFullscreen={toggleFullScreen}
@@ -1787,163 +1875,15 @@ export default function InterviewRoom() {
           latestAnswerRef.current = val;
         }}
         videoMLMetrics={videoMLMetrics}
+        isFollowUpMode={isFollowUpMode}
+        isMicOn={isMicOn}
+        isCameraOn={isCameraOn}
+        onToggleMic={handleToggleMic}
+        onToggleCamera={handleToggleCamera}
+        onRepeatQuestion={handleRepeatQuestionCallback}
+        onRequestClarification={handleRequestClarificationCallback}
+        onSkipQuestion={() => submitAnswer('I would like to pass on this question and move to the next topic.', true)}
       />
-
-
-
-
-
-      {/* Custom End Interview Confirmation Modal */}
-      <AnimatePresence>
-        {showEndConfirmation && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 backdrop-blur-md p-4"
-          >
-            <motion.div
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
-              className="max-w-md w-full rounded-3xl border border-red-500/20 bg-[#121214] p-6 text-center shadow-2xl relative overflow-hidden"
-            >
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 to-orange-500" />
-              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-500/10 text-red-500">
-                <AlertCircle size={24} />
-              </div>
-              <h3 className="text-xl font-bold font-display text-white mb-2">
-                Should we end this meet?
-              </h3>
-              <p className="text-sm text-white/60 font-body mb-6">
-                Are you sure you want to end this meet? Your progress will be saved and Ava will begin analyzing your responses.
-              </p>
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={async () => {
-                    setShowEndConfirmation(false);
-                    try {
-                      const stream = await navigator.mediaDevices.getUserMedia({
-                        video: { width: 640, height: 480, facingMode: 'user' },
-                        audio: true,
-                      });
-                      setMediaStream(stream);
-                      setIsCameraOn(true);
-                      setIsMicOn(true);
-                    } catch (err) {
-                      console.error('Failed to re-acquire media stream on cancel:', err);
-                    }
-                  }}
-                  className="flex-1 rounded-xl border border-white/10 px-4 py-3 text-sm font-semibold text-white/80 hover:bg-white/5 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowEndConfirmation(false);
-                    confirmEndInterview();
-                  }}
-                  className="flex-1 rounded-xl bg-gradient-to-r from-red-500 to-orange-500 px-4 py-3 text-sm font-bold text-white shadow-lg hover:brightness-105 active:scale-[0.98] transition-all"
-                >
-                  Yes, End Meet
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Full Screen Premium Analyzing Card */}
-      <AnimatePresence>
-        {isAnalyzing && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[110] flex flex-col items-center justify-center bg-[#F8FAFC] text-slate-800 p-6"
-          >
-            {/* Soft background glows */}
-            <div className="absolute inset-0 pointer-events-none overflow-hidden">
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[500px] rounded-full bg-[#F5A623]/5 blur-[140px]" />
-              <div className="absolute bottom-10 right-10 h-[300px] w-[300px] rounded-full bg-emerald-500/5 blur-[120px]" />
-            </div>
-
-            <motion.div
-              initial={{ scale: 0.95, y: 15 }}
-              animate={{ scale: 1, y: 0 }}
-              className="max-w-md w-full bg-white border border-slate-200/80 p-8 rounded-3xl shadow-xl space-y-8 relative overflow-hidden"
-            >
-              <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#F5A623] to-[#E85D24]" />
-              
-              <div className="text-center space-y-3">
-                <div className="relative mx-auto h-20 w-20 flex items-center justify-center">
-                  {/* Spinning radar rings */}
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }}
-                    className="absolute inset-0 rounded-full border-2 border-dashed border-slate-200"
-                  />
-                  <motion.div
-                    animate={{ scale: [1, 1.15, 1], opacity: [0.4, 0.8, 0.4] }}
-                    transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                    className="h-14 w-14 rounded-full bg-[#F5A623]/10 flex items-center justify-center text-[#F5A623]"
-                  >
-                    <Sparkles size={24} />
-                  </motion.div>
-                </div>
-                <h2 className="text-2xl font-black font-display tracking-tight text-slate-800">Analyzing Your Responses</h2>
-                <p className="text-xs text-slate-500">Ava is compiling your high-fidelity mock interview report...</p>
-              </div>
-
-              {/* Checklist */}
-              <div className="space-y-4">
-                {[
-                  "Enhancing speech-to-text transcript accuracy...",
-                  "Evaluating subject-matter technical depth...",
-                  "Scoring communication clarity and structure...",
-                  "Assessing presence and eye-contact metrics...",
-                  "Compiling personalized tips and resources..."
-                ].map((text, idx) => {
-                  const isDone = analysisStep > idx;
-                  const isActive = analysisStep === idx;
-                  
-                  return (
-                    <div
-                      key={idx}
-                      className={`flex items-center gap-3.5 p-3 rounded-xl border transition-all ${
-                        isDone 
-                          ? 'border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold'
-                          : isActive
-                            ? 'border-amber-200 bg-amber-50 text-amber-700 font-semibold shadow-sm'
-                            : 'border-slate-100 bg-slate-50/50 text-slate-400'
-                      }`}
-                    >
-                      {isDone ? (
-                        <CheckCircle2 size={16} className="text-emerald-650 flex-shrink-0" />
-                      ) : isActive ? (
-                        <motion.div
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                          className="h-4 w-4 rounded-full border-2 border-transparent border-t-[#F5A623] flex-shrink-0"
-                        />
-                      ) : (
-                        <div className="h-4 w-4 rounded-full border border-slate-200 flex-shrink-0" />
-                      )}
-                      <span className="text-xs font-body leading-none">{text}</span>
-                    </div>
-                  );
-                })}
-              </div>
-
-              <p className="text-[10px] text-center text-slate-400 font-body">
-                Camera and audio streams deactivated. Compilation phase active.
-              </p>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

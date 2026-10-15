@@ -96,8 +96,8 @@ export function synthesizeSessionAnalysis(session: any): Analysis {
 
   const answeredQuestions = questions.filter((q) => q.answerText && q.answerText.trim().length > 0);
   
-  // 1. Core Dimension Scores
-  let technicalScore = 76;
+  // 1. Core Dimension Scores (strictly derived from candidate answers)
+  let technicalScore = 0;
   if (answeredQuestions.length > 0) {
     const scoredQuestions = answeredQuestions.filter((q) => typeof q.evalScore === 'number');
     if (scoredQuestions.length > 0) {
@@ -122,24 +122,37 @@ export function synthesizeSessionAnalysis(session: any): Analysis {
 
   const fillerPenalty = Math.min(30, fillerCount * 3);
   const avgWordsPerQ = answeredQuestions.length > 0 ? totalWords / answeredQuestions.length : 0;
-  const lengthScore = Math.min(100, Math.max(40, avgWordsPerQ * 1.6));
+  const lengthScore = Math.min(100, Math.max(0, avgWordsPerQ * 1.6));
   const communicationScore = answeredQuestions.length > 0
-    ? Math.max(30, Math.min(100, Math.round(lengthScore * 0.65 + (100 - fillerPenalty) * 0.35)))
-    : 75;
+    ? Math.max(0, Math.min(100, Math.round(lengthScore * 0.65 + (100 - fillerPenalty) * 0.35)))
+    : 0;
 
-  const problemSolvingScore = Math.max(30, Math.min(100, Math.round(technicalScore * 0.95 + 2)));
-  const depthScore = Math.max(30, Math.min(100, Math.round(Math.min(95, (avgWordsPerQ / 45) * 80 + 15))));
-  const relevanceScore = Math.max(50, Math.min(100, Math.round(88 - (questions.length - answeredQuestions.length) * 8)));
+  const problemSolvingScore = answeredQuestions.length > 0
+    ? Math.max(0, Math.min(100, Math.round(technicalScore * 0.95 + 2)))
+    : 0;
+  const depthScore = answeredQuestions.length > 0
+    ? Math.max(0, Math.min(100, Math.round(Math.min(95, (avgWordsPerQ / 45) * 80 + 15))))
+    : 0;
+  const relevanceScore = answeredQuestions.length > 0
+    ? Math.round(answeredQuestions.reduce((acc, q) => acc + (typeof q.evalScore === 'number' ? q.evalScore : 70), 0) / answeredQuestions.length)
+    : 0;
 
-  // Proctoring & Confidence
-  const eyeContactScore = session.proctoring?.eyeContactScore ?? (session.isDisqualified ? 0 : 85);
+  // Proctoring & Confidence (Never assume camera scores)
+  const eyeContactScore = session.proctoring?.eyeContactScore != null ? Number(session.proctoring.eyeContactScore) : null;
+  const presenceScore = session.proctoring?.presenceScore != null ? Number(session.proctoring.presenceScore) : null;
   const tabBlurCount = session.proctoring?.tabBlurCount ?? 0;
   const confidenceScore = session.isDisqualified
     ? 0
-    : Math.max(30, Math.min(100, 100 - tabBlurCount * 12 - (eyeContactScore < 75 ? 12 : 0)));
+    : session.confidenceMetrics?.score != null
+    ? Math.max(0, Math.min(100, Number(session.confidenceMetrics.score)))
+    : Math.max(0, Math.min(100, 100 - tabBlurCount * 12 - (eyeContactScore != null && eyeContactScore < 75 ? 12 : 0)));
 
-  const structureScore = Math.max(30, Math.min(100, Math.round(technicalScore * 0.45 + communicationScore * 0.35 + depthScore * 0.20)));
-  const industryReadinessScore = Math.max(30, Math.min(100, Math.round(technicalScore * 0.40 + communicationScore * 0.30 + structureScore * 0.30)));
+  const structureScore = answeredQuestions.length > 0
+    ? Math.max(0, Math.min(100, Math.round(technicalScore * 0.45 + communicationScore * 0.35 + depthScore * 0.20)))
+    : 0;
+  const industryReadinessScore = answeredQuestions.length > 0
+    ? Math.max(0, Math.min(100, Math.round(technicalScore * 0.40 + communicationScore * 0.30 + structureScore * 0.30)))
+    : 0;
   
   const overallScore = Math.max(
     30,
@@ -366,8 +379,8 @@ export function synthesizeSessionAnalysis(session: any): Analysis {
       avgPauseCount: fillerCount,
       avgAnswerLength: Math.round(avgWordsPerQ),
     },
-    eyeContactScore,
-    presenceScore: confidenceScore,
+    eyeContactScore: eyeContactScore ?? undefined,
+    presenceScore: presenceScore ?? undefined,
     summary: `Candidate completed interview evaluation for ${role} at ${company}. Technical proficiency scored at ${technicalScore}/100, verbal clarity at ${communicationScore}/100, and proctoring composure at ${confidenceScore}/100.`,
     strengths,
     improvements,

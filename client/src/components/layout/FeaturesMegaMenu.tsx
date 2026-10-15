@@ -104,11 +104,11 @@ export default function FeaturesMegaMenu({ isOpen, onClose }: FeaturesMegaMenuPr
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 8, scale: 0.98 }}
         transition={{ duration: 0.2, ease: 'easeOut' }}
-        className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-[92vw] max-w-4xl bg-white/98 backdrop-blur-2xl rounded-3xl border border-[#DCE7F2] shadow-2xl shadow-[#11183D]/12 overflow-hidden z-50 pointer-events-auto"
+        className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-[92vw] max-w-4xl bg-white/98 dark:bg-[#1A1A1A]/98 backdrop-blur-2xl rounded-3xl border border-[#DCE7F2] dark:border-[#262626] shadow-2xl shadow-[#11183D]/12 dark:shadow-black/50 overflow-hidden z-50 pointer-events-auto"
       >
         <div className="grid grid-cols-1 md:grid-cols-12 min-h-[380px]">
           {/* Left Sidebar: Categories Navigation */}
-          <div className="md:col-span-4 bg-[#F8FAFC]/90 p-4 border-r border-[#DCE7F2] flex flex-col justify-between">
+          <div className="md:col-span-4 bg-[#F8FAFC]/90 dark:bg-[#1C1C1C] p-4 border-r border-[#DCE7F2] dark:border-[#262626] flex flex-col justify-between">
             <div>
               <div className="px-3 py-2 mb-2">
                 <span className="text-[10px] uppercase font-bold tracking-wider text-[#7E8B9B] font-mono">
@@ -185,7 +185,7 @@ export default function FeaturesMegaMenu({ isOpen, onClose }: FeaturesMegaMenuPr
           </div>
 
           {/* Right Pane: Category Content & Direct Links */}
-          <div className="md:col-span-8 p-6 flex flex-col justify-between bg-white">
+          <div className="md:col-span-8 p-6 flex flex-col justify-between bg-white dark:bg-[#1A1A1A]">
             <div>
               {/* Category 1: AI Interviews */}
               {activeCategory === 'interview' && (
@@ -542,27 +542,6 @@ export default function FeaturesMegaMenu({ isOpen, onClose }: FeaturesMegaMenuPr
                       </h5>
                       <p className="text-[11px] text-[#526078] mt-1">
                         Build and test your resume with 6-pillar ATS quality diagnostics and competitive job matching.
-                      </p>
-                    </Link>
-
-                    <Link
-                      to="/roadmap"
-                      onClick={onClose}
-                      className="p-3.5 rounded-2xl border border-[#DCE7F2] hover:border-violet-500 hover:bg-violet-50/30 transition-all group"
-                    >
-                      <div className="flex items-center justify-between mb-1.5">
-                        <div className="p-2 rounded-xl bg-violet-50 text-violet-600">
-                          <Compass className="w-4 h-4" />
-                        </div>
-                        <span className="text-[10px] font-bold text-violet-600 bg-violet-50 px-2 py-0.5 rounded-full">
-                          Step-by-Step
-                        </span>
-                      </div>
-                      <h5 className="text-xs font-bold text-[#11183D] group-hover:text-violet-600 transition-colors">
-                        Developer Career Roadmaps
-                      </h5>
-                      <p className="text-[11px] text-[#526078] mt-1">
-                        Curated milestones and learning sequences for Frontend, Backend, Fullstack, and AI engineers.
                       </p>
                     </Link>
                   </div>

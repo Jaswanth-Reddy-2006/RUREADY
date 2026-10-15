@@ -68,3 +68,16 @@ model CodeExecutionDelta {
   @@index([sessionId, timestamp])
   @@map("code_execution_deltas")
 }
+
+model UserSolvedProblem {
+  id        String   @id @default(uuid())
+  userId    String
+  problemId String
+  language  String   @default("javascript")
+  passed    Boolean  @default(true)
+  solvedAt  DateTime @default(now())
+
+  @@unique([userId, problemId])
+  @@index([userId])
+  @@map("user_solved_problems")
+}

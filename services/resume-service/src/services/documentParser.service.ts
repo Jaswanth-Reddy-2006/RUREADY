@@ -112,7 +112,7 @@ export const documentParserService = {
     filePath: string,
     originalFilename: string
   ): Promise<ParsedResumeDocument> {
-    const pythonCmd = process.env.PYTHON_PATH || 'python';
+    const pythonCmd = process.env.PYTHON_PATH || (process.platform === 'win32' ? 'py' : 'python');
 
     return new Promise((resolve, reject) => {
       const child = spawn(pythonCmd, [PARSER_SCRIPT_PATH, filePath, originalFilename], {

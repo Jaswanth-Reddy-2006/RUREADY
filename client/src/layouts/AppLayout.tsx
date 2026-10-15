@@ -1,9 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useLocation } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
-import { AnimatePresence, motion } from 'framer-motion';
-import SidebarNav from '../components/SidebarNav';
-import Logo from '../components/ui/Logo';
+import TopNav from '../components/TopNav';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -12,21 +9,53 @@ interface AppLayoutProps {
 export default function AppLayout({ children }: AppLayoutProps) {
   const location = useLocation();
   const path = location.pathname;
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  // Live secure interview room pattern: all video and coding rooms run full-screen with 0 sidebars
+  const isVideoRoom =
+    path.startsWith('/video/') &&
+    !path.startsWith('/video/new') &&
+    !path.startsWith('/video/setup') &&
+    !path.startsWith('/video/history') &&
+    !path.startsWith('/video/catalog') &&
+    !path.startsWith('/video/review') &&
+    !path.startsWith('/video/precheck') &&
+    !path.startsWith('/video/device-check') &&
+    !path.includes('/analysis') &&
+    !path.includes('/complete') &&
+    !path.includes('/replay');
 
-  // Auto-close mobile drawer on route transition
-  useEffect(() => {
-    setMobileMenuOpen(false);
-  }, [path]);
+  const isCodingRoom =
+    path.startsWith('/coding/') &&
+    !path.startsWith('/coding/new') &&
+    !path.startsWith('/coding/setup') &&
+    !path.startsWith('/coding/history') &&
+    !path.includes('/analysis');
 
-  // Live secure interview room pattern: /interview/:id and /interview/coding/:id (excluding setup/new forms)
-  const isSecureInterviewRoom = 
-    /^\/interview\/(coding\/)?[^/]+$/.test(path) && 
-    path !== '/interview/setup' && 
+  const isOralOrLegacyRoom =
+    /^\/interview\/(coding\/)?[^/]+$/.test(path) &&
+    path !== '/interview/setup' &&
     path !== '/interview/new' &&
     path !== '/oral/new' &&
-    path !== '/interview/coding/new' ||
+    path !== '/interview/coding/new' &&
+    path !== '/interview/catalog' &&
+    path !== '/interview/history' &&
+    !path.includes('/analysis');
+
+  const isSecureInterviewRoom =
+    isVideoRoom ||
+    isCodingRoom ||
+    isOralOrLegacyRoom ||
     path.startsWith('/challenges/match/');
+
+  const isSystemDesignStudio =
+    path.startsWith('/system-design/studio/') ||
+    (/^\/system-design\/(room\/)?[^/]+$/.test(path) &&
+      !path.startsWith('/system-design/new') &&
+      !path.startsWith('/system-design/setup') &&
+      !path.startsWith('/system-design/review') &&
+      !path.startsWith('/system-design/precheck') &&
+      !path.startsWith('/system-design/device-check') &&
+      !path.startsWith('/system-design/history') &&
+      !path.includes('/analysis'));
 
   // Public/Auth routes: / (landing page), /login, /register, /about, /contact, /terms, /privacy
   const isPublicRoute =
@@ -49,13 +78,21 @@ export default function AppLayout({ children }: AppLayoutProps) {
     );
   }
 
+  if (isSystemDesignStudio) {
+    return (
+      <div className="w-screen h-screen overflow-hidden bg-white dark:bg-[#000000] text-slate-900 dark:text-slate-100 relative select-none">
+        {children}
+      </div>
+    );
+  }
+
   if (isPublicRoute || isAdminRoute) {
     return <>{children}</>;
   }
 
   // Dashboard platform routes (dashboard, setup/new, history, analytics, settings)
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[#EFFAFD] dark:bg-[#080C1D] text-[#11183D] dark:text-[#F8FAFC] transition-colors">
+    <div className="flex h-screen w-screen overflow-hidden bg-[#EFFAFD] dark:bg-[#000000] text-[#11183D] dark:text-[#FFFFFF] transition-colors">
       
       {/* Skip to Main Content Accessibility Link */}
       <a
@@ -65,66 +102,16 @@ export default function AppLayout({ children }: AppLayoutProps) {
         Skip to main content
       </a>
 
-      {/* Desktop Persistent Sidebar */}
-      <div className="hidden md:block shrink-0">
-        <SidebarNav />
-      </div>
-
-      {/* Mobile Drawer */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <div 
-            className="fixed inset-0 z-50 md:hidden flex"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Mobile Navigation"
-          >
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setMobileMenuOpen(false)}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm"
-              aria-hidden="true"
-            />
-            {/* Drawer */}
-            <motion.div
-              initial={{ x: '-100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '-100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="relative z-10 h-full"
-            >
-              <SidebarNav />
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
       {/* Workspace Main Area */}
-      <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0 bg-[#EFFAFD] dark:bg-[#080C1D]">
-        {/* Mobile top bar with hamburger */}
-        <header className="md:hidden flex items-center justify-between px-4 py-3 bg-white dark:bg-[#11183D] border-b border-[#DCE7F2] dark:border-[#1E293B] text-[#11183D] dark:text-white shrink-0">
-          <div className="flex items-center gap-2">
-            <Logo size="sm" theme="light" />
-          </div>
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 rounded-xl text-[#526078] dark:text-[#94A3B8] hover:text-[#11183D] dark:hover:text-white hover:bg-[#EFFAFD] dark:hover:bg-white/[0.05] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A8BDF]"
-            aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
-            aria-expanded={mobileMenuOpen}
-          >
-            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
-        </header>
+      <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0 bg-[#EFFAFD] dark:bg-[#000000]">
+        <TopNav />
 
         {/* Scrollable workspace content container */}
         <div 
           id="workspace-viewport"
           role="region"
           aria-label="Workspace content view"
-          className="flex-1 h-full overflow-y-auto bg-[#EFFAFD] dark:bg-[#080C1D] text-[#11183D] dark:text-[#F8FAFC] relative focus:outline-none transition-colors"
+          className="flex-1 h-full overflow-y-auto bg-[#EFFAFD] dark:bg-[#000000] text-[#11183D] dark:text-[#FFFFFF] relative focus:outline-none transition-colors"
         >
           {children}
         </div>

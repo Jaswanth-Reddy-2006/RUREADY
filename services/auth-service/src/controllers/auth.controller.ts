@@ -14,6 +14,11 @@ import {
   verifyRefreshToken,
   revokeAllUserRefreshTokens,
   verifyAccessToken,
+  generateAndSendRegistrationOtp,
+  verifyRegistrationOtp,
+  verifyEmailToken,
+  sendForgotPasswordReset,
+  resetPasswordWithToken,
 } from '../services/auth.service.js';
 
 export const registerSchema = z.object({
@@ -36,9 +41,30 @@ export const registerSchema = z.object({
       'Password must contain at least one uppercase letter, one lowercase letter, and one number',
     ),
   confirmPassword: z.string(),
+  verificationToken: z.string().optional(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: 'Passwords do not match',
   path: ['confirmPassword'],
+});
+
+export const sendOtpSchema = z.object({
+  email: z.string().trim().email('Invalid email address').toLowerCase(),
+  name: z.string().trim().optional(),
+});
+
+export const verifyOtpSchema = z.object({
+  email: z.string().trim().email('Invalid email address').toLowerCase(),
+  otp: z.string().trim().length(6, 'Verification code must be 6 digits'),
+});
+
+export const forgotPasswordSchema = z.object({
+  email: z.string().trim().email('Invalid email address').toLowerCase(),
+});
+
+export const resetPasswordSchema = z.object({
+  token: z.string().trim().min(1, 'Reset token is required'),
+  email: z.string().trim().email('Invalid email address').toLowerCase(),
+  newPassword: z.string().min(8, 'Password must be at least 8 characters'),
 });
 
 export const loginSchema = z.object({
@@ -83,9 +109,13 @@ export async function register(req: Request, res: Response, next: NextFunction):
 
     const passwordHash = await hashPassword(password);
 
+    // Validate email verification token if provided from Step 1 OTP verification
+    const verificationToken = (req.body as any).verificationToken;
+    const isEmailVerified = verificationToken ? verifyEmailToken(verificationToken, cleanEmail) : false;
+
     const user = await prisma.user.create({
-      data: { name, email: cleanEmail, passwordHash },
-      select: { id: true, email: true, name: true, createdAt: true, updatedAt: true },
+      data: { name, email: cleanEmail, passwordHash, isEmailVerified },
+      select: { id: true, email: true, name: true, isEmailVerified: true, createdAt: true, updatedAt: true },
     });
 
     const accessToken = generateAccessToken(user.id, user.email);
@@ -102,11 +132,100 @@ export async function register(req: Request, res: Response, next: NextFunction):
         name: user.name,
         role: isUserAdmin ? 'ADMIN' : 'CANDIDATE',
         plan: 'FREE',
+        isEmailVerified: user.isEmailVerified,
         createdAt: user.createdAt.toISOString(),
         updatedAt: user.updatedAt.toISOString(),
       },
       accessToken,
     });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * POST /api/auth/send-registration-otp
+ * Dispatches 6-digit OTP code to user's email via Resend
+ */
+export async function sendRegistrationOtp(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const parsed = sendOtpSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({
+        code: 'VALIDATION_ERROR',
+        message: parsed.error.issues[0]?.message || 'Invalid email address',
+      });
+      return;
+    }
+
+    const result = await generateAndSendRegistrationOtp(parsed.data.email, parsed.data.name);
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * POST /api/auth/verify-registration-otp
+ * Verifies 6-digit OTP and returns signed verification token
+ */
+export async function verifyRegistrationOtpHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const parsed = verifyOtpSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({
+        code: 'VALIDATION_ERROR',
+        message: parsed.error.issues[0]?.message || 'Please enter a valid 6-digit code',
+      });
+      return;
+    }
+
+    const result = await verifyRegistrationOtp(parsed.data.email, parsed.data.otp);
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * POST /api/auth/forgot-password
+ * Initiates password reset link delivery via Resend
+ */
+export async function forgotPassword(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const parsed = forgotPasswordSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({
+        code: 'VALIDATION_ERROR',
+        message: parsed.error.issues[0]?.message || 'Please enter a valid email address',
+      });
+      return;
+    }
+
+    const result = await sendForgotPasswordReset(parsed.data.email);
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * POST /api/auth/reset-password
+ * Resets user password using the verified link token
+ */
+export async function resetPassword(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const parsed = resetPasswordSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({
+        code: 'VALIDATION_ERROR',
+        message: parsed.error.issues[0]?.message || 'Invalid password reset parameters',
+      });
+      return;
+    }
+
+    const result = await resetPasswordWithToken(parsed.data.token, parsed.data.email, parsed.data.newPassword);
+    res.status(200).json(result);
   } catch (error) {
     next(error);
   }

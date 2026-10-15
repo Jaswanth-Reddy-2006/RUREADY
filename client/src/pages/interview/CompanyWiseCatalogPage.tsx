@@ -80,20 +80,20 @@ export default function CompanyWiseCatalogPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F4F7FC] dark:bg-[#080C1D] text-slate-900 dark:text-slate-100 py-8 px-4 sm:px-6 lg:px-8 font-sans transition-colors">
+    <div className="min-h-screen bg-[#F4F7FC] dark:bg-[#000000] text-slate-900 dark:text-[#FFFFFF] py-8 px-4 sm:px-6 lg:px-8 font-sans transition-colors">
       <div className="max-w-6xl mx-auto space-y-7">
         
         {/* ─── HEADER ─── */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white dark:bg-[#11183D] p-6 md:p-8 rounded-3xl border border-slate-200/80 dark:border-[#1E293B] shadow-xs">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white dark:bg-[#1A1A1A] p-6 md:p-8 rounded-3xl border border-slate-200/80 dark:border-[#262626] shadow-xs">
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 text-xs font-bold border border-purple-200 dark:border-purple-800/60 font-mono">
               <Building2 className="w-3.5 h-3.5" />
               <span>Company-Specific Practice Tracks</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-slate-900 dark:text-white font-display">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-slate-900 dark:text-[#FFFFFF] font-display">
               Company-wise Interview Loops
             </h1>
-            <p className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm max-w-2xl leading-relaxed">
+            <p className="text-slate-500 dark:text-[#A8A8A8] text-xs sm:text-sm max-w-2xl leading-relaxed">
               Practice multi-round hiring loops calibrated against real rubric criteria for Amazon, Google, Microsoft, Uber, Flipkart, Razorpay, TCS, and Infosys.
             </p>
           </div>
@@ -106,7 +106,7 @@ export default function CompanyWiseCatalogPage() {
         </div>
 
         {/* ─── SEARCH & CATEGORY FILTER BAR ─── */}
-        <div className="p-4 sm:p-5 rounded-3xl bg-white dark:bg-[#11183D] border border-slate-200/80 dark:border-[#1E293B] shadow-xs space-y-3">
+        <div className="p-4 sm:p-5 rounded-3xl bg-white dark:bg-[#1A1A1A] border border-slate-200/80 dark:border-[#262626] shadow-xs space-y-3">
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
             
             {/* Search Input */}
@@ -117,13 +117,13 @@ export default function CompanyWiseCatalogPage() {
                 placeholder="Search company, role, or technology (e.g. Amazon, Kafka, Google, Machine Coding)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 text-xs rounded-xl bg-slate-50 dark:bg-[#0E152E] border border-slate-200 dark:border-[#1E293B] text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-purple-500 shadow-2xs"
+                className="w-full pl-9 pr-4 py-2 text-xs rounded-xl bg-slate-50 dark:bg-[#1C1C1C] border border-slate-200 dark:border-[#262626] text-slate-900 dark:text-[#FFFFFF] placeholder:text-slate-400 focus:outline-none focus:border-purple-500 shadow-2xs"
               />
               {searchQuery && (
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-white text-xs font-bold"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-100 text-xs font-bold"
                 >
                   Clear
                 </button>
@@ -131,8 +131,8 @@ export default function CompanyWiseCatalogPage() {
             </div>
 
             {/* Quick Stats */}
-            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium self-center">
-              Showing <strong className="text-slate-900 dark:text-white">{filteredTracks.length}</strong> company loops
+            <span className="text-xs text-slate-500 dark:text-[#A8A8A8] font-medium self-center">
+              Showing <strong className="text-slate-900 dark:text-[#FFFFFF]">{filteredTracks.length}</strong> company loops
             </span>
           </div>
 
@@ -149,7 +149,7 @@ export default function CompanyWiseCatalogPage() {
                 className={`px-3 py-1 rounded-xl text-xs font-medium transition-all shrink-0 cursor-pointer ${
                   selectedTier === tier
                     ? 'bg-purple-600 text-white font-bold shadow-xs'
-                    : 'bg-slate-50 dark:bg-[#152046] border border-slate-200 dark:border-[#1E293B] text-slate-600 dark:text-slate-300 hover:border-purple-300'
+                    : 'bg-slate-50 dark:bg-[#262626] border border-slate-200 dark:border-[#262626] text-slate-600 dark:text-[#D2D2D7] hover:border-purple-300'
                 }`}
               >
                 {tier}
@@ -169,7 +169,7 @@ export default function CompanyWiseCatalogPage() {
                 className={`px-2.5 py-1 rounded-xl text-xs font-medium transition-all shrink-0 cursor-pointer ${
                   selectedDifficulty === diff
                     ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold shadow-xs'
-                    : 'bg-slate-50 dark:bg-[#152046] border border-slate-200 dark:border-[#1E293B] text-slate-600 dark:text-slate-300 hover:border-slate-400'
+                    : 'bg-slate-50 dark:bg-[#262626] border border-slate-200 dark:border-[#262626] text-slate-600 dark:text-[#D2D2D7] hover:border-slate-400'
                 }`}
               >
                 {diff}
@@ -180,12 +180,12 @@ export default function CompanyWiseCatalogPage() {
 
         {/* ─── COMPANY TRACK CARDS GRID ─── */}
         {filteredTracks.length === 0 ? (
-          <div className="py-16 text-center space-y-3 bg-white dark:bg-[#11183D] rounded-3xl border border-slate-200 dark:border-[#1E293B]">
+          <div className="py-16 text-center space-y-3 bg-white dark:bg-[#1A1A1A] rounded-3xl border border-slate-200 dark:border-[#262626]">
             <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mx-auto">
               <Search className="w-6 h-6" />
             </div>
-            <h4 className="text-sm font-bold text-slate-900 dark:text-white">No company tracks match your filters</h4>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Try clearing your search query or tier filters.</p>
+            <h4 className="text-sm font-bold text-slate-900 dark:text-[#FFFFFF]">No company tracks match your filters</h4>
+            <p className="text-xs text-slate-500 dark:text-[#A8A8A8]">Try clearing your search query or tier filters.</p>
             <Button
               onClick={() => {
                 setSearchQuery('');
@@ -206,7 +206,7 @@ export default function CompanyWiseCatalogPage() {
                 transition={{ duration: 0.2 }}
                 className="h-full"
               >
-                <Card className="p-6 bg-white dark:bg-[#11183D] border-slate-200/90 dark:border-[#1E293B] hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-md transition-all rounded-3xl space-y-5 flex flex-col justify-between h-full">
+                <Card className="p-6 bg-white dark:bg-[#1A1A1A] border-slate-200/90 dark:border-[#262626] hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-md transition-all rounded-3xl space-y-5 flex flex-col justify-between h-full">
                   <div className="space-y-4">
                     {/* Top Row: Company Icon, Name, Tier & Salary */}
                     <div className="flex items-start justify-between gap-3">
@@ -216,7 +216,7 @@ export default function CompanyWiseCatalogPage() {
                         </div>
                         <div>
                           <div className="flex items-center gap-2 mb-0.5">
-                            <h3 className="font-extrabold text-lg text-slate-900 dark:text-white font-display">
+                            <h3 className="font-extrabold text-lg text-slate-900 dark:text-[#FFFFFF] font-display">
                               {track.companyName}
                             </h3>
                             {getTierBadge(track.tier)}
@@ -235,12 +235,12 @@ export default function CompanyWiseCatalogPage() {
                       </div>
                     </div>
 
-                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    <p className="text-xs text-slate-600 dark:text-[#D2D2D7] leading-relaxed">
                       {track.description}
                     </p>
 
                     {/* Hiring Insights Callout */}
-                    <div className="p-3 rounded-2xl bg-purple-50/50 dark:bg-[#152046] border border-purple-100 dark:border-[#1E293B] text-[11px] text-slate-700 dark:text-slate-300 space-y-0.5">
+                    <div className="p-3 rounded-2xl bg-purple-50/50 dark:bg-[#262626] border border-purple-100 dark:border-[#262626] text-[11px] text-slate-700 dark:text-[#D2D2D7] space-y-0.5">
                       <span className="font-bold text-purple-700 dark:text-purple-300 block text-[10px] uppercase font-mono">
                         Hiring Strategy Insight:
                       </span>
@@ -257,7 +257,7 @@ export default function CompanyWiseCatalogPage() {
                         {track.sections.map((sec) => (
                           <div
                             key={sec.id}
-                            className="text-xs text-slate-700 dark:text-slate-300 flex items-center justify-between bg-slate-50 dark:bg-[#0E152E] p-2.5 rounded-xl border border-slate-100 dark:border-[#1E293B]"
+                            className="text-xs text-slate-700 dark:text-[#D2D2D7] flex items-center justify-between bg-slate-50 dark:bg-[#1C1C1C] p-2.5 rounded-xl border border-slate-100 dark:border-[#262626]"
                           >
                             <div className="flex items-center gap-2 min-w-0">
                               <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold font-mono ${
@@ -269,7 +269,7 @@ export default function CompanyWiseCatalogPage() {
                               </span>
                               <span className="font-medium truncate">{sec.title}</span>
                             </div>
-                            <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono shrink-0 ml-2">
+                            <span className="text-[10px] text-slate-500 dark:text-[#A8A8A8] font-mono shrink-0 ml-2">
                               {sec.durationMins}m
                             </span>
                           </div>
@@ -280,7 +280,7 @@ export default function CompanyWiseCatalogPage() {
 
                   {/* Card Bottom Actions */}
                   <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                    <span className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1 font-medium font-mono text-[11px]">
+                    <span className="text-xs text-slate-500 dark:text-[#A8A8A8] flex items-center gap-1 font-medium font-mono text-[11px]">
                       <Clock className="w-3.5 h-3.5 text-slate-400" />
                       Total Loop: {track.sections.reduce((acc, s) => acc + s.durationMins, 0)} mins
                     </span>

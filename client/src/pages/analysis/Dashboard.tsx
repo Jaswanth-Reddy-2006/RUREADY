@@ -951,7 +951,6 @@ export default function Dashboard() {
             ))}
           </div>
         </section>
-
         {/* ─── 10. QUICK ACTIONS ─── */}
         <section className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs space-y-4">
           <div className="space-y-0.5">

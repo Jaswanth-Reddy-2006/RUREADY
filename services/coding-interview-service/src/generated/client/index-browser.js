@@ -165,6 +165,15 @@ exports.Prisma.CodeExecutionDeltaScalarFieldEnum = {
   timestamp: 'timestamp'
 };
 
+exports.Prisma.UserSolvedProblemScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  problemId: 'problemId',
+  language: 'language',
+  passed: 'passed',
+  solvedAt: 'solvedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -194,7 +203,8 @@ exports.Prisma.JsonNullValueFilter = {
 exports.Prisma.ModelName = {
   CodingSession: 'CodingSession',
   PreDefinedProblem: 'PreDefinedProblem',
-  CodeExecutionDelta: 'CodeExecutionDelta'
+  CodeExecutionDelta: 'CodeExecutionDelta',
+  UserSolvedProblem: 'UserSolvedProblem'
 };
 
 /**

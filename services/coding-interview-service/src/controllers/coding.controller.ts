@@ -98,4 +98,14 @@ export const codingController = {
       next(err);
     }
   },
+
+  async getSolvedProblems(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = (req as any).user?.userId || (req.headers['x-user-id'] as string) || (req.query.userId as string) || (req.params.userId as string);
+      const solvedIds = await codingService.getSolvedProblemIds(userId);
+      res.status(200).json({ userId, solvedProblemIds: solvedIds, totalSolved: solvedIds.length });
+    } catch (err) {
+      next(err);
+    }
+  },
 };

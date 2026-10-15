@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -23,12 +23,17 @@ import {
   Sparkles,
   Zap,
   Loader2,
+  ShieldCheck,
+  RotateCw,
+  AlertCircle,
+  CheckCircle2,
 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Logo from '@/components/ui/Logo';
 import { useAuth } from '@/hooks/useAuth';
 import { authApi } from '@/api/auth';
+import toast from 'react-hot-toast';
 
 interface StrengthResult {
   score: number; // 0-4
@@ -163,6 +168,11 @@ const STEP_QUOTES = [
     role: 'Pioneering Computer Scientist & Turing Laureate',
   },
   {
+    quote: 'Security is not a product, but a process.',
+    author: 'Bruce Schneier',
+    role: 'Renowned Security Technologist & Cryptographer',
+  },
+  {
     quote: 'Simplicity is prerequisite for reliability.',
     author: 'Edsger W. Dijkstra',
     role: 'Turing Award Laureate & Systems Pioneer',
@@ -181,11 +191,21 @@ const STEP_QUOTES = [
 
 export default function Register() {
   const { register, isRegistering } = useAuth();
-  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(1);
+  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4 | 5>(1);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [isCheckingEmail, setIsCheckingEmail] = useState(false);
   const [emailExists, setEmailExists] = useState(false);
+
+  // Email verification continuous step state
+  const [verificationToken, setVerificationToken] = useState<string | null>(null);
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
+  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+  const [otpDigits, setOtpDigits] = useState<string[]>(['', '', '', '', '', '']);
+  const [otpError, setOtpError] = useState<string | null>(null);
+  const [resendCooldown, setResendCooldown] = useState<number>(45);
+  const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
   const [errors, setErrors] = useState<{
     name?: string;
     email?: string;
@@ -263,6 +283,120 @@ export default function Register() {
     return () => clearTimeout(timer);
   }, [form.email]);
 
+  // Resend cooldown timer for Step 2
+  useEffect(() => {
+    if (currentStep !== 2 || resendCooldown <= 0) return;
+    const interval = setInterval(() => {
+      setResendCooldown((prev) => Math.max(0, prev - 1));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [currentStep, resendCooldown]);
+
+  // Focus first OTP input when arriving on Step 2
+  useEffect(() => {
+    if (currentStep === 2) {
+      setTimeout(() => {
+        otpInputRefs.current[0]?.focus();
+      }, 150);
+    }
+  }, [currentStep]);
+
+  const handleOtpDigitChange = (index: number, value: string) => {
+    setOtpError(null);
+
+    // Multi-character paste (e.g. user pasted 6 digits)
+    if (value.length > 1) {
+      const pasted = value.replace(/\D/g, '').slice(0, 6).split('');
+      const newDigits = [...otpDigits];
+      pasted.forEach((char, i) => {
+        if (i < 6) newDigits[i] = char;
+      });
+      setOtpDigits(newDigits);
+
+      const nextFocus = Math.min(pasted.length, 5);
+      otpInputRefs.current[nextFocus]?.focus();
+
+      if (newDigits.every((d) => d !== '')) {
+        handleVerifyOtp(newDigits.join(''));
+      }
+      return;
+    }
+
+    // Single digit input
+    const char = value.replace(/\D/g, '');
+    const newDigits = [...otpDigits];
+    newDigits[index] = char;
+    setOtpDigits(newDigits);
+
+    if (char && index < 5) {
+      otpInputRefs.current[index + 1]?.focus();
+    }
+
+    if (newDigits.every((d) => d !== '')) {
+      handleVerifyOtp(newDigits.join(''));
+    }
+  };
+
+  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace' && !otpDigits[index] && index > 0) {
+      otpInputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handleVerifyOtp = async (codeToVerify?: string) => {
+    const code = codeToVerify || otpDigits.join('');
+    if (code.length < 6) {
+      setOtpError('Please enter all 6 digits of your verification code.');
+      return;
+    }
+
+    try {
+      setIsVerifyingOtp(true);
+      setOtpError(null);
+      const res = await authApi.verifyRegistrationOtp({
+        email: form.email.trim(),
+        otp: code,
+      });
+
+      if (res.verified && res.verificationToken) {
+        setVerificationToken(res.verificationToken);
+        toast.success('Email successfully verified!');
+        // Seamlessly advance to Step 3: Target Track
+        setCurrentStep(3);
+      } else {
+        setOtpError('Invalid verification code. Please check and try again.');
+      }
+    } catch (err: any) {
+      const msg =
+        err.response?.data?.message ||
+        'Invalid or expired verification code. Please try again.';
+      setOtpError(msg);
+      setOtpDigits(['', '', '', '', '', '']);
+      otpInputRefs.current[0]?.focus();
+    } finally {
+      setIsVerifyingOtp(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (resendCooldown > 0 || isSendingOtp) return;
+    try {
+      setIsSendingOtp(true);
+      setOtpError(null);
+      await authApi.sendRegistrationOtp({
+        email: form.email.trim(),
+        name: form.name.trim(),
+      });
+      setResendCooldown(45);
+      toast.success('A new verification code has been dispatched.');
+    } catch (err: any) {
+      const msg = err.response?.data?.message || 'Failed to resend code. Please try again.';
+      setOtpError(msg);
+    } finally {
+      setIsSendingOtp(false);
+    }
+  };
+
   const validateStep1 = (): boolean => {
     const newErrors: typeof errors = {};
     const trimmedEmail = form.email.trim();
@@ -299,15 +433,42 @@ export default function Register() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleNextStep = (e: React.FormEvent) => {
+  const handleNextStep = async (e: React.FormEvent) => {
     e.preventDefault();
     if (currentStep === 1) {
       if (!validateStep1()) return;
-      setCurrentStep(2);
+
+      // If user already verified their email with OTP in this session, skip OTP and advance to Step 3
+      if (verificationToken) {
+        setCurrentStep(3);
+        return;
+      }
+
+      // Send OTP to email and smoothly transition to continuous Step 2
+      try {
+        setIsSendingOtp(true);
+        await authApi.sendRegistrationOtp({
+          email: form.email.trim(),
+          name: form.name.trim(),
+        });
+        setResendCooldown(45);
+        setOtpDigits(['', '', '', '', '', '']);
+        setOtpError(null);
+        setCurrentStep(2);
+      } catch (err: any) {
+        const msg =
+          err.response?.data?.message ||
+          'Failed to send verification code. Please check your email and try again.';
+        setErrors((prev) => ({ ...prev, email: msg }));
+      } finally {
+        setIsSendingOtp(false);
+      }
     } else if (currentStep === 2) {
-      setCurrentStep(3);
+      handleVerifyOtp();
     } else if (currentStep === 3) {
       setCurrentStep(4);
+    } else if (currentStep === 4) {
+      setCurrentStep(5);
     } else {
       handleSubmitFinal();
     }
@@ -351,10 +512,14 @@ export default function Register() {
       email: form.email.trim(),
       password: form.password,
       confirmPassword: form.confirmPassword,
+      verificationToken: verificationToken || undefined,
     });
   };
 
   const updateField = (field: keyof typeof form, value: string) => {
+    if (field === 'email' && value !== form.email) {
+      setVerificationToken(null);
+    }
     setForm((prev) => ({ ...prev, [field]: value }));
     if (errors[field as keyof typeof errors]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
@@ -394,22 +559,34 @@ export default function Register() {
             ) : (
               <button
                 type="button"
-                onClick={() => setCurrentStep((prev) => (prev > 1 ? ((prev - 1) as 1 | 2 | 3 | 4) : 1))}
+                onClick={() =>
+                  setCurrentStep((prev) => (prev > 1 ? ((prev - 1) as 1 | 2 | 3 | 4 | 5) : 1))
+                }
                 className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#4A8BDF] hover:text-[#2459A8] transition-colors font-display cursor-pointer"
               >
                 <ArrowLeft className="h-3.5 w-3.5" />
-                Back to Step {currentStep - 1}
+                {currentStep === 2
+                  ? 'Back to Step 1'
+                  : currentStep === 3
+                  ? 'Back to Email Verification'
+                  : currentStep === 4
+                  ? 'Back to Role Track'
+                  : 'Back to Focus Calibration'}
               </button>
             )}
 
             {/* Step Progress Pill */}
             <div className="flex items-center gap-1.5 bg-[#EFFAFD] px-3 py-1 rounded-full border border-[#DCE7F2]">
-              {[1, 2, 3, 4].map((stepNum) => (
+              {[1, 2, 3, 4, 5].map((stepNum) => (
                 <div
                   key={stepNum}
                   onClick={() => {
-                    if (stepNum < currentStep || (stepNum === 2 && validateStep1())) {
-                      setCurrentStep(stepNum as 1 | 2 | 3 | 4);
+                    if (
+                      stepNum < currentStep ||
+                      (stepNum === 2 && validateStep1()) ||
+                      (stepNum > 2 && verificationToken)
+                    ) {
+                      setCurrentStep(stepNum as 1 | 2 | 3 | 4 | 5);
                     }
                   }}
                   className={`cursor-pointer transition-all duration-300 ${
@@ -423,7 +600,7 @@ export default function Register() {
                 />
               ))}
               <span className="text-[10.5px] font-mono font-bold text-[#526078] ml-1">
-                {currentStep}/4
+                {currentStep}/5
               </span>
             </div>
           </div>
@@ -588,9 +765,10 @@ export default function Register() {
                     type="submit"
                     size="lg"
                     fullWidth
+                    isLoading={isSendingOtp}
                     className="w-full bg-[#4A8BDF] hover:bg-[#2459A8] text-white font-display font-bold text-sm sm:text-base py-3 rounded-xl shadow-md shadow-[#4A8BDF]/20 transition-all mt-1 cursor-pointer"
                   >
-                    Continue to Target Track →
+                    Verify Email & Continue →
                   </Button>
                 </form>
 
@@ -606,10 +784,119 @@ export default function Register() {
               </motion.div>
             )}
 
-            {/* ═════════ STEP 2: Target Role & Experience Level ═════════ */}
+            {/* ═════════ STEP 2: Continuous Email OTP Verification ═════════ */}
             {currentStep === 2 && (
               <motion.div
-                key="step-2"
+                key="step-2-otp"
+                initial={{ opacity: 0, x: -15 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 15 }}
+                transition={{ duration: 0.25 }}
+                className="space-y-4"
+              >
+                <div>
+                  <div className="w-13 h-13 rounded-2xl bg-gradient-to-tr from-[#EFFAFD] to-[#E0F2FE] text-[#2459A8] border border-[#BAE6FD] flex items-center justify-center shadow-sm mb-3">
+                    <ShieldCheck className="h-6 w-6 text-[#2459A8]" />
+                  </div>
+                  <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-[#11183D] tracking-tight">
+                    Verify your email address
+                  </h2>
+                  <p className="font-body text-xs sm:text-sm text-[#526078] mt-1">
+                    We've sent a 6-digit confirmation code to verify your Rennetus account.
+                  </p>
+                </div>
+
+                {/* Email address badge with edit link */}
+                <div className="flex items-center justify-between p-3.5 bg-white border border-[#DCE7F2] rounded-2xl shadow-sm">
+                  <div className="flex items-center gap-3 overflow-hidden min-w-0">
+                    <div className="w-9 h-9 rounded-xl bg-[#EFFAFD] text-[#2459A8] border border-[#DCE7F2] flex items-center justify-center shrink-0">
+                      <Mail className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-[#7B8799]">Sent to</p>
+                      <p className="font-mono text-xs sm:text-sm font-semibold text-[#11183D] truncate">
+                        {form.email}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setCurrentStep(1)}
+                    className="text-xs font-semibold text-[#2459A8] hover:text-[#11183D] bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200 transition-colors shrink-0 ml-2 cursor-pointer font-body"
+                  >
+                    Change
+                  </button>
+                </div>
+
+                {/* 6 Digit Numeric Inputs */}
+                <div className="pt-1">
+                  <label className="text-xs font-display font-semibold text-[#526078] uppercase tracking-wider block mb-3 text-center">
+                    Enter 6-Digit Verification Code
+                  </label>
+                  <div className="flex justify-between gap-1.5 sm:gap-2.5 max-w-sm mx-auto">
+                    {otpDigits.map((digit, idx) => (
+                      <input
+                        key={idx}
+                        ref={(el) => (otpInputRefs.current[idx] = el)}
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        maxLength={1}
+                        value={digit}
+                        onChange={(e) => handleOtpDigitChange(idx, e.target.value)}
+                        onKeyDown={(e) => handleOtpKeyDown(idx, e)}
+                        className={`w-11 h-14 sm:w-13 sm:h-16 text-center font-mono text-2xl sm:text-3xl font-extrabold rounded-2xl border-2 transition-all duration-200 outline-none select-none ${
+                          digit
+                            ? 'border-[#2459A8] bg-[#EFFAFD] text-[#11183D] shadow-sm ring-4 ring-[#4A8BDF]/20'
+                            : 'border-[#DCE7F2] bg-white text-[#11183D] hover:border-[#94A3B8] focus:border-[#2459A8] focus:bg-[#EFFAFD]/30 focus:ring-4 focus:ring-[#4A8BDF]/20 shadow-sm'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {otpError && (
+                  <div className="flex items-start gap-2.5 p-3.5 bg-red-50 border border-red-200 rounded-2xl text-red-700 text-xs font-body shadow-sm">
+                    <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-red-600" />
+                    <span>{otpError}</span>
+                  </div>
+                )}
+
+                <div className="pt-2 flex flex-col gap-3">
+                  <Button
+                    type="button"
+                    size="lg"
+                    fullWidth
+                    isLoading={isVerifyingOtp}
+                    onClick={() => handleVerifyOtp()}
+                    className="w-full bg-[#4A8BDF] hover:bg-[#2459A8] text-white font-display font-bold text-sm sm:text-base py-3.5 rounded-2xl shadow-md shadow-[#4A8BDF]/20 transition-all cursor-pointer"
+                  >
+                    Verify & Continue to Target Track →
+                  </Button>
+
+                  <div className="flex items-center justify-between text-xs font-body text-[#526078] px-1 pt-0.5">
+                    <span className="flex items-center gap-1">
+                      <span>Didn't receive the email?</span>
+                      <span className="text-[11px] text-[#7B8799] hidden sm:inline">(Check spam)</span>
+                    </span>
+                    <button
+                      type="button"
+                      disabled={resendCooldown > 0 || isSendingOtp}
+                      onClick={handleResendOtp}
+                      className="font-semibold text-[#4A8BDF] hover:text-[#2459A8] disabled:opacity-40 disabled:hover:text-[#526078] inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+                    >
+                      <RotateCw className={`h-3.5 w-3.5 ${isSendingOtp ? 'animate-spin' : ''}`} />
+                      {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend Code'}
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* ═════════ STEP 3: Target Role & Experience Level ═════════ */}
+            {currentStep === 3 && (
+              <motion.div
+                key="step-3"
                 initial={{ opacity: 0, x: -15 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 15 }}
@@ -702,7 +989,7 @@ export default function Register() {
                           </div>
                           <div
                             className={`text-[9.5px] font-mono ${
-                              isSelected ? 'text-white/85' : 'text-[#7B8799]'
+                              isSelected ? 'text-slate-200' : 'text-[#7B8799]'
                             }`}
                           >
                             {exp.range}
@@ -727,10 +1014,10 @@ export default function Register() {
               </motion.div>
             )}
 
-            {/* ═════════ STEP 3: Interview Focus & Urgency ═════════ */}
-            {currentStep === 3 && (
+            {/* ═════════ STEP 4: Interview Focus & Urgency ═════════ */}
+            {currentStep === 4 && (
               <motion.div
-                key="step-3"
+                key="step-4"
                 initial={{ opacity: 0, x: -15 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 15 }}
@@ -839,7 +1126,7 @@ export default function Register() {
                     type="button"
                     size="lg"
                     fullWidth
-                    onClick={() => setCurrentStep(4)}
+                    onClick={() => setCurrentStep(5)}
                     className="w-full bg-[#4A8BDF] hover:bg-[#2459A8] text-white font-display font-bold text-sm sm:text-base py-3 rounded-xl shadow-md shadow-[#4A8BDF]/20 transition-all cursor-pointer"
                   >
                     Continue to Academic Profile (Optional) →
@@ -856,10 +1143,10 @@ export default function Register() {
               </motion.div>
             )}
 
-            {/* ═════════ STEP 4: Academic & Student Profile (Optional) ═════════ */}
-            {currentStep === 4 && (
+            {/* ═════════ STEP 5: Academic & Student Profile (Optional) ═════════ */}
+            {currentStep === 5 && (
               <motion.div
-                key="step-4"
+                key="step-5"
                 initial={{ opacity: 0, x: -15 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 15 }}
@@ -990,14 +1277,14 @@ export default function Register() {
           <div className="w-12 h-12 rounded-2xl bg-white/15 flex items-center justify-center backdrop-blur-md shadow-sm border border-white/10">
             <Quote className="w-6 h-6 text-white" />
           </div>
-          <blockquote className="font-editorial font-bold text-2xl xl:text-3xl text-white leading-snug tracking-tight">
+          <blockquote className="font-editorial font-bold text-2xl xl:text-3xl text-slate-100 leading-snug tracking-tight">
             &ldquo;{currentQuote.quote}&rdquo;
           </blockquote>
           <div className="pt-3 border-t border-white/20">
             <p className="font-mono text-sm uppercase tracking-widest font-semibold text-white">
               — {currentQuote.author}
             </p>
-            <p className="text-xs text-white/80 font-sans mt-0.5">
+            <p className="text-xs text-slate-300 font-sans mt-0.5">
               {currentQuote.role}
             </p>
           </div>

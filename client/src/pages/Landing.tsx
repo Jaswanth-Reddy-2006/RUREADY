@@ -1,7 +1,7 @@
-import { useRef, useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useRef, useState, useEffect, useMemo, forwardRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { motion, AnimatePresence, useInView, useScroll, animate } from 'framer-motion';
+import { motion, AnimatePresence, useInView, useScroll, useTransform, useSpring } from 'framer-motion';
 import {
   Brain,
   ArrowRight,
@@ -10,7 +10,9 @@ import {
   Check,
   Star,
   ChevronRight,
+  ChevronLeft,
   ChevronDown,
+  ChevronUp,
   Code2,
   Activity,
   FileText,
@@ -27,9 +29,29 @@ import {
   ShieldCheck,
   CheckCircle,
   HelpCircle,
+  Plus,
+  Mic,
+  Clock,
+  Bot,
+  Crosshair,
+  Scan,
+  Gauge,
+  Eye,
+  BarChart3,
+  Sliders,
+  Grid,
+  Search,
+  ThumbsDown,
+  Database,
+  Server,
+  Smartphone,
+  Network,
+  Lock,
+  X,
+  Copy,
+  MessageSquare,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
-import FeaturesCarousel from '@/components/landing/FeaturesCarousel';
 
 // ─── Company Brand Logo SVGs for Orbital Hero Rings ──────────────
 
@@ -171,6 +193,22 @@ function SalesforceLogo({ className = "w-5 h-5" }: { className?: string }) {
   );
 }
 
+function CompanyMark({ name = '', className = "w-5 h-5" }: { name?: string; className?: string }) {
+  const initials = name
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((part) => part[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
+
+  return (
+    <span className={`${className} rounded-full bg-[#0F172A] flex items-center justify-center text-[8px] font-bold text-white font-mono`}>
+      {initials}
+    </span>
+  );
+}
+
 // ─── Frequently Asked Questions Categorized Data ─────────────
 
 interface FaqItem {
@@ -287,7 +325,7 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         q: 'Can I disable the camera and microphone during practice?',
-        a: 'While camera and mic are required for proctored benchmarks and live lip-synced mock interviews, you can practice coding problems and explore roadmaps completely independently without camera permissions.',
+        a: 'While camera and mic are required for proctored benchmarks and live lip-synced mock interviews, you can practice coding problems independently without camera permissions.',
       },
     ],
   },
@@ -327,11 +365,11 @@ const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         q: 'What happens when my subscription or credits expire?',
-        a: 'All your past interview reports, resume audit history, and roadmap progress remain accessible in your dashboard indefinitely. You only need active credits to launch new live mock interviews or advanced ATS audits.',
+        a: 'All your past interview reports, resume audit history progress remain accessible in your dashboard indefinitely. You only need active credits to launch new live mock interviews or advanced ATS audits.',
       },
       {
         q: 'Can two learners share an account?',
-        a: 'Each account is calibrated to an individual candidate’s voice profile, resume history, and personalized skill gap matrix. We recommend separate accounts so your Readiness Score and custom roadmaps accurately reflect your individual capabilities.',
+        a: 'Each account is calibrated to an individual candidate’s voice profile, resume history, and personalized skill gap matrix. We recommend separate accounts so your Readiness Score accurately reflect your individual capabilities.',
       },
       {
         q: 'Will I get access to newly released interview problems and features?',
@@ -345,116 +383,575 @@ const FAQ_CATEGORIES: FaqCategory[] = [
   },
 ];
 
-// ─── Dynamic Animated Number Counter Component ───────────────
+// ─── Most Popular Tech Roles Data ─────────────────────────────
 
-function AnimatedCounter({
-  target,
-  duration = 2,
-  decimals = 0,
-  prefix = '',
-  suffix = '',
-}: {
-  target: number;
-  duration?: number;
-  decimals?: number;
-  prefix?: string;
-  suffix?: string;
-}) {
-  const [value, setValue] = useState(0);
-  const ref = useRef<HTMLSpanElement>(null);
-  const isInView = useInView(ref, { once: true, margin: '-50px' });
-
-  useEffect(() => {
-    if (!isInView) return;
-    const controls = animate(0, target, {
-      duration,
-      ease: [0.25, 0.46, 0.45, 0.94],
-      onUpdate: (latest) => setValue(latest),
-    });
-    return () => controls.stop();
-  }, [isInView, target, duration]);
-
-  const formatted =
-    decimals > 0
-      ? value.toFixed(decimals)
-      : Math.floor(value).toLocaleString('en-US');
-
-  return (
-    <span ref={ref}>
-      {prefix}
-      {formatted}
-      {suffix}
-    </span>
-  );
+interface PopularTechRole {
+  title: string;
+  category: string;
+  stack: string[];
+  interviewsCount: string;
+  accent: string;
+  badgeColor: string;
+  roleRoute: string;
 }
 
-// ─── Section Helper Component ─────────────────────────────────
+const POPULAR_TECH_ROLES: PopularTechRole[] = [
+  {
+    title: 'Full Stack Engineer',
+    category: 'Web & Systems',
+    stack: ['React', 'Node.js', 'TypeScript', 'Next.js'],
+    interviewsCount: '14.2k+ prepped',
+    accent: '#4A8BDF',
+    badgeColor: 'bg-[#EFFAFD] text-[#2459A8] border-[#DCE7F2] dark:bg-[#1E293B] dark:text-[#93C5FD] dark:border-[#334155]',
+    roleRoute: '/interview/new',
+  },
+  {
+    title: 'Backend Systems Engineer',
+    category: 'Distributed Infra',
+    stack: ['Go', 'Java', 'Kafka', 'Redis', 'PostgreSQL'],
+    interviewsCount: '18.9k+ prepped',
+    accent: '#047857',
+    badgeColor: 'bg-[#E8F5F0] text-[#047857] border-[#A7E3CF] dark:bg-[#064E3B]/30 dark:text-[#34D399] dark:border-[#047857]',
+    roleRoute: '/interview/new',
+  },
+  {
+    title: 'AI / Machine Learning Engineer',
+    category: 'GenAI & Modeling',
+    stack: ['Python', 'PyTorch', 'RAG', 'LLMs', 'Vector DB'],
+    interviewsCount: '16.5k+ prepped',
+    accent: '#7C3AED',
+    badgeColor: 'bg-[#F5F3FF] text-[#7C3AED] border-[#DDD6FE] dark:bg-[#4C1D95]/30 dark:text-[#C4B5FD] dark:border-[#7C3AED]',
+    roleRoute: '/interview/new',
+  },
+  {
+    title: 'Frontend Architect',
+    category: 'Client Platform',
+    stack: ['React', 'Next.js', 'Web Vitals', 'Tailwind', 'TS'],
+    interviewsCount: '9.8k+ prepped',
+    accent: '#A0006D',
+    badgeColor: 'bg-[#F8EAF4] text-[#A0006D] border-[#F4B4D6] dark:bg-[#701A75]/30 dark:text-[#F472B6] dark:border-[#A0006D]',
+    roleRoute: '/interview/new',
+  },
+  {
+    title: 'DevOps & Cloud SRE',
+    category: 'Cloud Infrastructure',
+    stack: ['AWS', 'Kubernetes', 'Docker', 'Terraform', 'CI/CD'],
+    interviewsCount: '11.3k+ prepped',
+    accent: '#D97706',
+    badgeColor: 'bg-[#FFFBEB] text-[#B45309] border-[#FDE68A] dark:bg-[#78350F]/30 dark:text-[#FCD34D] dark:border-[#D97706]',
+    roleRoute: '/interview/new',
+  },
+  {
+    title: 'System Design Lead',
+    category: 'Staff & Principal SWE',
+    stack: ['CAP Theorem', 'Sharding', 'Rate Limiting', 'Microservices'],
+    interviewsCount: '21.4k+ prepped',
+    accent: '#E11D48',
+    badgeColor: 'bg-[#FFF1F2] text-[#E11D48] border-[#FECDD3] dark:bg-[#881337]/30 dark:text-[#FDA4AF] dark:border-[#E11D48]',
+    roleRoute: '/interview/new',
+  },
+  {
+    title: 'Mobile App Developer',
+    category: 'iOS & Android Native',
+    stack: ['Swift', 'SwiftUI', 'Kotlin', 'React Native'],
+    interviewsCount: '7.6k+ prepped',
+    accent: '#0284C7',
+    badgeColor: 'bg-[#F0F9FF] text-[#0284C7] border-[#BAE6FD] dark:bg-[#0C4A6E]/30 dark:text-[#7DD3FC] dark:border-[#0284C7]',
+    roleRoute: '/interview/new',
+  },
+  {
+    title: 'Data Platform Engineer',
+    category: 'Big Data Pipeline',
+    stack: ['Apache Spark', 'Snowflake', 'dbt', 'Airflow', 'SQL'],
+    interviewsCount: '8.4k+ prepped',
+    accent: '#059669',
+    badgeColor: 'bg-[#ECFDF5] text-[#059669] border-[#A7F3D0] dark:bg-[#064E3B]/30 dark:text-[#6EE7B7] dark:border-[#059669]',
+    roleRoute: '/interview/new',
+  },
+];
 
-function Section({
-  children,
-  className = '',
-  id,
-}: {
+// ─── Interactive Feature Showcase Cards Data ─────────────────
+
+interface FeatureCardTheme {
+  border: string;
+  bg: string;
+  badge: string;
+  accentText: string;
+  btn: string;
+  ring: string;
+  glow: string;
+}
+
+interface FeatureCardData {
+  id: string;
+  step: string;
+  badge: string;
+  title: string;
+  description: string;
+  keyPoints: string[];
+  ctaText: string;
+  ctaLink: string;
+  accent: string;
+  theme: FeatureCardTheme;
+}
+
+const FEATURE_CARDS: FeatureCardData[] = [
+  {
+    id: 'voice-mock',
+    step: '01',
+    badge: 'Live Socratic AI Mock',
+    title: '3D AI Voice Interviewer with Dynamic Lip-Sync',
+    description: 'Experience verbal technical interviews with Ava. Dynamic phonetic lip-sync, speech cadence telemetry, and adaptive Socratic follow-ups tailored to your claims.',
+    keyPoints: [
+      'Speech cadence analysis (140–160 WPM optimal pacing)',
+      'STAR framework scoring & verbal filler metric audit',
+      'Phonetic morph targets with real-time natural eye contact',
+    ],
+    ctaText: 'Start Voice Mock',
+    ctaLink: '/interview/new',
+    accent: '#2563EB',
+    theme: {
+      border: 'border-blue-500/40 dark:border-blue-500/30',
+      bg: 'bg-gradient-to-b from-blue-50/70 via-white to-blue-50/30 dark:from-[#131B2E] dark:via-[#111318] dark:to-[#0D0E12]',
+      badge: 'bg-blue-100/80 text-blue-700 border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800/50',
+      accentText: 'text-blue-600 dark:text-blue-400',
+      btn: 'bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/25',
+      ring: 'ring-1 ring-blue-500/20',
+      glow: 'from-blue-500/20 via-blue-400/5 to-transparent',
+    },
+  },
+  {
+    id: 'code-sandbox',
+    step: '02',
+    badge: 'Monaco Sandbox • 6 Languages',
+    title: 'Live In-Browser Code Runner & Editorial Hints',
+    description: 'Solve algorithmic challenges with immediate compilation across 6 languages. Test custom edge-case inputs and unlock progressive hints with zero penalty.',
+    keyPoints: [
+      'Languages: TypeScript, Python, Java, C++, Go, JS',
+      'Progressive 3-Tier editorial hints with 0 spoiler penalty',
+      'O(1) auxiliary space benchmarks & boundary test coverage',
+    ],
+    ctaText: 'Open Code Sandbox',
+    ctaLink: '/interview/coding',
+    accent: '#059669',
+    theme: {
+      border: 'border-emerald-500/40 dark:border-emerald-500/30',
+      bg: 'bg-gradient-to-b from-emerald-50/70 via-white to-emerald-50/30 dark:from-[#0F241C] dark:via-[#111318] dark:to-[#0D0E12]',
+      badge: 'bg-emerald-100/80 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/50',
+      accentText: 'text-emerald-600 dark:text-emerald-400',
+      btn: 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-500/25',
+      ring: 'ring-1 ring-emerald-500/20',
+      glow: 'from-emerald-500/20 via-emerald-400/5 to-transparent',
+    },
+  },
+  {
+    id: 'ats-audit',
+    step: '03',
+    badge: 'ATS Scanner 2.4 • High Yield',
+    title: 'Calibrate Your Resume to Tier-1 Standards',
+    description: 'Upload your PDF resume to detect critical technical keyword gaps, flag passive verbs, and generate quantified STAR bullet points benchmarked to top hiring thresholds.',
+    keyPoints: [
+      'Instant JD keyword extraction & gap highlighting',
+      'Automated conversion into quantified STAR statements',
+      'Uninflated ATS match score without fake praise',
+    ],
+    ctaText: 'Scan My Resume',
+    ctaLink: '/ats',
+    accent: '#9333EA',
+    theme: {
+      border: 'border-purple-500/40 dark:border-purple-500/30',
+      bg: 'bg-gradient-to-b from-purple-50/70 via-white to-purple-50/30 dark:from-[#21122E] dark:via-[#111318] dark:to-[#0D0E12]',
+      badge: 'bg-purple-100/80 text-purple-700 border-purple-200 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-800/50',
+      accentText: 'text-purple-600 dark:text-purple-400',
+      btn: 'bg-purple-600 hover:bg-purple-700 text-white shadow-md shadow-purple-500/25',
+      ring: 'ring-1 ring-purple-500/20',
+      glow: 'from-purple-500/20 via-purple-400/5 to-transparent',
+    },
+  },
+  {
+    id: 'system-design',
+    step: '05',
+    badge: 'Staff & Principal Systems',
+    title: 'System Design Architectural Probes',
+    description: 'Design distributed rate limiters, consensus clusters, and multi-region sharded databases. Ava grills you on CAP trade-offs, failover, and zero-downtime rollbacks.',
+    keyPoints: [
+      'Real-world distributed systems failure scenarios',
+      'CAP theorem, cache invalidation & split-brain probes',
+      'Latency & throughput scalability benchmarks',
+    ],
+    ctaText: 'Practice System Design',
+    ctaLink: '/interview/new',
+    accent: '#D97706',
+    theme: {
+      border: 'border-amber-500/40 dark:border-amber-500/30',
+      bg: 'bg-gradient-to-b from-amber-50/70 via-white to-amber-50/30 dark:from-[#241A0E] dark:via-[#111318] dark:to-[#0D0E12]',
+      badge: 'bg-amber-100/80 text-amber-700 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800/50',
+      accentText: 'text-amber-600 dark:text-amber-400',
+      btn: 'bg-amber-600 hover:bg-amber-700 text-white shadow-md shadow-amber-500/25',
+      ring: 'ring-1 ring-amber-500/20',
+      glow: 'from-amber-500/20 via-amber-400/5 to-transparent',
+    },
+  },
+  {
+    id: 'bar-raiser',
+    step: '06',
+    badge: 'Tier-1 Hiring Committee',
+    title: 'Behavioral Rounds & Bar-Raiser Calibration',
+    description: 'Simulate high-stakes behavioral rounds evaluated against Amazon 16 LP and Google Googliness benchmarks to communicate ownership and business impact.',
+    keyPoints: [
+      'Amazon LP & Google E5/E6 behavioral rubrics',
+      'Identifies weak accountability or vague impact metrics',
+      'Detailed Board Decision report with Hire/No-Hire verdict',
+    ],
+    ctaText: 'Try Behavioral Mock',
+    ctaLink: '/interview/new',
+    accent: '#E11D48',
+    theme: {
+      border: 'border-rose-500/40 dark:border-rose-500/30',
+      bg: 'bg-gradient-to-b from-rose-50/70 via-white to-rose-50/30 dark:from-[#291118] dark:via-[#111318] dark:to-[#0D0E12]',
+      badge: 'bg-rose-100/80 text-rose-700 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800/50',
+      accentText: 'text-rose-600 dark:text-rose-400',
+      btn: 'bg-rose-600 hover:bg-rose-700 text-white shadow-md shadow-rose-500/25',
+      ring: 'ring-1 ring-rose-500/20',
+      glow: 'from-rose-500/20 via-rose-400/5 to-transparent',
+    },
+  },
+];
+
+// ─── Diary Entry Testimonials (Analog Physical Notes Style) ───────────────
+
+interface DiaryTestimonial {
+  quote: string;
+  author: string;
+  role: string;
+  company: string;
+  date: string;
+  tilt: string;
+  accent: string;
+  badgeBg: string;
+  offerPackage: string;
+  readinessScore: number;
+  scoreGain: string;
+  roundsCleared: string[];
+  metrics: {
+    label: string;
+    value: string;
+  }[];
+}
+
+const DIARY_TESTIMONIALS: DiaryTestimonial[] = [
+  {
+    quote: "I failed Google L5 system design twice because I rushed my explanations without clear trade-offs. Ava grilled me relentlessly on CAP theorem nuances, split-brain consensus, and filler words until my pacing became razor sharp.",
+    author: "Aarav Sharma",
+    role: "Placed at Google L5 (Bengaluru)",
+    company: "Google",
+    date: "Session #07 • Calibrated",
+    tilt: "-rotate-1",
+    accent: "#2459A8",
+    badgeBg: "bg-[#EFFAFD] text-[#2459A8] border-[#DCE7F2] dark:bg-[#1E293B] dark:text-[#93C5FD] dark:border-[#334155]",
+    offerPackage: "$185,000 + Equity",
+    readinessScore: 94,
+    scoreGain: "+26 pts",
+    roundsCleared: ["L5 System Design", "Coding Bar-Raiser", "Google Leadership"],
+    metrics: [
+      { label: "Speech Cadence", value: "152 WPM (Optimal)" },
+      { label: "Verbal Fillers", value: "-78% reduction" },
+      { label: "STAR Depth", value: "95% alignment" },
+    ],
+  },
+  {
+    quote: "The ATS resume scanner pinpointed 7 missing distributed systems keywords that were silently getting my application filtered out. Fixed them, ran 3 oral mock sessions, and cleared Stripe with zero surprises.",
+    author: "Priya Nair",
+    role: "Placed at Stripe Backend SDE II",
+    company: "Stripe",
+    date: "Session #04 • Calibrated",
+    tilt: "rotate-1",
+    accent: "#A0006D",
+    badgeBg: "bg-[#F8EAF4] text-[#A0006D] border-[#F4B4D6] dark:bg-[#701A75]/30 dark:text-[#F472B6] dark:border-[#A0006D]",
+    offerPackage: "$210,000 Total Comp",
+    readinessScore: 96,
+    scoreGain: "+31 pts",
+    roundsCleared: ["Distributed Systems", "Concurrency Probes", "Architecture"],
+    metrics: [
+      { label: "ATS Match", value: "94% target JD" },
+      { label: "Keywords Added", value: "7 high-yield" },
+      { label: "Oral Score", value: "9.6 / 10" },
+    ],
+  },
+  {
+    quote: "Most mock platforms give fake 9/10 praise. Rennetus flagged my Big-O auxiliary space inefficiency immediately in the Monaco editor and forced me to optimize to O(1) in-place before my Amazon bar-raiser.",
+    author: "Vikram Sen",
+    role: "Placed at Amazon AWS (Hyderabad)",
+    company: "Amazon AWS",
+    date: "Session #11 • Calibrated",
+    tilt: "rotate-1",
+    accent: "#047857",
+    badgeBg: "bg-[#E8F5F0] text-[#047857] border-[#A7E3CF] dark:bg-[#064E3B]/30 dark:text-[#34D399] dark:border-[#047857]",
+    offerPackage: "$145,000 Base Equivalent",
+    readinessScore: 92,
+    scoreGain: "+22 pts",
+    roundsCleared: ["Amazon LP Bar-Raiser", "Monaco DSA Sandbox", "System Design"],
+    metrics: [
+      { label: "DSA Speed", value: "O(1) in-place" },
+      { label: "Test Cases", value: "100% boundary pass" },
+      { label: "Decision", value: "Strong Hire" },
+    ],
+  },
+  {
+    quote: "The Socratic follow-up questions felt 100% like talking to a real Principal Engineer. No canned scripts — Ava picked up on my exact edge-case assumptions and grilled me on zero-downtime rollback strategies.",
+    author: "Sneha Mukherjee",
+    role: "Placed at Microsoft Core Platform",
+    company: "Microsoft",
+    date: "Session #06 • Calibrated",
+    tilt: "-rotate-1",
+    accent: "#E11D48",
+    badgeBg: "bg-[#FFF1F2] text-[#E11D48] border-[#FECDD3] dark:bg-[#881337]/30 dark:text-[#FDA4AF] dark:border-[#E11D48]",
+    offerPackage: "$178,000 + Sign-on",
+    readinessScore: 95,
+    scoreGain: "+28 pts",
+    roundsCleared: ["Core Cloud Infra", "Resilience & Rollback", "Culture Alignment"],
+    metrics: [
+      { label: "Follow-up Handling", value: "96% unscripted" },
+      { label: "Eye Gaze Focus", value: "94% confident" },
+      { label: "Board Decision", value: "Consensus Hire" },
+    ],
+  },
+];
+
+// ─── Hiring Companies Marquee Data ───────────────────────────
+
+const HIRING_COMPANIES = [
+  { name: 'Google', Logo: GoogleLogo },
+  { name: 'Stripe', Logo: StripeLogo },
+  { name: 'Amazon AWS', Logo: AWSLogo },
+  { name: 'Microsoft', Logo: MicrosoftLogo },
+  { name: 'Meta', Logo: MetaLogo },
+  { name: 'Apple', Logo: AppleLogo },
+  { name: 'Uber', Logo: UberLogo },
+  { name: 'OpenAI', Logo: OpenAILogo },
+  { name: 'Netflix', Logo: NetflixLogo },
+  { name: 'Nvidia', Logo: NvidiaLogo },
+  { name: 'GitHub', Logo: GitHubLogo },
+  { name: 'Figma', Logo: FigmaLogo },
+  { name: 'Salesforce', Logo: SalesforceLogo },
+  { name: 'Adobe', Logo: CompanyMark },
+  { name: 'Atlassian', Logo: CompanyMark },
+  { name: 'Shopify', Logo: CompanyMark },
+  { name: 'LinkedIn', Logo: LinkedInLogo },
+  { name: 'Airbnb', Logo: AirbnbLogo },
+  { name: 'Spotify', Logo: SpotifyLogo },
+  { name: 'X', Logo: CompanyMark },
+  { name: 'Reddit', Logo: CompanyMark },
+  { name: 'Slack', Logo: CompanyMark },
+  { name: 'Twilio', Logo: CompanyMark },
+  { name: 'Cloudflare', Logo: CompanyMark },
+  { name: 'Snowflake', Logo: CompanyMark },
+  { name: 'Datadog', Logo: CompanyMark },
+  { name: 'MongoDB', Logo: CompanyMark },
+  { name: 'Oracle', Logo: CompanyMark },
+  { name: 'IBM', Logo: CompanyMark },
+  { name: 'Cisco', Logo: CompanyMark },
+  { name: 'Intel', Logo: CompanyMark },
+  { name: 'Qualcomm', Logo: CompanyMark },
+  { name: 'Samsung', Logo: CompanyMark },
+  { name: 'Walmart Global Tech', Logo: CompanyMark },
+  { name: 'JPMorgan Chase', Logo: CompanyMark },
+  { name: 'Goldman Sachs', Logo: CompanyMark },
+  { name: 'Morgan Stanley', Logo: CompanyMark },
+  { name: 'PayPal', Logo: CompanyMark },
+  { name: 'Block', Logo: CompanyMark },
+  { name: 'Coinbase', Logo: CompanyMark },
+  { name: 'Razorpay', Logo: CompanyMark },
+  { name: 'PhonePe', Logo: CompanyMark },
+  { name: 'Swiggy', Logo: CompanyMark },
+  { name: 'Zomato', Logo: CompanyMark },
+  { name: 'Flipkart', Logo: CompanyMark },
+  { name: 'Meesho', Logo: CompanyMark },
+  { name: 'Zoho', Logo: CompanyMark },
+  { name: 'Freshworks', Logo: CompanyMark },
+  { name: 'Postman', Logo: CompanyMark },
+  { name: 'BrowserStack', Logo: CompanyMark },
+  { name: 'CRED', Logo: CompanyMark },
+  { name: 'Deloitte', Logo: CompanyMark },
+  { name: 'Accenture', Logo: CompanyMark },
+  { name: 'TCS', Logo: CompanyMark },
+  { name: 'Infosys', Logo: CompanyMark },
+  { name: 'Wipro', Logo: CompanyMark },
+  { name: 'Capgemini', Logo: CompanyMark },
+  { name: 'ServiceNow', Logo: CompanyMark },
+  { name: 'SAP', Logo: CompanyMark },
+  { name: 'ARM', Logo: CompanyMark },
+];
+
+// ─── Section Helper Component with Fluid Scroll Trigger ────────
+
+const Section = forwardRef<HTMLElement, {
   children: React.ReactNode;
   className?: string;
   id?: string;
-}) {
-  const ref = useRef<HTMLElement>(null);
-  const isInView = useInView(ref, { once: true, margin: '-60px' });
+  once?: boolean;
+}>(function Section({ children, className = '', id, once = false }, forwardedRef) {
+  const internalRef = useRef<HTMLElement>(null);
+  const targetRef = (forwardedRef as React.RefObject<HTMLElement>) || internalRef;
+  const isInView = useInView(targetRef, { once, margin: '-60px' });
 
   return (
     <motion.section
-      ref={ref}
+      ref={targetRef}
       id={id}
-      initial={{ opacity: 0, y: 30 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-      transition={{ duration: 0.6, ease: 'easeOut' }}
-      className={className}
+      initial={{ opacity: 0, y: 35 }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 35 }}
+      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+      className={`scroll-mt-28 ${className}`}
     >
       {children}
     </motion.section>
+  );
+});
+
+// ─── Technical Blueprint & Drafting Grid Overlays ────────────
+
+function TechnicalGridOverlay({
+  className = '',
+}: {
+  pattern?: string;
+  className?: string;
+}) {
+  return (
+    <div className={`absolute inset-0 pointer-events-none z-0 overflow-hidden ${className}`}>
+      {/* Dull, subtle small-box grid lines (24px x 24px) */}
+      <div
+        className="w-full h-full opacity-40 dark:opacity-20"
+        style={{
+          backgroundImage: `
+            linear-gradient(to right, rgba(100, 116, 139, 0.12) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(100, 116, 139, 0.12) 1px, transparent 1px)
+          `,
+          backgroundSize: '24px 24px',
+          maskImage: 'radial-gradient(ellipse 95% 85% at 50% 50%, black 50%, transparent 100%)',
+          WebkitMaskImage: 'radial-gradient(ellipse 95% 85% at 50% 50%, black 50%, transparent 100%)',
+        }}
+      />
+    </div>
   );
 }
 
 export default function Landing() {
   const containerRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
+  const [conversionEmail, setConversionEmail] = useState('');
 
   const [activeFaqCategory, setActiveFaqCategory] = useState<number>(0);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const [pricingCycle, setPricingCycle] = useState<'monthly' | 'yearly'>('monthly');
+  const [activeFeatureIndex, setActiveFeatureIndex] = useState<number>(0);
+
+  // ─── 1. Global Page Scroll Progress Hook ─────────────────────
+  const { scrollYProgress: globalScroll } = useScroll();
+  const scaleX = useSpring(globalScroll, {
+    stiffness: 120,
+    damping: 30,
+    restDelta: 0.001,
+  });
+
+  // ─── 2. Hero Section Parallax Scroll Hooks ───────────────────
+  const { scrollYProgress: heroScroll } = useScroll({
+    target: heroRef,
+    offset: ['start start', 'end start'],
+  });
+  const heroContentY = useTransform(heroScroll, [0, 1], [0, 130]);
+  const heroOpacity = useTransform(heroScroll, [0, 0.75], [1, 0.15]);
+  const heroOrbitScale = useTransform(heroScroll, [0, 1], [1, 0.86]);
+  const heroOrbitRotate = useTransform(heroScroll, [0, 1], [0, 24]);
+  const heroBlobsY = useTransform(heroScroll, [0, 1], [0, -80]);
+
+  // ─── 3. Cascading Mockups Scroll Depth Parallax ─────────────
+  const { scrollYProgress: previewScroll } = useScroll({
+    target: previewRef,
+    offset: ['start end', 'end start'],
+  });
+  const leftMockupY = useTransform(previewScroll, [0, 1], [80, -30]);
+  const rightMockupY = useTransform(previewScroll, [0, 1], [130, -50]);
+  const centerMockupScale = useTransform(previewScroll, [0, 0.5, 1], [0.94, 1.03, 0.96]);
 
   return (
     <div
       ref={containerRef}
-      className="min-h-screen bg-[#EFFAFD] text-[#0F172A] overflow-hidden selection:bg-[#4A8BDF]/20 selection:text-[#2459A8] font-sans"
+      className="min-h-screen bg-[#EFFAFD] dark:bg-[#000000] text-[#0F172A] dark:text-[#FFFFFF] overflow-hidden selection:bg-[#4A8BDF]/20 selection:text-[#2459A8] font-sans"
     >
       <Helmet>
         <title>Rennetus — Recognize • Rebuild • Rise | AI Interview Platform</title>
         <meta
           name="description"
-          content="Rennetus — Calibrated AI Mock Interviews, ATS Resume Alignment, Live In-Browser Coding Sandbox, and Custom Tech Career Roadmaps."
+          content="Rennetus — Calibrated AI Mock Interviews, ATS Resume Alignment, Live In-Browser Coding Sandbox, and Calibrated AI Interview Practice and ATS Resume Alignment."
         />
       </Helmet>
 
+      {/* ─── Global Top Smooth Scroll Progress Bar ─── */}
+      <motion.div
+        style={{ scaleX }}
+        className="fixed top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#4A8BDF] via-[#2459A8] to-[#E11D48] origin-left z-50 pointer-events-none shadow-sm shadow-[#4A8BDF]/40"
+      />
 
+      {/* ─── Global Background Architectural Grid Lines (Dull color, small boxes) ─── */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div
+          className="w-full h-full opacity-35 dark:opacity-15"
+          style={{
+            backgroundImage: `
+              linear-gradient(to right, rgba(100, 116, 139, 0.1) 1px, transparent 1px),
+              linear-gradient(to bottom, rgba(100, 116, 139, 0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: '24px 24px',
+          }}
+        />
+      </div>
+
+      {/* ─── Global Tactile Analog Paper Grain Overlay ─── */}
+      <div className="fixed inset-0 pointer-events-none z-50 opacity-[0.24] dark:opacity-[0.14] mix-blend-overlay">
+        <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+          <filter id="rennetus-grain">
+            <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
+            <feColorMatrix type="saturate" values="0" />
+          </filter>
+          <rect width="100%" height="100%" filter="url(#rennetus-grain)" />
+        </svg>
+      </div>
 
       {/* ════════════════════════════════════════════════════════ */}
       {/* 1. HERO SECTION WITH PERFECT CONCENTRIC ORBITING LOGOS   */}
       {/* ════════════════════════════════════════════════════════ */}
       <section
         ref={heroRef}
-        className="relative min-h-[96vh] flex flex-col items-center justify-center pt-28 pb-20 lg:pt-36 lg:pb-28 overflow-hidden bg-gradient-to-b from-[#EFFAFD] via-white to-[#EFFAFD]"
+        className="relative min-h-[96vh] flex flex-col items-center justify-center pt-28 pb-20 lg:pt-36 lg:pb-28 overflow-hidden bg-gradient-to-b from-[#EFFAFD] via-white to-[#EFFAFD] dark:from-[#000000] dark:via-[#1A1A1A] dark:to-[#000000]"
       >
-        {/* Ambient Radial Background Glows */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[850px] h-[550px] bg-[#4A8BDF]/10 rounded-full blur-[140px] pointer-events-none z-0" />
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[450px] h-[450px] bg-[#A0006D]/8 rounded-full blur-[120px] pointer-events-none z-0" />
+        {/* Technical Blueprint Grid Backdrop + Horizon Grid Floor */}
+        <TechnicalGridOverlay pattern="perspective" />
 
-        {/* ─── Concentric Circular Orbit Rings with Smooth Rotating Logos ─── */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden z-10">
-          
+        {/* Ambient Radial Background Glows with Scroll Parallax + Floating Motion */}
+        <motion.div style={{ y: heroBlobsY }} className="absolute inset-0 pointer-events-none">
+          <motion.div
+            animate={{ y: [-10, 10, -10], x: [-6, 6, -6] }}
+            transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[850px] h-[550px] bg-[#4A8BDF]/12 dark:bg-white/5 rounded-full blur-[140px] pointer-events-none z-0"
+          />
+          <motion.div
+            animate={{ y: [10, -10, 10], x: [6, -6, 6] }}
+            transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+            className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[480px] h-[480px] bg-[#E11D48]/8 dark:bg-white/5 rounded-full blur-[120px] pointer-events-none z-0"
+          />
+        </motion.div>
+
+        {/* ─── Concentric Circular Orbit Rings with Smooth Rotating Logos & Scroll Scale ─── */}
+        <motion.div
+          style={{ scale: heroOrbitScale, rotate: heroOrbitRotate }}
+          className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden z-10"
+        >
           {/* ORBIT RING 1: Inner Perimeter (Radius 360px => Diameter 720px) */}
-          <div className="absolute w-[720px] h-[720px] rounded-full border border-[#DCE7F2]/90 hidden md:block">
+          <div className="absolute w-[720px] h-[720px] rounded-full border border-[#DCE7F2]/90 dark:border-[#262626] hidden md:block">
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 48, repeat: Infinity, ease: 'linear' }}
@@ -465,7 +962,7 @@ export default function Landing() {
                 <motion.div
                   animate={{ rotate: -360 }}
                   transition={{ duration: 48, repeat: Infinity, ease: 'linear' }}
-                  className="p-3 rounded-full bg-white border border-[#DCE7F2] shadow-md hover:scale-120 hover:shadow-xl transition-all cursor-pointer flex items-center justify-center"
+                  className="p-3 rounded-full bg-white dark:bg-[#1C1C1C] border border-[#DCE7F2] dark:border-[#262626] shadow-md hover:scale-120 hover:shadow-xl transition-all cursor-pointer flex items-center justify-center"
                   title="Google"
                 >
                   <GoogleLogo className="w-5 h-5" />
@@ -477,7 +974,7 @@ export default function Landing() {
                 <motion.div
                   animate={{ rotate: -360 }}
                   transition={{ duration: 48, repeat: Infinity, ease: 'linear' }}
-                  className="p-3 rounded-full bg-white border border-[#DCE7F2] shadow-md hover:scale-120 hover:shadow-xl transition-all cursor-pointer flex items-center justify-center"
+                  className="p-3 rounded-full bg-white dark:bg-[#1C1C1C] border border-[#DCE7F2] dark:border-[#262626] shadow-md hover:scale-120 hover:shadow-xl transition-all cursor-pointer flex items-center justify-center"
                   title="AWS"
                 >
                   <AWSLogo className="w-5 h-5" />
@@ -489,7 +986,7 @@ export default function Landing() {
                 <motion.div
                   animate={{ rotate: -360 }}
                   transition={{ duration: 48, repeat: Infinity, ease: 'linear' }}
-                  className="p-3 rounded-full bg-white border border-[#DCE7F2] shadow-md hover:scale-120 hover:shadow-xl transition-all cursor-pointer flex items-center justify-center"
+                  className="p-3 rounded-full bg-white dark:bg-[#1C1C1C] border border-[#DCE7F2] dark:border-[#262626] shadow-md hover:scale-120 hover:shadow-xl transition-all cursor-pointer flex items-center justify-center"
                   title="Stripe"
                 >
                   <StripeLogo className="w-5 h-5" />
@@ -501,7 +998,7 @@ export default function Landing() {
                 <motion.div
                   animate={{ rotate: -360 }}
                   transition={{ duration: 48, repeat: Infinity, ease: 'linear' }}
-                  className="p-3 rounded-full bg-white border border-[#DCE7F2] shadow-md hover:scale-120 hover:shadow-xl transition-all cursor-pointer flex items-center justify-center"
+                  className="p-3 rounded-full bg-white dark:bg-[#1C1C1C] border border-[#DCE7F2] dark:border-[#262626] shadow-md hover:scale-120 hover:shadow-xl transition-all cursor-pointer flex items-center justify-center"
                   title="Uber"
                 >
                   <UberLogo className="w-5 h-5" />
@@ -513,7 +1010,7 @@ export default function Landing() {
                 <motion.div
                   animate={{ rotate: -360 }}
                   transition={{ duration: 48, repeat: Infinity, ease: 'linear' }}
-                  className="p-3 rounded-full bg-white border border-[#DCE7F2] shadow-md hover:scale-120 hover:shadow-xl transition-all cursor-pointer flex items-center justify-center"
+                  className="p-3 rounded-full bg-white dark:bg-[#1C1C1C] border border-[#DCE7F2] dark:border-[#262626] shadow-md hover:scale-120 hover:shadow-xl transition-all cursor-pointer flex items-center justify-center"
                   title="OpenAI"
                 >
                   <OpenAILogo className="w-5 h-5" />
@@ -525,7 +1022,7 @@ export default function Landing() {
                 <motion.div
                   animate={{ rotate: -360 }}
                   transition={{ duration: 48, repeat: Infinity, ease: 'linear' }}
-                  className="p-3 rounded-full bg-white border border-[#DCE7F2] shadow-md hover:scale-120 hover:shadow-xl transition-all cursor-pointer flex items-center justify-center"
+                  className="p-3 rounded-full bg-white dark:bg-[#1C1C1C] border border-[#DCE7F2] dark:border-[#262626] shadow-md hover:scale-120 hover:shadow-xl transition-all cursor-pointer flex items-center justify-center"
                   title="GitHub"
                 >
                   <GitHubLogo className="w-5 h-5" />
@@ -535,7 +1032,7 @@ export default function Landing() {
           </div>
 
           {/* ORBIT RING 2: Middle Perimeter (Radius 520px => Diameter 1040px) */}
-          <div className="absolute w-[1040px] h-[1040px] rounded-full border border-[#DCE7F2]/60 hidden lg:block">
+          <div className="absolute w-[1040px] h-[1040px] rounded-full border border-[#DCE7F2]/60 dark:border-[#262626]/70 hidden lg:block">
             <motion.div
               animate={{ rotate: -360 }}
               transition={{ duration: 68, repeat: Infinity, ease: 'linear' }}
@@ -546,7 +1043,7 @@ export default function Landing() {
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 68, repeat: Infinity, ease: 'linear' }}
-                  className="p-3 rounded-full bg-white border border-[#DCE7F2] shadow-md hover:scale-120 hover:shadow-xl transition-all cursor-pointer flex items-center justify-center"
+                  className="p-3 rounded-full bg-white dark:bg-[#1C1C1C] border border-[#DCE7F2] dark:border-[#262626] shadow-md hover:scale-120 hover:shadow-xl transition-all cursor-pointer flex items-center justify-center"
                   title="Meta"
                 >
                   <MetaLogo className="w-5 h-5" />
@@ -558,7 +1055,7 @@ export default function Landing() {
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 68, repeat: Infinity, ease: 'linear' }}
-                  className="p-3 rounded-full bg-white border border-[#DCE7F2] shadow-md hover:scale-120 hover:shadow-xl transition-all cursor-pointer flex items-center justify-center"
+                  className="p-3 rounded-full bg-white dark:bg-[#1C1C1C] border border-[#DCE7F2] dark:border-[#262626] shadow-md hover:scale-120 hover:shadow-xl transition-all cursor-pointer flex items-center justify-center"
                   title="Microsoft"
                 >
                   <MicrosoftLogo className="w-5 h-5" />
@@ -570,7 +1067,7 @@ export default function Landing() {
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 68, repeat: Infinity, ease: 'linear' }}
-                  className="p-3 rounded-full bg-white border border-[#DCE7F2] shadow-md hover:scale-120 hover:shadow-xl transition-all cursor-pointer flex items-center justify-center"
+                  className="p-3 rounded-full bg-white dark:bg-[#1C1C1C] border border-[#DCE7F2] dark:border-[#262626] shadow-md hover:scale-120 hover:shadow-xl transition-all cursor-pointer flex items-center justify-center"
                   title="Apple"
                 >
                   <AppleLogo className="w-5 h-5" />
@@ -582,7 +1079,7 @@ export default function Landing() {
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 68, repeat: Infinity, ease: 'linear' }}
-                  className="p-3 rounded-full bg-white border border-[#DCE7F2] shadow-md hover:scale-120 hover:shadow-xl transition-all cursor-pointer flex items-center justify-center"
+                  className="p-3 rounded-full bg-white dark:bg-[#1C1C1C] border border-[#DCE7F2] dark:border-[#262626] shadow-md hover:scale-120 hover:shadow-xl transition-all cursor-pointer flex items-center justify-center"
                   title="Netflix"
                 >
                   <NetflixLogo className="w-5 h-5" />
@@ -594,7 +1091,7 @@ export default function Landing() {
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 68, repeat: Infinity, ease: 'linear' }}
-                  className="p-3 rounded-full bg-white border border-[#DCE7F2] shadow-md hover:scale-120 hover:shadow-xl transition-all cursor-pointer flex items-center justify-center"
+                  className="p-3 rounded-full bg-white dark:bg-[#1C1C1C] border border-[#DCE7F2] dark:border-[#262626] shadow-md hover:scale-120 hover:shadow-xl transition-all cursor-pointer flex items-center justify-center"
                   title="Spotify"
                 >
                   <SpotifyLogo className="w-5 h-5" />
@@ -606,7 +1103,7 @@ export default function Landing() {
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 68, repeat: Infinity, ease: 'linear' }}
-                  className="p-3 rounded-full bg-white border border-[#DCE7F2] shadow-md hover:scale-120 hover:shadow-xl transition-all cursor-pointer flex items-center justify-center"
+                  className="p-3 rounded-full bg-white dark:bg-[#1C1C1C] border border-[#DCE7F2] dark:border-[#262626] shadow-md hover:scale-120 hover:shadow-xl transition-all cursor-pointer flex items-center justify-center"
                   title="LinkedIn"
                 >
                   <LinkedInLogo className="w-5 h-5" />
@@ -616,7 +1113,7 @@ export default function Landing() {
           </div>
 
           {/* ORBIT RING 3: Outer Perimeter (Radius 680px => Diameter 1360px) */}
-          <div className="absolute w-[1360px] h-[1360px] rounded-full border border-[#DCE7F2]/40 hidden xl:block">
+          <div className="absolute w-[1360px] h-[1360px] rounded-full border border-[#DCE7F2]/40 dark:border-[#262626]/50 hidden xl:block">
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 92, repeat: Infinity, ease: 'linear' }}
@@ -627,7 +1124,7 @@ export default function Landing() {
                 <motion.div
                   animate={{ rotate: -360 }}
                   transition={{ duration: 92, repeat: Infinity, ease: 'linear' }}
-                  className="p-3 rounded-full bg-white border border-[#DCE7F2] shadow-md hover:scale-120 hover:shadow-xl transition-all cursor-pointer flex items-center justify-center"
+                  className="p-3 rounded-full bg-white dark:bg-[#1C1C1C] border border-[#DCE7F2] dark:border-[#262626] shadow-md hover:scale-120 hover:shadow-xl transition-all cursor-pointer flex items-center justify-center"
                   title="Airbnb"
                 >
                   <AirbnbLogo className="w-5 h-5" />
@@ -639,7 +1136,7 @@ export default function Landing() {
                 <motion.div
                   animate={{ rotate: -360 }}
                   transition={{ duration: 92, repeat: Infinity, ease: 'linear' }}
-                  className="p-3 rounded-full bg-white border border-[#DCE7F2] shadow-md hover:scale-120 hover:shadow-xl transition-all cursor-pointer flex items-center justify-center"
+                  className="p-3 rounded-full bg-white dark:bg-[#1C1C1C] border border-[#DCE7F2] dark:border-[#262626] shadow-md hover:scale-120 hover:shadow-xl transition-all cursor-pointer flex items-center justify-center"
                   title="Nvidia"
                 >
                   <NvidiaLogo className="w-5 h-5" />
@@ -651,7 +1148,7 @@ export default function Landing() {
                 <motion.div
                   animate={{ rotate: -360 }}
                   transition={{ duration: 92, repeat: Infinity, ease: 'linear' }}
-                  className="p-3 rounded-full bg-white border border-[#DCE7F2] shadow-md hover:scale-120 hover:shadow-xl transition-all cursor-pointer flex items-center justify-center"
+                  className="p-3 rounded-full bg-white dark:bg-[#1C1C1C] border border-[#DCE7F2] dark:border-[#262626] shadow-md hover:scale-120 hover:shadow-xl transition-all cursor-pointer flex items-center justify-center"
                   title="Figma"
                 >
                   <FigmaLogo className="w-5 h-5" />
@@ -663,7 +1160,7 @@ export default function Landing() {
                 <motion.div
                   animate={{ rotate: -360 }}
                   transition={{ duration: 92, repeat: Infinity, ease: 'linear' }}
-                  className="p-3 rounded-full bg-white border border-[#DCE7F2] shadow-md hover:scale-120 hover:shadow-xl transition-all cursor-pointer flex items-center justify-center"
+                  className="p-3 rounded-full bg-white dark:bg-[#1C1C1C] border border-[#DCE7F2] dark:border-[#262626] shadow-md hover:scale-120 hover:shadow-xl transition-all cursor-pointer flex items-center justify-center"
                   title="Salesforce"
                 >
                   <SalesforceLogo className="w-5 h-5" />
@@ -671,21 +1168,26 @@ export default function Landing() {
               </div>
             </motion.div>
           </div>
-        </div>
+        </motion.div>
 
-        {/* ─── Hero Center Content Box ─── */}
-        <div className="relative z-20 mx-auto max-w-3xl px-4 sm:px-6 text-center space-y-7">
-          
-          {/* Main Hero Headline */}
+        {/* ─── Hero Center Content Box with Scroll Parallax Dissipation ─── */}
+        <motion.div
+          style={{ y: heroContentY, opacity: heroOpacity }}
+          className="relative z-20 mx-auto max-w-4xl px-4 sm:px-6 text-center space-y-7"
+        >
+          {/* Main Hero Headline with Reenie Beanie Tactile Cursive Emphasis */}
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.1 }}
-            className="font-sans font-black text-4xl sm:text-5xl lg:text-6xl text-[#0F172A] leading-[1.14] tracking-tight"
+            className="font-sans font-black text-4xl sm:text-6xl lg:text-7xl text-[#0F172A] dark:text-white leading-[1.12] tracking-tight max-w-4xl mx-auto"
           >
             Check Your Standards &{' '}
-            <span className="text-[#4A8BDF] underline decoration-[#4A8BDF]/40 underline-offset-8">
-              Upgrade Yourself
+            <span className="font-cursive text-5xl sm:text-7xl lg:text-8xl text-[#E11D48] -rotate-2 inline-block px-1 font-normal tracking-normal select-none">
+              authentically
+            </span>{' '}
+            <span className="text-[#4A8BDF] underline decoration-[#4A8BDF]/30 underline-offset-8">
+              Upgrade
             </span>{' '}
             to Get Placed
           </motion.h1>
@@ -695,9 +1197,9 @@ export default function Landing() {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.25 }}
-            className="font-sans text-base sm:text-lg text-black font-semibold max-w-2xl mx-auto leading-relaxed"
+            className="font-sans text-base sm:text-lg text-[#374151] dark:text-gray-300 font-semibold max-w-2xl mx-auto leading-relaxed"
           >
-            From ATS resume alignment and live browser coding to Socratic mock interviews and custom career roadmaps — benchmark your real readiness against Tier-1 tech hiring bars.
+            From ATS resume alignment and live browser coding to Socratic mock interviews and — benchmark your real readiness against Tier-1 tech hiring bars.
           </motion.p>
 
           {/* Action Buttons */}
@@ -711,86 +1213,347 @@ export default function Landing() {
               <motion.button
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
-                className="inline-flex items-center gap-2.5 bg-[#0F172A] hover:bg-[#1E293B] text-white font-sans font-bold text-sm sm:text-base px-8 py-3.5 rounded-full shadow-lg hover:shadow-xl transition-all cursor-pointer"
+                className="inline-flex items-center gap-2.5 bg-[#0F172A] hover:bg-[#1E293B] text-white dark:bg-white dark:text-black dark:hover:bg-[#EBEBF5] font-sans font-bold text-sm sm:text-base px-8 py-3.5 rounded-full shadow-lg hover:shadow-xl transition-all cursor-pointer"
               >
                 <span>{isAuthenticated ? 'Go to Dashboard' : 'Start Free Practice'}</span>
-                <ArrowRight className="h-4 w-4 text-white" />
+                <ArrowRight className="h-4 w-4 text-white dark:text-black" />
               </motion.button>
             </Link>
+          </motion.div>
+        </motion.div>
+      </section>
 
-            <Link to="/roadmap">
-              <motion.button
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-                className="inline-flex items-center gap-2 bg-white hover:bg-[#EFFAFD] text-[#0F172A] hover:text-[#4A8BDF] font-sans font-bold text-sm sm:text-base px-7 py-3.5 rounded-full border-2 border-[#DCE7F2] hover:border-[#4A8BDF] shadow-sm hover:shadow transition-all cursor-pointer"
+      {/* ─── MOST POPULAR TECH ROLES & HIRING COMPANIES MARQUEE ─── */}
+      <section className="relative w-full py-6 space-y-4 overflow-hidden border-y border-[#DCE7F2] dark:border-[#262626] bg-white/40 dark:bg-black/30 backdrop-blur-xs">
+        <TechnicalGridOverlay />
+
+        {/* Roles Marquee Row */}
+        <div className="relative w-full overflow-hidden py-2 bg-white/40 dark:bg-black/40 backdrop-blur-xs border-y border-[#DCE7F2]/60 dark:border-[#262626]/80">
+          <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-[#EFFAFD] dark:from-[#000000] to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[#EFFAFD] dark:from-[#000000] to-transparent z-10 pointer-events-none" />
+          <motion.div
+            animate={{ x: ['0%', '-50%'] }}
+            transition={{ duration: 38, repeat: Infinity, ease: 'linear' }}
+            className="flex items-center gap-4 whitespace-nowrap w-max"
+          >
+            {[...POPULAR_TECH_ROLES, ...POPULAR_TECH_ROLES].map((role, idx) => (
+              <Link
+                key={idx}
+                to={role.roleRoute}
+                className="inline-flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-white dark:bg-[#1A1A1A] border border-[#DCE7F2] dark:border-[#262626] shadow-2xs hover:shadow-card hover:border-[#4A8BDF]/60 transition-all cursor-pointer group"
               >
-                <Compass className="w-4.5 h-4.5 text-[#4A8BDF]" />
-                <span className="text-[#0F172A]">Explore Roadmaps</span>
-              </motion.button>
-            </Link>
+                <div className="flex flex-col text-left">
+                  <span className="text-xs font-bold text-[#0F172A] dark:text-white group-hover:text-[#4A8BDF] transition-colors font-sans">
+                    {role.title}
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </motion.div>
+        </div>
+
+        {/* Tier-1 Hiring Companies Marquee Row */}
+        <div className="relative w-full overflow-hidden py-2 bg-transparent">
+          <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-[#EFFAFD] dark:from-[#000000] to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[#EFFAFD] dark:from-[#000000] to-transparent z-10 pointer-events-none" />
+          <motion.div
+            animate={{ x: ['-50%', '0%'] }}
+            transition={{ duration: 38, repeat: Infinity, ease: 'linear' }}
+            className="flex items-center gap-12 whitespace-nowrap w-max"
+          >
+            {[...HIRING_COMPANIES, ...HIRING_COMPANIES].map((comp, idx) => {
+              const CompLogo = comp.Logo;
+              return (
+                <div key={idx} className="flex items-center gap-2.5 opacity-70 hover:opacity-100 transition-opacity cursor-default">
+                  <span className="p-1.5 rounded-full bg-white dark:bg-[#1E1E1E] shadow-2xs border border-[#DCE7F2] dark:border-[#303030]">
+                    {CompLogo === CompanyMark ? <CompanyMark name={comp.name} className="w-4 h-4" /> : <CompLogo className="w-4 h-4" />}
+                  </span>
+                  <span className="text-xs font-bold text-[#0F172A] dark:text-white font-sans">{comp.name}</span>
+                </div>
+              );
+            })}
           </motion.div>
         </div>
       </section>
 
       {/* ════════════════════════════════════════════════════════ */}
-      {/* 2. SEQUENTIAL SCROLLING FEATURE CARDS WITH LIVE SIMULATIONS */}
+      {/* 3. INTERACTIVE 3-CARD COVER FLOW FEATURES CAROUSEL       */}
       {/* ════════════════════════════════════════════════════════ */}
-      <section id="features" className="py-20 sm:py-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
-        
-        {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-4">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#0F172A] tracking-tight">
-            Four Core Pillars to Power Your Placement
+      <Section id="features" ref={previewRef} className="relative py-12 sm:py-16 lg:py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-x border-[#DCE7F2]/60 dark:border-[#262626]/70">
+        {/* Technical Blueprint Grid Background */}
+        <TechnicalGridOverlay pattern="blueprint" />
+
+        {/* Section Header - Compact */}
+        <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-10 relative z-10 space-y-3">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#0F172A] dark:text-white tracking-tight">
+            Everything you need to turn <span className="text-[#4A8BDF]">practice into proof.</span>
           </h2>
-          <p className="text-base sm:text-lg text-black font-medium leading-relaxed">
-            Experience our calibrated interview intelligence suite — designed with real-time telemetry, live code execution, and uninflated rubrics.
+          <p className="landing-copy text-sm sm:text-base text-[#334155] dark:text-[#A8A8A8] font-medium leading-relaxed max-w-2xl mx-auto">
+            Explore every part of the Rennetus loop—from finding a gap to rehearsing it under pressure, then tracking the evidence that you are ready.
           </p>
         </div>
 
-        {/* Interactive Feature Showcase Carousel (Simple, Understandable & Engaging) */}
-        <FeaturesCarousel />
-      </section>
+        {/* 3-Card Staging Layout: Left, Center (Enlarged with Curves & Grey Font), Right */}
+        <div className="relative z-10">
+          {(() => {
+            const total = FEATURE_CARDS.length;
+            const prevIdx = (activeFeatureIndex - 1 + total) % total;
+            const currIdx = activeFeatureIndex;
+            const nextIdx = (activeFeatureIndex + 1) % total;
+
+            const prevCard = FEATURE_CARDS[prevIdx];
+            const currCard = FEATURE_CARDS[currIdx];
+            const nextCard = FEATURE_CARDS[nextIdx];
+
+            return (
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-5 lg:gap-6 items-center">
+                
+                {/* ─── LEFT CARD (Click / < to view) ─── */}
+                <motion.div
+                  key={`prev-${prevIdx}`}
+                  initial={{ opacity: 0, x: -20, scale: 0.92 }}
+                  animate={{ opacity: 0.82, x: 0, scale: 0.95 }}
+                  transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                  whileHover={{ opacity: 1, scale: 0.98 }}
+                  onClick={() => setActiveFeatureIndex(prevIdx)}
+                  className={`hidden lg:flex lg:col-span-3 min-h-[340px] sm:min-h-[360px] rounded-[24px] border ${prevCard.theme.border} ${prevCard.theme.bg} p-4 sm:p-5 shadow-sm hover:shadow-md cursor-pointer flex-col justify-between transition-all select-none group backdrop-blur-xs`}
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border ${prevCard.theme.badge}`}>
+                        Pillar {prevCard.step}
+                      </span>
+                      <span className="text-[10px] font-mono text-[#64748B] dark:text-[#94A3B8]">
+                        0{prevIdx + 1} / 0{total}
+                      </span>
+                    </div>
+
+                    <h3 className={`text-base sm:text-lg font-bold font-sans leading-snug transition-colors ${prevCard.theme.accentText}`}>
+                      {prevCard.title}
+                    </h3>
+
+                    <p className="text-xs text-[#475569] dark:text-[#94A3B8] font-medium leading-relaxed line-clamp-3">
+                      {prevCard.description}
+                    </p>
+                  </div>
+
+                  <div className="pt-3 border-t border-black/5 dark:border-white/10 flex items-center justify-between">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveFeatureIndex(prevIdx);
+                      }}
+                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold ${prevCard.theme.btn} shadow-xs cursor-pointer`}
+                    >
+                      <ChevronLeft className="w-3.5 h-3.5" />
+                      <span>Prev</span>
+                    </button>
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-[#64748B] dark:text-[#94A3B8] font-bold">
+                      Click to view
+                    </span>
+                  </div>
+                </motion.div>
+
+                {/* ─── CENTER CARD (Curved, Refined Colors, Grey Font, Fits Full Screen) ─── */}
+                <motion.div
+                  key={`curr-${currIdx}`}
+                  initial={{ opacity: 0, y: 15, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1.02 }}
+                  transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                  className={`md:col-span-12 lg:col-span-6 min-h-[375px] sm:min-h-[395px] rounded-[30px] sm:rounded-[36px] border-2 ${currCard.theme.border} ${currCard.theme.bg} p-5 sm:p-6 shadow-xl ${currCard.theme.ring} relative flex flex-col justify-between z-30 group backdrop-blur-sm overflow-hidden`}
+                >
+                  {/* Curved Ambient Lighting Orbs */}
+                  <div className={`pointer-events-none absolute -top-14 -right-14 w-48 h-48 rounded-full bg-gradient-to-br ${currCard.theme.glow} blur-2xl opacity-60`} />
+                  <div className={`pointer-events-none absolute -bottom-14 -left-14 w-48 h-48 rounded-full bg-gradient-to-tr ${currCard.theme.glow} blur-2xl opacity-40`} />
+
+                  <div className="space-y-3 relative z-10">
+                    {/* Header Badge */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className={`text-[11px] font-mono font-black px-2.5 py-0.5 rounded-full border shadow-2xs ${currCard.theme.badge}`}>
+                          Pillar {currCard.step}
+                        </span>
+                        <span className="text-xs font-bold text-[#64748B] dark:text-[#94A3B8] font-sans">
+                          {currCard.badge}
+                        </span>
+                      </div>
+                      <span className={`text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-white/70 dark:bg-black/40 border border-black/5 dark:border-white/10 ${currCard.theme.accentText}`}>
+                        Active Focus
+                      </span>
+                    </div>
+
+                    {/* Headline & Description - Grey Font in Dark Mode */}
+                    <div className="space-y-1">
+                      <h3 className="text-lg sm:text-xl font-black font-sans leading-snug text-[#0F172A] dark:text-[#CBD5E1]">
+                        {currCard.title}
+                      </h3>
+                      <p className="text-xs sm:text-sm text-[#475569] dark:text-[#94A3B8] font-medium leading-relaxed line-clamp-2">
+                        {currCard.description}
+                      </p>
+                    </div>
+
+                    {/* Key Technical Benefits - Curved Boxes & Grey Font */}
+                    <div className="space-y-2 pt-1">
+                      {currCard.keyPoints.map((pt, pidx) => (
+                        <div
+                          key={pidx}
+                          className="flex items-center gap-2.5 px-3 py-2 rounded-2xl bg-white/70 dark:bg-[#18191E]/80 border border-slate-200/60 dark:border-[#27272A] shadow-2xs"
+                        >
+                          <CheckCircle2 className={`w-4 h-4 shrink-0 ${currCard.theme.accentText}`} />
+                          <span className="text-xs font-medium text-[#475569] dark:text-[#94A3B8] leading-tight truncate">
+                            {pt}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Primary CTA Button */}
+                  <div className="pt-2.5 border-t border-black/5 dark:border-white/10 relative z-10">
+                    <Link to={currCard.ctaLink} className="block">
+                      <motion.button
+                        whileHover={{ scale: 1.01 }}
+                        whileTap={{ scale: 0.99 }}
+                        className={`w-full py-2.5 sm:py-3 rounded-full font-sans font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer ${currCard.theme.btn}`}
+                      >
+                        <span>{currCard.ctaText}</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </motion.button>
+                    </Link>
+                  </div>
+                </motion.div>
+
+                {/* ─── RIGHT CARD (Click / > to view) ─── */}
+                <motion.div
+                  key={`next-${nextIdx}`}
+                  initial={{ opacity: 0, x: 20, scale: 0.92 }}
+                  animate={{ opacity: 0.82, x: 0, scale: 0.95 }}
+                  transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                  whileHover={{ opacity: 1, scale: 0.98 }}
+                  onClick={() => setActiveFeatureIndex(nextIdx)}
+                  className={`hidden lg:flex lg:col-span-3 min-h-[340px] sm:min-h-[360px] rounded-[24px] border ${nextCard.theme.border} ${nextCard.theme.bg} p-4 sm:p-5 shadow-sm hover:shadow-md cursor-pointer flex-col justify-between transition-all select-none group backdrop-blur-xs`}
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border ${nextCard.theme.badge}`}>
+                        Pillar {nextCard.step}
+                      </span>
+                      <span className="text-[10px] font-mono text-[#64748B] dark:text-[#94A3B8]">
+                        0{nextIdx + 1} / 0{total}
+                      </span>
+                    </div>
+
+                    <h3 className={`text-base sm:text-lg font-bold font-sans leading-snug transition-colors ${nextCard.theme.accentText}`}>
+                      {nextCard.title}
+                    </h3>
+
+                    <p className="text-xs text-[#475569] dark:text-[#94A3B8] font-medium leading-relaxed line-clamp-3">
+                      {nextCard.description}
+                    </p>
+                  </div>
+
+                  <div className="pt-3 border-t border-black/5 dark:border-white/10 flex items-center justify-between">
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-[#64748B] dark:text-[#94A3B8] font-bold">
+                      Click to view
+                    </span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveFeatureIndex(nextIdx);
+                      }}
+                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold ${nextCard.theme.btn} shadow-xs cursor-pointer`}
+                    >
+                      <span>Next</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </motion.div>
+              </div>
+            );
+          })()}
+
+          {/* Carousel Controls: Arrows + Dots Navigator */}
+          <div className="flex items-center justify-center gap-3 pt-4 sm:pt-5">
+            <button
+              onClick={() => setActiveFeatureIndex((prev) => (prev - 1 + FEATURE_CARDS.length) % FEATURE_CARDS.length)}
+              className="p-2 rounded-full bg-white dark:bg-[#1E1E1E] border border-[#DCE7F2] dark:border-[#333] hover:bg-[#EFFAFD] dark:hover:bg-[#2A2A2A] text-[#0F172A] dark:text-[#CBD5E1] transition-all shadow-2xs cursor-pointer active:scale-95"
+              title="Previous pillar"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+
+            <div className="flex items-center gap-1.5">
+              {FEATURE_CARDS.map((card, idx) => (
+                <button
+                  key={card.id}
+                  onClick={() => setActiveFeatureIndex(idx)}
+                  className={`h-2 rounded-full transition-all cursor-pointer ${
+                    activeFeatureIndex === idx
+                      ? 'w-6 bg-[#0F172A] dark:bg-[#CBD5E1]'
+                      : 'w-2 bg-[#CBD5E1] dark:bg-[#404040] hover:bg-[#94A3B8]'
+                  }`}
+                  title={`Jump to ${card.title}`}
+                />
+              ))}
+            </div>
+
+            <button
+              onClick={() => setActiveFeatureIndex((prev) => (prev + 1) % FEATURE_CARDS.length)}
+              className="p-2 rounded-full bg-white dark:bg-[#1E1E1E] border border-[#DCE7F2] dark:border-[#333] hover:bg-[#EFFAFD] dark:hover:bg-[#2A2A2A] text-[#0F172A] dark:text-[#CBD5E1] transition-all shadow-2xs cursor-pointer active:scale-95"
+              title="Next pillar"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </Section>
 
       {/* ════════════════════════════════════════════════════════ */}
       {/* 3. WHAT YOU GAIN WITH R U READY? (TRANSFORMATION VALUE) */}
       {/* ════════════════════════════════════════════════════════ */}
-      <Section id="benefits" className="py-20 sm:py-28 bg-white border-y border-[#DCE7F2]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-14">
+      <Section id="benefits" className="relative py-20 sm:py-28 bg-white/60 dark:bg-[#1A1A1A]/80 backdrop-blur-xs border-y border-[#DCE7F2] dark:border-[#262626] overflow-hidden">
+        {/* Dense Technical Blueprint Grid */}
+        <TechnicalGridOverlay pattern="dense" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-14 relative z-10 border-x border-[#DCE7F2]/60 dark:border-[#262626]/70">
           
           <div className="text-center max-w-3xl mx-auto space-y-4">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#0F172A] tracking-tight">
-              What You Gain With Rennetus
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#0F172A] dark:text-white tracking-tight">
+              <span className="text-[#4A8BDF]">Why Rennetus?</span> Stop guessing what to practice next.
             </h2>
-            <p className="text-base sm:text-lg text-black font-medium leading-relaxed">
-              From your first diagnostic session to clearing strict Tier-1 hiring loops — here is what happens when you prepare with calibrated intelligence.
+            <p className="landing-copy text-base sm:text-lg text-[#334155] dark:text-[#A8A8A8] font-medium leading-relaxed">
+              Rennetus connects the pieces most candidates prepare in isolation: communication, technical depth, resume signal, and a plan that adapts as you improve.
             </p>
           </div>
 
-          {/* 4 Outcome Transformation Cards */}
+          {/* 4 Outcome Transformation Cards with Staggered Scroll Entrance */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             
             {/* Gain 1 */}
             <motion.div
-              whileHover={{ y: -4 }}
-              className="bg-white p-6 sm:p-7 rounded-3xl border border-[#DCE7F2] shadow-sm flex flex-col justify-between space-y-4 group hover:border-[#4A8BDF]/60 hover:shadow-md transition-all"
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.2 }}
+              transition={{ duration: 0.6, delay: 0, ease: [0.22, 1, 0.36, 1] }}
+              whileHover={{ y: -8, scale: 1.01 }}
+              className="bg-white dark:bg-[#1C1C1C] p-6 sm:p-7 rounded-3xl border border-[#DCE7F2] dark:border-[#262626] shadow-sm flex flex-col justify-between space-y-4 group hover:border-[#4A8BDF]/60 hover:shadow-card-hover transition-all"
             >
               <div className="space-y-3">
-                <div className="w-12 h-12 rounded-2xl bg-[#EFFAFD] text-[#4A8BDF] flex items-center justify-center border border-[#DCE7F2] shadow-xs group-hover:scale-105 transition-transform">
-                  <Target className="w-6 h-6 text-[#4A8BDF]" />
+                <div className="w-12 h-12 rounded-2xl bg-[#EFFAFD] dark:bg-[#262626] text-[#4A8BDF] dark:text-[#64D2FF] flex items-center justify-center border border-[#DCE7F2] dark:border-[#303030] shadow-xs group-hover:scale-105 transition-transform">
+                  <Target className="w-6 h-6 text-[#4A8BDF] dark:text-[#64D2FF]" />
                 </div>
-                <h3 className="text-lg font-bold text-[#0F172A] group-hover:text-[#4A8BDF] transition-colors">
+                <h3 className="text-lg font-bold text-[#0F172A] dark:text-white group-hover:text-[#4A8BDF] transition-colors">
                   1. Zero Hidden Blind Spots
                 </h3>
-                <p className="text-xs sm:text-sm text-[#334155] font-medium leading-relaxed">
+                <p className="text-xs sm:text-sm text-[#334155] dark:text-[#D2D2D7] font-medium leading-relaxed">
                   Uncover the exact technical and architectural gaps that cause silent rejections at top tech firms, with zero polite praise.
                 </p>
               </div>
               <Link
                 to="/interview/new"
-                className="pt-4 border-t border-[#DCE7F2] flex items-center justify-between text-xs font-bold text-[#4A8BDF] hover:text-[#2459A8] transition-colors group/btn"
+                className="pt-4 border-t border-[#DCE7F2] dark:border-[#262626] flex items-center justify-between text-xs font-bold text-[#4A8BDF] dark:text-[#64D2FF] hover:text-[#2459A8] transition-colors group/btn"
               >
                 <span>Strict Tier-1 Scoring Rubrics</span>
-                <span className="w-7 h-7 rounded-full bg-[#EFFAFD] flex items-center justify-center group-hover/btn:bg-[#4A8BDF] group-hover/btn:text-white transition-all shadow-xs shrink-0">
+                <span className="w-7 h-7 rounded-full bg-[#EFFAFD] dark:bg-[#262626] flex items-center justify-center group-hover/btn:bg-[#4A8BDF] group-hover/btn:text-white transition-all shadow-xs shrink-0">
                   <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" />
                 </span>
               </Link>
@@ -798,26 +1561,30 @@ export default function Landing() {
 
             {/* Gain 2 */}
             <motion.div
-              whileHover={{ y: -4 }}
-              className="bg-white p-6 sm:p-7 rounded-3xl border border-[#DCE7F2] shadow-sm flex flex-col justify-between space-y-4 group hover:border-[#047857]/60 hover:shadow-md transition-all"
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.2 }}
+              transition={{ duration: 0.6, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
+              whileHover={{ y: -8, scale: 1.01 }}
+              className="bg-white dark:bg-[#1C1C1C] p-6 sm:p-7 rounded-3xl border border-[#DCE7F2] dark:border-[#262626] shadow-sm flex flex-col justify-between space-y-4 group hover:border-[#047857]/60 hover:shadow-card-hover transition-all"
             >
               <div className="space-y-3">
-                <div className="w-12 h-12 rounded-2xl bg-[#E8F5F0] text-[#047857] flex items-center justify-center border border-[#A7E3CF] shadow-xs group-hover:scale-105 transition-transform">
-                  <Activity className="w-6 h-6 text-[#047857]" />
+                <div className="w-12 h-12 rounded-2xl bg-[#E8F5F0] dark:bg-[#262626] text-[#047857] dark:text-[#2CBB5D] flex items-center justify-center border border-[#A7E3CF] dark:border-[#303030] shadow-xs group-hover:scale-105 transition-transform">
+                  <Activity className="w-6 h-6 text-[#047857] dark:text-[#2CBB5D]" />
                 </div>
-                <h3 className="text-lg font-bold text-[#0F172A] group-hover:text-[#047857] transition-colors">
+                <h3 className="text-lg font-bold text-[#0F172A] dark:text-white group-hover:text-[#047857] transition-colors">
                   2. Flawless STAR & Code Delivery
                 </h3>
-                <p className="text-xs sm:text-sm text-[#334155] font-medium leading-relaxed">
+                <p className="text-xs sm:text-sm text-[#334155] dark:text-[#D2D2D7] font-medium leading-relaxed">
                   Eliminate filler words, manage speech pacing (140-160 WPM), and explain algorithmic trade-offs with structured conviction.
                 </p>
               </div>
               <Link
                 to="/interview/coding"
-                className="pt-4 border-t border-[#DCE7F2] flex items-center justify-between text-xs font-bold text-[#047857] hover:text-[#065F46] transition-colors group/btn"
+                className="pt-4 border-t border-[#DCE7F2] dark:border-[#262626] flex items-center justify-between text-xs font-bold text-[#047857] dark:text-[#2CBB5D] hover:text-[#065F46] transition-colors group/btn"
               >
                 <span>Live Audio & IDE Telemetry</span>
-                <span className="w-7 h-7 rounded-full bg-[#E8F5F0] flex items-center justify-center group-hover/btn:bg-[#047857] group-hover/btn:text-white transition-all shadow-xs shrink-0">
+                <span className="w-7 h-7 rounded-full bg-[#E8F5F0] dark:bg-[#262626] flex items-center justify-center group-hover/btn:bg-[#047857] group-hover/btn:text-white transition-all shadow-xs shrink-0">
                   <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" />
                 </span>
               </Link>
@@ -825,26 +1592,30 @@ export default function Landing() {
 
             {/* Gain 3 */}
             <motion.div
-              whileHover={{ y: -4 }}
-              className="bg-white p-6 sm:p-7 rounded-3xl border border-[#DCE7F2] shadow-sm flex flex-col justify-between space-y-4 group hover:border-[#A0006D]/60 hover:shadow-md transition-all"
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.2 }}
+              transition={{ duration: 0.6, delay: 0.24, ease: [0.22, 1, 0.36, 1] }}
+              whileHover={{ y: -8, scale: 1.01 }}
+              className="bg-white dark:bg-[#1C1C1C] p-6 sm:p-7 rounded-3xl border border-[#DCE7F2] dark:border-[#262626] shadow-sm flex flex-col justify-between space-y-4 group hover:border-[#A0006D]/60 hover:shadow-card-hover transition-all"
             >
               <div className="space-y-3">
-                <div className="w-12 h-12 rounded-2xl bg-[#F8EAF4] text-[#A0006D] flex items-center justify-center border border-[#F4B4D6] shadow-xs group-hover:scale-105 transition-transform">
-                  <FileText className="w-6 h-6 text-[#A0006D]" />
+                <div className="w-12 h-12 rounded-2xl bg-[#F8EAF4] dark:bg-[#262626] text-[#A0006D] dark:text-[#BF5AF2] flex items-center justify-center border border-[#F4B4D6] dark:border-[#303030] shadow-xs group-hover:scale-105 transition-transform">
+                  <FileText className="w-6 h-6 text-[#A0006D] dark:text-[#BF5AF2]" />
                 </div>
-                <h3 className="text-lg font-bold text-[#0F172A] group-hover:text-[#A0006D] transition-colors">
+                <h3 className="text-lg font-bold text-[#0F172A] dark:text-white group-hover:text-[#A0006D] transition-colors">
                   3. 90%+ ATS Screening Conversion
                 </h3>
-                <p className="text-xs sm:text-sm text-[#334155] font-medium leading-relaxed">
+                <p className="text-xs sm:text-sm text-[#334155] dark:text-[#D2D2D7] font-medium leading-relaxed">
                   Ensure your resume gets past ATS screening algorithms with matched keywords and quantified achievement bullet points.
                 </p>
               </div>
               <Link
                 to="/resume"
-                className="pt-4 border-t border-[#DCE7F2] flex items-center justify-between text-xs font-bold text-[#A0006D] hover:text-[#780052] transition-colors group/btn"
+                className="pt-4 border-t border-[#DCE7F2] dark:border-[#262626] flex items-center justify-between text-xs font-bold text-[#A0006D] dark:text-[#BF5AF2] hover:text-[#780052] transition-colors group/btn"
               >
                 <span>Automated STAR Rewrites</span>
-                <span className="w-7 h-7 rounded-full bg-[#F8EAF4] flex items-center justify-center group-hover/btn:bg-[#A0006D] group-hover/btn:text-white transition-all shadow-xs shrink-0">
+                <span className="w-7 h-7 rounded-full bg-[#F8EAF4] dark:bg-[#262626] flex items-center justify-center group-hover/btn:bg-[#A0006D] group-hover/btn:text-white transition-all shadow-xs shrink-0">
                   <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" />
                 </span>
               </Link>
@@ -852,170 +1623,336 @@ export default function Landing() {
 
             {/* Gain 4 */}
             <motion.div
-              whileHover={{ y: -4 }}
-              className="bg-white p-6 sm:p-7 rounded-3xl border border-[#DCE7F2] shadow-sm flex flex-col justify-between space-y-4 group hover:border-[#4A8BDF]/60 hover:shadow-md transition-all"
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.2 }}
+              transition={{ duration: 0.6, delay: 0.36, ease: [0.22, 1, 0.36, 1] }}
+              whileHover={{ y: -8, scale: 1.01 }}
+              className="bg-white dark:bg-[#1C1C1C] p-6 sm:p-7 rounded-3xl border border-[#DCE7F2] dark:border-[#262626] shadow-sm flex flex-col justify-between space-y-4 group hover:border-[#4A8BDF]/60 hover:shadow-card-hover transition-all"
             >
               <div className="space-y-3">
-                <div className="w-12 h-12 rounded-2xl bg-[#EFFAFD] text-[#0F172A] flex items-center justify-center border border-[#DCE7F2] shadow-xs group-hover:scale-105 transition-transform">
-                  <TrendingUp className="w-6 h-6 text-[#4A8BDF]" />
+                <div className="w-12 h-12 rounded-2xl bg-[#EFFAFD] dark:bg-[#262626] text-[#0F172A] dark:text-[#64D2FF] flex items-center justify-center border border-[#DCE7F2] dark:border-[#303030] shadow-xs group-hover:scale-105 transition-transform">
+                  <TrendingUp className="w-6 h-6 text-[#4A8BDF] dark:text-[#64D2FF]" />
                 </div>
-                <h3 className="text-lg font-bold text-[#0F172A] group-hover:text-[#4A8BDF] transition-colors">
+                <h3 className="text-lg font-bold text-[#0F172A] dark:text-white group-hover:text-[#4A8BDF] transition-colors">
                   4. Accelerated Placement & Pay
                 </h3>
-                <p className="text-xs sm:text-sm text-[#334155] font-medium leading-relaxed">
+                <p className="text-xs sm:text-sm text-[#334155] dark:text-[#D2D2D7] font-medium leading-relaxed">
                   Cut months off trial-and-error prep. Benchmark your readiness before real interviews and negotiate top compensation packages.
                 </p>
               </div>
-              <Link
-                to="/roadmap"
-                className="pt-4 border-t border-[#DCE7F2] flex items-center justify-between text-xs font-bold text-[#4A8BDF] hover:text-[#2459A8] transition-colors group/btn"
-              >
-                <span>Higher Offer Confidence</span>
-                <span className="w-7 h-7 rounded-full bg-[#EFFAFD] flex items-center justify-center group-hover/btn:bg-[#4A8BDF] group-hover/btn:text-white transition-all shadow-xs shrink-0">
-                  <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" />
-                </span>
-              </Link>
             </motion.div>
           </div>
+        </div>
+      </Section>
+
+      <Section id="testimonials" className="relative py-20 sm:py-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-x border-[#DCE7F2]/60 dark:border-[#262626]/70">
+        {/* Technical Blueprint Grid Lines */}
+        <TechnicalGridOverlay pattern="blueprint" />
+
+        <div className="text-center max-w-3xl mx-auto mb-16 space-y-4 relative z-10">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#0F172A] dark:text-white tracking-tight">
+            Unfiltered Notes from Candidates Who Cleared
+          </h2>
+          <p className="landing-copy text-sm sm:text-base text-[#334155] dark:text-[#A8A8A8] font-medium leading-relaxed max-w-2xl mx-auto">
+            Real interview reflections from engineers who calibrated with Rennetus and cracked Tier-1 offers.
+          </p>
+        </div>
+
+        {/* Two-Column Grid on Desktop, Single-Column on Mobile with Tilted Physical Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-7 sm:gap-8 max-w-5xl mx-auto">
+          {DIARY_TESTIMONIALS.map((item, idx) => {
+            const isLeft = idx % 2 === 0;
+            return (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 50, rotate: isLeft ? -4 : 4 }}
+                whileInView={{ opacity: 1, y: 0, rotate: isLeft ? -1 : 1 }}
+                viewport={{ once: false, amount: 0.2 }}
+                transition={{ duration: 0.7, delay: idx * 0.1, ease: [0.22, 1, 0.36, 1] }}
+                whileHover={{ rotate: 0, y: -8, scale: 1.02 }}
+                className={`bg-white dark:bg-[#1A1A1A] p-7 sm:p-8 rounded-3xl border border-[#DCE7F2] dark:border-[#262626] shadow-sm hover:shadow-card-hover transition-all flex flex-col justify-between space-y-5 cursor-default`}
+              >
+                <div className="space-y-4">
+                  {/* Top row: Company + Placed Offer Package */}
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <div className="flex items-center gap-2">
+                      <span className={`text-[10px] font-bold font-mono px-2.5 py-0.5 rounded-full border ${item.badgeBg}`}>
+                        {item.company}
+                      </span>
+                      <span className="text-[10px] font-mono text-[#78716C] dark:text-[#71717A]">
+                        {item.date}
+                      </span>
+                    </div>
+                    <span className="text-[11px] font-bold font-mono px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-[#047857] dark:text-[#34D399] border border-emerald-200 dark:border-emerald-800/60 shadow-2xs">
+                      🎉 {item.offerPackage}
+                    </span>
+                  </div>
+
+                  {/* Readiness Score Gain & Star Rating */}
+                  <div className="flex items-center justify-between p-3 rounded-2xl bg-[#F8FAFC] dark:bg-[#202020] border border-[#E2E8F0] dark:border-[#2E2E2E]">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-[#EFFAFD] dark:bg-[#1E293B] border border-[#DCE7F2] dark:border-[#334155] flex items-center justify-center text-[#2459A8] dark:text-[#64D2FF]">
+                        <Activity className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <div className="text-[10px] font-mono font-semibold text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider">
+                          Readiness Score
+                        </div>
+                        <div className="text-sm font-black font-sans text-[#0F172A] dark:text-white">
+                          {item.readinessScore}/100{' '}
+                          <span className="text-[11px] font-bold text-[#047857] dark:text-[#34D399]">
+                            ({item.scoreGain})
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-0.5 text-[#F59E0B]">
+                      {[...Array(5)].map((_, s) => (
+                        <Star key={s} className="w-3.5 h-3.5 fill-[#F59E0B]" />
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Quote */}
+                  <p className="text-sm sm:text-base text-[#292524] dark:text-[#E2E8F0] font-sans leading-relaxed font-normal italic">
+                    "{item.quote}"
+                  </p>
+
+                  {/* Rounds Cleared Badges */}
+                  <div className="space-y-1.5 pt-1">
+                    <div className="text-[10px] font-mono font-bold uppercase text-[#64748B] dark:text-[#A8A8A8] tracking-wider">
+                      Rounds Cleared:
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {item.roundsCleared.map((round, rIdx) => (
+                        <span
+                          key={rIdx}
+                          className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-[#FAFDFE] dark:bg-[#252525] border border-[#DCE7F2] dark:border-[#333333] text-[#334155] dark:text-[#CBD5E1]"
+                        >
+                          ✓ {round}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Telemetry Metrics Grid */}
+                  <div className="grid grid-cols-3 gap-2 pt-2 border-t border-[#DCE7F2]/60 dark:border-[#262626]">
+                    {item.metrics.map((met, mIdx) => (
+                      <div key={mIdx} className="p-2 rounded-xl bg-[#FAFDFE] dark:bg-[#1E1E1E] border border-[#DCE7F2]/50 dark:border-[#2E2E2E]">
+                        <div className="text-[9px] font-mono text-[#64748B] dark:text-[#94A3B8] truncate">{met.label}</div>
+                        <div className="text-xs font-bold font-sans text-[#0F172A] dark:text-white mt-0.5 truncate">{met.value}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  {/* 32px Horizontal tactile divider line */}
+                  <div className="w-8 h-[2px] bg-[#DCE7F2] dark:bg-[#333333] mb-3.5" />
+
+                  {/* Signature with expressive cursive font */}
+                  <div className="font-cursive text-2xl sm:text-3xl text-[#2459A8] dark:text-[#64D2FF] font-normal tracking-wide">
+                    {item.author}
+                  </div>
+                  <span className="text-xs font-semibold text-[#78716C] dark:text-[#A8A8A8] block mt-0.5 font-sans">
+                    {item.role}
+                  </span>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
       </Section>
 
       {/* ════════════════════════════════════════════════════════ */}
       {/* 4. PRICING BUNDLES SECTION                              */}
       {/* ════════════════════════════════════════════════════════ */}
-      <Section id="pricing" className="py-20 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#0F172A] tracking-tight">
-            Flexible Practice That Fits Your Budget
+      <Section id="pricing" className="relative py-20 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-x border-[#DCE7F2]/60 dark:border-[#262626]/70">
+        {/* Technical Blueprint Grid Lines */}
+        <TechnicalGridOverlay pattern="blueprint" />
+        <div className="text-center max-w-3xl mx-auto mb-14 space-y-4 relative z-10">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white dark:bg-[#1C1C1C] border border-[#DCE7F2] dark:border-[#262626] text-xs font-bold text-[#4A8BDF] dark:text-[#64D2FF] font-mono uppercase tracking-wider shadow-2xs">
+            <Zap className="w-3.5 h-3.5 text-[#4A8BDF]" />
+            <span>Calibrated Membership</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#0F172A] dark:text-white tracking-tight">
+            Flexible Practice in US Dollars
           </h2>
-          <p className="text-sm sm:text-base text-black font-medium leading-relaxed">
-            Zero lock-in subscriptions. Pay only for the calibrated interview sessions you need.
+          <p className="landing-copy text-sm sm:text-base text-[#334155] dark:text-[#A8A8A8] font-medium leading-relaxed max-w-xl mx-auto">
+            Choose monthly flexibility or save with yearly billing. Transparent pricing with calculated daily investment.
           </p>
+
+          {/* Monthly / Yearly Billing Toggle Switch */}
+          <div className="flex items-center justify-center pt-2">
+            <div className="p-1 rounded-full bg-white dark:bg-[#1E1E1E] border border-[#DCE7F2] dark:border-[#303030] shadow-xs inline-flex items-center gap-1">
+              <button
+                onClick={() => setPricingCycle('monthly')}
+                className={`px-5 py-2 rounded-full text-xs font-bold font-sans transition-all cursor-pointer ${
+                  pricingCycle === 'monthly'
+                    ? 'bg-[#0F172A] text-white dark:bg-white dark:text-black shadow-xs'
+                    : 'text-[#64748B] dark:text-[#A0A0A0] hover:text-[#0F172A] dark:hover:text-white'
+                }`}
+              >
+                Monthly Billing
+              </button>
+              <button
+                onClick={() => setPricingCycle('yearly')}
+                className={`px-5 py-2 rounded-full text-xs font-bold font-sans transition-all cursor-pointer flex items-center gap-2 ${
+                  pricingCycle === 'yearly'
+                    ? 'bg-[#4A8BDF] text-white shadow-xs'
+                    : 'text-[#64748B] dark:text-[#A0A0A0] hover:text-[#0F172A] dark:hover:text-white'
+                }`}
+              >
+                <span>Yearly Billing</span>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#10B981] text-white shadow-2xs">
+                  Save 20%+
+                </span>
+              </button>
+            </div>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+        {/* 3 Plans Responsive Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto items-stretch relative z-10">
           
-          {/* Plan 1: Free */}
+          {/* Plan 1: Starter ($0) */}
           <motion.div
-            whileHover={{ y: -4 }}
-            className="rounded-3xl bg-white border border-[#DCE7F2] p-6 sm:p-7 shadow-sm flex flex-col justify-between transition-all"
+            initial={{ opacity: 0, y: 35 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: false, amount: 0.2 }}
+            transition={{ duration: 0.5, delay: 0, ease: [0.22, 1, 0.36, 1] }}
+            whileHover={{ y: -6, scale: 1.01 }}
+            className="rounded-3xl bg-white dark:bg-[#1A1A1A] border border-[#DCE7F2] dark:border-[#262626] p-7 sm:p-8 shadow-sm hover:shadow-card-hover flex flex-col justify-between transition-all"
           >
             <div>
-              <div className="inline-block px-3 py-1 rounded-full bg-[#EFFAFD] text-[#0F172A] text-[10px] font-bold font-mono uppercase tracking-wider mb-4 border border-[#DCE7F2]">
-                Starter
+              <div className="flex items-center justify-between mb-4">
+                <span className="px-3 py-1 rounded-full bg-[#EFFAFD] dark:bg-[#262626] text-[#0F172A] dark:text-white text-[10px] font-bold font-mono uppercase tracking-wider border border-[#DCE7F2] dark:border-[#303030]">
+                  Starter Tier
+                </span>
+                <span className="text-xs font-mono font-bold text-[#047857] dark:text-[#34D399] bg-[#E8F5F0] dark:bg-[#064E3B]/40 px-2.5 py-0.5 rounded-full border border-[#A7E3CF] dark:border-[#047857]/50">
+                  $0 / day
+                </span>
               </div>
-              <h3 className="font-sans font-bold text-xl text-[#0F172A] mb-1">Free Tier</h3>
+              <h3 className="font-sans font-bold text-2xl text-[#0F172A] dark:text-white mb-1">Free Tier</h3>
+              <p className="text-xs text-[#64748B] dark:text-[#A0A0A0] font-sans mb-5">
+                Explore Ava's live speech engine, Monaco coding runner, and baseline ATS diagnostics.
+              </p>
               <div className="mb-6 flex items-baseline gap-1">
-                <span className="font-sans font-black text-4xl text-[#0F172A]">₹0</span>
-                <span className="text-xs font-mono text-[#64748B]">/ forever free</span>
+                <span className="font-sans font-black text-5xl text-[#0F172A] dark:text-white">$0</span>
+                <span className="text-xs font-mono text-[#64748B] dark:text-[#A8A8A8]">/ forever free</span>
               </div>
-              <ul className="space-y-3 text-xs font-sans text-[#1E293B] font-medium mb-8 border-t border-[#DCE7F2] pt-6">
-                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#10B981] shrink-0" /> 2 Practice Sessions / month (Oral or Code)</li>
-                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#10B981] shrink-0" /> Standard Behavioral STAR Evaluation</li>
-                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#10B981] shrink-0" /> Basic ATS Resume Keyword Match Overview</li>
-                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#10B981] shrink-0" /> In-Browser Monaco Code Runner (6 Languages)</li>
-                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#10B981] shrink-0" /> Web & Mobile Responsive Studio Access</li>
-                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#10B981] shrink-0" /> Forever Free — No Credit Card Required</li>
+              <ul className="space-y-3 text-xs font-sans text-[#1E293B] dark:text-[#D2D2D7] font-medium mb-8 border-t border-[#DCE7F2] dark:border-[#262626] pt-6">
+                <li className="flex items-start gap-2.5"><Check className="w-4 h-4 text-[#10B981] shrink-0 mt-0.5" /> 2 Practice Sessions / month (Voice or Code)</li>
+                <li className="flex items-start gap-2.5"><Check className="w-4 h-4 text-[#10B981] shrink-0 mt-0.5" /> Standard Behavioral STAR Evaluation</li>
+                <li className="flex items-start gap-2.5"><Check className="w-4 h-4 text-[#10B981] shrink-0 mt-0.5" /> Basic ATS Resume Keyword Match Overview</li>
+                <li className="flex items-start gap-2.5"><Check className="w-4 h-4 text-[#10B981] shrink-0 mt-0.5" /> In-Browser Monaco Code Runner (6 Languages)</li>
+                <li className="flex items-start gap-2.5"><Check className="w-4 h-4 text-[#10B981] shrink-0 mt-0.5" /> Curated Algorithmic Editorial Hints</li>
+                <li className="flex items-start gap-2.5"><Check className="w-4 h-4 text-[#10B981] shrink-0 mt-0.5" /> Forever Free — No Credit Card Required</li>
               </ul>
             </div>
             <Link to="/register">
-              <button className="w-full py-3 rounded-full bg-[#0F172A] hover:bg-[#1E293B] text-white font-bold text-xs shadow-sm transition-all cursor-pointer">
-                Start Free — ₹0
+              <button className="w-full py-3.5 rounded-full bg-[#0F172A] hover:bg-[#1E293B] dark:bg-white dark:text-black dark:hover:bg-[#EBEBF5] text-white font-bold text-xs shadow-sm transition-all cursor-pointer">
+                Start Free — $0
               </button>
             </Link>
           </motion.div>
 
-          {/* Plan 2: ₹69 */}
+          {/* Plan 2: Pro ($19/mo or $15/mo yearly) */}
           <motion.div
-            whileHover={{ y: -4 }}
-            className="rounded-3xl bg-white border border-[#DCE7F2] p-6 sm:p-7 shadow-sm flex flex-col justify-between transition-all"
-          >
-            <div>
-              <div className="inline-block px-3 py-1 rounded-full bg-[#EFFAFD] text-[#4A8BDF] border border-[#DCE7F2] text-[10px] font-bold font-mono uppercase tracking-wider mb-4">
-                Quick Sprint
-              </div>
-              <h3 className="font-sans font-bold text-xl text-[#0F172A] mb-1">Single Pass</h3>
-              <div className="mb-6 flex items-baseline gap-1">
-                <span className="font-sans font-black text-4xl text-[#0F172A]">₹69</span>
-                <span className="text-xs font-mono text-[#64748B]">/ single session</span>
-              </div>
-              <ul className="space-y-3 text-xs font-sans text-[#1E293B] font-medium mb-8 border-t border-[#DCE7F2] pt-6">
-                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#4A8BDF] shrink-0" /> 1 Full Adaptive Mock Session (Oral or Code)</li>
-                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#4A8BDF] shrink-0" /> Real-Time Viseme & Speech Telemetry (WPM + Fillers)</li>
-                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#4A8BDF] shrink-0" /> Detailed ATS Resume Match Diagnostic with Gap Analysis</li>
-                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#4A8BDF] shrink-0" /> Instant PDF Feedback & Benchmark Report Download</li>
-                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#4A8BDF] shrink-0" /> Ideal Solutions & Editorial Hints for Algorithmic Questions</li>
-                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#4A8BDF] shrink-0" /> 30-Day Full Session Replay & Telemetry History</li>
-              </ul>
-            </div>
-            <Link to="/register">
-              <button className="w-full py-3 rounded-full bg-[#4A8BDF] text-white font-bold text-xs shadow-sm hover:bg-[#2459A8] transition-all cursor-pointer">
-                Get Pass — ₹69
-              </button>
-            </Link>
-          </motion.div>
-
-          {/* Plan 3: ₹159 Pro */}
-          <motion.div
-            whileHover={{ y: -4 }}
-            className="rounded-3xl bg-white border-2 border-[#4A8BDF] p-6 sm:p-7 shadow-xl relative flex flex-col justify-between transition-all"
+            initial={{ opacity: 0, y: 35 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: false, amount: 0.2 }}
+            transition={{ duration: 0.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+            whileHover={{ y: -8, scale: 1.02 }}
+            className="rounded-3xl bg-white dark:bg-[#1A1A1A] border-2 border-[#4A8BDF] dark:border-[#4A8BDF] p-7 sm:p-8 shadow-xl hover:shadow-card-hover relative flex flex-col justify-between transition-all"
           >
             <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-[#4A8BDF] text-white text-[10px] font-bold font-mono uppercase tracking-widest shadow-sm">
-              Most Popular
+              Most Popular • 85% of Offers
             </div>
             <div>
-              <div className="inline-block px-3 py-1 rounded-full bg-[#F8EAF4] text-[#A0006D] text-[10px] font-bold font-mono uppercase tracking-wider mb-4 mt-2">
-                AI Career Pro
+              <div className="flex items-center justify-between mb-4 mt-2">
+                <span className="px-3 py-1 rounded-full bg-[#EFFAFD] dark:bg-[#1E293B] text-[#4A8BDF] dark:text-[#64D2FF] text-[10px] font-bold font-mono uppercase tracking-wider border border-[#DCE7F2] dark:border-[#334155]">
+                  AI Career Pro
+                </span>
+                <span className="text-xs font-mono font-bold text-[#2459A8] dark:text-[#64D2FF] bg-[#EFFAFD] dark:bg-[#1E293B] px-2.5 py-0.5 rounded-full border border-[#DCE7F2] dark:border-[#334155]">
+                  {pricingCycle === 'yearly' ? '~$0.49 / day' : '~$0.63 / day'}
+                </span>
               </div>
-              <h3 className="font-sans font-bold text-xl text-[#0F172A] mb-1">5-Session Bundle</h3>
-              <div className="mb-6 flex items-baseline gap-1">
-                <span className="font-sans font-black text-4xl text-[#4A8BDF]">₹159</span>
-                <span className="text-xs font-mono text-[#64748B]">/ 5 sessions</span>
+              <h3 className="font-sans font-bold text-2xl text-[#0F172A] dark:text-white mb-1">Pro Calibration</h3>
+              <p className="text-xs text-[#64748B] dark:text-[#A0A0A0] font-sans mb-5">
+                Full interview readiness for active candidates targeting Tier-1 and FAANG engineering roles.
+              </p>
+              <div className="mb-2 flex items-baseline gap-1">
+                <span className="font-sans font-black text-5xl text-[#4A8BDF] dark:text-[#64D2FF]">
+                  {pricingCycle === 'yearly' ? '$15' : '$19'}
+                </span>
+                <span className="text-xs font-mono text-[#64748B] dark:text-[#A8A8A8]">/ month</span>
               </div>
-              <ul className="space-y-3 text-xs font-sans text-[#1E293B] font-medium mb-8 border-t border-[#DCE7F2] pt-6">
-                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#4A8BDF] shrink-0" /> 5 Full-Length Mock Sessions (Mix Oral + Code)</li>
-                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#4A8BDF] shrink-0" /> Socratic AI Interviewer with Dynamic Lip-Sync & Emotion</li>
-                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#4A8BDF] shrink-0" /> Unlimited ATS Resume & STAR Bullet Point Rewrites</li>
-                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#4A8BDF] shrink-0" /> Custom Role Roadmaps & Candidate Discussion Hub</li>
-                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#4A8BDF] shrink-0" /> Algorithmic Sandbox with 6 Languages & Boundary Tests</li>
-                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#4A8BDF] shrink-0" /> Detailed Readiness Score & Longitudinal Trend Analysis</li>
-                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#4A8BDF] shrink-0" /> High Priority Execution Queue & Progressive Hints</li>
+              <div className="text-[11px] font-mono font-semibold text-[#047857] dark:text-[#34D399] mb-5">
+                {pricingCycle === 'yearly' ? 'Billed $180 / year (save 21%)' : 'Billed monthly, cancel anytime'}
+              </div>
+              <ul className="space-y-3 text-xs font-sans text-[#1E293B] dark:text-[#D2D2D7] font-medium mb-8 border-t border-[#DCE7F2] dark:border-[#262626] pt-6">
+                <li className="flex items-start gap-2.5"><Check className="w-4 h-4 text-[#4A8BDF] shrink-0 mt-0.5" /> Unlimited Monaco Code Sandbox & Boundary Edge Tests</li>
+                <li className="flex items-start gap-2.5"><Check className="w-4 h-4 text-[#4A8BDF] shrink-0 mt-0.5" /> 8 Full Socratic Voice Mock Interviews / month</li>
+                <li className="flex items-start gap-2.5"><Check className="w-4 h-4 text-[#4A8BDF] shrink-0 mt-0.5" /> Real-Time Phonetic Viseme & Speech Cadence Telemetry</li>
+                <li className="flex items-start gap-2.5"><Check className="w-4 h-4 text-[#4A8BDF] shrink-0 mt-0.5" /> Unlimited ATS Resume Scans & STAR Bullet Rewrites</li>
+                <li className="flex items-start gap-2.5"><Check className="w-4 h-4 text-[#4A8BDF] shrink-0 mt-0.5" /> Curated Company Question Tracks (Google, Meta, Amazon)</li>
+                <li className="flex items-start gap-2.5"><Check className="w-4 h-4 text-[#4A8BDF] shrink-0 mt-0.5" /> Longitudinal Readiness Score & Skill Gap Radar</li>
+                <li className="flex items-start gap-2.5"><Check className="w-4 h-4 text-[#4A8BDF] shrink-0 mt-0.5" /> High Priority Execution Queue & Progressive Hints</li>
               </ul>
             </div>
             <Link to="/register">
-              <button className="w-full py-3.5 rounded-full bg-[#4A8BDF] hover:bg-[#2459A8] text-white font-bold text-xs shadow-md transition-all cursor-pointer">
-                Unlock Pro Pack — ₹159
+              <button className="w-full py-3.5 rounded-full bg-[#4A8BDF] hover:bg-[#2459A8] dark:bg-white dark:text-black dark:hover:bg-[#EBEBF5] text-white font-bold text-xs shadow-md transition-all cursor-pointer">
+                Unlock Pro — {pricingCycle === 'yearly' ? '$15/mo' : '$19/mo'}
               </button>
             </Link>
           </motion.div>
 
-          {/* Plan 4: ₹249 Elite */}
+          {/* Plan 3: Elite ($39/mo or $29/mo yearly) */}
           <motion.div
-            whileHover={{ y: -4 }}
-            className="rounded-3xl bg-white border border-[#DCE7F2] p-6 sm:p-7 shadow-sm flex flex-col justify-between transition-all"
+            initial={{ opacity: 0, y: 35 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: false, amount: 0.2 }}
+            transition={{ duration: 0.5, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            whileHover={{ y: -6, scale: 1.01 }}
+            className="rounded-3xl bg-white dark:bg-[#1A1A1A] border border-[#DCE7F2] dark:border-[#262626] p-7 sm:p-8 shadow-sm hover:shadow-card-hover flex flex-col justify-between transition-all"
           >
             <div>
-              <div className="inline-block px-3 py-1 rounded-full bg-[#F8EAF4] text-[#A0006D] text-[10px] font-bold font-mono uppercase tracking-wider mb-4">
-                Full AI Mastery
+              <div className="flex items-center justify-between mb-4">
+                <span className="px-3 py-1 rounded-full bg-[#F8EAF4] dark:bg-[#262626] text-[#A0006D] dark:text-[#BF5AF2] text-[10px] font-bold font-mono uppercase tracking-wider border border-[#F4B4D6] dark:border-[#303030]">
+                  Full AI Mastery
+                </span>
+                <span className="text-xs font-mono font-bold text-[#A0006D] dark:text-[#BF5AF2] bg-[#F8EAF4] dark:bg-[#701A75]/30 px-2.5 py-0.5 rounded-full border border-[#F4B4D6] dark:border-[#A0006D]/40">
+                  {pricingCycle === 'yearly' ? '~$0.97 / day' : '~$1.30 / day'}
+                </span>
               </div>
-              <h3 className="font-sans font-bold text-xl text-[#0F172A] mb-1">15-Session Elite</h3>
-              <div className="mb-6 flex items-baseline gap-1">
-                <span className="font-sans font-black text-4xl text-[#0F172A]">₹249</span>
-                <span className="text-xs font-mono text-[#64748B]">/ 15 sessions</span>
+              <h3 className="font-sans font-bold text-2xl text-[#0F172A] dark:text-white mb-1">Elite Mastery</h3>
+              <p className="text-xs text-[#64748B] dark:text-[#A0A0A0] font-sans mb-5">
+                For Senior & Staff engineers aiming to dominate bar-raiser panels and system design rounds.
+              </p>
+              <div className="mb-2 flex items-baseline gap-1">
+                <span className="font-sans font-black text-5xl text-[#0F172A] dark:text-white">
+                  {pricingCycle === 'yearly' ? '$29' : '$39'}
+                </span>
+                <span className="text-xs font-mono text-[#64748B] dark:text-[#A8A8A8]">/ month</span>
               </div>
-              <ul className="space-y-3 text-xs font-sans text-[#1E293B] font-medium mb-8 border-t border-[#DCE7F2] pt-6">
-                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#A0006D] shrink-0" /> 15 Full-Length Multi-Modal Mock Sessions</li>
-                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#A0006D] shrink-0" /> Socratic Oral + Real-Time Monaco Coding Assessment</li>
-                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#A0006D] shrink-0" /> Priority ATS Match Parsing with Target JD Alignment</li>
-                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#A0006D] shrink-0" /> Complete Career Blueprint Mastery with Milestones</li>
-                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#A0006D] shrink-0" /> VIP Access to Role Discussion Forums & Solutions</li>
-                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#A0006D] shrink-0" /> Full Diagnostic Analytics with Shareable Portfolio Report</li>
-                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-[#A0006D] shrink-0" /> Personalized Socratic Rubrics Calibrated for Tier-1 FAANG</li>
+              <div className="text-[11px] font-mono font-semibold text-[#047857] dark:text-[#34D399] mb-5">
+                {pricingCycle === 'yearly' ? 'Billed $348 / year (save 25%)' : 'Billed monthly, cancel anytime'}
+              </div>
+              <ul className="space-y-3 text-xs font-sans text-[#1E293B] dark:text-[#D2D2D7] font-medium mb-8 border-t border-[#DCE7F2] dark:border-[#262626] pt-6">
+                <li className="flex items-start gap-2.5"><Check className="w-4 h-4 text-[#A0006D] shrink-0 mt-0.5" /> Unlimited Multi-Modal Mock Sessions (Oral + Code)</li>
+                <li className="flex items-start gap-2.5"><Check className="w-4 h-4 text-[#A0006D] shrink-0 mt-0.5" /> System Design Architectural Probes (CAP, Sharding, Failovers)</li>
+                <li className="flex items-start gap-2.5"><Check className="w-4 h-4 text-[#A0006D] shrink-0 mt-0.5" /> Amazon 16 LP & Google Bar-Raiser Committee Rubrics</li>
+                <li className="flex items-start gap-2.5"><Check className="w-4 h-4 text-[#A0006D] shrink-0 mt-0.5" /> Live Socratic Grilling on Edge-Case System Assumptions</li>
+                <li className="flex items-start gap-2.5"><Check className="w-4 h-4 text-[#A0006D] shrink-0 mt-0.5" /> Comprehensive Diagnostic PDF Reports & Portfolio Exports</li>
+                <li className="flex items-start gap-2.5"><Check className="w-4 h-4 text-[#A0006D] shrink-0 mt-0.5" /> Personalized Rubrics Calibrated for L5/L6 Senior Benchmarks</li>
+                <li className="flex items-start gap-2.5"><Check className="w-4 h-4 text-[#A0006D] shrink-0 mt-0.5" /> 24/7 Priority Support & 24/7 Priority Support</li>
               </ul>
             </div>
             <Link to="/register">
-              <button className="w-full py-3 rounded-full bg-[#A0006D] hover:bg-[#780052] text-white font-bold text-xs transition-all cursor-pointer">
-                Get Ultimate — ₹249
+              <button className="w-full py-3.5 rounded-full bg-[#A0006D] hover:bg-[#780052] dark:bg-white dark:text-black dark:hover:bg-[#EBEBF5] text-white font-bold text-xs transition-all cursor-pointer">
+                Unlock Elite — {pricingCycle === 'yearly' ? '$29/mo' : '$39/mo'}
               </button>
             </Link>
           </motion.div>
@@ -1023,19 +1960,26 @@ export default function Landing() {
       </Section>
 
       {/* ════════════════════════════════════════════════════════ */}
-      {/* 5. FREQUENTLY ASKED QUESTIONS (TAKEUFORWARD STYLE)       */}
+      {/* 5. FREQUENTLY ASKED QUESTIONS (INTERACTIVE ENGINE)       */}
       {/* ════════════════════════════════════════════════════════ */}
-      <Section id="faq" className="py-20 sm:py-28 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-10 sm:mb-12 space-y-3">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#0F172A] tracking-tight font-display">
+      <Section id="faq" className="relative py-20 sm:py-28 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 border-x border-[#DCE7F2]/60 dark:border-[#262626]/70">
+        {/* Technical Blueprint Grid Lines */}
+        <TechnicalGridOverlay pattern="blueprint" />
+
+        <div className="mb-10 sm:mb-12 space-y-3 relative z-10 text-center sm:text-left">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white dark:bg-[#1C1C1C] border border-[#DCE7F2] dark:border-[#262626] text-xs font-bold text-[#4A8BDF] dark:text-[#64D2FF] font-mono uppercase tracking-wider shadow-2xs">
+            <HelpCircle className="w-3.5 h-3.5 text-[#4A8BDF]" />
+            <span>Platform FAQ</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#0F172A] dark:text-white tracking-tight font-display">
             Frequently Asked <span className="text-[#4A8BDF]">Questions</span>
           </h2>
-          <p className="text-sm sm:text-base text-[#475569] font-medium font-body max-w-2xl leading-relaxed">
-            Everything you need to know about our interview benchmarking engine, coding sandbox, ATS parser, and privacy standards.
+          <p className="landing-copy text-sm sm:text-base text-[#334155] dark:text-[#A8A8A8] font-medium font-body max-w-2xl leading-relaxed">
+            Everything you need to know about our Socratic AI interviewer, Monaco coding runtime, uninflated ATS resume scores, and zero-storage privacy policies.
           </p>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8 lg:gap-10 items-start">
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-10 items-start relative z-10">
           {/* Left Column: Category Pills Alternating Blue and Pink */}
           <div className="w-full lg:w-80 shrink-0 flex lg:flex-col gap-2.5 overflow-x-auto pb-2 lg:pb-0 scrollbar-none">
             {FAQ_CATEGORIES.map((cat, idx) => {
@@ -1052,8 +1996,8 @@ export default function Landing() {
                   buttonClasses = 'bg-[#A0006D] text-white shadow-lg shadow-[#A0006D]/25 border border-[#A0006D]';
                   iconClasses = 'bg-white/20 text-white';
                 } else {
-                  buttonClasses = 'bg-white text-[#0F172A] hover:text-[#A0006D] hover:bg-[#F8EAF4] hover:border-[#A0006D]/40 border border-[#DCE7F2]';
-                  iconClasses = 'bg-[#F8EAF4] text-[#A0006D]';
+                  buttonClasses = 'bg-white dark:bg-[#1A1A1A] text-[#0F172A] dark:text-[#D2D2D7] hover:text-[#A0006D] dark:hover:text-[#BF5AF2] hover:bg-[#F8EAF4] dark:hover:bg-[#262626] hover:border-[#A0006D]/40 border border-[#DCE7F2] dark:border-[#262626]';
+                  iconClasses = 'bg-[#F8EAF4] dark:bg-[#262626] text-[#A0006D] dark:text-[#BF5AF2]';
                 }
               } else {
                 // Royal Blue Theme
@@ -1061,8 +2005,8 @@ export default function Landing() {
                   buttonClasses = 'bg-[#4A8BDF] text-white shadow-lg shadow-[#4A8BDF]/25 border border-[#4A8BDF]';
                   iconClasses = 'bg-white/20 text-white';
                 } else {
-                  buttonClasses = 'bg-white text-[#0F172A] hover:text-[#4A8BDF] hover:bg-[#EFF7FD] hover:border-[#4A8BDF]/40 border border-[#DCE7F2]';
-                  iconClasses = 'bg-[#EFFAFD] text-[#4A8BDF]';
+                  buttonClasses = 'bg-white dark:bg-[#1A1A1A] text-[#0F172A] dark:text-[#D2D2D7] hover:text-[#4A8BDF] dark:hover:text-[#64D2FF] hover:bg-[#EFF7FD] dark:hover:bg-[#262626] hover:border-[#4A8BDF]/40 border border-[#DCE7F2] dark:border-[#262626]';
+                  iconClasses = 'bg-[#EFFAFD] dark:bg-[#262626] text-[#4A8BDF] dark:text-[#64D2FF]';
                 }
               }
 
@@ -1086,25 +2030,25 @@ export default function Landing() {
 
           {/* Right Column: Accordion Card */}
           <div className="flex-1 min-w-0 w-full">
-            <div className="rounded-3xl bg-white border border-[#DCE7F2] overflow-hidden shadow-xs divide-y divide-[#DCE7F2]">
-              {FAQ_CATEGORIES[activeFaqCategory].items.map((faq, i) => {
+            <div className="rounded-3xl bg-white dark:bg-[#1A1A1A] border border-[#DCE7F2] dark:border-[#262626] overflow-hidden shadow-xs divide-y divide-[#DCE7F2] dark:divide-[#262626]">
+              {FAQ_CATEGORIES[activeFaqCategory]?.items.map((faq, i) => {
                 const isOpen = openFaq === i;
                 const isCurrentViolet = activeFaqCategory % 2 === 1;
                 return (
                   <div key={i} className="transition-colors">
                     <button
                       onClick={() => setOpenFaq(isOpen ? null : i)}
-                      className={`w-full flex items-center justify-between p-5 sm:p-6 text-left font-display font-bold text-sm sm:text-base text-black transition-colors cursor-pointer gap-4 ${
-                        isCurrentViolet ? 'hover:text-[#A0006D]' : 'hover:text-[#4A8BDF]'
+                      className={`w-full flex items-center justify-between p-5 sm:p-6 text-left font-display font-bold text-sm sm:text-base text-black dark:text-white transition-colors cursor-pointer gap-4 ${
+                        isCurrentViolet ? 'hover:text-[#A0006D] dark:hover:text-[#BF5AF2]' : 'hover:text-[#4A8BDF] dark:hover:text-[#64D2FF]'
                       }`}
                     >
-                      <span className="leading-snug text-black">{faq.q}</span>
+                      <span className="leading-snug text-black dark:text-white">{faq.q}</span>
                       <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 transition-transform duration-200 ${
                         isOpen
                           ? isCurrentViolet
-                            ? 'rotate-180 bg-[#F8EAF4] text-[#A0006D]'
-                            : 'rotate-180 bg-[#EFF7FD] text-[#4A8BDF]'
-                          : 'bg-[#EFFAFD] text-[#526078]'
+                            ? 'rotate-180 bg-[#F8EAF4] dark:bg-[#262626] text-[#A0006D] dark:text-[#BF5AF2]'
+                            : 'rotate-180 bg-[#EFF7FD] dark:bg-[#262626] text-[#4A8BDF] dark:text-[#64D2FF]'
+                          : 'bg-[#EFFAFD] dark:bg-[#262626] text-[#526078] dark:text-[#D2D2D7]'
                       }`}>
                         <ChevronDown size={16} />
                       </div>
@@ -1119,7 +2063,7 @@ export default function Landing() {
                           transition={{ duration: 0.2, ease: 'easeInOut' }}
                           className="overflow-hidden"
                         >
-                          <div className="px-6 pb-6 pt-1 text-xs sm:text-sm text-[#334155] font-body leading-relaxed border-t border-[#DCE7F2]/40 bg-[#FAFDFE]">
+                          <div className="px-6 pb-6 pt-1 text-xs sm:text-sm text-[#334155] dark:text-[#D2D2D7] font-body leading-relaxed border-t border-[#DCE7F2]/40 dark:border-[#262626] bg-[#FAFDFE] dark:bg-[#1C1C1C]">
                             {faq.a}
                           </div>
                         </motion.div>
@@ -1129,41 +2073,133 @@ export default function Landing() {
                 );
               })}
             </div>
+
+            {/* Still Have Questions? Help Card */}
+            <div className="mt-8 rounded-3xl bg-gradient-to-r from-[#EFFAFD] via-white to-[#F8EAF4] dark:from-[#1E293B] dark:via-[#1A1A1A] dark:to-[#2D1B2D] border border-[#DCE7F2] dark:border-[#334155] p-6 sm:p-7 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
+              <div className="flex items-center gap-4 text-center md:text-left flex-col md:flex-row">
+                <div className="w-12 h-12 rounded-2xl bg-[#4A8BDF] text-white flex items-center justify-center shrink-0 shadow-md">
+                  <MessageSquare className="w-6 h-6" />
+                </div>
+                <div className="space-y-1">
+                  <h4 className="font-bold text-[#0F172A] dark:text-white text-base">
+                    Have a question we haven't covered?
+                  </h4>
+                  <p className="text-xs sm:text-sm text-[#475569] dark:text-[#94A3B8]">
+                    Ava is ready to walk you through a live diagnostic mock session or answer technical questions directly.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 shrink-0">
+                <Link
+                  to="/interview/new"
+                  className="px-5 py-2.5 rounded-full bg-[#4A8BDF] hover:bg-[#2459A8] text-xs font-bold text-white shadow-sm transition-all"
+                >
+                  Ask Ava Live
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </Section>
 
       {/* ════════════════════════════════════════════════════════ */}
-      {/* 6. CALL TO ACTION BANNER                                */}
+      {/* 6. WAITLIST / QUICK START CONVERSION SECTION             */}
       {/* ════════════════════════════════════════════════════════ */}
       <Section className="pb-20 sm:pb-28 px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-5xl rounded-3xl overflow-hidden relative shadow-2xl bg-gradient-to-br from-[#5E0040] via-[#A0006D] to-[#780052] border border-[#A0006D]/40 p-8 sm:p-14 text-center text-white space-y-6 shadow-[#A0006D]/20">
-          {/* Subtle static ambient glow */}
-          <div className="pointer-events-none absolute -top-24 -right-24 w-96 h-96 bg-[#4A8BDF]/25 rounded-full blur-3xl" />
-          <div className="pointer-events-none absolute -bottom-24 -left-24 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
+        <motion.div
+          initial={{ opacity: 0, scale: 0.94, y: 40 }}
+          whileInView={{ opacity: 1, scale: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.25 }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          className="mx-auto max-w-4xl rounded-4xl overflow-hidden relative shadow-2xl bg-[#0F172A] border border-[#334155]/60 dark:border-[#303030] p-8 sm:p-14 text-center text-white space-y-7"
+        >
+          {/* High-blur floating background gradients */}
+          <motion.div
+            animate={{ scale: [1, 1.2, 1], rotate: [0, 45, 0] }}
+            transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+            className="pointer-events-none absolute -top-24 -right-24 w-80 h-80 bg-[#4A8BDF]/25 rounded-full blur-3xl"
+          />
+          <motion.div
+            animate={{ scale: [1.2, 1, 1.2], rotate: [0, -45, 0] }}
+            transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
+            className="pointer-events-none absolute -bottom-24 -left-24 w-80 h-80 bg-[#E11D48]/20 rounded-full blur-3xl"
+          />
 
-          <div className="relative z-10 space-y-6">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white max-w-2xl mx-auto leading-tight">
-              Ready to Check Your Standards & Get Placed?
+          {/* Cyber Blueprint Grid Overlay */}
+          <div
+            className="absolute inset-0 pointer-events-none opacity-25 z-0"
+            style={{
+              backgroundImage: `
+                linear-gradient(to right, rgba(74, 139, 223, 0.25) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(74, 139, 223, 0.25) 1px, transparent 1px)
+              `,
+              backgroundSize: '36px 36px',
+              maskImage: 'radial-gradient(ellipse 85% 85% at 50% 50%, black 35%, transparent 100%)',
+              WebkitMaskImage: 'radial-gradient(ellipse 85% 85% at 50% 50%, black 35%, transparent 100%)',
+            }}
+          />
+
+          {/* Center Dark Rounded-Square Icon with signature red dot */}
+          <div className="relative z-10 mx-auto w-16 h-16 rounded-2xl bg-[#1E293B] border border-white/10 flex items-center justify-center shadow-lg">
+            <Brain className="w-8 h-8 text-[#64D2FF]" />
+            <span className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-[#E11D48] ring-2 ring-[#0F172A]" />
+          </div>
+
+          <div className="relative z-10 space-y-4 max-w-2xl mx-auto">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight font-sans">
+              Ready to Check Your Standards &{' '}
+              <span className="font-cursive text-5xl sm:text-6xl text-[#FFB7B2] inline-block -rotate-2 font-normal">
+                Rise
+              </span>?
             </h2>
-            <p className="text-pink-100 text-sm sm:text-base font-medium leading-relaxed max-w-xl mx-auto">
-              Join thousands of candidates using Rennetus for ATS alignment, live coding benchmarks, and multi-agent mock interviews.
+            <p className="text-slate-300 text-sm sm:text-base font-medium leading-relaxed">
+              Start with complimentary diagnostic interview credits. Experience live Socratic feedback, Monaco problem solving, and ATS resume scans.
             </p>
 
-            <div className="pt-2 flex flex-wrap items-center justify-center gap-4">
-              <Link to="/register">
-                <motion.button
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="inline-flex items-center gap-2 bg-white hover:bg-[#EFFAFD] text-[#A0006D] hover:text-[#780052] font-sans font-bold text-sm sm:text-base px-8 py-3.5 rounded-full shadow-lg shadow-black/15 transition-all cursor-pointer"
-                >
-                  <span>Start Free Assessment</span>
-                  <ArrowRight className="h-4 w-4 text-[#A0006D]" />
-                </motion.button>
-              </Link>
+            {/* Email Input & Hover-Scaling CTA */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (conversionEmail.trim()) {
+                  navigate(`/register?email=${encodeURIComponent(conversionEmail.trim())}`);
+                } else {
+                  navigate('/register');
+                }
+              }}
+              className="pt-3 flex flex-col sm:flex-row items-center justify-center gap-3 max-w-lg mx-auto"
+            >
+              <input
+                type="email"
+                value={conversionEmail}
+                onChange={(e) => setConversionEmail(e.target.value)}
+                placeholder="Enter your email to start..."
+                className="w-full sm:flex-1 px-6 py-3.5 rounded-full bg-white/10 border border-white/20 text-white placeholder-slate-400 text-sm focus:outline-none focus:border-[#4A8BDF] focus:bg-white/15 transition-all shadow-inner font-sans"
+              />
+              <motion.button
+                type="submit"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#E11D48] hover:bg-[#BE123C] text-white font-sans font-bold text-sm px-8 py-3.5 rounded-full shadow-lg shadow-[#E11D48]/30 transition-all cursor-pointer shrink-0"
+              >
+                <span>Claim Credits</span>
+                <ArrowRight className="h-4 w-4" />
+              </motion.button>
+            </form>
+
+            {/* Trust Badges */}
+            <div className="pt-4 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-400 font-medium font-sans">
+              <span className="flex items-center gap-1.5">
+                <Check className="w-3.5 h-3.5 text-[#10B981]" /> Zero credit card required
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Check className="w-3.5 h-3.5 text-[#10B981]" /> Instant starter credits
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Check className="w-3.5 h-3.5 text-[#10B981]" /> Tier-1 uninflated rubrics
+              </span>
             </div>
           </div>
-        </div>
+        </motion.div>
       </Section>
     </div>
   );

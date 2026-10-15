@@ -49,7 +49,7 @@ export class AIInterviewerService {
   static getOpeningGreeting(problem: SystemDesignProblemDefinition): ChatMessage {
     const greetingContent = `Hello! Welcome to your System Design interview for **${problem.title}**.
 
-I'm your AI Interviewer. We will approach this like a real Staff Engineer interview in 6 stages:
+I'm Ava, your system design interviewer. We will approach this like a real Staff Engineer interview in 6 stages:
 1. **Requirements & Scoping**
 2. **Capacity & Scale Estimation**
 3. **High-Level Design**
@@ -106,36 +106,32 @@ Take a moment to review the problem statement. What functional and non-functiona
       nextStage = stage + 1;
     }
 
-    // Call external LLM (Gemini / Groq) if API key exists, otherwise use rich deterministic Socratic engine
-    const apiKey = process.env.GEMINI_API_KEY || process.env.GROQ_API_KEY;
-
-    if (apiKey) {
-      try {
-        const llmResponse = await this.callExternalLLM({
-          problem,
-          stage: nextStage,
-          userMessage,
-          graph,
-          capacityOutputs,
-          validationReport,
-          transcript,
-        });
-        if (llmResponse) {
-          return {
-            message: {
-              id: `ai_${Date.now()}`,
-              role: 'ai',
-              content: llmResponse.content,
-              timestamp: new Date().toISOString(),
-              stage: nextStage,
-              suggestions: llmResponse.suggestions,
-            },
-            nextStage: nextStage !== stage ? nextStage : undefined,
-          };
-        }
-      } catch (err) {
-        console.warn('[AI Interviewer] LLM call failed, falling back to deterministic Socratic engine:', err);
+    // Approach centralized AI Analysis Service (Meta Llama via Ollama)
+    try {
+      const llmResponse = await this.callExternalLLM({
+        problem,
+        stage: nextStage,
+        userMessage,
+        graph,
+        capacityOutputs,
+        validationReport,
+        transcript,
+      });
+      if (llmResponse) {
+        return {
+          message: {
+            id: `ai_${Date.now()}`,
+            role: 'ai',
+            content: llmResponse.content,
+            timestamp: new Date().toISOString(),
+            stage: nextStage,
+            suggestions: llmResponse.suggestions,
+          },
+          nextStage: nextStage !== stage ? nextStage : undefined,
+        };
       }
+    } catch (err) {
+      console.warn('[AI Interviewer] Centralized Meta Llama AI call failed, falling back to deterministic Socratic engine:', err);
     }
 
     // Fallback: Deterministic context-rich Socratic interviewer
@@ -312,7 +308,70 @@ When you are ready, click **Finish Interview** to generate your official **11-Di
     validationReport?: ValidationReport;
     transcript: ChatMessage[];
   }): Promise<{ content: string; suggestions: string[] } | null> {
-    // If external key is present, implement HTTP call to Gemini / Groq
+    const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:4003';
+    const nodesCount = params.graph.nodes?.length || 0;
+    const nodeLabels = (params.graph.nodes || []).map((n) => n.data.label).join(', ');
+
+    const systemPrompt = `You are a Principal / Staff Distributed Systems Interviewer conducting an interactive System Design interview.
+You are powered by Meta Llama.
+Current Problem: ${params.problem.title} (${params.problem.difficulty})
+Current Stage: ${params.stage} (${STAGE_NAMES[params.stage] || 'Scoping'})
+Functional Requirements: ${params.problem.functionalRequirements.join('; ')}
+Non-Functional Requirements: ${params.problem.nonFunctionalRequirements.join('; ')}
+
+Current Whiteboard Canvas State:
+- Placed Components: ${nodesCount} (${nodeLabels || 'None yet'})
+${params.validationReport?.issues?.length ? `- Architecture Diagnostics: ${params.validationReport.issues.map((i) => i.title).join('; ')}` : ''}
+
+Respond in concise, professional markdown as the AI interviewer. Follow Socratic methodology: challenge trade-offs, ask deep architectural questions, and provide 2-4 concrete next suggestions.
+Output strictly JSON in this format:
+{
+  "content": "Your markdown reply here...",
+  "suggestions": ["suggestion 1", "suggestion 2", "suggestion 3"]
+}`;
+
+    const userPrompt = `Candidate Message: "${params.userMessage}"
+Recent Conversation:
+${params.transcript.slice(-4).map((t) => `${t.role}: ${t.content}`).join('\n')}
+
+Generate the next Socratic interviewer response adhering strictly to Stage ${params.stage}.`;
+
+    try {
+      const response = await fetch(`${aiServiceUrl}/internal/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          systemPrompt,
+          userPrompt,
+          temperature: 0.4,
+          responseFormatJson: true,
+          timeoutMs: 12000,
+        }),
+        signal: AbortSignal.timeout(12000),
+      });
+
+      if (!response.ok) return null;
+      const data = (await response.json()) as any;
+      const rawText = data.content || '';
+
+      let cleaned = rawText.trim();
+      if (cleaned.startsWith('```json')) cleaned = cleaned.slice(7);
+      if (cleaned.startsWith('```')) cleaned = cleaned.slice(3);
+      if (cleaned.endsWith('```')) cleaned = cleaned.slice(0, -3);
+      cleaned = cleaned.trim();
+
+      const parsed = JSON.parse(cleaned);
+      if (parsed.content && Array.isArray(parsed.suggestions)) {
+        return {
+          content: parsed.content,
+          suggestions: parsed.suggestions.slice(0, 4),
+        };
+      }
+    } catch {
+      // Graceful fallback to deterministic Socratic reply
+      return null;
+    }
+
     return null;
   }
 

@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model DiscussionPost {
+  id           String              @id @default(cuid())
+  userId       String
+  userName     String
+  userAvatar   String?
+  roleCategory String
+  title        String
+  content      String              @db.Text
+  tags         String[]            @default([])
+  upvotes      Int                 @default(0)
+  aiReply      String?             @db.Text
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  comments     DiscussionComment[]
+
+  @@index([roleCategory])
+  @@map("discussion_posts")
+}
+
+model DiscussionComment {
+  id         String         @id @default(cuid())
+  postId     String
+  post       DiscussionPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId     String
+  userName   String
+  userAvatar String?
+  content    String         @db.Text
+  upvotes    Int            @default(0)
+  createdAt  DateTime       @default(now())
+
+  @@index([postId])
+  @@map("discussion_comments")
+}
