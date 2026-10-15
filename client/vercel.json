@@ -1,6 +1,6 @@
 {
   "framework": "vite",
-  "buildCommand": "pnpm --filter client build",
+  "buildCommand": "pnpm --filter @ru-ready/shared build && pnpm --filter client build",
   "outputDirectory": "dist",
   "rewrites": [
     {

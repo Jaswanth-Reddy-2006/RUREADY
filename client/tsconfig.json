@@ -10,8 +10,10 @@
     "noEmit": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@ru-ready/shared": ["../packages/shared/src/types/index.ts"],
+      "@ru-ready/shared/*": ["../packages/shared/src/types/*"]
     }
   },
-  "include": ["src"]
+  "include": ["src", "../packages/shared/src"]
 }

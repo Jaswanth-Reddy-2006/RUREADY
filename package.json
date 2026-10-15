@@ -15,7 +15,7 @@
     "dev:client": "pnpm --filter client dev",
     "build": "pnpm db:generate && pnpm --filter shared build && pnpm --filter gateway build && pnpm --filter \"./services/*\" build && node scripts/copy-prisma-generated.mjs && pnpm --filter client build",
     "build:gateway": "pnpm --filter gateway build",
-    "build:client": "pnpm --filter client build",
+    "build:client": "pnpm --filter shared build && pnpm --filter client build",
     "db:generate": "pnpm -r db:generate",
     "db:push:roadmap": "pnpm --filter roadmap-service db:push",
     "lint": "pnpm -r typecheck",
