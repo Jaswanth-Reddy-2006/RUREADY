@@ -2,6 +2,8 @@
 // RU Ready? — Challenge Microservice Entry Point (Port 4012)
 // ═══════════════════════════════════════════════════════════════
 
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import express, { Express } from 'express';
 import http from 'http';
 import cors from 'cors';
@@ -10,6 +12,9 @@ import dotenv from 'dotenv';
 import challengeRoutes from './routes/challenge.routes.js';
 import { setupSocketServer } from './socket/socket.server.js';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
 dotenv.config();
 
 const app: Express = express();
@@ -45,7 +50,7 @@ app.use('/', challengeRoutes);
 // Setup Socket.IO
 const io = setupSocketServer(server);
 
-const PORT = process.env.PORT || 4012;
+const PORT = process.env.CHALLENGE_SERVICE_PORT || 4012;
 
 server.listen(PORT, () => {
   console.log(`[Challenge Service] Running on port ${PORT}`);

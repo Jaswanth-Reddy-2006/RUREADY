@@ -18,7 +18,7 @@ import {
 import { SQL_CHALLENGES, SqlChallenge } from '../../data/coreCs.data';
 
 // Sample Mock Tables for in-browser SQL queries
-const MOCK_DATA = {
+const PLAYGROUND_TABLES = {
   employees: [
     { id: 1, name: 'Alice Smith', department_id: 101, salary: 95000, hire_date: '2021-03-15' },
     { id: 2, name: 'Bob Jones', department_id: 101, salary: 110000, hire_date: '2019-06-20' },
@@ -61,19 +61,19 @@ export default function SqlPlayground() {
 
       if (queryLower.includes('second') || (queryLower.includes('salary') && (queryLower.includes('offset 1') || queryLower.includes('max(salary)')))) {
         // Find second highest salary
-        const salaries = Array.from(new Set(MOCK_DATA.employees.map(e => e.salary))).sort((a, b) => b - a);
+        const salaries = Array.from(new Set(PLAYGROUND_TABLES.employees.map(e => e.salary))).sort((a, b) => b - a);
         const secondHighest = salaries[1] || null;
         results = [{ SecondHighestSalary: secondHighest }];
       } else if (queryLower.includes('join') || queryLower.includes('department')) {
         // Department highest salary
-        const deptMap = new Map(MOCK_DATA.departments.map(d => [d.id, d.name]));
+        const deptMap = new Map(PLAYGROUND_TABLES.departments.map(d => [d.id, d.name]));
         const highestPerDept: Record<number, number> = {};
-        MOCK_DATA.employees.forEach(e => {
+        PLAYGROUND_TABLES.employees.forEach(e => {
           if (!highestPerDept[e.department_id] || e.salary > highestPerDept[e.department_id]) {
             highestPerDept[e.department_id] = e.salary;
           }
         });
-        results = MOCK_DATA.employees
+        results = PLAYGROUND_TABLES.employees
           .filter(e => e.salary === highestPerDept[e.department_id])
           .map(e => ({
             Department: deptMap.get(e.department_id) || 'Unknown',
@@ -82,8 +82,8 @@ export default function SqlPlayground() {
           }));
       } else if (queryLower.includes('dense_rank') || queryLower.includes('rank')) {
         // Rank employees by department
-        const deptMap = new Map(MOCK_DATA.departments.map(d => [d.id, d.name]));
-        results = [...MOCK_DATA.employees]
+        const deptMap = new Map(PLAYGROUND_TABLES.departments.map(d => [d.id, d.name]));
+        results = [...PLAYGROUND_TABLES.employees]
           .sort((a, b) => b.salary - a.salary)
           .map((e, idx) => ({
             id: e.id,
@@ -94,7 +94,7 @@ export default function SqlPlayground() {
           }));
       } else {
         // Default select all from employees
-        results = MOCK_DATA.employees.map(e => ({ ...e }));
+        results = PLAYGROUND_TABLES.employees.map(e => ({ ...e }));
       }
 
       const elapsed = Math.round(performance.now() - startTime + 8); // realistic execution duration
@@ -272,13 +272,13 @@ export default function SqlPlayground() {
                 <table className="w-full text-left text-[11px] border-collapse">
                   <thead>
                     <tr className="bg-[#F8FAFC] border-b border-[#DCE7F2] text-[#7E8B9B] uppercase font-bold">
-                      {Object.keys(MOCK_DATA[activeSchemaTab][0]).map((key) => (
+                      {Object.keys(PLAYGROUND_TABLES[activeSchemaTab][0]).map((key) => (
                         <th key={key} className="py-2 px-3">{key}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#DCE7F2]">
-                    {MOCK_DATA[activeSchemaTab].map((row: any, i: number) => (
+                    {PLAYGROUND_TABLES[activeSchemaTab].map((row: any, i: number) => (
                       <tr key={i} className="hover:bg-[#EFFAFD]/30">
                         {Object.values(row).map((val: any, j: number) => (
                           <td key={j} className="py-2 px-3 text-[#526078] font-mono">

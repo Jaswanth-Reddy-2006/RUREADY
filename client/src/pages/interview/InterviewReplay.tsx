@@ -54,16 +54,8 @@ export default function InterviewReplay() {
         const response = await apiClient.get(`/interview/session/${id}`);
         setSession(response.data || null);
       } catch (err) {
-        console.warn('[InterviewReplay] Using fallback session data:', err);
-        setSession({
-          id: id || 'sess_demo_1',
-          targetRole: 'Full Stack Engineer',
-          targetCompany: 'Google',
-          interviewType: 'CODING',
-          durationMins: 15,
-          createdAt: new Date().toISOString(),
-          evalScore: 84,
-        });
+        console.warn('[InterviewReplay] Could not fetch session:', err);
+        setSession(null);
       } finally {
         setIsLoading(false);
       }
@@ -95,112 +87,99 @@ export default function InterviewReplay() {
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
-  // Mock Event Timeline Snapshots (Synced across video, code, transcript)
-  const replayEvents = [
-    {
-      timestampSecs: 15,
-      timeFormatted: '00:15',
-      eventType: 'INTERVIEWER_SPOKE',
-      speaker: 'AVA',
-      text: 'Welcome! Let us start by discussing how you would implement an LRU Cache with O(1) time complexity.',
-      codeSnapshot: '# Initial solution scaffold\nclass LRUCache:\n    def __init__(self, capacity: int):\n        pass',
-      evaluationNote: {
-        type: 'HINT',
-        title: 'Problem Introduced',
-        details: 'Ava presented LRU Cache requirements: O(1) get & put.',
-      },
-    },
-    {
-      timestampSecs: 90,
-      timeFormatted: '01:30',
-      eventType: 'CANDIDATE_SPOKE',
-      speaker: 'CANDIDATE',
-      text: 'I will use a Doubly LinkedList for fast nodes order update combined with a Hash Map for O(1) key lookup.',
-      codeSnapshot: '# Candidate approach outline\n# HashMap: key -> DoublyLinkedListNode\n# DoublyLinkedList: head (MRU) <-> tail (LRU)',
-      evaluationNote: {
-        type: 'STRONG',
-        title: 'Optimal Approach Identified',
-        details: 'Correctly identified Hash Map + Doubly LinkedList pattern.',
-      },
-    },
-    {
-      timestampSecs: 240,
-      timeFormatted: '04:00',
-      eventType: 'CODE_SNAPSHOT',
-      speaker: 'CANDIDATE',
-      text: 'Coding doubly linked list node structure and pointer updates...',
-      codeSnapshot: `class Node:
-    def __init__(self, key, val):
-        self.key = key
-        self.val = val
-        self.prev = None
-        self.next = None
+interface ReplayEvent {
+  timestampSecs: number;
+  timeFormatted: string;
+  eventType: string;
+  speaker: 'AVA' | 'CANDIDATE';
+  text: string;
+  codeSnapshot?: string;
+  evaluationNote?: {
+    type: string;
+    title: string;
+    details: string;
+  } | null;
+}
 
-class LRUCache:
-    def __init__(self, capacity: int):
-        self.cap = capacity
-        self.cache = {} # Map key -> Node
-        self.head = Node(0, 0)
-        self.tail = Node(0, 0)
-        self.head.next = self.tail
-        self.tail.prev = self.head`,
-      evaluationNote: {
-        type: 'STRONG',
-        title: 'Dummy Head & Tail Guard',
-        details: 'Used sentinel head/tail nodes to simplify pointer operations.',
-      },
-    },
-    {
-      timestampSecs: 480,
-      timeFormatted: '08:00',
-      eventType: 'COMPILER_TEST',
-      speaker: 'CANDIDATE',
-      text: 'Running test cases for capacity eviction...',
-      codeSnapshot: `    def put(self, key: int, value: int) -> None:
-        if key in self.cache:
-            self._remove(self.cache[key])
-        node = Node(key, value)
-        self._add(node)
-        self.cache[key] = node
-        if len(self.cache) > self.cap:
-            lru = self.head.next
-            self._remove(lru)
-            del self.cache[lru.key]`,
-      evaluationNote: {
-        type: 'IMPROVEMENT',
-        title: 'Boundary Check Execution',
-        details: 'Compiler verified O(1) put eviction logic against 10 test cases.',
-      },
-    },
-    {
-      timestampSecs: 720,
-      timeFormatted: '12:00',
-      eventType: 'HINT_GIVEN',
-      speaker: 'AVA',
-      text: 'Good. What is the space complexity, and how would you make this thread-safe in a multi-threaded environment?',
-      codeSnapshot: `# Final verified solution
-# Space Complexity: O(Capacity)
-# Time Complexity: O(1) for get and put`,
-      evaluationNote: {
-        type: 'HINT',
-        title: 'Socratic Architecture Probe',
-        details: 'Probed thread safety and concurrency lock mechanisms.',
-      },
-    },
-  ];
+  // Derive Event Timeline Snapshots dynamically from session
+  const replayEvents: ReplayEvent[] = React.useMemo(() => {
+    if (session?.events && Array.isArray(session.events) && session.events.length > 0) {
+      return session.events;
+    }
+    if (session?.chatHistory && Array.isArray(session.chatHistory) && session.chatHistory.length > 0) {
+      return session.chatHistory.map((item: any, idx: number): ReplayEvent => {
+        const timeSecs = item.timestampSecs ?? (idx * 45 + 15);
+        const m = Math.floor(timeSecs / 60);
+        const s = Math.floor(timeSecs % 60);
+        const formatted = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        return {
+          timestampSecs: timeSecs,
+          timeFormatted: formatted,
+          eventType: item.role === 'assistant' ? 'INTERVIEWER_SPOKE' : 'CANDIDATE_SPOKE',
+          speaker: item.role === 'assistant' ? 'AVA' : 'CANDIDATE',
+          text: item.content || item.text || '',
+          codeSnapshot: item.codeSnapshot || '',
+          evaluationNote: item.evaluationNote || null
+        };
+      });
+    }
+    if (session?.questions && Array.isArray(session.questions) && session.questions.length > 0) {
+      return session.questions.map((q: any, idx: number): ReplayEvent => {
+        const timeSecs = idx * 90 + 15;
+        const m = Math.floor(timeSecs / 60);
+        const s = Math.floor(timeSecs % 60);
+        const formatted = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        return {
+          timestampSecs: timeSecs,
+          timeFormatted: formatted,
+          eventType: 'INTERVIEWER_SPOKE',
+          speaker: 'AVA',
+          text: q.questionText || q.prompt || q.text || `Question ${idx + 1}`,
+          codeSnapshot: q.starterCode || q.code || '',
+          evaluationNote: q.evalNote ? {
+            type: 'HINT',
+            title: `Question ${idx + 1}`,
+            details: q.evalNote
+          } : null
+        };
+      });
+    }
+    return [];
+  }, [session]);
 
   // Find active event based on current timestamp
-  const activeEventIndex = replayEvents.reduce((acc, evt, idx) => {
+  const activeEventIndex = replayEvents.reduce((acc: number, evt: ReplayEvent, idx: number) => {
     if (currentTimeSecs >= evt.timestampSecs) return idx;
     return acc;
   }, 0);
 
-  const activeEvent = replayEvents[activeEventIndex] || replayEvents[0];
+  const activeEvent = replayEvents[activeEventIndex] || {
+    timestampSecs: 0,
+    timeFormatted: '00:00',
+    eventType: 'IDLE',
+    speaker: 'AVA',
+    text: 'No recorded dialogue events available for this session.',
+    codeSnapshot: '',
+    evaluationNote: null
+  };
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-slate-900 text-white flex items-center justify-center">
         <div className="h-10 w-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!session) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-6 space-y-4">
+        <AlertCircle className="w-12 h-12 text-amber-500" />
+        <h2 className="text-xl font-bold">Interview Session Not Found</h2>
+        <p className="text-xs text-slate-400">The requested interview replay session could not be loaded.</p>
+        <Button onClick={() => navigate(-1)} className="bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs">
+          Go Back
+        </Button>
       </div>
     );
   }
@@ -225,15 +204,17 @@ class LRUCache:
               <span className="text-xs text-slate-400 font-mono">Session #{session?.id?.slice(0, 10)}</span>
             </div>
             <h1 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-              {session?.targetRole || 'Full Stack Engineer'} — {session?.targetCompany || 'Google'}
+              {session?.targetRole || 'Interview Role'} {session?.targetCompany ? `— ${session.targetCompany}` : ''}
             </h1>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-xs font-mono font-bold">
-            Readiness Score: {session?.evalScore || 84}%
-          </Badge>
+          {(session?.evalScore !== undefined || session?.overallScore !== undefined) && (
+            <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-xs font-mono font-bold">
+              Readiness Score: {session?.evalScore ?? session?.overallScore}%
+            </Badge>
+          )}
           <Button
             onClick={() => navigate(`/interview/${id}/analysis`)}
             className="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-4 py-2 rounded-xl flex items-center gap-1.5"
@@ -269,8 +250,8 @@ class LRUCache:
             </div>
 
             <div className="z-10 flex items-center justify-between text-[11px] font-mono text-slate-400 bg-slate-950/70 p-2 rounded-xl backdrop-blur-xs">
-              <span>Voice WPM: 142 (Optimal)</span>
-              <span>Eye Contact: 88%</span>
+              <span>Voice WPM: {session?.metrics?.wpm ? `${session.metrics.wpm}` : 'N/A'}</span>
+              <span>Eye Contact: {session?.metrics?.eyeContactScore ? `${session.metrics.eyeContactScore}%` : 'N/A'}</span>
             </div>
           </Card>
 

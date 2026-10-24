@@ -51,8 +51,7 @@ export default function SidebarNav() {
     location.pathname.startsWith('/coding') ||
     location.pathname.startsWith('/interview') ||
     location.pathname.startsWith('/interviews') ||
-    location.pathname.startsWith('/company-wise') ||
-    location.pathname.startsWith('/system-design')
+        location.pathname.startsWith('/system-design')
   );
 
   const [challengesOpen, setChallengesOpen] = useState(
@@ -105,11 +104,12 @@ export default function SidebarNav() {
   };
 
   const isInterviewsActive =
+    location.pathname.startsWith('/video') ||
     location.pathname.startsWith('/oral') ||
     location.pathname.startsWith('/coding') ||
+    location.pathname.startsWith('/system-design') ||
     location.pathname.startsWith('/interview') ||
-    location.pathname.startsWith('/interviews') ||
-    location.pathname.startsWith('/company-wise');
+    location.pathname.startsWith('/interviews');
 
   const isChallengesActive = location.pathname.startsWith('/challenges');
 
@@ -194,12 +194,12 @@ export default function SidebarNav() {
               className={clsx(
                 "w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-bold font-sans transition-all duration-200 group relative text-left cursor-pointer",
                 isInterviewsActive
-                  ? "bg-blue-50/60 dark:bg-[#262626] text-[#11183D] dark:text-[#FFFFFF]"
+                  ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-sm font-extrabold"
                   : "text-[#526078] dark:text-[#A8A8A8] hover:bg-[#F8FAFC] dark:hover:bg-[#262626] hover:text-[#11183D] dark:hover:text-white"
               )}
             >
               <div className="flex items-center gap-3">
-                <Brain size={17} className={isInterviewsActive ? "text-[#4A8BDF] dark:text-white" : "text-[#526078] dark:text-[#A8A8A8] group-hover:text-[#11183D] dark:group-hover:text-white"} />
+                <Brain size={17} className={isInterviewsActive ? "text-white" : "text-[#526078] dark:text-[#A8A8A8] group-hover:text-[#11183D] dark:group-hover:text-white"} />
                 <span>Interviews</span>
               </div>
               <div className="flex items-center">
@@ -269,25 +269,7 @@ export default function SidebarNav() {
                   </NavLink>
                 )}
 
-                {/* Company-wise Interviews */}
-                {isFeatureEnabled('company_wise_interview') && (
-                  <NavLink
-                    to="/interviews/company-wise"
-                    className={({ isActive }) =>
-                      clsx(
-                        "flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all",
-                        isActive || location.pathname.startsWith('/interviews/company-wise') || location.pathname.startsWith('/company-wise')
-                          ? "bg-[#EFFAFD] dark:bg-[#262626] text-[#4A8BDF] dark:text-white font-extrabold"
-                          : "text-slate-600 dark:text-[#A8A8A8] hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-[#262626]"
-                      )
-                    }
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <Building2 size={15} />
-                      <span>Company-wise</span>
-                    </div>
-                  </NavLink>
-                )}
+                
               </div>
             )}
           </div>

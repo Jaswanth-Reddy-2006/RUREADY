@@ -113,8 +113,8 @@ let broadcastsList: Array<{
     isActive: true,
     createdAt: new Date(Date.now() - 86400000).toISOString(),
     expiresAt: new Date(Date.now() + 14 * 86400000).toISOString(),
-    impressionsCount: 24,
-    clicksCount: 8,
+    impressionsCount: 0,
+    clicksCount: 0,
   },
   {
     id: 'bc_2',
@@ -128,8 +128,8 @@ let broadcastsList: Array<{
     isActive: true,
     createdAt: new Date(Date.now() - 172800000).toISOString(),
     expiresAt: new Date(Date.now() + 30 * 86400000).toISOString(),
-    impressionsCount: 16,
-    clicksCount: 3,
+    impressionsCount: 0,
+    clicksCount: 0,
   },
 ];
 
@@ -219,6 +219,12 @@ export const adminService = {
 
     const dynamicOnlineUsers = totalUsersCount > 0 ? Math.max(activeSessions, recentActiveUsers) : 0;
 
+    const scoredOral = oralSessions.filter(s => typeof s.overallScore === 'number' && s.overallScore > 0);
+    const scoredCoding = codingSessions.filter(s => typeof s.overallScore === 'number' && s.overallScore > 0);
+    const totalScored = scoredOral.length + scoredCoding.length;
+    const sumScores = scoredOral.reduce((acc, s) => acc + s.overallScore, 0) + scoredCoding.reduce((acc, s) => acc + s.overallScore, 0);
+    const calculatedAvgScore = totalScored > 0 ? Math.round(sumScores / totalScored) : 0;
+
     return {
       totalUsers: totalUsersCount,
       totalCandidates: totalUsersCount,
@@ -230,7 +236,7 @@ export const adminService = {
       totalSessions,
       completedSessions,
       totalRevenue,
-      avgScore: completedSessions > 0 ? 82 : 0,
+      avgScore: calculatedAvgScore,
       completedInterviews: completedSessions,
       systemHealth: operationalCount === (healthMatrix.length || 9) ? 'OPERATIONAL' : (operationalCount > 0 ? 'DEGRADED' : 'OFFLINE'),
       gatewayUptimeSecs: 86400,
@@ -318,22 +324,42 @@ export const adminService = {
     const totalCompleted = oralSessions.filter(s => s.status === 'COMPLETED' || s.status === 'ANALYSED').length +
       codingSessions.filter(s => s.status === 'COMPLETED').length;
 
+    const scoredSessions = [
+      ...oralSessions.filter(s => (s.status === 'COMPLETED' || s.status === 'ANALYSED') && typeof s.overallScore === 'number'),
+      ...codingSessions.filter(s => s.status === 'COMPLETED' && typeof s.overallScore === 'number'),
+    ];
+
+    let excellentCount = 0;
+    let goodCount = 0;
+    let avgCount = 0;
+    let needsImpCount = 0;
+
+    scoredSessions.forEach((s) => {
+      const score = s.overallScore;
+      if (score >= 85) excellentCount++;
+      else if (score >= 70) goodCount++;
+      else if (score >= 50) avgCount++;
+      else needsImpCount++;
+    });
+
+    const evaluatedTotal = scoredSessions.length;
+
     return {
       scoreDistribution: {
-        EXCELLENT: Math.round(totalCompleted * 0.3),
-        GOOD: Math.round(totalCompleted * 0.45),
-        AVERAGE: Math.round(totalCompleted * 0.2),
-        NEEDS_IMPROVEMENT: Math.round(totalCompleted * 0.05),
+        EXCELLENT: excellentCount,
+        GOOD: goodCount,
+        AVERAGE: avgCount,
+        NEEDS_IMPROVEMENT: needsImpCount,
       },
       interviewTypeMetrics: {
         ORAL: totalOral,
         CODING: totalCoding,
       },
-      readinessVerdictRates: totalCompleted > 0 ? {
-        STRONG: `${Math.round((totalCompleted * 0.35) / totalCompleted * 100)}%`,
-        READY: `${Math.round((totalCompleted * 0.45) / totalCompleted * 100)}%`,
-        ALMOST_READY: `${Math.round((totalCompleted * 0.15) / totalCompleted * 100)}%`,
-        NOT_READY: `${Math.round((totalCompleted * 0.05) / totalCompleted * 100)}%`,
+      readinessVerdictRates: evaluatedTotal > 0 ? {
+        STRONG: `${Math.round((excellentCount / evaluatedTotal) * 100)}%`,
+        READY: `${Math.round((goodCount / evaluatedTotal) * 100)}%`,
+        ALMOST_READY: `${Math.round((avgCount / evaluatedTotal) * 100)}%`,
+        NOT_READY: `${Math.round((needsImpCount / evaluatedTotal) * 100)}%`,
       } : {
         STRONG: '0%',
         READY: '0%',
@@ -375,6 +401,12 @@ export const adminService = {
 
       const isUserAdmin = u.email.toLowerCase() === 'admin@ruready.ai' || u.email.toLowerCase().startsWith('admin@');
 
+      const userScoredOral = userOral.filter((s) => typeof s.overallScore === 'number' && s.overallScore > 0);
+      const userScoredCoding = userCoding.filter((s) => typeof s.overallScore === 'number' && s.overallScore > 0);
+      const totalUserScored = userScoredOral.length + userScoredCoding.length;
+      const userSumScore = userScoredOral.reduce((acc, s) => acc + s.overallScore, 0) + userScoredCoding.reduce((acc, s) => acc + s.overallScore, 0);
+      const userAvgScore = totalUserScored > 0 ? Math.round(userSumScore / totalUserScored) : null;
+
       return {
         id: u.id,
         name: u.name,
@@ -384,7 +416,7 @@ export const adminService = {
         status: 'ACTIVE',
         totalSessions: totalSess,
         completedSessions: completedSess,
-        avgScore: completedSess > 0 ? 82 : null,
+        avgScore: userAvgScore,
         lastActiveAt: u.updatedAt?.toISOString ? u.updatedAt.toISOString() : new Date().toISOString(),
         createdAt: u.createdAt?.toISOString ? u.createdAt.toISOString() : new Date().toISOString(),
       };
@@ -411,7 +443,7 @@ export const adminService = {
         mode: 'ORAL',
         status: s.status,
         createdAt: s.createdAt?.toISOString ? s.createdAt.toISOString() : new Date().toISOString(),
-        analysis: s.status === 'COMPLETED' || s.status === 'ANALYSED' ? { overallScore: 82 } : null,
+        analysis: typeof s.overallScore === 'number' ? { overallScore: s.overallScore } : null,
       })),
       ...codingSessions.map((s) => ({
         id: s.id,
@@ -419,11 +451,14 @@ export const adminService = {
         mode: 'CODING',
         status: s.status,
         createdAt: s.startedAt?.toISOString ? s.startedAt.toISOString() : new Date().toISOString(),
-        analysis: s.status === 'COMPLETED' ? { overallScore: 80 } : null,
+        analysis: typeof s.overallScore === 'number' ? { overallScore: s.overallScore } : null,
       })),
     ];
 
     const completedCount = userSessions.filter((s) => s.status === 'COMPLETED' || s.status === 'ANALYSED').length;
+    const scoredSessions = userSessions.filter((s) => s.analysis?.overallScore !== undefined && s.analysis?.overallScore !== null);
+    const sumScore = scoredSessions.reduce((acc, s) => acc + (s.analysis?.overallScore || 0), 0);
+    const userAvgScore = scoredSessions.length > 0 ? Math.round(sumScore / scoredSessions.length) : null;
 
     return {
       user: {
@@ -435,7 +470,7 @@ export const adminService = {
         status: 'ACTIVE',
         totalSessions: userSessions.length,
         completedSessions: completedCount,
-        avgScore: completedCount > 0 ? 82 : null,
+        avgScore: userAvgScore,
         lastActiveAt: user.updatedAt?.toISOString ? user.updatedAt.toISOString() : new Date().toISOString(),
         createdAt: user.createdAt?.toISOString ? user.createdAt.toISOString() : new Date().toISOString(),
         sessions: userSessions,

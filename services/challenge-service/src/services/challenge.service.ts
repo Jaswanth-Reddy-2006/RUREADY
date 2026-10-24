@@ -123,6 +123,23 @@ export interface RatingData {
   totalXP: number;
 }
 
+export interface ChallengeInvitation {
+  id: string;
+  fromUserId: string;
+  fromUserName: string;
+  fromUserAvatar?: string;
+  fromUserRating: number;
+  toUserId: string;
+  toUserName?: string;
+  difficulty: 'EASY' | 'MEDIUM' | 'HARD' | 'MIXED';
+  topic: string;
+  language: string;
+  status: 'PENDING' | 'ACCEPTED' | 'DECLINED' | 'CANCELLED' | 'EXPIRED';
+  matchId?: string;
+  createdAt: number;
+  expiresAt: number;
+}
+
 class ChallengeService {
   private activeRooms: Map<string, ChallengeRoomState> = new Map();
   private codeToRoomId: Map<string, string> = new Map();
@@ -130,6 +147,7 @@ class ChallengeService {
   private activeQuizzes: Map<string, QuizSessionState> = new Map();
   private codeToQuizId: Map<string, string> = new Map();
   private ratingsCache: Map<string, RatingData> = new Map();
+  private invitations: Map<string, ChallengeInvitation> = new Map();
 
   // ═══════════════════════════════════════════════════════════════
   // 1. Authoritative Rating & Elo Calculation (K=32, Base 1200)
@@ -577,10 +595,18 @@ class ChallengeService {
 
   private async persistMatchInDb(match: MatchSessionState) {
     try {
+      let validRoomId: string | null = null;
+      if (match.roomId) {
+        const room = await prisma.challengeRoom.findUnique({ where: { id: match.roomId } }).catch(() => null);
+        if (room) {
+          validRoomId = match.roomId;
+        }
+      }
+
       await prisma.matchSession.create({
         data: {
           id: match.id,
-          roomId: match.roomId,
+          roomId: validRoomId,
           matchType: match.matchType,
           difficulty: match.difficulty,
           status: match.status,
@@ -605,8 +631,203 @@ class ChallengeService {
     }
   }
 
+  // ═══════════════════════════════════════════════════════════════
+  // 3. Friend Invitation Flow (Zero Fake Data, Authoritative State)
+  // ═══════════════════════════════════════════════════════════════
+
+  public async createInvitation(params: {
+    fromUserId: string;
+    fromUserName: string;
+    fromUserAvatar?: string;
+    toUserId: string;
+    toUserName?: string;
+    difficulty?: 'EASY' | 'MEDIUM' | 'HARD' | 'MIXED';
+    topic?: string;
+    language?: string;
+  }): Promise<ChallengeInvitation> {
+    if (!params.fromUserId || !params.toUserId) {
+      throw new Error('Both sender and recipient user IDs are required');
+    }
+    if (params.fromUserId === params.toUserId) {
+      throw new Error('You cannot challenge yourself');
+    }
+
+    // Clean up expired invitations
+    const now = Date.now();
+    for (const [id, inv] of this.invitations.entries()) {
+      if (inv.status === 'PENDING' && now > inv.expiresAt) {
+        inv.status = 'EXPIRED';
+      }
+    }
+
+    // Check if an active pending invite already exists between these two users
+    const existing = Array.from(this.invitations.values()).find(
+      (inv) =>
+        inv.fromUserId === params.fromUserId &&
+        inv.toUserId === params.toUserId &&
+        inv.status === 'PENDING' &&
+        now < inv.expiresAt
+    );
+    if (existing) {
+      return existing;
+    }
+
+    const senderRating = await this.getUserRating(params.fromUserId, params.fromUserName, params.fromUserAvatar);
+
+    const inviteId = `inv_${uuidv4().replace(/-/g, '').slice(0, 16)}`;
+    const invitation: ChallengeInvitation = {
+      id: inviteId,
+      fromUserId: params.fromUserId,
+      fromUserName: params.fromUserName,
+      fromUserAvatar: params.fromUserAvatar,
+      fromUserRating: senderRating.rating,
+      toUserId: params.toUserId,
+      toUserName: params.toUserName || 'Challenger',
+      difficulty: params.difficulty || 'MEDIUM',
+      topic: params.topic || 'DSA',
+      language: params.language || 'all',
+      status: 'PENDING',
+      createdAt: now,
+      expiresAt: now + 5 * 60 * 1000, // 5 minutes validity
+    };
+
+    this.invitations.set(inviteId, invitation);
+    return invitation;
+  }
+
+  public getPendingInvitations(userId: string): ChallengeInvitation[] {
+    const now = Date.now();
+    const list: ChallengeInvitation[] = [];
+    for (const inv of this.invitations.values()) {
+      if (inv.toUserId === userId) {
+        if (inv.status === 'PENDING') {
+          if (now > inv.expiresAt) {
+            inv.status = 'EXPIRED';
+          } else {
+            list.push(inv);
+          }
+        }
+      }
+    }
+    return list.sort((a, b) => b.createdAt - a.createdAt);
+  }
+
+  public async acceptInvitation(params: {
+    invitationId: string;
+    userId: string;
+    userName: string;
+    userAvatar?: string;
+  }): Promise<{ invitation: ChallengeInvitation; match: MatchSessionState }> {
+    const inv = this.invitations.get(params.invitationId);
+    if (!inv) {
+      throw new Error('Invitation not found');
+    }
+    if (inv.toUserId !== params.userId) {
+      throw new Error('Not authorized to accept this invitation');
+    }
+    if (inv.status !== 'PENDING') {
+      throw new Error(`Invitation is already ${inv.status.toLowerCase()}`);
+    }
+    if (Date.now() > inv.expiresAt) {
+      inv.status = 'EXPIRED';
+      throw new Error('Invitation has expired');
+    }
+
+    // Pick suitable problem matching difficulty
+    const targetDiff = inv.difficulty !== 'MIXED' ? inv.difficulty : 'MEDIUM';
+    const candidates = CHALLENGE_PROBLEMS.filter(
+      (p) => inv.difficulty === 'MIXED' || p.difficulty === targetDiff
+    );
+    const chosenProblem = candidates.length > 0
+      ? candidates[Math.floor(Math.random() * candidates.length)]
+      : CHALLENGE_PROBLEMS[0];
+
+    const matchId = `match_${uuidv4().replace(/-/g, '').slice(0, 16)}`;
+    const senderRating = await this.getUserRating(inv.fromUserId, inv.fromUserName, inv.fromUserAvatar);
+    const recipientRating = await this.getUserRating(params.userId, params.userName, params.userAvatar);
+
+    const match = this.createDirectMatch({
+      matchId,
+      problem: chosenProblem,
+      player1: {
+        userId: inv.fromUserId,
+        userName: inv.fromUserName,
+        userAvatar: inv.fromUserAvatar,
+        userRating: senderRating.rating,
+      },
+      player2: {
+        userId: params.userId,
+        userName: params.userName,
+        userAvatar: params.userAvatar,
+        userRating: recipientRating.rating,
+      },
+      durationSeconds: 1200,
+      matchType: 'RANKED_1V1',
+    });
+
+    inv.status = 'ACCEPTED';
+    inv.matchId = matchId;
+
+    return { invitation: inv, match };
+  }
+
+  public declineInvitation(invitationId: string, userId: string): ChallengeInvitation {
+    const inv = this.invitations.get(invitationId);
+    if (!inv) {
+      throw new Error('Invitation not found');
+    }
+    if (inv.toUserId !== userId) {
+      throw new Error('Not authorized to decline this invitation');
+    }
+    inv.status = 'DECLINED';
+    return inv;
+  }
+
+  public cancelInvitation(invitationId: string, userId: string): ChallengeInvitation {
+    const inv = this.invitations.get(invitationId);
+    if (!inv) {
+      throw new Error('Invitation not found');
+    }
+    if (inv.fromUserId !== userId) {
+      throw new Error('Not authorized to cancel this invitation');
+    }
+    inv.status = 'CANCELLED';
+    return inv;
+  }
+
   public getMatch(matchId: string): MatchSessionState | null {
-    return this.activeMatches.get(matchId) || null;
+    const match = this.activeMatches.get(matchId) || null;
+    if (match && match.status === 'IN_PROGRESS' && Date.now() > match.endsAt) {
+      this.finalizeMatch(match);
+    }
+    return match;
+  }
+
+  public async forfeitMatch(matchId: string, forfeitingUserId: string): Promise<MatchSessionState> {
+    const match = this.getMatch(matchId);
+    if (!match) {
+      throw new Error('Match not found');
+    }
+    if (match.status === 'COMPLETED') {
+      return match;
+    }
+
+    const forfeiter = match.participants[forfeitingUserId];
+    if (!forfeiter) {
+      throw new Error('Participant not in this match');
+    }
+
+    const opponentId = Object.keys(match.participants).find((id) => id !== forfeitingUserId);
+    if (!opponentId) {
+      throw new Error('No opponent found to award victory');
+    }
+
+    forfeiter.status = 'LOST';
+    match.participants[opponentId].status = 'WON';
+    match.winnerId = opponentId;
+
+    await this.finalizeMatch(match, opponentId);
+    return match;
   }
 
   public async runSampleTests(params: {
@@ -717,11 +938,18 @@ class ChallengeService {
 
     let isWinner = false;
 
-    if (isAllPassed) {
+    // ATOMIC CONCURRENCY CHECK:
+    // If another player already conquered the match while sandbox was executing:
+    if ((match.status as string) === 'COMPLETED' || (match.winnerId && match.winnerId !== params.userId)) {
+      participant.status = 'LOST';
+      isWinner = false;
+    } else if (isAllPassed) {
       participant.status = 'WON';
       match.winnerId = params.userId;
       isWinner = true;
       await this.finalizeMatch(match, params.userId);
+    } else {
+      participant.status = 'SUBMITTED';
     }
 
     const allCompleted = Object.values(match.participants).every(
@@ -739,6 +967,9 @@ class ChallengeService {
   public async finalizeMatch(match: MatchSessionState, winnerId?: string) {
     if (match.status === 'COMPLETED') return;
     match.status = 'COMPLETED';
+    if (winnerId) {
+      match.winnerId = winnerId;
+    }
 
     const pKeys = Object.keys(match.participants);
     if (pKeys.length === 2) {
@@ -831,6 +1062,31 @@ class ChallengeService {
           status: 'COMPLETED',
           winnerId: match.winnerId,
           endedAt: new Date(),
+        },
+      }).catch(() => {});
+
+      // Authoritative DB Updates for participants
+      prisma.matchParticipant.updateMany({
+        where: { matchId: match.id, userId: p1.userId },
+        data: {
+          score: p1.score,
+          passedTests: p1.passedTests,
+          ratingAfter: p1.ratingAfter,
+          xpEarned: p1.xpAwarded,
+          status: p1.status,
+          submittedAt: new Date(),
+        },
+      }).catch(() => {});
+
+      prisma.matchParticipant.updateMany({
+        where: { matchId: match.id, userId: p2.userId },
+        data: {
+          score: p2.score,
+          passedTests: p2.passedTests,
+          ratingAfter: p2.ratingAfter,
+          xpEarned: p2.xpAwarded,
+          status: p2.status,
+          submittedAt: new Date(),
         },
       }).catch(() => {});
     }
@@ -1172,19 +1428,107 @@ class ChallengeService {
   }
 
   public async getUserMatchHistory(userId: string) {
+    const allMatchesMap = new Map<string, any>();
+
     try {
-      const submissions = await prisma.challengeSubmission.findMany({
+      const userMatches = await prisma.matchParticipant.findMany({
         where: { userId },
-        orderBy: { submittedAt: 'desc' },
-        take: 20,
+        orderBy: { match: { createdAt: 'desc' } },
+        take: 30,
         include: {
-          match: true,
+          match: {
+            include: {
+              participants: true,
+            },
+          },
         },
       });
-      return submissions;
+
+      if (userMatches && userMatches.length > 0) {
+        for (const record of userMatches) {
+          const match = record.match;
+          const opponent = match.participants.find((p) => p.userId !== userId);
+          const isWinner = match.winnerId === userId;
+          const isTie = !match.winnerId && match.status === 'COMPLETED';
+          const problem = CHALLENGE_PROBLEMS.find((p) => p.id === match.problemId);
+
+          allMatchesMap.set(match.id, {
+            id: match.id,
+            matchId: match.id,
+            matchType: match.matchType,
+            difficulty: match.difficulty,
+            status: match.status,
+            result: isWinner ? 'WIN' : isTie ? 'TIE' : 'LOSS',
+            problemId: match.problemId,
+            problemTitle: problem ? problem.title : 'Algorithmic Challenge',
+            ratingBefore: record.ratingBefore,
+            ratingAfter: record.ratingAfter,
+            ratingDelta: record.ratingAfter - record.ratingBefore,
+            passedTests: record.passedTests,
+            totalTests: record.totalTests,
+            score: record.score,
+            xpEarned: record.xpEarned,
+            startedAt: match.startedAt?.toISOString() || new Date(match.createdAt).toISOString(),
+            endedAt: match.endedAt?.toISOString() || null,
+            durationSeconds: match.durationSeconds,
+            opponent: opponent
+              ? {
+                  userId: opponent.userId,
+                  userName: opponent.userName,
+                  userAvatar: opponent.userAvatar,
+                  rating: opponent.ratingBefore,
+                }
+              : null,
+          });
+        }
+      }
     } catch (e) {
-      return [];
+      console.warn('[Challenge Service] DB match history fallback:', e);
     }
+
+    // Merge active in-memory matches that belong to this user (giving preference to live/in-memory state)
+    for (const match of this.activeMatches.values()) {
+      if (match.participants[userId]) {
+        const p = match.participants[userId];
+        const opponentId = Object.keys(match.participants).find((id) => id !== userId);
+        const opponent = opponentId ? match.participants[opponentId] : null;
+        const isWinner = match.winnerId === userId;
+        const isTie = !match.winnerId && match.status === 'COMPLETED';
+
+        allMatchesMap.set(match.id, {
+          id: match.id,
+          matchId: match.id,
+          matchType: match.matchType,
+          difficulty: match.difficulty,
+          status: match.status,
+          result: isWinner ? 'WIN' : isTie ? 'TIE' : 'LOSS',
+          problemId: match.problem.id,
+          problemTitle: match.problem.title,
+          ratingBefore: p.ratingBefore,
+          ratingAfter: p.ratingAfter,
+          ratingDelta: p.ratingAfter - p.ratingBefore,
+          passedTests: p.passedTests,
+          totalTests: p.totalTests,
+          score: p.score,
+          xpEarned: p.xpAwarded,
+          startedAt: new Date(match.startedAt).toISOString(),
+          endedAt: match.status === 'COMPLETED' ? new Date().toISOString() : null,
+          durationSeconds: Math.floor((match.endsAt - match.startedAt) / 1000),
+          opponent: opponent
+            ? {
+                userId: opponent.userId,
+                userName: opponent.userName,
+                userAvatar: opponent.userAvatar,
+                rating: opponent.ratingBefore,
+              }
+            : null,
+        });
+      }
+    }
+
+    return Array.from(allMatchesMap.values()).sort(
+      (a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime()
+    );
   }
 }
 

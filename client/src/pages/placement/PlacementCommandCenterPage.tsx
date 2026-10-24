@@ -47,22 +47,60 @@ export default function PlacementCommandCenterPage() {
 
   // Placement Insights Date Filtering State
   const [insightTimeRange, setInsightTimeRange] = useState<TimeRangeType>('THIS_MONTH');
-  const [customFromDate, setCustomFromDate] = useState<string>('2026-09-01');
-  const [customToDate, setCustomToDate] = useState<string>('2026-09-30');
+  const [customFromDate, setCustomFromDate] = useState<string>(() => {
+    const d = new Date();
+    d.setDate(1);
+    return d.toISOString().split('T')[0];
+  });
+  const [customToDate, setCustomToDate] = useState<string>(() => new Date().toISOString().split('T')[0]);
 
   const urgentAction = getUrgentAction();
 
+  const analyticsData = useMemo(() => {
+    const total = applications.length;
+    const shortlisted = applications.filter((a) => a.stage !== 'APPLIED' && a.stage !== 'REJECTED').length + applications.filter(a => a.stage === 'OFFERED').length;
+    const oaCleared = applications.filter((a) => ['TECHNICAL_1', 'TECHNICAL_2', 'HR', 'OFFERED'].includes(a.stage)).length;
+    const techReached = applications.filter((a) => ['TECHNICAL_1', 'TECHNICAL_2', 'HR', 'OFFERED'].includes(a.stage)).length;
+    const offered = applications.filter((a) => a.stage === 'OFFERED').length;
+
+    const shortlistRate = total > 0 ? Math.round((shortlisted / total) * 100) : 0;
+    const oaClearRate = shortlisted > 0 ? Math.round((oaCleared / shortlisted) * 100) : 0;
+    const techToOfferRate = techReached > 0 ? Math.round((offered / techReached) * 100) : 0;
+    const weakSpots = Array.from(new Set(applications.flatMap((a) => a.rejectionWeakTopics || [])));
+
+    return {
+      total,
+      shortlisted,
+      oaCleared,
+      offered,
+      shortlistRate,
+      oaClearRate,
+      techToOfferRate,
+      weakSpots,
+    };
+  }, [applications]);
+
   // Filtered Applications for Placement Insights Card based on selected Date Range
   const insightsFilteredApps = useMemo(() => {
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - now.getDay());
+
     return applications.filter((app) => {
-      // In seed data, dates are strings like "Sep 18, 2026" or "2026-09-18"
+      const appDate = new Date(app.appliedDate);
+      if (isNaN(appDate.getTime())) return true;
       if (insightTimeRange === 'THIS_MONTH') {
-        return true; // All September 2026 data
+        return appDate >= startOfMonth;
       }
       if (insightTimeRange === 'THIS_WEEK') {
-        return app.appliedDate.includes('18') || app.appliedDate.includes('19') || app.appliedDate.includes('20') || app.appliedDate.includes('21') || app.appliedDate.includes('22');
+        return appDate >= startOfWeek;
       }
       if (insightTimeRange === 'CUSTOM') {
+        const from = customFromDate ? new Date(customFromDate) : null;
+        const to = customToDate ? new Date(customToDate) : null;
+        if (from && appDate < from) return false;
+        if (to && appDate > to) return false;
         return true;
       }
       return true;
@@ -169,13 +207,12 @@ export default function PlacementCommandCenterPage() {
                     </span>
                     <div className="flex items-baseline gap-2">
                       <span className="text-3xl font-black font-display text-[#11183D] group-hover:text-[#2459A8] transition-colors">
-                        {dynamicFunnel.applied || applications.length}
-                      </span>
-                      <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
-                        ↑ 18%
+                        {applications.length}
                       </span>
                     </div>
-                    <p className="text-[11px] text-[#7B8799] font-medium">+5 new this month</p>
+                    <p className="text-[11px] text-[#7B8799] font-medium">
+                      {applications.length === 1 ? '1 application tracked' : `${applications.length} applications tracked`}
+                    </p>
                   </div>
 
                   <div className="p-3.5 rounded-2xl bg-[#EFFAFD] text-[#2459A8] border border-[#DCE7F2] group-hover:bg-[#2459A8] group-hover:text-white transition-all shrink-0">
@@ -194,13 +231,12 @@ export default function PlacementCommandCenterPage() {
                     </span>
                     <div className="flex items-baseline gap-2">
                       <span className="text-3xl font-black font-display text-[#11183D] group-hover:text-[#4A8BDF] transition-colors">
-                        {dynamicFunnel.shortlisted || 11}
-                      </span>
-                      <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
-                        ↑ 25%
+                        {applications.filter((a) => !['OFFERED', 'REJECTED'].includes(a.stage)).length}
                       </span>
                     </div>
-                    <p className="text-[11px] text-[#7B8799] font-medium">4 interviews upcoming</p>
+                    <p className="text-[11px] text-[#7B8799] font-medium">
+                      {applications.filter((a) => ['OA', 'TECHNICAL_1', 'TECHNICAL_2', 'HR'].includes(a.stage)).length} active interview stages
+                    </p>
                   </div>
 
                   <div className="p-3.5 rounded-2xl bg-[#EFFAFD] text-[#4A8BDF] border border-[#DCE7F2] group-hover:bg-[#4A8BDF] group-hover:text-white transition-all shrink-0">
@@ -219,13 +255,17 @@ export default function PlacementCommandCenterPage() {
                     </span>
                     <div className="flex items-baseline gap-2">
                       <span className="text-3xl font-black font-display text-rose-900">
-                        {applications.filter(a => a.riskLevel === 'CRITICAL').length || 3}
+                        {applications.filter(a => a.riskLevel === 'CRITICAL').length}
                       </span>
-                      <span className="text-[11px] font-bold text-rose-800 bg-rose-100 border border-rose-200 px-2 py-0.5 rounded-full">
-                        High Priority
-                      </span>
+                      {applications.filter(a => a.riskLevel === 'CRITICAL').length > 0 && (
+                        <span className="text-[11px] font-bold text-rose-800 bg-rose-100 border border-rose-200 px-2 py-0.5 rounded-full">
+                          High Priority
+                        </span>
+                      )}
                     </div>
-                    <p className="text-[11px] text-rose-700 font-medium">Action required</p>
+                    <p className="text-[11px] text-rose-700 font-medium">
+                      {applications.filter(a => a.riskLevel === 'CRITICAL').length > 0 ? 'Action required' : 'No urgent risks'}
+                    </p>
                   </div>
 
                   <div className="p-3.5 rounded-2xl bg-rose-100 text-rose-800 border border-rose-200 group-hover:bg-rose-600 group-hover:text-white transition-all shrink-0">
@@ -244,13 +284,17 @@ export default function PlacementCommandCenterPage() {
                     </span>
                     <div className="flex items-baseline gap-2">
                       <span className="text-3xl font-black font-display text-emerald-900">
-                        {dynamicFunnel.offered}
+                        {applications.filter(a => a.stage === 'OFFERED').length}
                       </span>
-                      <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-200 px-2 py-0.5 rounded-full">
-                        🎉 Secured
-                      </span>
+                      {applications.filter(a => a.stage === 'OFFERED').length > 0 && (
+                        <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-200 px-2 py-0.5 rounded-full">
+                          🎉 Secured
+                        </span>
+                      )}
                     </div>
-                    <p className="text-[11px] text-emerald-700 font-medium">Keep going!</p>
+                    <p className="text-[11px] text-emerald-700 font-medium">
+                      {applications.filter(a => a.stage === 'OFFERED').length > 0 ? 'Congratulations!' : 'Keep preparing!'}
+                    </p>
                   </div>
 
                   <div className="p-3.5 rounded-2xl bg-emerald-100 text-emerald-800 border border-emerald-200 group-hover:bg-emerald-600 group-hover:text-white transition-all shrink-0">
@@ -289,89 +333,42 @@ export default function PlacementCommandCenterPage() {
 
                   {/* Deadlines List */}
                   <div className="space-y-3 pt-3">
-                    {/* Item 1: Google */}
-                    <div 
-                      onClick={() => setSelectedApplicationId('app-google-1')}
-                      className="flex items-center justify-between gap-3 p-2.5 rounded-2xl hover:bg-[#EFFAFD] transition-colors cursor-pointer group"
-                    >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-10 h-10 rounded-xl bg-[#EFFAFD] flex flex-col items-center justify-center shrink-0 font-mono leading-none border border-[#DCE7F2]">
-                          <span className="text-[9px] font-bold text-[#526078] uppercase">SEP</span>
-                          <span className="text-sm font-bold text-[#11183D]">18</span>
+                    {applications.filter(a => a.nextDeadlineDate).slice(0, 4).map((app) => {
+                      const d = new Date(app.nextDeadlineDate!);
+                      const monthStr = !isNaN(d.getTime()) ? d.toLocaleString('en-US', { month: 'short' }).toUpperCase() : 'DUE';
+                      const dayStr = !isNaN(d.getTime()) ? d.getDate() : '--';
+                      return (
+                        <div 
+                          key={app.id}
+                          onClick={() => setSelectedApplicationId(app.id)}
+                          className="flex items-center justify-between gap-3 p-2.5 rounded-2xl hover:bg-[#EFFAFD] transition-colors cursor-pointer group"
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="w-10 h-10 rounded-xl bg-[#EFFAFD] flex flex-col items-center justify-center shrink-0 font-mono leading-none border border-[#DCE7F2]">
+                              <span className="text-[9px] font-bold text-[#526078] uppercase">{monthStr}</span>
+                              <span className="text-sm font-bold text-[#11183D]">{dayStr}</span>
+                            </div>
+                            <div className="min-w-0">
+                              <h4 className="text-xs font-bold text-[#11183D] group-hover:text-[#2459A8] transition-colors truncate">
+                                {app.company} — {app.nextDeadlineTitle || app.stage}
+                              </h4>
+                              <p className="text-[11px] text-[#526078] truncate">{app.role}</p>
+                            </div>
+                          </div>
+
+                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold shrink-0 border ${
+                            app.riskLevel === 'CRITICAL' ? 'bg-rose-50 text-rose-800 border-rose-200' : 'bg-slate-100 text-[#526078] border-slate-200'
+                          }`}>
+                            {app.timeTag || 'Scheduled'}
+                          </span>
                         </div>
-                        <div className="min-w-0">
-                          <h4 className="text-xs font-bold text-[#11183D] group-hover:text-[#2459A8] transition-colors truncate">Google — OA</h4>
-                          <p className="text-[11px] text-[#526078] truncate">Coding & Debugging</p>
-                        </div>
+                      );
+                    })}
+                    {applications.filter(a => a.nextDeadlineDate).length === 0 && (
+                      <div className="p-6 text-center text-xs text-[#7B8799]">
+                        No upcoming deadlines scheduled.
                       </div>
-
-                      <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-50 text-rose-800 shrink-0 border border-rose-200">
-                        ↓ 18 hours left
-                      </span>
-                    </div>
-
-                    {/* Item 2: Microsoft */}
-                    <div 
-                      onClick={() => setSelectedApplicationId('app-msft-2')}
-                      className="flex items-center justify-between gap-3 p-2.5 rounded-2xl hover:bg-[#EFFAFD] transition-colors cursor-pointer group"
-                    >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-10 h-10 rounded-xl bg-[#EFFAFD] flex flex-col items-center justify-center shrink-0 font-mono leading-none border border-[#DCE7F2]">
-                          <span className="text-[9px] font-bold text-[#526078] uppercase">SEP</span>
-                          <span className="text-sm font-bold text-[#11183D]">19</span>
-                        </div>
-                        <div className="min-w-0">
-                          <h4 className="text-xs font-bold text-[#11183D] group-hover:text-[#2459A8] transition-colors truncate">Microsoft — Technical Round 1</h4>
-                          <p className="text-[11px] text-[#526078] truncate">Data Structures & OOP</p>
-                        </div>
-                      </div>
-
-                      <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-50 text-rose-800 shrink-0 border border-rose-200">
-                        ↓ Tomorrow
-                      </span>
-                    </div>
-
-                    {/* Item 3: TCS Digital */}
-                    <div 
-                      onClick={() => setSelectedApplicationId('app-tcs-4')}
-                      className="flex items-center justify-between gap-3 p-2.5 rounded-2xl hover:bg-[#EFFAFD] transition-colors cursor-pointer group"
-                    >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-10 h-10 rounded-xl bg-[#EFFAFD] flex flex-col items-center justify-center shrink-0 font-mono leading-none border border-[#DCE7F2]">
-                          <span className="text-[9px] font-bold text-[#526078] uppercase">SEP</span>
-                          <span className="text-sm font-bold text-[#11183D]">21</span>
-                        </div>
-                        <div className="min-w-0">
-                          <h4 className="text-xs font-bold text-[#11183D] group-hover:text-[#2459A8] transition-colors truncate">TCS Digital — OA</h4>
-                          <p className="text-[11px] text-[#526078] truncate">Aptitude & Coding</p>
-                        </div>
-                      </div>
-
-                      <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-100 text-[#526078] shrink-0 border border-slate-200">
-                        3 days left
-                      </span>
-                    </div>
-
-                    {/* Item 4: Amazon */}
-                    <div 
-                      onClick={() => setSelectedApplicationId('app-amazon-7')}
-                      className="flex items-center justify-between gap-3 p-2.5 rounded-2xl hover:bg-[#EFFAFD] transition-colors cursor-pointer group"
-                    >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-10 h-10 rounded-xl bg-[#EFFAFD] flex flex-col items-center justify-center shrink-0 font-mono leading-none border border-[#DCE7F2]">
-                          <span className="text-[9px] font-bold text-[#526078] uppercase">SEP</span>
-                          <span className="text-sm font-bold text-[#11183D]">22</span>
-                        </div>
-                        <div className="min-w-0">
-                          <h4 className="text-xs font-bold text-[#11183D] group-hover:text-[#2459A8] transition-colors truncate">Amazon — HR Round</h4>
-                          <p className="text-[11px] text-[#526078] truncate">Behavioral Interview</p>
-                        </div>
-                      </div>
-
-                      <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-100 text-[#526078] shrink-0 border border-slate-200">
-                        4 days left
-                      </span>
-                    </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -394,49 +391,55 @@ export default function PlacementCommandCenterPage() {
                     </span>
                   </div>
 
-                  {/* Target Company Header */}
-                  <div className="pt-3 flex items-start justify-between gap-3">
-                    <div>
-                      <h4 className="text-sm font-extrabold text-[#11183D] font-display">Google Online Challenge</h4>
-                      <p className="text-[11px] text-[#526078] font-medium mt-0.5 flex items-center gap-1.5">
-                        <span>OA</span> • <span className="text-rose-700 font-bold">↓ 18 hours left</span>
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Preparation Readiness Progress Bar */}
-                  <div className="space-y-1.5 pt-3">
-                    <div className="flex justify-between text-xs font-bold">
-                      <span className="text-[#526078]">Preparation Readiness</span>
-                      <span className="text-[#2459A8] font-mono">78%</span>
-                    </div>
-                    <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-[#2459A8] rounded-full transition-all duration-300" style={{ width: '78%' }} />
-                    </div>
-                  </div>
-
-                  {/* Checklist */}
-                  <div className="space-y-2 pt-3">
-                    {urgentAction?.tasks.map((task) => (
-                      <div 
-                        key={task.id}
-                        onClick={() => togglePrepTask(urgentAction.app.id, task.id)}
-                        className="flex items-center justify-between gap-2 text-xs font-medium text-[#11183D] cursor-pointer hover:text-[#2459A8] transition-colors"
-                      >
-                        <div className="flex items-center gap-2 min-w-0">
-                          <div className={`w-4 h-4 rounded flex items-center justify-center shrink-0 transition-colors ${
-                            task.isCompleted ? 'bg-[#2459A8] text-white' : 'border border-[#DCE7F2] bg-white'
-                          }`}>
-                            {task.isCompleted && <Check size={12} />}
-                          </div>
-                          <span className={`truncate ${task.isCompleted ? 'line-through text-[#7B8799]' : ''}`}>
-                            {task.title}
-                          </span>
+                  {urgentAction ? (
+                    <>
+                      <div className="pt-3 flex items-start justify-between gap-3">
+                        <div>
+                          <h4 className="text-sm font-extrabold text-[#11183D] font-display">{urgentAction.app.company} — {urgentAction.taskSummary}</h4>
+                          <p className="text-[11px] text-[#526078] font-medium mt-0.5 flex items-center gap-1.5">
+                            <span>{urgentAction.app.stage}</span> • <span className="text-rose-700 font-bold">{urgentAction.app.timeTag || `${urgentAction.hoursLeft} hours left`}</span>
+                          </p>
                         </div>
-                        <span className="text-[10px] font-mono text-[#7B8799] shrink-0">{task.estimatedMinutes}m</span>
                       </div>
-                    ))}
-                  </div>
+
+                      <div className="space-y-1.5 pt-3">
+                        <div className="flex justify-between text-xs font-bold">
+                          <span className="text-[#526078]">Preparation Readiness</span>
+                          <span className="text-[#2459A8] font-mono">{urgentAction.app.prepScore}%</span>
+                        </div>
+                        <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                          <div className="h-full bg-[#2459A8] rounded-full transition-all duration-300" style={{ width: `${urgentAction.app.prepScore}%` }} />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2 pt-3">
+                        {urgentAction.tasks.map((task) => (
+                          <div 
+                            key={task.id}
+                            onClick={() => togglePrepTask(urgentAction.app.id, task.id)}
+                            className="flex items-center justify-between gap-2 text-xs font-medium text-[#11183D] cursor-pointer hover:text-[#2459A8] transition-colors"
+                          >
+                            <div className="flex items-center gap-2 min-w-0">
+                              <div className={`w-4 h-4 rounded flex items-center justify-center shrink-0 transition-colors ${
+                                task.isCompleted ? 'bg-[#2459A8] text-white' : 'border border-[#DCE7F2] bg-white'
+                              }`}>
+                                {task.isCompleted && <Check size={12} />}
+                              </div>
+                              <span className={`truncate ${task.isCompleted ? 'line-through text-[#7B8799]' : ''}`}>
+                                {task.title}
+                              </span>
+                            </div>
+                            <span className="text-[10px] font-mono text-[#7B8799] shrink-0">{task.estimatedMinutes}m</span>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="pt-6 text-center text-xs text-[#7B8799] space-y-2">
+                      <p className="font-semibold text-[#11183D]">All caught up!</p>
+                      <p>No urgent deadlines or pending tasks. Add an application to track preparation.</p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Action Buttons */}
@@ -445,16 +448,18 @@ export default function PlacementCommandCenterPage() {
                     onClick={() => navigate('/coding/new')}
                     className="flex-1 py-2.5 bg-[#2459A8] hover:bg-[#1d4787] text-white rounded-xl text-xs font-bold font-display flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer"
                   >
-                    <span>Start Preparation</span>
+                    <span>Start Practice</span>
                     <ArrowRight size={14} />
                   </button>
 
-                  <button
-                    onClick={() => setSelectedApplicationId('app-google-1')}
-                    className="px-4 py-2.5 bg-white border border-[#DCE7F2] hover:bg-[#EFFAFD] text-[#11183D] rounded-xl text-xs font-bold font-display transition-all cursor-pointer"
-                  >
-                    View Details
-                  </button>
+                  {urgentAction && (
+                    <button
+                      onClick={() => setSelectedApplicationId(urgentAction.app.id)}
+                      className="px-4 py-2.5 bg-white border border-[#DCE7F2] hover:bg-[#EFFAFD] text-[#11183D] rounded-xl text-xs font-bold font-display transition-all cursor-pointer"
+                    >
+                      View Details
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -538,12 +543,12 @@ export default function PlacementCommandCenterPage() {
                       <div className="relative w-16 h-16 flex items-center justify-center">
                         <svg className="w-16 h-16 transform -rotate-90">
                           <circle cx="32" cy="32" r="24" stroke="#DCE7F2" strokeWidth="6" fill="transparent" />
-                          <circle cx="32" cy="32" r="24" stroke="#168A62" strokeWidth="6" fill="transparent" strokeDasharray="150" strokeDashoffset={150 - (150 * (dynamicFunnel.conversionRate || 17)) / 100} strokeLinecap="round" />
+                          <circle cx="32" cy="32" r="24" stroke="#168A62" strokeWidth="6" fill="transparent" strokeDasharray="150" strokeDashoffset={150 - (150 * (dynamicFunnel.conversionRate || 0)) / 100} strokeLinecap="round" />
                         </svg>
                         <span className="absolute font-black text-sm font-display text-[#11183D]">{dynamicFunnel.conversionRate}%</span>
                       </div>
                       <p className="text-[10px] font-bold text-[#11183D] mt-1 leading-tight">Overall Conversion Rate</p>
-                      <p className="text-[9px] font-bold text-[#168A62] mt-0.5">↑ 5% from last month</p>
+                      <p className="text-[9px] font-bold text-[#168A62] mt-0.5">{dynamicFunnel.offered} of {dynamicFunnel.applied} secured</p>
                     </div>
                   </div>
                 </div>
@@ -556,7 +561,7 @@ export default function PlacementCommandCenterPage() {
                   <div className="flex items-center gap-2">
                     <Lightbulb size={16} className="text-[#D97706] shrink-0" />
                     <p className="text-[11px] font-medium text-[#92400E] leading-tight">
-                      <strong>Insight:</strong> You are getting shortlisted <strong>2.3x more often</strong> when using tailored resumes.
+                      <strong>Recommendation:</strong> Tailor your ATS resume to target company job descriptions to maximize skill match.
                     </p>
                   </div>
                   <ChevronRight size={14} className="text-[#D97706] shrink-0" />
@@ -701,20 +706,20 @@ export default function PlacementCommandCenterPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div className="p-4 bg-[#EFFAFD] border border-[#DCE7F2] rounded-2xl space-y-1">
                         <p className="text-[10px] font-bold uppercase text-[#526078]">Resume Shortlist Rate</p>
-                        <p className="text-2xl font-black font-display text-[#2459A8]">56%</p>
-                        <p className="text-[11px] text-[#526078] font-medium">+12% above average</p>
+                        <p className="text-2xl font-black font-display text-[#2459A8]">{analyticsData.shortlistRate}%</p>
+                        <p className="text-[11px] text-[#526078] font-medium">{analyticsData.shortlisted} of {analyticsData.total} applications</p>
                       </div>
 
                       <div className="p-4 bg-[#EFFAFD] border border-[#DCE7F2] rounded-2xl space-y-1">
                         <p className="text-[10px] font-bold uppercase text-[#526078]">OA Clear Rate</p>
-                        <p className="text-2xl font-black font-display text-[#2459A8]">78%</p>
-                        <p className="text-[11px] text-[#526078] font-medium">Strong coding accuracy</p>
+                        <p className="text-2xl font-black font-display text-[#2459A8]">{analyticsData.oaClearRate}%</p>
+                        <p className="text-[11px] text-[#526078] font-medium">{analyticsData.oaCleared} assessments passed</p>
                       </div>
 
                       <div className="p-4 bg-[#EFFAFD] border border-[#DCE7F2] rounded-2xl space-y-1">
                         <p className="text-[10px] font-bold uppercase text-[#526078]">Tech Round to Offer Rate</p>
-                        <p className="text-2xl font-black font-display text-[#168A62]">40%</p>
-                        <p className="text-[11px] text-[#168A62] font-medium">2 offers secured</p>
+                        <p className="text-2xl font-black font-display text-[#168A62]">{analyticsData.techToOfferRate}%</p>
+                        <p className="text-[11px] text-[#168A62] font-medium">{analyticsData.offered} offers secured</p>
                       </div>
                     </div>
 
@@ -729,30 +734,30 @@ export default function PlacementCommandCenterPage() {
                           <div>
                             <div className="flex justify-between mb-1">
                               <span>Applied ➔ Shortlisted</span>
-                              <span className="font-mono text-[#2459A8]">56%</span>
+                              <span className="font-mono text-[#2459A8]">{analyticsData.shortlistRate}%</span>
                             </div>
                             <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                              <div className="h-full bg-[#2459A8] rounded-full" style={{ width: '56%' }} />
+                              <div className="h-full bg-[#2459A8] rounded-full" style={{ width: `${analyticsData.shortlistRate}%` }} />
                             </div>
                           </div>
 
                           <div>
                             <div className="flex justify-between mb-1">
                               <span>Shortlisted ➔ OA Cleared</span>
-                              <span className="font-mono text-[#4A8BDF]">78%</span>
+                              <span className="font-mono text-[#4A8BDF]">{analyticsData.oaClearRate}%</span>
                             </div>
                             <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                              <div className="h-full bg-[#4A8BDF] rounded-full" style={{ width: '78%' }} />
+                              <div className="h-full bg-[#4A8BDF] rounded-full" style={{ width: `${analyticsData.oaClearRate}%` }} />
                             </div>
                           </div>
 
                           <div>
                             <div className="flex justify-between mb-1">
                               <span>Technical Interview ➔ Offer</span>
-                              <span className="font-mono text-[#168A62]">40%</span>
+                              <span className="font-mono text-[#168A62]">{analyticsData.techToOfferRate}%</span>
                             </div>
                             <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                              <div className="h-full bg-[#168A62] rounded-full" style={{ width: '40%' }} />
+                              <div className="h-full bg-[#168A62] rounded-full" style={{ width: `${analyticsData.techToOfferRate}%` }} />
                             </div>
                           </div>
                         </div>
@@ -764,15 +769,19 @@ export default function PlacementCommandCenterPage() {
                           Diagnosed Rejection Weak Spots
                         </h4>
                         <p className="text-xs text-rose-900 font-medium leading-relaxed">
-                          Based on candidate logs, key topics causing drop-offs in technical rounds:
+                          {analyticsData.weakSpots.length > 0
+                            ? 'Based on candidate logs, key topics causing drop-offs in technical rounds:'
+                            : 'No rejection weak spots logged yet. Maintain steady preparation.'}
                         </p>
-                        <div className="flex flex-wrap gap-2 pt-1">
-                          {['Distributed Redis Locks', 'Dynamic Programming', 'Kafka Idempotency', 'System Design LLD'].map((t, idx) => (
-                            <span key={idx} className="px-3 py-1 bg-white text-rose-800 border border-rose-200 rounded-xl text-xs font-bold font-mono shadow-2xs">
-                              {t}
-                            </span>
-                          ))}
-                        </div>
+                        {analyticsData.weakSpots.length > 0 && (
+                          <div className="flex flex-wrap gap-2 pt-1">
+                            {analyticsData.weakSpots.map((t, idx) => (
+                              <span key={idx} className="px-3 py-1 bg-white text-rose-800 border border-rose-200 rounded-xl text-xs font-bold font-mono shadow-2xs">
+                                {t}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

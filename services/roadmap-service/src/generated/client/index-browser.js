@@ -125,6 +125,10 @@ exports.Prisma.RoadmapScalarFieldEnum = {
   id: 'id',
   ownerId: 'ownerId',
   creatorName: 'creatorName',
+  creatorRole: 'creatorRole',
+  creatorCompany: 'creatorCompany',
+  isVerifiedCreator: 'isVerifiedCreator',
+  isEndorsed: 'isEndorsed',
   title: 'title',
   description: 'description',
   goal: 'goal',
@@ -134,9 +138,18 @@ exports.Prisma.RoadmapScalarFieldEnum = {
   tags: 'tags',
   cloneCount: 'cloneCount',
   viewCount: 'viewCount',
+  forkCount: 'forkCount',
+  followerCount: 'followerCount',
+  rating: 'rating',
+  reviewCount: 'reviewCount',
+  currentVersion: 'currentVersion',
+  forkedFromId: 'forkedFromId',
+  forkedFromVersion: 'forkedFromVersion',
+  license: 'license',
   status: 'status',
   isPublished: 'isPublished',
   publishedAt: 'publishedAt',
+  graphLayout: 'graphLayout',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -171,10 +184,80 @@ exports.Prisma.RoadmapProgressScalarFieldEnum = {
   nodeId: 'nodeId',
   userId: 'userId',
   status: 'status',
+  masteryStatus: 'masteryStatus',
   percent: 'percent',
   notes: 'notes',
+  competenciesDemonstrated: 'competenciesDemonstrated',
+  checklistCompleted: 'checklistCompleted',
+  assessmentScore: 'assessmentScore',
+  lastAssessmentAt: 'lastAssessmentAt',
   completedAt: 'completedAt',
   updatedAt: 'updatedAt',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.RoadmapInstanceScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  roadmapId: 'roadmapId',
+  roadmapVersion: 'roadmapVersion',
+  status: 'status',
+  targetPaceHoursPerWeek: 'targetPaceHoursPerWeek',
+  currentModuleId: 'currentModuleId',
+  progressPercent: 'progressPercent',
+  completedModulesCount: 'completedModulesCount',
+  totalModulesCount: 'totalModulesCount',
+  customOverrides: 'customOverrides',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.RoadmapFollowScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  roadmapId: 'roadmapId',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.RoadmapReviewScalarFieldEnum = {
+  id: 'id',
+  roadmapId: 'roadmapId',
+  userId: 'userId',
+  userName: 'userName',
+  userAvatar: 'userAvatar',
+  rating: 'rating',
+  reviewText: 'reviewText',
+  isVerifiedLearner: 'isVerifiedLearner',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.RoadmapDiscussionScalarFieldEnum = {
+  id: 'id',
+  roadmapId: 'roadmapId',
+  nodeId: 'nodeId',
+  userId: 'userId',
+  userName: 'userName',
+  userAvatar: 'userAvatar',
+  title: 'title',
+  content: 'content',
+  replyCount: 'replyCount',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.RoadmapAssessmentAttemptScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  roadmapId: 'roadmapId',
+  nodeId: 'nodeId',
+  nodeTitle: 'nodeTitle',
+  score: 'score',
+  passed: 'passed',
+  verdict: 'verdict',
+  feedback: 'feedback',
+  competencyScores: 'competencyScores',
+  transcript: 'transcript',
   createdAt: 'createdAt'
 };
 
@@ -197,6 +280,67 @@ exports.Prisma.RoadmapShareScalarFieldEnum = {
   expiresAt: 'expiresAt',
   access: 'access',
   createdAt: 'createdAt'
+};
+
+exports.Prisma.RoadmapVersionScalarFieldEnum = {
+  id: 'id',
+  roadmapId: 'roadmapId',
+  version: 'version',
+  title: 'title',
+  description: 'description',
+  changelog: 'changelog',
+  nodesSnapshot: 'nodesSnapshot',
+  graphLayout: 'graphLayout',
+  createdBy: 'createdBy',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.RoadmapSubmissionScalarFieldEnum = {
+  id: 'id',
+  roadmapId: 'roadmapId',
+  nodeId: 'nodeId',
+  userId: 'userId',
+  userName: 'userName',
+  userAvatar: 'userAvatar',
+  deliverableType: 'deliverableType',
+  deliverableUrl: 'deliverableUrl',
+  deliverableText: 'deliverableText',
+  codeLanguage: 'codeLanguage',
+  executionResult: 'executionResult',
+  status: 'status',
+  evaluationFeedback: 'evaluationFeedback',
+  rubricScore: 'rubricScore',
+  competenciesDemonstrated: 'competenciesDemonstrated',
+  evaluatedAt: 'evaluatedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.RoadmapLearningCircleScalarFieldEnum = {
+  id: 'id',
+  roadmapId: 'roadmapId',
+  name: 'name',
+  description: 'description',
+  creatorId: 'creatorId',
+  creatorName: 'creatorName',
+  isPrivate: 'isPrivate',
+  joinCode: 'joinCode',
+  targetDate: 'targetDate',
+  weeklyGoalHours: 'weeklyGoalHours',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.RoadmapLearningCircleMemberScalarFieldEnum = {
+  id: 'id',
+  circleId: 'circleId',
+  userId: 'userId',
+  userName: 'userName',
+  userAvatar: 'userAvatar',
+  role: 'role',
+  progressPercent: 'progressPercent',
+  completedModulesCount: 'completedModulesCount',
+  joinedAt: 'joinedAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -235,8 +379,17 @@ exports.Prisma.ModelName = {
   RoadmapNode: 'RoadmapNode',
   RoadmapCollaborator: 'RoadmapCollaborator',
   RoadmapProgress: 'RoadmapProgress',
+  RoadmapInstance: 'RoadmapInstance',
+  RoadmapFollow: 'RoadmapFollow',
+  RoadmapReview: 'RoadmapReview',
+  RoadmapDiscussion: 'RoadmapDiscussion',
+  RoadmapAssessmentAttempt: 'RoadmapAssessmentAttempt',
   RoadmapTemplate: 'RoadmapTemplate',
-  RoadmapShare: 'RoadmapShare'
+  RoadmapShare: 'RoadmapShare',
+  RoadmapVersion: 'RoadmapVersion',
+  RoadmapSubmission: 'RoadmapSubmission',
+  RoadmapLearningCircle: 'RoadmapLearningCircle',
+  RoadmapLearningCircleMember: 'RoadmapLearningCircleMember'
 };
 
 /**

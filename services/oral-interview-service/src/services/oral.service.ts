@@ -10,7 +10,6 @@ const memoryQuestions = new Map<string, any[]>();
 const memoryChatHistory = new Map<string, any[]>();
 const memoryAnalysis = new Map<string, any>();
 
-
 export function classifyCandidateIntent(text: string): any {
   if (!text || !text.trim()) return 'ANSWER';
   const clean = text.toLowerCase().trim();
@@ -63,7 +62,7 @@ export function classifyCandidateIntent(text: string): any {
   return 'ANSWER';
 }
 
-function getInitialInterviewPrompt(targetRole: string, targetCompany?: string): string {
+export function getInitialInterviewPrompt(targetRole: string, targetCompany?: string): string {
   const roleLower = (targetRole || 'Software Engineer').toLowerCase();
   const company = targetCompany && targetCompany !== 'None / General Target' ? targetCompany : '';
 
@@ -86,6 +85,171 @@ function getInitialInterviewPrompt(targetRole: string, targetCompany?: string): 
     return `To kick off, describe a critical infrastructure or deployment pipeline challenge you recently solved, and how you ensured high availability and observability under traffic spikes.`;
   }
   return `To kick off our technical discussion, describe a technically demanding project you recently engineered as a ${targetRole || 'Software Engineer'}, and the core system design trade-offs you had to defend.`;
+}
+
+export function generateContextualFollowUp(
+  targetRole: string,
+  targetCompany: string | undefined,
+  currentQuestionText: string,
+  answerText: string
+): { followUpText: string; spokenBridge: string } {
+  const ans = (answerText || '').toLowerCase();
+  const company = targetCompany && targetCompany !== 'None / General Target' ? ` at ${targetCompany}` : '';
+
+  if (ans.includes('react') || ans.includes('redux') || ans.includes('hook') || ans.includes('frontend') || ans.includes('render') || ans.includes('state') || ans.includes('virtual dom')) {
+    return {
+      followUpText: `You mentioned managing component state and rendering${company}. How do you isolate state updates to prevent unnecessary re-render waterfalls, and what trade-offs do you consider between Context API, external stores like Zustand, and local state?`,
+      spokenBridge: `Good explanation. Let me probe deeper into your frontend architecture:`,
+    };
+  }
+
+  if (ans.includes('redis') || ans.includes('cache') || ans.includes('caching') || ans.includes('memcached')) {
+    return {
+      followUpText: `Regarding the caching layer you touched on: how do you manage cache invalidation strategies, handle cache penetration or stampedes under sudden traffic surges, and ensure consistency with your primary database?`,
+      spokenBridge: `Interesting points on caching. Diving into the concurrency aspects:`,
+    };
+  }
+
+  if (ans.includes('postgres') || ans.includes('sql') || ans.includes('mongo') || ans.includes('database') || ans.includes('index') || ans.includes('query') || ans.includes('transaction')) {
+    return {
+      followUpText: `Following up on your database layer: when queries experience high latency under concurrency, what indexing strategies (like B-Tree vs Hash or composite indexes) do you implement, and how do you prevent transaction deadlocks?`,
+      spokenBridge: `Understood. Let us explore the database trade-offs a step further:`,
+    };
+  }
+
+  if (ans.includes('microservice') || ans.includes('api') || ans.includes('kafka') || ans.includes('queue') || ans.includes('worker') || ans.includes('event') || ans.includes('async')) {
+    return {
+      followUpText: `You mentioned distributed services and communication. How do you handle network partition timeouts, implement idempotency for retry mechanisms, and prevent message duplication in your event pipelines?`,
+      spokenBridge: `That is a critical system consideration. Following up on resilience:`,
+    };
+  }
+
+  if (ans.includes('python') || ans.includes('fastapi') || ans.includes('django') || ans.includes('celery')) {
+    return {
+      followUpText: `Given your Python stack: how do you manage the Global Interpreter Lock under CPU-bound tasks, structure asyncio event loops, and tune background worker concurrency?`,
+      spokenBridge: `Good technical foundation. Following up on your Python internals:`,
+    };
+  }
+
+  if (ans.includes('java') || ans.includes('spring') || ans.includes('jvm')) {
+    return {
+      followUpText: `In your Java and Spring services: how do you tune thread pool executors, manage transactional boundaries across repositories, and handle JVM garbage collection pause latency?`,
+      spokenBridge: `Solid overview. Let us probe deeper into your Spring architecture:`,
+    };
+  }
+
+  return {
+    followUpText: `Could you walk me through the primary technical trade-offs you evaluated when making that choice, and how you would redesign it if the traffic volume or scale multiplied by a factor of ten?`,
+    spokenBridge: `You're on the right track. Can you elaborate further on the architectural trade-offs?`,
+  };
+}
+
+export function getDomainQuestionForStage(
+  stageOrder: number,
+  targetRole: string,
+  targetCompany: string | undefined,
+  previousQA: Array<{ questionText: string; answerText?: string }>
+): { questionText: string; questionType: string; category: string; difficulty: string; spokenBridge: string } {
+  const roleLower = (targetRole || 'Software Engineer').toLowerCase();
+  const allSpoken = previousQA.map(p => (p.answerText || '').toLowerCase()).join(' ');
+
+  if (stageOrder <= 1) {
+    return {
+      questionText: getInitialInterviewPrompt(targetRole, targetCompany),
+      questionType: 'TECHNICAL',
+      category: 'TECHNICAL',
+      difficulty: 'MEDIUM',
+      spokenBridge: "To start our technical interview:",
+    };
+  }
+
+  if (stageOrder === 2) {
+    if (allSpoken.includes('react') || allSpoken.includes('frontend') || roleLower.includes('front')) {
+      return {
+        questionText: `In your frontend architecture, how do you manage complex client-side state, optimize rendering performance with memoization or virtualization, and ensure optimal Core Web Vitals?`,
+        questionType: 'TECHNICAL',
+        category: 'TECHNICAL',
+        difficulty: 'MEDIUM',
+        spokenBridge: "Moving into our technical stack deep dive:",
+      };
+    } else if (allSpoken.includes('node') || allSpoken.includes('backend') || allSpoken.includes('express') || roleLower.includes('back')) {
+      return {
+        questionText: `When designing your backend services and APIs, how do you structure your data validation layer, handle database connection pooling, and isolate errors across asynchronous pipelines?`,
+        questionType: 'TECHNICAL',
+        category: 'TECHNICAL',
+        difficulty: 'MEDIUM',
+        spokenBridge: "Moving into our backend architecture deep dive:",
+      };
+    } else if (allSpoken.includes('python') || allSpoken.includes('django') || allSpoken.includes('fastapi')) {
+      return {
+        questionText: `Given your experience with Python, how do you handle asynchronous I/O, background worker queues with Celery or Redis, and API performance optimization?`,
+        questionType: 'TECHNICAL',
+        category: 'TECHNICAL',
+        difficulty: 'MEDIUM',
+        spokenBridge: "Diving deeper into your service architecture:",
+      };
+    } else if (allSpoken.includes('java') || allSpoken.includes('spring')) {
+      return {
+        questionText: `In your Spring Boot services, how do you manage dependency injection, thread pool sizing, and transactional boundary isolation across microservices?`,
+        questionType: 'TECHNICAL',
+        category: 'TECHNICAL',
+        difficulty: 'MEDIUM',
+        spokenBridge: "Diving deeper into your service architecture:",
+      };
+    }
+    return {
+      questionText: `In the primary tech stack you use as a ${targetRole || 'Software Engineer'}, walk me through the end-to-end architecture of a significant feature or service you developed.`,
+      questionType: 'TECHNICAL',
+      category: 'TECHNICAL',
+      difficulty: 'MEDIUM',
+      spokenBridge: "Moving into our technical stack deep dive:",
+    };
+  }
+
+  if (stageOrder === 3) {
+    if (allSpoken.includes('postgres') || allSpoken.includes('sql') || allSpoken.includes('mongo') || allSpoken.includes('database') || roleLower.includes('back') || roleLower.includes('full')) {
+      return {
+        questionText: `When scaling your database layer under high concurrent write throughput, how do you evaluate indexing strategies, database connection pooling, and decide between caching with Redis versus read replicas?`,
+        questionType: 'SYSTEM_DESIGN',
+        category: 'SYSTEM_DESIGN',
+        difficulty: 'MEDIUM',
+        spokenBridge: "Let us now focus on system architecture and scalability:",
+      };
+    } else if (roleLower.includes('front')) {
+      return {
+        questionText: `How do you architect large-scale client applications for offline resilience, service worker caching, and secure token management without exposing vulnerable XSS or CSRF surfaces?`,
+        questionType: 'SYSTEM_DESIGN',
+        category: 'SYSTEM_DESIGN',
+        difficulty: 'MEDIUM',
+        spokenBridge: "Let us now focus on client architecture and security:",
+      };
+    }
+    return {
+      questionText: `How do you approach scalability bottlenecks in your system, specifically regarding load balancing, caching layers, and handling asynchronous task processing?`,
+      questionType: 'SYSTEM_DESIGN',
+      category: 'SYSTEM_DESIGN',
+      difficulty: 'MEDIUM',
+      spokenBridge: "Let us now focus on system architecture and scalability:",
+    };
+  }
+
+  if (stageOrder === 4) {
+    return {
+      questionText: `Can you describe a complex production bug, memory leak, or latency bottleneck you diagnosed in your systems? What telemetry or profiling tools did you use, and how did you verify the permanent fix?`,
+      questionType: 'TECHNICAL',
+      category: 'TECHNICAL',
+      difficulty: 'HARD',
+      spokenBridge: "Moving into real-world troubleshooting and incident response:",
+    };
+  }
+
+  return {
+    questionText: `Tell me about a time you faced a sharp technical disagreement with a teammate or stakeholder regarding system architecture or library choice. How did you objectively evaluate the trade-offs and build consensus?`,
+    questionType: 'BEHAVIOURAL',
+    category: 'BEHAVIOURAL',
+    difficulty: 'MEDIUM',
+    spokenBridge: "For our final discussion area regarding engineering collaboration:",
+  };
 }
 
 export const oralService = {
@@ -136,8 +300,6 @@ export const oralService = {
   },
 
   async startSession(sessionId: string, userId: string) {
-    const firstQuestionText = `Tell me about yourself and your experience relative to the target role.`;
-    
     try {
       const dbSession = await prisma.oralSession.findFirst({
         where: { id: sessionId },
@@ -159,9 +321,19 @@ export const oralService = {
             orderIndex: 1,
             questionText: dynamicPrompt,
             questionType: 'TECHNICAL',
+            category: 'TECHNICAL',
             difficulty: 'MEDIUM',
             evalStrengths: [],
             evalWeaknesses: [],
+          },
+        });
+
+        // Store Ava opening prompt into chat history
+        await prisma.oralChatHistory.create({
+          data: {
+            sessionId,
+            role: 'ai',
+            content: dynamicPrompt,
           },
         });
 
@@ -176,7 +348,6 @@ export const oralService = {
     const targetRole = memSession?.targetRole || 'Software Engineer';
     const targetCompany = memSession?.targetCompany;
     if (!memSession) {
-      // Create session on the fly if not found
       const newSession = {
         id: sessionId,
         userId: userId || 'demo-user-123',
@@ -197,6 +368,7 @@ export const oralService = {
       orderIndex: 1,
       questionText: dynamicPrompt,
       questionType: 'TECHNICAL',
+      category: 'TECHNICAL',
       difficulty: 'MEDIUM',
       evalStrengths: [],
       evalWeaknesses: [],
@@ -205,6 +377,16 @@ export const oralService = {
     const questions = memoryQuestions.get(sessionId) || [];
     questions.push(question);
     memoryQuestions.set(sessionId, questions);
+
+    const chats = memoryChatHistory.get(sessionId) || [];
+    chats.push({
+      id: uuidv4(),
+      sessionId,
+      role: 'ai',
+      content: dynamicPrompt,
+      timestamp: new Date(),
+    });
+    memoryChatHistory.set(sessionId, chats);
 
     return { session: memorySessions.get(sessionId), currentQuestion: question };
   },
@@ -236,7 +418,7 @@ export const oralService = {
         score: 0,
         feedback: 'Candidate skipped this question.',
         recommendedAction: 'MOVE_ON',
-        spokenResponse: 'Understood. Let us move to the next question.',
+        spokenResponse: 'Understood. That is completely okay. Let us move to the next question.',
         emotion: 'encouraging',
         gesture: 'nod',
         isSkip: true,
@@ -272,7 +454,7 @@ export const oralService = {
     if (!evaluationResult) {
       const words = answerText ? answerText.trim().split(/\s+/).filter(Boolean) : [];
       const wordCount = words.length;
-      let calculatedScore = 72;
+      let calculatedScore = 75;
       let calculatedQuality = 'PARTIAL';
       let feedback = 'Solid foundational answer, though exploring more architectural trade-offs would strengthen your response.';
 
@@ -316,33 +498,70 @@ export const oralService = {
     }
 
     const sessionObj = await this.getSession(sessionId, userId);
+    const existingQuestions = sessionObj.questions || [];
     const context = {
       sessionId,
       currentState: sessionObj.engineState || 'ASKING',
-      currentQuestionIndex: sessionObj.questions ? sessionObj.questions.length : 1,
+      currentQuestionIndex: existingQuestions.length || 1,
       totalQuestionsPlanned: sessionObj.durationMins ? Math.round(sessionObj.durationMins / 4) : 5,
       currentDifficulty: sessionObj.currentDifficulty || 'MEDIUM',
       consecutiveStrongAnswers: sessionObj.consecutiveStrongAnswers || 0,
       consecutiveWeakAnswers: sessionObj.consecutiveWeakAnswers || 0,
-      sessionMemory: sessionObj.questions || [],
+      sessionMemory: existingQuestions,
     };
 
     const transitionResult = InterviewStateMachine.handleIntent(context, evaluationResult);
 
     try {
+      // 1. Locate the DB question
+      let targetQ: any = null;
+      if (questionId) {
+        targetQ = await prisma.oralQuestion.findUnique({
+          where: { id: questionId },
+        });
+      }
+      if (!targetQ) {
+        targetQ = await prisma.oralQuestion.findFirst({
+          where: { sessionId, answerText: null },
+          orderBy: { orderIndex: 'desc' },
+        });
+      }
+      if (!targetQ) {
+        targetQ = await prisma.oralQuestion.findFirst({
+          where: { sessionId },
+          orderBy: { orderIndex: 'desc' },
+        });
+      }
+
       const updateData: any = {
-        answerText,
+        answerText: isSkip ? `[Candidate skipped: "${answerText || 'Not familiar with this topic'}"]` : answerText,
         answeredAt: new Date(),
         timeTakenSecs: timeTaken,
         evalScore: evaluationResult.score,
         evalFeedback: evaluationResult.feedback,
+        evalStrengths: evaluationResult.coveredConcepts || [],
+        evalWeaknesses: evaluationResult.missingConcepts || [],
       };
 
-      const updatedQuestion = await prisma.oralQuestion.update({
-        where: { id: questionId },
-        data: updateData,
-      });
+      let updatedQuestion: any;
+      if (targetQ) {
+        updatedQuestion = await prisma.oralQuestion.update({
+          where: { id: targetQ.id },
+          data: updateData,
+        });
+      } else {
+        updatedQuestion = await prisma.oralQuestion.create({
+          data: {
+            sessionId,
+            orderIndex: 1,
+            questionText: 'Technical overview discussion',
+            questionType: 'TECHNICAL',
+            ...updateData,
+          },
+        });
+      }
 
+      // 2. Chat history for candidate answer
       await prisma.oralChatHistory.create({
         data: {
           sessionId,
@@ -351,33 +570,260 @@ export const oralService = {
         },
       });
 
+      // 3. Evaluate completion or determine next question / follow-up
+      const allDbQuestions = await prisma.oralQuestion.findMany({
+        where: { sessionId },
+        orderBy: { orderIndex: 'asc' },
+      });
+
+      const answeredCount = allDbQuestions.filter(q => q.answerText && q.answerText.trim()).length;
+      const durationMins = sessionObj.durationMins || 20;
+      const maxQuestions = Math.max(5, Math.ceil(durationMins / 3));
+
+      const startedAt = sessionObj.startedAt ? new Date(sessionObj.startedAt).getTime() : Date.now();
+      const elapsedMinutes = (Date.now() - startedAt) / (1000 * 60);
+
+      // Session Complete Condition
+      if (
+        (elapsedMinutes >= durationMins && answeredCount >= 3) ||
+        answeredCount >= maxQuestions ||
+        transitionResult.nextAction === 'COMPLETE_INTERVIEW'
+      ) {
+        const closingResponse = "That completes all the questions for today's session! You've done an excellent job discussing your engineering experiences. Let me now compile your complete evaluation report.";
+        await prisma.oralChatHistory.create({
+          data: {
+            sessionId,
+            role: 'ai',
+            content: closingResponse,
+          },
+        });
+
+        return {
+          ...updatedQuestion,
+          evaluation: evaluationResult,
+          transition: transitionResult,
+          isFollowUp: false,
+          spokenResponse: closingResponse,
+          nextQuestion: null,
+          isComplete: true,
+        };
+      }
+
+      // 4. Determine if Follow-up or Next Domain Question
+      const wasFollowUp = targetQ?.questionType === 'FOLLOW_UP';
+      const words = answerText ? answerText.trim().split(/\s+/).filter(Boolean) : [];
+
+      let shouldFollowUp = false;
+      if (!isSkip && !wasFollowUp) {
+        if (
+          (targetQ?.orderIndex || 1) <= 1 ||
+          transitionResult.nextAction === 'PROBE_DEPTH' ||
+          transitionResult.nextAction === 'HARDER_FOLLOW_UP' ||
+          transitionResult.nextAction === 'SIMPLER_QUESTION' ||
+          evaluationResult.recommendedAction === 'PROBE_DEPTH' ||
+          words.length < 35 ||
+          evaluationResult.quality === 'PARTIAL' ||
+          /(redis|cache|caching|kafka|queue|postgres|sql|react|microservice)/i.test(answerText)
+        ) {
+          shouldFollowUp = true;
+        }
+      }
+
+      let newPrompt = '';
+      let newBridge = '';
+      let newType = 'TECHNICAL';
+      let newCategory = 'TECHNICAL';
+      let newDifficulty = 'MEDIUM';
+
+      if (shouldFollowUp) {
+        const fup = generateContextualFollowUp(
+          sessionObj.targetRole || 'Software Engineer',
+          sessionObj.targetCompany,
+          targetQ?.questionText || '',
+          answerText
+        );
+        newPrompt = fup.followUpText;
+        newBridge = fup.spokenBridge;
+        newType = 'FOLLOW_UP';
+        newCategory = targetQ?.category || 'TECHNICAL';
+        newDifficulty = transitionResult.updatedDifficulty || 'MEDIUM';
+      } else {
+        // Advance to next stage question
+        const nextStageOrder = Math.max(2, allDbQuestions.filter(q => q.questionType !== 'FOLLOW_UP').length + 1);
+        const stageQ = getDomainQuestionForStage(
+          nextStageOrder,
+          sessionObj.targetRole || 'Software Engineer',
+          sessionObj.targetCompany,
+          allDbQuestions.map(q => ({ questionText: q.questionText, answerText: q.answerText || '' }))
+        );
+        newPrompt = stageQ.questionText;
+        newBridge = isSkip
+          ? "No problem at all, that is completely fine. Let's transition to our next core topic: "
+          : (wasFollowUp
+            ? "That clarifies the implementation nicely. Let's move on to our next core topic: "
+            : (stageQ.spokenBridge || "Good. That covers the foundational requirements. Moving to our next topic: "));
+        newType = stageQ.questionType;
+        newCategory = stageQ.category;
+        newDifficulty = stageQ.difficulty;
+      }
+
+      const nextOrderIndex = (targetQ?.orderIndex || allDbQuestions.length) + 1;
+      const createdQ = await prisma.oralQuestion.create({
+        data: {
+          sessionId,
+          orderIndex: nextOrderIndex,
+          questionText: newPrompt,
+          questionType: newType,
+          category: newCategory,
+          difficulty: newDifficulty,
+          evalStrengths: [],
+          evalWeaknesses: [],
+        },
+      });
+
+      const fullSpokenResponse = `${newBridge ? newBridge + ' ' : ''}${newPrompt}`.trim();
+      await prisma.oralChatHistory.create({
+        data: {
+          sessionId,
+          role: 'ai',
+          content: fullSpokenResponse,
+        },
+      });
+
       return {
         ...updatedQuestion,
         evaluation: evaluationResult,
         transition: transitionResult,
+        isFollowUp: shouldFollowUp,
+        spokenResponse: fullSpokenResponse,
+        nextQuestion: createdQ,
+        isComplete: false,
       };
+
     } catch (err) {
       console.warn('[OralService] DB submitAnswer fallback:', (err as Error).message);
       const questions = memoryQuestions.get(sessionId) || [];
-      const q = questions.find((item) => item.id === questionId) || {
-        id: questionId,
-        sessionId,
-        orderIndex: 1,
-        questionText: 'Tell me about yourself',
-      };
+      let q = questions.find((item) => item.id === questionId);
+      if (!q) {
+        q = questions[questions.length - 1] || {
+          id: questionId,
+          sessionId,
+          orderIndex: 1,
+          questionText: 'Tell me about yourself',
+        };
+      }
       q.answerText = answerText;
       q.answeredAt = new Date();
       q.timeTakenSecs = timeTaken;
-      (q as any).evalScore = evaluationResult.score;
-      (q as any).evalFeedback = evaluationResult.feedback;
+      q.evalScore = evaluationResult.score;
+      q.evalFeedback = evaluationResult.feedback;
+
+      const chats = memoryChatHistory.get(sessionId) || [];
+      chats.push({
+        id: uuidv4(),
+        sessionId,
+        role: 'user',
+        content: isSkip ? `[Candidate skipped: "${answerText || 'Not familiar with this topic'}"]` : answerText,
+        timestamp: new Date(),
+      });
+
+      const answeredCount = questions.filter(item => item.answerText && item.answerText.trim()).length;
+      const durationMins = sessionObj.durationMins || 20;
+      const maxQuestions = Math.max(5, Math.ceil(durationMins / 3));
+
+      if (answeredCount >= maxQuestions) {
+        const closingText = "That completes all the questions for today's session! You've done an excellent job discussing your engineering experiences. Let me now compile your complete evaluation report.";
+        chats.push({
+          id: uuidv4(),
+          sessionId,
+          role: 'ai',
+          content: closingText,
+          timestamp: new Date(),
+        });
+        memoryChatHistory.set(sessionId, chats);
+
+        return {
+          ...q,
+          evaluation: evaluationResult,
+          transition: transitionResult,
+          isFollowUp: false,
+          spokenResponse: closingText,
+          nextQuestion: null,
+          isComplete: true,
+        };
+      }
+
+      const wasFollowUp = q.questionType === 'FOLLOW_UP';
+      const words = answerText ? answerText.trim().split(/\s+/).filter(Boolean) : [];
+      const shouldFollowUp = !isSkip && !wasFollowUp && ((q.orderIndex || 1) <= 1 || words.length < 35 || evaluationResult.quality === 'PARTIAL' || /(redis|cache|caching|kafka|queue|postgres|sql|react|microservice)/i.test(answerText));
+
+      let newPrompt = '';
+      let newBridge = '';
+      let newType = 'TECHNICAL';
+      let newCategory = 'TECHNICAL';
+      let newDifficulty = 'MEDIUM';
+
+      if (shouldFollowUp) {
+        const fup = generateContextualFollowUp(
+          sessionObj.targetRole || 'Software Engineer',
+          sessionObj.targetCompany,
+          q.questionText || '',
+          answerText
+        );
+        newPrompt = fup.followUpText;
+        newBridge = fup.spokenBridge;
+        newType = 'FOLLOW_UP';
+      } else {
+        const stageQ = getDomainQuestionForStage(
+          questions.length + 1,
+          sessionObj.targetRole || 'Software Engineer',
+          sessionObj.targetCompany,
+          questions.map(item => ({ questionText: item.questionText, answerText: item.answerText || '' }))
+        );
+        newPrompt = stageQ.questionText;
+        newBridge = isSkip
+          ? "No problem at all, that is completely fine. Let's transition to our next core topic: "
+          : (wasFollowUp ? "That clarifies the implementation nicely. Let's move on to our next core topic: " : stageQ.spokenBridge);
+        newType = stageQ.questionType;
+        newCategory = stageQ.category;
+        newDifficulty = stageQ.difficulty;
+      }
+
+      const newQ = {
+        id: `q_${uuidv4().slice(0, 8)}`,
+        sessionId,
+        orderIndex: questions.length + 1,
+        questionText: newPrompt,
+        questionType: newType,
+        category: newCategory,
+        difficulty: newDifficulty,
+        evalStrengths: [],
+        evalWeaknesses: [],
+      };
+
+      questions.push(newQ);
+      memoryQuestions.set(sessionId, questions);
+
+      const fullSpokenResponse = `${newBridge ? newBridge + ' ' : ''}${newPrompt}`.trim();
+      chats.push({
+        id: uuidv4(),
+        sessionId,
+        role: 'ai',
+        content: fullSpokenResponse,
+        timestamp: new Date(),
+      });
+      memoryChatHistory.set(sessionId, chats);
 
       return {
         ...q,
         evaluation: evaluationResult,
         transition: transitionResult,
+        isFollowUp: shouldFollowUp,
+        spokenResponse: fullSpokenResponse,
+        nextQuestion: newQ,
+        isComplete: false,
       };
     }
-
   },
 
   async getSession(sessionId: string, userId: string) {
@@ -392,7 +838,14 @@ export const oralService = {
 
       if (dbSession) {
         const sessionWithAnalysis: any = { ...dbSession };
-        if (memoryAnalysis.has(sessionId)) {
+        if (dbSession.feedbackSummary && dbSession.feedbackSummary.trim().startsWith('{')) {
+          try {
+            sessionWithAnalysis.analysis = JSON.parse(dbSession.feedbackSummary);
+          } catch (e) {
+            // ignore
+          }
+        }
+        if (!sessionWithAnalysis.analysis && memoryAnalysis.has(sessionId)) {
           sessionWithAnalysis.analysis = memoryAnalysis.get(sessionId);
         }
         return sessionWithAnalysis;
@@ -453,171 +906,55 @@ export const oralService = {
   async getNextQuestion(sessionId: string, userId: string) {
     try {
       const session = await this.getSession(sessionId, userId);
-      const existingCount = session.questions ? session.questions.length : 0;
-      const durationMins = session.durationMins || 15;
-      const startedAt = session.startedAt ? new Date(session.startedAt).getTime() : (session.createdAt ? new Date(session.createdAt).getTime() : Date.now());
+      const existingQuestions = session.questions || [];
+      const existingCount = existingQuestions.length;
+      const durationMins = session.durationMins || 20;
+      const startedAt = session.startedAt ? new Date(session.startedAt).getTime() : Date.now();
       const elapsedMinutes = (Date.now() - startedAt) / (1000 * 60);
-      const maxQuestionsForDuration = Math.max(6, Math.ceil(durationMins / 2));
+      const maxQuestionsForDuration = Math.max(5, Math.ceil(durationMins / 3));
 
-      // End session if allocated time elapsed (with at least 3 questions) or reached question safety limit
       if ((elapsedMinutes >= durationMins && existingCount >= 3) || existingCount >= maxQuestionsForDuration) {
         return { isComplete: true };
       }
 
       const nextOrder = existingCount + 1;
-      const role = session.targetRole || 'Software Engineer';
-      const roleLower = role.toLowerCase();
-
-      // Formulate past Q&A context to pass to Ollama / AI Service
-      const previousQA = (session.questions || []).map((q: any) => ({
-        questionText: q.questionText,
-        answerText: q.answerText || '',
-        score: q.evalScore ?? undefined,
-      }));
-
-      let promptText = '';
-      let qType = 'TECHNICAL';
-      let difficulty = 'MEDIUM';
-
-      const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:4003';
-      try {
-        const resp = await fetch(`${aiServiceUrl}/internal/generate-next-question`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            session: {
-              id: session.id,
-              targetRole: session.targetRole || 'Software Engineer',
-              targetCompany: session.targetCompany || 'Top Tech Companies',
-              industry: session.industry || 'Technology',
-              experienceLevel: session.experienceLevel || 'MID',
-              focusAreas: session.focusAreas || ['Software Engineering', 'System Design'],
-              interviewType: session.interviewType || 'TECHNICAL',
-            },
-            previousQA,
-            orderIndex: nextOrder - 1,
-          }),
-          signal: AbortSignal.timeout(10000),
-        });
-
-        if (resp.ok) {
-          const aiData = (await resp.json()) as any;
-          if (aiData?.questionText?.trim()) {
-            promptText = aiData.questionText.trim()
-              .replace(/^(Follow-up|Follow up|Question\s*\d+|Next question|Follow-up Question)\s*:\s*/i, '')
-              .trim();
-            if (aiData.questionType) qType = aiData.questionType;
-            if (aiData.difficulty) difficulty = aiData.difficulty;
-          }
-        }
-      } catch (fetchErr) {
-        console.warn('[OralService] AI Service generate-next-question offline/timed out, using adaptive fallback:', (fetchErr as Error).message);
-      }
-
-      // Cohesive 5-Stage Adaptive Question Strategy (Domain & Stated Stack Aware)
-      let requiredConcepts: string[] = [];
-      let optionalConcepts: string[] = [];
-
-      if (!promptText) {
-        const allSpokenSoFar = previousQA.map((p: any) => (p.answerText || '').toLowerCase()).join(' ');
-        const roleLower = (session.targetRole || 'Software Engineer').toLowerCase();
-
-        if (nextOrder === 1) {
-          promptText = getInitialInterviewPrompt(session.targetRole, session.targetCompany);
-          qType = 'TECHNICAL';
-          difficulty = 'MEDIUM';
-          requiredConcepts = ['architecture overview', 'core technical stack', 'design trade-offs'];
-        } else if (nextOrder === 2) {
-          // Stage 2: Deep dive into the candidate's exact stated stack
-          if (allSpokenSoFar.includes('react') || allSpokenSoFar.includes('frontend') || roleLower.includes('front')) {
-            promptText = `You mentioned working with frontend technologies. How do you manage complex client state, prevent unnecessary component re-renders, and ensure optimal Core Web Vitals in production?`;
-            requiredConcepts = ['state management', 'render optimization', 'Core Web Vitals (LCP, INP, CLS)', 'component architecture'];
-          } else if (allSpokenSoFar.includes('node') || allSpokenSoFar.includes('backend') || allSpokenSoFar.includes('express') || roleLower.includes('back')) {
-            promptText = `You mentioned working on backend services. How do you design your REST or GraphQL APIs, structure database connections, and handle asynchronous error propagation at scale?`;
-            requiredConcepts = ['API design', 'database connection pooling', 'error handling middleware', 'asynchronous event loop'];
-          } else if (allSpokenSoFar.includes('python') || allSpokenSoFar.includes('django') || allSpokenSoFar.includes('fastapi') || allSpokenSoFar.includes('ai') || allSpokenSoFar.includes('ml')) {
-            promptText = `Given your experience with Python and data/backend services, how do you handle asynchronous I/O, background task queues with Celery or Redis, and API performance optimization?`;
-            requiredConcepts = ['asyncio / asynchronous I/O', 'background worker queues', 'caching with Redis', 'data validation'];
-          } else if (allSpokenSoFar.includes('java') || allSpokenSoFar.includes('spring')) {
-            promptText = `In your Spring Boot / Java services, how do you manage dependency injection, thread pool executor tuning, and transactional boundary isolation across microservices?`;
-            requiredConcepts = ['Spring IoC / Dependency Injection', 'Thread pool sizing', 'Transaction management (@Transactional)', 'Microservice boundaries'];
-          } else {
-            promptText = `In the primary tech stack you use as a ${session.targetRole || 'Software Engineer'}, walk me through the end-to-end architecture of a significant feature or service you developed.`;
-            requiredConcepts = ['architecture layout', 'data flow', 'component interaction', 'trade-offs made'];
-          }
-          qType = 'TECHNICAL';
-          difficulty = 'MEDIUM';
-        } else if (nextOrder === 3) {
-          // Stage 3: System Architecture & Data/Trade-off Layer
-          if (allSpokenSoFar.includes('postgres') || allSpokenSoFar.includes('sql') || allSpokenSoFar.includes('database') || allSpokenSoFar.includes('mongo') || roleLower.includes('full') || roleLower.includes('back')) {
-            promptText = `When scaling your database layer under high concurrent traffic, how do you evaluate indexing strategies, connection pooling, and choosing between SQL vs NoSQL or caching with Redis?`;
-            requiredConcepts = ['indexing (B-Tree)', 'read vs write trade-offs', 'caching invalidation strategy', 'concurrency control'];
-          } else if (roleLower.includes('front')) {
-            promptText = `How do you architect large-scale client-side applications for offline resilience, service worker caching, and secure token storage without exposing vulnerable XSS surfaces?`;
-            requiredConcepts = ['service workers / caching strategies', 'token security (HttpOnly vs memory)', 'XSS / CSRF mitigation', 'bundle splitting'];
-          } else {
-            promptText = `How do you approach scalability bottlenecks in your system, specifically regarding load balancing, caching layers, and handling asynchronous task processing?`;
-            requiredConcepts = ['load balancing algorithms', 'caching layers', 'message queuing', 'system bottlenecks'];
-          }
-          qType = 'SYSTEM_DESIGN';
-          difficulty = 'MEDIUM';
-        } else if (nextOrder === 4) {
-          // Stage 4: Real-World Troubleshooting / Production Outage / Optimization
-          promptText = `Can you describe a complex production bug, memory leak, or performance latency bottleneck you investigated in your applications? How did you isolate root cause and verify the fix?`;
-          qType = 'TECHNICAL';
-          difficulty = 'HARD';
-          requiredConcepts = ['root cause analysis', 'profiling & telemetry tools', 'mitigation strategy', 'long-term regression prevention'];
-        } else {
-          // Stage 5: Behavioral & Engineering Leadership
-          promptText = `Tell me about a time you faced a sharp technical disagreement with a teammate regarding system architecture or library choice. How did you evaluate trade-offs and reach alignment?`;
-          qType = 'BEHAVIOURAL';
-          difficulty = 'MEDIUM';
-          requiredConcepts = ['conflict resolution', 'objective technical trade-offs', 'team alignment', 'positive outcome'];
-        }
-      } else {
-        // Find matching required concepts if text aligns with question bank or defaults
-        const bankMatch = QUESTION_BANK.find(q => promptText.toLowerCase().includes(q.topic.toLowerCase()));
-        if (bankMatch) {
-          requiredConcepts = bankMatch.requiredConcepts;
-          optionalConcepts = bankMatch.optionalConcepts;
-        } else {
-          requiredConcepts = ['core concept', 'technical implementation', 'trade-offs'];
-        }
-      }
-
-      const questionObj = {
-        id: `q_${uuidv4().slice(0, 8)}`,
-        sessionId,
-        orderIndex: nextOrder,
-        questionText: promptText,
-        questionType: qType,
-        difficulty,
-        requiredConcepts,
-        optionalConcepts,
-        evalStrengths: [],
-        evalWeaknesses: [],
-      };
+      const stageQ = getDomainQuestionForStage(
+        nextOrder,
+        session.targetRole || 'Software Engineer',
+        session.targetCompany,
+        existingQuestions.map((q: any) => ({ questionText: q.questionText, answerText: q.answerText || '' }))
+      );
 
       try {
         const createdQ = await prisma.oralQuestion.create({
           data: {
             sessionId,
             orderIndex: nextOrder,
-            questionText: promptText,
-            questionType: qType,
-            difficulty,
+            questionText: stageQ.questionText,
+            questionType: stageQ.questionType,
+            category: stageQ.category,
+            difficulty: stageQ.difficulty,
             evalStrengths: [],
             evalWeaknesses: [],
           },
         });
         return {
           isComplete: false,
-          question: { ...createdQ, requiredConcepts, optionalConcepts },
+          question: createdQ,
           ...createdQ,
-          requiredConcepts,
-          optionalConcepts,
         };
       } catch {
+        const questionObj = {
+          id: `q_${uuidv4().slice(0, 8)}`,
+          sessionId,
+          orderIndex: nextOrder,
+          questionText: stageQ.questionText,
+          questionType: stageQ.questionType,
+          category: stageQ.category,
+          difficulty: stageQ.difficulty,
+          evalStrengths: [],
+          evalWeaknesses: [],
+        };
         const questions = memoryQuestions.get(sessionId) || [];
         questions.push(questionObj);
         memoryQuestions.set(sessionId, questions);
@@ -630,169 +967,370 @@ export const oralService = {
 
     } catch (err) {
       console.warn('[OralService] DB getNextQuestion fallback:', (err as Error).message);
-      const questions = memoryQuestions.get(sessionId) || [];
-      const nextOrder = questions.length + 1;
-      const memSession = memorySessions.get(sessionId) || {};
-      const durationMins = memSession.durationMins || 15;
-      const startedAt = memSession.startedAt ? new Date(memSession.startedAt).getTime() : (memSession.createdAt ? new Date(memSession.createdAt).getTime() : Date.now());
-      const elapsedMinutes = (Date.now() - startedAt) / (1000 * 60);
-      const maxQuestionsForDuration = Math.max(6, Math.ceil(durationMins / 2));
-
-      if ((elapsedMinutes >= durationMins && nextOrder > 3) || nextOrder > maxQuestionsForDuration) {
-        return { isComplete: true };
-      }
-
-      const role = memSession.targetRole || 'Software Engineer';
-      const roleLower = role.toLowerCase();
-      const allSpokenSoFar = questions.map((p: any) => (p.answerText || '').toLowerCase()).join(' ');
-
-      let promptText = '';
-      let qType = 'TECHNICAL';
-      let difficulty = 'MEDIUM';
-
-      if (nextOrder === 1) {
-        promptText = `Tell me about yourself, your recent engineering experience, and what technical stack you work with day-to-day as a ${role}.`;
-        qType = 'BEHAVIOURAL';
-        difficulty = 'EASY';
-      } else if (nextOrder === 2) {
-        if (allSpokenSoFar.includes('react') || allSpokenSoFar.includes('frontend') || roleLower.includes('front')) {
-          promptText = `You mentioned working with frontend technologies. How do you manage complex client state, prevent unnecessary component re-renders, and ensure optimal Core Web Vitals in production?`;
-        } else if (allSpokenSoFar.includes('node') || allSpokenSoFar.includes('backend') || allSpokenSoFar.includes('express') || roleLower.includes('back')) {
-          promptText = `You mentioned working on backend services. How do you design your REST or GraphQL APIs, structure database connections, and handle asynchronous error propagation at scale?`;
-        } else if (allSpokenSoFar.includes('python') || allSpokenSoFar.includes('django') || allSpokenSoFar.includes('fastapi')) {
-          promptText = `Given your experience with Python, how do you handle asynchronous I/O, background worker queues with Celery or Redis, and API performance optimization?`;
-        } else {
-          promptText = `In the primary tech stack you use as a ${role}, walk me through the end-to-end architecture of a significant feature or service you developed.`;
-        }
-      } else if (nextOrder === 3) {
-        promptText = `When scaling your system under high concurrent traffic, how do you evaluate indexing strategies, database connection pooling, and caching with Redis?`;
-        qType = 'SYSTEM_DESIGN';
-      } else if (nextOrder === 4) {
-        promptText = `Can you describe a complex production bug, memory leak, or performance latency bottleneck you investigated in your applications? How did you isolate root cause and verify the fix?`;
-        difficulty = 'HARD';
-      } else if (nextOrder === 5) {
-        promptText = `How do you secure your services against vulnerabilities like injection, broken authentication tokens, or rate limit exhaustion under DDoS scenarios?`;
-        difficulty = 'HARD';
-      } else {
-        promptText = `Tell me about a time you faced a sharp technical disagreement with a teammate regarding system architecture or library choice. How did you evaluate trade-offs and reach alignment?`;
-        qType = 'BEHAVIOURAL';
-      }
-
-      const newQ = {
-        id: `q_${uuidv4().slice(0, 8)}`,
-        sessionId,
-        orderIndex: nextOrder,
-        questionText: promptText,
-        questionType: qType,
-        difficulty,
-        evalStrengths: [],
-        evalWeaknesses: [],
-      };
-
-      questions.push(newQ);
-      memoryQuestions.set(sessionId, questions);
-      return {
-        isComplete: false,
-        question: newQ,
-        ...newQ,
-      };
+      return { isComplete: false };
     }
   },
 
   async completeSession(sessionId: string, userId: string, payload?: any) {
     const session = await this.getSession(sessionId, userId);
     const questions: any[] = session.questions || [];
-    const answered = questions.filter((q: any) => q.answerText && q.answerText.trim());
+    const answered = questions.filter((q: any) => q.answerText && q.answerText.trim() && !q.answerText.includes('[Candidate skipped:'));
 
-    // 1. Technical score from answered questions
-    let technicalScore = 0;
-    if (answered.length > 0) {
-      const totalScore = answered.reduce((acc: number, q: any) => acc + (typeof q.evalScore === 'number' ? q.evalScore : 70), 0);
-      technicalScore = Math.round(totalScore / answered.length);
-    }
-
-    // 2. Communication score from real words and pace
-    const allAnswers = answered.map((q: any) => q.answerText).join(' ');
-    const words = allAnswers.split(/\s+/).filter(Boolean);
-    const totalWords = words.length;
-
-    let fillerCount = 0;
-    const fillers = ['um', 'umm', 'uh', 'uhh', 'like', 'basically', 'actually', 'literally'];
-    for (const f of fillers) {
-      const regex = new RegExp(`\\b${f}\\b`, 'gi');
-      const matches = allAnswers.match(regex);
-      if (matches) fillerCount += matches.length;
-    }
-
-    const fillerPenalty = Math.min(30, fillerCount * 3);
-    const lengthScore = Math.min(100, Math.max(30, (totalWords / (answered.length || 1)) * 1.5));
-    const communicationScore = answered.length > 0
-      ? Math.max(20, Math.min(100, Math.round(lengthScore * 0.7 + (100 - fillerPenalty) * 0.3)))
-      : 0;
-
-    // 3. Confidence & Proctoring Telemetry
+    // Proctoring & telemetry values from live video ML session
     const tabBlurCount = payload?.proctoring?.tabBlurCount ?? 0;
-    const eyeContactScore = payload?.proctoring?.eyeContactScore ?? (payload?.isDisqualified ? 0 : 85);
-    const videoConfidence = payload?.confidenceMetrics?.videoConfidence ?? payload?.confidenceMetrics?.score;
-    const postureStatus = payload?.confidenceMetrics?.postureStatus;
-    const composureLevel = payload?.confidenceMetrics?.composureLevel;
+    const rawEyeContact = payload?.proctoring?.eyeContactScore;
+    const eyeContactScore = rawEyeContact != null && !isNaN(Number(rawEyeContact)) ? Math.round(Number(rawEyeContact)) : 82;
+    const postureStatus = payload?.confidenceMetrics?.postureStatus || 'Optimal';
+    const composureLevel = payload?.confidenceMetrics?.composureLevel || 'Calm';
 
-    const baseConfidence = videoConfidence != null ? videoConfidence : 85;
-    const proctorPenalty = tabBlurCount * 12 + (eyeContactScore < 70 ? 12 : 0) + (postureStatus === 'Off-Center' ? 8 : 0);
-    const confidenceScore = payload?.isDisqualified ? 0 : Math.max(20, Math.min(100, Math.round(baseConfidence * 0.7 + (100 - proctorPenalty) * 0.3)));
+    let technicalScore = 0;
+    let communicationScore = 0;
+    let confidenceScore = 0;
+    let problemSolvingScore = 0;
+    let depthScore = 0;
+    let relevanceScore = 0;
+    let structureScore = 0;
+    let industryReadinessScore = 0;
+    let overallScore = 0;
 
-    const structureScore = Math.max(0, Math.min(100, Math.round(technicalScore * 0.55 + communicationScore * 0.3 + confidenceScore * 0.15)));
-    const overallScore = Math.max(0, Math.min(100, Math.round(technicalScore * 0.40 + communicationScore * 0.30 + confidenceScore * 0.30)));
-
-    // 4. Dynamic Strengths & Improvements
+    let totalWords = 0;
+    let fillerCount = 0;
+    const detectedFillers: string[] = [];
     const strengths: string[] = [];
     const improvements: string[] = [];
 
-    answered.forEach((q: any) => {
-      if (q.evalStrengths && Array.isArray(q.evalStrengths)) {
-        strengths.push(...q.evalStrengths);
+    const isEarlyAbandon = answered.length === 0;
+
+    if (!isEarlyAbandon) {
+      // 1. Technical score from answered questions (actual evalScores)
+      const totalScore = answered.reduce((acc: number, q: any) => acc + (typeof q.evalScore === 'number' ? q.evalScore : 75), 0);
+      technicalScore = Math.max(10, Math.min(100, Math.round(totalScore / answered.length)));
+
+      // 2. Communication score from real candidate transcript, pace, and fillers
+      const allAnswers = answered.map((q: any) => q.answerText).join(' ');
+      const words = allAnswers.split(/\s+/).filter(Boolean);
+      totalWords = words.length;
+
+      const fillers = ['um', 'umm', 'uh', 'uhh', 'like', 'basically', 'actually', 'literally', 'you know'];
+      for (const f of fillers) {
+        const regex = new RegExp(`\\b${f}\\b`, 'gi');
+        const matches = allAnswers.match(regex);
+        if (matches) {
+          fillerCount += matches.length;
+          detectedFillers.push(f);
+        }
       }
-      if (q.evalWeaknesses && Array.isArray(q.evalWeaknesses)) {
-        improvements.push(...q.evalWeaknesses);
+
+      const totalAnsweredSecs = answered.reduce((acc: number, q: any) => acc + (q.timeTakenSecs || 35), 0);
+      const answeredMins = Math.max(0.2, totalAnsweredSecs / 60);
+      const realWpm = Math.round(totalWords / answeredMins);
+
+      const paceScore = realWpm >= 110 && realWpm <= 165
+        ? 95
+        : realWpm < 110
+          ? Math.max(25, 95 - (110 - realWpm) * 0.7)
+          : Math.max(30, 95 - (realWpm - 165) * 0.6);
+
+      const avgWordsPerQ = totalWords / answered.length;
+      const lengthScore = avgWordsPerQ >= 35
+        ? Math.min(98, 70 + (avgWordsPerQ - 35) * 0.6)
+        : Math.max(20, avgWordsPerQ * 2.0);
+
+      const fillerPenalty = Math.min(30, fillerCount * 3.5);
+      communicationScore = Math.max(10, Math.min(100, Math.round(paceScore * 0.35 + lengthScore * 0.45 + (100 - fillerPenalty) * 0.20)));
+
+      // 3. Confidence & Proctoring Telemetry
+      const proctorPenalty = tabBlurCount * 14 + (eyeContactScore < 75 ? 12 : 0) + (postureStatus === 'Off-Center' ? 8 : 0);
+      confidenceScore = payload?.isDisqualified
+        ? 0
+        : Math.max(15, Math.min(100, Math.round(eyeContactScore * 0.6 + (100 - proctorPenalty) * 0.4)));
+
+      // 4. Secondary Dimensions (calibrated to real responses)
+      problemSolvingScore = Math.max(10, Math.min(100, Math.round(technicalScore * 0.85 + (totalWords >= 50 ? 10 : 0) + (answered.length > 1 ? 5 : 0))));
+      depthScore = Math.max(10, Math.min(100, Math.round(Math.min(96, (avgWordsPerQ / 45) * 75 + 15))));
+      relevanceScore = Math.max(10, Math.min(100, Math.round(technicalScore * 0.60 + communicationScore * 0.40 - (questions.length - answered.length) * 10)));
+      structureScore = Math.max(10, Math.min(100, Math.round(technicalScore * 0.40 + communicationScore * 0.40 + depthScore * 0.20)));
+      industryReadinessScore = Math.max(10, Math.min(100, Math.round(technicalScore * 0.35 + communicationScore * 0.25 + problemSolvingScore * 0.20 + confidenceScore * 0.20)));
+
+      // 5. Overall Weighted Composite Score
+      overallScore = Math.max(
+        10,
+        Math.min(
+          100,
+          Math.round(
+            technicalScore * 0.35 +
+            communicationScore * 0.25 +
+            problemSolvingScore * 0.15 +
+            confidenceScore * 0.15 +
+            structureScore * 0.10
+          )
+        )
+      );
+
+      // Strengths & Improvements extraction
+      answered.forEach((q: any) => {
+        if (q.evalStrengths && Array.isArray(q.evalStrengths)) {
+          strengths.push(...q.evalStrengths);
+        }
+        if (q.evalWeaknesses && Array.isArray(q.evalWeaknesses)) {
+          improvements.push(...q.evalWeaknesses);
+        }
+      });
+
+      if (eyeContactScore >= 80) {
+        strengths.push(`Maintained strong, engaging on-camera eye contact (${eyeContactScore}%).`);
       }
-    });
+      if (tabBlurCount === 0) {
+        strengths.push('Strict test environment compliance: zero tab switch or window blur events.');
+      }
+      if (realWpm >= 115 && realWpm <= 160) {
+        strengths.push(`Well-paced conversational cadence (${realWpm} words per minute).`);
+      }
 
-    if (eyeContactScore >= 82) {
-      strengths.push('Maintained strong, engaging eye contact and visual poise.');
-    }
-    if (postureStatus === 'Optimal') {
-      strengths.push('Excellent on-camera posture and steady composure.');
-    }
+      if (fillerCount > 0) {
+        improvements.push(`Reduce verbal filler tokens (${fillerCount} instances detected: ${Array.from(new Set(detectedFillers)).slice(0, 3).join(', ')}).`);
+      }
+      if (eyeContactScore < 70) {
+        improvements.push(`Increase eye contact with the camera to project confidence (${eyeContactScore}% recorded).`);
+      }
+      if (tabBlurCount > 0) {
+        improvements.push(`Avoid context-switching: ${tabBlurCount} window blur events recorded during the session.`);
+      }
+      if (technicalScore < 70) {
+        improvements.push('Elaborate with deeper architectural trade-offs, scalability limits, and concrete implementation examples.');
+      }
+      if (improvements.length === 0) {
+        if (questions.length > answered.length) {
+          improvements.push(`Review skipped topics (${questions.length - answered.length} question(s) passed) to build comprehensive domain mastery.`);
+        } else if (technicalScore < 85) {
+          improvements.push('Incorporate deeper trade-offs around memory footprints, caching invalidation, and failure modes.');
+        } else {
+          improvements.push('Elaborate on production failure recovery, edge cases, and automated rollback strategies.');
+        }
+      }
+    } else {
+      // Clean, honest data for zero-answer early exit
+      overallScore = 0;
+      technicalScore = 0;
+      communicationScore = 0;
+      confidenceScore = eyeContactScore;
+      problemSolvingScore = 0;
+      depthScore = 0;
+      relevanceScore = 0;
+      structureScore = 0;
+      industryReadinessScore = 0;
 
-    if (strengths.length === 0) {
-      if (technicalScore >= 70) strengths.push(`Demonstrated solid competence in ${session.targetRole || 'engineering'} topics.`);
-      if (communicationScore >= 70) strengths.push('Clear conversational pace and articulation.');
-      if (strengths.length === 0) strengths.push('Completed the interview session.');
-    }
-
-    if (postureStatus === 'Off-Center') {
-      improvements.push('Keep your face centered in the camera frame throughout the session.');
-    }
-    if (eyeContactScore < 70) {
-      improvements.push('Maintain consistent eye contact with the camera to project confidence.');
-    }
-    if (composureLevel === 'Restless') {
-      improvements.push('Work on composed body language and steady pacing during explanations.');
-    }
-
-    if (improvements.length === 0) {
-      if (fillerCount > 2) improvements.push(`Reduce verbal fillers (${fillerCount} detected).`);
-      if (technicalScore < 70) improvements.push('Expand technical depth and discuss architectural trade-offs.');
-      if (tabBlurCount > 0) improvements.push(`Avoid window switching (${tabBlurCount} tab blur events).`);
-      if (improvements.length === 0) improvements.push('Practice structuring responses using the STAR method.');
+      strengths.push('Successfully established audio, microphone, and webcam device check.');
+      improvements.push('Provide verbal responses during the live interview to receive full AI rubric scoring.');
     }
 
     const readinessVerdict = overallScore >= 80 ? 'READY' : overallScore >= 60 ? 'ALMOST_READY' : 'NOT_READY';
 
-    const problemSolvingScore = Math.max(30, Math.min(100, Math.round(technicalScore * 0.95 + 2)));
-    const depthScore = Math.max(30, Math.min(100, Math.round((totalWords / Math.max(1, answered.length * 45)) * 80 + 15)));
-    const relevanceScore = Math.max(50, Math.min(100, Math.round(88 - (questions.length - answered.length) * 8)));
-    const industryReadinessScore = Math.max(30, Math.min(100, Math.round(technicalScore * 0.40 + communicationScore * 0.30 + structureScore * 0.30)));
+    // ─── Dynamic Stages Breakdown (Built from ACTUAL questions asked) ───
+    const stages: any[] = [];
+    if (questions.length === 0) {
+      stages.push({
+        stageNumber: 1,
+        stageName: 'Interview Track',
+        questionCount: 0,
+        durationMins: 0,
+        score: 0,
+        description: 'No questions delivered.',
+      });
+    } else if (questions.length === 1) {
+      const q = questions[0];
+      stages.push({
+        stageNumber: 1,
+        stageName: q.category || 'Technical Foundations',
+        questionCount: 1,
+        durationMins: Math.max(1, Math.round((q.timeTakenSecs || 45) / 60)),
+        score: typeof q.evalScore === 'number' ? q.evalScore : (q.answerText ? technicalScore : 0),
+        description: q.questionText.slice(0, 95) + '…',
+      });
+    } else if (questions.length === 2) {
+      questions.forEach((q: any, i: number) => {
+        stages.push({
+          stageNumber: i + 1,
+          stageName: q.category || (i === 0 ? 'System Foundations' : 'Technical Deep Dive'),
+          questionCount: 1,
+          durationMins: Math.max(1, Math.round((q.timeTakenSecs || 45) / 60)),
+          score: typeof q.evalScore === 'number' ? q.evalScore : (q.answerText ? technicalScore : 0),
+          description: q.questionText.slice(0, 95) + '…',
+        });
+      });
+    } else {
+      const stageCount = Math.min(questions.length, 4);
+      const chunkSize = Math.ceil(questions.length / stageCount);
+      for (let s = 0; s < stageCount; s++) {
+        const stageQuestions = questions.slice(s * chunkSize, (s + 1) * chunkSize);
+        if (stageQuestions.length === 0) continue;
+        const stageAnswered = stageQuestions.filter((q: any) => q.answerText);
+        const stageScore = stageAnswered.length > 0
+          ? Math.round(stageAnswered.reduce((a: number, q: any) => a + (q.evalScore || technicalScore), 0) / stageAnswered.length)
+          : (isEarlyAbandon ? 0 : technicalScore);
+        const stageDurSecs = stageQuestions.reduce((a: number, q: any) => a + (q.timeTakenSecs || 45), 0);
+        const primaryCategory = stageQuestions[0].category || (s === 0 ? 'Core Architecture' : s === 1 ? 'Deep Dive' : s === 2 ? 'Problem Solving' : 'Review & Wrap Up');
+
+        stages.push({
+          stageNumber: s + 1,
+          stageName: primaryCategory,
+          questionCount: stageQuestions.length,
+          durationMins: Math.max(1, Math.round(stageDurSecs / 60)),
+          score: stageScore,
+          description: stageQuestions[0].questionText.slice(0, 95) + '…',
+        });
+      }
+    }
+
+    // ─── Dynamic Performance Timeline (All actual questions) ───
+    const performanceTimeline = questions.map((q: any, idx: number) => {
+      const score = typeof q.evalScore === 'number' ? q.evalScore : (q.answerText ? technicalScore : 0);
+      let rating: 'Strong' | 'Good' | 'Needs Improvement' | 'Weak' = 'Good';
+      if (score >= 80) rating = 'Strong';
+      else if (score >= 60) rating = 'Good';
+      else if (score >= 40) rating = 'Needs Improvement';
+      else rating = 'Weak';
+
+      return {
+        questionIndex: idx + 1,
+        questionLabel: `Q${idx + 1}`,
+        score,
+        rating,
+        category: q.category || 'Technical',
+        durationSecs: q.timeTakenSecs || (q.answerText ? 45 : 0),
+        questionText: q.questionText,
+      };
+    });
+
+    // ─── Dynamic Interview Summary ───
+    const timeTakenVals = answered.map((q: any) => (q.timeTakenSecs || 0) / 60);
+    const avgDurMin = timeTakenVals.length ? +(timeTakenVals.reduce((a, b) => a + b, 0) / timeTakenVals.length).toFixed(1) : 0;
+    const maxDurMin = timeTakenVals.length ? +Math.max(...timeTakenVals).toFixed(1) : 0;
+    const minDurMin = timeTakenVals.length ? +Math.min(...timeTakenVals).toFixed(1) : 0;
+
+    const uniqueTopics = Array.from(new Set(
+      questions.map((q: any) => q.category).filter(Boolean).concat(session.focusAreas || [])
+    )) as string[];
+    if (uniqueTopics.length === 0) {
+      uniqueTopics.push(session.targetRole || 'Software Engineering');
+    }
+
+    const interviewSummary = {
+      totalQuestionsAsked: questions.length,
+      questionsAnswered: answered.length,
+      questionsSkipped: questions.length - answered.length,
+      averageAnswerLengthMinutes: avgDurMin,
+      longestAnswerMinutes: maxDurMin,
+      shortestAnswerMinutes: minDurMin,
+      followUpQuestionsCount: questions.filter((q: any) => q.questionType === 'FOLLOW_UP').length,
+      topicsCovered: uniqueTopics,
+    };
+
+    // ─── Dynamic Personalized Recommendations (Ranked by candidate's 3 lowest dimensions) ───
+    const dimensionPool = [
+      {
+        name: 'Technical Knowledge',
+        score: technicalScore,
+        title: 'Deepen System Design & Architectural Fundamentals',
+        weakness: `Technical score registered at ${technicalScore}/100 with opportunities to elaborate on distributed limits.`,
+        action: 'Study high-throughput caching, read/write database partitioning, and microservice decoupling patterns.',
+        expectedOutcome: 'Confidently justify latency vs throughput trade-offs in technical architectural rounds.',
+        practiceResource: '/system-design',
+      },
+      {
+        name: 'Communication',
+        score: communicationScore,
+        title: 'Refine Speech Cadence & Minimize Filler Words',
+        weakness: fillerCount > 0 ? `Detected ${fillerCount} verbal filler tokens affecting delivery clarity.` : 'Verbal pacing can be calibrated for clearer articulation.',
+        action: 'Replace verbal fillers with silent 1-second deliberate pauses to project calm authority.',
+        expectedOutcome: 'Structured, authoritative answers delivered at an optimal 120-150 WPM.',
+        practiceResource: '/video/setup',
+      },
+      {
+        name: 'Confidence & Proctoring',
+        score: confidenceScore,
+        title: 'Strengthen Camera Eye Contact & Composure',
+        weakness: `Camera focus score evaluated at ${confidenceScore}% during the session.`,
+        action: 'Keep visual gaze centered on the webcam lens and position camera at eye level.',
+        expectedOutcome: 'High on-camera engagement and superior proctoring compliance scores.',
+        practiceResource: '/video/setup',
+      },
+      {
+        name: 'Problem Solving',
+        score: problemSolvingScore,
+        title: 'Adopt Structured Problem-Solving Frameworks',
+        weakness: 'Responses jumped into implementation without establishing edge cases or constraints.',
+        action: 'Apply the STAR method: articulate Context, Problem, Execution, and Measurable Metric Lift.',
+        expectedOutcome: 'Crisp, structured problem breakdowns demonstrating Senior/Staff engineering maturity.',
+        practiceResource: '/challenges',
+      },
+      {
+        name: 'Depth of Explanation',
+        score: depthScore,
+        title: 'Elaborate with Measurable Metrics & Failure Scenarios',
+        weakness: 'Initial answers were brief and omitted production failure handling.',
+        action: 'Substantiate technical claims with quantifiable metrics (QPS, memory, p99 latency) and recovery strategies.',
+        expectedOutcome: 'Deep technical credibility demonstrating production experience.',
+        practiceResource: '/preparation',
+      },
+    ];
+
+    dimensionPool.sort((a, b) => a.score - b.score);
+    const recommendations = dimensionPool.slice(0, 3).map((item, idx) => ({
+      priority: idx + 1,
+      title: item.title,
+      weakness: item.weakness,
+      action: item.action,
+      expectedOutcome: item.expectedOutcome,
+      practiceResource: item.practiceResource,
+    }));
+
+    // ─── Practice Resources ───
+    const practiceResources = [
+      {
+        title: 'System Design Fundamentals',
+        subtitle: 'Scalable system patterns, caching & sharding',
+        category: 'System Design',
+        link: '/system-design',
+        iconType: 'layers',
+      },
+      {
+        title: 'Database Architecture',
+        subtitle: 'SQL vs NoSQL, indexing & consistency models',
+        category: 'Databases',
+        link: '/preparation',
+        iconType: 'database',
+      },
+      {
+        title: 'AI Mock Interview',
+        subtitle: 'Practice technical discussions with Ava',
+        category: 'Interview Practice',
+        link: '/video/setup',
+        iconType: 'mic',
+      },
+      {
+        title: 'Technical Challenges',
+        subtitle: 'Hands-on problem solving under timed constraints',
+        category: 'Coding & Algorithms',
+        link: '/challenges',
+        iconType: 'code',
+      },
+    ];
+
+    const categoryScores = {
+      'Technical Knowledge': technicalScore,
+      'Communication': communicationScore,
+      'Problem Solving': problemSolvingScore,
+      'Depth of Explanation': depthScore,
+      'Relevance': relevanceScore,
+      'Confidence': confidenceScore,
+      'Structure': structureScore,
+      'Industry Readiness': industryReadinessScore,
+    };
+
+    let summaryText = isEarlyAbandon
+      ? `Interview session ended early before spoken responses were submitted. No evaluation scoring registered for ${session.targetRole || 'Software Engineer'}.`
+      : `Candidate completed oral interview for ${session.targetRole || 'Software Engineer'}. Technical proficiency scored at ${technicalScore}/100, communication clarity at ${communicationScore}/100, and proctoring composure at ${confidenceScore}/100.`;
 
     let analysis: any = {
       id: `an_${sessionId}`,
@@ -806,65 +1344,27 @@ export const oralService = {
       depthScore,
       relevanceScore,
       industryReadinessScore,
-      categoryScores: {
-        'Technical Knowledge': technicalScore,
-        'Communication': communicationScore,
-        'Problem Solving': problemSolvingScore,
-        'Depth of Explanation': depthScore,
-        'Relevance': relevanceScore,
-        'Confidence': confidenceScore,
-        'Structure': structureScore,
-        'Industry Readiness': industryReadinessScore,
-      },
+      categoryScores,
       confidenceMeterScore: confidenceScore,
       confidenceSignals: {
-        avgWpm: Math.round(totalWords / Math.max(1, (answered.length * 1.5)) || 135),
+        avgWpm: answered.length > 0 ? Math.round(totalWords / Math.max(0.2, (answered.reduce((a: number, q: any) => a + (q.timeTakenSecs || 35), 0) / 60))) : 0,
         avgPauseCount: fillerCount,
-        avgAnswerLength: Math.round(totalWords / (answered.length || 1)),
+        avgAnswerLength: answered.length > 0 ? Math.round(totalWords / answered.length) : 0,
       },
       eyeContactScore,
       presenceScore: confidenceScore,
-      summary: `Candidate completed interview for ${session.targetRole || 'Software Engineer'}. Technical score: ${technicalScore}/100. Communication score: ${communicationScore}/100. Proctoring & confidence: ${confidenceScore}/100.`,
+      summary: summaryText,
       strengths: Array.from(new Set(strengths)).slice(0, 5),
       improvements: Array.from(new Set(improvements)).slice(0, 5),
-      actionableTips: [
-        { tip: 'Substantiate Trade-offs', reason: `For ${session.targetRole || 'target'} roles, discuss scalability and system limits.` },
-        { tip: 'Fluent Delivery', reason: fillerCount > 0 ? 'Replace filler words with deliberate pauses.' : 'Maintain your clear speaking rhythm.' },
-        { tip: 'Screen Presence', reason: 'Keep visual focus locked on the interviewer to maximize proctoring scores.' },
-      ],
+      actionableTips: recommendations.map(r => ({ tip: r.title, reason: r.action })),
+      stageBreakdown: stages,
+      performanceTimeline,
+      interviewSummary,
+      recommendations,
+      practiceResources,
       readinessVerdict,
       createdAt: new Date().toISOString(),
     };
-
-    // Try calling AI Analysis service RPC for full neural compilation
-    const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:4003';
-    try {
-      const resp = await fetch(`${aiServiceUrl}/internal/evaluate-session`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sessionId,
-          confidenceMetrics: {
-            score: confidenceScore,
-            signals: analysis.confidenceSignals,
-          },
-          proctoring: {
-            eyeContactScore,
-            presenceScore: confidenceScore,
-            tabBlurCount,
-          },
-        }),
-        signal: AbortSignal.timeout(6000),
-      });
-      if (resp.ok) {
-        const aiAnalysis = await resp.json();
-        if (aiAnalysis && aiAnalysis.overallScore !== undefined) {
-          analysis = aiAnalysis;
-        }
-      }
-    } catch (e) {
-      console.warn('[OralService] ai-analysis-service evaluate-session RPC skipped/fallback:', (e as Error).message);
-    }
 
     memoryAnalysis.set(sessionId, analysis);
 
@@ -874,6 +1374,8 @@ export const oralService = {
         data: {
           status: 'COMPLETED',
           completedAt: new Date(),
+          overallScore,
+          feedbackSummary: JSON.stringify(analysis),
         },
       });
       return { ...updated, analysis };
@@ -883,9 +1385,11 @@ export const oralService = {
       if (s) {
         s.status = 'COMPLETED';
         s.completedAt = new Date();
+        s.overallScore = overallScore;
+        s.feedbackSummary = JSON.stringify(analysis);
         s.analysis = analysis;
       }
-      return s || { id: sessionId, status: 'COMPLETED', analysis };
+      return s || { id: sessionId, status: 'COMPLETED', overallScore, analysis };
     }
   },
 };

@@ -113,152 +113,12 @@ export interface UserProfileData {
   }>;
 }
 
-const DEFAULT_FOLLOWERS: FollowerUser[] = [
-  {
-    id: 'usr-101',
-    name: 'Sarah Chen',
-    username: 'sarah_codes',
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
-    role: 'Staff Frontend Architect',
-    company: 'Meta',
-    rank: 'Top 1%',
-    streak: 42,
-    isFollowing: true,
-    mutualCount: 12
-  },
-  {
-    id: 'usr-102',
-    name: 'Alex Rivera',
-    username: 'alex_distributed',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
-    role: 'Backend Distributed Systems Engineer',
-    company: 'Stripe',
-    rank: 'Top 3%',
-    streak: 28,
-    isFollowing: true,
-    mutualCount: 8
-  },
-  {
-    id: 'usr-103',
-    name: 'Priya Sharma',
-    username: 'priya_algo',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-    role: 'Machine Learning Engineer',
-    company: 'Google',
-    rank: 'Top 2%',
-    streak: 19,
-    isFollowing: false,
-    mutualCount: 5
-  },
-  {
-    id: 'usr-104',
-    name: 'Marcus Vance',
-    username: 'marcus_vance',
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
-    role: 'Engineering Director',
-    company: 'Netflix',
-    rank: 'Top 0.5%',
-    streak: 64,
-    isFollowing: true,
-    mutualCount: 22
-  },
-  {
-    id: 'usr-105',
-    name: 'Elena Rostova',
-    username: 'elena_algo_queen',
-    avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80',
-    role: 'Full Stack Engineer',
-    company: 'Uber',
-    rank: 'Top 4%',
-    streak: 14,
-    isFollowing: false,
-    mutualCount: 3
-  }
-];
+const DEFAULT_FOLLOWERS: FollowerUser[] = [];
 
-const DEFAULT_FOLLOWING: FollowerUser[] = [
-  {
-    id: 'usr-201',
-    name: 'Dan Abramov',
-    username: 'dan_gaearon',
-    avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
-    role: 'Core Systems Developer',
-    company: 'Bluesky',
-    rank: 'Legend',
-    streak: 120,
-    isFollowing: true,
-    mutualCount: 45
-  },
-  {
-    id: 'usr-101',
-    name: 'Sarah Chen',
-    username: 'sarah_codes',
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
-    role: 'Staff Frontend Architect',
-    company: 'Meta',
-    rank: 'Top 1%',
-    streak: 42,
-    isFollowing: true,
-    mutualCount: 12
-  },
-  {
-    id: 'usr-102',
-    name: 'Alex Rivera',
-    username: 'alex_distributed',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
-    role: 'Backend Distributed Systems Engineer',
-    company: 'Stripe',
-    rank: 'Top 3%',
-    streak: 28,
-    isFollowing: true,
-    mutualCount: 8
-  }
-];
+const DEFAULT_FOLLOWING: FollowerUser[] = [];
 
 function generateInitialActivityMap(): Record<string, ActivityDay> {
-  const map: Record<string, ActivityDay> = {};
-  const today = new Date();
-  
-  for (let i = 180; i >= 0; i--) {
-    const d = new Date();
-    d.setDate(today.getDate() - i);
-    const dateStr = d.toISOString().split('T')[0];
-    
-    const dayOfWeek = d.getDay();
-    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-    const activeChance = isWeekend ? 0.75 : 0.60;
-    
-    if (Math.random() < activeChance) {
-      const coding = Math.floor(Math.random() * 4);
-      const oral = Math.random() > 0.6 ? 1 : 0;
-      const total = coding + oral;
-      if (total > 0) {
-        map[dateStr] = {
-          date: dateStr,
-          count: total,
-          codingCount: coding,
-          oralCount: oral,
-          scoreAvg: Math.floor(75 + Math.random() * 23)
-        };
-      }
-    }
-  }
-
-  // Ensure recent 14 days are active for streak representation
-  for (let i = 0; i < 14; i++) {
-    const d = new Date();
-    d.setDate(today.getDate() - i);
-    const dateStr = d.toISOString().split('T')[0];
-    map[dateStr] = {
-      date: dateStr,
-      count: 3 + (i % 3),
-      codingCount: 2 + (i % 2),
-      oralCount: (i % 2),
-      scoreAvg: 88 + (i % 8)
-    };
-  }
-
-  return map;
+  return {};
 }
 
 const DEFAULT_BADGES: CandidateBadge[] = [
@@ -269,7 +129,7 @@ const DEFAULT_BADGES: CandidateBadge[] = [
     icon: 'Flame',
     tier: 'GOLD',
     description: 'Maintained uninterrupted daily technical practice for 14 consecutive days.',
-    unlockedAt: '2026-09-10'
+    progress: 0
   },
   {
     id: 'badge-2',
@@ -278,7 +138,7 @@ const DEFAULT_BADGES: CandidateBadge[] = [
     icon: 'Mic',
     tier: 'DIAMOND',
     description: 'Scored 90%+ in STAR structured oral reasoning across 5 consecutive sessions.',
-    unlockedAt: '2026-09-08'
+    progress: 0
   },
   {
     id: 'badge-3',
@@ -287,7 +147,7 @@ const DEFAULT_BADGES: CandidateBadge[] = [
     icon: 'Zap',
     tier: 'GOLD',
     description: 'Solved 20+ Medium and Hard DP problems with optimal memory bounds.',
-    unlockedAt: '2026-09-02'
+    progress: 0
   },
   {
     id: 'badge-4',
@@ -296,7 +156,7 @@ const DEFAULT_BADGES: CandidateBadge[] = [
     icon: 'Briefcase',
     tier: 'SILVER',
     description: 'Achieved an ATS score exceeding 92/100 across 3 role benchmarks.',
-    unlockedAt: '2026-08-28'
+    progress: 0
   },
   {
     id: 'badge-5',
@@ -305,7 +165,7 @@ const DEFAULT_BADGES: CandidateBadge[] = [
     icon: 'Award',
     tier: 'BRONZE',
     description: 'Contributed 10+ verified interview questions and solution breakdowns in the Discuss hub.',
-    unlockedAt: '2026-08-15'
+    progress: 0
   },
   {
     id: 'badge-6',
@@ -314,7 +174,7 @@ const DEFAULT_BADGES: CandidateBadge[] = [
     icon: 'Rocket',
     tier: 'DIAMOND',
     description: 'Practice every day for 30 consecutive calendar days.',
-    progress: 70
+    progress: 0
   }
 ];
 

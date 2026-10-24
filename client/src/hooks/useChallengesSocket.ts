@@ -46,6 +46,10 @@ export interface ChallengesSocketHookResult {
   broadcastProgress: (matchId: string, passedTests: number, totalTests: number) => void;
   runSampleTests: (problemId: string, code: string, language: string) => void;
   submitMatchSolution: (matchId: string, code: string, language: string) => void;
+  forfeitMatch: (matchId: string) => void;
+  sendInvite: (data: { toUserId: string; toUserName?: string; difficulty?: string; topic?: string; language?: string }) => void;
+  acceptInvite: (invitationId: string) => void;
+  declineInvite: (invitationId: string) => void;
   joinQuiz: (sessionCodeOrId: string) => void;
   startQuiz: (sessionId: string) => void;
   submitQuizAnswer: (sessionId: string, questionIndex: number, selectedIndex: number) => void;
@@ -202,6 +206,58 @@ export function useChallengesSocket(): ChallengesSocketHookResult {
     [user]
   );
 
+  const forfeitMatch = useCallback(
+    (matchId: string) => {
+      if (!socketRef.current || !user) return;
+      socketRef.current.emit('match:forfeit', {
+        matchId,
+        userId: user.id || 'usr_guest',
+      });
+    },
+    [user]
+  );
+
+  const sendInvite = useCallback(
+    (data: { toUserId: string; toUserName?: string; difficulty?: string; topic?: string; language?: string }) => {
+      if (!socketRef.current || !user) return;
+      socketRef.current.emit('invite:send', {
+        fromUserId: user.id || 'usr_guest',
+        fromUserName: user.name || 'Challenger',
+        fromUserAvatar: (user as any).avatarUrl,
+        toUserId: data.toUserId,
+        toUserName: data.toUserName,
+        difficulty: data.difficulty || 'MEDIUM',
+        topic: data.topic || 'DSA',
+        language: data.language || 'all',
+      });
+    },
+    [user]
+  );
+
+  const acceptInvite = useCallback(
+    (invitationId: string) => {
+      if (!socketRef.current || !user) return;
+      socketRef.current.emit('invite:accept', {
+        invitationId,
+        userId: user.id || 'usr_guest',
+        userName: user.name || 'Challenger',
+        userAvatar: (user as any).avatarUrl,
+      });
+    },
+    [user]
+  );
+
+  const declineInvite = useCallback(
+    (invitationId: string) => {
+      if (!socketRef.current || !user) return;
+      socketRef.current.emit('invite:decline', {
+        invitationId,
+        userId: user.id || 'usr_guest',
+      });
+    },
+    [user]
+  );
+
   // Quiz Arena Actions
   const joinQuiz = useCallback(
     (sessionCodeOrId: string) => {
@@ -262,6 +318,10 @@ export function useChallengesSocket(): ChallengesSocketHookResult {
     broadcastProgress,
     runSampleTests,
     submitMatchSolution,
+    forfeitMatch,
+    sendInvite,
+    acceptInvite,
+    declineInvite,
     joinQuiz,
     startQuiz,
     submitQuizAnswer,

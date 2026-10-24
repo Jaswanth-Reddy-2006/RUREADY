@@ -65,7 +65,7 @@ export interface SessionTimelinePoint {
   interviewType: 'ORAL' | 'CODING';
   date: string;
   timestamp: number;
-  score: number;
+  score: number | null;
   topStrength?: string;
   topWeakness?: string;
   analysisUrl: string;
@@ -84,7 +84,7 @@ export interface ObservedStrength {
 export interface PriorityImprovement {
   id: string;
   title: string;
-  score: number;
+  score: number | null;
   reason: string;
   evidenceCount: number;
   evidenceItems: EvidenceMoment[];
@@ -365,11 +365,11 @@ export function aggregateCareerAnalytics(
         aptitudeScore: prepStoreState?.subjectScores?.['aptitude'] ?? null,
         reasoningScore: prepStoreState?.subjectScores?.['reasoning'] ?? null,
         verbalScore: prepStoreState?.subjectScores?.['verbal'] ?? null,
-        readinessPercent: prepStoreState ? Math.round(prepStoreState.readinessScore || 0) : 0
+        readinessPercent: prepStoreState?.readinessScore != null ? Math.round(prepStoreState.readinessScore) : 0
       },
       placementReadiness: {
-        resumeAtsScore: resumeStoreState?.masterResume ? 84 : null,
-        prepScore: prepStoreState ? Math.round(prepStoreState.readinessScore || 0) : 0,
+        resumeAtsScore: resumeStoreState?.masterResume?.atsScore ?? null,
+        prepScore: prepStoreState?.readinessScore != null ? Math.round(prepStoreState.readinessScore) : 0,
         codingAvgScore: null,
         oralAvgScore: null,
         applicationCount: placementStoreState?.applications?.length || 0,
@@ -385,16 +385,32 @@ export function aggregateCareerAnalytics(
   ).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
 
   // Scores
-  const getScore = (s: any) => s.evalScore || s.analysis?.overallScore || s.score || 70;
+  const getScore = (s: any): number | null => {
+    const score = s.evalScore ?? s.analysis?.overallScore ?? s.score;
+    return typeof score === 'number' && Number.isFinite(score) ? score : null;
+  };
+  const scoredSessions = sortedSessions.filter((session) => getScore(session) !== null);
+  const measuredScores = scoredSessions.map((session) => getScore(session) as number);
+  const evidenceCount = measuredScores.length;
+  const hasMeasuredScore = evidenceCount > 0;
+  const scoreAverage = hasMeasuredScore
+    ? Math.round(measuredScores.reduce((total, score) => total + score, 0) / evidenceCount)
+    : null;
   const overallScores = sortedSessions.map(getScore);
-  const overallAvg = Math.round(overallScores.reduce((a, b) => a + b, 0) / count);
+  const overallAvg = scoreAverage;
+  const averageSessionScore = (sessions: any[]): number | null => {
+    const scores = sessions.map(getScore).filter((score): score is number => score !== null);
+    return scores.length ? Math.round(scores.reduce((total, score) => total + score, 0) / scores.length) : null;
+  };
 
   // Overall trend: comparison between first half and second half
   let overallTrend: 'UP' | 'DOWN' | 'STABLE' | 'NO_DATA' = 'STABLE';
   if (count >= 2) {
-    const firstScore = overallScores[0];
-    const lastScore = overallScores[count - 1];
-    if (lastScore > firstScore + 2) overallTrend = 'UP';
+    const firstScore = overallScores.find((score): score is number => score !== null);
+    const lastScore = [...overallScores].reverse().find((score): score is number => score !== null);
+    if (firstScore === undefined || lastScore === undefined) {
+      overallTrend = 'NO_DATA';
+    } else if (lastScore > firstScore + 2) overallTrend = 'UP';
     else if (lastScore < firstScore - 2) overallTrend = 'DOWN';
   }
 
@@ -439,13 +455,13 @@ export function aggregateCareerAnalytics(
   const codingSessions = sortedSessions.filter((s) => s.interviewType === 'CODING');
 
   const competencies: MetricDimension[] = [
-    { key: 'tech', label: 'Technical Accuracy', score: technicalScore, evidenceCount: count, trend: overallTrend, statusText: technicalScore >= 75 ? 'Strong' : 'Developing', tier: 'PRIMARY', whyThisScoreReason: 'Evaluates accuracy of technical concepts, algorithms, and system design principles.' },
-    { key: 'problem', label: 'Problem Solving', score: problemSolvingScore, evidenceCount: count, trend: overallTrend, statusText: problemSolvingScore >= 75 ? 'Strong' : 'Developing', tier: 'PRIMARY', whyThisScoreReason: 'Measures analytical problem decomposition and trade-off evaluation.' },
-    { key: 'comm', label: 'Communication', score: communicationScore, evidenceCount: count, trend: overallTrend, statusText: communicationScore >= 75 ? 'Strong' : 'Developing', tier: 'SECONDARY', whyThisScoreReason: 'Evaluates explanation clarity, verbal flow, and STAR answer structure.' },
+    { key: 'tech', label: 'Technical Accuracy', score: technicalScore, evidenceCount: count, trend: overallTrend, statusText: technicalScore !== null && technicalScore >= 75 ? 'Strong' : 'Developing', tier: 'PRIMARY', whyThisScoreReason: 'Evaluates accuracy of technical concepts, algorithms, and system design principles.' },
+    { key: 'problem', label: 'Problem Solving', score: problemSolvingScore, evidenceCount: count, trend: overallTrend, statusText: problemSolvingScore !== null && problemSolvingScore >= 75 ? 'Strong' : 'Developing', tier: 'PRIMARY', whyThisScoreReason: 'Measures analytical problem decomposition and trade-off evaluation.' },
+    { key: 'comm', label: 'Communication', score: communicationScore, evidenceCount: count, trend: overallTrend, statusText: communicationScore !== null && communicationScore >= 75 ? 'Strong' : 'Developing', tier: 'SECONDARY', whyThisScoreReason: 'Evaluates explanation clarity, verbal flow, and STAR answer structure.' },
     { key: 'struct', label: 'Answer Structure', score: communicationScore ? Math.min(100, communicationScore + 2) : null, evidenceCount: count, trend: overallTrend, statusText: 'Strong', tier: 'SECONDARY', whyThisScoreReason: 'Measures logical ordering and STAR framework completeness.' },
-    { key: 'coding', label: 'Coding / Implementation', score: codingSessions.length ? Math.round(codingSessions.reduce((a, b) => a + getScore(b), 0) / codingSessions.length) : null, evidenceCount: codingSessions.length, trend: codingSessions.length ? 'UP' : 'NO_DATA', statusText: codingSessions.length ? 'Verified' : 'Requires more evidence', tier: 'PRIMARY', whyThisScoreReason: 'Evaluates code correctness, syntax precision, and test pass rate.' },
+    { key: 'coding', label: 'Coding / Implementation', score: averageSessionScore(codingSessions), evidenceCount: codingSessions.length, trend: codingSessions.length ? 'UP' : 'NO_DATA', statusText: codingSessions.length ? 'Verified' : 'Requires more evidence', tier: 'PRIMARY', whyThisScoreReason: 'Evaluates code correctness, syntax precision, and test pass rate.' },
     { key: 'debug', label: 'Debugging', score: codingSessions.length ? Math.round(codingSessions.reduce((a, b) => a + (b.analysis?.debugScore || 73), 0) / codingSessions.length) : null, evidenceCount: codingSessions.length, trend: codingSessions.length ? 'UP' : 'NO_DATA', statusText: codingSessions.length ? 'Verified' : 'Requires more evidence', tier: 'PRIMARY', whyThisScoreReason: 'Measures error identification speed and bug resolution.' },
-    { key: 'delivery', label: 'Delivery & Presentation', score: deliveryScore, evidenceCount: count, trend: overallTrend, statusText: deliveryScore >= 75 ? 'Strong' : 'Developing', tier: 'SUPPORTING', whyThisScoreReason: 'Tracks observable speech pacing, verbal filler frequency, and camera engagement.' },
+    { key: 'delivery', label: 'Delivery & Presentation', score: deliveryScore, evidenceCount: count, trend: overallTrend, statusText: deliveryScore !== null && deliveryScore >= 75 ? 'Strong' : 'Developing', tier: 'SUPPORTING', whyThisScoreReason: 'Tracks observable speech pacing, verbal filler frequency, and camera engagement.' },
   ];
 
   // Evidence moments collection
@@ -468,19 +484,6 @@ export function aggregateCareerAnalytics(
           date: new Date(s.createdAt || s.date || Date.now()).toLocaleDateString()
         });
       });
-    } else {
-      recentEvidence.push({
-        id: `ev-${s.id}-default`,
-        sessionId: s.id,
-        sessionTitle: s.targetRole || s.title || (isCoding ? 'Coding Interview' : 'Oral Interview'),
-        interviewType: isCoding ? 'CODING' : 'ORAL',
-        displayTimestamp: isCoding ? '02:31' : '04:12',
-        topicOrContext: isCoding ? 'Complexity & Algorithm Analysis' : 'System Design & Tradeoffs',
-        quoteOrAnswer: isCoding ? 'Explained O(N log N) sorting approach with auxiliary array storage.' : 'Demonstrated structured STAR approach explaining distributed database indexing.',
-        evaluation: isCoding ? 'Correctly identified primary loop, but did not account for nested iteration.' : 'Clear explanation with strong technical verb choice.',
-        score: getScore(s),
-        date: new Date(s.createdAt || s.date || Date.now()).toLocaleDateString()
-      });
     }
   });
 
@@ -492,78 +495,36 @@ export function aggregateCareerAnalytics(
       skills: [
         { id: 'tech-acc', name: 'Technical Accuracy', score: technicalScore, trend: 'UP', evidenceCount: count, evidenceItems: recentEvidence.filter((e) => e.interviewType === 'ORAL'), targetModule: 'ORAL', tier: 'PRIMARY', whyThisScoreReason: 'Score is based on technical explanation correctness across oral sessions.' },
         { id: 'prob-solv', name: 'Problem Solving', score: problemSolvingScore, trend: 'UP', evidenceCount: count, evidenceItems: recentEvidence, targetModule: 'ORAL', tier: 'PRIMARY', whyThisScoreReason: 'Score is based on problem decomposition and trade-off evaluation.' },
-        { id: 'code-corr', name: 'Code Correctness', score: codingSessions.length ? 78 : null, trend: codingSessions.length ? 'UP' : 'NO_DATA', evidenceCount: codingSessions.length, evidenceItems: recentEvidence.filter((e) => e.interviewType === 'CODING'), targetModule: 'CODING', tier: 'PRIMARY', whyThisScoreReason: 'Score is based on automated test execution pass rates.' },
-        { id: 'comp-anal', name: 'Complexity Analysis', score: codingSessions.length ? 61 : null, trend: codingSessions.length ? 'DOWN' : 'NO_DATA', evidenceCount: codingSessions.length, evidenceItems: recentEvidence.filter((e) => e.interviewType === 'CODING'), targetModule: 'PREP', targetTopicId: 'dsa-time-complexity', tier: 'PRIMARY', whyThisScoreReason: 'Score is based on Big-O time and space complexity explanations provided during coding challenges.' },
-        { id: 'debug-skill', name: 'Debugging', score: codingSessions.length ? 73 : null, trend: codingSessions.length ? 'UP' : 'NO_DATA', evidenceCount: codingSessions.length, evidenceItems: recentEvidence.filter((e) => e.interviewType === 'CODING'), targetModule: 'CODING', tier: 'PRIMARY', whyThisScoreReason: 'Score is based on error diagnosis speed and bug resolution.' },
+        { id: 'code-corr', name: 'Code Correctness', score: averageSessionScore(codingSessions), trend: codingSessions.length ? 'UP' : 'NO_DATA', evidenceCount: codingSessions.length, evidenceItems: recentEvidence.filter((e) => e.interviewType === 'CODING'), targetModule: 'CODING', tier: 'PRIMARY', whyThisScoreReason: 'Score is based on automated test execution pass rates.' },
+        { id: 'comp-anal', name: 'Complexity Analysis', score: null, trend: 'NO_DATA', evidenceCount: 0, evidenceItems: [], targetModule: 'PREP', targetTopicId: 'dsa-time-complexity', tier: 'PRIMARY', whyThisScoreReason: 'No verified complexity explanation score is present in the session data.' },
+        { id: 'debug-skill', name: 'Debugging', score: null, trend: 'NO_DATA', evidenceCount: 0, evidenceItems: [], targetModule: 'CODING', tier: 'PRIMARY', whyThisScoreReason: 'No verified debugging score is present in the session data.' },
       ]
     },
     {
       domainTitle: 'SECONDARY: COMMUNICATION & STRUCTURE',
       tier: 'SECONDARY',
       skills: [
-        { id: 'ans-struct', name: 'Answer Structure', score: Math.min(100, communicationScore + 3), trend: 'UP', evidenceCount: count, evidenceItems: recentEvidence, targetModule: 'ORAL', tier: 'SECONDARY', whyThisScoreReason: 'Score is based on adherence to STAR framework.' },
+        { id: 'ans-struct', name: 'Answer Structure', score: communicationScore === null ? null : Math.min(100, communicationScore + 3), trend: 'UP', evidenceCount: count, evidenceItems: recentEvidence, targetModule: 'ORAL', tier: 'SECONDARY', whyThisScoreReason: 'Score is based on adherence to STAR framework.' },
         { id: 'comm-clar', name: 'Communication', score: communicationScore, trend: 'UP', evidenceCount: count, evidenceItems: recentEvidence, targetModule: 'ORAL', tier: 'SECONDARY', whyThisScoreReason: 'Score is based on explanation clarity and verbal structure.' },
-        { id: 'follow-up', name: 'Follow-up Handling', score: Math.max(50, technicalScore - 4), trend: 'STABLE', evidenceCount: count, evidenceItems: recentEvidence, targetModule: 'ORAL', tier: 'SECONDARY', whyThisScoreReason: 'Score is based on response quality during follow-up questions.' },
+        { id: 'follow-up', name: 'Follow-up Handling', score: technicalScore === null ? null : Math.max(50, technicalScore - 4), trend: 'STABLE', evidenceCount: count, evidenceItems: recentEvidence, targetModule: 'ORAL', tier: 'SECONDARY', whyThisScoreReason: 'Score is based on response quality during follow-up questions.' },
       ]
     },
     {
       domainTitle: 'SUPPORTING: DELIVERY & PRESENTATION',
       tier: 'SUPPORTING',
       skills: [
-        { id: 'speech-clarity', name: 'Speech Pace & Pacing', score: 82, trend: 'UP', evidenceCount: oralSessions.length || 1, evidenceItems: recentEvidence, targetModule: 'ORAL', tier: 'SUPPORTING', whyThisScoreReason: 'Score is based on words-per-minute pacing stability (120-150 WPM).' },
-        { id: 'filler-words', name: 'Filler Word Control', score: 71, trend: 'UP', evidenceCount: oralSessions.length || 1, evidenceItems: recentEvidence, targetModule: 'ORAL', tier: 'SUPPORTING', whyThisScoreReason: 'Score is based on low frequency of verbal filler words (um, uh, like).' },
-        { id: 'camera-eng', name: 'Camera Engagement', score: 79, trend: 'UP', evidenceCount: oralSessions.length || 1, evidenceItems: recentEvidence, targetModule: 'ORAL', tier: 'SUPPORTING', whyThisScoreReason: 'Score is based on visual focus and camera alignment duration.' },
+        { id: 'speech-clarity', name: 'Speech Pace & Pacing', score: null, trend: 'NO_DATA', evidenceCount: 0, evidenceItems: [], targetModule: 'ORAL', tier: 'SUPPORTING', whyThisScoreReason: 'No verified speech pacing score is present in the session data.' },
+        { id: 'filler-words', name: 'Filler Word Control', score: null, trend: 'NO_DATA', evidenceCount: 0, evidenceItems: [], targetModule: 'ORAL', tier: 'SUPPORTING', whyThisScoreReason: 'No verified filler-word score is present in the session data.' },
+        { id: 'camera-eng', name: 'Camera Engagement', score: null, trend: 'NO_DATA', evidenceCount: 0, evidenceItems: [], targetModule: 'ORAL', tier: 'SUPPORTING', whyThisScoreReason: 'No verified camera-engagement score is present in the session data.' },
       ]
     }
   ];
 
   // Observed Strengths (Evidence-Backed, strictly requiring count >= 2 for verification)
   const strengths: ObservedStrength[] = [];
-  if (count >= 2) {
-    strengths.push({
-      id: 'str-1',
-      title: 'Clear architectural project explanations',
-      observedFrequency: `Observed in ${Math.max(2, count - 1)} / ${count} sessions`,
-      count: Math.max(2, count - 1),
-      total: count,
-      evidenceItems: recentEvidence.slice(0, 3)
-    });
-    strengths.push({
-      id: 'str-2',
-      title: 'Structured STAR methodology in problem breakdown',
-      observedFrequency: `Observed in ${count} / ${count} sessions`,
-      count: count,
-      total: count,
-      evidenceItems: recentEvidence.slice(0, 2)
-    });
-  }
 
   // Priority Improvements (Evidence-Backed)
-  const improvements: PriorityImprovement[] = [
-    {
-      id: 'imp-1',
-      title: 'Complexity Analysis Explanation',
-      score: 61,
-      reason: 'Frequently identifies correct Big-O outcome but misses nested loop contributions.',
-      evidenceCount: Math.max(1, codingSessions.length || 2),
-      evidenceItems: recentEvidence.filter((e) => e.interviewType === 'CODING'),
-      actionType: 'PRACTICE',
-      actionLabel: 'Practice Complexity',
-      actionUrl: '/preparation',
-      topicId: 'dsa-time-complexity'
-    },
-    {
-      id: 'imp-2',
-      title: 'Deadlock & Concurrency Concepts',
-      score: 54,
-      reason: 'Struggles with race condition resolution during operating system questions.',
-      evidenceCount: Math.max(1, oralSessions.length || 1),
-      evidenceItems: recentEvidence.filter((e) => e.interviewType === 'ORAL'),
-      actionType: 'LEARN',
-      actionLabel: 'Learn Operating Systems',
-      actionUrl: '/preparation'
-    }
-  ];
+  const improvements: PriorityImprovement[] = [];
 
   // Next Best Actions
   const nextBestActions: NextBestAction[] = [
@@ -597,24 +558,7 @@ export function aggregateCareerAnalytics(
   ];
 
   // Cross Module Insights (Using strict neutral co-observation language, NO unproven statistical causation claims!)
-  const crossModuleInsights: CrossModuleInsight[] = [
-    {
-      id: 'cmi-1',
-      title: 'Observed Together: DSA Practice & Problem Solving',
-      description: 'DSA practice accuracy (62% → 74%) and Coding interview problem-solving score (64% → 71%) both increased during the same evaluation period.',
-      actionLabel: 'View Skill Map',
-      actionUrl: '/preparation/skills',
-      type: 'POSITIVE'
-    },
-    {
-      id: 'cmi-2',
-      title: 'Observed Gap: Code Implementation vs Complexity Explanation',
-      description: 'You perform well in raw code implementation (78%), but interview evaluations repeatedly highlight complexity explanation (61%) as an area to refine.',
-      actionLabel: 'Practice Complexity Drills',
-      actionUrl: '/preparation',
-      type: 'ATTENTION'
-    }
-  ];
+  const crossModuleInsights: CrossModuleInsight[] = [];
 
   return {
     totalAnalyzedSessions: count,
@@ -637,34 +581,34 @@ export function aggregateCareerAnalytics(
     crossModuleInsights,
     oralBreakdown: {
       totalSessions: oralSessions.length,
-      avgScore: oralSessions.length ? Math.round(oralSessions.reduce((a, b) => a + getScore(b), 0) / oralSessions.length) : null,
+      avgScore: averageSessionScore(oralSessions),
       trend: overallTrend,
-      metrics: { 'Technical Knowledge': technicalScore, 'Communication': communicationScore, 'Answer Structure': Math.min(100, communicationScore + 3) },
+      metrics: { 'Technical Knowledge': technicalScore, 'Communication': communicationScore, 'Answer Structure': communicationScore === null ? null : Math.min(100, communicationScore + 3) },
       recentSessions: trendPoints.filter((t) => t.interviewType === 'ORAL')
     },
-    codingBreakdown: {
+      codingBreakdown: {
       totalSessions: codingSessions.length,
-      avgScore: codingSessions.length ? Math.round(codingSessions.reduce((a, b) => a + getScore(b), 0) / codingSessions.length) : null,
+      avgScore: averageSessionScore(codingSessions),
       trend: codingSessions.length ? 'UP' : 'NO_DATA',
-      metrics: { 'Problem Understanding': 83, 'Approach': 76, 'Code Correctness': 78, 'Complexity': 61, 'Debugging': 73, 'Testing': 80 },
+      metrics: { 'Code Correctness': averageSessionScore(codingSessions) },
       recentSessions: trendPoints.filter((t) => t.interviewType === 'CODING')
     },
     prepPerformance: {
-      coreCsScore: prepStoreState?.subjectScores?.['core-cs'] ?? 62,
-      dsaScore: prepStoreState?.subjectScores?.['dsa'] ?? 74,
-      sqlScore: prepStoreState?.subjectScores?.['sql'] ?? 81,
-      aptitudeScore: prepStoreState?.subjectScores?.['aptitude'] ?? 65,
-      reasoningScore: prepStoreState?.subjectScores?.['reasoning'] ?? 57,
-      verbalScore: prepStoreState?.subjectScores?.['verbal'] ?? 70,
-      readinessPercent: prepStoreState ? Math.round(prepStoreState.readinessScore || 68) : 68
+      coreCsScore: prepStoreState?.subjectScores?.['core-cs'] ?? null,
+      dsaScore: prepStoreState?.subjectScores?.['dsa'] ?? null,
+      sqlScore: prepStoreState?.subjectScores?.['sql'] ?? null,
+      aptitudeScore: prepStoreState?.subjectScores?.['aptitude'] ?? null,
+      reasoningScore: prepStoreState?.subjectScores?.['reasoning'] ?? null,
+      verbalScore: prepStoreState?.subjectScores?.['verbal'] ?? null,
+      readinessPercent: prepStoreState?.readinessScore != null ? Math.round(prepStoreState.readinessScore) : 0
     },
     placementReadiness: {
-      resumeAtsScore: resumeStoreState?.masterResume ? 84 : 84,
-      prepScore: prepStoreState ? Math.round(prepStoreState.readinessScore || 68) : 68,
-      codingAvgScore: codingSessions.length ? Math.round(codingSessions.reduce((a, b) => a + getScore(b), 0) / codingSessions.length) : (count ? overallAvg : null),
-      oralAvgScore: oralSessions.length ? Math.round(oralSessions.reduce((a, b) => a + getScore(b), 0) / oralSessions.length) : (count ? overallAvg : null),
-      applicationCount: placementStoreState?.applications?.length || 3,
-      hasEvidenceInAllAreas: count > 0
+      resumeAtsScore: resumeStoreState?.masterResume?.atsScore ?? null,
+      prepScore: prepStoreState?.readinessScore != null ? Math.round(prepStoreState.readinessScore) : 0,
+      codingAvgScore: averageSessionScore(codingSessions),
+      oralAvgScore: averageSessionScore(oralSessions),
+      applicationCount: placementStoreState?.applications?.length || 0,
+      hasEvidenceInAllAreas: count > 0 && averageSessionScore(codingSessions) !== null && averageSessionScore(oralSessions) !== null
     }
   };
 }

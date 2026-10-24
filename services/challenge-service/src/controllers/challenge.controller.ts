@@ -269,4 +269,88 @@ export const challengeController = {
       res.status(500).json({ success: false, error: error.message });
     }
   },
+
+  // ─────────────────────────────────────────────────────────────
+  // 1v1 Direct Invitations & Match Actions
+  // ─────────────────────────────────────────────────────────────
+  async createInvitation(req: Request, res: Response) {
+    try {
+      const { fromUserId, fromUserName, fromUserAvatar, toUserId, toUserName, difficulty, topic, language } = req.body;
+      const inv = await challengeService.createInvitation({
+        fromUserId,
+        fromUserName: fromUserName || 'Challenger',
+        fromUserAvatar,
+        toUserId,
+        toUserName,
+        difficulty,
+        topic,
+        language,
+      });
+      res.status(201).json({ success: true, data: inv });
+    } catch (error: any) {
+      res.status(400).json({ success: false, error: error.message });
+    }
+  },
+
+  async getPendingInvitations(req: Request, res: Response) {
+    try {
+      const userId = (req.query.userId as string) || (req.headers['x-user-id'] as string);
+      if (!userId) {
+        return res.status(400).json({ success: false, error: 'User ID required' });
+      }
+      const invitations = challengeService.getPendingInvitations(userId);
+      res.json({ success: true, data: invitations });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  },
+
+  async acceptInvitation(req: Request, res: Response) {
+    try {
+      const invitationId = String(req.params.inviteId);
+      const { userId, userName, userAvatar } = req.body;
+      const result = await challengeService.acceptInvitation({
+        invitationId,
+        userId,
+        userName: userName || 'Challenger',
+        userAvatar,
+      });
+      res.json({ success: true, data: result });
+    } catch (error: any) {
+      res.status(400).json({ success: false, error: error.message });
+    }
+  },
+
+  async declineInvitation(req: Request, res: Response) {
+    try {
+      const invitationId = String(req.params.inviteId);
+      const { userId } = req.body;
+      const inv = challengeService.declineInvitation(invitationId, userId);
+      res.json({ success: true, data: inv });
+    } catch (error: any) {
+      res.status(400).json({ success: false, error: error.message });
+    }
+  },
+
+  async cancelInvitation(req: Request, res: Response) {
+    try {
+      const invitationId = String(req.params.inviteId);
+      const { userId } = req.body;
+      const inv = challengeService.cancelInvitation(invitationId, userId);
+      res.json({ success: true, data: inv });
+    } catch (error: any) {
+      res.status(400).json({ success: false, error: error.message });
+    }
+  },
+
+  async forfeitMatch(req: Request, res: Response) {
+    try {
+      const matchId = String(req.params.matchId);
+      const { userId } = req.body;
+      const match = await challengeService.forfeitMatch(matchId, userId);
+      res.json({ success: true, data: match });
+    } catch (error: any) {
+      res.status(400).json({ success: false, error: error.message });
+    }
+  },
 };

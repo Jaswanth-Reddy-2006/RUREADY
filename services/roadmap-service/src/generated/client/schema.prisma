@@ -9,48 +9,74 @@ datasource db {
 }
 
 model Roadmap {
-  id             String                @id @default(cuid())
-  ownerId        String
-  creatorName    String?
-  title          String
-  description    String?
-  goal           String?
-  category       String?
-  difficulty     String?
-  estimatedWeeks Int?
-  tags           Json?
-  cloneCount     Int                   @default(0)
-  viewCount      Int                   @default(0)
-  status         String                @default("DRAFT")
-  isPublished    Boolean               @default(false)
-  publishedAt    DateTime?
-  share          RoadmapShare?
-  nodes          RoadmapNode[]
-  collaborators  RoadmapCollaborator[]
-  progress       RoadmapProgress[]
-  createdAt      DateTime              @default(now())
-  updatedAt      DateTime              @updatedAt
+  id                String    @id @default(cuid())
+  ownerId           String
+  creatorName       String?
+  creatorRole       String?
+  creatorCompany    String?
+  isVerifiedCreator Boolean   @default(false)
+  isEndorsed        Boolean   @default(false)
+  title             String
+  description       String?
+  goal              String?
+  category          String?
+  difficulty        String?
+  estimatedWeeks    Int?
+  tags              Json?
+  cloneCount        Int       @default(0)
+  viewCount         Int       @default(0)
+  forkCount         Int       @default(0)
+  followerCount     Int       @default(0)
+  rating            Float     @default(0.0)
+  reviewCount       Int       @default(0)
+  currentVersion    Int       @default(1)
+  forkedFromId      String?
+  forkedFromVersion Int?
+  license           String    @default("CC-BY-4.0")
+  status            String    @default("DRAFT")
+  isPublished       Boolean   @default(false)
+  publishedAt       DateTime?
+  graphLayout       Json?
+
+  share              RoadmapShare?
+  nodes              RoadmapNode[]
+  collaborators      RoadmapCollaborator[]
+  progress           RoadmapProgress[]
+  instances          RoadmapInstance[]
+  follows            RoadmapFollow[]
+  reviews            RoadmapReview[]
+  discussions        RoadmapDiscussion[]
+  assessmentAttempts RoadmapAssessmentAttempt[]
+  versions           RoadmapVersion[]
+  submissions        RoadmapSubmission[]
+  learningCircles    RoadmapLearningCircle[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([ownerId])
   @@index([status])
+  @@index([category, isPublished])
   @@map("roadmaps")
 }
 
 model RoadmapNode {
-  id          String            @id @default(cuid())
+  id          String              @id @default(cuid())
   roadmapId   String
   title       String
   description String?
-  type        String            @default("TOPIC")
-  position    Int               @default(0)
+  type        String              @default("TOPIC")
+  position    Int                 @default(0)
   metadata    Json?
-  roadmap     Roadmap           @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  roadmap     Roadmap             @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
   parentId    String?
-  parent      RoadmapNode?      @relation("RoadmapNodeTree", fields: [parentId], references: [id], onDelete: Cascade)
-  children    RoadmapNode[]     @relation("RoadmapNodeTree")
+  parent      RoadmapNode?        @relation("RoadmapNodeTree", fields: [parentId], references: [id], onDelete: Cascade)
+  children    RoadmapNode[]       @relation("RoadmapNodeTree")
   progress    RoadmapProgress[]
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
+  submissions RoadmapSubmission[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([roadmapId, position])
   @@index([parentId])
@@ -74,22 +100,119 @@ model RoadmapCollaborator {
 }
 
 model RoadmapProgress {
-  id          String      @id @default(cuid())
-  roadmapId   String
-  nodeId      String
-  userId      String
-  status      String      @default("NOT_STARTED")
-  percent     Int         @default(0)
-  notes       String?
-  completedAt DateTime?
-  roadmap     Roadmap     @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
-  node        RoadmapNode @relation(fields: [nodeId], references: [id], onDelete: Cascade)
-  updatedAt   DateTime    @updatedAt
-  createdAt   DateTime    @default(now())
+  id                       String    @id @default(cuid())
+  roadmapId                String
+  nodeId                   String
+  userId                   String
+  status                   String    @default("NOT_STARTED")
+  masteryStatus            String    @default("NOT_STARTED") // NOT_STARTED, IN_PROGRESS, LEARNING_COMPLETE, ASSESSMENT_PENDING, ASSESSMENT_PASSED, NEEDS_IMPROVEMENT, MASTERED
+  percent                  Int       @default(0)
+  notes                    String?
+  competenciesDemonstrated Json?
+  checklistCompleted       Json?
+  assessmentScore          Int?
+  lastAssessmentAt         DateTime?
+  completedAt              DateTime?
+
+  roadmap Roadmap     @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  node    RoadmapNode @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
 
   @@unique([nodeId, userId])
   @@index([roadmapId, userId])
   @@map("roadmap_progress")
+}
+
+model RoadmapInstance {
+  id                     String   @id @default(cuid())
+  userId                 String
+  roadmapId              String
+  roadmap                Roadmap  @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  roadmapVersion         Int      @default(1)
+  status                 String   @default("ACTIVE") // ACTIVE, PAUSED, COMPLETED, ARCHIVED
+  targetPaceHoursPerWeek Int      @default(6)
+  currentModuleId        String?
+  progressPercent        Int      @default(0)
+  completedModulesCount  Int      @default(0)
+  totalModulesCount      Int      @default(0)
+  customOverrides        Json?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  @@unique([userId, roadmapId])
+  @@index([userId])
+  @@map("roadmap_instances")
+}
+
+model RoadmapFollow {
+  id        String   @id @default(cuid())
+  userId    String
+  roadmapId String
+  roadmap   Roadmap  @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, roadmapId])
+  @@index([userId])
+  @@map("roadmap_follows")
+}
+
+model RoadmapReview {
+  id                String   @id @default(cuid())
+  roadmapId         String
+  roadmap           Roadmap  @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  userId            String
+  userName          String
+  userAvatar        String?
+  rating            Int // 1 - 5
+  reviewText        String
+  isVerifiedLearner Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([roadmapId, userId])
+  @@index([roadmapId])
+  @@map("roadmap_reviews")
+}
+
+model RoadmapDiscussion {
+  id         String   @id @default(cuid())
+  roadmapId  String
+  roadmap    Roadmap  @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  nodeId     String?
+  userId     String
+  userName   String
+  userAvatar String?
+  title      String?
+  content    String
+  replyCount Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([roadmapId])
+  @@index([nodeId])
+  @@map("roadmap_discussions")
+}
+
+model RoadmapAssessmentAttempt {
+  id               String   @id @default(cuid())
+  userId           String
+  roadmapId        String
+  roadmap          Roadmap  @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  nodeId           String
+  nodeTitle        String
+  score            Int
+  passed           Boolean
+  verdict          String
+  feedback         String
+  competencyScores Json
+  transcript       Json
+  createdAt        DateTime @default(now())
+
+  @@index([userId, roadmapId])
+  @@index([nodeId])
+  @@map("roadmap_assessment_attempts")
 }
 
 model RoadmapTemplate {
@@ -117,4 +240,89 @@ model RoadmapShare {
   roadmap   Roadmap   @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
 
   @@map("roadmap_shares")
+}
+
+model RoadmapVersion {
+  id            String   @id @default(cuid())
+  roadmapId     String
+  roadmap       Roadmap  @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  version       Int
+  title         String
+  description   String?
+  changelog     String?
+  nodesSnapshot Json
+  graphLayout   Json?
+  createdBy     String?
+  createdAt     DateTime @default(now())
+
+  @@unique([roadmapId, version])
+  @@index([roadmapId, createdAt])
+  @@map("roadmap_versions")
+}
+
+model RoadmapSubmission {
+  id                       String    @id @default(cuid())
+  roadmapId                String
+  nodeId                   String
+  userId                   String
+  userName                 String?
+  userAvatar               String?
+  deliverableType          String // REPOSITORY, DEPLOYMENT, CODE, DIAGRAM, TEXT
+  deliverableUrl           String?
+  deliverableText          String?
+  codeLanguage             String?
+  executionResult          Json?
+  status                   String    @default("SUBMITTED") // SUBMITTED, EVALUATED, PASSED, NEEDS_REVISION
+  evaluationFeedback       String?
+  rubricScore              Int?
+  competenciesDemonstrated Json?
+  evaluatedAt              DateTime?
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
+
+  roadmap Roadmap     @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  node    RoadmapNode @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+
+  @@index([roadmapId, userId])
+  @@index([nodeId, userId])
+  @@map("roadmap_submissions")
+}
+
+model RoadmapLearningCircle {
+  id              String    @id @default(cuid())
+  roadmapId       String
+  name            String
+  description     String?
+  creatorId       String
+  creatorName     String?
+  isPrivate       Boolean   @default(false)
+  joinCode        String?   @unique
+  targetDate      DateTime?
+  weeklyGoalHours Int       @default(8)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  roadmap Roadmap                       @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  members RoadmapLearningCircleMember[]
+
+  @@index([roadmapId])
+  @@map("roadmap_learning_circles")
+}
+
+model RoadmapLearningCircleMember {
+  id                    String   @id @default(cuid())
+  circleId              String
+  userId                String
+  userName              String
+  userAvatar            String?
+  role                  String   @default("MEMBER") // CREATOR, MENTOR, MEMBER
+  progressPercent       Int      @default(0)
+  completedModulesCount Int      @default(0)
+  joinedAt              DateTime @default(now())
+
+  circle RoadmapLearningCircle @relation(fields: [circleId], references: [id], onDelete: Cascade)
+
+  @@unique([circleId, userId])
+  @@index([userId])
+  @@map("roadmap_learning_circle_members")
 }

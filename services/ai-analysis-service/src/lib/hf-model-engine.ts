@@ -210,12 +210,24 @@ class HuggingFaceModelEngine {
     coverageRatio: number;
     matchDetails: ConceptMatchResult[];
   }> {
-    if (!answerText || !answerText.trim() || requiredConcepts.length === 0) {
+    if (!answerText || !answerText.trim()) {
       return {
         coveredConcepts: [],
         missingConcepts: requiredConcepts,
         coverageRatio: 0,
         matchDetails: requiredConcepts.map(c => ({ concept: c, matched: false, similarity: 0 })),
+      };
+    }
+
+    if (requiredConcepts.length === 0) {
+      const words = answerText.trim().split(/\s+/).filter(Boolean);
+      const techHits = words.filter(w => TECHNICAL_INDICATORS.includes(w.toLowerCase())).length;
+      const autoRatio = Math.min(1.0, Math.max(0.65, (words.length >= 30 ? 0.85 : 0.65) + Math.min(0.15, techHits * 0.05)));
+      return {
+        coveredConcepts: techHits > 0 ? ['Technical Architecture', 'Engineering Implementation'] : ['Technical Comprehension'],
+        missingConcepts: [],
+        coverageRatio: autoRatio,
+        matchDetails: [],
       };
     }
 

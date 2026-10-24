@@ -151,6 +151,50 @@ export interface LeaderboardPayload {
   entries: LeaderboardEntry[];
 }
 
+export interface ChallengeInvitation {
+  id: string;
+  fromUserId: string;
+  fromUserName: string;
+  fromUserAvatar?: string;
+  fromUserRating: number;
+  toUserId: string;
+  toUserName?: string;
+  difficulty: 'EASY' | 'MEDIUM' | 'HARD' | 'MIXED';
+  topic: string;
+  language: string;
+  status: 'PENDING' | 'ACCEPTED' | 'DECLINED' | 'CANCELLED' | 'EXPIRED';
+  matchId?: string;
+  createdAt: number;
+  expiresAt: number;
+}
+
+export interface MatchHistoryItem {
+  id: string;
+  matchId: string;
+  matchType: string;
+  difficulty: string;
+  status: string;
+  result: 'WIN' | 'LOSS' | 'TIE';
+  problemId: string;
+  problemTitle: string;
+  ratingBefore: number;
+  ratingAfter: number;
+  ratingDelta: number;
+  passedTests: number;
+  totalTests: number;
+  score: number;
+  xpEarned: number;
+  startedAt: string;
+  endedAt?: string;
+  durationSeconds: number;
+  opponent?: {
+    userId: string;
+    userName: string;
+    userAvatar?: string;
+    rating: number;
+  } | null;
+}
+
 export const challengesApi = {
   async getHubOverview(userId?: string) {
     const res = await apiClient.get('/challenges/hub', {
@@ -240,8 +284,51 @@ export const challengesApi = {
     return res.data;
   },
 
-  async getUserHistory(userId: string) {
+  async getUserHistory(userId: string): Promise<{ success: boolean; data: MatchHistoryItem[] }> {
     const res = await apiClient.get(`/challenges/history/${userId}`);
+    return res.data;
+  },
+
+  // 1v1 Invitations
+  async sendInvitation(data: {
+    fromUserId: string;
+    fromUserName: string;
+    fromUserAvatar?: string;
+    toUserId: string;
+    toUserName?: string;
+    difficulty?: string;
+    topic?: string;
+    language?: string;
+  }) {
+    const res = await apiClient.post('/challenges/invite', data);
+    return res.data;
+  },
+
+  async getPendingInvitations(userId: string): Promise<{ success: boolean; data: ChallengeInvitation[] }> {
+    const res = await apiClient.get('/challenges/invitations/pending', {
+      params: { userId },
+    });
+    return res.data;
+  },
+
+  async acceptInvitation(inviteId: string, data: { userId: string; userName: string; userAvatar?: string }) {
+    const res = await apiClient.post(`/challenges/invitations/${inviteId}/accept`, data);
+    return res.data;
+  },
+
+  async declineInvitation(inviteId: string, userId: string) {
+    const res = await apiClient.post(`/challenges/invitations/${inviteId}/decline`, { userId });
+    return res.data;
+  },
+
+  async cancelInvitation(inviteId: string, userId: string) {
+    const res = await apiClient.post(`/challenges/invitations/${inviteId}/cancel`, { userId });
+    return res.data;
+  },
+
+  // Forfeit Match
+  async forfeitMatch(matchId: string, userId: string) {
+    const res = await apiClient.post(`/challenges/matches/${matchId}/forfeit`, { userId });
     return res.data;
   },
 };

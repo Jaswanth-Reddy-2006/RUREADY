@@ -25,7 +25,7 @@ export default function ApplicationDetailPage() {
   } = usePlacementStore();
 
   const appId = id || selectedApplicationId;
-  const app = applications.find((a) => a.id === appId) || applications[0]; // fallback to first app if mock
+  const app = applications.find((a) => a.id === appId);
 
   const [activeTab, setActiveTab] = useState<
     'OVERVIEW' | 'PREPARATION' | 'NOTES' | 'INTERVIEW_EXP' | 'DOCUMENTS' | 'COMPANY_INSIGHTS'
@@ -51,8 +51,8 @@ export default function ApplicationDetailPage() {
 
   // Calculated task progress
   const completedTasks = app.prepTasks.filter((t) => t.isCompleted).length;
-  const totalTasks = app.prepTasks.length || 7;
-  const taskProgressPct = Math.round((completedTasks / totalTasks) * 100);
+  const totalTasks = app.prepTasks.length;
+  const taskProgressPct = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
   const handleTaskToggle = (taskId: string) => {
     togglePrepTask(app.id, taskId);
@@ -81,9 +81,9 @@ export default function ApplicationDetailPage() {
 
   // Pipeline stages for progress stepper
   const STAGES: { id: ApplicationStage; label: string; date?: string }[] = [
-    { id: 'APPLIED', label: 'Applied', date: 'Sep 12' },
-    { id: 'SHORTLISTED', label: 'Shortlisted', date: 'Sep 14' },
-    { id: 'OA', label: 'OA', date: 'Upcoming' },
+    { id: 'APPLIED', label: 'Applied', date: app.appliedDate || '-' },
+    { id: 'SHORTLISTED', label: 'Shortlisted', date: '-' },
+    { id: 'OA', label: 'OA', date: app.nextDeadlineDate ? app.nextDeadlineDate.split('T')[0] : '-' },
     { id: 'TECHNICAL_1', label: 'Technical', date: '-' },
     { id: 'HR', label: 'HR', date: '-' },
     { id: 'OFFERED', label: 'Offer', date: '-' },
@@ -125,15 +125,17 @@ export default function ApplicationDetailPage() {
               <span>Edit Application</span>
             </button>
 
-            <a
-              href="https://careers.google.com"
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#2459A8] hover:bg-[#1a4380] text-white rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer"
-            >
-              <span>Open Job Link</span>
-              <ExternalLink size={14} />
-            </a>
+            {app.applicationUrl && (
+              <a
+                href={app.applicationUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#2459A8] hover:bg-[#1a4380] text-white rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer"
+              >
+                <span>Open Job Link</span>
+                <ExternalLink size={14} />
+              </a>
+            )}
           </div>
         </div>
 
@@ -183,7 +185,7 @@ export default function ApplicationDetailPage() {
                 <div className="flex flex-wrap items-center gap-4 text-xs text-slate-300 font-medium">
                   <span className="flex items-center gap-1.5">
                     <MapPin size={14} className="text-[#4A8BDF]" />
-                    {app.location || 'Hyderabad, India'}
+                    {app.location || 'Location Not Specified'}
                   </span>
                   <span>•</span>
                   <span className="flex items-center gap-1.5">
@@ -198,8 +200,8 @@ export default function ApplicationDetailPage() {
 
                 <p className="text-xs text-slate-400 max-w-xl leading-relaxed pt-1">
                   {app.jobDescription
-                    ? app.jobDescription.slice(0, 140) + '...'
-                    : "Build for everyone. Google's internship provides an opportunity to work on real-world problems, learn from industry experts, and make an impact at global scale."}
+                    ? (app.jobDescription.length > 140 ? app.jobDescription.slice(0, 140) + '...' : app.jobDescription)
+                    : "No job description provided."}
                 </p>
               </div>
 
@@ -248,18 +250,22 @@ export default function ApplicationDetailPage() {
                 <div className="flex items-center justify-between">
                   <span className="text-[11px] font-bold text-rose-200 flex items-center gap-1.5">
                     <Calendar size={13} />
-                    OA Deadline
+                    Next Deadline
                   </span>
-                  <span className="px-2 py-0.5 bg-rose-500 text-white text-[9px] font-black uppercase rounded-full">
-                    Urgent
-                  </span>
+                  {app.riskLevel === 'CRITICAL' && (
+                    <span className="px-2 py-0.5 bg-rose-500 text-white text-[9px] font-black uppercase rounded-full">
+                      Urgent
+                    </span>
+                  )}
                 </div>
                 <div className="text-base font-black text-white font-mono">
-                  {app.timeTag || '18 hours left'}
+                  {app.timeTag || 'No active deadline'}
                 </div>
-                <div className="text-[10px] text-rose-200 font-medium">
-                  {app.nextDeadlineDate ? app.nextDeadlineDate.split('T')[0] : 'Sep 18, 2026'} • 10:00 AM
-                </div>
+                {app.nextDeadlineDate && (
+                  <div className="text-[10px] text-rose-200 font-medium">
+                    {app.nextDeadlineDate.split('T')[0]}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -372,7 +378,7 @@ export default function ApplicationDetailPage() {
                       />
                       <path
                         className="text-emerald-500"
-                        strokeDasharray="78, 100"
+                        strokeDasharray={`${taskProgressPct}, 100`}
                         strokeWidth="3.5"
                         strokeLinecap="round"
                         stroke="currentColor"
@@ -381,14 +387,18 @@ export default function ApplicationDetailPage() {
                       />
                     </svg>
                     <div className="absolute inset-0 flex items-center justify-center font-black text-base text-[#11183D] font-mono">
-                      78%
+                      {taskProgressPct}%
                     </div>
                   </div>
 
                   <div className="space-y-1">
-                    <h4 className="text-sm font-black text-emerald-600">Good Progress</h4>
+                    <h4 className="text-sm font-black text-emerald-600">
+                      {taskProgressPct === 100 ? 'Fully Prepared' : taskProgressPct > 50 ? 'Good Progress' : 'In Progress'}
+                    </h4>
                     <p className="text-[11px] text-[#526078] leading-tight">
-                      Keep going! Complete the remaining tasks to be fully prepared.
+                      {taskProgressPct === 100 
+                        ? 'All tasks completed for this stage.' 
+                        : 'Complete remaining prep tasks to boost readiness.'}
                     </p>
                   </div>
                 </div>
@@ -424,7 +434,7 @@ export default function ApplicationDetailPage() {
 
                   <div className="flex items-start justify-between py-1 border-b border-slate-100">
                     <span className="text-[#526078] font-medium">Location:</span>
-                    <span className="font-bold text-[#11183D] text-right">{app.location || 'Hyderabad (On-site)'}</span>
+                    <span className="font-bold text-[#11183D] text-right">{app.location || 'Not specified'}</span>
                   </div>
 
                   <div className="flex items-start justify-between py-1 border-b border-slate-100">
@@ -438,29 +448,35 @@ export default function ApplicationDetailPage() {
                   </div>
 
                   <div className="flex items-start justify-between py-1 border-b border-slate-100">
-                    <span className="text-[#526078] font-medium">OA Date:</span>
-                    <span className="font-bold text-[#11183D]">Sep 18, 2026 • 10:00 AM</span>
+                    <span className="text-[#526078] font-medium">Next Deadline:</span>
+                    <span className="font-bold text-[#11183D]">
+                      {app.nextDeadlineDate ? app.nextDeadlineDate.split('T')[0] : 'Not scheduled'}
+                    </span>
                   </div>
 
                   <div className="flex items-start justify-between py-1 border-b border-slate-100">
                     <span className="text-[#526078] font-medium">Time Left:</span>
                     <span className="font-bold text-rose-600 flex items-center gap-1 font-mono">
-                      ⏳ {app.timeTag || '18 hours'}
+                      ⏳ {app.timeTag || 'None'}
                     </span>
                   </div>
 
                   <div className="flex items-start justify-between py-1 border-b border-slate-100">
                     <span className="text-[#526078] font-medium">Application Link:</span>
-                    <a href="#" className="font-bold text-[#2459A8] hover:underline flex items-center gap-1">
-                      <span>Open Link</span>
-                      <ExternalLink size={12} />
-                    </a>
+                    {app.applicationUrl ? (
+                      <a href={app.applicationUrl} target="_blank" rel="noreferrer" className="font-bold text-[#2459A8] hover:underline flex items-center gap-1">
+                        <span>Open Link</span>
+                        <ExternalLink size={12} />
+                      </a>
+                    ) : (
+                      <span className="text-[#7B8799] italic">None</span>
+                    )}
                   </div>
 
                   <div className="flex items-start justify-between py-1">
-                    <span className="text-[#526078] font-medium">Hiring Process:</span>
-                    <span className="font-bold text-[#11183D] text-right text-[11px] max-w-[150px]">
-                      OA → Tech 1 → Tech 2 → HR
+                    <span className="text-[#526078] font-medium">Drive Type:</span>
+                    <span className="font-bold text-[#11183D] text-right text-[11px]">
+                      {app.driveType === 'CAMPUS' ? 'On Campus' : app.driveType === 'OFF_CAMPUS' ? 'Off Campus' : 'Referral'}
                     </span>
                   </div>
                 </div>
@@ -483,27 +499,31 @@ export default function ApplicationDetailPage() {
 
                   {/* Tasks List */}
                   <div className="space-y-2.5 max-h-[260px] overflow-y-auto pr-1 no-scrollbar">
-                    {app.prepTasks.map((t) => (
-                      <div
-                        key={t.id}
-                        onClick={() => handleTaskToggle(t.id)}
-                        className={`p-2.5 rounded-2xl border transition-all cursor-pointer flex items-start gap-2.5 ${
-                          t.isCompleted
-                            ? 'bg-slate-50 border-slate-200 text-slate-400 line-through'
-                            : 'bg-white border-[#DCE7F2] hover:border-[#2459A8] text-[#11183D]'
-                        }`}
-                      >
-                        <div className={`mt-0.5 shrink-0 ${t.isCompleted ? 'text-emerald-500' : 'text-slate-300'}`}>
-                          {t.isCompleted ? <CheckCircle2 size={16} /> : <Circle size={16} />}
+                    {app.prepTasks.length === 0 ? (
+                      <p className="text-xs text-[#7B8799] italic py-4 text-center">No tasks assigned yet.</p>
+                    ) : (
+                      app.prepTasks.map((t) => (
+                        <div
+                          key={t.id}
+                          onClick={() => handleTaskToggle(t.id)}
+                          className={`p-2.5 rounded-2xl border transition-all cursor-pointer flex items-start gap-2.5 ${
+                            t.isCompleted
+                              ? 'bg-slate-50 border-slate-200 text-slate-400 line-through'
+                              : 'bg-white border-[#DCE7F2] hover:border-[#2459A8] text-[#11183D]'
+                          }`}
+                        >
+                          <div className={`mt-0.5 shrink-0 ${t.isCompleted ? 'text-emerald-500' : 'text-slate-300'}`}>
+                            {t.isCompleted ? <CheckCircle2 size={16} /> : <Circle size={16} />}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-semibold truncate leading-snug">{t.title}</p>
+                          </div>
+                          <span className="text-[10px] font-bold font-mono text-[#7B8799] shrink-0">
+                            {t.estimatedMinutes}m
+                          </span>
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-semibold truncate leading-snug">{t.title}</p>
-                        </div>
-                        <span className="text-[10px] font-bold font-mono text-[#7B8799] shrink-0">
-                          {t.estimatedMinutes}m
-                        </span>
-                      </div>
-                    ))}
+                      ))
+                    )}
                   </div>
                 </div>
 
@@ -542,23 +562,29 @@ export default function ApplicationDetailPage() {
                         </div>
                         <div>
                           <h5 className="text-xs font-black text-[#11183D]">
-                            {app.resumeTitle || 'SWE_Resume_v4.pdf'}
+                            {app.resumeTitle || 'No resume attached'}
                           </h5>
-                          <p className="text-[10px] text-[#526078]">Updated: Sep 10, 2026</p>
+                          <p className="text-[10px] text-[#526078]">
+                            {app.resumeTitle ? 'Attached for application' : 'Upload or link from Resume builder'}
+                          </p>
                         </div>
                       </div>
 
-                      <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-full text-[10px] font-bold">
-                        Best Match
-                      </span>
+                      {app.prepScore !== undefined && app.prepScore > 0 ? (
+                        <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-full text-[10px] font-bold">
+                          Matched
+                        </span>
+                      ) : null}
                     </div>
 
-                    <div className="flex items-center justify-between text-xs border-t border-[#DCE7F2]/80 pt-2">
-                      <span className="text-[#526078] font-medium">ATS Match Score:</span>
-                      <span className="font-black text-emerald-600 font-mono text-sm">
-                        91 / 100
-                      </span>
-                    </div>
+                    {app.prepScore !== undefined && app.prepScore > 0 ? (
+                      <div className="flex items-center justify-between text-xs border-t border-[#DCE7F2]/80 pt-2">
+                        <span className="text-[#526078] font-medium">ATS Match Score:</span>
+                        <span className="font-black text-emerald-600 font-mono text-sm">
+                          {app.prepScore} / 100
+                        </span>
+                      </div>
+                    ) : null}
                   </div>
                 </div>
 

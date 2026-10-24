@@ -20,6 +20,14 @@ router.post('/rooms/:roomCodeOrId/join', challengeController.joinRoom);
 router.get('/matches/:matchId', challengeController.getMatch);
 router.post('/matches/run-tests', challengeController.runSampleTests);
 router.post('/matches/:matchId/submit', challengeController.submitMatchSolution);
+router.post('/matches/:matchId/forfeit', challengeController.forfeitMatch);
+
+// Invitations (1v1 Direct Challenge)
+router.post('/invite', challengeController.createInvitation);
+router.get('/invitations/pending', challengeController.getPendingInvitations);
+router.post('/invitations/:inviteId/accept', challengeController.acceptInvitation);
+router.post('/invitations/:inviteId/decline', challengeController.declineInvitation);
+router.post('/invitations/:inviteId/cancel', challengeController.cancelInvitation);
 
 // Quizzes
 router.post('/quizzes', challengeController.createQuiz);

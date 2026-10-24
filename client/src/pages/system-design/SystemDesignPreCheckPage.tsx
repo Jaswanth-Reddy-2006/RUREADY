@@ -19,6 +19,7 @@ import {
 import Button from '../../components/ui/Button';
 import Badge from '../../components/ui/Badge';
 import toast from 'react-hot-toast';
+import { findEnglishBrowserVoice } from '../../lib/speech';
 import { systemDesignApi } from '../../api/systemDesign';
 import { useSystemDesignStore } from '../../store/useSystemDesignStore';
 
@@ -418,7 +419,7 @@ export default function SystemDesignPreCheckPage() {
                 {spokenTranscript ? (
                   <span className="text-emerald-600 dark:text-emerald-400 font-bold">"{spokenTranscript}"</span>
                 ) : (
-                  'Speak into your microphone to verify speech clarity and volume.'
+                  'Read out loud: "Hi, I am ready for interview." to verify microphone.'
                 )}
               </p>
             </div>

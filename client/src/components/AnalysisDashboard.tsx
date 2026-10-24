@@ -42,6 +42,17 @@ import type { Analysis, Question } from '../types';
 import toast from 'react-hot-toast';
 import CodingAnalysisView from './interview/CodingAnalysisView';
 
+
+function formatDurationDisplay(minutes: number): string {
+  if (!minutes || minutes <= 0) return '0s';
+  const totalSecs = Math.round(minutes * 60);
+  const m = Math.floor(totalSecs / 60);
+  const s = totalSecs % 60;
+  if (m === 0) return `${s}s`;
+  if (s === 0) return `${m}m`;
+  return `${m}m ${s}s`;
+}
+
 function cleanCandidateAnswer(text?: string | null): string {
   if (!text) return '[No transcript recorded for this question]';
   const cleaned = text
@@ -283,9 +294,9 @@ export default function AnalysisDashboard() {
   ];
 
   // Middle Summary & Timeline derived strictly from candidate session
-  const answeredCount = questions.filter((q) => q.answerText).length;
+  const answeredCount = questions.filter((q) => q.answerText && !q.answerText.includes('[Candidate skipped:')).length;
   const skippedCount = questions.length - answeredCount;
-  const timeTakenVals = questions.filter((q) => q.timeTakenSecs != null).map((q) => (q.timeTakenSecs! / 60));
+  const timeTakenVals = questions.filter((q) => q.answerText && q.timeTakenSecs != null).map((q) => (q.timeTakenSecs! / 60));
   const avgAnsMin = timeTakenVals.length ? +(timeTakenVals.reduce((a, b) => a + b, 0) / timeTakenVals.length).toFixed(1) : 0;
   const longestAnsMin = timeTakenVals.length ? +Math.max(...timeTakenVals).toFixed(1) : 0;
   const shortestAnsMin = timeTakenVals.length ? +Math.min(...timeTakenVals).toFixed(1) : 0;
@@ -301,44 +312,45 @@ export default function AnalysisDashboard() {
     topicsCovered: Array.from(new Set(questions.map(q => q.category || String(q.questionType)).concat(effectiveSession.focusAreas || []))).filter(Boolean),
   };
 
-  const timeline = analysis.performanceTimeline || (questions.length > 0 ? questions.map((q, idx) => ({
-    questionIndex: idx + 1,
-    questionLabel: `Q${idx + 1}`,
-    score: q.evalScore != null ? q.evalScore : (overallScore != null ? overallScore : 70),
-    rating: q.evalScore != null ? (q.evalScore >= 80 ? 'Strong' : q.evalScore >= 60 ? 'Good' : 'Needs Improvement') : 'Good',
-  })) : [
-    { questionIndex: 1, questionLabel: 'Q1', score: overallScore ?? 75, rating: 'Good' }
-  ]);
+  const timeline = (analysis.performanceTimeline && analysis.performanceTimeline.length > 0)
+    ? analysis.performanceTimeline
+    : (questions.length > 0 ? questions.map((q, idx) => ({
+        questionIndex: idx + 1,
+        questionLabel: `Q${idx + 1}`,
+        score: typeof q.evalScore === 'number' ? q.evalScore : (answeredCount > 0 ? 70 : 0),
+        rating: typeof q.evalScore === 'number' ? (q.evalScore >= 80 ? 'Strong' : q.evalScore >= 60 ? 'Good' : 'Needs Improvement') : (answeredCount > 0 ? 'Good' : 'Weak'),
+        category: q.category,
+        durationSecs: q.timeTakenSecs || 0,
+        questionText: q.questionText,
+      })) : [
+        { questionIndex: 1, questionLabel: 'Q1', score: overallScore ?? 0, rating: 'Weak' }
+      ]);
 
-  const stages = analysis.stageBreakdown || (questions.length > 0 ? [
-    {
-      stageNumber: 1,
-      stageName: 'Interview Track',
-      questionCount: questions.length,
-      durationMins: Math.max(1, Math.round(questions.reduce((a, q) => a + (q.timeTakenSecs || 60), 0) / 60)),
-      score: techScore != null ? techScore : (overallScore != null ? overallScore : 75)
-    }
-  ] : []);
+  const stages = (analysis.stageBreakdown && analysis.stageBreakdown.length > 0)
+    ? analysis.stageBreakdown
+    : (questions.length > 0 ? [
+        {
+          stageNumber: 1,
+          stageName: questions[0]?.category || 'Interview Track',
+          questionCount: questions.length,
+          durationMins: Math.max(1, Math.round(questions.reduce((a, q) => a + (q.timeTakenSecs || 45), 0) / 60)),
+          score: techScore != null ? techScore : (overallScore != null ? overallScore : 0)
+        }
+      ] : []);
 
-  const strengthsList = analysis.strengths && analysis.strengths.length > 0
+  const strengthsList = (analysis.strengths && analysis.strengths.length > 0)
     ? analysis.strengths
-    : [
-        'Clear and confident communication',
-        'Good understanding of core technical concepts',
-        'Provided relevant real-world examples',
-        'Maintained good structure in answers',
-        'Strong problem-solving approach',
-      ];
+    : (answeredCount > 0
+        ? ['Addressed core technical prompts with relevant architectural concepts.']
+        : ['Successfully verified audio and video devices for the interview session.']
+      );
 
-  const improvementsList = analysis.improvements && analysis.improvements.length > 0
+  const improvementsList = (analysis.improvements && analysis.improvements.length > 0)
     ? analysis.improvements
-    : [
-        'Need more technical depth in system design',
-        'Improve analysis of trade-offs',
-        'Be more specific with scalability discussions',
-        'Provide more structured frameworks',
-        'Work on time management for longer answers',
-      ];
+    : (answeredCount > 0
+        ? ['Substantiate technical choices with latency, scalability, and memory trade-offs.']
+        : ['Provide verbal responses during questions to generate full AI rubric evaluation.']
+      );
 
   const categoryRatings = [
     { label: 'Technical Knowledge', score: techScore },
@@ -419,6 +431,23 @@ export default function AnalysisDashboard() {
             </button>
           </div>
         </div>
+
+        {/* ─── EARLY EXIT NOTICE (IF ZERO ANSWERS RECORDED) ─── */}
+        {answeredCount === 0 && (
+          <div className="mb-6 p-4 sm:p-5 rounded-3xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200/90 dark:border-amber-900/40 flex items-start sm:items-center gap-3.5 text-xs text-amber-900 dark:text-amber-200 shadow-2xs">
+            <div className="p-2 rounded-2xl bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300 shrink-0">
+              <AlertCircle size={18} />
+            </div>
+            <div className="space-y-0.5">
+              <span className="font-bold text-xs sm:text-sm block text-amber-950 dark:text-white">
+                Interview Session Concluded Early
+              </span>
+              <p className="text-[11px] text-amber-800 dark:text-amber-300/90 leading-relaxed font-normal">
+                No verbal responses were recorded before the interview ended. Scores and telemetry reflect initial setup without technical evaluation. Speak during questions in your next session to generate full AI rubric feedback.
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* ─── 2. MAIN REPORT TITLE & OVERALL SCORE HERO ─── */}
         <div className="bg-white dark:bg-[#0D1117] border border-slate-200/90 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xs mb-6 transition-colors">
@@ -629,7 +658,7 @@ export default function AnalysisDashboard() {
                           <Clock size={14} className="text-blue-500" />
                           <span>Average Answer Length</span>
                         </span>
-                        <span className="font-bold text-slate-900 dark:text-white font-mono">{summary.averageAnswerLengthMinutes} minutes</span>
+                        <span className="font-bold text-slate-900 dark:text-white font-mono">{formatDurationDisplay(summary.averageAnswerLengthMinutes)}</span>
                       </div>
 
                       <div className="flex items-center justify-between text-slate-600 dark:text-slate-400">
@@ -637,7 +666,7 @@ export default function AnalysisDashboard() {
                           <Clock size={14} className="text-purple-500" />
                           <span>Longest Answer</span>
                         </span>
-                        <span className="font-bold text-slate-900 dark:text-white font-mono">{summary.longestAnswerMinutes} minutes</span>
+                        <span className="font-bold text-slate-900 dark:text-white font-mono">{formatDurationDisplay(summary.longestAnswerMinutes)}</span>
                       </div>
 
                       <div className="flex items-center justify-between text-slate-600 dark:text-slate-400">
@@ -645,7 +674,7 @@ export default function AnalysisDashboard() {
                           <Clock size={14} className="text-amber-500" />
                           <span>Shortest Answer</span>
                         </span>
-                        <span className="font-bold text-slate-900 dark:text-white font-mono">{summary.shortestAnswerMinutes} minutes</span>
+                        <span className="font-bold text-slate-900 dark:text-white font-mono">{formatDurationDisplay(summary.shortestAnswerMinutes)}</span>
                       </div>
 
                       <div className="flex items-center justify-between text-slate-600 dark:text-slate-400">
@@ -783,12 +812,12 @@ export default function AnalysisDashboard() {
                                 {stage.stageName}
                               </span>
                               <span className="text-[11px] text-slate-500 dark:text-slate-400">
-                                {stage.questionCount} {stage.questionCount === 1 ? 'question' : 'questions'} • {stage.durationMins} minutes
+                                {stage.questionCount} {stage.questionCount === 1 ? 'question' : 'questions'} • {stage.durationMins > 0 ? `${stage.durationMins} min` : '< 1 min'}
                               </span>
                             </div>
                           </div>
 
-                          <span className="font-bold text-emerald-600 dark:text-emerald-400 text-xs font-mono">
+                          <span className={`font-bold text-xs font-mono ${stage.score >= 80 ? "text-emerald-600 dark:text-emerald-400" : stage.score >= 60 ? "text-blue-600 dark:text-blue-400" : stage.score >= 40 ? "text-amber-600 dark:text-amber-400" : "text-rose-600 dark:text-rose-400"}`}>
                             {stage.score}<span className="text-slate-400 dark:text-slate-500 font-normal">/100</span>
                           </span>
                         </div>
@@ -927,7 +956,7 @@ export default function AnalysisDashboard() {
                             </span>
                             <span className="flex items-center gap-1 text-[10px] font-mono text-slate-500 dark:text-slate-400">
                               <Clock size={11} />
-                              <span>{Math.floor((q.timeTakenSecs || 45) / 60)}:{((q.timeTakenSecs || 45) % 60).toString().padStart(2, '0')}</span>
+                              <span>{!q.answerText && (!q.timeTakenSecs || q.timeTakenSecs === 0) ? "Not answered" : (q.timeTakenSecs && q.timeTakenSecs > 0 ? (q.timeTakenSecs >= 60 ? `${Math.floor(q.timeTakenSecs / 60)}m ${q.timeTakenSecs % 60}s` : `${q.timeTakenSecs}s`) : (q.answerText ? "45s" : "Not answered"))}</span>
                             </span>
                             {isOpen ? <ChevronUp size={16} className="text-slate-400" /> : <ChevronDown size={16} className="text-slate-400" />}
                           </div>
@@ -989,7 +1018,13 @@ export default function AnalysisDashboard() {
                                   <span>What Went Well</span>
                                 </span>
                                 <ul className="space-y-1 text-xs text-emerald-950 dark:text-emerald-200">
-                                  {(q.whatWentWell || ['Clear and concise introduction', 'Mentioned relevant skills and projects', 'Good confidence and structure']).map((item, wi) => (
+                                  {(q.whatWentWell && q.whatWentWell.length > 0
+                                    ? q.whatWentWell
+                                    : (q.answerText
+                                        ? ['Addressed the technical prompt directly', 'Communicated clear architectural concepts']
+                                        : ['No verbal response recorded for this question']
+                                      )
+                                  ).map((item, wi) => (
                                     <li key={wi} className="flex items-start gap-1.5">
                                       <span className="text-emerald-600 dark:text-emerald-400 font-bold">✓</span>
                                       <span>{item}</span>
@@ -1005,7 +1040,13 @@ export default function AnalysisDashboard() {
                                   <span>What Could Be Improved</span>
                                 </span>
                                 <ul className="space-y-1 text-xs text-amber-950 dark:text-amber-200">
-                                  {(q.whatCouldBeImproved || ['Add more specific impact or results', 'Mention key learnings or challenges', 'Be more concise and avoid filler words']).map((item, ii) => (
+                                  {(q.whatCouldBeImproved && q.whatCouldBeImproved.length > 0
+                                    ? q.whatCouldBeImproved
+                                    : (q.answerText
+                                        ? ['Substantiate technical claims with quantifiable system metrics (QPS, p99 latency)', 'Discuss failure recovery mechanisms and scaling edge cases']
+                                        : ['Attempt response during live interview to demonstrate technical competence']
+                                      )
+                                  ).map((item, ii) => (
                                     <li key={ii} className="flex items-start gap-1.5">
                                       <span className="text-amber-600 dark:text-amber-400 font-bold">•</span>
                                       <span>{item}</span>
@@ -1021,12 +1062,15 @@ export default function AnalysisDashboard() {
                                   <span>Suggested Answer Structure</span>
                                 </span>
                                 <ol className="space-y-1 text-xs text-blue-950 dark:text-blue-200">
-                                  {(q.suggestedAnswerStructure || [
-                                    'Brief background (education/experience)',
-                                    'Key technical skills',
-                                    'Notable projects with impact',
-                                    'Career goals and motivation',
-                                  ]).map((step, si) => (
+                                  {(q.suggestedAnswerStructure && q.suggestedAnswerStructure.length > 0
+                                    ? q.suggestedAnswerStructure
+                                    : [
+                                        'Direct architectural thesis and definition',
+                                        'Core component interaction and data flow',
+                                        'Scalability, partitioning, and trade-offs',
+                                        'Failure recovery and observability',
+                                      ]
+                                  ).map((step, si) => (
                                     <li key={si} className="flex items-start gap-1.5">
                                       <span className="font-bold text-blue-600 dark:text-blue-400">{si + 1}.</span>
                                       <span>{step}</span>
@@ -1070,11 +1114,14 @@ export default function AnalysisDashboard() {
                   </div>
 
                   <div className="space-y-3.5">
-                    {(analysis.recommendations || [
-                      { priority: 1, title: 'Practice system design concepts', action: 'Focus on scalability, trade-offs and real-world examples.' },
-                      { priority: 2, title: 'Improve answer depth', action: 'Provide more detailed technical explanations with examples.' },
-                      { priority: 3, title: 'Work on time management', action: 'Keep answers concise and structured within time limits.' },
-                    ]).map((rec, i) => (
+                    {((analysis.recommendations && analysis.recommendations.length > 0)
+                      ? analysis.recommendations
+                      : [
+                          { priority: 1, title: 'Deepen system design concepts', action: 'Focus on scalability, trade-offs and real-world database partitioning.' },
+                          { priority: 2, title: 'Improve answer depth', action: 'Provide more detailed technical explanations with quantifiable metrics.' },
+                          { priority: 3, title: 'Calibrate time management', action: 'Keep answers concise and structured using the STAR method.' },
+                        ]
+                    ).map((rec, i) => (
                       <div key={i} className="flex items-start gap-3">
                         <div className="h-6 w-6 rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
                           {rec.priority || i + 1}
@@ -1208,15 +1255,19 @@ export default function AnalysisDashboard() {
                   <div className="space-y-2 text-xs text-slate-700 dark:text-slate-300">
                     <div className="flex justify-between py-1 border-b border-slate-200/60 dark:border-slate-800">
                       <span>Speaking Speed:</span>
-                      <span className="font-bold text-slate-900 dark:text-white font-mono">{analysis.confidenceSignals?.avgWpm || 135} WPM</span>
+                      <span className="font-bold text-slate-900 dark:text-white font-mono">
+                        {analysis.confidenceSignals?.avgWpm ? `${analysis.confidenceSignals.avgWpm} WPM` : 'N/A'}
+                      </span>
                     </div>
                     <div className="flex justify-between py-1 border-b border-slate-200/60 dark:border-slate-800">
                       <span>Verbal Filler Instances:</span>
-                      <span className="font-bold text-slate-900 dark:text-white font-mono">{analysis.confidenceSignals?.avgPauseCount || 0}</span>
+                      <span className="font-bold text-slate-900 dark:text-white font-mono">{analysis.confidenceSignals?.avgPauseCount ?? 0}</span>
                     </div>
                     <div className="flex justify-between py-1">
                       <span>Average Response Length:</span>
-                      <span className="font-bold text-slate-900 dark:text-white font-mono">{analysis.confidenceSignals?.avgAnswerLength || 45} words</span>
+                      <span className="font-bold text-slate-900 dark:text-white font-mono">
+                        {analysis.confidenceSignals?.avgAnswerLength ? `${analysis.confidenceSignals.avgAnswerLength} words` : 'N/A'}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -1228,11 +1279,15 @@ export default function AnalysisDashboard() {
                   <div className="space-y-2 text-xs text-slate-700 dark:text-slate-300">
                     <div className="flex justify-between py-1 border-b border-slate-200/60 dark:border-slate-800">
                       <span>Eye Contact & Visual Focus:</span>
-                      <span className="font-bold text-emerald-600 dark:text-emerald-400 font-mono">{analysis.eyeContactScore || 85}%</span>
+                      <span className="font-bold text-emerald-600 dark:text-emerald-400 font-mono">
+                        {analysis.eyeContactScore !== undefined ? `${analysis.eyeContactScore}%` : 'N/A'}
+                      </span>
                     </div>
                     <div className="flex justify-between py-1 border-b border-slate-200/60 dark:border-slate-800">
                       <span>Platform Integrity Score:</span>
-                      <span className="font-bold text-blue-600 dark:text-blue-400 font-mono">{analysis.presenceScore || 95}%</span>
+                      <span className="font-bold text-blue-600 dark:text-blue-400 font-mono">
+                        {analysis.presenceScore !== undefined ? `${analysis.presenceScore}%` : 'N/A'}
+                      </span>
                     </div>
                     <div className="flex justify-between py-1">
                       <span>Readiness Classification:</span>

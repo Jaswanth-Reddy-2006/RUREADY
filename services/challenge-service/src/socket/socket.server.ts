@@ -90,6 +90,7 @@ export function setupSocketServer(httpServer: HttpServer) {
       if (disconnectGraceTimers.has(handshakeUserId)) {
         clearTimeout(disconnectGraceTimers.get(handshakeUserId));
         disconnectGraceTimers.delete(handshakeUserId);
+        io.emit('match:opponent_status', { userId: handshakeUserId, status: 'connected' });
       }
     }
 
@@ -293,6 +294,103 @@ export function setupSocketServer(httpServer: HttpServer) {
     });
 
     // ─────────────────────────────────────────────────────────────
+    // 3.5 DIRECT 1v1 INVITATIONS & FORFEIT
+    // ─────────────────────────────────────────────────────────────
+    socket.on('invite:send', async (data: {
+      fromUserId: string;
+      fromUserName: string;
+      fromUserAvatar?: string;
+      toUserId: string;
+      toUserName?: string;
+      difficulty?: 'EASY' | 'MEDIUM' | 'HARD' | 'MIXED';
+      topic?: string;
+      language?: string;
+    }) => {
+      try {
+        const inv = await challengeService.createInvitation(data);
+        socket.emit('invite:sent', { success: true, invitation: inv });
+
+        // If recipient is connected via socket, deliver invitation in real-time
+        const targetSocketId = userSocketMap.get(data.toUserId);
+        if (targetSocketId) {
+          io.to(targetSocketId).emit('invite:received', inv);
+        }
+      } catch (err: any) {
+        socket.emit('invite:error', { message: err.message || 'Failed to send invitation' });
+      }
+    });
+
+    socket.on('invite:accept', async (data: {
+      invitationId: string;
+      userId: string;
+      userName: string;
+      userAvatar?: string;
+    }) => {
+      try {
+        const result = await challengeService.acceptInvitation(data);
+
+        // Inform both sender and recipient to enter match
+        const sock1 = userSocketMap.get(result.invitation.fromUserId);
+        const sock2 = userSocketMap.get(data.userId) || socket.id;
+
+        if (sock1) {
+          io.to(sock1).emit('invite:accepted', {
+            matchId: result.match.id,
+            match: result.match,
+            opponent: {
+              userId: data.userId,
+              userName: data.userName,
+              userAvatar: data.userAvatar,
+            },
+          });
+        }
+
+        if (sock2) {
+          io.to(sock2).emit('invite:accepted', {
+            matchId: result.match.id,
+            match: result.match,
+            opponent: {
+              userId: result.invitation.fromUserId,
+              userName: result.invitation.fromUserName,
+              userAvatar: result.invitation.fromUserAvatar,
+            },
+          });
+        }
+      } catch (err: any) {
+        socket.emit('invite:error', { message: err.message || 'Failed to accept invitation' });
+      }
+    });
+
+    socket.on('invite:decline', (data: { invitationId: string; userId: string }) => {
+      try {
+        const inv = challengeService.declineInvitation(data.invitationId, data.userId);
+        const senderSocket = userSocketMap.get(inv.fromUserId);
+        if (senderSocket) {
+          io.to(senderSocket).emit('invite:declined', {
+            invitationId: inv.id,
+            declinedBy: data.userId,
+          });
+        }
+      } catch (err: any) {
+        socket.emit('invite:error', { message: err.message });
+      }
+    });
+
+    socket.on('match:forfeit', async (data: { matchId: string; userId: string }) => {
+      try {
+        const match = await challengeService.forfeitMatch(data.matchId, data.userId);
+        io.to(data.matchId).emit('match:completed', {
+          match,
+          winnerId: match.winnerId,
+          forfeitedBy: data.userId,
+        });
+        io.to(data.matchId).emit('match:state_update', match);
+      } catch (err: any) {
+        socket.emit('match:error', { message: err.message });
+      }
+    });
+
+    // ─────────────────────────────────────────────────────────────
     // 4. QUIZ ARENA ACTIONS
     // ─────────────────────────────────────────────────────────────
     socket.on('quiz:join', (data: {
@@ -375,6 +473,9 @@ export function setupSocketServer(httpServer: HttpServer) {
       const userInfo = socketUserMap.get(socket.id);
       if (userInfo) {
         matchmakingService.dequeue(userInfo.userId);
+
+        // Notify active match room of disconnect
+        io.emit('match:opponent_status', { userId: userInfo.userId, status: 'disconnected' });
 
         // Set 60s grace timer before forfeiting any active matches
         const timer = setTimeout(() => {

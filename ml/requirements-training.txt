@@ -1,0 +1,22 @@
+# ══════════════════════════════════════════════════════════════════════════
+# RU Ready AI Interviewer Model — Training & Fine-Tuning Dependencies
+# Compatible with: Hugging Face Transformers, Kaggle GPU (T4/P100), Google Colab
+# ══════════════════════════════════════════════════════════════════════════
+
+torch>=2.2.0
+transformers>=4.44.0
+peft>=0.12.0
+trl>=0.9.6
+bitsandbytes>=0.43.0
+accelerate>=0.33.0
+datasets>=2.20.0
+huggingface_hub>=0.24.0
+scipy>=1.12.0
+einops>=0.8.0
+sentencepiece>=0.2.0
+protobuf>=4.25.0
+fastapi>=0.111.0
+uvicorn>=0.30.0
+pydantic>=2.7.0
+tqdm>=4.66.0
+pyyaml>=6.0.1

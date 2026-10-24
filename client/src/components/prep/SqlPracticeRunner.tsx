@@ -12,7 +12,7 @@ ORDER BY salary DESC;`);
   const [executed, setExecuted] = useState(false);
   const [executing, setExecuting] = useState(false);
 
-  const mockResult = [
+  const sampleResult = [
     { emp_id: 104, emp_name: 'Ananya Rao', salary: '$95,000' },
     { emp_id: 101, emp_name: 'Vikram Singh', salary: '$88,000' },
     { emp_id: 108, emp_name: 'Karthik Raja', salary: '$78,000' },
@@ -88,7 +88,7 @@ ORDER BY salary DESC;`);
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800 text-slate-300">
-                {mockResult.map((row, idx) => (
+                {sampleResult.map((row, idx) => (
                   <tr key={idx} className="hover:bg-slate-900/50">
                     <td className="p-2 text-cyan-300">{row.emp_id}</td>
                     <td className="p-2">{row.emp_name}</td>

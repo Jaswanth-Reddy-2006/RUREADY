@@ -43,16 +43,28 @@ export default function RadarChart({
 }: RadarChartProps) {
   const [activeIdx, setActiveIdx] = useState<number | null>(null);
 
+  const safeData = useMemo(
+    () => (Array.isArray(data) ? data : []).map((metric) => ({
+      ...metric,
+      value: Number.isFinite(metric.value) ? metric.value : 0,
+      benchmarkValue:
+        metric.benchmarkValue === undefined || Number.isFinite(metric.benchmarkValue)
+          ? metric.benchmarkValue
+          : 0,
+    })),
+    [data],
+  );
+
   const cx = size / 2;
   const cy = size / 2;
   const radius = 125; // Leaving 75px on all sides for axis labels
 
-  const numAxes = data.length;
+  const numAxes = safeData.length;
 
   // Calculate geometric angles for each axis starting at 12 o'clock (-PI / 2)
   const angles = useMemo(() => {
-    return data.map((_, i) => -Math.PI / 2 + (i * 2 * Math.PI) / numAxes);
-  }, [data, numAxes]);
+    return safeData.map((_, i) => -Math.PI / 2 + (i * 2 * Math.PI) / numAxes);
+  }, [safeData, numAxes]);
 
   // Generate concentric polygon grid points
   const gridRings = useMemo(() => {
@@ -73,7 +85,7 @@ export default function RadarChart({
 
   // Compute candidate data polygon points & coordinates
   const { candidatePoints, candidateCoords } = useMemo(() => {
-    const coords = data.map((d, i) => {
+    const coords = safeData.map((d, i) => {
       const clampedVal = Math.max(0, Math.min(maxScore, d.value));
       const r = (clampedVal / maxScore) * radius;
       const x = cx + r * Math.cos(angles[i]);
@@ -82,14 +94,14 @@ export default function RadarChart({
     });
     const points = coords.map((c) => `${c.x.toFixed(2)},${c.y.toFixed(2)}`).join(' ');
     return { candidatePoints: points, candidateCoords: coords };
-  }, [data, maxScore, radius, cx, cy, angles]);
+  }, [safeData, maxScore, radius, cx, cy, angles]);
 
   // Compute benchmark polygon points & coordinates (if benchmark data exists)
   const { hasBenchmarkData, benchmarkPoints, benchmarkCoords } = useMemo(() => {
-    const hasData = showBenchmark && data.some((d) => d.benchmarkValue !== undefined);
+    const hasData = showBenchmark && safeData.some((d) => d.benchmarkValue !== undefined);
     if (!hasData) return { hasBenchmarkData: false, benchmarkPoints: '', benchmarkCoords: [] };
 
-    const coords = data.map((d, i) => {
+    const coords = safeData.map((d, i) => {
       const benchmarkVal = Math.max(0, Math.min(maxScore, d.benchmarkValue ?? 75));
       const r = (benchmarkVal / maxScore) * radius;
       const x = cx + r * Math.cos(angles[i]);
@@ -98,7 +110,7 @@ export default function RadarChart({
     });
     const points = coords.map((c) => `${c.x.toFixed(2)},${c.y.toFixed(2)}`).join(' ');
     return { hasBenchmarkData: true, benchmarkPoints: points, benchmarkCoords: coords };
-  }, [data, showBenchmark, maxScore, radius, cx, cy, angles]);
+  }, [safeData, showBenchmark, maxScore, radius, cx, cy, angles]);
 
   // Calculate axis outer endpoint & label coordinates
   const axisEndpoints = useMemo(() => {
@@ -129,12 +141,12 @@ export default function RadarChart({
         labelY,
         textAnchor,
         dominantBaseline,
-        metric: data[i],
+        metric: safeData[i],
       };
     });
-  }, [angles, cx, cy, radius, data]);
+  }, [angles, cx, cy, radius, safeData]);
 
-  if (!data || data.length < 3) {
+  if (safeData.length < 3 || !Number.isFinite(maxScore) || maxScore <= 0) {
     return (
       <div className="p-8 text-center bg-obsidian-900 bg-[#111318] border border-white/[0.08] rounded-2xl text-slate-400 font-mono text-xs">
         Competency radar requires at least 3 dimensions to render.
@@ -185,7 +197,7 @@ export default function RadarChart({
           {/* Accessible title and description for screen readers */}
           <title>{title || 'Competency Radar Chart'}</title>
           <desc>
-            {data.map((d) => `${d.label}: ${d.value} out of ${maxScore}`).join(', ')}
+             {safeData.map((d) => `${d.label}: ${d.value} out of ${maxScore}`).join(', ')}
           </desc>
 
           {/* 1. Background Concentric Polygons */}
@@ -364,7 +376,7 @@ export default function RadarChart({
                 fontWeight="bold"
                 className="uppercase tracking-wider"
               >
-                {data[activeIdx].label}
+                {safeData[activeIdx].label}
               </text>
               {/* Candidate Score vs Target */}
               <text
@@ -376,10 +388,10 @@ export default function RadarChart({
                 fontFamily="monospace"
                 fontWeight="bold"
               >
-                Score: {data[activeIdx].value}
-                {hasBenchmarkData && data[activeIdx].benchmarkValue !== undefined && (
+                Score: {safeData[activeIdx].value}
+                {hasBenchmarkData && safeData[activeIdx].benchmarkValue !== undefined && (
                   <tspan fill="#38BDF8" dx="4">
-                    | Bar: {data[activeIdx].benchmarkValue}
+                    | Bar: {safeData[activeIdx].benchmarkValue}
                   </tspan>
                 )}
               </text>
@@ -399,7 +411,7 @@ export default function RadarChart({
           </tr>
         </thead>
         <tbody>
-          {data.map((item) => (
+          {safeData.map((item) => (
             <tr key={item.key}>
               <th scope="row">{item.label}</th>
               <td>{item.value} / {maxScore}</td>

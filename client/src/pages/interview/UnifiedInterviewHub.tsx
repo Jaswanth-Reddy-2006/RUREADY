@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
+  Network,
   Video,
   Code2,
   Play,
@@ -20,7 +21,7 @@ import {
   Target,
   ShieldCheck,
   Search,
-} from 'lucide-react';
+ } from 'lucide-react';
 import clsx from 'clsx';
 import apiClient from '../../api/client';
 import { useAuthStore } from '../../store/authStore';
@@ -352,20 +353,20 @@ export default function UnifiedInterviewHub() {
           </div>
         </div>
 
-        {/* Stat 4: Company Catalog */}
+        {/* Stat 4: System Design Architecture */}
         <div
-          onClick={() => navigate('/interviews/company-wise')}
-          className="bg-gradient-to-br from-blue-50/80 to-indigo-50/80 p-5 rounded-3xl border border-blue-200 shadow-2xs space-y-1 cursor-pointer hover:border-[#4A8BDF] transition-all"
+          onClick={() => navigate('/system-design')}
+          className="bg-gradient-to-br from-purple-50/80 to-indigo-50/80 p-5 rounded-3xl border border-purple-200 shadow-2xs space-y-1 cursor-pointer hover:border-purple-400 transition-all"
         >
-          <div className="flex items-center justify-between text-blue-800 text-xs font-mono uppercase tracking-wider">
-            <span>Company Tracks</span>
-            <Building2 size={16} className="text-[#4A8BDF]" />
+          <div className="flex items-center justify-between text-purple-800 text-xs font-mono uppercase tracking-wider">
+            <span>System Design</span>
+            <Network size={16} className="text-purple-600" />
           </div>
-          <div className="text-2xl font-black text-blue-950 font-mono">
-            18+ Tracks
+          <div className="text-2xl font-black text-purple-950 font-mono">
+            Architecture
           </div>
-          <div className="text-[11px] text-[#4A8BDF] font-mono flex items-center gap-1">
-            Explore FAANG Tracks <ArrowRight size={11} />
+          <div className="text-[11px] text-purple-600 font-mono flex items-center gap-1">
+            Distributed Systems Studio <ArrowRight size={11} />
           </div>
         </div>
       </div>

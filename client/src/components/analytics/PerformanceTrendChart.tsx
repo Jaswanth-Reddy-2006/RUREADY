@@ -9,7 +9,8 @@ interface PerformanceTrendChartProps {
 
 export default function PerformanceTrendChart({ points }: PerformanceTrendChartProps) {
   const navigate = useNavigate();
-  const [hoveredPoint, setHoveredPoint] = useState<SessionTimelinePoint | null>(points[points.length - 1] || null);
+  const measuredPoints = points.filter((point) => point.score !== null);
+  const [hoveredPoint, setHoveredPoint] = useState<SessionTimelinePoint | null>(measuredPoints[measuredPoints.length - 1] || null);
 
   if (!points || points.length === 0) {
     return null;
@@ -51,16 +52,16 @@ export default function PerformanceTrendChart({ points }: PerformanceTrendChartP
 
             {/* Connecting line */}
             <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ overflow: 'visible' }}>
-              {points.length > 1 && (
+              {measuredPoints.length > 1 && (
                 <polyline
                   fill="none"
                   stroke="#2459A8"
                   strokeWidth="2.5"
                   strokeDasharray="0"
-                  points={points
+                  points={measuredPoints
                     .map((p, idx) => {
-                      const x = (idx / (points.length - 1 || 1)) * 90 + 5; // percentage
-                      const y = chartHeight - ((p.score - 40) / 60) * (chartHeight - paddingY * 2) - paddingY;
+                      const x = (idx / (measuredPoints.length - 1 || 1)) * 90 + 5; // percentage
+                      const y = chartHeight - (((p.score ?? 0) - 40) / 60) * (chartHeight - paddingY * 2) - paddingY;
                       return `${x}%,${y}`;
                     })
                     .join(' ')}
@@ -69,9 +70,9 @@ export default function PerformanceTrendChart({ points }: PerformanceTrendChartP
             </svg>
 
             {/* Data Point Nodes */}
-            {points.map((p, idx) => {
+            {measuredPoints.map((p, idx) => {
               const isHovered = hoveredPoint?.id === p.id;
-              const yPercent = ((p.score - 40) / 60) * 80 + 10;
+              const yPercent = (((p.score ?? 0) - 40) / 60) * 80 + 10;
 
               return (
                 <div

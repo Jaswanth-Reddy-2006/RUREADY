@@ -1,7 +1,7 @@
 // ═══════════════════════════════════════════════════════════════
-// Renatus — Video Interview Room UI (Google Meet Experience)
-// Clean White Aesthetic, Balanced Dual-Stage Architecture
-// Minimal Brand Header, Pure Spoken Prompt, Google Meet Dock
+// Renatus — Video / Oral Interview Room UI (Modern AI Studio)
+// Premium Glassmorphic Studio, Dual-Stage Architecture,
+// Real-time Audio Level Telemetry, Live Waveform & Sleek Dock
 // ═══════════════════════════════════════════════════════════════
 
 import React, { useEffect, useRef, useState } from 'react';
@@ -9,7 +9,9 @@ import AIAvatar, { type AvatarState } from './interview/AIAvatar';
 import { type OculusViseme } from './interview/visemeMapper';
 import { type VideoAnalysisMetrics } from '../hooks/useVideoAnalysisML';
 import { 
-  Maximize2, VideoOff, PhoneOff, ShieldAlert, Sun, Moon 
+  Activity, HelpCircle, Maximize2, Mic, MicOff, PhoneOff, RotateCcw, 
+  Send, ShieldAlert, SkipForward, Sun, Video, VideoOff, Moon,
+  Volume2, Sparkles, CheckCircle2, Radio, MessageSquareQuote
 } from 'lucide-react';
 
 function getQuestionFontSize(text: string): string {
@@ -62,7 +64,7 @@ export default function NormalInterviewRoom({
   currentQuestionText,
   onEndInterview,
   isProcessing,
-  processingLabel = 'Ava is considering your response…',
+  processingLabel = 'Ava is evaluating your response…',
   candidateTranscription = '',
   isFullscreen = true,
   onReEnterFullscreen,
@@ -74,11 +76,23 @@ export default function NormalInterviewRoom({
   onToggleCamera,
   onSubmitAnswer,
   videoMLMetrics,
+  questionIndex = 1,
+  totalQuestions = 5,
+  questionDifficulty = 'Medium',
+  onRepeatQuestion,
+  onRequestClarification,
+  onSkipQuestion,
 }: NormalInterviewRoomProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isDark, setIsDark] = useState<boolean>(() => {
     return document.documentElement.classList.contains('dark');
   });
+
+  // Candidate Mic Audio Level Meter (0 - 100)
+  const [micVolume, setMicVolume] = useState<number>(0);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const animFrameRef = useRef<number | null>(null);
 
   const toggleTheme = () => {
     const nextDark = !isDark;
@@ -102,6 +116,58 @@ export default function NormalInterviewRoom({
     }
   }, [mediaStream]);
 
+  // Audio level analysis for live candidate speech feedback
+  useEffect(() => {
+    if (!mediaStream || !isMicOn) {
+      setMicVolume(0);
+      return;
+    }
+
+    try {
+      const audioTracks = mediaStream.getAudioTracks();
+      if (audioTracks.length === 0) return;
+
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      const ctx = new AudioCtx();
+      audioContextRef.current = ctx;
+
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 64;
+      analyserRef.current = analyser;
+
+      const source = ctx.createMediaStreamSource(mediaStream);
+      source.connect(analyser);
+
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+
+      const checkVolume = () => {
+        if (!analyserRef.current) return;
+        analyserRef.current.getByteFrequencyData(dataArray);
+        let sum = 0;
+        for (let i = 0; i < bufferLength; i++) {
+          sum += dataArray[i];
+        }
+        const avg = sum / bufferLength;
+        const normalized = Math.min(100, Math.round((avg / 128) * 100));
+        setMicVolume(normalized);
+        animFrameRef.current = requestAnimationFrame(checkVolume);
+      };
+
+      checkVolume();
+    } catch (e) {
+      console.warn('Audio metering unavailable:', e);
+    }
+
+    return () => {
+      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+      if (audioContextRef.current) {
+        audioContextRef.current.close().catch(() => {});
+        audioContextRef.current = null;
+      }
+    };
+  }, [mediaStream, isMicOn]);
+
   // Keyboard shortcut: Press Enter to submit answer immediately if candidate has finished talking
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -116,8 +182,15 @@ export default function NormalInterviewRoom({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [candidateTranscription, isProcessing, aiIsSpeaking, onSubmitAnswer]);
 
+  const difficultyColor = 
+    questionDifficulty.toLowerCase() === 'hard'
+      ? 'bg-rose-500/10 text-rose-500 border-rose-500/30'
+      : questionDifficulty.toLowerCase() === 'easy'
+      ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30'
+      : 'bg-amber-500/10 text-amber-500 border-amber-500/30';
+
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-slate-50 dark:bg-black text-slate-900 dark:text-white font-sans select-none overflow-hidden transition-colors">
+    <div className="fixed inset-0 z-50 flex flex-col bg-slate-950 text-slate-100 font-sans select-none overflow-hidden transition-colors">
       
       {/* ─── 0. STRICT FULL-SCREEN LOCKDOWN OVERLAY (If Exited) ─── */}
       {!isFullscreen && (
@@ -153,31 +226,32 @@ export default function NormalInterviewRoom({
         </div>
       )}
 
-      {/* ─── 1. TOP MINIMAL BRAND HEADER WITH PROMINENT END CALL BUTTON ─── */}
-      <header className="px-6 py-3.5 shrink-0 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0D1117] z-20 flex items-center justify-between transition-colors">
-        <div className="flex items-center gap-3">
+      {/* ─── 1. TOP HEADER: RU READY LOGO, ROLE ORAL INTERVIEW, THEME TOGGLE, END CALL ─── */}
+      <header className="px-6 py-3 shrink-0 border-b border-slate-800/80 bg-slate-900/90 backdrop-blur-md z-20 flex items-center justify-between transition-colors">
+        <div className="flex items-center gap-3.5">
           <div className="flex items-center gap-2.5">
-            <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-[#2459A8] to-[#4A8BDF] flex items-center justify-center text-white font-bold text-xs shadow-sm font-display">
+            <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-xs shadow-md font-display ring-1 ring-white/20">
               RU
             </div>
-            <span className="text-base font-bold text-slate-900 dark:text-white font-display">
-              Renatus
+            <span className="text-base font-bold text-white font-display tracking-tight">
+              RU Ready
             </span>
           </div>
 
-          <div className="h-4 w-px bg-slate-300 dark:bg-slate-700" />
+          <div className="h-4 w-px bg-slate-700/60" />
 
-          <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 truncate max-w-[240px] sm:max-w-md">
-            {focusArea || 'Software Engineer'}
+          {/* Role Oral Interview Title */}
+          <span className="text-sm font-semibold text-slate-200">
+            {focusArea} Oral Interview
           </span>
         </div>
 
-        {/* Clear End Call Button & Theme Toggle at Top */}
+        {/* Right: Theme Toggle & Prominent End Call Button */}
         <div className="flex items-center gap-2.5">
           <button
             type="button"
             onClick={toggleTheme}
-            className="p-2 rounded-xl transition-all cursor-pointer border flex items-center justify-center bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-amber-300 border-slate-200 dark:border-slate-700 shadow-xs"
+            className="p-2 rounded-xl transition-all cursor-pointer border flex items-center justify-center bg-slate-800/80 hover:bg-slate-700 text-amber-300 border-slate-700 shadow-xs"
             title={isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
           >
             {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
@@ -186,7 +260,7 @@ export default function NormalInterviewRoom({
           <button
             type="button"
             onClick={onEndInterview}
-            className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs sm:text-sm flex items-center gap-2 shadow-sm hover:shadow transition-all cursor-pointer font-display active:scale-95 border border-rose-500/40"
+            className="px-4 py-2 rounded-xl bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white font-semibold text-xs sm:text-sm flex items-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer font-display active:scale-95 border border-rose-500/40"
             title="End interview immediately"
           >
             <PhoneOff className="w-4 h-4" />
@@ -196,13 +270,16 @@ export default function NormalInterviewRoom({
       </header>
 
       {/* ─── 2. MAIN 2-PANEL BALANCED STAGE ─── */}
-      <main className="flex-1 w-full max-w-[1700px] mx-auto p-4 sm:p-6 pb-24 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 items-stretch min-h-0 overflow-hidden">
+      <main className="flex-1 w-full max-w-[1700px] mx-auto p-3 sm:p-4 grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch min-h-0 overflow-hidden relative">
         
-        {/* ═══════════ LEFT PANEL: AI INTERVIEWER ═══════════ */}
-        <div className="w-full h-full flex flex-col bg-white dark:bg-[#0D1117] border border-slate-200/90 dark:border-slate-800 rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm transition-colors">
+        {/* ═══════════ LEFT PANEL: AI INTERVIEWER (EVA) ═══════════ */}
+        <div className="w-full h-full flex flex-col bg-slate-900/90 border border-slate-800/90 rounded-3xl overflow-hidden shadow-2xl relative transition-all group">
           
+          {/* Subtle Ambient Glow Behind Avatar */}
+          <div className="absolute inset-0 bg-radial-at-t from-blue-600/10 via-transparent to-transparent pointer-events-none" />
+
           {/* 3D Avatar Canvas */}
-          <div className="relative flex-1 min-h-[220px] w-full flex items-center justify-center overflow-hidden bg-gradient-to-b from-slate-900 via-slate-950 to-black">
+          <div className="relative flex-1 min-h-0 w-full flex items-center justify-center overflow-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-black">
             <AIAvatar
               state={avatarState}
               expression={
@@ -221,24 +298,34 @@ export default function NormalInterviewRoom({
               persona="AVA"
               className="w-full h-full object-cover"
             />
-          </div>
 
-          {/* Question Text Area — STRICT FIXED HEIGHT to prevent video feed jumping or shrinking */}
-          <div className="bg-white dark:bg-[#0D1117] border-t border-slate-100 dark:border-slate-800 px-4 py-3 sm:px-5 sm:py-3.5 shrink-0 h-28 sm:h-32 flex flex-col justify-center overflow-hidden transition-colors">
-            <div className="overflow-y-auto max-h-full pr-1">
-              <p className={`${getQuestionFontSize(currentQuestionText || '')} text-slate-800 dark:text-slate-100 font-medium font-display`}>
-                {currentQuestionText || 'Preparing technical question...'}
-              </p>
+            {/* Minimal Eva Status Symbol Badge */}
+            <div className="absolute top-4 left-4 z-10 flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-950/75 border border-slate-700/60 backdrop-blur-md text-[11px] font-mono text-slate-300 shadow-md">
+              {aiIsSpeaking ? (
+                <>
+                  <Volume2 className="w-3.5 h-3.5 text-blue-400 animate-pulse" />
+                  <span className="text-blue-300 font-semibold">Eva speaking</span>
+                </>
+              ) : isProcessing ? (
+                <>
+                  <Sparkles className="w-3.5 h-3.5 text-purple-400 animate-spin" />
+                  <span className="text-purple-300 font-semibold">Eva thinking</span>
+                </>
+              ) : (
+                <>
+                  <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-slate-300">Eva listening</span>
+                </>
+              )}
             </div>
           </div>
-
         </div>
 
         {/* ═══════════ RIGHT PANEL: CANDIDATE ═══════════ */}
-        <div className="w-full h-full flex flex-col bg-white dark:bg-[#0D1117] border border-slate-200/90 dark:border-slate-800 rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm relative transition-colors">
+        <div className="w-full h-full flex flex-col bg-slate-900/90 border border-slate-800/90 rounded-3xl overflow-hidden shadow-2xl relative transition-all group">
           
-          {/* Candidate Webcam Feed Area — Clean full-tile view matching video conferencing platforms */}
-          <div className="relative flex-1 w-full h-full bg-slate-950 flex items-center justify-center overflow-hidden">
+          {/* Candidate Webcam Feed Area (Clean, no badges) */}
+          <div className="relative flex-1 min-h-0 w-full h-full bg-slate-950 flex items-center justify-center overflow-hidden">
             {mediaStream && isCameraOn ? (
               <video
                 ref={videoRef}
@@ -248,25 +335,76 @@ export default function NormalInterviewRoom({
                 className="w-full h-full object-cover transform scale-x-[-1]"
               />
             ) : (
-              <div className="text-center space-y-2 p-6">
-                <div className="h-14 w-14 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center mx-auto text-slate-400">
-                  <VideoOff className="h-7 w-7 text-slate-500" />
+              <div className="text-center space-y-3 p-6">
+                <div className="h-16 w-16 rounded-2xl bg-slate-800/80 border border-slate-700 flex items-center justify-center mx-auto text-slate-400 shadow-inner">
+                  <VideoOff className="h-8 w-8 text-slate-500" />
                 </div>
-                <p className="text-sm font-medium text-slate-300">Camera Off</p>
+                <div>
+                  <p className="text-sm font-semibold text-slate-200 font-display">Camera Feed Inactive</p>
+                </div>
               </div>
             )}
 
-            {/* Subtle "You" badge overlay (Zero distracting transcript) */}
-            <div className="absolute bottom-4 left-4 z-10 flex items-center gap-2">
-              <span className="px-3 py-1 rounded-xl bg-slate-900/75 backdrop-blur-md text-white text-xs font-semibold shadow-xs">
-                You
-              </span>
-            </div>
+            {/* Candidate Out-of-Camera Warning Overlay */}
+            {videoMLMetrics && !videoMLMetrics.faceDetected && (
+              <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/85 backdrop-blur-md p-6 text-center animate-fadeIn">
+                <div className="h-14 w-14 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 mb-3 animate-pulse">
+                  <VideoOff size={28} />
+                </div>
+                <h3 className="text-base font-bold text-white font-display">
+                  Please come to the camera
+                </h3>
+                <p className="text-xs text-amber-300/90 mt-1 max-w-xs">
+                  Your face is not detected in the frame. Answering is paused until you return.
+                </p>
+              </div>
+            )}
           </div>
-
         </div>
 
       </main>
+
+      {/* ─── 3. FIXED POSITION TRANSCRIPT & LIVE DIALOGUE PANEL ─── */}
+      <footer className="shrink-0 border-t border-slate-800/90 bg-slate-900/95 backdrop-blur-xl px-4 sm:px-6 py-3 z-30 shadow-2xl">
+        <div className="max-w-5xl mx-auto flex flex-col gap-2">
+          {/* Question / Eva Spoken Prompt */}
+          <div className="flex items-start gap-2.5">
+            <span className="shrink-0 px-2 py-0.5 rounded-md text-[10px] font-bold font-mono uppercase tracking-wider bg-blue-500/20 text-blue-400 border border-blue-500/30">
+              Eva
+            </span>
+            <div className="flex-1 max-h-16 overflow-y-auto pr-1">
+              <p className={`${currentQuestionText.length > 200 ? 'text-xs sm:text-sm' : 'text-sm'} text-slate-100 font-display font-medium leading-relaxed`}>
+                {currentQuestionText || 'Preparing technical question...'}
+              </p>
+            </div>
+          </div>
+
+          {/* Candidate Live Speech Transcription */}
+          <div className="flex items-start gap-2.5 pt-1.5 border-t border-slate-800/70">
+            <span className="shrink-0 px-2 py-0.5 rounded-md text-[10px] font-bold font-mono uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+              You
+            </span>
+            <div className="flex-1 max-h-20 overflow-y-auto pr-1">
+              {candidateTranscription ? (
+                <p className={`${candidateTranscription.length > 220 ? 'text-xs sm:text-sm' : 'text-sm'} text-slate-200 font-sans leading-relaxed`}>
+                  <span>{candidateTranscription}</span>
+                  <span className="inline-block w-1.5 h-3.5 bg-emerald-400 ml-1.5 animate-pulse align-middle" />
+                </p>
+              ) : (
+                <p className="text-xs text-slate-500 italic">
+                  {aiIsSpeaking
+                    ? 'Eva is speaking...'
+                    : isProcessing
+                    ? (processingLabel || 'Eva is analyzing your response...')
+                    : videoMLMetrics && !videoMLMetrics.faceDetected
+                    ? 'Please return to the camera frame to continue answering...'
+                    : 'Listening to your voice... Speak your response naturally.'}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      </footer>
 
     </div>
   );

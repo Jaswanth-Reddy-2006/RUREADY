@@ -1,8 +1,9 @@
 // ═══════════════════════════════════════════════════════════════
 // RU Ready? — 1v1 DSA Battle Arena (/challenges/match/:matchId)
+// Authoritative State, Hidden Test Evaluation, Forfeit & Timer Sync
 // ═══════════════════════════════════════════════════════════════
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import {
@@ -21,6 +22,8 @@ import {
   ChevronRight,
   ArrowLeft,
   Loader2,
+  Flag,
+  WifiOff,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
@@ -41,8 +44,10 @@ export default function BattleArena1v1() {
   const [language, setLanguage] = useState<string>('javascript');
   const [timeRemainingSec, setTimeRemainingSec] = useState<number>(1200);
 
-  // Opponent Live Progress
+  // Opponent Live Progress & Connectivity
   const [opponentProgress, setOpponentProgress] = useState<{ passed: number; total: number }>({ passed: 0, total: 0 });
+  const [opponentDisconnected, setOpponentDisconnected] = useState<boolean>(false);
+  const [graceSecondsLeft, setGraceSecondsLeft] = useState<number>(60);
 
   // Execution & Test Console
   const [isExecutingSample, setIsExecutingSample] = useState<boolean>(false);
@@ -56,11 +61,14 @@ export default function BattleArena1v1() {
   } | null>(null);
   const [submissionResult, setSubmissionResult] = useState<any | null>(null);
 
+  // Forfeit Confirmation Modal
+  const [showForfeitModal, setShowForfeitModal] = useState<boolean>(false);
+  const [isForfeiting, setIsForfeiting] = useState<boolean>(false);
+
   // Match Completed Modal
   const [showCompletionModal, setShowCompletionModal] = useState<boolean>(false);
-  const [winnerParticipant, setWinnerParticipant] = useState<MatchParticipant | null>(null);
 
-  // Fetch initial match
+  // Fetch initial match data
   useEffect(() => {
     if (!matchId) return;
 
@@ -76,7 +84,7 @@ export default function BattleArena1v1() {
             '// Write your solution here\n';
           setCode(initialStarter);
 
-          // Calculate remaining timer
+          // Authoritative remaining timer from endsAt
           const now = Date.now();
           const rem = Math.max(0, Math.floor((res.data.endsAt - now) / 1000));
           setTimeRemainingSec(rem);
@@ -95,7 +103,7 @@ export default function BattleArena1v1() {
     fetchMatch();
   }, [matchId]);
 
-  // Join match socket room & listen to live opponent updates
+  // Join match socket room & listen to live events
   useEffect(() => {
     if (!matchId || !user) return;
 
@@ -111,37 +119,69 @@ export default function BattleArena1v1() {
       setMatch(updatedMatch);
     });
 
+    const unsubOpponentStatus = socket.on('match:opponent_status', (data: { userId: string; status: 'connected' | 'disconnected' }) => {
+      if (data.userId !== user.id) {
+        if (data.status === 'disconnected') {
+          setOpponentDisconnected(true);
+          setGraceSecondsLeft(60);
+          toast.error('Opponent disconnected! 60s reconnection grace period started.', { icon: '⚠️' });
+        } else {
+          setOpponentDisconnected(false);
+          toast.success('Opponent reconnected!', { icon: '✅' });
+        }
+      }
+    });
+
     const unsubCompleted = socket.on('match:completed', (data: { match: MatchSession; winnerId?: string }) => {
       setMatch(data.match);
-      if (data.winnerId && data.match.participants[data.winnerId]) {
-        setWinnerParticipant(data.match.participants[data.winnerId]);
-      }
       setShowCompletionModal(true);
     });
 
     return () => {
       unsubOpponentProgress();
       unsubStateUpdate();
+      unsubOpponentStatus();
       unsubCompleted();
     };
   }, [matchId, user, socket]);
 
-  // Match Countdown Timer
+  // Authoritative Match Countdown Timer (synced against endsAt)
   useEffect(() => {
     if (!match || match.status === 'COMPLETED') return;
 
-    const timer = setInterval(() => {
-      setTimeRemainingSec((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+    const syncTimer = () => {
+      const now = Date.now();
+      const remaining = Math.max(0, Math.floor((match.endsAt - now) / 1000));
+      setTimeRemainingSec(remaining);
 
-    return () => clearInterval(timer);
+      if (remaining <= 0) {
+        // Authoritatively check completion on server
+        challengesApi.getMatch(match.id).then((res) => {
+          if (res.success && res.data) {
+            setMatch(res.data);
+            if (res.data.status === 'COMPLETED') {
+              setShowCompletionModal(true);
+            }
+          }
+        });
+      }
+    };
+
+    syncTimer();
+    const interval = setInterval(syncTimer, 1000);
+    return () => clearInterval(interval);
   }, [match]);
+
+  // Disconnect Grace Timer
+  useEffect(() => {
+    let interval: any;
+    if (opponentDisconnected && graceSecondsLeft > 0) {
+      interval = setInterval(() => {
+        setGraceSecondsLeft((prev) => Math.max(0, prev - 1));
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [opponentDisconnected, graceSecondsLeft]);
 
   // Language Change Handler
   const handleLanguageChange = (newLang: string) => {
@@ -218,6 +258,27 @@ export default function BattleArena1v1() {
     }
   };
 
+  // Forfeit Match
+  const handleForfeit = async () => {
+    if (!matchId || !user) return;
+    try {
+      setIsForfeiting(true);
+      const res = await challengesApi.forfeitMatch(matchId, user.id);
+      socket.forfeitMatch(matchId);
+
+      if (res.success && res.data) {
+        setMatch(res.data);
+        setShowForfeitModal(false);
+        setShowCompletionModal(true);
+        toast('You forfeited the match.');
+      }
+    } catch (err: any) {
+      toast.error('Failed to forfeit match');
+    } finally {
+      setIsForfeiting(false);
+    }
+  };
+
   const formatTimer = (sec: number) => {
     const mins = Math.floor(sec / 60);
     const s = sec % 60;
@@ -244,7 +305,7 @@ export default function BattleArena1v1() {
           <p className="text-xs text-slate-400">This battle session may have concluded or the link is invalid.</p>
           <button
             onClick={() => navigate('/challenges')}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-xs font-bold rounded-xl"
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-xs font-bold rounded-xl cursor-pointer"
           >
             Return to Challenges
           </button>
@@ -259,13 +320,36 @@ export default function BattleArena1v1() {
 
   return (
     <div className="h-screen flex flex-col bg-[#0F172A] text-slate-100 overflow-hidden font-sans select-none">
+      {/* Disconnect Grace Period Alert Banner */}
+      <AnimatePresence>
+        {opponentDisconnected && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="bg-amber-500/20 border-b border-amber-500/40 px-4 py-2 text-xs flex items-center justify-center gap-2 text-amber-300 shrink-0"
+          >
+            <WifiOff size={14} className="animate-pulse" />
+            <span>
+              Opponent disconnected. Reconnection grace timer: <strong className="font-mono">{graceSecondsLeft}s</strong> before match is awarded to you.
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Top Header Bar */}
       <header className="h-14 bg-[#1E293B] border-b border-slate-700/80 px-4 flex items-center justify-between shrink-0 z-10">
         <div className="flex items-center gap-3">
           <button
-            onClick={() => navigate('/challenges')}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/60 transition-colors"
-            title="Exit Battle"
+            onClick={() => {
+              if (match.status === 'IN_PROGRESS') {
+                setShowForfeitModal(true);
+              } else {
+                navigate('/challenges');
+              }
+            }}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/60 transition-colors cursor-pointer"
+            title="Exit / Forfeit Battle"
           >
             <ArrowLeft size={16} />
           </button>
@@ -293,7 +377,7 @@ export default function BattleArena1v1() {
           </div>
         </div>
 
-        {/* Center Live Match Timer */}
+        {/* Center Live Authoritative Match Timer */}
         <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700 font-mono text-xs font-bold">
           <Clock size={14} className={timeRemainingSec < 180 ? 'text-rose-400 animate-ping' : 'text-blue-400'} />
           <span className={timeRemainingSec < 180 ? 'text-rose-400' : 'text-slate-200'}>
@@ -301,18 +385,22 @@ export default function BattleArena1v1() {
           </span>
         </div>
 
-        {/* Right Header Opponent Mini Status */}
+        {/* Right Header Opponent Mini Status & Actions */}
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 text-xs">
             <span className="text-slate-400 font-medium">Opponent:</span>
             <span className="font-bold text-white">{opponentParticipant?.userName || 'Searching...'}</span>
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span
+              className={`w-2 h-2 rounded-full ${
+                opponentDisconnected ? 'bg-amber-500 animate-ping' : 'bg-emerald-500 animate-pulse'
+              }`}
+            />
           </div>
 
           <div className="flex items-center gap-2">
             <button
               onClick={handleRunSampleTests}
-              disabled={isExecutingSample}
+              disabled={isExecutingSample || match.status === 'COMPLETED'}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-bold transition-all disabled:opacity-50 cursor-pointer"
             >
               {isExecutingSample ? <Loader2 size={13} className="animate-spin" /> : <Play size={13} />}
@@ -327,6 +415,16 @@ export default function BattleArena1v1() {
               {isSubmitting ? <Loader2 size={13} className="animate-spin" /> : <Send size={13} />}
               <span>Submit</span>
             </button>
+
+            {match.status === 'IN_PROGRESS' && (
+              <button
+                onClick={() => setShowForfeitModal(true)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                title="Forfeit Match"
+              >
+                <Flag size={15} />
+              </button>
+            )}
           </div>
         </div>
       </header>
@@ -411,7 +509,7 @@ export default function BattleArena1v1() {
 
             <button
               onClick={() => handleLanguageChange(language)}
-              className="text-slate-400 hover:text-white p-1 rounded-sm"
+              className="text-slate-400 hover:text-white p-1 rounded-sm cursor-pointer"
               title="Reset to starter code"
             >
               <RotateCcw size={13} />
@@ -443,7 +541,7 @@ export default function BattleArena1v1() {
             <div className="h-8 border-b border-slate-800/80 px-3 flex items-center gap-4 shrink-0 text-xs font-bold">
               <button
                 onClick={() => setConsoleTab('sample')}
-                className={`flex items-center gap-1.5 transition-colors ${
+                className={`flex items-center gap-1.5 transition-colors cursor-pointer ${
                   consoleTab === 'sample' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-slate-400 hover:text-white'
                 }`}
               >
@@ -457,7 +555,7 @@ export default function BattleArena1v1() {
 
               <button
                 onClick={() => setConsoleTab('submission')}
-                className={`flex items-center gap-1.5 transition-colors ${
+                className={`flex items-center gap-1.5 transition-colors cursor-pointer ${
                   consoleTab === 'submission' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-slate-400 hover:text-white'
                 }`}
               >
@@ -625,6 +723,53 @@ export default function BattleArena1v1() {
       </div>
 
       {/* ─────────────────────────────────────────────────────────────
+          FORFEIT CONFIRMATION MODAL
+      ───────────────────────────────────────────────────────────── */}
+      <AnimatePresence>
+        {showForfeitModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-[#1E293B] rounded-3xl p-6 max-w-sm w-full border border-rose-500/30 text-center space-y-4 shadow-2xl"
+            >
+              <div className="w-12 h-12 rounded-full bg-rose-500/20 text-rose-400 mx-auto flex items-center justify-center">
+                <Flag size={24} />
+              </div>
+              <h3 className="text-base font-bold text-white">Forfeit Match?</h3>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Are you sure you want to surrender? Your opponent will be awarded an immediate victory and standard rating penalties will apply.
+              </p>
+              <div className="grid grid-cols-2 gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowForfeitModal(false)}
+                  className="py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition-all cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  disabled={isForfeiting}
+                  onClick={handleForfeit}
+                  className="py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  {isForfeiting && <Loader2 size={13} className="animate-spin" />}
+                  <span>Confirm Forfeit</span>
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ─────────────────────────────────────────────────────────────
           MATCH COMPLETION MODAL
       ───────────────────────────────────────────────────────────── */}
       <AnimatePresence>
@@ -633,7 +778,7 @@ export default function BattleArena1v1() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4"
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
@@ -690,7 +835,7 @@ export default function BattleArena1v1() {
                 <div>
                   <span className="text-[10px] font-bold text-slate-400 uppercase">XP Awarded</span>
                   <div className="text-lg font-black font-mono text-amber-400 mt-0.5">
-                    +{myParticipant?.xpAwarded || 100} XP
+                    +{myParticipant?.xpAwarded || (match.winnerId === user?.id ? 120 : 40)} XP
                   </div>
                 </div>
               </div>

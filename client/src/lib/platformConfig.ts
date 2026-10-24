@@ -287,7 +287,9 @@ export function setPlatformConfig(modelId: AvatarModelId, voiceId: PlatformVoice
 
 export function getModelAssetPath(persona: AvatarModelId = 'AVA'): string {
   const meta = PLATFORM_AVATAR_MODELS.find((m) => m.id === persona);
-  return meta?.modelAssetPath || '/models/interviewer_ava.glb';
+  const assetPath = meta?.modelAssetPath || '/models/interviewer_ava.glb';
+  const baseUrl = import.meta.env.BASE_URL || '/';
+  return `${baseUrl.replace(/\/$/, '')}/${assetPath.replace(/^\/+/, '')}`;
 }
 
 export function subscribeToPlatformConfig(callback: (config: { model: AvatarModelId; voice: PlatformVoiceId }) => void): () => void {

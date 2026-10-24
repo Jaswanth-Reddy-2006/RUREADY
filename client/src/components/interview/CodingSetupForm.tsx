@@ -130,8 +130,8 @@ export default function CodingSetupForm() {
   const recognitionRef = useRef<any>(null);
   const micVerifiedRef = useRef<boolean>(false);
 
-  const initialFocus = searchParams.get('focus') || 'DSA';
-  const initialRole = searchParams.get('role') || 'Software Engineer';
+  const initialFocus = searchParams.get('focus') || '';
+  const initialRole = searchParams.get('role') || '';
 
   // 3-Step Wizard: 1 = Config, 2 = Review, 3 = Pre-Check
   const [wizardStep, setWizardStep] = useState<number>(1);
@@ -149,8 +149,9 @@ export default function CodingSetupForm() {
   const [selectedTrack, setSelectedTrack] = useState<string>(initialFocus);
   const [selectedAlgorithms, setSelectedAlgorithms] = useState<string[]>([]);
   const [customAlgoInput, setCustomAlgoInput] = useState<string>('');
-  const [durationMins, setDurationMins] = useState<number>(30);
+  const [durationMins, setDurationMins] = useState<number>(0);
   const [simulationMode, setSimulationMode] = useState<'PRACTICE' | 'REALISTIC' | 'CHALLENGE'>('REALISTIC');
+  const [hasAttemptedStep1, setHasAttemptedStep1] = useState<boolean>(false);
 
   // Loading & Submission State
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -176,6 +177,24 @@ export default function CodingSetupForm() {
     setSelectedAlgorithms((prev) =>
       prev.includes(algo) ? prev.filter((a) => a !== algo) : [...prev, algo]
     );
+  };
+
+  const handleProceedToReview = () => {
+    setHasAttemptedStep1(true);
+    const effRole = isCustomRole ? customRoleInput.trim() : targetRole.trim();
+    if (!effRole) {
+      toast.error('Please select or specify a Target Engineering Role.');
+      return;
+    }
+    if (!selectedTrack) {
+      toast.error('Please select a Coding Practice Track.');
+      return;
+    }
+    if (!durationMins || durationMins === 0) {
+      toast.error('Please select an Interview Duration.');
+      return;
+    }
+    setWizardStep(2);
   };
 
   const handleAddCustomAlgo = () => {
@@ -488,9 +507,10 @@ export default function CodingSetupForm() {
       const sessionId = newSession?.id || `coding-${Date.now()}`;
       navigate(`/coding/${sessionId}`);
     } catch (err) {
-      console.warn('Session create fallback:', err);
-      const fallbackId = `coding-${Date.now()}`;
-      navigate(`/coding/${fallbackId}`);
+      console.error('Failed to create coding interview session:', err);
+      setIsSubmitting(false);
+      setPrepMessage('Unable to create a coding session. Check the API services and try again.');
+      toast.error('Coding session could not be created.');
     }
   };
 
@@ -673,59 +693,7 @@ export default function CodingSetupForm() {
               </div>
             </Card>
 
-            {/* 2. Target Company */}
-            <Card className="p-6 bg-white border-slate-200/90 shadow-xs rounded-3xl space-y-4">
-              <div className="space-y-1 border-b border-slate-100 pb-3">
-                <div className="flex items-center gap-2 text-slate-900 font-bold text-sm">
-                  <Building2 size={16} className="text-indigo-600" />
-                  <span>2. Target Company</span>
-                </div>
-                <p className="text-xs text-slate-500">
-                  Select your target company to simulate exact problem standards and branding.
-                </p>
-              </div>
-
-              <div className="flex flex-wrap gap-2">
-                {POPULAR_COMPANIES.map((company) => {
-                  const isSelected = !isCustomCompany && targetCompany === company;
-                  return (
-                    <button
-                      key={company}
-                      type="button"
-                      onClick={() => {
-                        if (company === 'Custom Company') {
-                          setIsCustomCompany(true);
-                        } else {
-                          setIsCustomCompany(false);
-                          setTargetCompany(company);
-                        }
-                      }}
-                      className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
-                        isSelected
-                          ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs'
-                          : 'bg-slate-50 text-slate-700 border-slate-200/80 hover:bg-slate-100'
-                      }`}
-                    >
-                      {company}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {isCustomCompany && (
-                <div className="pt-2">
-                  <input
-                    type="text"
-                    placeholder="Enter target company name (e.g. Snowflake, Databricks, Stripe)..."
-                    value={customCompanyInput}
-                    onChange={(e) => setCustomCompanyInput(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-hidden focus:border-indigo-500"
-                  />
-                </div>
-              )}
-            </Card>
-
-            {/* 3. Practice Domain / Track */}
+            {/* 2. Practice Domain / Track */}
             <Card className="p-6 bg-white border-slate-200/90 shadow-xs rounded-3xl space-y-4">
               <div className="space-y-1 border-b border-slate-100 pb-3">
                 <div className="flex items-center gap-2 text-slate-900 font-bold text-sm">
@@ -938,10 +906,7 @@ export default function CodingSetupForm() {
                 <strong className="text-sm font-bold text-slate-900 block">{finalDisplayRole}</strong>
               </div>
 
-              <div className="space-y-1">
-                <span className="text-xs text-slate-500 font-medium block">Target Company</span>
-                <strong className="text-sm font-bold text-slate-900 block">{finalDisplayCompany}</strong>
-              </div>
+              
 
               <div className="space-y-1">
                 <span className="text-xs text-slate-500 font-medium block">Simulation Mode</span>
@@ -1120,7 +1085,7 @@ export default function CodingSetupForm() {
                     Read Out Loud to Verify Mic:
                   </span>
                   <p className="text-xs italic text-purple-950 font-serif leading-relaxed font-semibold">
-                    "I am ready to start my mock interview."
+                    "Hi, I'm ready for interview."
                   </p>
 
                   {spokenTranscript && (

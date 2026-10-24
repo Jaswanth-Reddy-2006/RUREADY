@@ -77,7 +77,7 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
       }
 
       const {
-        fallbackTitle = 'Interview room error',
+         fallbackTitle = 'Something went wrong',
         fallbackSubtitle = 'An unexpected error interrupted this view. You can retry the operation or return safely.',
         returnLabel = 'Return to Setup',
         showRetry = true,

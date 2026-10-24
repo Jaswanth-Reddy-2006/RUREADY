@@ -29,6 +29,7 @@ export interface MatchFoundPayload {
 class MatchmakingQueueService {
   private queue: QueuePlayer[] = [];
   private onMatchFoundCallbacks: ((match: MatchFoundPayload) => void)[] = [];
+  private isProcessing = false;
 
   constructor() {
     // Run matchmaking loop every 1.5 seconds
@@ -36,10 +37,23 @@ class MatchmakingQueueService {
   }
 
   public enqueue(player: QueuePlayer): { success: boolean; message: string } {
-    // Prevent duplicate entries
+    // Validate player
+    if (!player.userId) {
+      return { success: false, message: 'Invalid user ID' };
+    }
+
+    // Clean up any stale entries (> 5 minutes in queue)
+    const now = Date.now();
+    this.queue = this.queue.filter((p) => now - p.joinedAt < 300000);
+
+    // Prevent duplicate entries — update existing player if already in queue
     const existingIdx = this.queue.findIndex((p) => p.userId === player.userId);
     if (existingIdx !== -1) {
-      this.queue[existingIdx] = { ...player, joinedAt: Date.now() };
+      this.queue[existingIdx] = {
+        ...player,
+        joinedAt: Date.now(),
+        userRating: player.userRating || 1200,
+      };
       return { success: true, message: 'Queue updated' };
     }
 
@@ -60,62 +74,84 @@ class MatchmakingQueueService {
     return this.queue.length < initialLen;
   }
 
-  public getQueueStatus(userId: string): { inQueue: boolean; waitTimeSec: number; queueSize: number } {
+  public getQueueStatus(userId: string): { inQueue: boolean; waitTimeSec: number; queueSize: number; difficulty?: string } {
     const player = this.queue.find((p) => p.userId === userId);
     return {
       inQueue: !!player,
       waitTimeSec: player ? Math.floor((Date.now() - player.joinedAt) / 1000) : 0,
       queueSize: this.queue.length,
+      difficulty: player?.difficulty,
     };
+  }
+
+  public clearQueue() {
+    this.queue = [];
   }
 
   public onMatchFound(callback: (match: MatchFoundPayload) => void) {
     this.onMatchFoundCallbacks.push(callback);
   }
 
-  private processQueue() {
-    if (this.queue.length < 2) return;
+  public processQueue() {
+    if (this.isProcessing) return;
+    this.isProcessing = true;
 
-    const matchedIndices = new Set<number>();
+    try {
+      // Filter out abandoned / stale queue entries (> 5 min)
+      const now = Date.now();
+      this.queue = this.queue.filter((p) => now - p.joinedAt < 300000);
 
-    for (let i = 0; i < this.queue.length; i++) {
-      if (matchedIndices.has(i)) continue;
-      const p1 = this.queue[i];
-      const waitSec = (Date.now() - p1.joinedAt) / 1000;
+      if (this.queue.length < 2) return;
 
-      // Progressive rating range expansion
-      let allowedDiff = 100;
-      if (waitSec > 5) allowedDiff = 250;
-      if (waitSec > 10) allowedDiff = 500;
-      if (waitSec > 15) allowedDiff = 1500; // Match any available player
+      const matchedIndices = new Set<number>();
 
-      for (let j = i + 1; j < this.queue.length; j++) {
-        if (matchedIndices.has(j)) continue;
-        const p2 = this.queue[j];
+      for (let i = 0; i < this.queue.length; i++) {
+        if (matchedIndices.has(i)) continue;
+        const p1 = this.queue[i];
+        const waitSec = (Date.now() - p1.joinedAt) / 1000;
 
-        // Rating difference check
-        const ratingDiff = Math.abs(p1.userRating - p2.userRating);
-        if (ratingDiff <= allowedDiff) {
-          // Check difficulty compatibility
-          const diffMatch =
-            p1.difficulty === 'MIXED' ||
-            p2.difficulty === 'MIXED' ||
-            p1.difficulty === p2.difficulty;
+        // Progressive rating range expansion
+        let allowedDiff = 100;
+        if (waitSec > 5) allowedDiff = 250;
+        if (waitSec > 10) allowedDiff = 500;
+        if (waitSec > 15) allowedDiff = 1500; // Match any available player
 
-          if (diffMatch || waitSec > 12) {
-            matchedIndices.add(i);
-            matchedIndices.add(j);
+        for (let j = i + 1; j < this.queue.length; j++) {
+          if (matchedIndices.has(j)) continue;
+          const p2 = this.queue[j];
 
-            this.createMatch(p1, p2);
-            break;
+          // STABLE CONCURRENCY & SELF-MATCH PREVENTION
+          if (p1.userId === p2.userId) {
+            // Cannot match against self
+            continue;
+          }
+
+          // Rating difference check
+          const ratingDiff = Math.abs(p1.userRating - p2.userRating);
+          if (ratingDiff <= allowedDiff) {
+            // Check difficulty compatibility
+            const diffMatch =
+              p1.difficulty === 'MIXED' ||
+              p2.difficulty === 'MIXED' ||
+              p1.difficulty === p2.difficulty;
+
+            if (diffMatch || waitSec > 12) {
+              matchedIndices.add(i);
+              matchedIndices.add(j);
+
+              this.createMatch(p1, p2);
+              break;
+            }
           }
         }
       }
-    }
 
-    // Remove matched players from queue
-    if (matchedIndices.size > 0) {
-      this.queue = this.queue.filter((_, idx) => !matchedIndices.has(idx));
+      // Remove matched players from queue
+      if (matchedIndices.size > 0) {
+        this.queue = this.queue.filter((_, idx) => !matchedIndices.has(idx));
+      }
+    } finally {
+      this.isProcessing = false;
     }
   }
 

@@ -7,6 +7,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import apiClient from '../../api/client';
+import { codingApi } from '../../api/coding';
 import AIAvatar, { type AvatarState } from '../../components/interview/AIAvatar';
 import UserCamera from '../../components/interview/UserCamera';
 import LiveTranscript, { type TranscriptEntry } from '../../components/interview/LiveTranscript';
@@ -110,7 +111,7 @@ export default function InterviewRoom() {
       case 'python':
         return `# Write your Python code here\ndef find_missing_number(nums):\n    n = len(nums)\n    total = n * (n + 1) // 2\n    return total - sum(nums)\n\n# Example run:\nprint("Missing number is:", find_missing_number([0, 1, 3]))`;
       case 'java':
-        return `// Write your Java code here\nimport java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        System.out.println("Hello, Java mock compilation passes!");\n    }\n}`;
+        return `// Write your Java code here\nimport java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        System.out.println("Hello, Java execution passes!");\n    }\n}`;
       case 'cpp':
         return `// Write your C++ code here\n#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    cout << "Ready to solve complex algorithm." << endl;\n    return 0;\n}`;
       case 'javascript':
@@ -135,22 +136,39 @@ export default function InterviewRoom() {
     }
   }, []);
 
-  const handleRunCode = useCallback(() => {
+  const handleRunCode = useCallback(async () => {
+    if (isRunningCode) return;
+
+    if (!codeValue.trim()) {
+      setConsoleOutput('[ERROR] No code submitted. Write a solution before running.');
+      return;
+    }
+
     setIsRunningCode(true);
-    setConsoleOutput('Compiling source code...\n');
-    setTimeout(() => {
-      setConsoleOutput(prev => prev + 'Executing test suite...\n\n');
-      setTimeout(() => {
-        const timestamp = new Date().toLocaleTimeString();
-        let output = `[${timestamp}] Compilation successful.\n`;
-        output += `Test Case 1: pass (input: default, latency: 14ms)\n`;
-        output += `Test Case 2: pass (latency: 18ms)\n`;
-        output += `\nStatus: SUCCESS (2/2 tests passed)`;
-        setConsoleOutput(prev => prev + output);
-        setIsRunningCode(false);
-      }, 750);
-    }, 550);
-  }, []);
+    setConsoleOutput('Submitting code to the interview sandbox...\n');
+
+    try {
+      const result = await codingApi.runTestCases(
+        id || 'interview-room',
+        codeValue,
+        codeLanguage,
+        'two-sum',
+      );
+      const lines = [
+        `Status: ${result.success ? 'SUCCESS' : 'FAILED'}`,
+        `Passed: ${result.passedCount}/${result.totalCount}`,
+        `Runtime: ${result.runtimeMs ?? 0}ms`,
+      ];
+      if (result.stdout) lines.push(`\nStandard Output:\n${result.stdout}`);
+      if (result.errorDetails) lines.push(`\n${result.errorDetails}`);
+      setConsoleOutput(lines.join('\n'));
+    } catch (err: any) {
+      const message = err?.response?.data?.error || err?.message || 'Code execution service unavailable';
+      setConsoleOutput(`[EXECUTION ERROR] ${message}`);
+    } finally {
+      setIsRunningCode(false);
+    }
+  }, [codeLanguage, codeValue, id, isRunningCode]);
 
   const handleLanguageChange = useCallback((lang: string) => {
     setCodeLanguage(lang);
@@ -569,6 +587,10 @@ export default function InterviewRoom() {
   const videoMLMetrics = useVideoAnalysisML(mediaStream, isCameraOn, (m) => {
     handleGazeSample(m.eyeContactScore);
   });
+  const videoMLMetricsRef = useRef(videoMLMetrics);
+  useEffect(() => {
+    videoMLMetricsRef.current = videoMLMetrics;
+  }, [videoMLMetrics]);
 
   // Multiple Faces / Cheating Real-Time Enforcer
   const multipleFacesStreakRef = useRef(0);
@@ -691,6 +713,11 @@ export default function InterviewRoom() {
     rec.lang = browserLang.toLowerCase().startsWith('en') ? browserLang : 'en-US';
 
     rec.onresult = (event: any) => {
+      // Suppress listening if candidate is out of the camera
+      if (videoMLMetricsRef.current && !videoMLMetricsRef.current.faceDetected) {
+        clearSilenceTimers();
+        return;
+      }
       const now = Date.now();
       const gapMs = now - lastSpeechRef.current;
       if (hadSpeechRef.current && gapMs > 2000) {
@@ -1039,26 +1066,21 @@ export default function InterviewRoom() {
     // 2. Transition states
     setIsInterviewStarted(true);
 
-    // 3. Initialize Context & Dynamic Question Generation
+    // 3. Deliver Greeting and Initial Technical Question from Server
     if (session) {
       const roleName = session.targetRole || 'Software Engineer';
-      const ctx = createInterviewContext({
-        targetRole: roleName,
-        targetCompany: session.targetCompany,
-        experienceLevel: session.experienceLevel || 'Fresher',
-        focusAreas: session.focusAreas || ['Technical Knowledge', 'Architecture'],
-      });
-      interviewContextRef.current = ctx;
+      const initialQ = currentQuestionRef.current || currentQuestion;
+      const questionTextToAsk = initialQ?.questionText || `To kick off our technical discussion, describe a technically demanding project you recently engineered as a ${roleName}, and the core system design trade-offs you had to defend.`;
 
-      const dynamicInitialQ = generateInitialDynamicQuestion(ctx);
-      const activeQ = {
-        id: `q_${Date.now()}`,
-        orderIndex: 0,
-        questionText: dynamicInitialQ,
-        questionType: 'TECHNICAL',
-        difficulty: 'MEDIUM',
-      };
-      setCurrentQuestion(activeQ);
+      if (!initialQ) {
+        setCurrentQuestion({
+          id: `q_${Date.now()}`,
+          orderIndex: 1,
+          questionText: questionTextToAsk,
+          questionType: 'TECHNICAL',
+          difficulty: 'MEDIUM',
+        });
+      }
 
       const briefGreeting = `Hello! I'm Ava. We're going to dive into technical architecture and engineering decisions for the ${roleName} role today.`;
       
@@ -1085,8 +1107,9 @@ export default function InterviewRoom() {
         });
       });
 
-      // Ava delivers the dynamic opening technical question
-      await aiSpeak(dynamicInitialQ);
+      // Ava delivers the server-provided technical opening question with lip-sync
+      setInterviewerPrompt(questionTextToAsk);
+      await aiSpeak(questionTextToAsk);
       startListening();
     }
   }, [session, aiSpeak, startListening, addTranscriptEntry]);
@@ -1161,22 +1184,24 @@ export default function InterviewRoom() {
     setProcessingLabel('Completing interview and compiling report…');
 
     try {
-      let submittedAnswer = answerText.trim();
+      const candidateTranscript = (latestAnswerRef.current || finalTranscriptRef.current || answerText).trim();
+      let submittedAnswer = candidateTranscript;
       if (showCodeWorkspace && codeValue.trim()) {
         submittedAnswer += `\n\n[Submitted Code (${codeLanguage})]:\n\`\`\`${codeLanguage}\n${codeValue}\n\`\`\``;
       }
 
-      // Submit current answer if any (ensure we don't save repeat or skip requests as answers)
+      // Submit current answer if any
       if (
         currentQuestion &&
-        answerText.trim() &&
-        !isRepeatRequest(answerText) &&
-        !isSkipOrUnknownRequest(answerText)
+        candidateTranscript.length >= 3 &&
+        !isRepeatRequest(candidateTranscript) &&
+        !isSkipOrUnknownRequest(candidateTranscript)
       ) {
+        const timeTakenSecs = Math.max(3, Math.floor((Date.now() - (questionStartRef.current || Date.now())) / 1000));
         await apiClient.post(`/interview/session/${id}/answer`, {
           questionId: currentQuestion.id,
           answerText: submittedAnswer,
-          timeTaken: 30,
+          timeTaken: timeTakenSecs,
         });
       }
 
@@ -1210,7 +1235,9 @@ export default function InterviewRoom() {
         },
       });
 
-      navigate(`/interview/${id}/analysis`);
+      setTimeout(() => {
+        navigate(`/interview/${id}/analysis`);
+      }, 1000);
     } catch (err) {
       console.error('Failed to end interview:', err);
       navigate(`/interview/${id}/analysis`);
@@ -1405,47 +1432,47 @@ export default function InterviewRoom() {
           });
         }
 
-        // Generate next dynamic question based on candidate answer & extracted claims
-        const { question: nextDynamicQuestion, isClosing } = interviewContextRef.current
-          ? generateNextDynamicQuestion(interviewContextRef.current, submittedAnswer)
-          : { question: 'What technical trade-offs would you weigh for that system?', isClosing: false };
-
-        // Asynchronously sync answer to backend
-        apiClient.post(`/interview/session/${id}/answer`, {
+        // Submit answer to backend and receive dynamic follow-up or next question from PostgreSQL
+        const timeTakenSecs = Math.max(3, Math.floor((Date.now() - (questionStartRef.current || Date.now())) / 1000));
+        const res = await apiClient.post(`/interview/session/${id}/answer`, {
           questionId: activeQ.id,
           answerText: submittedAnswer,
-          timeTaken: Math.max(5, Math.floor((Date.now() - (questionStartRef.current || Date.now())) / 1000)),
-        }).catch((err) => console.warn('Background answer post failed:', err));
+          timeTaken: timeTakenSecs,
+          isSkip: false,
+        });
 
-        if (isClosing) {
+        const data = res.data;
+        if (data?.isComplete) {
           setAvatarState('pleased');
-          await aiSpeak(nextDynamicQuestion);
+          const closingText = data.spokenResponse || "That concludes all the questions for today's session! You've done an excellent job articulating your technical decisions. Let me compile your detailed evaluation report.";
+          setInterviewerPrompt(closingText);
+          await aiSpeak(closingText);
           stopAllSpeech();
           handleEndInterview();
           return;
         }
 
-        const nextQ: QuestionData = {
-          id: `q_${Date.now()}`,
-          orderIndex: (activeQ.orderIndex || 0) + 1,
-          questionText: nextDynamicQuestion,
-          questionType: 'TECHNICAL',
-          difficulty: 'MEDIUM',
-        };
-        setCurrentQuestion(nextQ);
-        setInterviewerPrompt(nextDynamicQuestion);
-        setAnswerText('');
-        setIsProcessing(false);
-        setProcessingLabel('');
+        const nextQ = data?.nextQuestion;
+        if (nextQ) {
+          setIsFollowUpMode(Boolean(data.isFollowUp));
+          setCurrentQuestion(nextQ);
+          const speechToDeliver = data.spokenResponse || nextQ.questionText;
+          setInterviewerPrompt(speechToDeliver);
+          setAnswerText('');
+          setIsProcessing(false);
+          setProcessingLabel('');
 
-        if (showCodeWorkspace) {
-          setCodeValue(getLanguageBoilerplate(codeLanguage));
-          setConsoleOutput('');
+          if (showCodeWorkspace) {
+            setCodeValue(getLanguageBoilerplate(codeLanguage));
+            setConsoleOutput('');
+          }
+
+          // Ava delivers the follow-up or next technical question with lip-sync
+          await aiSpeak(speechToDeliver);
+          startListening();
+        } else {
+          handleEndInterview();
         }
-
-        // Ava delivers the dynamic follow-up inquiry directly with lip-sync
-        await aiSpeak(nextDynamicQuestion);
-        startListening();
       } catch (err) {
         console.error('Failed to submit answer:', err);
         setIsProcessing(false);
@@ -1561,7 +1588,7 @@ export default function InterviewRoom() {
           setLoadingMessage('Ava is preparing your first AI question...');
           const startRes = await apiClient.post(`/interview/session/${id}/start`);
           if (!active) return;
-          firstQuestion = startRes.data;
+          firstQuestion = startRes.data?.currentQuestion || startRes.data;
         }
 
         if (!firstQuestion?.id || !firstQuestion?.questionText) {

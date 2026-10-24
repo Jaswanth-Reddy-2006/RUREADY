@@ -28,6 +28,52 @@ export interface AvatarEngine3DProps {
   className?: string;
 }
 
+const MORPH_TARGET_ALIASES: Record<string, string[]> = {
+  eyeBlinkLeft: ['eyeblinkl', 'blinkleft'],
+  eyeBlinkRight: ['eyeblinkr', 'blinkright'],
+  eyeLookInLeft: ['eyelookinl'],
+  eyeLookInRight: ['eyelookinr'],
+  eyeLookOutLeft: ['eyelookoutl'],
+  eyeLookOutRight: ['eyelookoutr'],
+  eyeLookUpLeft: ['eyelookupl'],
+  eyeLookUpRight: ['eyelookupr'],
+  jawOpen: ['jawopen'],
+};
+
+function normalizeMorphTargetName(name: string): string {
+  return name.toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
+function resolveMorphTargetIndex(
+  dictionary: Record<string, number>,
+  targetName: string,
+): number | undefined {
+  const directIndex = dictionary[targetName];
+  if (directIndex !== undefined) return directIndex;
+
+  const normalizedTargetName = normalizeMorphTargetName(targetName);
+  const aliases = MORPH_TARGET_ALIASES[targetName] || [];
+  const candidateNames = [normalizedTargetName, ...aliases];
+  const matchingName = Object.keys(dictionary).find((name) =>
+    candidateNames.includes(normalizeMorphTargetName(name)),
+  );
+
+  return matchingName === undefined ? undefined : dictionary[matchingName];
+}
+
+function disposeAvatarResources(root: THREE.Object3D): void {
+  root.traverse((child) => {
+    const mesh = child as THREE.Mesh;
+    mesh.geometry?.dispose();
+
+    const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+    for (const material of materials) {
+      if (!material) continue;
+      material.dispose();
+    }
+  });
+}
+
 export default function AvatarEngine3D({
   persona = 'AVA',
   state = 'IDLE',
@@ -42,6 +88,8 @@ export default function AvatarEngine3D({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [modelAssetLoaded, setModelAssetLoaded] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [loadProgress, setLoadProgress] = useState<number | null>(null);
+  const [retryNonce, setRetryNonce] = useState(0);
 
   // Synchronize dynamic reactive props with refs so Three.js render loop consumes them smoothly
   const stateRef = useRef(state);
@@ -62,31 +110,47 @@ export default function AvatarEngine3D({
 
     setModelAssetLoaded(false);
     setLoadError(null);
+    setLoadProgress(null);
 
     const avatarController = new AvatarController();
 
     // ─── 1. WEBGL SCENE & CINEMATIC CLOSE-UP PORTRAIT CAMERA ───
     const scene = new THREE.Scene();
 
-    const width = canvas.parentElement?.clientWidth || 640;
-    const height = canvas.parentElement?.clientHeight || 480;
+    const parent = canvas.parentElement;
+    const initialWidth = parent?.clientWidth || 1;
+    const initialHeight = parent?.clientHeight || 1;
 
     // Portrait Close-up Camera directly framing the full face & upper shoulders
-    const camera = new THREE.PerspectiveCamera(28, width / height, 0.05, 50);
+    const camera = new THREE.PerspectiveCamera(28, initialWidth / initialHeight, 0.05, 50);
     camera.position.set(0, 0.01, 0.65);
     camera.lookAt(0, 0, 0);
 
-    const renderer = new THREE.WebGLRenderer({
-      canvas,
-      antialias: true,
-      alpha: true,
-      powerPreference: 'high-performance',
-    });
-    renderer.setSize(width, height);
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({
+        canvas,
+        antialias: true,
+        alpha: true,
+        powerPreference: 'high-performance',
+      });
+    } catch (err) {
+      console.error('[AvatarEngine3D] WebGL renderer initialization failed:', err);
+      setLoadError('3D rendering is unavailable in this browser or device');
+      return undefined;
+    }
+    renderer.setSize(initialWidth, initialHeight, false);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2.5));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.22;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+    const handleContextLost = (event: Event) => {
+      event.preventDefault();
+      console.error('[AvatarEngine3D] WebGL context lost', { persona, modelUrl });
+      setLoadError('3D rendering stopped unexpectedly. Retry the interviewer model to recover.');
+    };
+    canvas.addEventListener('webglcontextlost', handleContextLost, false);
 
     // ─── 2. HIGH-DEFINITION STUDIO PBR LIGHTING RIG ───
     const ambientLight = new THREE.AmbientLight(0xfffaf6, 1.3);
@@ -123,6 +187,8 @@ export default function AvatarEngine3D({
 
     const morphMeshes: THREE.Mesh[] = [];
     let mixer: THREE.AnimationMixer | null = null;
+    let loadedModel: THREE.Object3D | null = null;
+    let disposed = false;
 
     const loader = new GLTFLoader();
     const modelUrl = getModelAssetPath(persona);
@@ -130,7 +196,12 @@ export default function AvatarEngine3D({
     loader.load(
       modelUrl,
       (gltf) => {
-        const loadedModel = gltf.scene;
+        if (disposed) {
+          disposeAvatarResources(gltf.scene);
+          return;
+        }
+
+        loadedModel = gltf.scene;
 
         // ─── Detect Mixamo models (cm scale) and normalize to meters ───
         let isMixamo = false;
@@ -264,10 +335,19 @@ export default function AvatarEngine3D({
           }
         });
       },
-      undefined,
+      (progress) => {
+        if (progress.total > 0) {
+          setLoadProgress(Math.round((progress.loaded / progress.total) * 100));
+        }
+      },
       (err) => {
-        console.error('[AvatarEngine3D] Error loading 3D avatar GLB asset:', err);
-        setLoadError('Unable to load 3D character asset');
+        if (disposed) return;
+        console.error('[AvatarEngine3D] Error loading 3D avatar GLB asset', {
+          persona,
+          modelUrl,
+          error: err,
+        });
+        setLoadError('The interviewer model could not be loaded. You can retry or continue with the 2D interviewer.');
       }
     );
 
@@ -298,7 +378,13 @@ export default function AvatarEngine3D({
         avatarController.facial.setExpression(currentExpr);
       }
 
-      const frameState = avatarController.updateFrame(delta, activeVisemeRef.current);
+      const externalViseme = activeVisemeRef.current;
+      const frameState = avatarController.updateFrame(
+        delta,
+        typeof externalViseme === 'string' && oculusVisemeList.includes(externalViseme as OculusViseme)
+          ? externalViseme as OculusViseme
+          : undefined,
+      );
       const currentBlendshapes = frameState.blendshapes;
       const eyeGaze = frameState.eyeGaze;
 
@@ -344,32 +430,38 @@ export default function AvatarEngine3D({
         if (!inf || !dict) continue;
 
         // 1. Oculus Visemes with Dynamic Volume Modulation (for Ready Player Me / Oculus Rigs)
-        if (dict['viseme_aa'] !== undefined) {
-          for (const v of oculusVisemeList) {
-            if (dict[v] !== undefined) {
-              const isVowel = (v === 'viseme_aa' || v === 'viseme_O' || v === 'viseme_E' || v === 'viseme_I');
-              const baseIntensity = isVowel ? 0.65 : 0.48;
-              const target = (frameState.viseme === v && isSpeakingNow) ? (baseIntensity * volumeScale) : 0.0;
-              const lerpFactor = target > inf[dict[v]] ? 0.42 : 0.22;
-              inf[dict[v]] = THREE.MathUtils.lerp(inf[dict[v]], target, lerpFactor);
+        const visemeAaIndex = resolveMorphTargetIndex(dict, 'viseme_aa');
+          if (visemeAaIndex !== undefined) {
+            for (const v of oculusVisemeList) {
+              const visemeIndex = resolveMorphTargetIndex(dict, v);
+              if (visemeIndex !== undefined) {
+                const isVowel = (v === 'viseme_aa' || v === 'viseme_O' || v === 'viseme_E' || v === 'viseme_I');
+                const baseIntensity = isVowel ? 0.65 : 0.48;
+                const target = (frameState.viseme === v && isSpeakingNow) ? (baseIntensity * volumeScale) : 0.0;
+                const lerpFactor = target > inf[visemeIndex] ? 0.42 : 0.22;
+                inf[visemeIndex] = THREE.MathUtils.lerp(inf[visemeIndex], target, lerpFactor);
+              }
+            }
+
+          // Natural vertical jaw articulation synchronized with Oculus speech
+            const jawOpenIndex = resolveMorphTargetIndex(dict, 'jawOpen');
+            if (jawOpenIndex !== undefined) {
+              const isVowel = (frameState.viseme === 'viseme_aa' || frameState.viseme === 'viseme_O' || frameState.viseme === 'viseme_E');
+              const targetJaw = (isSpeakingNow && frameState.viseme !== 'viseme_sil')
+                ? (isVowel ? 0.36 : 0.20) * volumeScale
+                : Math.sin(breathPhase * 0.8) * 0.005;
+              inf[jawOpenIndex] = THREE.MathUtils.lerp(inf[jawOpenIndex], Math.max(0, targetJaw), 0.35);
             }
           }
 
-          // Natural vertical jaw articulation synchronized with Oculus speech
-          if (dict['jawOpen'] !== undefined) {
-            const isVowel = (frameState.viseme === 'viseme_aa' || frameState.viseme === 'viseme_O' || frameState.viseme === 'viseme_E');
-            const targetJaw = (isSpeakingNow && frameState.viseme !== 'viseme_sil')
-              ? (isVowel ? 0.36 : 0.20) * volumeScale
-              : Math.sin(breathPhase * 0.8) * 0.005;
-            inf[dict['jawOpen']] = THREE.MathUtils.lerp(inf[dict['jawOpen']], Math.max(0, targetJaw), 0.35);
-          }
-        }
-
-        // Natural Eyelid Blinking
-        if (dict['eyeBlinkLeft'] !== undefined) inf[dict['eyeBlinkLeft']] = eyeGaze.blinkWeight;
-        if (dict['eyeBlinkRight'] !== undefined) inf[dict['eyeBlinkRight']] = eyeGaze.blinkWeight;
-        if (dict['eyesClosed'] !== undefined && dict['eyeBlinkLeft'] === undefined) {
-          inf[dict['eyesClosed']] = eyeGaze.blinkWeight;
+          // Natural Eyelid Blinking
+        const eyeBlinkLeftIndex = resolveMorphTargetIndex(dict, 'eyeBlinkLeft');
+        const eyeBlinkRightIndex = resolveMorphTargetIndex(dict, 'eyeBlinkRight');
+        const eyesClosedIndex = resolveMorphTargetIndex(dict, 'eyesClosed');
+        if (eyeBlinkLeftIndex !== undefined) inf[eyeBlinkLeftIndex] = eyeGaze.blinkWeight;
+        if (eyeBlinkRightIndex !== undefined) inf[eyeBlinkRightIndex] = eyeGaze.blinkWeight;
+        if (eyesClosedIndex !== undefined && eyeBlinkLeftIndex === undefined) {
+          inf[eyesClosedIndex] = eyeGaze.blinkWeight;
         }
 
         // Eye Contact & Gaze
@@ -380,17 +472,22 @@ export default function AvatarEngine3D({
           gazeY = 0.08;
         }
 
-        if (dict['eyeLookInLeft'] !== undefined) inf[dict['eyeLookInLeft']] = Math.min(0.18, Math.max(0, gazeX));
-        if (dict['eyeLookOutRight'] !== undefined) inf[dict['eyeLookOutRight']] = Math.min(0.18, Math.max(0, gazeX));
-        if (dict['eyeLookUpLeft'] !== undefined) inf[dict['eyeLookUpLeft']] = Math.min(0.15, Math.max(0, gazeY));
-        if (dict['eyeLookUpRight'] !== undefined) inf[dict['eyeLookUpRight']] = Math.min(0.15, Math.max(0, gazeY));
+        const eyeLookInLeftIndex = resolveMorphTargetIndex(dict, 'eyeLookInLeft');
+        const eyeLookOutRightIndex = resolveMorphTargetIndex(dict, 'eyeLookOutRight');
+        const eyeLookUpLeftIndex = resolveMorphTargetIndex(dict, 'eyeLookUpLeft');
+        const eyeLookUpRightIndex = resolveMorphTargetIndex(dict, 'eyeLookUpRight');
+        if (eyeLookInLeftIndex !== undefined) inf[eyeLookInLeftIndex] = Math.min(0.18, Math.max(0, gazeX));
+        if (eyeLookOutRightIndex !== undefined) inf[eyeLookOutRightIndex] = Math.min(0.18, Math.max(0, gazeX));
+        if (eyeLookUpLeftIndex !== undefined) inf[eyeLookUpLeftIndex] = Math.min(0.15, Math.max(0, gazeY));
+        if (eyeLookUpRightIndex !== undefined) inf[eyeLookUpRightIndex] = Math.min(0.15, Math.max(0, gazeY));
 
         // 2. ARKit Blendshapes & Situational Expressions Driver
         const isMouthShape = (name: string) => /^(jawOpen|mouthFunnel|mouthPucker|mouthStretch|mouthLowerDown|mouthUpperUp|mouthPress|mouthRoll|mouthDimple|mouthClose)/.test(name);
         const activeVisemeARKit = (OCULUS_VISEME_WEIGHTS as any)[frameState.viseme] || {};
 
         for (const [bsName, bsVal] of Object.entries(currentBlendshapes)) {
-          if (dict[bsName] !== undefined && typeof bsVal === 'number') {
+            const blendshapeIndex = resolveMorphTargetIndex(dict, bsName);
+            if (blendshapeIndex !== undefined && typeof bsVal === 'number') {
             let targetVal = bsVal;
             
             // If model does not have native Oculus visemes, inject calibrated ARKit viseme weights
@@ -416,18 +513,19 @@ export default function AvatarEngine3D({
             const maxLimit = isMouthShape(bsName) ? (bsName === 'jawOpen' ? 0.65 : 0.50) : 0.25;
             const clamped = Math.min(maxLimit, Math.max(0, targetVal));
             const lerpSpeed = isMouthShape(bsName) ? 0.40 : 0.18;
-            inf[dict[bsName]] = THREE.MathUtils.lerp(inf[dict[bsName]], clamped, lerpSpeed);
+            inf[blendshapeIndex] = THREE.MathUtils.lerp(inf[blendshapeIndex], clamped, lerpSpeed);
           }
         }
 
         // Idle gentle breathing when silent for non-Oculus models
-        if (dict['viseme_aa'] === undefined && dict['jawOpen'] !== undefined && !isSpeakingNow) {
-          inf[dict['jawOpen']] = THREE.MathUtils.lerp(inf[dict['jawOpen']], Math.sin(breathPhase * 0.8) * 0.006, 0.08);
+        const jawOpenIndex = resolveMorphTargetIndex(dict, 'jawOpen');
+        if (visemeAaIndex === undefined && jawOpenIndex !== undefined && !isSpeakingNow) {
+          inf[jawOpenIndex] = THREE.MathUtils.lerp(inf[jawOpenIndex], Math.sin(breathPhase * 0.8) * 0.006, 0.08);
         }
       }
 
       renderer.render(scene, camera);
-      animationFrameId = requestAnimationFrame(animate);
+      if (!disposed) animationFrameId = requestAnimationFrame(animate);
     };
 
     animate();
@@ -442,14 +540,28 @@ export default function AvatarEngine3D({
       renderer.setSize(w, h, false);
     };
 
+    handleResize();
     window.addEventListener('resize', handleResize);
+    const resizeObserver = typeof ResizeObserver !== 'undefined' && parent
+      ? new ResizeObserver(handleResize)
+      : null;
+    if (resizeObserver && parent) resizeObserver.observe(parent);
 
     return () => {
+      disposed = true;
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener('resize', handleResize);
+      canvas.removeEventListener('webglcontextlost', handleContextLost);
+      resizeObserver?.disconnect();
+      mixer?.stopAllAction();
+      if (mixer && loadedModel) mixer.uncacheRoot(loadedModel);
+      if (loadedModel) {
+        avatarGroup.remove(loadedModel);
+        disposeAvatarResources(loadedModel);
+      }
       renderer.dispose();
     };
-  }, [persona]);
+  }, [persona, retryNonce]);
 
   return (
     <div className={`relative w-full h-full flex items-center justify-center overflow-hidden rounded-3xl border border-[#1E293B] ${className}`}
@@ -462,15 +574,32 @@ export default function AvatarEngine3D({
       {!modelAssetLoaded && !loadError && (
         <div className="absolute z-20 flex flex-col items-center justify-center gap-3 text-slate-400">
           <div className="w-9 h-9 rounded-full border-2 border-[#4A8BDF] border-t-transparent animate-spin" />
-          <span className="text-xs font-medium tracking-wide">Loading 3D HD Model...</span>
+          <span className="text-xs font-medium tracking-wide">
+            {loadProgress === null ? 'Loading 3D interviewer…' : `Loading 3D interviewer… ${loadProgress}%`}
+          </span>
         </div>
       )}
 
       {/* Error Fallback Card */}
       {loadError && (
-        <div className="absolute z-20 flex flex-col items-center justify-center gap-2 p-4 text-center text-rose-400 bg-slate-950/80 rounded-2xl border border-rose-500/30">
-          <span className="text-sm font-semibold">3D Model Asset Unavailable</span>
-          <span className="text-xs text-slate-400">Please check model file path</span>
+        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 p-6 text-center bg-slate-950/90">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-blue-400/30 bg-blue-500/10 text-2xl font-black text-blue-300">
+            {persona.slice(0, 1)}
+          </div>
+          <span className="text-sm font-semibold text-slate-100">2D interviewer fallback</span>
+          <span className="max-w-xs text-xs leading-relaxed text-slate-400">{loadError}</span>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <button
+              type="button"
+              onClick={() => setRetryNonce((value) => value + 1)}
+              className="rounded-xl border border-blue-400/40 bg-blue-500/15 px-3 py-2 text-xs font-semibold text-blue-200 transition hover:bg-blue-500/25"
+            >
+              Retry 3D model
+            </button>
+            <span className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-slate-300">
+              Interview progress preserved
+            </span>
+          </div>
         </div>
       )}
 

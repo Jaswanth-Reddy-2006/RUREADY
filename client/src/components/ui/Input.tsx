@@ -60,7 +60,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             className={clsx(
               'w-full rounded-xl border border-[#DCE7F2] dark:border-[#262626] bg-white dark:bg-[#1C1C1C] px-4 py-2.5 text-sm font-sans text-[#11183D] dark:text-[#FFFFFF] placeholder:text-[#7B8799] dark:placeholder:text-[#8A8A8A] shadow-sm transition-all duration-200 ease-out focus:outline-none focus:border-[#0A84FF] focus:ring-2 focus:ring-[#0A84FF]/20',
               error && 'border-[#D64545] text-[#D64545] focus:border-[#D64545] focus:ring-[#D64545]/20',
-              disabled && 'opacity-50 cursor-not-allowed bg-[#EFFAFD] dark:bg-[#262626] pointer-events-none',
+              disabled && 'dark:bg-[#262626] opacity-50 cursor-not-allowed bg-[#EFFAFD] pointer-events-none',
               icon && 'pl-10',
               iconRight && 'pr-10',
               className,

@@ -34,8 +34,6 @@ import InterviewReplay from './pages/interview/InterviewReplay';
 import CodingSetupForm from './components/interview/CodingSetupForm';
 import CodingInterviewRoom from './components/interview/CodingInterviewRoom';
 import OralHistoryPage from './pages/interview/OralHistoryPage';
-import CompanyWiseCatalogPage from './pages/interview/CompanyWiseCatalogPage';
-import CompanyTrackDetailPage from './pages/interview/CompanyTrackDetailPage';
 import InbuiltInterviewCatalogPage from './pages/interview/InbuiltInterviewCatalogPage';
 
 // Placement Preparation Engine pages
@@ -600,46 +598,10 @@ function App() {
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="/interviews/company-wise"
-                element={
-                  <ProtectedRoute>
-                    <FeatureGuard featureKey="company_wise_interview" featureTitle="Company-wise Tracks">
-                      <CompanyWiseCatalogPage />
-                    </FeatureGuard>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/interview/company-wise"
-                element={
-                  <ProtectedRoute>
-                    <FeatureGuard featureKey="company_wise_interview" featureTitle="Company-wise Tracks">
-                      <CompanyWiseCatalogPage />
-                    </FeatureGuard>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/company-wise"
-                element={
-                  <ProtectedRoute>
-                    <FeatureGuard featureKey="company_wise_interview" featureTitle="Company-wise Tracks">
-                      <CompanyWiseCatalogPage />
-                    </FeatureGuard>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/interviews/company-wise/:companyId"
-                element={
-                  <ProtectedRoute>
-                    <FeatureGuard featureKey="company_wise_interview" featureTitle="Company-wise Tracks">
-                      <CompanyTrackDetailPage />
-                    </FeatureGuard>
-                  </ProtectedRoute>
-                }
-              />
+              <Route path="/interviews/company-wise" element={<Navigate to="/interviews" replace />} />
+              <Route path="/interview/company-wise" element={<Navigate to="/interviews" replace />} />
+              <Route path="/company-wise" element={<Navigate to="/interviews" replace />} />
+              <Route path="/interviews/company-wise/:companyId" element={<Navigate to="/interviews" replace />} />
 
               {/* Online Challenges & Multiplayer Competition Routes */}
               <Route
@@ -810,26 +772,8 @@ function App() {
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="/interview/company-wise/:companyId"
-                element={
-                  <ProtectedRoute>
-                    <FeatureGuard featureKey="company_wise_interview" featureTitle="Company-wise Tracks">
-                      <CompanyTrackDetailPage />
-                    </FeatureGuard>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/company-wise/:companyId"
-                element={
-                  <ProtectedRoute>
-                    <FeatureGuard featureKey="company_wise_interview" featureTitle="Company-wise Tracks">
-                      <CompanyTrackDetailPage />
-                    </FeatureGuard>
-                  </ProtectedRoute>
-                }
-              />
+              <Route path="/interview/company-wise/:companyId" element={<Navigate to="/interviews" replace />} />
+              <Route path="/company-wise/:companyId" element={<Navigate to="/interviews" replace />} />
 
               <Route
                 path="/history"

@@ -502,16 +502,16 @@ describe('Empirical M1 Stress Testing — UI Primitives & Layout Shell', () => {
       expect(html).toContain('Dim2');
     });
 
-    it('reveals boundary vulnerability: null or undefined data throws TypeError before fallback check', () => {
-      // RadarChart line 50 calls `const numAxes = data.length;` before the line 137 check `if (!data || data.length < 3)`.
-      // Passing undefined or null causes an unhandled TypeError.
+    it('handles null or undefined data with a safe fallback instead of throwing', () => {
       expect(() => {
-        renderToString(React.createElement(RadarChart, { data: undefined as any }));
-      }).toThrow(TypeError);
+        const html = renderToString(React.createElement(RadarChart, { data: undefined as any }));
+        expect(html).toContain('requires at least 3 dimensions');
+      }).not.toThrow();
 
       expect(() => {
-        renderToString(React.createElement(RadarChart, { data: null as any }));
-      }).toThrow(TypeError);
+        const html = renderToString(React.createElement(RadarChart, { data: null as any }));
+        expect(html).toContain('requires at least 3 dimensions');
+      }).not.toThrow();
     });
   });
 });

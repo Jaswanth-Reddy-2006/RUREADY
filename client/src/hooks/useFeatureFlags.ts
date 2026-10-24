@@ -35,7 +35,7 @@ const DEFAULT_FEATURE_FLAGS: Record<string, FeatureFlag> = {
     id: 'company_wise_interview',
     name: 'Company-wise Tracks',
     description: 'Targeted Google, Amazon, Microsoft, and Meta interview prep',
-    enabled: true,
+    enabled: false,
     updatedAt: new Date().toISOString(),
   },
   challenges_arena: {
@@ -173,10 +173,10 @@ if (typeof window !== 'undefined') {
     }
   });
 
-  // Background sync every 4 seconds
+  // Background sync every 30 seconds
   setInterval(() => {
-    useFeatureFlagsStore.getState().fetchFeatures();
-  }, 4000);
+    useFeatureFlagsStore.getState().fetchFeatures().catch(() => {});
+  }, 30000);
 }
 
 export function useFeatureFlags() {

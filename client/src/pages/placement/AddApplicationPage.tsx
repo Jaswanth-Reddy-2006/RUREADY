@@ -17,13 +17,13 @@ export default function AddApplicationPage() {
   const [location, setLocation] = useState('');
   const [driveType, setDriveType] = useState<DriveType>('CAMPUS');
   const [stage, setStage] = useState<ApplicationStage>('APPLIED');
-  const [nextDeadlineDate, setNextDeadlineDate] = useState('2026-09-25');
+  const [nextDeadlineDate, setNextDeadlineDate] = useState('');
   const [nextDeadlineTitle, setNextDeadlineTitle] = useState('');
-  const [resumeTitle, setResumeTitle] = useState('Software_Engineer_ATS_V2.pdf');
+  const [resumeTitle, setResumeTitle] = useState('');
   const [jobDescription, setJobDescription] = useState('');
   const [riskLevel, setRiskLevel] = useState<RiskLevel>('ON_TRACK');
   const [riskFactorInput, setRiskFactorInput] = useState('');
-  const [riskFactors, setRiskFactors] = useState<string[]>(['Strict CS Cutoff']);
+  const [riskFactors, setRiskFactors] = useState<string[]>([]);
 
   const handleAddRiskFactor = () => {
     if (riskFactorInput.trim() && !riskFactors.includes(riskFactorInput.trim())) {
@@ -46,13 +46,13 @@ export default function AddApplicationPage() {
     addApplication({
       company: company.trim(),
       role: role.trim(),
-      ctc: ctc.trim() || '12 LPA',
-      location: location.trim() || 'Bengaluru / Hybrid',
+      ctc: ctc.trim() || 'Not specified',
+      location: location.trim() || 'Not specified',
       driveType,
       stage,
       nextDeadlineDate: nextDeadlineDate ? `${nextDeadlineDate}T18:00:00Z` : undefined,
       nextDeadlineTitle: nextDeadlineTitle.trim() || (stage === 'OA' ? 'Online Assessment' : 'Interview Round'),
-      resumeTitle,
+      resumeTitle: resumeTitle.trim() || undefined,
       jobDescription: jobDescription.trim(),
       riskLevel,
       riskFactors,

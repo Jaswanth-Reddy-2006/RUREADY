@@ -97,6 +97,10 @@ exports.Prisma.RoadmapScalarFieldEnum = {
   id: 'id',
   ownerId: 'ownerId',
   creatorName: 'creatorName',
+  creatorRole: 'creatorRole',
+  creatorCompany: 'creatorCompany',
+  isVerifiedCreator: 'isVerifiedCreator',
+  isEndorsed: 'isEndorsed',
   title: 'title',
   description: 'description',
   goal: 'goal',
@@ -106,9 +110,18 @@ exports.Prisma.RoadmapScalarFieldEnum = {
   tags: 'tags',
   cloneCount: 'cloneCount',
   viewCount: 'viewCount',
+  forkCount: 'forkCount',
+  followerCount: 'followerCount',
+  rating: 'rating',
+  reviewCount: 'reviewCount',
+  currentVersion: 'currentVersion',
+  forkedFromId: 'forkedFromId',
+  forkedFromVersion: 'forkedFromVersion',
+  license: 'license',
   status: 'status',
   isPublished: 'isPublished',
   publishedAt: 'publishedAt',
+  graphLayout: 'graphLayout',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -143,10 +156,80 @@ exports.Prisma.RoadmapProgressScalarFieldEnum = {
   nodeId: 'nodeId',
   userId: 'userId',
   status: 'status',
+  masteryStatus: 'masteryStatus',
   percent: 'percent',
   notes: 'notes',
+  competenciesDemonstrated: 'competenciesDemonstrated',
+  checklistCompleted: 'checklistCompleted',
+  assessmentScore: 'assessmentScore',
+  lastAssessmentAt: 'lastAssessmentAt',
   completedAt: 'completedAt',
   updatedAt: 'updatedAt',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.RoadmapInstanceScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  roadmapId: 'roadmapId',
+  roadmapVersion: 'roadmapVersion',
+  status: 'status',
+  targetPaceHoursPerWeek: 'targetPaceHoursPerWeek',
+  currentModuleId: 'currentModuleId',
+  progressPercent: 'progressPercent',
+  completedModulesCount: 'completedModulesCount',
+  totalModulesCount: 'totalModulesCount',
+  customOverrides: 'customOverrides',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.RoadmapFollowScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  roadmapId: 'roadmapId',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.RoadmapReviewScalarFieldEnum = {
+  id: 'id',
+  roadmapId: 'roadmapId',
+  userId: 'userId',
+  userName: 'userName',
+  userAvatar: 'userAvatar',
+  rating: 'rating',
+  reviewText: 'reviewText',
+  isVerifiedLearner: 'isVerifiedLearner',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.RoadmapDiscussionScalarFieldEnum = {
+  id: 'id',
+  roadmapId: 'roadmapId',
+  nodeId: 'nodeId',
+  userId: 'userId',
+  userName: 'userName',
+  userAvatar: 'userAvatar',
+  title: 'title',
+  content: 'content',
+  replyCount: 'replyCount',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.RoadmapAssessmentAttemptScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  roadmapId: 'roadmapId',
+  nodeId: 'nodeId',
+  nodeTitle: 'nodeTitle',
+  score: 'score',
+  passed: 'passed',
+  verdict: 'verdict',
+  feedback: 'feedback',
+  competencyScores: 'competencyScores',
+  transcript: 'transcript',
   createdAt: 'createdAt'
 };
 
@@ -169,6 +252,67 @@ exports.Prisma.RoadmapShareScalarFieldEnum = {
   expiresAt: 'expiresAt',
   access: 'access',
   createdAt: 'createdAt'
+};
+
+exports.Prisma.RoadmapVersionScalarFieldEnum = {
+  id: 'id',
+  roadmapId: 'roadmapId',
+  version: 'version',
+  title: 'title',
+  description: 'description',
+  changelog: 'changelog',
+  nodesSnapshot: 'nodesSnapshot',
+  graphLayout: 'graphLayout',
+  createdBy: 'createdBy',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.RoadmapSubmissionScalarFieldEnum = {
+  id: 'id',
+  roadmapId: 'roadmapId',
+  nodeId: 'nodeId',
+  userId: 'userId',
+  userName: 'userName',
+  userAvatar: 'userAvatar',
+  deliverableType: 'deliverableType',
+  deliverableUrl: 'deliverableUrl',
+  deliverableText: 'deliverableText',
+  codeLanguage: 'codeLanguage',
+  executionResult: 'executionResult',
+  status: 'status',
+  evaluationFeedback: 'evaluationFeedback',
+  rubricScore: 'rubricScore',
+  competenciesDemonstrated: 'competenciesDemonstrated',
+  evaluatedAt: 'evaluatedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.RoadmapLearningCircleScalarFieldEnum = {
+  id: 'id',
+  roadmapId: 'roadmapId',
+  name: 'name',
+  description: 'description',
+  creatorId: 'creatorId',
+  creatorName: 'creatorName',
+  isPrivate: 'isPrivate',
+  joinCode: 'joinCode',
+  targetDate: 'targetDate',
+  weeklyGoalHours: 'weeklyGoalHours',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.RoadmapLearningCircleMemberScalarFieldEnum = {
+  id: 'id',
+  circleId: 'circleId',
+  userId: 'userId',
+  userName: 'userName',
+  userAvatar: 'userAvatar',
+  role: 'role',
+  progressPercent: 'progressPercent',
+  completedModulesCount: 'completedModulesCount',
+  joinedAt: 'joinedAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -207,8 +351,17 @@ exports.Prisma.ModelName = {
   RoadmapNode: 'RoadmapNode',
   RoadmapCollaborator: 'RoadmapCollaborator',
   RoadmapProgress: 'RoadmapProgress',
+  RoadmapInstance: 'RoadmapInstance',
+  RoadmapFollow: 'RoadmapFollow',
+  RoadmapReview: 'RoadmapReview',
+  RoadmapDiscussion: 'RoadmapDiscussion',
+  RoadmapAssessmentAttempt: 'RoadmapAssessmentAttempt',
   RoadmapTemplate: 'RoadmapTemplate',
-  RoadmapShare: 'RoadmapShare'
+  RoadmapShare: 'RoadmapShare',
+  RoadmapVersion: 'RoadmapVersion',
+  RoadmapSubmission: 'RoadmapSubmission',
+  RoadmapLearningCircle: 'RoadmapLearningCircle',
+  RoadmapLearningCircleMember: 'RoadmapLearningCircleMember'
 };
 /**
  * Create the Client
@@ -257,13 +410,13 @@ const config = {
       }
     }
   },
-  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/client\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel Roadmap {\n  id             String                @id @default(cuid())\n  ownerId        String\n  creatorName    String?\n  title          String\n  description    String?\n  goal           String?\n  category       String?\n  difficulty     String?\n  estimatedWeeks Int?\n  tags           Json?\n  cloneCount     Int                   @default(0)\n  viewCount      Int                   @default(0)\n  status         String                @default(\"DRAFT\")\n  isPublished    Boolean               @default(false)\n  publishedAt    DateTime?\n  share          RoadmapShare?\n  nodes          RoadmapNode[]\n  collaborators  RoadmapCollaborator[]\n  progress       RoadmapProgress[]\n  createdAt      DateTime              @default(now())\n  updatedAt      DateTime              @updatedAt\n\n  @@index([ownerId])\n  @@index([status])\n  @@map(\"roadmaps\")\n}\n\nmodel RoadmapNode {\n  id          String            @id @default(cuid())\n  roadmapId   String\n  title       String\n  description String?\n  type        String            @default(\"TOPIC\")\n  position    Int               @default(0)\n  metadata    Json?\n  roadmap     Roadmap           @relation(fields: [roadmapId], references: [id], onDelete: Cascade)\n  parentId    String?\n  parent      RoadmapNode?      @relation(\"RoadmapNodeTree\", fields: [parentId], references: [id], onDelete: Cascade)\n  children    RoadmapNode[]     @relation(\"RoadmapNodeTree\")\n  progress    RoadmapProgress[]\n  createdAt   DateTime          @default(now())\n  updatedAt   DateTime          @updatedAt\n\n  @@index([roadmapId, position])\n  @@index([parentId])\n  @@map(\"roadmap_nodes\")\n}\n\nmodel RoadmapCollaborator {\n  id        String    @id @default(cuid())\n  roadmapId String\n  userId    String?\n  email     String\n  role      String    @default(\"VIEWER\")\n  status    String    @default(\"PENDING\")\n  invitedAt DateTime  @default(now())\n  joinedAt  DateTime?\n  roadmap   Roadmap   @relation(fields: [roadmapId], references: [id], onDelete: Cascade)\n\n  @@unique([roadmapId, email])\n  @@index([userId])\n  @@map(\"roadmap_collaborators\")\n}\n\nmodel RoadmapProgress {\n  id          String      @id @default(cuid())\n  roadmapId   String\n  nodeId      String\n  userId      String\n  status      String      @default(\"NOT_STARTED\")\n  percent     Int         @default(0)\n  notes       String?\n  completedAt DateTime?\n  roadmap     Roadmap     @relation(fields: [roadmapId], references: [id], onDelete: Cascade)\n  node        RoadmapNode @relation(fields: [nodeId], references: [id], onDelete: Cascade)\n  updatedAt   DateTime    @updatedAt\n  createdAt   DateTime    @default(now())\n\n  @@unique([nodeId, userId])\n  @@index([roadmapId, userId])\n  @@map(\"roadmap_progress\")\n}\n\nmodel RoadmapTemplate {\n  id          String   @id @default(cuid())\n  name        String\n  description String?\n  category    String?\n  isPublic    Boolean  @default(true)\n  authorId    String?\n  definition  Json\n  createdAt   DateTime @default(now())\n  updatedAt   DateTime @updatedAt\n\n  @@index([category, isPublic])\n  @@map(\"roadmap_templates\")\n}\n\nmodel RoadmapShare {\n  id        String    @id @default(cuid())\n  roadmapId String    @unique\n  token     String    @unique @default(cuid())\n  expiresAt DateTime?\n  access    String    @default(\"VIEW\")\n  createdAt DateTime  @default(now())\n  roadmap   Roadmap   @relation(fields: [roadmapId], references: [id], onDelete: Cascade)\n\n  @@map(\"roadmap_shares\")\n}\n",
-  "inlineSchemaHash": "3573a633c6de1a032fbc61f39f8e4d2a7b49564cc6d7747458b79ba2b7155b2f",
+  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/client\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel Roadmap {\n  id                String    @id @default(cuid())\n  ownerId           String\n  creatorName       String?\n  creatorRole       String?\n  creatorCompany    String?\n  isVerifiedCreator Boolean   @default(false)\n  isEndorsed        Boolean   @default(false)\n  title             String\n  description       String?\n  goal              String?\n  category          String?\n  difficulty        String?\n  estimatedWeeks    Int?\n  tags              Json?\n  cloneCount        Int       @default(0)\n  viewCount         Int       @default(0)\n  forkCount         Int       @default(0)\n  followerCount     Int       @default(0)\n  rating            Float     @default(0.0)\n  reviewCount       Int       @default(0)\n  currentVersion    Int       @default(1)\n  forkedFromId      String?\n  forkedFromVersion Int?\n  license           String    @default(\"CC-BY-4.0\")\n  status            String    @default(\"DRAFT\")\n  isPublished       Boolean   @default(false)\n  publishedAt       DateTime?\n  graphLayout       Json?\n\n  share              RoadmapShare?\n  nodes              RoadmapNode[]\n  collaborators      RoadmapCollaborator[]\n  progress           RoadmapProgress[]\n  instances          RoadmapInstance[]\n  follows            RoadmapFollow[]\n  reviews            RoadmapReview[]\n  discussions        RoadmapDiscussion[]\n  assessmentAttempts RoadmapAssessmentAttempt[]\n  versions           RoadmapVersion[]\n  submissions        RoadmapSubmission[]\n  learningCircles    RoadmapLearningCircle[]\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  @@index([ownerId])\n  @@index([status])\n  @@index([category, isPublished])\n  @@map(\"roadmaps\")\n}\n\nmodel RoadmapNode {\n  id          String              @id @default(cuid())\n  roadmapId   String\n  title       String\n  description String?\n  type        String              @default(\"TOPIC\")\n  position    Int                 @default(0)\n  metadata    Json?\n  roadmap     Roadmap             @relation(fields: [roadmapId], references: [id], onDelete: Cascade)\n  parentId    String?\n  parent      RoadmapNode?        @relation(\"RoadmapNodeTree\", fields: [parentId], references: [id], onDelete: Cascade)\n  children    RoadmapNode[]       @relation(\"RoadmapNodeTree\")\n  progress    RoadmapProgress[]\n  submissions RoadmapSubmission[]\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  @@index([roadmapId, position])\n  @@index([parentId])\n  @@map(\"roadmap_nodes\")\n}\n\nmodel RoadmapCollaborator {\n  id        String    @id @default(cuid())\n  roadmapId String\n  userId    String?\n  email     String\n  role      String    @default(\"VIEWER\")\n  status    String    @default(\"PENDING\")\n  invitedAt DateTime  @default(now())\n  joinedAt  DateTime?\n  roadmap   Roadmap   @relation(fields: [roadmapId], references: [id], onDelete: Cascade)\n\n  @@unique([roadmapId, email])\n  @@index([userId])\n  @@map(\"roadmap_collaborators\")\n}\n\nmodel RoadmapProgress {\n  id                       String    @id @default(cuid())\n  roadmapId                String\n  nodeId                   String\n  userId                   String\n  status                   String    @default(\"NOT_STARTED\")\n  masteryStatus            String    @default(\"NOT_STARTED\") // NOT_STARTED, IN_PROGRESS, LEARNING_COMPLETE, ASSESSMENT_PENDING, ASSESSMENT_PASSED, NEEDS_IMPROVEMENT, MASTERED\n  percent                  Int       @default(0)\n  notes                    String?\n  competenciesDemonstrated Json?\n  checklistCompleted       Json?\n  assessmentScore          Int?\n  lastAssessmentAt         DateTime?\n  completedAt              DateTime?\n\n  roadmap Roadmap     @relation(fields: [roadmapId], references: [id], onDelete: Cascade)\n  node    RoadmapNode @relation(fields: [nodeId], references: [id], onDelete: Cascade)\n\n  updatedAt DateTime @updatedAt\n  createdAt DateTime @default(now())\n\n  @@unique([nodeId, userId])\n  @@index([roadmapId, userId])\n  @@map(\"roadmap_progress\")\n}\n\nmodel RoadmapInstance {\n  id                     String   @id @default(cuid())\n  userId                 String\n  roadmapId              String\n  roadmap                Roadmap  @relation(fields: [roadmapId], references: [id], onDelete: Cascade)\n  roadmapVersion         Int      @default(1)\n  status                 String   @default(\"ACTIVE\") // ACTIVE, PAUSED, COMPLETED, ARCHIVED\n  targetPaceHoursPerWeek Int      @default(6)\n  currentModuleId        String?\n  progressPercent        Int      @default(0)\n  completedModulesCount  Int      @default(0)\n  totalModulesCount      Int      @default(0)\n  customOverrides        Json?\n  createdAt              DateTime @default(now())\n  updatedAt              DateTime @updatedAt\n\n  @@unique([userId, roadmapId])\n  @@index([userId])\n  @@map(\"roadmap_instances\")\n}\n\nmodel RoadmapFollow {\n  id        String   @id @default(cuid())\n  userId    String\n  roadmapId String\n  roadmap   Roadmap  @relation(fields: [roadmapId], references: [id], onDelete: Cascade)\n  createdAt DateTime @default(now())\n\n  @@unique([userId, roadmapId])\n  @@index([userId])\n  @@map(\"roadmap_follows\")\n}\n\nmodel RoadmapReview {\n  id                String   @id @default(cuid())\n  roadmapId         String\n  roadmap           Roadmap  @relation(fields: [roadmapId], references: [id], onDelete: Cascade)\n  userId            String\n  userName          String\n  userAvatar        String?\n  rating            Int // 1 - 5\n  reviewText        String\n  isVerifiedLearner Boolean  @default(false)\n  createdAt         DateTime @default(now())\n  updatedAt         DateTime @updatedAt\n\n  @@unique([roadmapId, userId])\n  @@index([roadmapId])\n  @@map(\"roadmap_reviews\")\n}\n\nmodel RoadmapDiscussion {\n  id         String   @id @default(cuid())\n  roadmapId  String\n  roadmap    Roadmap  @relation(fields: [roadmapId], references: [id], onDelete: Cascade)\n  nodeId     String?\n  userId     String\n  userName   String\n  userAvatar String?\n  title      String?\n  content    String\n  replyCount Int      @default(0)\n  createdAt  DateTime @default(now())\n  updatedAt  DateTime @updatedAt\n\n  @@index([roadmapId])\n  @@index([nodeId])\n  @@map(\"roadmap_discussions\")\n}\n\nmodel RoadmapAssessmentAttempt {\n  id               String   @id @default(cuid())\n  userId           String\n  roadmapId        String\n  roadmap          Roadmap  @relation(fields: [roadmapId], references: [id], onDelete: Cascade)\n  nodeId           String\n  nodeTitle        String\n  score            Int\n  passed           Boolean\n  verdict          String\n  feedback         String\n  competencyScores Json\n  transcript       Json\n  createdAt        DateTime @default(now())\n\n  @@index([userId, roadmapId])\n  @@index([nodeId])\n  @@map(\"roadmap_assessment_attempts\")\n}\n\nmodel RoadmapTemplate {\n  id          String   @id @default(cuid())\n  name        String\n  description String?\n  category    String?\n  isPublic    Boolean  @default(true)\n  authorId    String?\n  definition  Json\n  createdAt   DateTime @default(now())\n  updatedAt   DateTime @updatedAt\n\n  @@index([category, isPublic])\n  @@map(\"roadmap_templates\")\n}\n\nmodel RoadmapShare {\n  id        String    @id @default(cuid())\n  roadmapId String    @unique\n  token     String    @unique @default(cuid())\n  expiresAt DateTime?\n  access    String    @default(\"VIEW\")\n  createdAt DateTime  @default(now())\n  roadmap   Roadmap   @relation(fields: [roadmapId], references: [id], onDelete: Cascade)\n\n  @@map(\"roadmap_shares\")\n}\n\nmodel RoadmapVersion {\n  id            String   @id @default(cuid())\n  roadmapId     String\n  roadmap       Roadmap  @relation(fields: [roadmapId], references: [id], onDelete: Cascade)\n  version       Int\n  title         String\n  description   String?\n  changelog     String?\n  nodesSnapshot Json\n  graphLayout   Json?\n  createdBy     String?\n  createdAt     DateTime @default(now())\n\n  @@unique([roadmapId, version])\n  @@index([roadmapId, createdAt])\n  @@map(\"roadmap_versions\")\n}\n\nmodel RoadmapSubmission {\n  id                       String    @id @default(cuid())\n  roadmapId                String\n  nodeId                   String\n  userId                   String\n  userName                 String?\n  userAvatar               String?\n  deliverableType          String // REPOSITORY, DEPLOYMENT, CODE, DIAGRAM, TEXT\n  deliverableUrl           String?\n  deliverableText          String?\n  codeLanguage             String?\n  executionResult          Json?\n  status                   String    @default(\"SUBMITTED\") // SUBMITTED, EVALUATED, PASSED, NEEDS_REVISION\n  evaluationFeedback       String?\n  rubricScore              Int?\n  competenciesDemonstrated Json?\n  evaluatedAt              DateTime?\n  createdAt                DateTime  @default(now())\n  updatedAt                DateTime  @updatedAt\n\n  roadmap Roadmap     @relation(fields: [roadmapId], references: [id], onDelete: Cascade)\n  node    RoadmapNode @relation(fields: [nodeId], references: [id], onDelete: Cascade)\n\n  @@index([roadmapId, userId])\n  @@index([nodeId, userId])\n  @@map(\"roadmap_submissions\")\n}\n\nmodel RoadmapLearningCircle {\n  id              String    @id @default(cuid())\n  roadmapId       String\n  name            String\n  description     String?\n  creatorId       String\n  creatorName     String?\n  isPrivate       Boolean   @default(false)\n  joinCode        String?   @unique\n  targetDate      DateTime?\n  weeklyGoalHours Int       @default(8)\n  createdAt       DateTime  @default(now())\n  updatedAt       DateTime  @updatedAt\n\n  roadmap Roadmap                       @relation(fields: [roadmapId], references: [id], onDelete: Cascade)\n  members RoadmapLearningCircleMember[]\n\n  @@index([roadmapId])\n  @@map(\"roadmap_learning_circles\")\n}\n\nmodel RoadmapLearningCircleMember {\n  id                    String   @id @default(cuid())\n  circleId              String\n  userId                String\n  userName              String\n  userAvatar            String?\n  role                  String   @default(\"MEMBER\") // CREATOR, MENTOR, MEMBER\n  progressPercent       Int      @default(0)\n  completedModulesCount Int      @default(0)\n  joinedAt              DateTime @default(now())\n\n  circle RoadmapLearningCircle @relation(fields: [circleId], references: [id], onDelete: Cascade)\n\n  @@unique([circleId, userId])\n  @@index([userId])\n  @@map(\"roadmap_learning_circle_members\")\n}\n",
+  "inlineSchemaHash": "1ece6be754f9c57dfa83cf9ea25b346436b62fc7dcbf5dee51fab9ec64a22d8b",
   "copyEngine": true
 }
 config.dirname = '/'
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"Roadmap\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"ownerId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"creatorName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"goal\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"category\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"difficulty\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"estimatedWeeks\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"tags\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"cloneCount\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"viewCount\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"status\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"isPublished\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"publishedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"share\",\"kind\":\"object\",\"type\":\"RoadmapShare\",\"relationName\":\"RoadmapToRoadmapShare\"},{\"name\":\"nodes\",\"kind\":\"object\",\"type\":\"RoadmapNode\",\"relationName\":\"RoadmapToRoadmapNode\"},{\"name\":\"collaborators\",\"kind\":\"object\",\"type\":\"RoadmapCollaborator\",\"relationName\":\"RoadmapToRoadmapCollaborator\"},{\"name\":\"progress\",\"kind\":\"object\",\"type\":\"RoadmapProgress\",\"relationName\":\"RoadmapToRoadmapProgress\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"roadmaps\"},\"RoadmapNode\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"roadmapId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"type\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"position\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"metadata\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"roadmap\",\"kind\":\"object\",\"type\":\"Roadmap\",\"relationName\":\"RoadmapToRoadmapNode\"},{\"name\":\"parentId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"parent\",\"kind\":\"object\",\"type\":\"RoadmapNode\",\"relationName\":\"RoadmapNodeTree\"},{\"name\":\"children\",\"kind\":\"object\",\"type\":\"RoadmapNode\",\"relationName\":\"RoadmapNodeTree\"},{\"name\":\"progress\",\"kind\":\"object\",\"type\":\"RoadmapProgress\",\"relationName\":\"RoadmapNodeToRoadmapProgress\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"roadmap_nodes\"},\"RoadmapCollaborator\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"roadmapId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"role\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"invitedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"joinedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"roadmap\",\"kind\":\"object\",\"type\":\"Roadmap\",\"relationName\":\"RoadmapToRoadmapCollaborator\"}],\"dbName\":\"roadmap_collaborators\"},\"RoadmapProgress\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"roadmapId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"nodeId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"percent\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"notes\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"completedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"roadmap\",\"kind\":\"object\",\"type\":\"Roadmap\",\"relationName\":\"RoadmapToRoadmapProgress\"},{\"name\":\"node\",\"kind\":\"object\",\"type\":\"RoadmapNode\",\"relationName\":\"RoadmapNodeToRoadmapProgress\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"roadmap_progress\"},\"RoadmapTemplate\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"category\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"isPublic\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"authorId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"definition\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"roadmap_templates\"},\"RoadmapShare\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"roadmapId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"token\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"expiresAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"access\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"roadmap\",\"kind\":\"object\",\"type\":\"Roadmap\",\"relationName\":\"RoadmapToRoadmapShare\"}],\"dbName\":\"roadmap_shares\"}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"Roadmap\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"ownerId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"creatorName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"creatorRole\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"creatorCompany\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"isVerifiedCreator\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"isEndorsed\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"goal\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"category\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"difficulty\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"estimatedWeeks\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"tags\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"cloneCount\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"viewCount\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"forkCount\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"followerCount\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"rating\",\"kind\":\"scalar\",\"type\":\"Float\"},{\"name\":\"reviewCount\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"currentVersion\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"forkedFromId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"forkedFromVersion\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"license\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"isPublished\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"publishedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"graphLayout\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"share\",\"kind\":\"object\",\"type\":\"RoadmapShare\",\"relationName\":\"RoadmapToRoadmapShare\"},{\"name\":\"nodes\",\"kind\":\"object\",\"type\":\"RoadmapNode\",\"relationName\":\"RoadmapToRoadmapNode\"},{\"name\":\"collaborators\",\"kind\":\"object\",\"type\":\"RoadmapCollaborator\",\"relationName\":\"RoadmapToRoadmapCollaborator\"},{\"name\":\"progress\",\"kind\":\"object\",\"type\":\"RoadmapProgress\",\"relationName\":\"RoadmapToRoadmapProgress\"},{\"name\":\"instances\",\"kind\":\"object\",\"type\":\"RoadmapInstance\",\"relationName\":\"RoadmapToRoadmapInstance\"},{\"name\":\"follows\",\"kind\":\"object\",\"type\":\"RoadmapFollow\",\"relationName\":\"RoadmapToRoadmapFollow\"},{\"name\":\"reviews\",\"kind\":\"object\",\"type\":\"RoadmapReview\",\"relationName\":\"RoadmapToRoadmapReview\"},{\"name\":\"discussions\",\"kind\":\"object\",\"type\":\"RoadmapDiscussion\",\"relationName\":\"RoadmapToRoadmapDiscussion\"},{\"name\":\"assessmentAttempts\",\"kind\":\"object\",\"type\":\"RoadmapAssessmentAttempt\",\"relationName\":\"RoadmapToRoadmapAssessmentAttempt\"},{\"name\":\"versions\",\"kind\":\"object\",\"type\":\"RoadmapVersion\",\"relationName\":\"RoadmapToRoadmapVersion\"},{\"name\":\"submissions\",\"kind\":\"object\",\"type\":\"RoadmapSubmission\",\"relationName\":\"RoadmapToRoadmapSubmission\"},{\"name\":\"learningCircles\",\"kind\":\"object\",\"type\":\"RoadmapLearningCircle\",\"relationName\":\"RoadmapToRoadmapLearningCircle\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"roadmaps\"},\"RoadmapNode\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"roadmapId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"type\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"position\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"metadata\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"roadmap\",\"kind\":\"object\",\"type\":\"Roadmap\",\"relationName\":\"RoadmapToRoadmapNode\"},{\"name\":\"parentId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"parent\",\"kind\":\"object\",\"type\":\"RoadmapNode\",\"relationName\":\"RoadmapNodeTree\"},{\"name\":\"children\",\"kind\":\"object\",\"type\":\"RoadmapNode\",\"relationName\":\"RoadmapNodeTree\"},{\"name\":\"progress\",\"kind\":\"object\",\"type\":\"RoadmapProgress\",\"relationName\":\"RoadmapNodeToRoadmapProgress\"},{\"name\":\"submissions\",\"kind\":\"object\",\"type\":\"RoadmapSubmission\",\"relationName\":\"RoadmapNodeToRoadmapSubmission\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"roadmap_nodes\"},\"RoadmapCollaborator\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"roadmapId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"role\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"invitedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"joinedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"roadmap\",\"kind\":\"object\",\"type\":\"Roadmap\",\"relationName\":\"RoadmapToRoadmapCollaborator\"}],\"dbName\":\"roadmap_collaborators\"},\"RoadmapProgress\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"roadmapId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"nodeId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"masteryStatus\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"percent\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"notes\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"competenciesDemonstrated\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"checklistCompleted\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"assessmentScore\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"lastAssessmentAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"completedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"roadmap\",\"kind\":\"object\",\"type\":\"Roadmap\",\"relationName\":\"RoadmapToRoadmapProgress\"},{\"name\":\"node\",\"kind\":\"object\",\"type\":\"RoadmapNode\",\"relationName\":\"RoadmapNodeToRoadmapProgress\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"roadmap_progress\"},\"RoadmapInstance\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"roadmapId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"roadmap\",\"kind\":\"object\",\"type\":\"Roadmap\",\"relationName\":\"RoadmapToRoadmapInstance\"},{\"name\":\"roadmapVersion\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"status\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"targetPaceHoursPerWeek\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"currentModuleId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"progressPercent\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"completedModulesCount\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"totalModulesCount\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"customOverrides\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"roadmap_instances\"},\"RoadmapFollow\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"roadmapId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"roadmap\",\"kind\":\"object\",\"type\":\"Roadmap\",\"relationName\":\"RoadmapToRoadmapFollow\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"roadmap_follows\"},\"RoadmapReview\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"roadmapId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"roadmap\",\"kind\":\"object\",\"type\":\"Roadmap\",\"relationName\":\"RoadmapToRoadmapReview\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userAvatar\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"rating\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"reviewText\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"isVerifiedLearner\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"roadmap_reviews\"},\"RoadmapDiscussion\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"roadmapId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"roadmap\",\"kind\":\"object\",\"type\":\"Roadmap\",\"relationName\":\"RoadmapToRoadmapDiscussion\"},{\"name\":\"nodeId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userAvatar\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"content\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"replyCount\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"roadmap_discussions\"},\"RoadmapAssessmentAttempt\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"roadmapId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"roadmap\",\"kind\":\"object\",\"type\":\"Roadmap\",\"relationName\":\"RoadmapToRoadmapAssessmentAttempt\"},{\"name\":\"nodeId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"nodeTitle\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"score\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"passed\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"verdict\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"feedback\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"competencyScores\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"transcript\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"roadmap_assessment_attempts\"},\"RoadmapTemplate\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"category\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"isPublic\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"authorId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"definition\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"roadmap_templates\"},\"RoadmapShare\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"roadmapId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"token\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"expiresAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"access\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"roadmap\",\"kind\":\"object\",\"type\":\"Roadmap\",\"relationName\":\"RoadmapToRoadmapShare\"}],\"dbName\":\"roadmap_shares\"},\"RoadmapVersion\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"roadmapId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"roadmap\",\"kind\":\"object\",\"type\":\"Roadmap\",\"relationName\":\"RoadmapToRoadmapVersion\"},{\"name\":\"version\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"changelog\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"nodesSnapshot\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"graphLayout\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"createdBy\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"roadmap_versions\"},\"RoadmapSubmission\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"roadmapId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"nodeId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userAvatar\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"deliverableType\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"deliverableUrl\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"deliverableText\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"codeLanguage\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"executionResult\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"status\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"evaluationFeedback\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"rubricScore\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"competenciesDemonstrated\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"evaluatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"roadmap\",\"kind\":\"object\",\"type\":\"Roadmap\",\"relationName\":\"RoadmapToRoadmapSubmission\"},{\"name\":\"node\",\"kind\":\"object\",\"type\":\"RoadmapNode\",\"relationName\":\"RoadmapNodeToRoadmapSubmission\"}],\"dbName\":\"roadmap_submissions\"},\"RoadmapLearningCircle\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"roadmapId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"creatorId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"creatorName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"isPrivate\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"joinCode\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"targetDate\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"weeklyGoalHours\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"roadmap\",\"kind\":\"object\",\"type\":\"Roadmap\",\"relationName\":\"RoadmapToRoadmapLearningCircle\"},{\"name\":\"members\",\"kind\":\"object\",\"type\":\"RoadmapLearningCircleMember\",\"relationName\":\"RoadmapLearningCircleToRoadmapLearningCircleMember\"}],\"dbName\":\"roadmap_learning_circles\"},\"RoadmapLearningCircleMember\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"circleId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userAvatar\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"role\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"progressPercent\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"completedModulesCount\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"joinedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"circle\",\"kind\":\"object\",\"type\":\"RoadmapLearningCircle\",\"relationName\":\"RoadmapLearningCircleToRoadmapLearningCircleMember\"}],\"dbName\":\"roadmap_learning_circle_members\"}},\"enums\":{},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.engineWasm = {
   getRuntime: async () => require('./query_engine_bg.js'),

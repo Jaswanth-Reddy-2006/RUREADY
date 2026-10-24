@@ -30,8 +30,7 @@ const menus: Array<{ label: string; feature?: string; items: MenuItem[] }> = [
       { label: 'Video Interview', href: '/video', icon: Video, feature: 'video_interview' },
       { label: 'Coding Interview', href: '/coding', icon: Code2, feature: 'coding_interview' },
       { label: 'System Design', href: '/system-design', icon: Network, feature: 'system_design_interview' },
-      { label: 'Company-wise', href: '/interviews/company-wise', icon: BriefcaseBusiness, feature: 'company_wise_interview' },
-    ],
+          ],
   },
   {
     label: 'Challenges',
@@ -128,7 +127,17 @@ export default function TopNav() {
           </NavLink>
 
           {visibleMenus.map((menu) => {
-            const active = menu.items.some((item) => location.pathname.startsWith(item.href));
+            const isInterviews = menu.label === 'Interviews';
+            const active =
+              menu.items.some((item) => location.pathname.startsWith(item.href)) ||
+              (isInterviews && (
+                location.pathname.startsWith('/video') ||
+                location.pathname.startsWith('/oral') ||
+                location.pathname.startsWith('/coding') ||
+                location.pathname.startsWith('/system-design') ||
+                location.pathname.startsWith('/interview') ||
+                location.pathname.startsWith('/interviews')
+              ));
             return (
               <div
                 key={menu.label}
@@ -140,14 +149,16 @@ export default function TopNav() {
                   onClick={() => setOpenMenu(openMenu === menu.label ? null : menu.label)}
                   aria-expanded={openMenu === menu.label}
                   className={clsx(
-                    'flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-colors',
-                    active || openMenu === menu.label
-                      ? 'bg-[#EFFAFD] text-[#11183D] dark:bg-[#262626] dark:text-white'
-                      : 'text-[#526078] hover:bg-[#F8FAFC] hover:text-[#11183D] dark:text-[#A8A8A8] dark:hover:bg-[#262626] dark:hover:text-white'
+                    'flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition-all duration-200',
+                    active && isInterviews
+                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-xs font-extrabold hover:from-blue-700 hover:to-indigo-700'
+                      : active || openMenu === menu.label
+                        ? 'bg-blue-50 text-blue-700 dark:bg-[#262626] dark:text-white'
+                        : 'text-[#526078] hover:bg-[#F8FAFC] hover:text-[#11183D] dark:text-[#A8A8A8] dark:hover:bg-[#262626] dark:hover:text-white'
                   )}
                 >
                   {menu.label}
-                  <ChevronDown size={13} className={clsx('transition-transform', openMenu === menu.label && 'rotate-180')} />
+                  <ChevronDown size={13} className={clsx('transition-transform', openMenu === menu.label && 'rotate-180', active && isInterviews ? 'text-white/80' : '')} />
                 </button>
 
                 {openMenu === menu.label && (

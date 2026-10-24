@@ -9,8 +9,9 @@ import { usePlacementStore, JobApplication } from '../../store/usePlacementStore
 
 export default function PlacementCalendar({ onSelectApplication }: { onSelectApplication: (id: string) => void }) {
   const { applications } = usePlacementStore();
-  const [currentDate, setCurrentDate] = useState(new Date(2026, 8, 1)); // September 2026
-  const [selectedDayNum, setSelectedDayNum] = useState<number>(18); // Default to 18th
+  const today = new Date();
+  const [currentDate, setCurrentDate] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
+  const [selectedDayNum, setSelectedDayNum] = useState<number>(today.getDate());
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -115,7 +116,7 @@ export default function PlacementCalendar({ onSelectApplication }: { onSelectApp
           {Array.from({ length: daysInMonth }).map((_, i) => {
             const dayNum = i + 1;
             const dayEvents = getEventsForDay(dayNum);
-            const isToday = dayNum === 18 && month === 8 && year === 2026; // Sep 18, 2026
+            const isToday = dayNum === today.getDate() && month === today.getMonth() && year === today.getFullYear();
             const isSelected = selectedDayNum === dayNum;
 
             return (
@@ -193,7 +194,7 @@ export default function PlacementCalendar({ onSelectApplication }: { onSelectApp
                 </p>
               </div>
             </div>
-            {selectedDayNum === 18 && month === 8 && year === 2026 && (
+            {selectedDayNum === today.getDate() && month === today.getMonth() && year === today.getFullYear() && (
               <span className="px-2.5 py-0.5 bg-[#2459A8] text-white rounded-full text-[10px] font-bold font-mono">
                 Today
               </span>

@@ -1875,7 +1875,11 @@ export default function CodingInterviewRoom() {
             themeMode === 'light' ? 'bg-slate-100/60 border-slate-200' : 'bg-slate-950 border-slate-800'
           }`}>
             {/* Ava 3D Avatar (Moving Three.js WebGL Model with Bright Studio Background) */}
-            <div className="relative h-44 rounded-2xl overflow-hidden border border-slate-300 dark:border-slate-700/60 bg-gradient-to-tr from-sky-200 via-indigo-100 to-white shadow-md flex items-center justify-center">
+            <div className="relative h-44 rounded-2xl overflow-hidden border border-slate-800 bg-gradient-to-tr from-slate-900 via-slate-950 to-black shadow-lg flex items-center justify-center group">
+              <div className="absolute top-2 left-2 z-10 flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-black/75 backdrop-blur-md text-[10px] font-bold text-white border border-white/10">
+                <span className={`w-1.5 h-1.5 rounded-full ${aiIsSpeaking ? 'bg-amber-400 animate-pulse' : isProcessing ? 'bg-purple-400 animate-pulse' : 'bg-blue-400'}`} />
+                <span>Ava (AI Mentor)</span>
+              </div>
               <AIAvatar
                 state={avatarState}
                 expression={
@@ -1899,7 +1903,11 @@ export default function CodingInterviewRoom() {
             </div>
 
             {/* Candidate Live Webcam Feed */}
-            <div className="relative h-44 rounded-2xl overflow-hidden border border-slate-800 bg-slate-900 shadow-md">
+            <div className="relative h-44 rounded-2xl overflow-hidden border border-slate-800 bg-slate-900 shadow-lg">
+              <div className="absolute top-2 left-2 z-10 flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-black/75 backdrop-blur-md text-[10px] font-bold text-white border border-white/10">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                <span>You</span>
+              </div>
               {mediaStream ? (
                 <video
                   ref={(ref) => {

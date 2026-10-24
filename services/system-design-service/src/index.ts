@@ -3,6 +3,8 @@
 // Port: 4013
 // ═══════════════════════════════════════════════════════════════
 
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -10,10 +12,13 @@ import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import systemDesignRoutes from './routes/systemDesign.routes.js';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
 dotenv.config();
 
 const app: express.Express = express();
-const PORT = parseInt(process.env.PORT || '4013', 10);
+const PORT = parseInt(process.env.SYSTEM_DESIGN_SERVICE_PORT || '4013', 10);
 
 app.use(
   helmet({

@@ -259,6 +259,7 @@ export function lerpBlendshapes(
  * Maps standard VisemeId from speech analysis to OculusViseme
  */
 export function mapVisemeIdToOculus(visemeId: string): OculusViseme {
+  if (visemeId.startsWith('viseme_')) return visemeId as OculusViseme;
   switch (visemeId) {
     case 'REST': return 'viseme_sil';
     case 'VIS_A': return 'viseme_aa';
