@@ -307,69 +307,94 @@ const curatedRoadmaps = [
   },
 ];
 
+async function executeWithRetry<T>(fn: () => Promise<T>, maxRetries = 5, delayMs = 3000): Promise<T> {
+  let lastErr: any;
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (err: any) {
+      lastErr = err;
+      const isConnectionErr =
+        err?.message?.includes("Can't reach database server") ||
+        err?.message?.includes("connection") ||
+        err?.message?.includes("Closed") ||
+        err?.code === 'P1001';
+      if (attempt < maxRetries && isConnectionErr) {
+        console.log(`[Roadmap Service] Database waking up from sleep (attempt ${attempt}/${maxRetries}), retrying in ${delayMs / 1000}s...`);
+        await new Promise((res) => setTimeout(res, delayMs));
+      } else if (!isConnectionErr) {
+        throw err;
+      }
+    }
+  }
+  throw lastErr;
+}
+
 export async function seedPublicRoadmaps() {
   try {
-    for (const item of curatedRoadmaps) {
-      const existing = await prisma.roadmap.findFirst({ where: { ownerId: item.key } });
+    await executeWithRetry(async () => {
+      for (const item of curatedRoadmaps) {
+        const existing = await prisma.roadmap.findFirst({ where: { ownerId: item.key } });
 
-      if (existing) {
-        // Update to make sure rich creator and verified fields are synced
-        await prisma.roadmap.update({
-          where: { id: existing.id },
+        if (existing) {
+          // Update to make sure rich creator and verified fields are synced
+          await prisma.roadmap.update({
+            where: { id: existing.id },
+            data: {
+              creatorRole: item.creatorRole,
+              creatorCompany: item.creatorCompany,
+              isVerifiedCreator: item.isVerifiedCreator,
+              isEndorsed: item.isEndorsed,
+              followerCount: item.followerCount,
+              rating: item.rating,
+              reviewCount: item.reviewCount,
+              license: item.license,
+              isPublished: true,
+              status: 'PUBLISHED',
+            },
+          });
+          continue;
+        }
+
+        const created = await prisma.roadmap.create({
           data: {
+            ownerId: item.key,
+            creatorName: item.creatorName,
             creatorRole: item.creatorRole,
             creatorCompany: item.creatorCompany,
             isVerifiedCreator: item.isVerifiedCreator,
             isEndorsed: item.isEndorsed,
+            title: item.title,
+            description: item.description,
+            goal: item.goal,
+            category: item.category,
+            difficulty: item.difficulty,
+            estimatedWeeks: item.estimatedWeeks,
+            tags: item.tags,
             followerCount: item.followerCount,
             rating: item.rating,
             reviewCount: item.reviewCount,
-            license: item.license,
-            isPublished: true,
             status: 'PUBLISHED',
+            isPublished: true,
+            publishedAt: new Date(),
+            license: item.license,
           },
         });
-        continue;
-      }
 
-      const created = await prisma.roadmap.create({
-        data: {
-          ownerId: item.key,
-          creatorName: item.creatorName,
-          creatorRole: item.creatorRole,
-          creatorCompany: item.creatorCompany,
-          isVerifiedCreator: item.isVerifiedCreator,
-          isEndorsed: item.isEndorsed,
-          title: item.title,
-          description: item.description,
-          goal: item.goal,
-          category: item.category,
-          difficulty: item.difficulty,
-          estimatedWeeks: item.estimatedWeeks,
-          tags: item.tags,
-          followerCount: item.followerCount,
-          rating: item.rating,
-          reviewCount: item.reviewCount,
-          status: 'PUBLISHED',
-          isPublished: true,
-          publishedAt: new Date(),
-          license: item.license,
-        },
-      });
-
-      for (const node of item.nodes) {
-        await prisma.roadmapNode.create({
-          data: {
-            roadmapId: created.id,
-            title: node.title,
-            description: node.description,
-            type: node.type,
-            position: node.position,
-            metadata: node.metadata as any,
-          },
-        });
+        for (const node of item.nodes) {
+          await prisma.roadmapNode.create({
+            data: {
+              roadmapId: created.id,
+              title: node.title,
+              description: node.description,
+              type: node.type,
+              position: node.position,
+              metadata: node.metadata as any,
+            },
+          });
+        }
       }
-    }
+    });
     console.log('[Roadmap Service] Curated community roadmaps seeded successfully with rich verification metadata.');
   } catch (error) {
     console.warn('[Roadmap Service] Warning: Unable to seed curated community roadmaps:', error);
